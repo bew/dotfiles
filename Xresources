@@ -1,0 +1,102 @@
+/* xterm */
+! Background color
+URxvt*background: #424242
+
+! Font color
+URxvt*foreground: white
+
+! Other colors
+/*
+URxvt*color0: black
+URxvt*color1: red3
+URxvt*color2: green3
+URxvt*color3: yellow3
+URxvt*color4: blue2
+URxvt*color5: magenta3
+URxvt*color6: cyan3
+URxvt*color7: gray90
+URxvt*color8: grey50
+URxvt*color9: red
+URxvt*color10: green
+URxvt*color11: yellow
+URxvt*color12: blue
+URxvt*color13: magenta
+URxvt*color14: cyan
+URxvt*color15: white
+*/
+
+URxvt*font: 9x15bold
+
+
+!xterm*reverseVideo:		on
+!xterm*background:               #eeeeee
+!xterm*foreground:               #424242
+xterm*background:               #424242
+xterm*foreground:               #eeeeee
+xterm*font:                     9x15bold
+xterm*saveLines:                6500
+xterm*scrollBar:                true
+
+/* Custom colors */
+
+/* terminal colors ----------------------------------- */
+
+/* Black + DarkGrey */
+
+ /* black (almost) */
+*color0:  #2F2F2F
+
+ /* dark grey */
+*color8:  #555753
+
+/* (DarkRed +) Red */
+
+ /* rouge */
+*color1:  #ff6565
+
+ /* rouge */
+*color9:  #ff6565
+
+/* DarkGreen + Green */
+
+ /* vert pomme */
+*color2:  #4CAF50
+
+ /* vert */
+*color10: #93d44f
+
+/* DarkYellow + Yellow */
+
+ /* jaune-orange */
+*color3:  #eab93d
+
+ /* jaune */
+*color11: #ffc123
+
+/* DarkBlue + Blue (pas de darkblue, orange à la place (couleur des commandes dans emacs) */
+
+ /* bleu foncé */
+/**color4:  #204a87 */
+
+ /* bleu ciel */
+*color4:  #5788FF
+
+ /* c est le bleu des dossiers de la commande ls */
+ /* bleu */
+*color12: #2C82F2
+
+/* DarkMagenta + Magenta */
+
+ /* orange foncé */
+*color5:  #ce5c00
+
+ /* orange */
+*color13: #f57900
+
+/* DarkCyan + Cyan (both not tango) */
+*color6:  #89b6e2
+*color14: #46a4ff
+
+/* LightGrey + White */
+*color7:  #cccccc
+*color15: #fafafa

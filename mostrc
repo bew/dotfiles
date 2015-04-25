@@ -1,0 +1,12 @@
+% unsetting some keys
+unsetkey "J"
+unsetkey "j"
+
+% Setting vim's movement keys
+setkey "up" "k"
+setkey "page_up" "K"
+setkey "down" "j"
+setkey "page_down" "J"
+
+% Setting some lol colors :)
+color status black white

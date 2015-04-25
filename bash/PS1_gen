@@ -1,0 +1,49 @@
+#! /bin/bash
+
+# Usage:
+#   ./PS1_gen            => will generate the PS1 and export it
+
+# function to adapt colors for the PS1:
+function ps1-col () {
+    # $1 : a color. ex: 'Red'
+    # to get the corresponding color: xcolors['Red'] => '\e[0;31m'
+    echo "\["${xcolors[$1]}"\]"
+}
+
+############## TESTS DE PS1 ##############
+
+ps1=""
+
+#(65)[lesell_b @ pc-lessell_b ~ $] lsl
+#export PS1="($BCyan\#$Color_off)$Red[$BYellow\u $BRed@ $Grey\h $BCyan\W $Red\$] ${xcolors[off]}"
+
+#83% (173)[lesell_b] ~ $> lsl
+ps1+="$(ps1-col 'Green')\`battery percentage\` "
+ps1+="$(ps1-col 'Grey')("
+ps1+="$(ps1-col 'BBlue')\#"
+ps1+="$(ps1-col 'Grey'))["
+ps1+="$(ps1-col 'BYellow')\u"
+ps1+="$(ps1-col 'Grey')] "
+ps1+="$(ps1-col 'BCyan')\W "
+ps1+="$(ps1-col 'Yellow')\$> "
+ps1+="$(ps1-col 'Off')"
+
+#lesell_b@pc-lesell_b: ~
+#hist:116 jobs:0 $ lsl
+#export PS1="$Green\u@\h: $White\w\n${Yellow}hist:\# ${Red}jobs:\j $Blue\$ ${xcolors[off]}"
+
+#(138)[lesell_b] ~ $> lsl (avec l'heure dans le coin haut-droite) /* BBBUUUUUGGGG */
+#ps1=""
+#ps1+="$(ps1-col 'Grey')("
+#ps1+="$(ps1-col 'BBlue')\#"
+#ps1+="$(ps1-col 'Grey'))["
+#ps1+="$(ps1-col 'BYellow')\u"
+#ps1+="$(ps1-col 'Grey')] "
+#ps1+="$(ps1-col 'BCyan')\W "
+#ps1+="$(ps1-col 'Yellow')\$> "
+#ps1+="$(ps1-col 'Off')"
+#ps1+="\[\e[s\e[1;\$((\$COLUMNS - 4))f\]\A\[\e[u\]"
+
+
+# just export
+export PS1=$ps1

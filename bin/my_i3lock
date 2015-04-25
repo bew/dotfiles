@@ -1,0 +1,9 @@
+#! /bin/bash
+
+pkill unclutter
+
+import -window root /tmp/screenshot_i3.png -quality 10
+convert /tmp/screenshot_i3.png -blur 0x5 /tmp/screenshot_blur_i3.png
+i3lock -i /tmp/screenshot_blur_i3.png
+
+unclutter &

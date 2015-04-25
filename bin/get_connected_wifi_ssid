@@ -1,0 +1,1 @@
+wpa_cli status | grep -E "^ssid" | cut -d '=' -f 2

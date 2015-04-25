@@ -1,0 +1,28 @@
+#! /bin/bash
+
+declare -A xcolors
+
+# Reset colors
+xcolors['Off']='\e[0m'
+
+# Regular colors
+xcolors['Black']='\e[0;30m'
+xcolors['Red']='\e[0;31m'
+xcolors['Green']='\e[0;32m'
+xcolors['Yellow']='\e[0;33m'
+xcolors['Blue']='\e[0;34m'
+xcolors['Purple']='\e[0;35m'
+xcolors['Cyan']='\e[0;36m'
+xcolors['Grey']='\e[0;37m'
+
+# Bold colors
+xcolors['BBlack']='\e[1;30m'
+xcolors['BRed']='\e[1;31m'
+xcolors['BGreen']='\e[1;32m'
+xcolors['BYellow']='\e[1;33m'
+xcolors['BBlue']='\e[1;34m'
+xcolors['BPurple']='\e[1;35m'
+xcolors['BCyan']='\e[1;36m'
+xcolors['BGrey']='\e[1;37m'
+
+export xcolors=$xcolors;
