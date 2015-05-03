@@ -223,10 +223,9 @@ class norme:
 			self.check_virgule()
 			self.check_regex('[ \t]$', 'Espace en fin de ligne')
 			if self.creturn == 0:
-				self.check_regex('return( \(\)| ;|;)', 'Mauvais format de return')
+				self.check_regex('return( \(\);|;)', 'Mauvais format de return')
 			if self.libc == 0:
-				self.check_regex('[^_](printf|atof|atoi|atol|strcmp|strlen|strcat|strncat|strncmp|strcpy|strncpy|fprintf|strstr|strtoc|sprintf|asprintf|perror|strtod|strtol|strtoul)(\()', \
-							 'Fonction de la lib C')
+				self.check_regex('[^_](printf|atof|atoi|atol|strcmp|strlen|strcat|strncat|strncmp|strcpy|strncpy|fprintf|strstr|strtoc|sprintf|asprintf|perror|strtod|strtol|strtoul)(\()', 'Fonction de la lib C')
 			self.check_nbchar()
 			self.check_cfunc()
 			self.check_arg()
