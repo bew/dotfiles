@@ -1,0 +1,2 @@
+#! /bin/sh
+vim -c "Man $*" -c 'silent only'
