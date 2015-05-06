@@ -3,65 +3,84 @@
 daemon_mode = false
 
 if (%w( -h --help -help help ) & ARGV).length > 0
-  puts "usage: djsd [-hvd]"
-  puts "option(s):"
-  puts "-d | daemon mode (background)"
-  puts "starts dotjs server in the foreground. kill with ^C"
-  exit
+	puts "usage: djsd [-hvd]"
+	puts "option(s):"
+	puts "-d | daemon mode (background)"
+	puts "starts dotjs server in the foreground. kill with ^C"
+	exit
 end
 
 if ARGV.include?('-v')
-  puts "djsd 2.0"
-  exit
+	puts "djsd 2.0"
+	exit
 end
 
 if ARGV.include?('-d')
-  daemon_mode = true
+	daemon_mode = true
 end
 
 require 'webrick'
 require 'webrick/https'
 
 dotjs = Class.new(WEBrick::HTTPServlet::AbstractServlet) do
-  def do_GET(request, response)
-    body = build_body(request.path)
+	def do_GET(request, response)
+		body = build_body(request.path)
 
-    response.status = body.empty? ? 204 : 200
-    if origin = detect_origin(request)
-      response['Access-Control-Allow-Origin'] = origin
-    end
-    response['Content-Type'] = 'text/javascript'
-    response.body = body
-  end
+		response.status = body.empty? ? 204 : 200
+		if origin = detect_origin(request)
+			response['Access-Control-Allow-Origin'] = origin
+			puts "origin: " + origin
+		end
+		response['Content-Type'] = 'text/javascript'
+		response.body = body
+	end
 
-  def build_body(path)
-    files = [File.expand_path("~/.js/default.js")]
-    paths = path.gsub('/','').split('.')
+	def build_body(path)
 
-    until paths.empty?
-      file = File.expand_path("~/.js/#{paths.join('.')}")
-      files << file if File.file?(file)
-      paths.shift
-    end
+		body = "// dotjs is working! //\n"
 
-    body = "// dotjs is working! //\n"
+		#puts "path: " + path[1..-1]
+		type = path[1..-1].split('/')[0]
+		#puts "type: " + path[1..-1].split('/')[0]
 
-    files.each do |file|
-      body << File.read(file) + "\n" if File.file?(file)
-    end
+		if type == "file" # type : FILE
+			file = path[1..-1].split('/')[1..-1].join('/')
+			filepath = File.expand_path("~/.js/#{file}")
+			puts "file: " + file
+			puts "read: " + File.read(filepath)
+			body << File.read(filepath) + "\n" if File.file?(filepath)
 
-    body
-  end
+		else # type : URL (no particular type)
 
-  def detect_origin(req)
-    path   = req.path
-    origin = req.header['origin']
-    search = path.gsub('/','').gsub(/\.js$/,'') + '$'
+			files = [File.expand_path("~/.js/default.js")]
+			paths = path[1..-1].split('.')
 
-    if origin.length == 1 && path.length != 1 && origin[0].match(search)
-      origin[0]
-    end
-  end
+			until paths.empty?
+				file = File.expand_path("~/.js/#{paths.join('.')}")
+				puts "file: " + file
+				files << file if File.file?(file)
+				paths.shift
+			end
+
+			files.each do |file|
+				body << File.read(file) + "\n" if File.file?(file)
+			end
+		end
+
+		puts "body successfully generated\n\n"
+
+		body
+	end
+
+	def detect_origin(req)
+		path   = req.path
+		origin = req.header['origin']
+		search = path.gsub('/','').gsub(/\.js$/,'') + '$'
+
+		if origin.length == 1 && path.length != 1 && origin[0].match(search)
+			origin[0]
+		end
+	end
 end
 
 ssl_info = DATA.read
@@ -69,25 +88,25 @@ ssl_cert = ssl_info.scan(/(-----BEGIN CERTIFICATE-----.+?-----END CERTIFICATE---
 ssl_key  = ssl_info.scan(/(-----BEGIN RSA PRIVATE KEY-----.+?-----END RSA PRIVATE KEY-----)/m)[0][0]
 
 server_options = {
-  :BindAddress => "127.0.0.1",
-  :Port => 3131,
-  :AccessLog => [],
-  :SSLEnable => true,
-  :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE,
-  :SSLPrivateKey => OpenSSL::PKey::RSA.new(ssl_key),
-  :SSLCertificate => OpenSSL::X509::Certificate.new(ssl_cert),
-  :SSLCertName => [["CN", WEBrick::Utils::getservername]],
+	:BindAddress => "127.0.0.1",
+	:Port => 3131,
+	:AccessLog => [],
+	:SSLEnable => true,
+	:SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE,
+	:SSLPrivateKey => OpenSSL::PKey::RSA.new(ssl_key),
+	:SSLCertificate => OpenSSL::X509::Certificate.new(ssl_cert),
+	:SSLCertName => [["CN", WEBrick::Utils::getservername]],
 }
 
 if daemon_mode
-  server_options[:ServerType] = WEBrick::Daemon
+	server_options[:ServerType] = WEBrick::Daemon
 end
 
 server = WEBrick::HTTPServer.new(server_options)
 server.mount('/', dotjs)
 
 %w( INT TERM ).each do |sig|
-  trap(sig) { server.shutdown }
+	trap(sig) { server.shutdown }
 end
 
 server.start
