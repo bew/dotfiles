@@ -37,7 +37,7 @@ dotjs = Class.new(WEBrick::HTTPServlet::AbstractServlet) do
 
 	def build_body(path)
 
-		body = "// dotjs is working! //\n"
+		body = ""
 
 		#puts "path: " + path[1..-1]
 		type = path[1..-1].split('/')[0]
@@ -50,7 +50,11 @@ dotjs = Class.new(WEBrick::HTTPServlet::AbstractServlet) do
 			puts "read: " + File.read(filepath)
 			body << File.read(filepath) + "\n" if File.file?(filepath)
 
+			#for later use: File.directory?(filepath)
+
 		else # type : URL (no particular type)
+
+			body = "// dotjs is working! //\n"
 
 			files = [File.expand_path("~/.js/default.js")]
 			paths = path[1..-1].split('.')
