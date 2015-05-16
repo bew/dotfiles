@@ -67,6 +67,8 @@ alias zshrc="source ~/.zshrc"
 
 alias xt="xterm&"
 
+alias grep="grep --color=auto -n"
+
 alias ls="ls --color=auto --group-directories-first"
 alias lsl="ls -lh"
 alias ll="lsl"
@@ -91,6 +93,9 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias cpwd="pwd | xclip -in -selection primary; echo 'pwd copied in X clipboard'"
 
+# Use the vim Man plugin
+#alias man=viman
+
 alias pacman="sudo pacman"
 
 function mkcd()
@@ -98,6 +103,14 @@ function mkcd()
 	mkd $1
 	cd $1
 }
+
+# google search
+function gg()
+{
+	chromium "`echo "google.fr/#q="$1`"
+}
+
+
 
 # work specific aliases
 
@@ -110,7 +123,7 @@ function epiclone
 }
 
 alias make="make"
-alias remake="make fclean > /dev/null; make -j all > /dev/null; clean .o > /dev/null"
+alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/null"
 alias remkae="remake"
 alias remaek="remake"
 
@@ -128,6 +141,7 @@ alias zut="sudo \`fc -ln -1\`"
 ########## GIT ##########
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
+alias gitai="git add -i"
 alias gitacommit="gitadl && git commit"
 alias gitstatus="git status"
 
@@ -187,7 +201,8 @@ autoload -U promptinit && promptinit
 autoload -U colors && colors
 setopt promptsubst
 
-local battery='$(battery percentage_num)%%'
+#local battery='$(battery percentage_num)%%'
+local battery='$(battery.lua percentage)%%'
 local batteryStyle="%{$fg[green]%}${battery}%{$reset_color%}"
 
 local username='%n'
