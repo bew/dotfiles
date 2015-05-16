@@ -1,5 +1,5 @@
 typeset -U path
-path=(~/.bin ~/soft-portable $path /usr/local/go/bin)
+path=(~/.bin ~/soft-portable $path /usr/local/go/bin ~/.gem/ruby/2.2.0/bin)
 
 export GOPATH=$HOME/gocode
 
