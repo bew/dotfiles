@@ -88,6 +88,9 @@ alias mkd="mkdir -vp"
 
 alias ne="echo 'Use: vim'"
 
+alias tree="tree -C --dirsfirst -F"
+alias tre="tree"
+
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
@@ -128,10 +131,14 @@ alias remkae="remake"
 alias remaek="remake"
 
 ## norme check in recursive
-alias nall="n \$(tree -if)"
+alias nall="n $* \$(tree -if)"
 
 alias cl="clean"
-alias valgrind="valgrind --leak-check=full --show-reachable=yes"
+
+alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
+
+#gcc in colors
+alias gcc="gcc -fdiagnostics-color"
 
 alias cdmath="cd ${renduDir}/Tek1_2014/Math"
 alias cdwork="cd ${renduDir}/Tek1_2014"
@@ -139,11 +146,14 @@ alias cdwork="cd ${renduDir}/Tek1_2014"
 alias zut="sudo \`fc -ln -1\`"
 
 ########## GIT ##########
+alias gti="git"
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
 alias gitai="git add -i"
 alias gitacommit="gitadl && git commit"
 alias gitstatus="git status"
+alias gitpush="git push"
+alias gitpull="git pull"
 
 
 

@@ -9,3 +9,5 @@ export EDITOR="vim"
 export VISUAL="$EDITOR"
 
 export GIT_EDITOR="$EDITOR"
+
+export RLWRAP_EDITOR="vim '+call cursor(%L,%C)'"
