@@ -290,7 +290,7 @@ source ~/.zsh/opp.zsh/opp.plugin.zsh
 
 ##############################################
 # load ssh keys in the current shell
-function load_sshkeys
+function loadsshkeys
 {
   eval `ssh-agent`
   ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
