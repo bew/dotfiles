@@ -27,15 +27,10 @@ URxvt*color15: white
 
 URxvt*font: 9x15bold
 
-
-!xterm*reverseVideo:		on
-!xterm*background:               #eeeeee
-!xterm*foreground:               #424242
 xterm*background:               #424242
 xterm*foreground:               #eeeeee
 xterm*font:                     9x15bold
 xterm*saveLines:                6500
-xterm*scrollBar:                true
 
 /* Custom colors */
 
