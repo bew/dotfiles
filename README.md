@@ -4,14 +4,16 @@ My personnal zsh config
 ## Installation
 
 ### clone
+
 ```shell
-cd ~/.config && git clone git@github.com:Bew78LesellB/ConfigZsh.git zsh
+cd ~/.config && git clone --recursive git@github.com:Bew78LesellB/ConfigZsh.git zsh
 ```
 
 ### place config files
 
 ```shell
-ln -s ~/.zsh ~/.config/zsh
-ln -s ~/.zshenv ~/.config/zsh/zshenv
-ln -s ~/.zshrc ~/.config/zsh/zshrc
+ln -s ~/.config/zsh ~/.zsh
+ln -s ~/.zsh/zshenv ~/.zshenv
+ln -s ~/.zsh/zshrc ~/.zshrc
+ln -s ~/.zsh/zlogin ~/.zlogin
 ```
