@@ -282,7 +282,7 @@ zle-keymap-select () {
 
 ##############################################
 # Add the ciw and ciW and others vim word def:
-source ~/.zsh/opp.zsh/opp.plugin.zsh
+source ~/.zsh/opp.zsh/opp.zsh
 
 
 
