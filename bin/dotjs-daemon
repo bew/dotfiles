@@ -61,7 +61,7 @@ dotjs = Class.new(WEBrick::HTTPServlet::AbstractServlet) do
 
 			until paths.empty?
 				file = File.expand_path("~/.js/#{paths.join('.')}")
-				puts "file: " + file
+				puts "testing file: " + file + (File.file?(file) ? "  [found]" : "")
 				files << file if File.file?(file)
 				paths.shift
 			end
