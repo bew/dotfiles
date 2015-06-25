@@ -16,6 +16,14 @@ xrdb ~/.Xresources
 xset -b
 
 pulseaudio --start
+
+# hide mouse automatically
 unclutter &
+
+# start all conkys
+~/.conky/conky_run.sh &
+
+# launch automounter daemon
+udiskie --tray 2&> /dev/null &
 
 exec awesome
