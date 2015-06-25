@@ -367,14 +367,14 @@ def help():
 	print "-verbose: affiche les messages impossible d'ouvrir"
 	print "-nocheat: desactive la detection de la triche"
 	print "-score: affiche le nombre de faute de norme"
-	print "-libc: active la verification des fonctions de la libc"
+        print "-libc: toggle la verification des fonctions de la libc"
 	print "-printline: affiche la ligne provoquant une erreur"
 	print "-return: active verifier le retour des fonctions (return ;)"
 	print "-comment: ne pas verifier les commentaires"
 	sys.exit()
 
 def main():
-	if '-help' in sys.argv[1:]:
+	if '-h' in sys.argv[1:]:
 		help()
 	check_version()
 	if len(sys.argv) == 1:
@@ -391,7 +391,7 @@ def main():
 	if '-score' in sys.argv[1:]:
 		moulin.score = 1
 	if '-libc' in sys.argv[1:]:
-		moulin.libc = 0
+		moulin.libc = not moulin.libc
 	if '-printline' in sys.argv[1:]:
 		moulin.printline = 1
 	if '-return' in sys.argv[1:]:
