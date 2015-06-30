@@ -99,7 +99,11 @@ alias cpwd="pwd | xclip -in -selection primary; echo 'pwd copied in X clipboard'
 # Use the vim Man plugin
 #alias man=viman
 
+# pacman
 alias pacman="sudo pacman"
+
+alias pacman-useless="pacman -Rnsv $(pacman -Qtd | cut -d' ' -f 1)"
+
 
 function mkcd()
 {
