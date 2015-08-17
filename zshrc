@@ -102,7 +102,11 @@ alias cpwd="pwd | xclip -in -selection primary; echo 'pwd copied in X clipboard'
 # pacman
 alias pacman="sudo pacman"
 
-alias pacman-useless="pacman -Rnsv $(pacman -Qtd | cut -d' ' -f 1)"
+alias pacmanuseless="pacman -Rnsv \$(pacman -Qtd | cut -d' ' -f 1)"
+
+
+# Close the current sudo session if any
+alias nosudo="sudo -k"
 
 
 function mkcd()
@@ -118,8 +122,6 @@ function gg()
 }
 
 
-
-# work specific aliases
 
 ####### ALIAS ########
 
@@ -141,12 +143,6 @@ alias cl="clean"
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 
-#gcc in colors
-alias gcc="gcc -fdiagnostics-color"
-
-alias cdmath="cd ${renduDir}/Tek1_2014/Math"
-alias cdwork="cd ${renduDir}/Tek1_2014"
-
 alias zut="sudo \`fc -ln -1\`"
 
 ########## GIT ##########
@@ -156,6 +152,7 @@ alias gitadl="git add --all"
 alias gitai="git add -i"
 alias gitacommit="gitadl && git commit"
 alias gitstatus="git status"
+alias gitdiff="git diff HEAD"
 alias gitpush="git push"
 alias gitpull="git pull"
 
@@ -234,7 +231,7 @@ PROMPT="${batteryStyle} [${usernameStyle}] ${currDir} ${usrIsRoot}> "
 #>-- Git Branch on RPROMPT
 source ~/.zsh/bin/git-prompt.sh
 
-function my_rprompt
+function prompt_git_branch
 {
 	local branchName=$(__git_ps1 "%s")
 	if [[ -z ${branchName} ]]; then
@@ -248,14 +245,24 @@ function my_rprompt
 	echo -n ${gitInfoStyle}
 }
 
-function in_vim
+function prompt_in_vim
 {
 	if [[ $VIM != "" ]]; then
 		echo -n "In Vim"
 	fi
 }
 
-local rprompt='$(in_vim) $(my_rprompt)'
+function prompt_in_sudo_session
+{
+	local result=$(sudo -n echo -n bla 2>/dev/null)
+	if test "$result" = "bla"; then
+		local inSudo="In sudo session"
+		local inSudoStyle="%{$fg[red]%}$inSudo%{$reset_color%}"
+		echo $inSudoStyle
+	fi
+}
+
+local rprompt='$(prompt_in_vim) $(prompt_in_sudo_session) $(prompt_git_branch)'
 
 RPROMPT="${rprompt}"
 
@@ -272,15 +279,6 @@ add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pw
 
 
 
-
-
-
-##############################################
-# widgets:
-zle-keymap-select () {
-  RPROMPT=$KEYMAP;
-}
-#zle -N zle-keymap-select;
 
 
 
