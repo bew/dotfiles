@@ -367,7 +367,7 @@ def help():
 	print "-verbose: affiche les messages impossible d'ouvrir"
 	print "-nocheat: desactive la detection de la triche"
 	print "-score: affiche le nombre de faute de norme"
-        print "-libc: toggle la verification des fonctions de la libc"
+	print "-libc: toggle la verification des fonctions de la libc"
 	print "-printline: affiche la ligne provoquant une erreur"
 	print "-return: active verifier le retour des fonctions (return ;)"
 	print "-comment: ne pas verifier les commentaires"
