@@ -94,15 +94,12 @@ alias tre="tree"
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias cpwd="pwd | xclip -in -selection primary; echo 'pwd copied in X clipboard'"
-
-# Use the vim Man plugin
-#alias man=viman
 
 # pacman
 alias pacman="sudo pacman"
 
-alias pacmanuseless="pacman -Rnsv \$(pacman -Qtd | cut -d' ' -f 1)"
+## Remove useless packages
+alias pacmanuseless="pacman -Rnsv \$(pacman -Qtdq)"
 
 
 # Close the current sudo session if any
@@ -150,17 +147,46 @@ alias gti="git"
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
 alias gitai="git add -i"
-alias gitacommit="gitadl && git commit"
+function gitacommit
+{
+	git add $*
+	git commit
+}
+function gitacommitamend
+{
+	git add $*
+	git commit --amend
+}
+function gitacommitamendnoedit
+{
+	git add $*
+	git commit --amend --no-edit
+}
+
 alias gitstatus="git status"
-alias gitdiff="git diff HEAD"
-alias gitpush="git push"
+alias gitstatusall="git status -u" # show all untracked files
+alias gitdiff="git diff --word-diff=color --ignore-all-space"
+
+alias gitbranch="git branch -vv"
+
+alias gitlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%n' --all"
+
+function gitpush
+{
+	echo "Rebase"
+	git rebase -i
+	if test "$?" != "0"; then
+		return
+	fi
+
+	echo "Push to remote"
+	git push $*
+}
+
 alias gitpull="git pull"
 
+alias push="gitpush"
 
-
-######## LOL aliases #####################
-alias lool="python -c 'print(\"blablablablablablablablablablablablablablablablablablablablablablablalablablablalablablablablabla\n\" * 500)'|lolcat"
-alias loool="python -c 'print(\"blblablablablablablablablablablablablablablablablablablablablablablablablablablalablablablalablablablablablablablablablablablablablablablablablablablablablablablablablablablablalablablablalablablablablabla\n\" * 500)'|lolcat"
 
 
 
