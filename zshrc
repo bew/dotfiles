@@ -187,6 +187,14 @@ alias gitpull="git pull"
 
 alias push="gitpush"
 
+###### CWD copy/paste ######
+function cwd ()
+{
+	echo \"$(pwd)\" copied into X primary clipboard;
+	pwd | xclip -in -selection primary;
+}
+
+alias cdwd="cd $(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
 
 
 
@@ -245,7 +253,7 @@ local batteryStyle="%{$fg[green]%}${battery}%{$reset_color%}"
 local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
 
-local currDir='%1~'
+local currDir='%2~'
 local usrIsRoot='%(!.#.$)'
 
 
