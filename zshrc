@@ -1,4 +1,4 @@
- ########################################################################################
+########################################################################################
 #|#                                                                                    #|#
 #|#  ::::::::: ::::::::  :::    :::       ::::::::   ::::::::  ::::    ::: ::::::::::  #|#
 #|#       :+: :+:    :+: :+:    :+:      :+:    :+: :+:    :+: :+:+:   :+: :+:         #|#
@@ -8,7 +8,7 @@
 #|#   #+#     #+#    #+# #+#    #+#      #+#    #+# #+#    #+# #+#   #+#+# #+#         #|#
 #|#  ######### ########  ###    ###       ########   ########  ###    #### ###         #|#
 #|#                                                                                    #|#
- ########################################################################################
+########################################################################################
 
 HISTFILE=~/.histfile
 HISTSIZE=1000
@@ -23,22 +23,40 @@ bindkey -v
 
 
 
-##############################################
-# auto completion
+## auto completion
+############################################################################################
 autoload -U compinit && compinit
 
+## menu completion style
 ##############################################
-# menu completion style
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
+# Case insensitive tab-completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# Direct complete with the first completion
+# I don't like : I cannot add letters once completion started
+#setopt MENU_COMPLETE
+
 zmodload zsh/complist
+
+# enable go back in completions with S-Tab
 bindkey -M menuselect '^[[Z' reverse-menu-complete
+
+# Cancel current completion with Esc
 bindkey -M menuselect "^[" send-break
 
 
 
+# do not remove slash on directory completion
+unsetopt AUTO_REMOVE_SLASH
 
+# enable Completion in the middle of a word
+setopt COMPLETE_IN_WORD
+
+# after a middle word completion, move cursor at end of word
+setopt ALWAYS_TO_END
 
 
 
