@@ -294,6 +294,11 @@ autoload -U promptinit && promptinit
 autoload -U colors && colors
 setopt promptsubst
 
+function precmd()
+{
+	LAST_EXIT_CODE=$?
+}
+
 #local battery='$(battery percentage_num)%%'
 local battery='$(battery.lua percentage)%%'
 local batteryStyle="%{$fg[green]%}${battery}%{$reset_color%}"
@@ -310,10 +315,14 @@ PROMPT="${batteryStyle} [${usernameStyle}] ${currDir} ${usrIsRoot}> "
 
 
 
-#>-- Git Branch on RPROMPT
+## RPROMPT
+#############################################################
+
+# Widget git branch
+#######################
 source ~/.zsh/bin/git-prompt.sh
 
-function prompt_git_branch
+function widget_git_branch
 {
 	local branchName=$(__git_ps1 "%s")
 	if [[ -z ${branchName} ]]; then
@@ -327,35 +336,132 @@ function prompt_git_branch
 	echo -n ${gitInfoStyle}
 }
 
-function prompt_in_vim
+# Widget last exit code
+##########################
+function widget_last_exit_code()
 {
-	if [[ $VIM != "" ]]; then
-		echo -n "In Vim"
+	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
+		local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} Last Exit: ${LAST_EXIT_CODE} %{$reset_color%}"
+		echo -n ${lastExitCodeStyle}
 	fi
 }
 
-function prompt_in_sudo_session
+# Widget shell in vim
+#######################
+function widget_in_vim
+{
+	if [[ $VIM != "" ]]; then
+		echo -n " In Vim "
+	fi
+}
+
+# Widget shell has sudo
+########################
+function widget_in_sudo
 {
 	local result=$(sudo -n echo -n bla 2>/dev/null)
 	if test "$result" = "bla"; then
-		local inSudo="In sudo session"
-		local inSudoStyle="%{$fg[red]%}$inSudo%{$reset_color%}"
+		local inSudo="In sudo"
+		local inSudoStyle="%{$bg[red]$fg_bold[white]%} $inSudo %{$reset_color%}"
 		echo $inSudoStyle
 	fi
 }
 
-local rprompt='$(prompt_in_vim) $(prompt_in_sudo_session) $(prompt_git_branch)'
+# Widget prompt vim mode
+#########################
+local vim_ins_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
+local vim_cmd_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
+local widget_vim_mode=$vim_ins_mode_style
+
+function zle-keymap-select {
+widget_vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode_style}}/(main|viins)/${vim_ins_mode_style}}"
+zle reset-prompt
+}
+zle -N zle-keymap-select
+
+function zle-line-finish {
+widget_vim_mode=$vim_ins_mode_style
+}
+zle -N zle-line-finish
+
+local rprompt='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''${widget_vim_mode}'
 
 RPROMPT="${rprompt}"
 
 
+# Widget date
+###############
+
+local currentTime='$(date "+%H:%M")'
+local currentTimeStyle=" ${currentTime} "
+
+# Widget variable debug
+#########################"
+
+local debugVar='' # add variables here to debug
+local debugVarStyle="$bg[blue]${debugVar}"
 
 
 
+## TODO: where to put theses ?
+# useful ANSI codes
+local _positionStatusbar=$'\e[$LINES;0H'
+local _clearLine=$'\e[2K'
+local _lineup=$'\e[1A'
+local _linedown=$'\e[1B'
+local _saveCursor=$'\e[s'
+local _restoreCursor=$'\e[u'
+
+## Widget Status line
+########################################################################################
 
 
+## StatusLine Config
+######################
+
+local slDefaultBG="$bg[magenta]"
+local slDefaultFG=""
+
+
+# TODO: list of widget for LeftStatusBar & RightStatusBar
+
+
+local slResetColor="${reset_color}${slDefaultBG}${slDefaultFG}"
+
+# statusline initializer
+local initStatusline="${slResetColor}${_clearLine}"
+
+#########################################################
+#FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
+# The statusline content
+local statusline='${widget_vim_mode}'"${slResetColor}""${currentTimeStyle}""${slResetColor}""          "'$(widget_in_sudo)'"${slResetColor}""  ""${debugVarStyle}""${slResetColor}"'$(widget_last_exit_code)'
+#########################################################
+
+# The statusline container
+local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
+
+# add statusline to prompt
+PROMPT="${statuslineContainer}"$PROMPT
+
+
+## Reset Prompt every N seconds
 ##############################################
+
+TMOUT=60
+#TMOUT=1    # every seconds !! (smooth on an i7 :P)
+
+# This special function is run every $TMOUT seconds
+TRAPALRM () {
+	zle reset-prompt
+}
+
+
+## Misc
+######################################################################################
+
+
 # remember recent directories (use with 'cdr')
+##############################################
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pwd change
 
