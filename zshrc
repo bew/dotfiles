@@ -126,16 +126,33 @@ alias nosudo="sudo -k"
 
 function mkcd()
 {
-	mkd $1
+	mkd $*
 	cd $1
 }
 
 # google search
 function gg()
 {
-	chromium "`echo "google.fr/#q="$1`"
+	chromium "`echo "google.fr/#q="$1`" 2> /dev/null
 }
 
+function histsearch()
+{
+	if test "$1" = ""; then
+		history 1
+	else
+		history 1 | grep $1
+	fi
+}
+
+
+# man in vim
+function man()
+{
+	/usr/bin/man $* | col -bp | vim -R -c "set ft=man nomod nolist nowrap ts=8" -
+}
+# man completion
+compdef _man man
 
 
 ####### ALIAS ########
@@ -158,13 +175,18 @@ alias cl="clean"
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 
-alias zut="sudo \`fc -ln -1\`"
+alias zut="sudo !!"
 
 ########## GIT ##########
 alias gti="git"
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
 alias gitai="git add -i"
+
+# git commit with diff
+alias gitcommit="git commit --verbose"
+
+# TODO: add autocompletion like git add
 function gitacommit
 {
 	git add $*
@@ -180,6 +202,10 @@ function gitacommitamendnoedit
 	git add $*
 	git commit --amend --no-edit
 }
+# git add completion
+compdef _git-add gitacommit
+compdef _git-add gitacommitamend
+compdef _git-add gitacommitamendnoedit
 
 alias gitstatus="git status"
 alias gitstatusall="git status -u" # show all untracked files
@@ -189,6 +215,7 @@ alias gitbranch="git branch -vv"
 
 alias gitlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%n' --all"
 
+# TODO: add autocompletion like git push
 function gitpush
 {
 	echo "Rebase"
@@ -212,8 +239,11 @@ function cwd ()
 	pwd | xclip -in -selection primary;
 }
 
-alias cdwd="cd $(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
+alias cdwd="cd \$(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
 
+
+# Fast zshrc edit
+alias vimzshrc="vim ~/.zshrc"
 
 
 ###########################################
@@ -334,18 +364,31 @@ add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pw
 
 
 
+# Add vim keys (ciw / ciW / etc...)
 ##############################################
-# Add the ciw and ciW and others vim word def:
 source ~/.zsh/opp.zsh/opp.zsh
 
 
 
 
 
-##############################################
 # load ssh keys in the current shell
+##############################################
 function loadsshkeys
 {
-  eval `ssh-agent`
-  ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
+	eval `ssh-agent`
+	ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 }
+# Do it once at shell start
+loadsshkeys > /dev/null 2>&1
+
+
+
+
+
+## Custom keybinds
+##############################################
+
+# Alt-L => redraw prompt on-demand
+bindkey "ì" reset-prompt
+
