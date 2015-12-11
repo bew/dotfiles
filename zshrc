@@ -133,10 +133,10 @@ function mkcd()
 # google search
 function gg()
 {
-	chromium "`echo "google.fr/#q="$1`" 2> /dev/null
+	chromium "google.fr/#q=$1" 2> /dev/null
 }
 
-function histsearch()
+function hsearch()
 {
 	if test "$1" = ""; then
 		history 1
@@ -146,10 +146,25 @@ function histsearch()
 }
 
 
+##### VIM #####
+
+alias vimlog="vim -X -V20/home/lesell_b/.vim/log/vimlog-\$(date +'%y-%m-%d_%H-%M')"
+alias v="vim -X"
+alias vm="v"
+alias vi="v"
+alias vim="v"
+alias vmi="v"
+alias imv="v"
+alias ivm="v"
+
+
+# vim for read only
+alias view="vim -R -c 'set nomod nolist'"
+
 # man in vim
 function man()
 {
-	/usr/bin/man $* | col -bp | vim -R -c "set ft=man nomod nolist nowrap ts=8" -
+	/usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
 }
 # man completion
 compdef _man man
@@ -183,30 +198,6 @@ alias gitcheck="git checkout"
 alias gitadl="git add --all"
 alias gitai="git add -i"
 
-# git commit with diff
-alias gitcommit="git commit --verbose"
-
-# TODO: add autocompletion like git add
-function gitacommit
-{
-	git add $*
-	git commit
-}
-function gitacommitamend
-{
-	git add $*
-	git commit --amend
-}
-function gitacommitamendnoedit
-{
-	git add $*
-	git commit --amend --no-edit
-}
-# git add completion
-compdef _git-add gitacommit
-compdef _git-add gitacommitamend
-compdef _git-add gitacommitamendnoedit
-
 alias gitstatus="git status"
 alias gitstatusall="git status -u" # show all untracked files
 alias gitdiff="git diff --word-diff=color --ignore-all-space"
@@ -215,25 +206,15 @@ alias gitbranch="git branch -vv"
 
 alias gitlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%n' --all"
 
-# TODO: add autocompletion like git push
-function gitpush
-{
-	echo "Rebase"
-	git rebase -i
-	if test "$?" != "0"; then
-		return
-	fi
+alias gitlogstat="gitlog --stat"
 
-	echo "Push to remote"
-	git push $*
-}
-
+alias gitpush="git push"
 alias gitpull="git pull"
 
 alias push="gitpush"
 
 ###### CWD copy/paste ######
-function cwd ()
+function cpwd ()
 {
 	echo \"$(pwd)\" copied into X primary clipboard;
 	pwd | xclip -in -selection primary;
@@ -242,8 +223,9 @@ function cwd ()
 alias cdwd="cd \$(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
 
 
-# Fast zshrc edit
+# Fast config edit
 alias vimzshrc="vim ~/.zshrc"
+alias vimvimrc="vim ~/.vimrc"
 
 
 ###########################################
@@ -486,7 +468,7 @@ function loadsshkeys
 	ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 }
 # Do it once at shell start
-loadsshkeys > /dev/null 2>&1
+#loadsshkeys > /dev/null 2>&1
 
 
 
