@@ -58,10 +58,11 @@ setopt COMPLETE_IN_WORD
 # after a middle word completion, move cursor at end of word
 setopt ALWAYS_TO_END
 
+# Allow comment (with '#') in zsh interactive mode
+setopt INTERACTIVE_COMMENTS
 
 
-
-
+setopt CORRECT
 
 
 
@@ -82,6 +83,10 @@ setopt HIST_IGNORE_DUPS
 ################################################
 # aliases
 alias zshrc="source ~/.zshrc"
+
+alias -g G="grep"
+alias -g T="tail"
+alias -g L="less"
 
 alias xt="xterm&"
 
@@ -156,6 +161,8 @@ alias vim="v"
 alias vmi="v"
 alias imv="v"
 alias ivm="v"
+alias -g V="vim"
+
 
 
 # vim for read only
@@ -281,7 +288,6 @@ function precmd()
 	LAST_EXIT_CODE=$?
 }
 
-#local battery='$(battery percentage_num)%%'
 local battery='$(battery.lua percentage)%%'
 local batteryStyle="%{$fg[green]%}${battery}%{$reset_color%}"
 
