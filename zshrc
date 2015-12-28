@@ -343,8 +343,8 @@ function widget_in_vim
 	fi
 }
 
-# Widget shell has sudo
-########################
+# Widget shell in sudo session
+################################
 function widget_in_sudo
 {
 	local result=$(sudo -n echo -n bla 2>/dev/null)
@@ -361,14 +361,16 @@ local vim_ins_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
 local vim_cmd_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
 local widget_vim_mode=$vim_ins_mode_style
 
-function zle-keymap-select {
-widget_vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode_style}}/(main|viins)/${vim_ins_mode_style}}"
-zle reset-prompt
+function zle-keymap-select
+{
+	widget_vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode_style}}/(main|viins)/${vim_ins_mode_style}}"
+	zle reset-prompt
 }
 zle -N zle-keymap-select
 
-function zle-line-finish {
-widget_vim_mode=$vim_ins_mode_style
+function zle-line-finish
+{
+	widget_vim_mode=$vim_ins_mode_style
 }
 zle -N zle-line-finish
 
@@ -484,5 +486,61 @@ function loadsshkeys
 ##############################################
 
 # Alt-L => redraw prompt on-demand
-bindkey "ì" reset-prompt
+bindkey "\el" reset-prompt
+
+# insert sudo at begining of the current line
+function insert-sudo ()
+{
+	local cursor=$CURSOR
+	BUFFER="sudo $BUFFER"
+	CURSOR=$(($cursor + 5))
+}
+zle -N insert-sudo
+
+# Alt-S => Insert sudo at buffer beginning
+bindkey -M vicmd "ó" insert-sudo
+
+
+function do-nothing () {}
+zle -N do-nothing
+
+# Menu key => do nothing
+bindkey "[29~" do-nothing
+
+
+
+# ZLE Tests
+
+function zletest ()
+{
+	zle -M "djsfhksdjfhkjsdfhlks jdfkjsd lk fsdlkjsdkj hkdlsj hksjd hlsdkj";
+}
+zle -N zletest
+
+# Alt-T => zle test
+bindkey -M vicmd "ô" zletest
+bindkey -M viins "\M-t" zletest # TODO not working...
+
+autoload -U edit-command-line
+zle -N edit-command-line
+
+# Alt-E => edit line in $EDITOR
+bindkey -M vicmd "å" edit-command-line
+
+
+# backspace and ^h working even after
+# returning from command mode
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+
+
+bindkey -M viins '^p'  up-line-or-history
+bindkey -M viins '^n'  down-line-or-history
+
+
+# cut the buffer and push it on the buffer stack
+bindkey -M vicmd '#' push-input
+
+
+
 
