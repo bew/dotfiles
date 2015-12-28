@@ -4,3 +4,6 @@
 [submodule "zsh-syntax-highlighting"]
 	path = zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "z"]
+	path = z
+	url = git@github.com:rupa/z.git

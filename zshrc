@@ -470,6 +470,9 @@ add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pw
 source ~/.zsh/opp.zsh/opp.zsh
 
 
+# smart cd
+##############################################
+source ~/.zsh/z/z.sh
 
 
 
