@@ -295,10 +295,13 @@ local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
 
 local currDir='%2~'
-local usrIsRoot='%(!.#.$)'
+local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$reset_color%}"
 
+local cmdSeparator="%%"
+local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
 
-PROMPT="${batteryStyle} [${usernameStyle}] ${currDir} ${usrIsRoot}> "
+PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
+PROMPT_LINE_OLD="- ${currDirStyle} ${cmdSeparatorStyle} "
 
 
 
@@ -374,9 +377,11 @@ function zle-line-finish
 }
 zle -N zle-line-finish
 
-local rprompt='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''${widget_vim_mode}'
+RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''${widget_vim_mode}'
+RPROMPT_LINE_OLD='$(widget_in_vim)''$(widget_in_sudo)'
 
-RPROMPT="${rprompt}"
+#RPROMPT_LINE="${rprompt}"
+RPROMPT=$RPROMPT_LINE
 
 
 # Widget date
@@ -431,7 +436,7 @@ local statusline='${widget_vim_mode}'"${slResetColor}""${currentTimeStyle}""${sl
 local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
 
 # add statusline to prompt
-PROMPT="${statuslineContainer}"$PROMPT
+PROMPT="${statuslineContainer}"$PROMPT_LINE
 
 
 ## Reset Prompt every N seconds
@@ -543,4 +548,30 @@ bindkey -M vicmd '#' push-input
 
 
 
+## Accept line HOOK
+###########################################
 
+function accept-line-hook()
+{
+	#set custom prompt
+	PROMPT=$PROMPT_LINE_OLD
+	RPROMPT=$RPROMPT_LINE_OLD
+
+	zle reset-prompt
+
+	#reset prompt to default
+	PROMPT="${statuslineContainer}"$PROMPT_LINE
+	RPROMPT=$RPROMPT_LINE
+
+	zle accept-line
+}
+zle -N accept-line-hook
+
+### Valid the line ###
+
+# Enter-key
+bindkey -M viins "" accept-line-hook
+bindkey -M vicmd "" accept-line-hook
+
+# Ctrl-J
+bindkey -M viins " " accept-line-hook
