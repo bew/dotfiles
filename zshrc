@@ -301,7 +301,7 @@ local cmdSeparator="%%"
 local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
 
 PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
-PROMPT_LINE_OLD="- ${currDirStyle} ${cmdSeparatorStyle} "
+PROMPT_LINE_OLD="%{$bg[black]%}- ${currDirStyle} ${cmdSeparatorStyle} %{$bg[black]%}"
 
 
 
@@ -332,7 +332,8 @@ function widget_git_branch
 function widget_last_exit_code()
 {
 	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
-		local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} Last Exit: ${LAST_EXIT_CODE} %{$reset_color%}"
+		local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
+		local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} ${lastExitCode} %{$reset_color%}"
 		echo -n ${lastExitCodeStyle}
 	fi
 }
