@@ -1,0 +1,14 @@
+#!/usr/bin/zsh
+
+vt_no=$1
+
+if [[ "$vt_no" == "" ]]; then
+	vt_no=6;
+fi
+
+if test "!" -d ~/.awesome-devel; then
+	echo "~/.awesome-devel doesn't exist"
+	exit 42
+fi
+
+startx /bin/awesome -C ~/.awesome-devel/bewconfig/init.lua -- :6 vt$vt_no
