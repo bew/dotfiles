@@ -3,34 +3,49 @@
 URxvt*background: #424242
 
 ! Font color
-URxvt*foreground: white
+URxvt*foreground: #eeeeee
+
+URxvt*scrollBar: false
 
 ! Other colors
 /*
-URxvt*color0: black
-URxvt*color1: red3
-URxvt*color2: green3
-URxvt*color3: yellow3
-URxvt*color4: blue2
-URxvt*color5: magenta3
-URxvt*color6: cyan3
-URxvt*color7: gray90
-URxvt*color8: grey50
-URxvt*color9: red
-URxvt*color10: green
-URxvt*color11: yellow
-URxvt*color12: blue
-URxvt*color13: magenta
-URxvt*color14: cyan
-URxvt*color15: white
-*/
+   URxvt*color0: black
+   URxvt*color1: red3
+   URxvt*color2: green3
+   URxvt*color3: yellow3
+   URxvt*color4: blue2
+   URxvt*color5: magenta3
+   URxvt*color6: cyan3
+   URxvt*color7: gray90
+   URxvt*color8: grey50
+   URxvt*color9: red
+   URxvt*color10: green
+   URxvt*color11: yellow
+   URxvt*color12: blue
+   URxvt*color13: magenta
+   URxvt*color14: cyan
+   URxvt*color15: white
+ */
 
-URxvt*font: 9x15bold
+URxvt*font:					xft:Liberation Mono:size=13
 
-xterm*background:               #424242
-xterm*foreground:               #eeeeee
-xterm*font:                     9x15bold
-xterm*saveLines:                6500
+
+/* --------------------------------------------------------------------------- */
+/* ------ XTERM CONFIG ------------------------------------------------------- */
+/* --------------------------------------------------------------------------- */
+
+xterm*background:				#424242
+xterm*foreground:				#eeeeee
+
+xterm*faceName:					Liberation Mono:size=11
+!xterm*boldFont:					true
+
+xterm*saveLines:				6500
+
+! Scroll on key press
+xterm*scrollKey:			true
+! Scroll on tty output
+xterm*scrollTtyOutput:		false
 
 /* Custom colors */
 
@@ -38,59 +53,59 @@ xterm*saveLines:                6500
 
 /* Black + DarkGrey */
 
- /* black (almost) */
+/* black (almost) */
 *color0:  #2F2F2F
 
- /* dark grey */
+/* dark grey */
 *color8:  #555753
 
 /* (DarkRed +) Red */
 
- /* rouge */
+/* rouge */
 *color1:  #ff6565
 
- /* rouge */
+/* rouge */
 *color9:  #ff6565
 
 /* DarkGreen + Green */
 
- /* vert pomme */
+/* 2:normal		vert pomme */
 *color2:  #4CAF50
 
- /* vert */
-*color10: #93d44f
+/* 2:bold		vert */
+*color10: #4CAF50
 
 /* DarkYellow + Yellow */
 
- /* jaune-orange */
+/* 3:normal		jaune-orange */
 *color3:  #eab93d
 
- /* jaune */
+/* 3:bold		jaune */
 *color11: #ffc123
 
 /* DarkBlue + Blue (pas de darkblue, orange à la place (couleur des commandes dans emacs) */
 
- /* bleu foncé */
+/* bleu foncé */
 /**color4:  #204a87 */
 
- /* bleu ciel */
+/* bleu ciel */
 *color4:  #5788FF
 
- /* c est le bleu des dossiers de la commande ls */
- /* bleu */
+/* c est le bleu des dossiers de la commande ls */
+/* bleu */
 *color12: #2C82F2
 
 /* DarkMagenta + Magenta */
 
- /* orange foncé */
+/* orange foncé */
 *color5:  #ce5c00
 
- /* orange */
+/* orange */
 *color13: #f57900
 
-/* DarkCyan + Cyan (both not tango) */
+/* DarkCyan + Cyan */
 *color6:  #89b6e2
-*color14: #46a4ff
+*color14: #89b6e2
 
 /* LightGrey + White */
 *color7:  #cccccc
