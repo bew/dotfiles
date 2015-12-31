@@ -91,6 +91,19 @@ autoload -U compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
+# Color completion for some things.
+# http://linuxshellaccount.blogspot.com/2008/12/color-completion-using-zsh-modules-on.html
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# formatting and messages
+# http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format "$fg[yellow]%B--- %d%b"
+zstyle ':completion:*:messages' format "$fg[cyan]%B-> %d%b"
+zstyle ':completion:*:warnings' format "$fg[red]No matches for:$reset_color %d"
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+zstyle ':completion:*' group-name ''
+
 # Case insensitive tab-completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
@@ -330,7 +343,7 @@ local cmdSeparator="%%"
 local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
 
 PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
-PROMPT_LINE_OLD="%{$bg[black]%}- ${currDirStyle} ${cmdSeparatorStyle} %{$bg[black]%}"
+PROMPT_LINE_OLD="%{$bg[black]%}- ${currDirStyle} ${cmdSeparatorStyle} "
 
 
 
