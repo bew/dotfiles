@@ -248,6 +248,9 @@ function man()
 # man completion
 compdef _man man
 
+# colors for common binaries (ls, tree, etc..)
+! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
+[ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
 
 ####### ALIAS ########
 
