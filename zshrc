@@ -78,6 +78,16 @@ source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
 
 
+# UTILS
+
+function get_cursor_pos()
+{
+	echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
+
+	# pos has format 'row;col'
+	CURSOR_POS_ROW=${pos%;*} # remove ';col'
+	CURSOR_POS_COL=${pos#*;} # remove 'row;'
+}
 
 
 
@@ -331,6 +341,14 @@ setopt promptsubst
 function precmd()
 {
 	LAST_EXIT_CODE=$?
+
+	# Get the cursor position for the (new) current prompt
+	get_cursor_pos
+
+	if [[ "$CURSOR_POS_ROW" > $(( $LINES - 4 )) ]]; then
+		echo $'\e[4S'	# scroll the terminal
+		echo $'\e[6A'
+	fi
 }
 
 local battery='$(battery.lua percentage)%%'
@@ -344,6 +362,7 @@ local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$reset_color%}"
 
 local cmdSeparator="%%"
 local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
+
 
 PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
 PROMPT_LINE_OLD="%{$bg[black]%}- ${currDirStyle} ${cmdSeparatorStyle} "
