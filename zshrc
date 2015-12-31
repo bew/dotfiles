@@ -412,13 +412,8 @@ function zle-keymap-select
 	widget_vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode_style}}/(main|viins)/${vim_ins_mode_style}}"
 	zle reset-prompt
 }
-zle -N zle-keymap-select
+hooks-add-hook zle_keymap_select_hook zle-keymap-select
 
-function zle-line-finish
-{
-	widget_vim_mode=$vim_ins_mode_style
-}
-zle -N zle-line-finish
 
 RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''${widget_vim_mode}'
 RPROMPT_LINE_OLD='$(widget_in_vim)''$(widget_in_sudo)'
@@ -582,6 +577,8 @@ bindkey -M viins '^n'  down-line-or-history
 bindkey -M vicmd '#' push-input
 
 
+# deer in-shell navigator
+bindkey -M vicmd "z" deer
 
 ## Accept line HOOK
 ###########################################
