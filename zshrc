@@ -1,3 +1,4 @@
+
 ########################################################################################
 #|#                                                                                    #|#
 #|#  ::::::::: ::::::::  :::    :::       ::::::::   ::::::::  ::::    ::: ::::::::::  #|#
@@ -16,6 +17,64 @@ SAVEHIST=1000
 unsetopt beep
 
 bindkey -v
+
+autoload -U colors && colors
+
+
+
+###
+# LOAD PLUGINS
+###
+
+# Add vim keys (ciw / ciW / etc...)
+##############################################
+source ~/.zsh/opp.zsh/opp.zsh
+
+
+# smart cd
+##############################################
+source ~/.zsh/z/z.sh
+
+# syntax hightlighting
+##############################################
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Enable highlighters
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+
+# Override highlighter colors
+ZSH_HIGHLIGHT_STYLES[default]=none
+ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
+ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=009,standout
+ZSH_HIGHLIGHT_STYLES[alias]=fg=cyan,bold
+ZSH_HIGHLIGHT_STYLES[builtin]=fg=cyan,bold
+ZSH_HIGHLIGHT_STYLES[function]=fg=cyan
+ZSH_HIGHLIGHT_STYLES[command]=fg=blue,bold
+ZSH_HIGHLIGHT_STYLES[precommand]=fg=white,underline
+ZSH_HIGHLIGHT_STYLES[commandseparator]=none
+ZSH_HIGHLIGHT_STYLES[hashed-command]=fg=009
+ZSH_HIGHLIGHT_STYLES[path]=fg=yellow
+ZSH_HIGHLIGHT_STYLES[globbing]=fg=063
+ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=white,underline
+ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
+ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=fg=blue
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=063
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=063
+ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=009
+ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=009
+ZSH_HIGHLIGHT_STYLES[assign]=none
+
+# deer : zle navigator
+##############################################
+source ~/.zsh/deer/deer
+
+zle -N deer
+
+
+# advanced zsh-hooks
+##############################################
+source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
 
 
@@ -247,40 +306,10 @@ alias help=run-help
 
 
 
-###########################################
-# zsh syntax hightlighting
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# Enable highlighters
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
-
-# Override highlighter colors
-ZSH_HIGHLIGHT_STYLES[default]=none
-ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
-ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=009,standout
-ZSH_HIGHLIGHT_STYLES[alias]=fg=cyan,bold
-ZSH_HIGHLIGHT_STYLES[builtin]=fg=cyan,bold
-ZSH_HIGHLIGHT_STYLES[function]=fg=cyan,bold
-ZSH_HIGHLIGHT_STYLES[command]=fg=blue,bold
-ZSH_HIGHLIGHT_STYLES[precommand]=fg=white,underline
-ZSH_HIGHLIGHT_STYLES[commandseparator]=none
-ZSH_HIGHLIGHT_STYLES[hashed-command]=fg=009
-ZSH_HIGHLIGHT_STYLES[path]=fg=yellow
-ZSH_HIGHLIGHT_STYLES[globbing]=fg=063
-ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=white,underline
-ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
-ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
-ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=fg=blue
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=063
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=063
-ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=009
-ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=009
-ZSH_HIGHLIGHT_STYLES[assign]=none
-
 
 ##############################################
 # prompt configuration
 autoload -U promptinit && promptinit
-autoload -U colors && colors
 setopt promptsubst
 
 function precmd()
@@ -463,17 +492,6 @@ add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pw
 
 
 
-
-
-
-# Add vim keys (ciw / ciW / etc...)
-##############################################
-source ~/.zsh/opp.zsh/opp.zsh
-
-
-# smart cd
-##############################################
-source ~/.zsh/z/z.sh
 
 
 
