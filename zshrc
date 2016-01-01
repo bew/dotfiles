@@ -342,6 +342,11 @@ function precmd()
 {
 	LAST_EXIT_CODE=$?
 
+	### Scroll when prompt get too close to bottom edge
+	if [[ "$TERM" = "linux" ]]; then
+		return
+	fi
+
 	# Get the cursor position for the (new) current prompt
 	get_cursor_pos
 
