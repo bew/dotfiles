@@ -350,7 +350,7 @@ function precmd()
 	# Get the cursor position for the (new) current prompt
 	get_cursor_pos
 
-	if [[ "$CURSOR_POS_ROW" > $(( $LINES - 4 )) ]]; then
+	if test $CURSOR_POS_ROW -gt $(( $LINES - 4 )); then
 		echo $'\e[4S'	# scroll the terminal
 		echo $'\e[6A'
 	fi
