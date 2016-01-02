@@ -35,7 +35,7 @@ source ~/.zsh/opp.zsh/opp.zsh
 ##############################################
 source ~/.zsh/z/z.sh
 
-# syntax hightlighting
+# Syntax hightlighting
 ##############################################
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
@@ -79,6 +79,7 @@ source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
 
 # UTILS
+##############################################
 
 function get_cursor_pos()
 {
@@ -89,15 +90,42 @@ function get_cursor_pos()
 	CURSOR_POS_COL=${pos#*;} # remove 'row;'
 }
 
+function regen-prompt()
+{
+	zle reset-prompt
+}
+
+# Setup Hooks
+##############################################
+
+## ZSH HOOKS
+
+# precmd-hook
+hooks-define-hook precmd_hook
+function precmd-wrapper() { hooks-run-hook precmd_hook }
+add-zsh-hook precmd precmd-wrapper
+
+# preexec-hook
+hooks-define-hook preexec_hook
+function preexec-wrapper() { hooks-run-hook preexec_hook }
+add-zsh-hook preexec preexec-wrapper
+
+# chpwd-hook
+hooks-define-hook chpwd_hook
+function chpwd-wrapper() { hooks-run-hook chpwd_hook }
+add-zsh-hook chpwd chpwd-wrapper
+
+## CUSTOM HOOKS
+
+hooks-define-hook pre_accept_line_hook
 
 
 
-## auto completion
+## Completion
 ############################################################################################
 autoload -U compinit && compinit
 
-## menu completion style
-##############################################
+# menu completion style
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
@@ -122,10 +150,6 @@ zstyle ':completion:*:man:*'      menu yes select
 # Case insensitive tab-completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# Direct complete with the first completion
-# I don't like : I cannot add letters once completion started
-#setopt MENU_COMPLETE
-
 zmodload zsh/complist
 
 # enable go back in completions with S-Tab
@@ -148,36 +172,32 @@ setopt ALWAYS_TO_END
 # Allow comment (with '#') in zsh interactive mode
 setopt INTERACTIVE_COMMENTS
 
-
-setopt CORRECT
-
-
-
-#########################################
 # ignore history duplications
 setopt HIST_IGNORE_DUPS
 
 
 
-
-
-
-
-
-
-
-
+# Aliases
 ################################################
-# aliases
+
 alias zshrc="source ~/.zshrc"
+
+# global aliases
 
 alias -g G="grep"
 alias -g T="tail"
 alias -g L="less"
+alias -g V="vim"
 
-alias xt="xterm&"
+# add verbosity
+
+alias cp="cp -v"
+alias mv="mv -v"
+alias mkdir="mkdir -v"
 
 alias grep="grep --color=auto -n"
+
+# ls
 
 alias ls="ls --color=auto --group-directories-first"
 alias lsl="ls -lh"
@@ -186,35 +206,24 @@ alias la='lsl -a'
 alias l="la"
 alias ls1="ls -1"
 alias clsl="clr && pwd && lsl"
+
+#
+
 alias j="jobs"
 
+# term
+
+alias xt="xterm&"
 alias clr="clear"
+
+# ping
+
 alias pg="ping google.fr"
 alias pgc="pg -c 1 -w 5"
 
-alias cp="cp -v"
-alias mv="mv -v"
-alias mkd="mkdir -vp"
+# mkdir
 
-alias ne="echo 'Use: vim'"
-
-alias tree="tree -C --dirsfirst -F"
-alias tre="tree"
-
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-
-# pacman
-alias pacman="sudo pacman"
-
-## Remove useless packages
-alias pacmanuseless="pacman -Rnsv \$(pacman -Qtdq)"
-
-
-# Close the current sudo session if any
-alias nosudo="sudo -k"
-
+alias mkd="mkdir -p"
 
 function mkcd()
 {
@@ -222,12 +231,38 @@ function mkcd()
 	cd $1
 }
 
+alias ne="echo 'Use: vim'"
+
+# tree
+
+alias tree="tree -C --dirsfirst -F"
+alias tre="tree"
+
+# cd
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+# pacman
+
+alias pacman="sudo pacman"
+
+# Remove useless packages
+alias pacmanuseless="pacman -Rnsv \$(pacman -Qtdq)"
+
+
+# Close the current sudo session if any
+alias nosudo="sudo -k"
+
+
 # google search
 function gg()
 {
 	chromium "google.fr/#q=$1" 2> /dev/null
 }
 
+# history search
 function hsearch()
 {
 	if test "$1" = ""; then
@@ -238,22 +273,18 @@ function hsearch()
 }
 
 
-##### VIM #####
+# vim
 
-alias vimlog="vim -X -V20/home/lesell_b/.vim/log/vimlog-\$(date +'%y-%m-%d_%H-%M')"
-alias v="vim -X"
+alias vim="vim -X"
+alias v="vim"
 alias vm="v"
 alias vi="v"
-alias vim="v"
 alias vmi="v"
 alias imv="v"
 alias ivm="v"
-alias -g V="vim"
 
-
-
-# vim for read only
 alias view="vim -R -c 'set nomod nolist'"
+
 
 # man in vim
 function man()
@@ -267,20 +298,24 @@ compdef _man man
 ! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
 [ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
 
-####### ALIAS ########
 
+# tek clone
 function epiclone
 {
 	echo "$fg[blue]Cloning from git@git.epitech.eu:$fg[yellow]$*$reset_color"
 	git clone git@git.epitech.eu:$*
 }
 
+# make
+
 alias make="make"
 alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/null"
 alias remkae="remake"
 alias remaek="remake"
 
-## norme check in recursive
+#
+
+# norme
 alias nall="n $* \$(tree -if)"
 
 alias cl="clean"
@@ -289,7 +324,8 @@ alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 
 alias zut="sudo !!"
 
-########## GIT ##########
+# git
+
 alias gti="git"
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
@@ -310,7 +346,8 @@ alias gitpull="git pull"
 
 alias push="gitpush"
 
-###### CWD copy/paste ######
+# cwd
+
 function cpwd ()
 {
 	echo \"$(pwd)\" copied into X primary clipboard;
@@ -321,70 +358,16 @@ alias cdwd="cd \$(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
 
 
 # Fast config edit
+
 alias vimzshrc="vim ~/.zshrc"
 alias vimvimrc="vim ~/.vimrc"
 
 
+
+## Custom widgets (not zle)
 ###########################################
-# help
-autoload -U run-help
-autoload run-help-git
-#unalias run-help
-alias help=run-help
-
-
-
-
-
-
-
-##############################################
-# prompt configuration
-autoload -U promptinit && promptinit
-setopt promptsubst
-
-function precmd()
-{
-	LAST_EXIT_CODE=$?
-
-	### Scroll when prompt get too close to bottom edge
-	if [[ "$TERM" = "linux" ]]; then
-		return
-	fi
-
-	# Get the cursor position for the (new) current prompt
-	get_cursor_pos
-
-	if test $CURSOR_POS_ROW -gt $(( $LINES - 4 )); then
-		echo $'\e[4S'	# scroll the terminal
-		echo $'\e[6A'
-	fi
-}
-
-local battery='$(battery.lua percentage)%%'
-local batteryStyle="%{$fg[green]%}${battery}%{$reset_color%}"
-
-local username='%n'
-local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
-
-local currDir='%2~'
-local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$reset_color%}"
-
-local cmdSeparator="%%"
-local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
-
-
-PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
-PROMPT_LINE_OLD="%{$bg[black]%}- ${currDirStyle} ${cmdSeparatorStyle} "
-
-
-
-
-## RPROMPT
-#############################################################
 
 # Widget git branch
-#######################
 source ~/.zsh/bin/git-prompt.sh
 
 function widget_git_branch
@@ -402,7 +385,6 @@ function widget_git_branch
 }
 
 # Widget last exit code
-##########################
 function widget_last_exit_code()
 {
 	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
@@ -412,8 +394,7 @@ function widget_last_exit_code()
 	fi
 }
 
-# Widget shell in vim
-#######################
+# Widget is shell in vim
 function widget_in_vim
 {
 	if [[ $VIM != "" ]]; then
@@ -421,8 +402,7 @@ function widget_in_vim
 	fi
 }
 
-# Widget shell in sudo session
-################################
+# Widget is shell in sudo session
 function widget_in_sudo
 {
 	local result=$(sudo -n echo -n bla 2>/dev/null)
@@ -433,26 +413,95 @@ function widget_in_sudo
 	fi
 }
 
-# Widget prompt vim mode
-#########################
-local vim_ins_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
-local vim_cmd_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
-local widget_vim_mode=$vim_ins_mode_style
-
-function zle-keymap-select
+# Widget prompt vim mode (normal/insert)
+function widget_vim_mode()
 {
-	widget_vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode_style}}/(main|viins)/${vim_ins_mode_style}}"
-	zle reset-prompt
+	local keymap=$ZSH_CUR_KEYMAP
+	local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
+	local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
+
+	if [[ "$keymap" == "vicmd" ]]; then
+		echo ${normal_mode_style}
+		return
+	fi
+	if [[ $keymap =~ "(main|viins)" ]]; then
+		echo ${insert_mode_style}
+		return
+	fi
+	if [[ -z $keymap ]]; then
+		echo ${insert_mode_style}
+		return
+	fi
+	echo $keymap
 }
-hooks-add-hook zle_keymap_select_hook zle-keymap-select
+
+#
+function get-last-exit()
+{
+	LAST_EXIT_CODE=$?
+}
+hooks-add-hook precmd_hook get-last-exit
+
+# Scroll when prompt get too close to bottom edge
+function prompt-auto-scroll()
+{
+	if [[ "$TERM" = "linux" ]]; then
+		return
+	fi
+
+	# Get the cursor position for the (new) current prompt
+	get_cursor_pos
+
+	if test $CURSOR_POS_ROW -gt $(( $LINES - 4 )); then
+		echo $'\e[4S'	# scroll the terminal
+		echo $'\e[6A'
+	fi
+}
+hooks-add-hook precmd_hook prompt-auto-scroll
+
+#
+function set-normal-prompts()
+{
+	PROMPT="${statuslineContainer}"$PROMPT_LINE
+	RPROMPT=$RPROMPT_LINE
+}
+hooks-add-hook precmd_hook set-normal-prompts
 
 
-RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''${widget_vim_mode}'
+
+
+local battery='$(battery.lua percentage)%%'
+local batteryStyle="%{$fg[green]%}${battery}%{$fg[default]%}"
+
+local username='%n'
+local usernameStyle="%{$fg[yellow]%}${username}%{$fg[default]%}"
+
+local currDir='%2~'
+local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$fg[default]%}"
+
+local cmdSeparator="%%"
+local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
+
+## Prompt
+##############################################
+autoload -U promptinit && promptinit
+setopt PROMPTSUBST
+
+
+PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
+PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
+
+
+
+
+## RPROMPT
+#############################################################
+
+hooks-add-hook zle_keymap_select_hook regen-prompt
+
+
+RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''$(widget_vim_mode)'
 RPROMPT_LINE_OLD='$(widget_in_vim)''$(widget_in_sudo)'
-
-#RPROMPT_LINE="${rprompt}"
-RPROMPT=$RPROMPT_LINE
-
 
 # Widget date
 ###############
@@ -463,8 +512,12 @@ local currentTimeStyle=" ${currentTime} "
 # Widget variable debug
 #########################"
 
-local debugVar='' # add variables here to debug
-local debugVarStyle="$bg[blue]${debugVar}"
+function widget-debug()
+{
+	local debugVar=$*
+	local debugVarStyle="$bg[blue]DEBUG: ${debugVar}"
+	echo $debugVarStyle
+}
 
 
 
@@ -488,7 +541,7 @@ local slDefaultBG="$bg[magenta]"
 local slDefaultFG=""
 
 
-# TODO: list of widget for LeftStatusBar & RightStatusBar
+# TODO: 2 list of widgets for LeftStatusBar & RightStatusBar
 
 
 local slResetColor="${reset_color}${slDefaultBG}${slDefaultFG}"
@@ -499,21 +552,16 @@ local initStatusline="${slResetColor}${_clearLine}"
 #########################################################
 #FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
 # The statusline content
-local statusline='${widget_vim_mode}'"${slResetColor}""${currentTimeStyle}""${slResetColor}""          "'$(widget_in_sudo)'"${slResetColor}""  ""${debugVarStyle}""${slResetColor}"'$(widget_last_exit_code)'
+local statusline='$(widget_vim_mode)'"${slResetColor}""${currentTimeStyle}""${slResetColor}"'$(widget_in_sudo)'"${slResetColor}""  "'$(widget_last_exit_code)'
 #########################################################
 
 # The statusline container
 local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
 
-# add statusline to prompt
-PROMPT="${statuslineContainer}"$PROMPT_LINE
-
-
 ## Reset Prompt every N seconds
 ##############################################
 
 TMOUT=60
-#TMOUT=1    # every seconds !! (smooth on an i7 :P)
 
 # This special function is run every $TMOUT seconds
 TRAPALRM () {
@@ -527,7 +575,7 @@ TRAPALRM () {
 
 # remember recent directories (use with 'cdr')
 ##############################################
-autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+autoload -Uz chpwd_recent_dirs cdr
 add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pwd change
 
 
@@ -542,12 +590,28 @@ function loadsshkeys
 	eval `ssh-agent`
 	ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 }
-# Do it once at shell start
-#loadsshkeys > /dev/null 2>&1
 
 
+## ZLE Widgets
+##############################################
+
+# insert sudo at begining of the current line
+function zwidget-insert-sudo ()
+{
+	local cursor=$CURSOR
+	BUFFER="sudo $BUFFER"
+	CURSOR=$(($cursor + 5))
+}
+zle -N zwidget-insert-sudo
 
 
+# ZLE Tests
+
+function zwidget-zletest ()
+{
+	zle -M "TEST OK";
+}
+zle -N zwidget-zletest
 
 ## Custom keybinds
 ##############################################
@@ -555,17 +619,8 @@ function loadsshkeys
 # Alt-L => redraw prompt on-demand
 bindkey "\el" reset-prompt
 
-# insert sudo at begining of the current line
-function insert-sudo ()
-{
-	local cursor=$CURSOR
-	BUFFER="sudo $BUFFER"
-	CURSOR=$(($cursor + 5))
-}
-zle -N insert-sudo
-
 # Alt-S => Insert sudo at buffer beginning
-bindkey -M vicmd "ó" insert-sudo
+bindkey -M vicmd "ó" zwidget-insert-sudo
 
 
 function do-nothing () {}
@@ -575,18 +630,9 @@ zle -N do-nothing
 bindkey "[29~" do-nothing
 
 
-
-# ZLE Tests
-
-function zletest ()
-{
-	zle -M "djsfhksdjfhkjsdfhlks jdfkjsd lk fsdlkjsdkj hkdlsj hksjd hlsdkj";
-}
-zle -N zletest
-
 # Alt-T => zle test
-bindkey -M vicmd "ô" zletest
-bindkey -M viins "\M-t" zletest # TODO not working...
+bindkey -M vicmd "ô" zwidget-zletest
+bindkey -M viins "ô" zwidget-zletest # TODO not working...
 
 autoload -U edit-command-line
 zle -N edit-command-line
@@ -615,27 +661,29 @@ bindkey -M vicmd "z" deer
 ## Accept line HOOK
 ###########################################
 
-function accept-line-hook()
+function set-custom-prompts
 {
 	#set custom prompt
 	PROMPT=$PROMPT_LINE_OLD
 	RPROMPT=$RPROMPT_LINE_OLD
 
 	zle reset-prompt
+}
+hooks-add-hook pre_accept_line_hook set-custom-prompts
 
-	#reset prompt to default
-	PROMPT="${statuslineContainer}"$PROMPT_LINE
-	RPROMPT=$RPROMPT_LINE
-
+function accept-line-wrapper
+{
+	hooks-run-hook pre_accept_line_hook
 	zle accept-line
 }
-zle -N accept-line-hook
+zle -N accept-line-wrapper
 
 ### Valid the line ###
 
 # Enter-key
-bindkey -M viins "" accept-line-hook
-bindkey -M vicmd "" accept-line-hook
+bindkey -M viins "" accept-line-wrapper
+bindkey -M vicmd "" accept-line-wrapper
 
 # Ctrl-J
-bindkey -M viins " " accept-line-hook
+bindkey -M vicmd " " accept-line-wrapper
+bindkey -M viins " " accept-line-wrapper
