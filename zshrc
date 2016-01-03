@@ -11,6 +11,7 @@
 #|#                                                                                    #|#
 ########################################################################################
 
+export SHELL=zsh
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
@@ -153,10 +154,10 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zmodload zsh/complist
 
 # enable go back in completions with S-Tab
-bindkey -M menuselect '^[[Z' reverse-menu-complete
+bindkey -M menuselect '[Z' reverse-menu-complete
 
 # Cancel current completion with Esc
-bindkey -M menuselect "^[" send-break
+bindkey -M menuselect "" send-break
 
 
 
@@ -172,8 +173,38 @@ setopt ALWAYS_TO_END
 # Allow comment (with '#') in zsh interactive mode
 setopt INTERACTIVE_COMMENTS
 
+## History options
+
 # ignore history duplications
 setopt HIST_IGNORE_DUPS
+
+# Ignore commands with a space before
+setopt HIST_IGNORE_SPACE
+
+# When searching history don't display results already cycled through twice
+setopt HIST_FIND_NO_DUPS
+
+# Remove extra blanks from each command line being added to history
+setopt HIST_REDUCE_BLANKS
+
+# Report the status of background jobs immediately, rather than waiting until just before printing a prompt
+setopt NOTIFY
+
+# List jobs in the long format
+setopt LONG_LIST_JOBS
+
+# Don't kill background jobs on logout
+setopt NOHUP
+
+# Allow functions to have local options
+setopt LOCAL_OPTIONS
+
+# Allow functions to have local traps
+setopt LOCAL_TRAPS
+
+# Required for global alias completion: m c<TAB>
+setopt COMPLETE_ALIASES
+
 
 
 
@@ -633,6 +664,7 @@ bindkey "[29~" do-nothing
 # Alt-T => zle test
 bindkey -M vicmd "ô" zwidget-zletest
 bindkey -M viins "ô" zwidget-zletest # TODO not working...
+bindkey -M viins "\et" zwidget-zletest # TODO not working...
 
 autoload -U edit-command-line
 zle -N edit-command-line
