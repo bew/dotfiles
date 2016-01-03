@@ -498,19 +498,31 @@ function prompt-auto-scroll()
 }
 hooks-add-hook precmd_hook prompt-auto-scroll
 
-#
-function set-normal-prompts()
+
+function widget-battery
 {
-	PROMPT="${statuslineContainer}"$PROMPT_LINE
-	RPROMPT=$RPROMPT_LINE
+	#local battery='$(battery.lua percentage)%%'
+	local bat_perc=$(cat /sys/class/power_supply/BAT0/capacity)
+	local bat_status=$(cat /sys/class/power_supply/BAT0/status)
+
+	# color
+	if [[ $bat_perc < 10 ]]; then
+		echo -n "%{$fg_bold[red]%}"
+	else
+		echo -n "%{$fg[green]%}"
+	fi
+
+	# status
+	[[ "$bat_status" =~ "Charging" ]] && echo -n "+"
+
+	[[ $bat_status =~ "Discharging" ]] && printf "-" # printf because we cannot echo "-"
+
+	# percentage
+	echo -n $bat_perc"%%"
+
+	# reset color
+	echo -n "%{$fg[default]%}"
 }
-hooks-add-hook precmd_hook set-normal-prompts
-
-
-
-
-local battery='$(battery.lua percentage)%%'
-local batteryStyle="%{$fg[green]%}${battery}%{$fg[default]%}"
 
 local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$fg[default]%}"
@@ -526,7 +538,7 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 autoload -U promptinit && promptinit
 
 
-PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
+PROMPT_LINE='$(widget-battery)'" [${usernameStyle}] ${currDir} > "
 PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
 
