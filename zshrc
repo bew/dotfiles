@@ -130,10 +130,6 @@ autoload -U compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
-# Color completion for some things.
-# http://linuxshellaccount.blogspot.com/2008/12/color-completion-using-zsh-modules-on.html
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
 # formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
 zstyle ':completion:*' verbose yes
@@ -150,6 +146,25 @@ zstyle ':completion:*:man:*'      menu yes select
 
 # Case insensitive tab-completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# cd will never select the parent directory (e.g.: cd ../<TAB>)
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+# Color completion for some things.
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*:original' list-colors "=*=$color[red];$color[bold]"
+zstyle ':completion:*:commands' list-colors "=*=$color[green];$color[bold]"
+zstyle ':completion:*:builtins' list-colors "=*=$color[cyan];$color[bold]"
+zstyle ':completion:*:functions' list-colors "=*=$color[cyan]"
+zstyle ':completion:*:parameters' list-colors "=*=$color[red]"
+zstyle ':completion:*:aliases' list-colors "=*=$color[cyan];$color[bold]"
+zstyle ':completion:*:reserved-words' list-colors "=*=$color[magenta]"
+
+zstyle ':completion:*:options' list-colors "=^(-- *)=$color[green]"
+
+zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
+
 
 zmodload zsh/complist
 
