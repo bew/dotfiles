@@ -21,6 +21,10 @@ bindkey -v
 
 autoload -U colors && colors
 
+# colors for common binaries (ls, tree, etc..)
+! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
+[ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
+
 
 
 ###
@@ -125,6 +129,7 @@ hooks-define-hook pre_accept_line_hook
 ## Completion
 ############################################################################################
 autoload -U compinit && compinit
+zmodload zsh/complist
 
 # menu completion style
 zstyle ':completion:*' menu select
@@ -166,16 +171,6 @@ zstyle ':completion:*:options' list-colors "=^(-- *)=$color[green]"
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
 
 
-zmodload zsh/complist
-
-# enable go back in completions with S-Tab
-bindkey -M menuselect '[Z' reverse-menu-complete
-
-# Cancel current completion with Esc
-bindkey -M menuselect "" send-break
-
-
-
 # do not remove slash on directory completion
 unsetopt AUTO_REMOVE_SLASH
 
@@ -187,6 +182,8 @@ setopt ALWAYS_TO_END
 
 # Allow comment (with '#') in zsh interactive mode
 setopt INTERACTIVE_COMMENTS
+
+setopt PROMPT_SUBST
 
 ## History options
 
@@ -339,10 +336,6 @@ function man()
 }
 # man completion
 compdef _man man
-
-# colors for common binaries (ls, tree, etc..)
-! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
-[ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
 
 
 # tek clone
@@ -531,7 +524,6 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 ## Prompt
 ##############################################
 autoload -U promptinit && promptinit
-setopt PROMPTSUBST
 
 
 PROMPT_LINE="${batteryStyle} [${usernameStyle}] ${currDir} > "
@@ -541,13 +533,34 @@ PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorS
 
 
 ## RPROMPT
-#############################################################
+##############################################
 
 hooks-add-hook zle_keymap_select_hook regen-prompt
 
 
 RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''$(widget_vim_mode)'
 RPROMPT_LINE_OLD='$(widget_in_vim)''$(widget_in_sudo)'
+
+# set prompts hooks
+
+function set-normal-prompts()
+{
+	PROMPT="${statuslineContainer}"$PROMPT_LINE
+	RPROMPT=$RPROMPT_LINE
+}
+hooks-add-hook precmd_hook set-normal-prompts
+
+function set-custom-prompts
+{
+	#set custom prompt
+	PROMPT=$PROMPT_LINE_OLD
+	RPROMPT=$RPROMPT_LINE_OLD
+
+	zle reset-prompt
+}
+hooks-add-hook pre_accept_line_hook set-custom-prompts
+
+
 
 # Widget date
 ###############
@@ -561,7 +574,7 @@ local currentTimeStyle=" ${currentTime} "
 function widget-debug()
 {
 	local debugVar=$*
-	local debugVarStyle="$bg[blue]DEBUG: ${debugVar}"
+	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
 	echo $debugVarStyle
 }
 
@@ -641,7 +654,7 @@ function loadsshkeys
 ## ZLE Widgets
 ##############################################
 
-# insert sudo at begining of the current line
+# insert sudo at <bol>
 function zwidget-insert-sudo ()
 {
 	local cursor=$CURSOR
@@ -652,18 +665,28 @@ zle -N zwidget-insert-sudo
 
 
 # ZLE Tests
-
 function zwidget-zletest ()
 {
 	zle -M "TEST OK";
 }
 zle -N zwidget-zletest
 
+
+# Accept Line Wrapper
+function accept-line
+{
+	hooks-run-hook pre_accept_line_hook
+	zle .accept-line
+}
+zle -N accept-line
+
+
 ## Custom keybinds
 ##############################################
 
 # Alt-L => redraw prompt on-demand
 bindkey "\el" reset-prompt
+bindkey "ì" reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
 bindkey -M vicmd "ó" zwidget-insert-sudo
@@ -705,32 +728,12 @@ bindkey -M vicmd '#' push-input
 # deer in-shell navigator
 bindkey -M vicmd "z" deer
 
-## Accept line HOOK
-###########################################
 
-function set-custom-prompts
-{
-	#set custom prompt
-	PROMPT=$PROMPT_LINE_OLD
-	RPROMPT=$RPROMPT_LINE_OLD
+# enable go back in completions with S-Tab
+bindkey -M menuselect '[Z' reverse-menu-complete
 
-	zle reset-prompt
-}
-hooks-add-hook pre_accept_line_hook set-custom-prompts
+# Cancel current completion with Esc
+bindkey -M menuselect "" send-break
 
-function accept-line-wrapper
-{
-	hooks-run-hook pre_accept_line_hook
-	zle accept-line
-}
-zle -N accept-line-wrapper
 
-### Valid the line ###
 
-# Enter-key
-bindkey -M viins "" accept-line-wrapper
-bindkey -M vicmd "" accept-line-wrapper
-
-# Ctrl-J
-bindkey -M vicmd " " accept-line-wrapper
-bindkey -M viins " " accept-line-wrapper
