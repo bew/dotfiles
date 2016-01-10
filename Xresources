@@ -27,7 +27,7 @@ URxvt*scrollBar: false
    URxvt*color15: white
  */
 
-URxvt*font:					xft:Liberation Mono:size=13
+URxvt*font:					xft:Liberation Mono:size=11
 
 
 /* --------------------------------------------------------------------------- */
@@ -46,6 +46,13 @@ xterm*saveLines:				6500
 xterm*scrollKey:			true
 ! Scroll on tty output
 xterm*scrollTtyOutput:		false
+
+
+! TESTING
+!xterm*altSendsEscape:		true
+
+
+
 
 /* Custom colors */
 
