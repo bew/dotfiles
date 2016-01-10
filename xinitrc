@@ -25,7 +25,6 @@ ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 # hide mouse automatically
 unclutter &
 
-# start all conkys
-~/.conky/conky_run.sh &
+[ -f ~/.config/compton ] && compton --config ~/.config/compton -b
 
 exec awesome
