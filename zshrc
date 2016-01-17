@@ -206,7 +206,7 @@ setopt NOTIFY
 setopt LONG_LIST_JOBS
 
 # Don't kill background jobs on logout
-setopt NOHUP
+#setopt NOHUP
 
 # Allow functions to have local options
 setopt LOCAL_OPTIONS
@@ -215,7 +215,8 @@ setopt LOCAL_OPTIONS
 setopt LOCAL_TRAPS
 
 # Required for global alias completion: m c<TAB>
-setopt COMPLETE_ALIASES
+# Unknown why it destroy completion....
+#setopt COMPLETE_ALIASES
 
 
 
@@ -225,12 +226,19 @@ setopt COMPLETE_ALIASES
 
 alias zshrc="source ~/.zshrc"
 
+
+# Tek piscine easy
+
+alias gccw="g++ *.cpp -Wextra -g3 -Wall -W && echo ok"
+
+
 # global aliases
 
-alias -g G="grep"
-alias -g T="tail"
-alias -g L="less"
-alias -g V="vim"
+alias G="grep"
+alias H="head"
+alias T="tail"
+alias L="less"
+alias V="vim"
 
 # add verbosity
 
@@ -253,6 +261,8 @@ alias clsl="clr && pwd && lsl"
 #
 
 alias j="jobs"
+
+alias todo="ack -i 'todo|fixme'"
 
 # term
 
@@ -328,6 +338,7 @@ alias ivm="v"
 
 alias view="vim -R -c 'set nomod nolist'"
 
+alias ":q"="exit"
 
 # man in vim
 function man()
@@ -382,6 +393,8 @@ alias gitlogstat="gitlog --stat"
 
 alias gitpush="git push"
 alias gitpull="git pull"
+alias gitph="gitpush"
+alias gitpl="gitpull"
 
 alias push="gitpush"
 
@@ -455,24 +468,26 @@ function widget_in_sudo
 # Widget prompt vim mode (normal/insert)
 function widget_vim_mode()
 {
-	local keymap=$ZSH_CUR_KEYMAP
+	local keymap=$KEYMAP
 	local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
 	local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
 
 	if [[ "$keymap" == "vicmd" ]]; then
-		echo ${normal_mode_style}
+		echo -n ${normal_mode_style}
 		return
 	fi
 	if [[ $keymap =~ "(main|viins)" ]]; then
-		echo ${insert_mode_style}
+		echo -n ${insert_mode_style}
 		return
 	fi
 	if [[ -z $keymap ]]; then
-		echo ${insert_mode_style}
+		echo -n ${insert_mode_style}
 		return
 	fi
-	echo $keymap
+	echo -n $keymap
 }
+
+hooks-add-hook zle_keymap_select_hook regen-prompt
 
 #
 function get-last-exit()
@@ -537,7 +552,6 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 ##############################################
 autoload -U promptinit && promptinit
 
-
 PROMPT_LINE='$(widget-battery)'" [${usernameStyle}] ${currDir} > "
 PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
@@ -546,8 +560,6 @@ PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorS
 
 ## RPROMPT
 ##############################################
-
-hooks-add-hook zle_keymap_select_hook regen-prompt
 
 
 RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''$(widget_vim_mode)'
@@ -689,6 +701,7 @@ function accept-line
 {
 	hooks-run-hook pre_accept_line_hook
 	zle .accept-line
+	ZSH_CUR_KEYMAP=
 }
 zle -N accept-line
 
