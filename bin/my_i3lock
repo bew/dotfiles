@@ -1,9 +1,22 @@
 #! /bin/bash
 
+DEBUG_PATH=/tmp/last_lock
+
+function date_time
+{
+	date "+%H:%M:%S"
+}
+
+echo start $(date_time) > $DEBUG_PATH
+
 pkill unclutter
 
-import -window root /tmp/screenshot_i3.png -quality 10
-convert /tmp/screenshot_i3.png -blur 0x5 /tmp/screenshot_blur_i3.png
-i3lock -i /tmp/screenshot_blur_i3.png
+echo import $(date_time) >> $DEBUG_PATH
+import -window root -resize 10% -resize 1000% -quality 0 /tmp/screenshot_i3.png
+
+echo i3lock $(date_time) >> $DEBUG_PATH
+i3lock -i /tmp/screenshot_i3.png
 
 unclutter &
+
+echo end $(date_time) >> $DEBUG_PATH

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+finale_img=/tmp/lockscreen.png
+
+function time_do()
+{
+	date=$(date)
+	echo -n "$*"
+	time $*
+	echo ----------------------------------------------------
+}
+
+time_do pkill unclutter
+
+time_do import -window root -resize 10% -resize 1000% -quality 0 $finale_img
+time_do i3lock -i $finale_img
+
+time_do unclutter &
