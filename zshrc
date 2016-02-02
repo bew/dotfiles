@@ -105,17 +105,17 @@ function regen-prompt()
 
 ## ZSH HOOKS
 
-# precmd-hook
+# precmd_hook
 hooks-define-hook precmd_hook
 function precmd-wrapper() { hooks-run-hook precmd_hook }
 add-zsh-hook precmd precmd-wrapper
 
-# preexec-hook
+# preexec_hook
 hooks-define-hook preexec_hook
 function preexec-wrapper() { hooks-run-hook preexec_hook }
 add-zsh-hook preexec preexec-wrapper
 
-# chpwd-hook
+# chpwd_hook
 hooks-define-hook chpwd_hook
 function chpwd-wrapper() { hooks-run-hook chpwd_hook }
 add-zsh-hook chpwd chpwd-wrapper
@@ -183,6 +183,7 @@ setopt ALWAYS_TO_END
 # Allow comment (with '#') in zsh interactive mode
 setopt INTERACTIVE_COMMENTS
 
+# Allow substitution in the prompt
 setopt PROMPT_SUBST
 
 ## History options
@@ -229,7 +230,7 @@ alias zshrc="source ~/.zshrc"
 
 # Tek piscine easy
 
-alias gccw="g++ *.cpp -Wextra -g3 -Wall -W && echo ok"
+alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
 
 
 # global aliases
@@ -253,6 +254,7 @@ alias grep="grep --color=auto -n"
 alias ls="ls --color=auto --group-directories-first"
 alias lsl="ls -lh"
 alias ll="lsl"
+alias lll="clear; ll"
 alias la='lsl -a'
 alias l="la"
 alias ls1="ls -1"
@@ -293,9 +295,9 @@ alias tre="tree"
 
 # cd
 
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
+alias ..="cd ..;"
+alias ...="cd ../..;"
+alias ....="cd ../../..;"
 
 # pacman
 
@@ -321,7 +323,7 @@ function hsearch()
 	if test "$1" = ""; then
 		history 1
 	else
-		history 1 | grep $1
+		history 1 | \grep --color=auto $1
 	fi
 }
 
@@ -391,6 +393,7 @@ alias gitlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bol
 
 alias gitlogstat="gitlog --stat"
 
+alias gitfetch="git fetch"
 alias gitpush="git push"
 alias gitpull="git pull"
 alias gitph="gitpush"
@@ -552,7 +555,7 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 ##############################################
 autoload -U promptinit && promptinit
 
-PROMPT_LINE='$(widget-battery)'" [${usernameStyle}] ${currDir} > "
+PROMPT_LINE='$(widget-battery)'" [${usernameStyle}] ${currDir} ▷ "
 PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
 
