@@ -506,6 +506,17 @@ function prompt-auto-scroll()
 		return
 	fi
 
+	# check if there is a command in the stdin buffer
+	# (as the get_cursor_pos will discard it)
+	local buff=""
+	while read -u0 -t -k char; do
+		buff=${buff}${char}
+	done
+	if ! [ -z "$buff" ]; then
+		# push it on the ZLE input stack
+		print -z "${buff}"
+	fi
+
 	# Get the cursor position for the (new) current prompt
 	get_cursor_pos
 
