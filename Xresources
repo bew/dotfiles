@@ -34,18 +34,24 @@ URxvt*font:					xft:Liberation Mono:size=11
 /* ------ XTERM CONFIG ------------------------------------------------------- */
 /* --------------------------------------------------------------------------- */
 
-xterm*background:				#424242
-xterm*foreground:				#eeeeee
+XTerm*background:				#424242
+XTerm*foreground:				#eeeeee
 
-xterm*faceName:					Liberation Mono:size=11
-!xterm*boldFont:					true
+!XTerm*utf8:						true
+!XTerm*renderFont:				true
+!XTerm*faceName:					Liberation Mono
+!XTerm*faceName:					VeraMono
+XTerm*faceName:					DejaVu Sans Mono
+XTerm*faceSize:					11
+XTerm*boldFont:					true
 
-xterm*saveLines:				6500
+XTerm*saveLines:				6500
+XTerm*cursorBlink:				true
 
 ! Scroll on key press
-xterm*scrollKey:			true
+XTerm*scrollKey:			true
 ! Scroll on tty output
-xterm*scrollTtyOutput:		false
+XTerm*scrollTtyOutput:		false
 
 
 ! TESTING
