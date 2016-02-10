@@ -235,6 +235,11 @@ alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
 
 # global aliases
 
+alias -g nostdin=" >/dev/null "
+alias -g nostderr=" 2>/dev/null "
+
+# Some short ones
+
 alias G="grep"
 alias H="head"
 alias T="tail"
