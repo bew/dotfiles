@@ -13,7 +13,7 @@ fi
 
 [ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
 
-setxkbmap fr
+setxkbmap -config ~/.config/xkbmap.config
 [ -f ~/.Xresources ] && xrdb ~/.Xresources
 xset -b
 
