@@ -9,30 +9,72 @@
 # -i ➤ --image=
 #
 
+function exit_clean
+{
+	unclutter &!
+	exit 0
+}
+
+function generate_img
+{
+	function echo_debug
+	{
+		echo "DEBUG [GEN]:" $*
+	}
+
+	timestamp_start=`date +%s`
+
+	echo_debug "start at $timestamp_start"
+
+	# Screenshot of desktop
+	import -window root -quality 0 ${final_img}
+
+	# Generating real lockscreen image
+	# ➤ blur
+	convert ${final_img} -blur 0x10 ${final_img}
+
+	timestamp_end=`date +%s`
+
+	echo_debug "end at $timestamp_end"
+
+	echo_debug "diff is " $(( timestamp_end - timestamp_start ))
+
+	if [ $(( timestamp_end - timestamp_start )) -gt 60 ]; then
+		echo "Too long to generate new image (maybe computer hibernated ?)"
+		exit_clean
+	fi
+}
+
+############################################################################
+# INIT VARIABLES
+
 i3lock_options=(-f -e)
 
 loading_img=${HOME}/wallpapers/hacker-virus-loading-computer-1920x1080-blured.png
 final_img=/tmp/screenshot_i3.png
 
-# Screenshot of desktop
-import -window root -quality 0 ${final_img}
+############################################################################
 
 pkill unclutter
 
-# First loading lock
+############################################################################
+# Loading lock
+
 i3lock -n ${i3lock_options[@]} -i "$loading_img" &!
 loading_pid=$!
 echo "first is at $loading_pid"
 
-# Generating real lockscreen image
-# ➤ blur
-convert ${final_img} -blur 0x10 ${final_img}
+############################################################################
+
+generate_img
+
+############################################################################
+# Real lock
 
 echo "Real lockscreen generated, killing $loading_pid"
 kill $loading_pid
 echo "Running new i3lock with real lockscreen image"
 
-# Real lock
 i3lock ${i3lock_options[@]} -i "${final_img}"
 locker_status=$?
 
@@ -41,4 +83,6 @@ if ! [ "$locker_status" -eq 0 ]; then
 	i3lock -i "$loading_img";
 fi
 
-unclutter &!
+############################################################################
+
+exit_clean
