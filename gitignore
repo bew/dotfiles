@@ -1,0 +1,10 @@
+# this is the global git ignore
+
+# vim files
+.cs_*
+tags
+
+
+# C/C++ compilation
+*.o
+*.out

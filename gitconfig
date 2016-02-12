@@ -1,0 +1,15 @@
+[user]
+	email = lesell_b@epitech.eu
+	name = lesell_b
+[push]
+	default = simple
+[core]
+	excludesfile = ~/.gitignore
+[alias]
+	unstage = reset HEAD --
+	com = commit --verbose
+	untrack = update-index --assume-unchanged
+	retrack = update-index --no-assume-unchanged
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
