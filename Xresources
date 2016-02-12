@@ -1,33 +1,16 @@
-/* xterm */
+/* URxvt */
+
+#include ".Xresources.d/urxvt"
+
 ! Background color
-URxvt*background: #424242
+URxvt*background: #202020
 
 ! Font color
 URxvt*foreground: #eeeeee
 
 URxvt*scrollBar: false
 
-! Other colors
-/*
-   URxvt*color0: black
-   URxvt*color1: red3
-   URxvt*color2: green3
-   URxvt*color3: yellow3
-   URxvt*color4: blue2
-   URxvt*color5: magenta3
-   URxvt*color6: cyan3
-   URxvt*color7: gray90
-   URxvt*color8: grey50
-   URxvt*color9: red
-   URxvt*color10: green
-   URxvt*color11: yellow
-   URxvt*color12: blue
-   URxvt*color13: magenta
-   URxvt*color14: cyan
-   URxvt*color15: white
- */
-
-URxvt*font:					xft:Liberation Mono:size=11
+!URxvt*font:					xft:Liberation Mono:size=11
 
 
 /* --------------------------------------------------------------------------- */
@@ -41,7 +24,7 @@ XTerm*foreground:				#eeeeee
 !XTerm*renderFont:				true
 !XTerm*faceName:					Liberation Mono
 !XTerm*faceName:					VeraMono
-XTerm*faceName:					DejaVu Sans Mono
+XTerm*faceName:					DejaVu Sans Mono for Powerline
 XTerm*faceSize:					11
 XTerm*boldFont:					true
 
