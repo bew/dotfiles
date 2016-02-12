@@ -135,6 +135,10 @@ zmodload zsh/complist
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
+
+# Ignore *.o on file complete, when completing vim
+zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*.o'
+
 # formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
 zstyle ':completion:*' verbose yes
@@ -235,7 +239,7 @@ alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
 
 # global aliases
 
-alias -g nostdin=" >/dev/null "
+alias -g nostdout=" >/dev/null "
 alias -g nostderr=" 2>/dev/null "
 
 # Some short ones
