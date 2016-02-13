@@ -1,0 +1,116 @@
+#!/bin/zsh
+
+#
+# i3lock options
+#
+# -e ➤ --ignore-empty-password
+# -f ➤ --show-failed-attempts
+# -n ➤ --nofork
+# -i ➤ --image=
+#
+
+############################################################################
+##########################  Init Variables  ################################
+
+i3lock_options=(-f -e)
+
+# ➤ loading_img : this img is displayed in the loading locker
+loading_img="${HOME}/wallpapers/hacker-virus-loading-computer-1920x1080-blured.png"
+
+# ➤ buffer_path : this path is used for the screenshot (the file extension
+# must be an image handled by imagemagick)
+buffer_path="/tmp/screenshot_i3.png"
+
+# ➤ final_img : this is the path of the final img to be displayed
+final_img="/tmp/screenshot_i3.png"
+
+# Max loading time for the the final img to be generated.
+#
+# If the specified time is reached, the loading locker will not be killed,
+# and the final_img will never be displayed.
+max_loading_time=60 # in seconds
+
+############################################################################
+############################  Functions  ###################################
+
+function exit_clean
+{
+	unclutter &!
+	exit 0
+}
+
+function init_buffer
+{
+	local buffer=$1
+	import -window root -quality 0 "$buffer"
+}
+
+function process_img
+{
+	local buffer=$1
+	local final_buffer=$2
+
+	# ➤ blur
+	convert "$buffer" -blur 0x10 "$final_buffer"
+}
+
+function generate_img
+{
+	function echo_debug
+	{
+		echo "DEBUG [GEN]:" $*
+	}
+
+	local timestamp_start=`date +%s`
+
+	echo_debug "start at $timestamp_start"
+
+	# Screenshot of desktop
+	init_buffer "$buffer_path"
+
+	# Generating real lockscreen image
+	process_img "$buffer_path" "$final_img"
+
+	local timestamp_end=`date +%s`
+
+	echo_debug "end at $timestamp_end"
+
+	local generation_time=$(( timestamp_end - timestamp_start ))
+
+	echo_debug "diff is $generation_time"
+
+	if [ $generation_time -gt $max_loading_time ]; then
+		echo "Too long to generate new image (maybe computer hibernated ?)"
+		exit_clean
+	fi
+}
+
+############################################################################
+#########################  Script entry-point  #############################
+
+# Tidy up X mouse / keyboard grabbers
+pkill unclutter
+
+# Loading locker
+i3lock -n ${i3lock_options[@]} -i "$loading_img" &!
+loading_pid=$!
+echo "Loading Locker is at PID $loading_pid"
+
+# Final image generation
+generate_img
+
+# Real lock
+echo "Real lockscreen generated, killing $loading_pid"
+kill $loading_pid
+echo "Running new i3lock with real lockscreen image"
+
+i3lock ${i3lock_options[@]} -i "$final_img"
+locker_status=$?
+
+if ! [ "$locker_status" -eq 0 ]; then
+	echo "bad locker_status: $locker_status"
+	i3lock -i "$loading_img";
+fi
+
+# Everything worked correctly, bye !
+exit_clean
