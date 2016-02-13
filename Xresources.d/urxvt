@@ -240,8 +240,8 @@ URxvt*keysym.M-i: string:é
 URxvt*keysym.M-w: string:÷
 ! the . is 0xa0
 URxvt*keysym.M-space: string: 
-URxvt*keysym.M-S-j: string:Ê
-URxvt*keysym.M-S-k: string:Ë
+URxvt*keysym.M-J: string:Ê
+URxvt*keysym.M-K: string:Ë
 URxvt*keysym.M-p: string:ð
 URxvt*keysym.M-r: string:ò
 URxvt*keysym.M-c: string:ã
