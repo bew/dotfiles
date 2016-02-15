@@ -247,6 +247,8 @@ URxvt*keysym.M-r: string:ò
 URxvt*keysym.M-c: string:ã
 URxvt*keysym.M-m: string:í
 URxvt*keysym.M-z: string:ú
+URxvt*keysym.M-j: string:ê
+URxvt*keysym.M-k: string:ë
 
 ! URxvt*perl-ext-common: string
 
