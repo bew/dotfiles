@@ -127,13 +127,13 @@ URxvt*font: xft:DejaVu\ Sans\ Mono\ for\ Powerline:pixelsize=15, xft:Siji
 ! URxvt*scrollBar_align: mode
 
 ! True: scroll to bottom when tty receives output; option -si.  False: do not scroll to bottom when tty receives output; option +si.
-! URxvt*scrollTtyOutput: boolean
+URxvt*scrollTtyOutput: false
 
 ! True: scroll with scrollback buffer when tty receives new lines (i.e.  try to show the same lines) and scrollTtyOutput is False; option -sw. False: do not scroll with scrollback buffer when tty
 ! URxvt*scrollWithBuffer: boolean
 
 ! True: scroll to bottom when a non-special key is pressed. Special keys are those which are intercepted by rxvt-unicode for special handling and are not passed onto the shell; option -sk. False:
-! URxvt*scrollTtyKeypress: boolean
+URxvt*scrollTtyKeypress: true
 
 ! Save number lines in the scrollback buffer [default 1000]; option -sl.
 ! URxvt*saveLines: number
@@ -163,7 +163,7 @@ URxvt*meta8: true
 ! URxvt*mouseWheelScrollPage: boolean
 
 ! True: store tabs as wide characters. False: interpret tabs as cursor movement only; option "-ptab".
-! URxvt*pastableTabs: boolean
+URxvt*pastableTabs: true
 
 ! True: blink the cursor. False: do not blink the cursor [default]; option -bc.
 ! URxvt*cursorBlink: boolean
@@ -172,7 +172,7 @@ URxvt*meta8: true
 ! URxvt*cursorUnderline: boolean
 
 ! True: blank the pointer when a key is pressed or after a set number of seconds of inactivity. False: the pointer is always visible [default].
-! URxvt*pointerBlank: boolean
+URxvt*pointerBlank: true
 
 ! Mouse pointer foreground colour.
 ! URxvt*pointerColor: colour
