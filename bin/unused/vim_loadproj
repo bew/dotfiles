@@ -36,5 +36,5 @@ function load_project
 load_project > $file_tmp
 
 vim -X -S $file_tmp
-#rm $file_tmp
+rm $file_tmp
 
