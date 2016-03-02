@@ -69,12 +69,6 @@ ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=009
 ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=009
 ZSH_HIGHLIGHT_STYLES[assign]=none
 
-# deer : zle navigator
-##############################################
-source ~/.zsh/deer/deer
-
-zle -N deer
-
 
 # advanced zsh-hooks
 ##############################################
@@ -135,8 +129,9 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
 
-# Ignore *.o on file complete, when completing vim
+# Ignore *.o & *.pdf on file complete, when completing vim
 zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*.o'
+zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*.pdf'
 
 # formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
@@ -737,7 +732,6 @@ function accept-line
 }
 zle -N accept-line
 
-
 ## Custom keybinds
 ##############################################
 
@@ -780,10 +774,6 @@ bindkey -M viins '^n'  down-line-or-history
 # cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
 bindkey -M viins '\M-#' push-input
-
-
-# deer in-shell navigator
-bindkey -M vicmd "z" deer
 
 
 # enable go back in completions with S-Tab

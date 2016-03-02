@@ -7,9 +7,6 @@
 [submodule "z"]
 	path = z
 	url = git@github.com:rupa/z.git
-[submodule "deer"]
-	path = deer
-	url = git@github.com:Vifon/deer.git
 [submodule "zsh-hooks"]
 	path = zsh-hooks
 	url = git@github.com:willghatch/zsh-hooks.git
