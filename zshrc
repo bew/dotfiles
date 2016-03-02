@@ -437,13 +437,13 @@ alias vimvimrc="vim ~/.vimrc"
 
 
 
-## Custom widgets (not zle)
+## Custom segmts (not zle)
 ###########################################
 
 # Widget git branch
 source ~/.zsh/bin/git-prompt.sh
 
-function widget_git_branch
+function segmt_git_branch
 {
 	local branchName=$(__git_ps1 "%s")
 	if [[ -z ${branchName} ]]; then
@@ -458,7 +458,7 @@ function widget_git_branch
 }
 
 # Widget last exit code
-function widget_last_exit_code()
+function segmt_last_exit_code()
 {
 	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
 		local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
@@ -468,7 +468,7 @@ function widget_last_exit_code()
 }
 
 # Widget is shell in vim
-function widget_in_vim
+function segmt_in_vim
 {
 	if [[ $VIM != "" ]]; then
 		echo -n " In Vim "
@@ -476,7 +476,7 @@ function widget_in_vim
 }
 
 # Widget is shell in sudo session
-function widget_in_sudo
+function segmt_in_sudo
 {
 	local result=$(sudo -n echo -n bla 2>/dev/null)
 	if test "$result" = "bla"; then
@@ -487,7 +487,7 @@ function widget_in_sudo
 }
 
 # Widget prompt vim mode (normal/insert)
-function widget_vim_mode()
+function segmt_vim_mode()
 {
 	local keymap=$KEYMAP
 	local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
@@ -546,7 +546,7 @@ function prompt-auto-scroll()
 hooks-add-hook precmd_hook prompt-auto-scroll
 
 
-function widget-battery
+function segmt_battery
 {
 	#local battery='$(battery.lua percentage)%%'
 	local bat_perc=$(cat /sys/class/power_supply/BAT0/capacity)
@@ -584,7 +584,7 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 ##############################################
 autoload -U promptinit && promptinit
 
-PROMPT_LINE='$(widget-battery)'" [${usernameStyle}] ${currDir} ▷ "
+PROMPT_LINE='$(segmt_battery)'" [${usernameStyle}] ${currDir} ▷ "
 PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
 
@@ -594,8 +594,8 @@ PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorS
 ##############################################
 
 
-RPROMPT_LINE='$(widget_in_vim)''$(widget_in_sudo)''$(widget_git_branch)''$(widget_vim_mode)'
-RPROMPT_LINE_OLD='$(widget_in_vim)''$(widget_in_sudo)'
+RPROMPT_LINE='$(segmt_in_vim)''$(segmt_in_sudo)''$(segmt_git_branch)''$(segmt_vim_mode)'
+RPROMPT_LINE_OLD='$(segmt_in_vim)''$(segmt_in_sudo)'
 
 # set prompts hooks
 
@@ -627,7 +627,7 @@ local currentTimeStyle=" ${currentTime} "
 # Widget variable debug
 #########################"
 
-function widget-debug()
+function segmt_debug()
 {
 	local debugVar=$*
 	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
@@ -656,7 +656,7 @@ local slDefaultBG="$bg[magenta]"
 local slDefaultFG=""
 
 
-# TODO: 2 list of widgets for LeftStatusBar & RightStatusBar
+# TODO: 2 list of segmts for LeftStatusBar & RightStatusBar
 
 
 local slResetColor="${reset_color}${slDefaultBG}${slDefaultFG}"
@@ -667,7 +667,7 @@ local initStatusline="${slResetColor}${_clearLine}"
 #########################################################
 #FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
 # The statusline content
-local statusline='$(widget_vim_mode)'"${slResetColor}""${currentTimeStyle}""${slResetColor}"'$(widget_in_sudo)'"${slResetColor}""  "'$(widget_last_exit_code)'
+local statusline='$(segmt_vim_mode)'"${slResetColor}""${currentTimeStyle}""${slResetColor}"'$(segmt_in_sudo)'"${slResetColor}""  "'$(segmt_last_exit_code)'
 #########################################################
 
 # The statusline container
