@@ -742,11 +742,11 @@ zle -N accept-line
 ##############################################
 
 # Alt-L => redraw prompt on-demand
-bindkey "\el" reset-prompt
+bindkey "\M-l" reset-prompt
 bindkey "ì" reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
-bindkey -M vicmd "ó" zwidget-insert-sudo
+bindkey -M vicmd "\M-s" zwidget-insert-sudo
 
 
 function do-nothing () {}
@@ -758,14 +758,13 @@ bindkey "[29~" do-nothing
 
 # Alt-T => zle test
 bindkey -M vicmd "ô" zwidget-zletest
-bindkey -M viins "ô" zwidget-zletest # TODO not working...
-bindkey -M viins "\et" zwidget-zletest # TODO not working...
+bindkey -M viins "\M-t" zwidget-zletest
 
 autoload -U edit-command-line
 zle -N edit-command-line
 
 # Alt-E => edit line in $EDITOR
-bindkey -M vicmd "å" edit-command-line
+bindkey -M viins "\M-e" edit-command-line
 
 
 # backspace and ^h working even after
@@ -780,6 +779,7 @@ bindkey -M viins '^n'  down-line-or-history
 
 # cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
+bindkey -M viins '\M-#' push-input
 
 
 # deer in-shell navigator
