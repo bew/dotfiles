@@ -10,6 +10,8 @@
 	com = commit --verbose
 	untrack = update-index --assume-unchanged
 	retrack = update-index --no-assume-unchanged
+	pl = pull
+	ph = push
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
