@@ -1,4 +1,3 @@
-
 ########################################################################################
 #|#                                                                                    #|#
 #|#  ::::::::: ::::::::  :::    :::       ::::::::   ::::::::  ::::    ::: ::::::::::  #|#
@@ -349,6 +348,10 @@ alias ivm="v"
 
 alias view="vim -R -c 'set nomod nolist'"
 
+alias ":h"="vimhelp"
+
+
+
 alias ":q"="exit"
 
 # man in vim
@@ -366,6 +369,9 @@ function epiclone
 	echo "$fg[blue]Cloning from git@git.epitech.eu:$fg[yellow]$*$reset_color"
 	git clone git@git.epitech.eu:$*
 }
+
+# wpa
+alias wpa=wpa_cli
 
 # make
 
@@ -387,13 +393,16 @@ alias zut="sudo !!"
 
 # git
 
+alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
+
+alias g="git"
 alias gti="git"
 alias gitcheck="git checkout"
 alias gitadl="git add --all"
 alias gitai="git add -i"
 
-alias gitstatus="git status"
-alias gitstatusall="git status -u" # show all untracked files
+alias gitstatus="git status --ignore-submodules"
+alias gitstatusall="gitstatus -u" # show all untracked files
 alias gitdiff="git diff --word-diff=color --ignore-all-space"
 
 alias gitbranch="git branch -vv"
