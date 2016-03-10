@@ -675,7 +675,9 @@ TMOUT=60
 
 # This special function is run every $TMOUT seconds
 TRAPALRM () {
-	zle reset-prompt
+	if [[ "$WIDGET" -ne "expand-or-complete" ]]; then
+		zle reset-prompt
+	fi
 }
 
 
