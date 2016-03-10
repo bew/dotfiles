@@ -3,6 +3,7 @@
 # vim files
 .cs_*
 tags
+.ycm_extra_conf.py*
 
 
 # C/C++ compilation
