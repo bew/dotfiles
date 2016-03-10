@@ -246,8 +246,8 @@ alias V="vim"
 
 # add verbosity
 
-alias cp="cp -v"
-alias mv="mv -v"
+alias cp="cp -vi"
+alias mv="mv -vi"
 alias mkdir="mkdir -v"
 
 alias grep="grep --color=auto -n"
