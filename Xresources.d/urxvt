@@ -236,19 +236,22 @@ URxvt*modifier: alt
 
 ! Compile frills: Associate action with keysym sym. The intervening resource name keysym. cannot be omitted.
 ! URxvt*keysym.sym: action
-URxvt*keysym.M-i: string:é
-URxvt*keysym.M-w: string:÷
-! the . is 0xa0
-URxvt*keysym.M-space: string: 
 URxvt*keysym.M-J: string:Ê
 URxvt*keysym.M-K: string:Ë
-URxvt*keysym.M-p: string:ð
-URxvt*keysym.M-r: string:ò
+URxvt*keysym.M-O: string:Ï
+! the . is 0xa0
+URxvt*keysym.M-space: string: 
 URxvt*keysym.M-c: string:ã
-URxvt*keysym.M-m: string:í
-URxvt*keysym.M-z: string:ú
+URxvt*keysym.M-i: string:é
 URxvt*keysym.M-j: string:ê
 URxvt*keysym.M-k: string:ë
+URxvt*keysym.M-m: string:í
+URxvt*keysym.M-o: string:ï
+URxvt*keysym.M-p: string:ð
+URxvt*keysym.M-r: string:ò
+URxvt*keysym.M-v: string:ö
+URxvt*keysym.M-w: string:÷
+URxvt*keysym.M-z: string:ú
 
 ! URxvt*perl-ext-common: string
 
