@@ -2,30 +2,23 @@
 
 if [ -z $1 ]
 then
-	echo "o--------------------------------o"
-	echo "| You must specify a parameter ! |"
-	echo "o--------------------------------o"
-	echo "|       Usages:                  |"
-	echo "| create_repo repo_name          |"
-	echo "| create_repo repo_name [clone]  |"
-	echo "o--------------------------------o"
+	echo "create_repo repo_name [clone [destination]]"
 	exit 0
 fi
 
 blih repository create $1
 
 echo "Setting ACL for ramassage-tek :"
-blih repository setacl $1 ramassage-tek r
+blih repository setacl $1 ramassage-tek r && echo "ramassage-tek:r"
 
-echo "ramassage-tek:r"
-
-if [ -z $2 ]
-then
+if [ -z $2 ]; then
 	exit 0
 fi
 
-if [ $2 == "clone" ]
-then
-	echo "Cloning $1 in ~/rendu/"
-	clone_repo /lesell_b/$1
+if [ $2 == "clone" ]; then
+	if [ -z $3 ]; then
+		clone_repo /lesell_b/$1
+	else
+		clone_repo /lesell_b/$1 $3
+	fi
 fi
