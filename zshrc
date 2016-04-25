@@ -208,6 +208,10 @@ setopt LOCAL_TRAPS
 alias zshrc="source ~/.zshrc"
 
 
+# test urxvt meta8
+alias togglemeta8='echo -e "\e]777;meta8;toggle\007"'
+
+
 # Tek piscine easy
 
 alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
@@ -355,6 +359,7 @@ alias wpa=wpa_cli
 # make
 
 alias make="make"
+alias m=make
 alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/null"
 alias remkae="remake"
 alias remaek="remake"
@@ -423,6 +428,8 @@ alias vimvimrc="vim ~/.vimrc"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors yes
 
+# Directories first when completing files
+zstyle ':completion:*' list-dirs-first on
 
 # formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
@@ -771,7 +778,6 @@ function zwidget-insert-sudo ()
 }
 zle -N zwidget-insert-sudo
 
-
 # ZLE Tests
 function zwidget-zletest ()
 {
@@ -828,6 +834,9 @@ zle -N edit-command-line
 # Alt-E => edit line in $EDITOR
 bindkey -M viins "\M-e" edit-command-line
 
+# Ctrl-F => file fuzzy search
+bindkey -M viins '^f' fzf-file-widget
+bindkey -M vicmd '^f' fzf-file-widget
 
 # backspace and ^h working even after
 # returning from command mode
@@ -849,12 +858,26 @@ bindkey -M vicmd '#' push-input
 bindkey -M viins '\M-#' push-input
 
 
+# menuselect keybindings
+#-------------------------------------------------------------
+
 # enable go back in completions with S-Tab
 bindkey -M menuselect '[Z' reverse-menu-complete
 
 # Cancel current completion with Esc
 bindkey -M menuselect "" send-break
 
+# Alt-hjkl to move inside results
+bindkey -M menuselect "\M-h" backward-char
+bindkey -M menuselect "\M-j" down-line-or-history
+bindkey -M menuselect "\M-k" up-line-or-history
+bindkey -M menuselect "\M-l" forward-char
+
+# Alt-$ & Alt-0 => got to first & last results
+bindkey -M menuselect "\M-0" beginning-of-line
+bindkey -M menuselect "\M-$" end-of-line
+
+. ~/.zsh/fzf/key-bindings.zsh
 
 #----------------------------------------------------------------------------------
 # Other init
