@@ -669,7 +669,7 @@ hooks-add-hook pre_accept_line_hook set-custom-prompts
 
 function segmt_time()
 {
-	local currentTime=$(date "+%H:%M")
+	local currentTime=$(date "+%H:%M [%d/%m]")
 	local currentTimeStyle=" ${currentTime} "
 	echo -n ${currentTimeStyle}
 }
