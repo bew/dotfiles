@@ -323,6 +323,7 @@ function hsearch()
 
 alias vim="vim -X"
 alias v="vim"
+alias im="v"
 alias vm="v"
 alias vi="v"
 alias vmi="v"
@@ -785,6 +786,17 @@ function zwidget-zletest ()
 }
 zle -N zwidget-zletest
 
+# Git status
+function zwidget-git-status
+{
+	if [[ -n $BUFFER ]]; then
+		zle push-input
+	fi
+	BUFFER="git status"
+	zle accept-line
+}
+zle -N zwidget-git-status
+
 # Just do nothing
 function do-nothing () {}
 zle -N do-nothing
@@ -811,7 +823,6 @@ zle -N accept-line
 
 # Alt-L => redraw prompt on-demand
 bindkey "\M-l" reset-prompt
-bindkey "ì" reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
 bindkey "\M-s" zwidget-insert-sudo
@@ -819,6 +830,8 @@ bindkey "\M-s" zwidget-insert-sudo
 # Menu key => do nothing
 bindkey "[29~" do-nothing
 
+# Git status
+bindkey "\M-g" zwidget-git-status
 
 # Who doesn't want home and end to work?
 bindkey '\e[7~' beginning-of-line
