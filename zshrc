@@ -208,10 +208,6 @@ setopt LOCAL_TRAPS
 alias zshrc="source ~/.zshrc"
 
 
-# test urxvt meta8
-alias togglemeta8='echo -e "\e]777;meta8;toggle\007"'
-
-
 # Tek piscine easy
 
 alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
@@ -224,7 +220,8 @@ alias -g nostderr=" 2>/dev/null "
 
 # Short aliases
 
-alias G="grep"
+alias G="realgrep"
+alias A="ack"
 alias H="head"
 alias T="tail"
 alias L="less"
@@ -237,7 +234,8 @@ alias mv="mv -vi"
 alias mkdir="mkdir -v"
 
 # use ack instead !!
-alias grep="grep --color=auto -n"
+alias realgrep="command grep --color=auto -n"
+alias grep="echo Use ack"
 
 # ls
 
@@ -368,7 +366,7 @@ alias remaek="remake"
 #
 
 # norme
-alias nall="n $* \$(tree -if)"
+alias nall="n $* \$(tree -if) -libc"
 
 alias cl="clean"
 
@@ -468,6 +466,8 @@ zstyle ':completion:*:options' list-colors "=^(-- *)=$color[green]"
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
 
 # Vim ignore files for completion
+#----------------------------------------
+
 local vimIgnore='*.pdf'
 
 # Ignore *.o & *.pdf on file complete, when completing vim
@@ -739,7 +739,7 @@ TMOUT=60
 
 # This special function is run every $TMOUT seconds
 TRAPALRM () {
-	# Reset prompt only when we are not completing something
+	# Reset prompt only when we are not in complete mode
 	if [[ "$WIDGET" != "expand-or-complete" ]]; then
 		zle reset-prompt
 	fi
