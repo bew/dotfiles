@@ -617,6 +617,18 @@ function segmt_battery
 	echo -n "%{$fg[default]%}"
 }
 
+function segmt_shlvl
+{
+	if [[ $SHLVL = 1 ]]; then
+		return
+	fi
+
+	local shlvl='%L'
+	local shlvlStyle="%{$fg_bold[red]%}$shlvl  %{$reset_color%}"
+
+	echo -n "${shlvlStyle}"
+}
+
 local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$fg[default]%}"
 
@@ -630,8 +642,8 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 ##############################################
 autoload -U promptinit && promptinit
 
-PROMPT_LINE='$(segmt_battery)'" [${usernameStyle}] ${currDir} ▷ "
-PROMPT_LINE_OLD="%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
+PROMPT_LINE='$(segmt_shlvl)''$(segmt_battery)'" [${usernameStyle}] ${currDir} ▷ "
+PROMPT_LINE_OLD='$(segmt_shlvl)'"%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
 
 
