@@ -1,0 +1,28 @@
+#!/bin/zsh
+
+AWESOME_MASTER_DIR=~/.awesome-master/
+
+BIN_DIR=$AWESOME_MASTER_DIR/bin/
+CONFIG_DIR=$AWESOME_MASTER_DIR/config/awesome/
+
+
+
+local config_name=$1
+
+if [[ -z $config ]]; then
+	config_name=default
+fi
+
+local bin_path=$BIN_DIR/awesome
+
+! [ -f "$bin_path" ] && echo "No binary found at $bin_path" && exit 1
+
+echo "Found binary at $bin_path"
+
+local config_path=$CONFIG_DIR/rc.$config_name.lua
+
+! [ -f "$config_path" ] && echo "No config found at $config_path" && exit 1
+
+echo "Found config '$config_name' at $config_path"
+
+awmtt start -B "$bin_path" -C "$config_path"

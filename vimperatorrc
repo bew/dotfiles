@@ -80,12 +80,15 @@ imapclear
 " tab operation {{{2
 nnoremap J gT
 nnoremap K gt
-"noremap <C-p> :tabmove! -1<CR>
-"noremap <C-n> :tabmove! +1<CR>
+noremap <A-h> :tabmove! -1<CR>
+noremap <A-l> :tabmove! +1<CR>
 
 " scroll
 nnoremap j 3j
 nnoremap k 3k
+
+" validation
+noremap <C-j> <enter>
 
 " miscs {{{2
 " fullscreen
@@ -95,7 +98,7 @@ noremap <F11> <C-v><F11>
 noremap <A-r> :source ~/.vimperatorrc<CR>
 
 " searching {{{2
-noremap <Leader>h :nohlsearch<CR>
+noremap § :nohlsearch<CR>
 
 
 " styles {{{1

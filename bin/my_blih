@@ -38,6 +38,8 @@ import getpass
 version = 1.7
 
 no_passwd = True
+debug = False
+no_print = False
 
 print("No passwd: ", no_passwd)
 
@@ -72,7 +74,7 @@ class blih:
     token = property(token_get, token_set)
 
     def token_calc(self):
-        prompt = "Hello " + self._user + ",\nEnter your password : "
+        prompt = "Hello " + self._user + ", password : "
         try:
             passwd = getpass.getpass(prompt)
         except (KeyboardInterrupt, EOFError) as e:
@@ -84,6 +86,8 @@ class blih:
         signature = hmac.new(self._token, msg=bytes(self._user, 'utf8'), digestmod=hashlib.sha512)
         if data:
             signature.update(bytes(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), 'utf8'))
+            if debug:
+                print("data to json: ", json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
 
         signed_data = {'user' : self._user, 'signature' : signature.hexdigest()}
 
@@ -95,7 +99,15 @@ class blih:
     def request(self, resource, method='GET', content_type='application/json', data=None, url=None):
         signed_data = self.sign_data(data)
 
-        #####print("token: ", self._token)
+        if debug:
+            print("===== DEBUG =================================")
+            print("Resource: ", resource)
+            print("Method: ", method)
+            #print("Data: ", json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
+            print("Signed Data: ", json.dumps(signed_data, sort_keys=True, indent=4, separators=(',', ': ')))
+            print("=== END DEBUG ===============================")
+
+        ####print("token: ", self._token)
 
         if url:
             req = urllib.request.Request(url=url, method=method, data=bytes(json.dumps(signed_data), 'utf8'))
@@ -108,7 +120,17 @@ class blih:
             f = urllib.request.urlopen(req)
         except urllib.error.HTTPError as e:
             print ('HTTP Error ' + str(e.code))
-            data = json.loads(e.read().decode('utf8'))
+            error_msg = e.read().decode('utf8')
+
+            if debug:
+                print()
+                print("============================== DEBUG =================================")
+                print()
+                print(error_msg)
+                print()
+                print("============================ END DEBUG ===============================")
+                print()
+            data = json.loads(error_msg)
             print ("Error message : '" + data['error'] + "'")
             sys.exit(1)
 
@@ -118,6 +140,15 @@ class blih:
             except:
                 print ("Can't decode data, aborting")
                 sys.exit(1)
+
+            if debug:
+                print()
+                print("============================== DEBUG =================================")
+                print()
+                print(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
+                print()
+                print("============================ END DEBUG ===============================")
+                print()
             return (f.status, f.reason, f.info(), data)
 
         print ('Unknown error')
@@ -128,30 +159,36 @@ class blih:
         if description:
             data['description'] = description
         status, reason, headers, data = self.request('/repositories', method='POST', data=data)
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def repo_list(self):
         status, reason, headers, data = self.request('/repositories', method='GET')
         for i in data['repositories']:
-            print (i)
+            if not no_print:
+                print (i)
 
     def repo_delete(self, name):
         status, reason, headers, data = self.request('/repository/' + name, method='DELETE')
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def repo_info(self, name):
         status, reason, headers, data = self.request('/repository/' + name, method='GET')
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def repo_setacl(self, name, acluser, acl):
         data = {'user' : acluser, 'acl' : acl}
         status, reason, headers, data = self.request('/repository/' + name + '/acls', method='POST', data=data)
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def repo_getacl(self, name):
         status, reason, headers, data = self.request('/repository/' + name + '/acls', method='GET')
-        for i in data.keys():
-            print (i + ':' + data[i])
+        if not no_print:
+            for i in data.keys():
+                print (i + ':' + data[i])
 
     def sshkey_upload(self, keyfile):
         try:
@@ -163,21 +200,25 @@ class blih:
         f.close()
         data = {'sshkey' : key}
         status, reason, headers, data = self.request('/sshkeys', method='POST', data=data)
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def sshkey_delete(self, sshkey):
         status, reason, headers, data = self.request('/sshkey/' + sshkey, method='DELETE')
-        print (data['message'])
+        if not no_print:
+            print (data['message'])
 
     def sshkey_list(self):
         status, reason, headers, data = self.request('/sshkeys', method='GET')
         for i in data.keys():
-            print (data[i] + ' ' + i)
+            if not no_print:
+                print (data[i] + ' ' + i)
 
     def whoami(self):
         status, reason, headers, data = self.request('/whoami', method='GET')
-        print ("================================================")
-        print (data['message'])
+        if not no_print:
+            print ("================================================")
+            print (data['message'])
 
 def usage_repository():
     print ('Usage: ' + sys.argv[0] + ' [options] repository command ...')
@@ -288,6 +329,8 @@ def usage():
     print ('\t-v | --verbose\t\t\t-- Verbose')
     print ('\t-b url | --baseurl=url\t\t-- Base URL for BLIH')
     print ('\t-t | --token\t\t\t-- Specify token in the cmdline')
+    print ("\t-d | --debug\t\t\t-- Print blih reply in json-format")
+    print ('\t-n | --no-print\t\t\t-- Do not print result messages')
     print ()
     print ('Commands :')
     print ('\trepository\t\t\t-- Repository management')
@@ -298,7 +341,7 @@ def usage():
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvu:b:t:VU:', ['help', 'verbose', 'user=', 'baseurl=', 'token=', 'version', 'useragent='])
+        opts, args = getopt.getopt(sys.argv[1:], 'dnhvu:b:t:VU:', ['help', 'no-print', 'debug', 'verbose', 'user=', 'baseurl=', 'token=', 'version', 'useragent='])
     except getopt.GetoptError as e:
         print (e)
         usage()
@@ -310,7 +353,11 @@ if __name__ == "__main__":
     user_agent = 'blih-' + str(version)
 
     for o, a in opts:
-        if o in ('-h', '--help'):
+        if o in ('-n', '--no-print'):
+            no_print = True
+        elif o in ('-d', '--debug'):
+            debug = True
+        elif o in ('-h', '--help'):
             usage()
         elif o in ('-v', '--verbose'):
             verbose = True
@@ -330,6 +377,9 @@ if __name__ == "__main__":
 
     if len(args) == 0:
         usage()
+
+    if no_passwd and not user:
+        token = bytes("ce143e50a8c4a6dc8d7fc8629c3e0a81a06d6a92c791463f4e13c2192d29cba69bbd66480cf392164a9f80a06483ea1a454a0376abb8f397131125c0a539e2ed", 'utf8')
 
     if args[0] == 'repository':
         repository(args[1:], baseurl, user, token, verbose, user_agent)

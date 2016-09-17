@@ -12,6 +12,8 @@
 ############################################################################
 ##########################  Init Variables  ################################
 
+log_file="/tmp/i3locker.log"
+
 i3lock_options=(-f -e)
 
 # ➤ loading_img : this img is displayed in the loading locker
@@ -31,10 +33,26 @@ final_img="/tmp/screenshot_i3.png"
 max_loading_time=60 # in seconds
 
 ############################################################################
+##############################  Helper #####################################
+
+function echo_init
+{
+	echo -n > ${log_file}
+}
+
+function echo_debug
+{
+	[[ -t 1 ]] && echo $@
+	echo $@ >> ${log_file}
+}
+
+############################################################################
 ############################  Functions  ###################################
 
 function exit_clean
 {
+	rm -f ${buffer_path}
+	rm -f ${final_img}
 	unclutter &!
 	exit 0
 }
@@ -56,14 +74,14 @@ function process_img
 
 function generate_img
 {
-	function echo_debug
+	function debug_gen
 	{
-		echo "DEBUG [GEN]:" $*
+		echo_debug "DEBUG [GEN]:" $*
 	}
 
 	local timestamp_start=`date +%s`
 
-	echo_debug "start at $timestamp_start"
+	debug_gen "start at $timestamp_start"
 
 	# Screenshot of desktop
 	init_buffer "$buffer_path"
@@ -73,14 +91,14 @@ function generate_img
 
 	local timestamp_end=`date +%s`
 
-	echo_debug "end at $timestamp_end"
+	debug_gen "end at $timestamp_end"
 
 	local generation_time=$(( timestamp_end - timestamp_start ))
 
-	echo_debug "diff is $generation_time"
+	debug_gen "diff is $generation_time"
 
 	if [ $generation_time -gt $max_loading_time ]; then
-		echo "Too long to generate new image (maybe computer hibernated ?)"
+		echo_debug "Too long to generate new image (maybe computer hibernated ?)"
 		exit_clean
 	fi
 }
@@ -94,21 +112,21 @@ pkill unclutter
 # Loading locker
 i3lock -n ${i3lock_options[@]} -i "$loading_img" &!
 loading_pid=$!
-echo "Loading Locker is at PID $loading_pid"
+echo_debug "Loading Locker is at PID $loading_pid"
 
 # Final image generation
 generate_img
 
 # Real lock
-echo "Real lockscreen generated, killing $loading_pid"
+echo_debug "Real lockscreen generated, killing $loading_pid"
 kill $loading_pid
-echo "Running new i3lock with real lockscreen image"
+echo_debug "Running new i3lock with real lockscreen image"
 
 i3lock ${i3lock_options[@]} -i "$final_img"
 locker_status=$?
 
 if ! [ "$locker_status" -eq 0 ]; then
-	echo "bad locker_status: $locker_status"
+	echo_debug "bad locker_status: $locker_status"
 	i3lock -i "$loading_img";
 fi
 

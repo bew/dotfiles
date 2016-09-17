@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+COWIFI_CONFIG_FILE=~/.cowifi
+
+function is_connected
+{
+}
+
+function get_network_id
+{
+	network_alias=$1
+
+	# find a syntax for config file (ex: lines with "id:alias")
+}
+
+
+
+
+while ! is_connected; do
+
+done

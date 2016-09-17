@@ -68,7 +68,7 @@
 ! URxvt*borderColor: colour
 
 ! Select the fonts to be used. This is a comma separated list of font names that are checked in order when trying to find glyphs for characters. The first font defines the cell size for
-URxvt*font: xft:DejaVu\ Sans\ Mono\ for\ Powerline:pixelsize=15, xft:Siji
+URxvt*font: xft:DejaVu\ Sans\ Mono\ for\ Powerline:pixelsize=15
 
 ! URxvt*boldFont: fontlist
 
@@ -91,7 +91,7 @@ URxvt*font: xft:DejaVu\ Sans\ Mono\ for\ Powerline:pixelsize=15, xft:Siji
 ! URxvt*mapAlert: boolean
 
 ! True: set the urgency hint for the wm on receipt of a bell character.  False: do not set the urgency hint [default].
-! URxvt*urgentOnBell: boolean
+URxvt*urgentOnBell: true
 
 ! True: use visual bell on receipt of a bell character; option -vb.  False: no visual bell [default]; option +vb.
 ! URxvt*visualBell: boolean
@@ -249,14 +249,19 @@ URxvt*keysym.M-m: string:í
 URxvt*keysym.M-o: string:ï
 URxvt*keysym.M-p: string:ð
 URxvt*keysym.M-r: string:ò
+URxvt*keysym.M-s: string:ó
 URxvt*keysym.M-v: string:ö
 URxvt*keysym.M-w: string:÷
 URxvt*keysym.M-z: string:ú
 
-! URxvt*perl-ext-common: string
+! Perl extensions loading
 
 ! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance; option -pe.
-! URxvt*perl-ext: string
+URxvt*perl-ext-common: overlay-osc,meta8-osc
+
+! If both of these resources are the empty string, then the perl interpreter will not be initialized. The rationale for having two options is that perl-ext-common will be used for extensions that
+! should be available to all instances, while perl-ext is used for specific instances.
+URxvt*perl-ext:
 
 ! Perl code to be evaluated when all extensions have been registered. See the urxvtperl(3) manpage.
 ! URxvt*perl-eval: string
@@ -283,9 +288,9 @@ URxvt*keysym.M-z: string:ú
 ! URxvt*override-redirect: boolean
 
 ! Turn on/off ISO 14755 (default enabled).
-! URxvt*iso14755: boolean
+URxvt*iso14755: false
 
 ! Turn on/off ISO 14755 5.2 mode (default enabled).
-! URxvt*iso14755_52: boolean
+URxvt*iso14755_52: false
 
 

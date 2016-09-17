@@ -1,0 +1,22 @@
+# Lua
+#--------------------------------------------
+
+#--regex-lua=/([a-zA-Z0-9_]+) = require[ (]"([^"]+)"/\1/r,require/
+
+# local variable
+--regex-lua=/local[ \t]+([a-z][a-zA-Z0-9_]*)[ \t]*=/\1/v,variable/
+
+# Not working when there are TABS at begin-of-line :(
+#--regex-lua=/^\t+local[ \t]+([a-z][a-zA-Z0-9_]*)[ \t]*=/\1/v,variable/
+
+#--regex-lua=/[ \t]+([a-zA-Z0-9_]+)[ \t]*[=][^=]*/\1/v,variable/
+
+
+# C/C++
+#--------------------------------------------
+
+# need test : add c function with TABS
+#--regex-c=/^[^\t]+[\t]+([a-z0-9_]+)\(.*\);?$/\1/f,function/
+
+#--regex-c++=/([a-z][a-z0-9_]*);/\1/v,variable/
+

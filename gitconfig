@@ -1,6 +1,6 @@
 [user]
 	email = lesell_b@epitech.eu
-	name = lesell_b
+	name = Benoit de Chezelles
 [push]
 	default = simple
 [core]
@@ -8,10 +8,15 @@
 [alias]
 	unstage = reset HEAD --
 	com = commit --verbose
-	untrack = update-index --assume-unchanged
-	retrack = update-index --no-assume-unchanged
+	untrack = rm --cached
 	pl = pull
 	ph = push
+	st = status --ignore-submodules
+	l = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n' --all
+	d = diff --word-diff=color --ignore-all-space
+	f = fetch
+	m = merge
+	ch = checkout
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3

@@ -1,0 +1,3 @@
+[submodule "bin/vimpager"]
+	path = bin/vimpager
+	url = git@github.com:rkitover/vimpager.git
