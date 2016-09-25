@@ -9,7 +9,7 @@ CONFIG_DIR=$AWESOME_MASTER_DIR/config/awesome/
 
 local config_name=$1
 
-if [[ -z $config ]]; then
+if [[ -z $config_name ]]; then
 	config_name=default
 fi
 
