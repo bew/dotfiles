@@ -103,7 +103,6 @@ class blih:
             print("===== DEBUG =================================")
             print("Resource: ", resource)
             print("Method: ", method)
-            #print("Data: ", json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
             print("Signed Data: ", json.dumps(signed_data, sort_keys=True, indent=4, separators=(',', ': ')))
             print("=== END DEBUG ===============================")
 
@@ -381,13 +380,18 @@ if __name__ == "__main__":
     if no_passwd and not user:
         token = bytes("ce143e50a8c4a6dc8d7fc8629c3e0a81a06d6a92c791463f4e13c2192d29cba69bbd66480cf392164a9f80a06483ea1a454a0376abb8f397131125c0a539e2ed", 'utf8')
 
-    if args[0] == 'repository':
-        repository(args[1:], baseurl, user, token, verbose, user_agent)
-    elif args[0] == 'sshkey':
-        sshkey(args[1:], baseurl, user, token, verbose, user_agent)
-    elif args[0] == 'whoami':
-        whoami(args[1:], baseurl, user, token, verbose, user_agent)
-    elif args[0] == 'get_token':
-        get_token(args[1:], baseurl, user, token, verbose, user_agent)
-    else:
-        usage()
+
+    try:
+        if args[0] == 'repository':
+            repository(args[1:], baseurl, user, token, verbose, user_agent)
+        elif args[0] == 'sshkey':
+            sshkey(args[1:], baseurl, user, token, verbose, user_agent)
+        elif args[0] == 'whoami':
+            whoami(args[1:], baseurl, user, token, verbose, user_agent)
+        elif args[0] == 'get_token':
+            get_token(args[1:], baseurl, user, token, verbose, user_agent)
+        else:
+            usage()
+    except KeyboardInterrupt:
+        print("Quitting :(")
+
