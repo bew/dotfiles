@@ -106,7 +106,7 @@ function get_cursor_pos()
 # TODO: move this in the prompt module
 function regen-prompt()
 {
-	zle reset-prompt
+	zle && zle reset-prompt
 }
 
 #----------------------------------------------------------------------------------
@@ -205,20 +205,27 @@ setopt LOCAL_TRAPS
 # Aliases
 #----------------------------------------------------------------------------------
 
-alias zshrc="source ~/.zshrc"
-
-
-# Tek piscine easy
-
-alias gccw="g++ *.cpp -Werror -Wextra -g3 -Wall -W && echo ok"
-
+alias zshrc="exec zsh"
 
 # global aliases
 
 alias -g nostdout=" >/dev/null "
 alias -g nostderr=" 2>/dev/null "
 
-# Short aliases
+# Shorters
+
+alias g=git
+alias m=make
+alias t=task
+alias dk=docker
+alias cr=crystal
+alias pac=pacman
+alias wpa=wpa_cli
+alias tre=tree
+
+alias j=jobs
+
+# One letter aliases
 
 alias G="realgrep"
 alias A="ack"
@@ -229,6 +236,7 @@ alias V="vim"
 
 # add verbosity
 
+alias rm="rm -vI"
 alias cp="cp -vi"
 alias mv="mv -vi"
 alias mkdir="mkdir -v"
@@ -240,24 +248,14 @@ alias grep="echo Use ack"
 # ls
 
 alias ls="ls --color=auto --group-directories-first"
-alias lsl="ls -lh"
-alias ll="lsl"
-alias lll="clear; ll"
-alias la='lsl -a'
+alias ll="ls -lh"
+alias la='ll -a'
 alias l="la"
 alias ls1="ls -1"
-alias clsl="clr && pwd && lsl"
 
-#
-
-alias j="jobs"
+# misc
 
 alias todo="ack -i 'todo|fixme'"
-
-# term
-
-alias xt="xterm&"
-alias clr="clear"
 
 # ping
 
@@ -280,7 +278,6 @@ alias ne="echo 'Use: vim'"
 # tree
 
 alias tree="tree -C --dirsfirst -F"
-alias tre="tree"
 
 # cd
 
@@ -291,20 +288,12 @@ alias ....="cd ../../..;"
 # pacman
 
 alias pacman="sudo pacman"
-
-# Remove useless packages
 alias pacmanuseless="pacman -Rnsv \$(pacman -Qtdq)"
 
 
 # Close the current sudo session if any
-alias nosudo="sudo -k"
+alias nosudo="sudo -k;"
 
-
-# google search
-function gg()
-{
-	chromium "google.fr/#q=$1" 2> /dev/null
-}
 
 # history search
 function hsearch()
@@ -317,9 +306,11 @@ function hsearch()
 }
 
 
-# vim
+# original vim
+alias ovim="command vim -X"
 
-alias vim="vim -X"
+# nvim
+
 alias vim=nvim
 alias v="vim"
 alias im="v"
@@ -339,83 +330,55 @@ function man()
 {
 	/usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
 }
-# man completion
 compdef _man man
 
 
-# tek clone
+# tek
+
 function epiclone
 {
-	echo "$fg[blue]Cloning from git@git.epitech.eu:$fg[yellow]$*$reset_color"
-	git clone git@git.epitech.eu:$*
+	local host='git@git.epitech.eu'
+
+	echo "$fg[blue]Cloning from $host:$fg[yellow]$*$reset_color"
+	git clone $host:$*
 }
 
-# wpa
-alias wpa=wpa_cli
+# norme
+alias nall="n $* \$(tree -if) -libc"
 
 # make
 
-alias make="make"
-alias m=make
 alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/null"
 alias remkae="remake"
 alias remaek="remake"
 
 #
 
-# norme
-alias nall="n $* \$(tree -if) -libc"
-
-alias cl="clean"
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
-
-alias zut="sudo !!"
-
-# git
-
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
-
-alias g="git"
-alias gti="git"
-alias gitcheck="git checkout"
-alias gitadl="git add --all"
-alias gitai="git add -i"
-
-alias gitstatus="git status --ignore-submodules"
-alias gitstatusall="gitstatus -u" # show all untracked files
-alias gitdiff="git diff --word-diff=color --ignore-all-space"
-
-alias gitbranch="git branch -vv"
-
-alias gitlog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%n' --all"
-
-alias gitlogstat="gitlog --stat"
-
-alias gitfetch="git fetch"
-alias gitpush="git push"
-alias gitpull="git pull"
-alias gitph="gitpush"
-alias gitpl="gitpull"
-
-alias push="gitpush"
-
-# cwd
-
-function cpwd ()
-{
-	echo \"$(pwd)\" copied into X primary clipboard;
-	pwd | xclip -in -selection primary;
-}
-
-alias cdwd="cd \$(xclip -out -selection primary) && echo 'Moved to' \$(pwd)"
 
 
 # Fast config edit
 
 alias vimzshrc="vim ~/.zshrc"
 alias vimvimrc="vim ~/.vimrc"
+alias vimnviminit="vim ~/.config/nvim/init.vim"
 
+
+# misc
+
+function path
+{
+	echo "$bg[grey]      Path entries:      $reset_color"
+	echo "> $PATH" | sed 's/:/\n> /g' | awk "{ \
+		sub(\"/usr\",   \"$fg_bold[green]/usr$reset_color\"); \
+		sub(\"/bin\",   \"$fg_bold[blue]/bin$reset_color\"); \
+		sub(\"/opt\",   \"$fg_bold[cyan]/opt$reset_color\"); \
+		sub(\"/sbin\",  \"$fg_bold[magenta]/sbin$reset_color\"); \
+		sub(\"/local\", \"$fg_bold[yellow]/local$reset_color\"); \
+		print }"
+}
 
 #----------------------------------------------------------------------------------
 # Completion
@@ -561,19 +524,22 @@ function get-last-exit()
 }
 hooks-add-hook precmd_hook get-last-exit
 
+zmodload zsh/system
+
 # Scroll when prompt get too close to bottom edge
 function prompt-auto-scroll()
 {
+	# Don't attempt to scroll in a tty
 	if [[ "$TERM" = "linux" ]]; then
 		return
 	fi
 
 	# check if there is a command in the stdin buffer
 	# (as the get_cursor_pos will discard it)
-	local buff=""
-	while read -u0 -t -k char; do
-		buff=${buff}${char}
-	done
+	# FIXME: find how to turn on raw input
+	local buff
+	sysread -t 0.1 -i 0 buff
+	#echo "Buff: '$buff'"
 	if ! [ -z "$buff" ]; then
 		# push it on the ZLE input stack
 		print -z "${buff}"
@@ -582,7 +548,7 @@ function prompt-auto-scroll()
 	# Get the cursor position for the (new) current prompt
 	get_cursor_pos
 
-	if test $CURSOR_POS_ROW -gt $(( $LINES - 4 )); then
+	if (( CURSOR_POS_ROW > (LINES - 4) )) then
 		echo $'\e[4S'	# scroll the terminal
 		echo $'\e[6A'
 	fi
@@ -606,7 +572,7 @@ function segmt_battery
 	# status
 	[[ "$bat_status" =~ "Charging" ]] && echo -n "+"
 
-	[[ $bat_status =~ "Discharging" ]] && printf "-" # printf because we cannot echo "-"
+	[[ $bat_status =~ "Discharging" ]] && printf "%s" "-" # printf because we cannot echo "-"
 
 	# percentage
 	echo -n $bat_perc"%%"
@@ -785,7 +751,7 @@ function zwidget-insert-sudo ()
 {
 	local cursor=$CURSOR
 	BUFFER="sudo $BUFFER"
-	CURSOR=(( cursor + 5 ))
+	CURSOR=$(( cursor + 5 ))
 }
 zle -N zwidget-insert-sudo
 
@@ -910,6 +876,4 @@ bindkey -M menuselect "\M-$" end-of-line
 #----------------------------------------
 
 [ -f ~/.opam/opam-init/init.zsh ] && . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
-
 
