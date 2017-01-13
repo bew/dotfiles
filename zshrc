@@ -36,7 +36,7 @@ zmodload zsh/complist
 # LOAD PLUGINS
 #----------------------------------------------------------------------------------
 
-# Add vim keys (ciw / ciW / etc...)
+# Add vim obj (ciw / ciW / etc...)
 #-------------------------------------------------------------
 source ~/.zsh/opp.zsh/opp.zsh
 
@@ -320,6 +320,7 @@ function hsearch()
 # vim
 
 alias vim="vim -X"
+alias vim=nvim
 alias v="vim"
 alias im="v"
 alias vm="v"
@@ -331,9 +332,6 @@ alias ivm="v"
 alias view="vim -R -c 'set nomod nolist'"
 
 alias ":h"="vimhelp"
-
-
-
 alias ":q"="exit"
 
 # man in vim

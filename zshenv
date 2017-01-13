@@ -8,7 +8,7 @@ export GOPATH=$HOME/gocode
 
 export PAGER="most"
 
-export EDITOR="vim"
+export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
 export GIT_EDITOR="$EDITOR"
