@@ -773,6 +773,17 @@ function zwidget-git-status
 }
 zle -N zwidget-git-status
 
+# Git log
+function zwidget-git-log
+{
+	if [[ -n $BUFFER ]]; then
+		zle push-input
+	fi
+	BUFFER="g l" # this is a git alias for a full formated git log, see ~/.gitconfig for expansion
+	zle accept-line
+}
+zle -N zwidget-git-log
+
 # Just do nothing
 function do-nothing () {}
 zle -N do-nothing
@@ -798,30 +809,30 @@ zle -N accept-line
 # TODO: better binds organization
 
 # Alt-L => redraw prompt on-demand
-bindkey "\M-l" reset-prompt
+bindkey "l" reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
-bindkey "\M-s" zwidget-insert-sudo
+bindkey "s" zwidget-insert-sudo
 
 # Menu key => do nothing
 bindkey "[29~" do-nothing
 
-# Git status
-bindkey "\M-g" zwidget-git-status
+# short Git
+bindkey "g" zwidget-git-status
+bindkey "l" zwidget-git-log
 
 # Who doesn't want home and end to work?
 bindkey '\e[7~' beginning-of-line
 bindkey '\e[8~' end-of-line
 
 # Alt-T => zle test
-bindkey -M vicmd "ô" zwidget-zletest
-bindkey -M viins "\M-t" zwidget-zletest
+bindkey -M viins "t" zwidget-zletest
 
 autoload -U edit-command-line
 zle -N edit-command-line
 
 # Alt-E => edit line in $EDITOR
-bindkey -M viins "\M-e" edit-command-line
+bindkey -M viins "e" edit-command-line
 
 # Ctrl-F => file fuzzy search
 bindkey -M viins '^f' fzf-file-widget
@@ -844,7 +855,7 @@ bindkey -M viins '^n'  down-line-or-history
 
 # cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
-bindkey -M viins '\M-#' push-input
+bindkey -M viins '#' push-input
 
 
 # menuselect keybindings
@@ -857,14 +868,16 @@ bindkey -M menuselect '[Z' reverse-menu-complete
 bindkey -M menuselect "" send-break
 
 # Alt-hjkl to move inside results
-bindkey -M menuselect "\M-h" backward-char
-bindkey -M menuselect "\M-j" down-line-or-history
-bindkey -M menuselect "\M-k" up-line-or-history
-bindkey -M menuselect "\M-l" forward-char
+bindkey -M menuselect "h" backward-char
+bindkey -M menuselect "j" down-line-or-history
+bindkey -M menuselect "k" up-line-or-history
+bindkey -M menuselect "l" forward-char
 
 # Alt-$ & Alt-0 => got to first & last results
-bindkey -M menuselect "\M-0" beginning-of-line
-bindkey -M menuselect "\M-$" end-of-line
+bindkey -M menuselect "0" beginning-of-line
+bindkey -M menuselect "$" end-of-line
+
+bindkey -M menuselect "a" accept-and-hold
 
 . ~/.zsh/fzf/key-bindings.zsh
 
