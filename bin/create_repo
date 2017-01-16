@@ -6,10 +6,12 @@ then
 	exit 0
 fi
 
-blih repository create $1
+USER=benoit.lesellierdechezelles@epitech.eu
+
+blih -u ${USER} repository create $1
 
 echo "Setting ACL for ramassage-tek :"
-blih repository setacl $1 ramassage-tek r && echo "ramassage-tek:r"
+blih -u ${USER} repository setacl $1 ramassage-tek r && echo "ramassage-tek:r"
 
 if [ -z $2 ]; then
 	exit 0
