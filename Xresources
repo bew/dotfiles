@@ -36,6 +36,8 @@ XTerm*scrollKey:			true
 ! Scroll on tty output
 XTerm*scrollTtyOutput:		false
 
+! Fix Backspace not deleting anything in vim
+XTerm.*backarrowKey: false
 
 ! TESTING
 !xterm*altSendsEscape:		true

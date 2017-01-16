@@ -157,7 +157,7 @@ URxvt*scrollTtyKeypress: true
 ! URxvt*lineSpace: number
 
 ! True: handle Meta (Alt) + keypress to set the 8th bit. False: handle Meta (Alt) + keypress as an escape prefix [default].
-URxvt*meta8: true
+URxvt*meta8: false
 
 ! True: the mouse wheel scrolls a page full. False: the mouse wheel scrolls five lines [default].
 ! URxvt*mouseWheelScrollPage: boolean
@@ -236,28 +236,18 @@ URxvt*modifier: alt
 
 ! Compile frills: Associate action with keysym sym. The intervening resource name keysym. cannot be omitted.
 ! URxvt*keysym.sym: action
-URxvt*keysym.M-J: string:Ê
-URxvt*keysym.M-K: string:Ë
-URxvt*keysym.M-O: string:Ï
-! the . is 0xa0
-URxvt*keysym.M-space: string: 
-URxvt*keysym.M-c: string:ã
-URxvt*keysym.M-i: string:é
-URxvt*keysym.M-j: string:ê
-URxvt*keysym.M-k: string:ë
-URxvt*keysym.M-m: string:í
-URxvt*keysym.M-o: string:ï
-URxvt*keysym.M-p: string:ð
-URxvt*keysym.M-r: string:ò
-URxvt*keysym.M-s: string:ó
-URxvt*keysym.M-v: string:ö
-URxvt*keysym.M-w: string:÷
-URxvt*keysym.M-z: string:ú
+
+!! Cursor word movement
+URxvt*altSendsEscape: true
+URxvt.keysym.C-Up:    \033[1;5A
+URxvt.keysym.C-Down:  \033[1;5B
+URxvt.keysym.C-Left:  \033[1;5D
+URxvt.keysym.C-Right: \033[1;5C
 
 ! Perl extensions loading
 
 ! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance; option -pe.
-URxvt*perl-ext-common: overlay-osc,meta8-osc
+URxvt*perl-ext-common: overlay-osc
 
 ! If both of these resources are the empty string, then the perl interpreter will not be initialized. The rationale for having two options is that perl-ext-common will be used for extensions that
 ! should be available to all instances, while perl-ext is used for specific instances.
