@@ -31,9 +31,6 @@ set followhints=1
 " addons + downloads + help + javascript + prefs
 set newtab=all
 
-" don't focus any "input" elements automatically when open pages.
-set focuscontent
-
 " show tabbar only
 "set gui=none,tabs,addons
 
@@ -80,8 +77,8 @@ imapclear
 " tab operation {{{2
 nnoremap J gT
 nnoremap K gt
-noremap <A-h> :tabmove! -1<CR>
-noremap <A-l> :tabmove! +1<CR>
+noremap <A-j> :tabmove! -1<CR>
+noremap <A-k> :tabmove! +1<CR>
 
 " scroll
 nnoremap j 3j
