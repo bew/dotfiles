@@ -15,7 +15,9 @@ fi
 
 setxkbmap -config ~/.config/xkbmap.config
 [ -f ~/.Xresources ] && xrdb ~/.Xresources
-xset -b
+
+xset -b # no beep
+#xset -r # no auto key repeat
 
 pulseaudio --start
 
