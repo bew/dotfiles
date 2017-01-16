@@ -1,5 +1,8 @@
 # this is the global git ignore
 
+# misc
+/*.pdf
+
 # vim files
 .cs_*
 tags
@@ -10,3 +13,7 @@ __pycache__
 # C/C++ compilation
 *.o
 *.out
+
+# temp
+cnorm
+pyrser
