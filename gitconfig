@@ -18,6 +18,7 @@
 	f = fetch
 	m = merge
 	ch = checkout
+	br = branch
 	vd = vimdiff
 [merge]
 	tool = vimdiff
