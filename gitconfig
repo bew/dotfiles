@@ -1,35 +1,55 @@
 [user]
 	email = lesell_b@epitech.eu
 	name = Benoit de Chezelles
+
 [push]
 	default = current
+
 [core]
 	excludesfile = ~/.gitignore
+
 [alias]
-	unstage = reset HEAD --
-	com = commit --verbose
-	untrack = rm --cached
-	pl = pull
-	ph = push
+
+	# add & commit
 	a = add
-	st = status --ignore-submodules
-	l = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n' --all
-	lo = "!f() { git l --oneline $@; }; f"
-	d = diff --word-diff=color --ignore-all-space
-	dc = diff --word-diff=color --ignore-all-space --cached
+	com = commit --verbose
+
+	# index manipulation
 	f = fetch
 	m = merge
 	ch = checkout
+	unstage = reset HEAD --
+	untrack = rm --cached
+
+	# remote interaction
+	ph = push
+	pl = pull
+
+	# info only
+	#----------------------------
+
 	br = branch
-	vd = vimdiff
+	st = status --ignore-submodules
+
+	# log
+	l = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n' --all
+	lo = "!f() { git l --oneline $@; }; f"
+
+	# diff
+	d = diff --word-diff=color --ignore-all-space
+	dc = "!f() { git d --staged $@; }; f"
+
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
+
 [mergetool "vimdiff"]
 	cmd = nvim -d
 	conflictstyle = diff3
+
 [help]
 	autocorrect = -1
+
 [color "status"]
 	untracked = "cyan dim "
 
