@@ -1,4 +1,7 @@
-*
-!.gitignore
+cache
 
-!autosave
+command-history
+search-history
+
+lib.pl
+playlist.pl

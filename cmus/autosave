@@ -96,7 +96,7 @@ set skip_track_info=false
 set smart_artist_sort=true
 set softvol=false
 set softvol_state=0 0
-set status_display_program=/home/lesell_b/cmus_status.zsh
+set status_display_program=/home/lesell_b/.config/cmus/bin/awesome_status.zsh
 set wrap_search=true
 bind browser backspace browser-up
 bind browser i toggle show_hidden
