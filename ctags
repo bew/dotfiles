@@ -11,12 +11,3 @@
 
 #--regex-lua=/[ \t]+([a-zA-Z0-9_]+)[ \t]*[=][^=]*/\1/v,variable/
 
-
-# C/C++
-#--------------------------------------------
-
-# need test : add c function with TABS
-#--regex-c=/^[^\t]+[\t]+([a-z0-9_]+)\(.*\);?$/\1/f,function/
-
-#--regex-c++=/([a-z][a-z0-9_]*);/\1/v,variable/
-
