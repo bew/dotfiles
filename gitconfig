@@ -39,14 +39,18 @@
 	d = diff --word-diff=color --ignore-all-space
 	dc = "!f() { git d --staged $@; }; f"
 
-	# last merge stat
-	lastmerge = "!f() { \
+	# last merge diff
+	diff-last-merge = "!f() { \
 		sha_orig_head=$(git rev-parse --short ORIG_HEAD); \
 		sha_head=$(git rev-parse --short HEAD); \
 		echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
 		git --no-pager diff --stat ORIG_HEAD && git --no-pager diff --summary ORIG_HEAD; \
 		}; f"
-	lm = "!f() { git lastmerge; }; f"
+	dlm = "!f() { git diff-last-merge; }; f"
+
+	# last merge logs
+	log-last-merge = "!f() { git pretty-log ORIG_HEAD.. }; f"
+	llm = "!f() { git log-last-merge; }; f"
 
 [merge]
 	tool = vimdiff
