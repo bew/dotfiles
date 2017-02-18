@@ -14,6 +14,7 @@
 	a = add
 	st = status --ignore-submodules
 	l = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n' --all
+	lo = "!f() { git l --oneline $@; }; f"
 	d = diff --word-diff=color --ignore-all-space
 	dc = diff --word-diff=color --ignore-all-space --cached
 	f = fetch
