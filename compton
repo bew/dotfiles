@@ -4,9 +4,9 @@ shadow = true;				# Enabled client-side shadows on windows.
 no-dnd-shadow = true;		# Don't draw shadows on DND windows.
 #clear-shadow = true;		# Zero the part of the shadow's mask behind the window (experimental).
 shadow-radius = 7;			# The blur radius for shadows. (default 12)
-shadow-offset-x = -7;		# The left offset for shadows. (default -15)
-shadow-offset-y = -7;		# The top offset for shadows. (default -15)
-# shadow-opacity = 0.7;		# The translucency for shadows. (default .75)
+shadow-offset-x = -10;		# The left offset for shadows. (default -15)
+shadow-offset-y = -10;		# The top offset for shadows. (default -15)
+shadow-opacity = 1;		# The translucency for shadows. (default .75)
 # shadow-red = 0.0;			# Red color value of shadow. (0.0 - 1.0, defaults to 0)
 # shadow-green = 0.0;		# Green color value of shadow. (0.0 - 1.0, defaults to 0)
 # shadow-blue = 0.0;		# Blue color value of shadow. (0.0 - 1.0, defaults to 0)
@@ -25,14 +25,14 @@ fade-out-step = 0.05;		# Opacity change between steps while fading out. (default
 # no-fading-openclose = true;	# Fade windows in/out when opening/closing.
 
 # Other
-inactive-dim = 0.4;		# Dim inactive windows. (0.0 - 1.0, defaults to 0).
-mark-wmwin-focused = true;	# Try to detect WM windows and mark them as active.
-mark-ovredir-focused = true;
+inactive-dim = 0.2;		# Dim inactive windows. (0.0 - 1.0, defaults to 0).
+#mark-wmwin-focused = true;	# Try to detect WM windows and mark them as active.
+#mark-ovredir-focused = true;
 detect-rounded-corners = true;
 detect-client-opacity = true;
 
 # Window type settings
 wintypes:
 {
-  tooltip = { fade = true; shadow = false; opacity = 0.85; };
+  tooltip = { fade = true; shadow = false; };
 };
