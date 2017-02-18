@@ -17,6 +17,7 @@ SAVEHIST=1000
 unsetopt beep
 
 bindkey -v
+KEYTIMEOUT=1 # ESC timeout is: $KEYTIMEOUT * 10ms
 
 # Autoload
 
