@@ -353,6 +353,12 @@ alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/nul
 alias remkae="remake"
 alias remaek="remake"
 
+# youtube-dl
+
+alias ytdl='youtube-dl'
+alias ytdl-m4a='ytdl --extract-audio -f m4a --ignore-errors'
+alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
+
 #
 
 
