@@ -359,6 +359,7 @@ alias remaek="remake"
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
+alias makeawesome='m CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
 # Hacks
 
