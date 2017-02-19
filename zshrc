@@ -226,7 +226,7 @@ alias tre=tree
 
 alias j=jobs
 
-# One letter aliases
+# Big-one letter aliases
 
 alias G="realgrep"
 alias A="ack"
@@ -363,9 +363,9 @@ alias makeawesome='m CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
 # Hacks
 
-# 'pezop' is a firefox profile, where the language is in french, to
+# 'pezop' is a firefox profile, where the browser language is in french, to
 # bypass language limitations on www.pezop.com :)
-alias pezop="firefox -P pezop www.pezop.com"
+alias pezop="firefox -P pezop www.pezop.com &!"
 
 
 # Fast config edit
