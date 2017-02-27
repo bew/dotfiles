@@ -821,6 +821,8 @@ zle -N accept-line
 # Keybinds
 #----------------------------------------------------------------------------------
 
+. ~/.zsh/fzf/key-bindings.zsh
+
 # TODO: better binds organization
 
 # Alt-L => redraw prompt on-demand
@@ -832,7 +834,7 @@ bindkey "s" zwidget-insert-sudo
 # Menu key => do nothing
 bindkey "[29~" do-nothing
 
-# short Git
+# fast git
 bindkey "g" zwidget-git-status
 bindkey "l" zwidget-git-log
 
@@ -852,6 +854,13 @@ bindkey -M viins "e" edit-command-line
 # Ctrl-F => file fuzzy search
 bindkey -M viins '^f' fzf-file-widget
 bindkey -M vicmd '^f' fzf-file-widget
+
+# Alt-c => cd to directory with fuzzy search
+bindkey -M viins 'c' fzf-cd-widget
+bindkey -M vicmd 'c' fzf-cd-widget
+
+# Ctrl-R => file fuzzy search
+#bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
 
 # backspace and ^h working even after
 # returning from command mode
@@ -893,8 +902,6 @@ bindkey -M menuselect "0" beginning-of-line
 bindkey -M menuselect "$" end-of-line
 
 bindkey -M menuselect "a" accept-and-hold
-
-. ~/.zsh/fzf/key-bindings.zsh
 
 #----------------------------------------------------------------------------------
 # Other init
