@@ -40,13 +40,17 @@
 	d = diff --word-diff=color --ignore-all-space
 	dc = "!f() { git d --staged $@; }; f"
 
-	# last merge diff
-	diff-last-merge = "!f() { \
+	# last merge stats
+	stat-last-merge = "!f() { \
 		sha_orig_head=$(git rev-parse --short ORIG_HEAD); \
 		sha_head=$(git rev-parse --short HEAD); \
 		echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
 		git --no-pager diff --stat ORIG_HEAD $@ && git --no-pager diff --summary ORIG_HEAD $@; \
 		}; f"
+	slm = "!f() { git stat-last-merge $@; }; f"
+
+	# last merge diff (move as simple alias?)
+	diff-last-merge = "diff ORIG_HEAD"
 	dlm = "!f() { git diff-last-merge $@; }; f"
 
 	# last merge logs
