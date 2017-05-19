@@ -31,8 +31,13 @@ __fzfcmd()
 
 fzf-file-widget()
 {
-	LBUFFER="${LBUFFER}$(__fsel)"
-	zle redisplay
+	local completion_prefix="${LBUFFER/* /}"
+	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
+	local selected_completions="$(__fsel $completion_prefix)"
+	if [ -n "$selected_completions" ]; then
+		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
+		zle redisplay
+	fi
 }
 zle     -N   fzf-file-widget
 
