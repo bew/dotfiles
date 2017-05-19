@@ -1,0 +1,91 @@
+snippet init "def initialize" b
+def initialize${1:(${2:args})}
+  ${VISUAL}${0}
+end
+endsnippet
+
+snippet req "require" b
+require "${1:file}"$0
+endsnippet
+
+snippet def "method definition - no args" b
+def ${1:method_name}${2:(${3:args})}
+  ${VISUAL}$4
+end$0
+endsnippet
+
+snippet !mod(ule)?! "Module definition" rb
+module ${1:ModuleName}
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet !st(ruct)?! "Struct definition" rb
+struct ${1:StructName}
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet !cl(ass)?! "Class definition" rb
+class ${1:ClassName}
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet do "do ... end"
+do
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet doa "do |args| ... end"
+do |${1:args}|
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet ido "inline block { ... }"
+{ ${VISUAL}$0 }
+endsnippet
+
+snippet idoa "inline block { |args| ... }"
+{ |${1:args}| ${VISUAL}$0 }
+endsnippet
+
+# Spec helpers
+
+snippet describe "Spec - describe 'desc' do ... end" b
+describe "${1:description}" do
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet it "Spec - it 'desc' do ... end" b
+it "${1:description}" do
+  ${VISUAL}$0
+end
+endsnippet
+
+# Macro helpers
+
+snippet !mac(ro)?! "Create a macro" rb
+macro ${1:macro_name}${2:(${3:args})}
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet ms "Macro stmt {% blabla %}" w
+{% ${VISUAL}$1 %}$2
+endsnippet
+
+snippet mp "Macro printed stmt {{ blabla }}" w
+{{ ${VISUAL}$1 }}$2
+endsnippet
+
+snippet mps "Short Macro printed stmt {{blabla}}" w
+{{${VISUAL}$1}}$2
+endsnippet
+
+snippet md "Macro debug here" b
+{% debug() %}$1
+endsnippet

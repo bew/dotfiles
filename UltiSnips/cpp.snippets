@@ -1,0 +1,176 @@
+priority -50
+
+extends c
+
+# We want to overwrite everything in parent ft.
+priority -49
+
+snippet doxcom "Doxygen comment" b
+/**
+ * ${1:Comment}
+ */$0
+endsnippet
+
+# TODO: how to set length of ======= to 80 columns automatically..
+snippet comline "hr comment line" b
+//==${1:=}=========================================================================
+endsnippet
+
+snippet fline "Full line ---" b
+//>----------------------------------------------------------------------------
+endsnippet
+
+snippet mline "Mid line ---" b
+//>-------------------------------------------------------------
+endsnippet
+
+snippet sline "Small line ---" b
+//>----------------------------------------
+endsnippet
+
+snippet section "Comment Section" b
+${1}
+// ${2:${VISUAL:Comment/^\/\/ ?//}}
+$1${0}
+endsnippet
+
+snippet header "Comment Header" b
+// ${1:${VISUAL:Comment/^\/\/ ?//}}
+${2}${0}
+endsnippet
+
+###########################################################################
+
+snippet inc "#include local" b
+#include "${1:`!p snip.rv = snip.basename or "file"`}${2:.hpp}"
+endsnippet
+
+snippet Inc "#include system" b
+#include <${1}>${0}
+endsnippet
+
+###########################################################################
+
+snippet class "class .."
+class ${1:`!p snip.rv = snip.basename or "ClassName"`}
+{
+${2:public}:
+	${0}
+};
+endsnippet
+
+snippet claiface "class .. (Interface)" b
+class ${1:`!p snip.rv = snip.basename or "ClassName"`}
+{
+public:
+	virtual ~${1/(\w+).*/$1/}() {};
+
+public:
+	${0}
+};
+endsnippet
+
+###########################################################################
+
+snippet claexcept "class .. (Exception class)"
+class ${1:`!p snip.rv = snip.basename or "ClassName"`} : public std::exception
+{
+public:
+	${1/(\w+).*/$1/}(${2:arguments});
+	virtual ~${1/(\w+).*/$1/}() throw();
+
+public:
+	const char * what() const throw();
+
+private:
+	${0:/* data */}
+};
+endsnippet
+
+###########################################################################
+
+snippet clacanon "class .. (Canonical class)"
+class ${1:`!p snip.rv = snip.basename or "ClassName"`}
+{
+public:
+	${1/(\w+).*/$1/}(${2:arguments});
+	${1/(\w+).*/$1/}(${1/(\w+).*/$1/} const & other);
+	${1/(\w+).*/$1/} & operator=(${1/(\w+).*/$1/} const & other);
+	virtual ~${1/(\w+).*/$1/}();
+
+protected:
+	${0:/* data */}
+};
+endsnippet
+
+snippet enumcla "enum class" b
+enum class ${1:EnumClass} : ${2:int}
+{
+	${VISUAL}${3}
+};
+endsnippet
+
+###########################################################################
+
+snippet ctor "Constructor implementation"
+${1:`!p snip.rv = snip.basename or "ClassName"`}::$1(${2})${3: :}
+{${4}
+}
+${0}
+endsnippet
+
+###########################################################################
+
+snippet dtor "Destructor implementation"
+${1:`!p snip.rv = snip.basename or "ClassName"`}::~$1()
+{${2}
+}
+${0}
+endsnippet
+
+###########################################################################
+
+snippet ns "namespace .. (namespace)"
+namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`}
+{
+	${VISUAL}${0}
+};
+endsnippet
+
+###########################################################################
+
+snippet map "std::map (map)"
+std::map<${1:key}, ${2:value}> map$0;
+endsnippet
+
+###########################################################################
+
+snippet vector "std::vector (v)"
+std::vector<${1:char}> v$0;
+endsnippet
+
+###########################################################################
+
+snippet tp "template <typename ..> (template)"
+template <typename ${1:_InputIter}>
+endsnippet
+
+###########################################################################
+
+snippet cout "std::cout std::endl"
+std::cout << ${1} << std::endl;${0}
+endsnippet
+
+snippet cerr "std::cerr std::endl"
+std::cerr << ${1} << std::endl;${0}
+endsnippet
+
+###########################################################################
+
+snippet incio "include iostream" b
+#include <iostream>
+endsnippet
+
+###########################################################################
+
+# vim:ft=snippets:

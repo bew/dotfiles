@@ -1,0 +1,127 @@
+###########################################################################
+#                            TextMate Snippets                            #
+###########################################################################
+
+priority -50
+
+snippet def "#define ..."
+#define ${1}
+endsnippet
+
+snippet ifndef "#ifndef ... #define ... #endif"
+#ifndef ${1/([A-Za-z0-9_]+).*/$1/}
+# define ${1:SYMBOL}
+
+#endif
+endsnippet
+
+snippet #if "#if #endif" b
+#if ${1:0}
+${VISUAL}${0}
+#endif
+endsnippet
+
+snippet inc "#include local header (inc)"
+#include "${1:`!p snip.rv = snip.basename`}${2:.h}"${0}
+endsnippet
+
+snippet Inc "#include <> (Inc)"
+#include <${1}${2:.h}>
+endsnippet
+
+snippet main "main() (main)"
+int main(${1:int ac, char *av[]})
+{
+	${VISUAL}${0}
+	return (0);
+}
+endsnippet
+
+snippet for "for loop (for)"
+for (${2:i} = 0; $2 < ${1:count}; ${3:++$2}) {
+	${VISUAL}${0}
+}
+endsnippet
+
+snippet enum "Enumeration"
+enum ${1:name}
+{
+	$0
+};
+endsnippet
+
+snippet once "Include header once only guard"
+#ifndef ${1:`!p
+if not snip.c:
+	import random, string
+	name = re.sub(r'[^A-Za-z0-9]+','_', snip.fn).upper()
+	# rand = ''.join(random.sample(string.ascii_letters+string.digits, 8))
+	snip.rv = ('%s_' % (name)).upper()
+else:
+	snip.rv = snip.c`}
+# define $1
+
+${VISUAL}${0}
+
+#endif /* !$1 */
+endsnippet
+
+snippet td "Typedef"
+typedef ${1:int} ${2:MyCustomType};
+endsnippet
+
+snippet tden "typedef enum (Epitech)" b
+typedef enum	e_$1
+{
+  ${VISUAL}${0},
+}		t_${1:enum};
+endsnippet
+
+snippet tdst "typedef struct (Epitech)" b
+typedef struct	s_$1
+{
+  ${VISUAL}${0}
+}		t_${1:struct};
+endsnippet
+
+snippet wh "while loop"
+while (${1:/* condition */})
+{
+	${VISUAL}${0}
+}
+endsnippet
+
+snippet fprintf "fprintf ..."
+fprintf(${1:stderr}, "${2:%s}\n"${2/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+
+snippet eli "else if .. (eli)"
+else if (${1:/* condition */})
+{
+	${VISUAL}${0}
+}
+endsnippet
+
+snippet printf "printf .. (printf)"
+printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
+endsnippet
+
+snippet st "struct"
+struct ${1:`!p snip.rv = "t_" + (snip.basename or "name")`}
+{
+	${0:/* data */}
+};
+endsnippet
+
+snippet fun "function" b
+${2:void} ${1:function_name}(${3})
+{
+	${VISUAL}${0}
+}
+endsnippet
+
+snippet funp "function prototype" b
+${2:void} ${1:function_name}(${3});
+endsnippet
+
+# vim:ft=snippets:
