@@ -4,13 +4,20 @@ if [[ $- != *i* ]]; then
 	return
 fi
 
+FIND_IGNORE_OPTIONS="\\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune"
+
 # CTRL-T - Paste the selected file path(s) into the command line
 __fsel()
 {
-	local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+	if [ -n "$1" ]; then
+		local base_dir="$1"
+	else
+		local base_dir='.'
+	fi
+	local cmd="${FZF_CTRL_T_COMMAND:-"command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
 		-o -type f -print \
 		-o -type d -print \
-		-o -type l -print 2> /dev/null | sed 1d | cut -b3-"}"
+		-o -type l -print 2> /dev/null | sed 1d"}"
 	eval "$cmd" | $(__fzfcmd) -m | while read item; do
 	echo -n "${(q)item} "
 done
@@ -32,7 +39,7 @@ zle     -N   fzf-file-widget
 # ALT-C - cd into the selected directory
 fzf-cd-widget()
 {
-	local cmd="${FZF_ALT_C_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+	local cmd="${FZF_ALT_C_COMMAND:-"command find -L . ${FIND_IGNORE_OPTIONS} \
 		-o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
 	cd "${$(eval "$cmd" | $(__fzfcmd) +m):-.}"
 	zle reset-prompt
