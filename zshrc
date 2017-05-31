@@ -772,8 +772,35 @@ function loadsshkeys
 
 
 #----------------------------------------------------------------------------------
+# Functions
+#----------------------------------------------------------------------------------
+
+function no_output
+{
+	$@ >/dev/null 2>&1
+}
+
+function in_a_git_repo
+{
+	no_output git rev-parse --is-inside-work-tree
+}
+
+#----------------------------------------------------------------------------------
 # ZLE Widgets
 #----------------------------------------------------------------------------------
+
+function zle::utils::check_git
+{
+	local error="Error:"
+	if [ -n "$1" ]; then
+		error="Error: $1 -"
+	fi
+
+	if ! in_a_git_repo; then
+		zle -M "${error} Not a git repository"
+		return 1
+	fi
+}
 
 # insert sudo at <bol>
 function zwidget-insert-sudo ()
@@ -794,22 +821,20 @@ zle -N zwidget-zletest
 # Git status
 function zwidget-git-status
 {
-	if [[ -n $BUFFER ]]; then
-		zle push-input
-	fi
-	BUFFER="git status"
-	zle accept-line
+	zle::utils::check_git "git status" || return
+
+	echo
+	git status
+	zle reset-prompt
 }
 zle -N zwidget-git-status
 
 # Git log
 function zwidget-git-log
 {
-	if [[ -n $BUFFER ]]; then
-		zle push-input
-	fi
-	BUFFER="g l" # this is a git alias for a full formated git log, see ~/.gitconfig for expansion
-	zle accept-line
+	zle::utils::check_git "git log" || return
+
+	git l
 }
 zle -N zwidget-git-log
 
