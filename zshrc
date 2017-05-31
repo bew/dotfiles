@@ -223,6 +223,7 @@ alias cr=crystal
 alias pac=pacman
 alias wpa=wpa_cli
 alias tre=tree
+alias py=python
 
 alias j=jobs
 
@@ -248,7 +249,7 @@ alias grep="echo Use ack"
 
 # ls
 
-alias ls="ls --color=auto --group-directories-first"
+alias ls="ls --color --group-directories-first"
 alias ll="ls -lh"
 alias la='ll -a'
 alias l="la"
@@ -358,6 +359,10 @@ alias remaek="remake"
 alias ytdl='youtube-dl'
 alias ytdl-m4a='ytdl --extract-audio -f m4a --ignore-errors'
 alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
+
+# mpv
+
+alias mpv-audio='mpv --no-video'
 
 #
 
