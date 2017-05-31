@@ -813,6 +813,15 @@ function zwidget-git-log
 }
 zle -N zwidget-git-log
 
+function zwidget-fg
+{
+	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
+
+	eval fg
+	zle reset-prompt
+}
+zle -N zwidget-fg
+
 # Just do nothing
 function do-nothing () {}
 zle -N do-nothing
@@ -868,6 +877,11 @@ bindkey -M viins "e" edit-command-line
 # Ctrl-F => file fuzzy search
 bindkey -M viins '^f' fzf-file-widget
 bindkey -M vicmd '^f' fzf-file-widget
+
+# Ctrl-Z => fg
+bindkey -M viins "^z" zwidget-fg
+bindkey -M vicmd "^z" zwidget-fg
+
 
 # Alt-c => cd to directory with fuzzy search
 bindkey -M viins 'c' fzf-cd-widget
