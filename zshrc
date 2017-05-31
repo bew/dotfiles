@@ -206,7 +206,16 @@ setopt LOCAL_TRAPS
 # Aliases
 #----------------------------------------------------------------------------------
 
-alias zshrc="exec zsh"
+function reload_zshrc
+{
+	if [ -n "$(jobs)" ]; then
+		echo "Error: $(jobs | wc -l) job(s) in background"
+	else
+		exec zsh
+	fi
+}
+
+alias zshrc=reload_zshrc
 
 # global aliases
 
@@ -864,7 +873,7 @@ bindkey -M vicmd '^f' fzf-file-widget
 bindkey -M viins 'c' fzf-cd-widget
 bindkey -M vicmd 'c' fzf-cd-widget
 
-# Ctrl-R => file fuzzy search
+# Ctrl-R => history fuzzy search
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
 
 # backspace and ^h working even after
