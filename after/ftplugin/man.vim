@@ -24,7 +24,3 @@ noremap <buffer> <S-Space> <C-u><C-u>
 
 " Quit
 noremap <buffer> q :q<CR>
-
-
-" recording replacement
-noremap <buffer> Q q
