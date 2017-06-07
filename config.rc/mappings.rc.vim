@@ -69,8 +69,16 @@ nnoremap <M-L> :tabmove +1<cr>
 inoremap <M-H> <esc>:tabmove -1<cr>
 inoremap <M-L> <esc>:tabmove +1<cr>
 
-" Open a zsh at cwd
-nnoremap <M-z> :!zsh<cr>
+
+
+"-- Visual Mapping
+"------------------------------------------------------------------
+
+vnoremap <Left> <gv
+vnoremap <Right> >gv
+vnoremap <Up> :m '<-2<cr>gv
+vnoremap <Down> :m '>+1<cr>gv
+
 
 "-- Normal helper
 "------------------------------------------------------------------
