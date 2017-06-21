@@ -11,22 +11,27 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
 	unset f
 fi
 
+# Setup keyboard mapping
 [ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
-
 setxkbmap -config ~/.config/xkbmap.config
+
+# Setup X resources
 [ -f ~/.Xresources ] && xrdb ~/.Xresources
 
 xset -b # no beep
-#xset -r # no auto key repeat
 
+# Run sound server
 pulseaudio --start
 
+# Load all ssh keys
 eval `ssh-agent`
 ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 
-# hide mouse automatically
+# Hide mouse automatically
 unclutter &
 
+# Run the compositor
 [ -f ~/.config/compton ] && compton --config ~/.config/compton -b
 
+# Run the WM
 exec awesome
