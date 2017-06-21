@@ -16,3 +16,6 @@ __pycache__
 # temp
 cnorm
 pyrser
+
+# Put any dir link you want to a __vcs_ignore__ directory!
+__vcs_ignore__/

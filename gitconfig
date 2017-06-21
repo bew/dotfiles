@@ -18,8 +18,9 @@
 	f = fetch
 	m = merge
 	ch = checkout
-	unstage = reset HEAD --
 	untrack = rm --cached
+
+	unstage = reset HEAD --
 
 	# remote interaction
 	ph = push
