@@ -1,4 +1,4 @@
-snippet init "def initialize" b
+snippet init "def initialize"
 def initialize${1:(${2:args})}
   ${VISUAL}${0}
 end
@@ -8,7 +8,7 @@ snippet req "require" b
 require "${1:file}"$0
 endsnippet
 
-snippet def "method definition - no args" b
+snippet def "method definition - no args"
 def ${1:method_name}${2:(${3:args})}
   ${VISUAL}$4
 end$0
@@ -56,13 +56,13 @@ endsnippet
 
 snippet describe "Spec - describe 'desc' do ... end" b
 describe "${1:description}" do
-  ${VISUAL}$0
+  ${VISUAL}$2
 end
 endsnippet
 
 snippet it "Spec - it 'desc' do ... end" b
 it "${1:description}" do
-  ${VISUAL}$0
+  ${VISUAL}$2
 end
 endsnippet
 
@@ -70,7 +70,7 @@ endsnippet
 
 snippet !mac(ro)?! "Create a macro" rb
 macro ${1:macro_name}${2:(${3:args})}
-  ${VISUAL}$0
+  ${VISUAL}$4
 end
 endsnippet
 
