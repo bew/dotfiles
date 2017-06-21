@@ -3,16 +3,18 @@
 " Easy short navigation in insert mode
 inoremap <A-h> <Left>
 inoremap <A-l> <Right>
-" thoses might be removed:
-inoremap <C-h> <Left>
-inoremap <C-l> <Right>
 
 " Easy windows navigation
-nnoremap <BS> <C-w>h
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+
+" When mapping <C-j> has no effect
+nmap <cr> <C-j>
+
+" When mapping <C-h> has no effect
+nmap <BS> <C-h>
 
 " Redraw
 nnoremap <C-r> <C-l>
@@ -20,21 +22,15 @@ nnoremap <C-r> <C-l>
 " Save buffer
 nnoremap <M-Space> :w<cr>
 inoremap <M-Space> <Esc>:w<cr>
+vnoremap <M-Space> <Esc>:w<cr>
 nnoremap <M-s> :w<cr>
 inoremap <M-s> <Esc>:w<cr>
+vnoremap <M-s> <Esc>:w<cr>
 
-" I don't use theses, but it may be useful when
-" <M-Space> is not available (on some terminal)
-nnoremap <C-s> :w<cr>
-inoremap <C-s> <Esc>:w<cr>
-
-"-- Toggle
-"------------------------------------------------------------------
-
-" wrap
+" toggle wrap
 nnoremap <M-w> :set wrap! wrap?<cr>
 
-" relativenumber
+" toggle relativenumber
 nnoremap <M-r>	:set relativenumber! relativenumber?<CR>
 
 
@@ -44,14 +40,12 @@ xmap gea <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. geaip)
 nmap gea <Plug>(EasyAlign)
 
-" Open Tagbar
-nnoremap <F8> :TagbarToggle<CR>
-
 " Discard last search highlight
 nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :<C-u>CtrlSpace<cr>
 
+" Toggle indent guides
 nnoremap <M-g> :<C-u>IndentGuidesToggle<cr>
 
 "-- Navigation
@@ -63,6 +57,7 @@ nnoremap <M-K> gt
 inoremap <M-J> <esc>gT
 inoremap <M-K> <esc>gt
 
+
 " Move tabs
 nnoremap <M-H> :tabmove -1<cr>
 nnoremap <M-L> :tabmove +1<cr>
@@ -70,72 +65,51 @@ inoremap <M-H> <esc>:tabmove -1<cr>
 inoremap <M-L> <esc>:tabmove +1<cr>
 
 
-
-"-- Visual Mapping
-"------------------------------------------------------------------
-
+" Visual - Move a selection of text
 vnoremap <Left> <gv
 vnoremap <Right> >gv
 vnoremap <Up> :m '<-2<cr>gv
 vnoremap <Down> :m '>+1<cr>gv
 
 
-"-- Normal helper
-"------------------------------------------------------------------
-
+" Insert empty lines up or down
+inoremap <M-o> <C-o>o
+inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
+
+" Shortcut
 nnoremap Q :q<cr>
 
-" THE missing one:
-"nnoremap ci( f(ci) " not working... :(
+" THE missing one (and still not working :/)
+"nnoremap ci( f(ci)
 
-"-- Insert helper
-"------------------------------------------------------------------
+" Insert a TAB (thanks Epitech for that habit)
+inoremap <M-i> <C-v><Tab>
 
-" Insert a tabulation (Alt + i) in insert mode
-inoremap <M-i> <C-V><Tab>
-
-inoremap <M-o> <C-o>o
-inoremap <M-O> <C-o>O
-
-" Disbale <M-i> in normal mode, as it hangs the terminal
+" Disable <M-i> in normal mode, it hangs the terminal
 nnoremap <M-i> <nop>
 
-" Indent line in normal and insert mode (return to normal mode)
+
+" Indent line
 nnoremap <Tab> mi==`i
 inoremap <Tab> <Esc>mi==`il
 
-" Indent visual selection
-" note that '<,'> is automatically inserted when pressing ':' in visual mode
+" note that '<,'> is automatically inserted on ':'
 vnoremap <Tab> :normal! ==<cr>
-
-"-- Global code Manipulation
-"------------------------------------------------------------------
 
 " Format the file
 nnoremap <C-f> gg=G``
 
-"-- Vim dev helpers
-"------------------------------------------------------------------
-
-" Show highlight infos
-nmap <F2> :echom "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
-
 " Toggle PASTE mode
 nnoremap <M-p> :set paste! paste?<CR>
 
-"-- OS integration
-"------------------------------------------------------------------
-
 " Copy/Paste with system clipboard
-" > copy from visual mode
-vnoremap <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
-" > paste in normal mode
+vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
 nnoremap <silent> <M-v> :r !xclip -out -selection clipboard<cr>
 
-" ask for sudo passwd and save the file
+" Save the file as sudo
 cnoremap w!! w !sudo tee % >/dev/null
 
 
@@ -156,7 +130,9 @@ function! ExecuteMacroOverVisualRange()
 endfunction
 
 
-" Some plugins mapping
+" Toggle Gundo tree
+nnoremap <F5> :GundoToggle<cr>
 
-nnoremap <F5> :GundoToggle<CR>
+" Show highlight infos
+nmap <F2> :echom "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
 
