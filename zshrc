@@ -384,8 +384,8 @@ alias makeawesome='m CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
-# bypass language limitations on www.pezop.com :)
-alias pezop="firefox -P pezop www.pezop.com &!"
+# bypass language limitations on www.rotazu.com :)
+alias pezop="firefox -P pezop www.rotazu.com &!"
 
 
 # Fast config edit
