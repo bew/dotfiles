@@ -35,19 +35,25 @@ max_loading_time=60 # in seconds
 ############################################################################
 ##############################  Helper #####################################
 
-function echo_init
-{
-	echo -n > ${log_file}
-}
-
 function echo_debug
 {
 	[[ -t 1 ]] && echo $@
-	echo $@ >> ${log_file}
+
+	if [ $# = 0 ]; then
+		echo >> ${log_file}
+	else
+		echo 'DEBUG:' $@ >> ${log_file}
+	fi
 }
 
 ############################################################################
 ############################  Functions  ###################################
+
+function init_logger
+{
+	echo >> ${log_file}
+	echo '==>' `date` >> ${log_file}
+}
 
 function exit_clean
 {
@@ -76,7 +82,7 @@ function generate_img
 {
 	function debug_gen
 	{
-		echo_debug "DEBUG [GEN]:" $*
+		echo_debug "[GEN]:" $*
 	}
 
 	local timestamp_start=`date +%s`
@@ -95,7 +101,7 @@ function generate_img
 
 	local generation_time=$(( timestamp_end - timestamp_start ))
 
-	debug_gen "diff is $generation_time"
+	debug_gen "diff is ${generation_time}s"
 
 	if [ $generation_time -gt $max_loading_time ]; then
 		echo_debug "Too long to generate new image (maybe computer hibernated ?)"
@@ -106,11 +112,13 @@ function generate_img
 ############################################################################
 #########################  Script entry-point  #############################
 
+init_logger
+
 # Tidy up X mouse / keyboard grabbers
 pkill unclutter
 
 # Loading locker
-i3lock -n ${i3lock_options[@]} -i "$loading_img" &!
+i3lock -n ${i3lock_options[@]} -i "$loading_img" >> ${log_file} &!
 loading_pid=$!
 echo_debug "Loading Locker is at PID $loading_pid"
 
@@ -122,12 +130,12 @@ echo_debug "Real lockscreen generated, killing $loading_pid"
 kill $loading_pid
 echo_debug "Running new i3lock with real lockscreen image"
 
-i3lock ${i3lock_options[@]} -i "$final_img"
+i3lock ${i3lock_options[@]} -i "$final_img" >> ${log_file}
 locker_status=$?
 
 if ! [ "$locker_status" -eq 0 ]; then
 	echo_debug "bad locker_status: $locker_status"
-	i3lock -i "$loading_img";
+	i3lock -i "$loading_img" >> ${log_file};
 fi
 
 # Everything worked correctly, bye !
