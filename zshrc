@@ -270,8 +270,8 @@ alias todo="ack -i 'todo|fixme'"
 
 # ping
 
+alias pingonce="ping -c 1"
 alias pg="ping google.fr"
-alias pgc="pg -c 1 -w 5"
 
 # mkdir
 
