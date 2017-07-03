@@ -874,43 +874,40 @@ zle -N accept-line
 # TODO: better binds organization
 
 # Alt-L => redraw prompt on-demand
-bindkey "l" reset-prompt
+bindkey 'l' reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
-bindkey "s" zwidget-insert-sudo
+bindkey -M viins -M vicmd 's' zwidget-insert-sudo
 
 # Menu key => do nothing
-bindkey "[29~" do-nothing
+bindkey '[29~' do-nothing
 
 # fast git
-bindkey "g" zwidget-git-status
-bindkey "l" zwidget-git-log
+bindkey 'g' zwidget-git-status
+bindkey 'l' zwidget-git-log
 
 # Who doesn't want home and end to work?
 bindkey '\e[7~' beginning-of-line
 bindkey '\e[8~' end-of-line
 
 # Alt-T => zle test
-bindkey -M viins "t" zwidget-zletest
+bindkey -M viins 't' zwidget-zletest
 
 autoload -U edit-command-line
 zle -N edit-command-line
 
 # Alt-E => edit line in $EDITOR
-bindkey -M viins "e" edit-command-line
+bindkey -M viins 'e' edit-command-line
 
 # Ctrl-F => file fuzzy search
-bindkey -M viins '^f' fzf-file-widget
-bindkey -M vicmd '^f' fzf-file-widget
+bindkey -M viins -M vicmd '^f' fzf-file-widget
 
 # Ctrl-Z => fg
-bindkey -M viins "^z" zwidget-fg
-bindkey -M vicmd "^z" zwidget-fg
+bindkey -M viins -M vicmd '^z' zwidget-fg
 
 
 # Alt-c => cd to directory with fuzzy search
-bindkey -M viins 'c' fzf-cd-widget
-bindkey -M vicmd 'c' fzf-cd-widget
+bindkey -M viins -M vicmd 'c' fzf-cd-widget
 
 # Ctrl-R => history fuzzy search
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
@@ -942,26 +939,17 @@ bindkey -M viins '#' push-input
 bindkey -M menuselect '[Z' reverse-menu-complete
 
 # Cancel current completion with Esc
-bindkey -M menuselect "" send-break
+bindkey -M menuselect '' send-break
 
 # Alt-hjkl to move inside results
-bindkey -M menuselect "h" backward-char
-bindkey -M menuselect "j" down-line-or-history
-bindkey -M menuselect "k" up-line-or-history
-bindkey -M menuselect "l" forward-char
+bindkey -M menuselect 'h' backward-char
+bindkey -M menuselect 'j' down-line-or-history
+bindkey -M menuselect 'k' up-line-or-history
+bindkey -M menuselect 'l' forward-char
 
 # Alt-$ & Alt-0 => got to first & last results
-bindkey -M menuselect "0" beginning-of-line
-bindkey -M menuselect "$" end-of-line
+bindkey -M menuselect '0' beginning-of-line
+bindkey -M menuselect '$' end-of-line
 
-bindkey -M menuselect "a" accept-and-hold
-
-#----------------------------------------------------------------------------------
-# Other init
-#----------------------------------------------------------------------------------
-
-# OPAM configuration
-#----------------------------------------
-
-[ -f ~/.opam/opam-init/init.zsh ] && . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+bindkey -M menuselect 'a' accept-and-hold
 
