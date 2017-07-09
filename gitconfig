@@ -2,6 +2,9 @@
 	email = lesell_b@epitech.eu
 	name = Benoit de Chezelles
 
+[github]
+	user = bew
+
 [push]
 	default = current
 
