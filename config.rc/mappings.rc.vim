@@ -78,6 +78,8 @@ inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
+" Exit the terminal grabber
+tnoremap <A-q> <C-\><C-n>
 
 " Shortcut
 nnoremap Q :q<cr>
