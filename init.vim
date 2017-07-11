@@ -27,7 +27,8 @@ Plug 'SirVer/ultisnips'					" Advanced snippets
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
-Plug 'Shougo/deoplete.nvim'				" Dark powered asynchronous completion framework
+Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
+			\ { 'do': ':UpdateRemotePlugins' }
 
 " -- UI
 
