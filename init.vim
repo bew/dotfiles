@@ -155,6 +155,11 @@ hi Visual ctermbg=238
 " We need the ctermbg=NONE at the end, I don't know why...
 hi Todo cterm=bold ctermfg=11 ctermbg=NONE
 
+hi Normal ctermfg=248
+
+" Markdown
+hi markdownCode ctermfg=29
+
 hi clear BadSpell
 hi BadSpell cterm=underline
 
