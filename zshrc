@@ -869,6 +869,13 @@ zle -N accept-line
 # Keybinds
 #----------------------------------------------------------------------------------
 
+function vibindkey
+{
+	bindkey -M viins $@
+	bindkey -M vicmd $@
+}
+compdef _bindkey vibindkey
+
 . ~/.zsh/fzf/key-bindings.zsh
 
 # TODO: better binds organization
@@ -877,7 +884,7 @@ zle -N accept-line
 bindkey 'l' reset-prompt
 
 # Alt-S => Insert sudo at buffer beginning
-bindkey -M viins -M vicmd 's' zwidget-insert-sudo
+vibindkey 's' zwidget-insert-sudo
 
 # Menu key => do nothing
 bindkey '[29~' do-nothing
@@ -900,14 +907,14 @@ zle -N edit-command-line
 bindkey -M viins 'e' edit-command-line
 
 # Ctrl-F => file fuzzy search
-bindkey -M viins -M vicmd '^f' fzf-file-widget
+vibindkey '^f' fzf-file-widget
 
 # Ctrl-Z => fg
-bindkey -M viins -M vicmd '^z' zwidget-fg
+vibindkey '^z' zwidget-fg
 
 
 # Alt-c => cd to directory with fuzzy search
-bindkey -M viins -M vicmd 'c' fzf-cd-widget
+vibindkey 'c' fzf-cd-widget
 
 # Ctrl-R => history fuzzy search
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
