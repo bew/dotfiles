@@ -1,2 +1,0 @@
-ulimit -c unlimited
-java -jar ~/.bin/Minecraft.jar
