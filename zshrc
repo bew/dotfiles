@@ -469,6 +469,11 @@ vimIgnore="$vimIgnore"'|*.cmx|*.cmi|*.cmo'
 
 zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
 
+# Activate completion for AWS
+if [ -f /usr/sbin/aws_zsh_completer.sh ]; then
+	source /usr/sbin/aws_zsh_completer.sh
+fi
+
 #----------------------------------------------------------------------------------
 # Custom segments (not zle)
 #----------------------------------------------------------------------------------
