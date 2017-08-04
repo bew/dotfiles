@@ -298,8 +298,8 @@ alias ....="cd ../../..;"
 
 # pacman
 
-alias pacman="sudo pacman"
-alias pacmanuseless="pacman -Rnsv \$(pacman -Qtdq)"
+alias pacman="pacman"
+alias pacmanuseless="sudo pacman -Rnsv \$(sudo pacman -Qtdq)"
 
 
 # Close the current sudo session if any
