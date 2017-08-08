@@ -373,8 +373,12 @@ alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 
 alias mpv-audio='mpv --no-video'
 
-#
+# clock in terminal
 
+alias clock='tty-clock -sc -C6 -d 0.5'
+alias c=clock
+
+#
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
