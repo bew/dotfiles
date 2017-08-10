@@ -17,7 +17,8 @@ __fsel()
 	local cmd="${FZF_CTRL_T_COMMAND:-"command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
 		-o -type f -print \
 		-o -type d -print \
-		-o -type l -print 2> /dev/null | sed 1d"}"
+		-o -type l -print \
+		2> /dev/null | sed 1d"}"
 	eval "$cmd" | $(__fzfcmd) -m | while read item; do
 	echo -n "${(q)item} "
 done
@@ -26,7 +27,8 @@ echo
 
 __fzfcmd()
 {
-	[ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+	local cool_args="--height=40% --multi --reverse --inline-info --border"
+	[ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%} $cool_args" || echo "fzf $cool_args"
 }
 
 fzf-file-widget()
@@ -36,8 +38,8 @@ fzf-file-widget()
 	local selected_completions="$(__fsel $completion_prefix)"
 	if [ -n "$selected_completions" ]; then
 		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
-		zle redisplay
 	fi
+	zle reset-prompt
 }
 zle     -N   fzf-file-widget
 
@@ -62,6 +64,6 @@ fzf-history-widget()
 			zle vi-fetch-history -n $num
 		fi
 	fi
-	zle redisplay
+	zle reset-prompt
 }
 zle     -N   fzf-history-widget
