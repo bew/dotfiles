@@ -298,9 +298,14 @@ alias ....="cd ../../..;"
 
 # pacman
 
-alias pacman="pacman"
 alias pacmanuseless="sudo pacman -Rnsv \$(sudo pacman -Qtdq)"
 
+
+# sudo
+
+# Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
+# Note: the trailing space is important (see the man for the alias builtin)
+alias sudo="sudo "
 
 # Close the current sudo session if any
 alias nosudo="sudo -k;"
