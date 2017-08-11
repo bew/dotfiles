@@ -14,8 +14,8 @@ export SHELL=zsh
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
-unsetopt beep
 
+# enable vim mode
 bindkey -v
 KEYTIMEOUT=1 # ESC timeout is: $KEYTIMEOUT * 10ms
 
@@ -93,7 +93,7 @@ source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 #
 # It saves the result in CURSOR_POS_ROW & CURSOR_POS_COL
 #-------------------------------------------------------------
-# FIXME: if the read buffer is not empty, it discard it
+# FIXME: if the read buffer is not empty, need to discard it
 #-------------------------------------------------------------
 function get_cursor_pos()
 {
@@ -139,6 +139,9 @@ hooks-define-hook pre_accept_line_hook
 #----------------------------------------------------------------------------------
 # Options
 #----------------------------------------------------------------------------------
+
+# do not beep !!!!
+unsetopt BEEP
 
 # do not remove slash on directory completion
 unsetopt AUTO_REMOVE_SLASH
@@ -226,7 +229,6 @@ alias -g nostderr=" 2>/dev/null "
 
 alias g=git
 alias m=make
-alias t=task
 alias dk=docker
 alias cr=crystal
 alias pac=pacman
@@ -238,12 +240,13 @@ alias j=jobs
 
 # Big-one letter aliases
 
-alias G="realgrep"
 alias A="ack"
 alias H="head"
 alias T="tail"
 alias L="less"
 alias V="vim"
+
+alias G="command grep --color=auto -n"
 
 # add verbosity
 
@@ -251,10 +254,6 @@ alias rm="rm -vI"
 alias cp="cp -vi"
 alias mv="mv -vi"
 alias mkdir="mkdir -v"
-
-# use ack instead !!
-alias realgrep="command grep --color=auto -n"
-alias grep="echo Use ack"
 
 # ls
 
@@ -298,7 +297,7 @@ alias ....="cd ../../..;"
 
 # pacman
 
-alias pacmanuseless="sudo pacman -Rnsv \$(sudo pacman -Qtdq)"
+alias pacmanuseless="command sudo pacman -Rnsv \$(command sudo pacman -Qtdq)"
 
 
 # sudo
@@ -349,25 +348,6 @@ function man()
 compdef _man man
 
 
-# tek
-
-function epiclone
-{
-	local host='git@git.epitech.eu'
-
-	echo "$fg[blue]Cloning from $host:$fg[yellow]$*$reset_color"
-	git clone $host:$*
-}
-
-# norme
-alias nall="n $* \$(tree -if) -libc"
-
-# make
-
-alias remake="make --silent fclean; make -j all > /dev/null; clean .o > /dev/null"
-alias remkae="remake"
-alias remaek="remake"
-
 # youtube-dl
 
 alias ytdl='youtube-dl'
@@ -388,35 +368,23 @@ alias c=clock
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
-alias makeawesome='m CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
+alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
+
+# use ack instead !!
+alias grep="echo Use ack"
 
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
 # bypass language limitations on www.rotazu.com :)
-alias pezop="firefox -P pezop www.rotazu.com &!"
+alias ff_streaming="firefox -P pezop www.rotazu.com &!"
 
 
 # Fast config edit
 
 alias vimzshrc="vim ~/.zshrc"
-alias vimvimrc="vim ~/.vimrc"
 alias vimnviminit="vim ~/.config/nvim/init.vim"
 
-
-# misc
-
-function path
-{
-	echo "$bg[grey]      Path entries:      $reset_color"
-	echo "> $PATH" | sed 's/:/\n> /g' | awk "{ \
-		sub(\"/usr\",   \"$fg_bold[green]/usr$reset_color\"); \
-		sub(\"/bin\",   \"$fg_bold[blue]/bin$reset_color\"); \
-		sub(\"/opt\",   \"$fg_bold[cyan]/opt$reset_color\"); \
-		sub(\"/sbin\",  \"$fg_bold[magenta]/sbin$reset_color\"); \
-		sub(\"/local\", \"$fg_bold[yellow]/local$reset_color\"); \
-		print }"
-}
 
 #----------------------------------------------------------------------------------
 # Completion
