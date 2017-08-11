@@ -61,6 +61,9 @@
 	log-last-merge = "!f() { git pretty-log ORIG_HEAD.. $@; }; f"
 	llm = "!f() { git log-last-merge $@; }; f"
 
+	remove-old-commits = reflog expire --all --expire=now
+	compress-repo = gc --aggressive --prune=now
+
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3
