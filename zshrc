@@ -99,12 +99,6 @@ function get_cursor_pos()
 	CURSOR_POS_COL=${pos#*;} # remove 'row;'
 }
 
-# TODO: move this in the prompt module
-function regen-prompt()
-{
-	zle && zle reset-prompt
-}
-
 #----------------------------------------------------------------------------------
 # Setup Hooks
 #----------------------------------------------------------------------------------
@@ -521,6 +515,10 @@ function segmt_vim_mode()
 	echo -n $keymap
 }
 
+function regen-prompt()
+{
+	zle && zle reset-prompt
+}
 hooks-add-hook zle_keymap_select_hook regen-prompt
 
 #
@@ -788,13 +786,6 @@ function zwidget-insert-sudo ()
 }
 zle -N zwidget-insert-sudo
 
-# ZLE Tests
-function zwidget-zletest ()
-{
-	zle -M "TEST OK";
-}
-zle -N zwidget-zletest
-
 # Git status
 function zwidget-git-status
 {
@@ -832,10 +823,6 @@ function zwidget-fg
 	zle reset-prompt
 }
 zle -N zwidget-fg
-
-# Just do nothing
-function do-nothing () {}
-zle -N do-nothing
 
 #-------------------------------------------------------------
 # Builtin ZLE wrappers
@@ -881,19 +868,11 @@ compdef _bindkey vibindkey
 # Alt-S => Insert sudo at buffer beginning
 vibindkey 's' zwidget-insert-sudo
 
-# Menu key => do nothing
-bindkey '[29~' do-nothing
 
 # fast git
 bindkey 'g' zwidget-git-status
 bindkey 'd' zwidget-git-diff
 #bindkey 'l' zwidget-git-log # handled by go-right_or_git-log
-# Who doesn't want home and end to work?
-bindkey '\e[7~' beginning-of-line
-bindkey '\e[8~' end-of-line
-
-# Alt-T => zle test
-bindkey -M viins 't' zwidget-zletest
 
 autoload -U edit-command-line
 zle -N edit-command-line
@@ -919,15 +898,11 @@ vibindkey 'c' fzf-cd-widget
 bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 
-# Rebind the insert key.  I really can't stand what it currently does.
-bindkey '\e[2~' overwrite-mode
-
-# Rebind the delete key. Again, useless.
-bindkey '\e[3~' delete-char
-
-bindkey -M viins '^p'  up-line-or-history
-bindkey -M viins '^n'  down-line-or-history
-
+# Sane default
+bindkey '\e[2~' overwrite-mode # Insert key
+bindkey '\e[3~' delete-char # Del (Suppr) key
+bindkey '\e[7~' beginning-of-line # Home key
+bindkey '\e[8~' end-of-line # End key
 
 # cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
@@ -984,4 +959,10 @@ bindkey -M menuselect '0' beginning-of-line
 bindkey -M menuselect '$' end-of-line
 
 bindkey -M menuselect 'a' accept-and-hold
+
+# disable some keybinds
+#-------------------------------------------------------------
+
+bindkey -r '/' # Alt-/
+bindkey -r '[29~' # Menu key
 
