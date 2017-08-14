@@ -6,52 +6,59 @@ fi
 
 FIND_IGNORE_OPTIONS="\\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune"
 
-# CTRL-T - Paste the selected file path(s) into the command line
+FIND_FILTER_ALL_FILES="-o -type f -print -o -type d -print"
+FIND_FILTER_DIRS="-o -type d -print"
+
 __fsel()
 {
-	if [ -n "$1" ]; then
-		local base_dir="$1"
+	local filters="$1"
+
+	if [ -n "$2" ]; then
+		local base_dir="$2"
 	else
 		local base_dir='.'
 	fi
-	local cmd="${FZF_CTRL_T_COMMAND:-"command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
-		-o -type f -print \
-		-o -type d -print \
-		-o -type l -print \
-		2> /dev/null | sed 1d"}"
-	eval "$cmd" | $(__fzfcmd) -m | while read item; do
-	echo -n "${(q)item} "
-done
-echo
+	local cmd="command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
+		$filters
+		2> /dev/null | sed 1d"
+	eval "$cmd" | $(__fzfcmd) | while read item; do
+		echo -n "${(q)item} "
+	done
+	echo
 }
 
 __fzfcmd()
 {
-	local cool_args="--height=40% --multi --reverse --inline-info --border"
-	[ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%} $cool_args" || echo "fzf $cool_args"
+	echo "fzf --height=40% --multi --reverse --inline-info --border"
 }
 
 fzf-file-widget()
 {
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
-	local selected_completions="$(__fsel $completion_prefix)"
+
+	local selected_completions="$(__fsel "$FIND_FILTER_ALL_FILES" "$completion_prefix")"
+
 	if [ -n "$selected_completions" ]; then
 		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
 	fi
 	zle reset-prompt
 }
-zle     -N   fzf-file-widget
+zle -N fzf-file-widget
 
-# ALT-C - cd into the selected directory
-fzf-cd-widget()
+fzf-directory-widget()
 {
-	local cmd="${FZF_ALT_C_COMMAND:-"command find -L . ${FIND_IGNORE_OPTIONS} \
-		-o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
-	cd "${$(eval "$cmd" | $(__fzfcmd) +m):-.}"
+	local completion_prefix="${LBUFFER/* /}"
+	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
+
+	local selected_completions="$(__fsel "$FIND_FILTER_DIRS" "$completion_prefix")"
+
+	if [ -n "$selected_completions" ]; then
+		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
+	fi
 	zle reset-prompt
 }
-zle     -N    fzf-cd-widget
+zle -N fzf-directory-widget
 
 # CTRL-R - Paste the selected command from history into the command line
 fzf-history-widget()
@@ -66,4 +73,4 @@ fzf-history-widget()
 	fi
 	zle reset-prompt
 }
-zle     -N   fzf-history-widget
+zle -N fzf-history-widget
