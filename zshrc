@@ -17,15 +17,15 @@ SAVEHIST=1000
 
 # enable vim mode
 bindkey -v
-KEYTIMEOUT=1 # ESC timeout is: $KEYTIMEOUT * 10ms
 
-# Autoload
+# ESC timeout
+KEYTIMEOUT=1 # 10ms
+# see helper::setup_keytimeout_per_keymap for setup per selected keymap
 
 autoload -U colors && colors
+
 autoload -U compinit && compinit
 zmodload zsh/complist
-
-
 
 # colors for common binaries (ls, tree, etc..)
 ! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
@@ -845,6 +845,18 @@ zle -N accept-line
 #----------------------------------------------------------------------------------
 # Keybinds
 #----------------------------------------------------------------------------------
+
+# Allows to have fast switch Insert => Normal, but still be able to
+# use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
+function helper::setup_keytimeout_per_keymap
+{
+	if [ "$KEYMAP" = "viins" ]; then
+		KEYTIMEOUT=1 # 10ms
+	else
+		KEYTIMEOUT=30 # 300ms
+	fi
+}
+hooks-add-hook zle_keymap_select_hook helper::setup_keytimeout_per_keymap
 
 function vibindkey
 {
