@@ -930,11 +930,17 @@ bindkey -M menuselect '[Z' reverse-menu-complete
 # Cancel current completion with Esc
 bindkey -M menuselect '' send-break
 
-# Alt-hjkl to move inside results
+# Alt-hjkl to move in complete menu
 bindkey -M menuselect 'h' backward-char
 bindkey -M menuselect 'j' down-line-or-history
 bindkey -M menuselect 'k' up-line-or-history
 bindkey -M menuselect 'l' forward-char
+
+# Alt-hjkl to move in insert mode
+bindkey -M viins 'h' backward-char
+bindkey -M viins 'j' down-line-or-history
+bindkey -M viins 'k' up-line-or-history
+#bindkey -M viins 'l' forward-char # this overwrite the Alt-L for 'git log' behavior
 
 # Alt-$ & Alt-0 => got to first & last results
 bindkey -M menuselect '0' beginning-of-line
