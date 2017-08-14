@@ -949,11 +949,26 @@ bindkey -M menuselect 'j' down-line-or-history
 bindkey -M menuselect 'k' up-line-or-history
 bindkey -M menuselect 'l' forward-char
 
-# Alt-hjkl to move in insert mode
+# Allow Alt+l to do:
+# - Go right if possible (there is text on the right)
+# - Call `git log` if no text on the right (or empty input line)
+function go-right_or_git-log
+{
+	if [ -z "$RBUFFER" ]; then
+		zwidget-git-log
+	else
+		zle forward-char
+	fi
+}
+zle -N go-right_or_git-log
+
+# Alt-hl to move in insert mode
 bindkey -M viins 'h' backward-char
-bindkey -M viins 'j' down-line-or-history
-bindkey -M viins 'k' up-line-or-history
-#bindkey -M viins 'l' forward-char # this overwrite the Alt-L for 'git log' behavior
+bindkey -M viins 'l' go-right_or_git-log
+# Alt-j & Alt-k are the same as Esc-j & Esc-k
+# Doing so will go to normal mode, then go down/up
+#
+# Why: it's almost never useful to go up/down, while staying in insert mode
 
 # Alt-$ & Alt-0 => got to first & last results
 bindkey -M menuselect '0' beginning-of-line
