@@ -933,6 +933,15 @@ bindkey -M viins '^n'  down-line-or-history
 bindkey -M vicmd '#' push-input
 bindkey -M viins '#' push-input
 
+# Mimic the vim-surround plugin
+autoload -Uz surround
+zle -N delete-surround surround
+zle -N add-surround surround
+zle -N change-surround surround
+bindkey -M vicmd cs change-surround
+bindkey -M vicmd ds delete-surround
+bindkey -M vicmd ys add-surround
+bindkey -M visual S add-surround
 
 # menuselect keybindings
 #-------------------------------------------------------------
