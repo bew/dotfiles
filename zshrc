@@ -815,6 +815,15 @@ function zwidget-git-log
 }
 zle -N zwidget-git-log
 
+# Git diff
+function zwidget-git-diff
+{
+	zle::utils::check_git "git log" || return
+
+	git d
+}
+zle -N zwidget-git-diff
+
 function zwidget-fg
 {
 	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
@@ -869,9 +878,6 @@ compdef _bindkey vibindkey
 
 # TODO: better binds organization
 
-# Alt-L => redraw prompt on-demand
-bindkey 'l' reset-prompt
-
 # Alt-S => Insert sudo at buffer beginning
 vibindkey 's' zwidget-insert-sudo
 
@@ -880,8 +886,8 @@ bindkey '[29~' do-nothing
 
 # fast git
 bindkey 'g' zwidget-git-status
-bindkey 'l' zwidget-git-log
-
+bindkey 'd' zwidget-git-diff
+#bindkey 'l' zwidget-git-log # handled by go-right_or_git-log
 # Who doesn't want home and end to work?
 bindkey '\e[7~' beginning-of-line
 bindkey '\e[8~' end-of-line
