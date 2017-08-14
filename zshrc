@@ -777,14 +777,20 @@ function zle::utils::check_git
 	fi
 }
 
-# insert sudo at <bol>
-function zwidget-insert-sudo ()
+# toggle sudo at <bol>
+function zwidget-toggle-sudo ()
 {
-	local cursor=$CURSOR
-	BUFFER="sudo $BUFFER"
-	CURSOR=$(( cursor + 5 ))
+	if [ ${BUFFER[1, 5]} = "sudo " ]; then
+		local cursor=$CURSOR
+		BUFFER=${BUFFER[6, ${#BUFFER}]}
+		CURSOR=$(( cursor - 5 ))
+	else
+		local cursor=$CURSOR
+		BUFFER="sudo $BUFFER"
+		CURSOR=$(( cursor + 5 ))
+	fi
 }
-zle -N zwidget-insert-sudo
+zle -N zwidget-toggle-sudo
 
 # Git status
 function zwidget-git-status
@@ -865,8 +871,7 @@ compdef _bindkey vibindkey
 
 # TODO: better binds organization
 
-# Alt-S => Insert sudo at buffer beginning
-vibindkey 's' zwidget-insert-sudo
+vibindkey 's' zwidget-toggle-sudo
 
 
 # fast git
