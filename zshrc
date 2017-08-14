@@ -885,15 +885,13 @@ zle -N edit-command-line
 # Alt-E => edit line in $EDITOR
 bindkey -M viins 'e' edit-command-line
 
-# Ctrl-F => file fuzzy search
-vibindkey '^f' fzf-file-widget
+vibindkey 'f' fzf-file-widget
+vibindkey 'c' fzf-directory-widget
 
 # Ctrl-Z => fg
 vibindkey '^z' zwidget-fg
 
 
-# Alt-c => cd to directory with fuzzy search
-vibindkey 'c' fzf-cd-widget
 
 # Ctrl-R => history fuzzy search
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
