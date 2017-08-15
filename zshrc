@@ -896,10 +896,10 @@ vibindkey '^z' zwidget-fg
 # Ctrl-R => history fuzzy search
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
 
-# backspace and ^h working even after
-# returning from command mode
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
+# Fix keybinds when returning from command mode
+bindkey '^?' backward-delete-char # Backspace (on some term)
+bindkey '^h' backward-delete-char # Backspace
+bindkey '^w' backward-kill-word
 
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
