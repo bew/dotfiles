@@ -35,6 +35,8 @@ set mouse=nv " normal & visual
 
 set display=lastline
 
+set linebreak		" when 'wrap' is on, wrap the line on word break
+
 set hidden
 
 set timeoutlen=300
