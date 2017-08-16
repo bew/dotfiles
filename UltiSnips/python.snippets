@@ -7,7 +7,7 @@ priority -50
 #! header
 snippet #! "Shebang header for python scripts" b
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 $0
 endsnippet
 
@@ -262,8 +262,8 @@ $0
 endsnippet
 
 snippet def "function with simple docstring" b
-def ${1:function}(${2:arg}):
-    ${3:${VISUAL:pass}}
+def ${1:function}(${2:self${3:, arg}}):
+    ${4:${VISUAL:pass}}
 endsnippet
 
 snippet defi "class __init__" b
