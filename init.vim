@@ -127,8 +127,6 @@ endfunction
 """""""""""""""""""""""""""""""""
 
 call s:loadConfigDir("plugins")
-"let g:neotags_enabled = 1
-"let g:neomake_cpp_clangcheck_args = ["-extra-arg=-std=c++14"] " not working...
 let g:deoplete#enable_at_startup = 1
 
 if (has("gui"))
