@@ -88,6 +88,9 @@ nnoremap k 3k
 noremap <C-j> <enter>
 
 " miscs {{{2
+" override Ctrl-q quit shortcut
+noremap <C-q> <nop>
+
 " fullscreen
 noremap <F11> <C-v><F11>
 
