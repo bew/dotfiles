@@ -780,9 +780,9 @@ function zle::utils::check_git
 # toggle sudo at <bol>
 function zwidget-toggle-sudo ()
 {
-	if [ ${BUFFER[1, 5]} = "sudo " ]; then
+	if [ "${BUFFER[1, 5]}" = "sudo " ]; then
 		local cursor=$CURSOR
-		BUFFER=${BUFFER[6, ${#BUFFER}]}
+		BUFFER="${BUFFER[6, ${#BUFFER}]}"
 		CURSOR=$(( cursor - 5 ))
 	else
 		local cursor=$CURSOR
