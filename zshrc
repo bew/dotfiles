@@ -766,13 +766,8 @@ function in_a_git_repo
 
 function zle::utils::check_git
 {
-	local error="Error:"
-	if [ -n "$1" ]; then
-		error="Error: $1 -"
-	fi
-
 	if ! in_a_git_repo; then
-		zle -M "${error} Not a git repository"
+		zle -M "Error: Not a git repository"
 		return 1
 	fi
 }
@@ -795,7 +790,7 @@ zle -N zwidget-toggle-sudo
 # Git status
 function zwidget-git-status
 {
-	zle::utils::check_git "git status" || return
+	zle::utils::check_git || return
 
 	echo
 	git status
@@ -806,7 +801,7 @@ zle -N zwidget-git-status
 # Git log
 function zwidget-git-log
 {
-	zle::utils::check_git "git log" || return
+	zle::utils::check_git || return
 
 	git l
 }
@@ -815,7 +810,7 @@ zle -N zwidget-git-log
 # Git diff
 function zwidget-git-diff
 {
-	zle::utils::check_git "git log" || return
+	zle::utils::check_git || return
 
 	git d
 }
