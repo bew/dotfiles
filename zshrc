@@ -280,9 +280,11 @@ alias tree="tree -C --dirsfirst -F"
 
 # cd
 
-alias ..="cd ..;"
-alias ...="cd ../..;"
-alias ....="cd ../../..;"
+alias ..='cd ..;'
+alias ...='cd ../..;'
+alias ....='cd ../../..;'
+
+alias cdt='cd /tmp;'
 
 # pacman
 
