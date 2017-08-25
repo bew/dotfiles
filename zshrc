@@ -90,7 +90,7 @@ source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 #-------------------------------------------------------------
 # FIXME: if the read buffer is not empty, need to discard it
 #-------------------------------------------------------------
-function get_cursor_pos()
+function get_cursor_pos
 {
 	echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
 
@@ -198,7 +198,7 @@ setopt LOCAL_TRAPS
 # Aliases
 #----------------------------------------------------------------------------------
 
-function reload_zshrc
+function reload_zsh
 {
 	if [ -n "$(jobs)" ]; then
 		echo "Error: $(jobs | wc -l) job(s) in background"
@@ -207,7 +207,7 @@ function reload_zshrc
 	fi
 }
 
-alias zshrc=reload_zshrc
+alias zshrc=reload_zsh
 
 # global aliases
 
@@ -265,7 +265,7 @@ alias pg="ping google.fr"
 
 alias mkd="mkdir -p"
 
-function mkcd()
+function mkcd
 {
 	mkd $*
 	cd $1
@@ -300,7 +300,7 @@ alias nosudo="sudo -k;"
 
 
 # history search
-function hsearch()
+function hsearch
 {
 	if test "$1" = ""; then
 		history 1
@@ -330,7 +330,7 @@ alias ":h"="vimhelp"
 alias ":q"="exit"
 
 # man in vim
-function man()
+function man
 {
 	/usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
 }
@@ -432,13 +432,10 @@ vimIgnore="$vimIgnore"'|*.o'
 # Ignore OCaml compilations files
 vimIgnore="$vimIgnore"'|*.cmx|*.cmi|*.cmo'
 
-
 zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
 
 # Activate completion for AWS
-if [ -f /usr/sbin/aws_zsh_completer.sh ]; then
-	source /usr/sbin/aws_zsh_completer.sh
-fi
+[ -f /usr/sbin/aws_zsh_completer.sh ] && source /usr/sbin/aws_zsh_completer.sh
 
 #----------------------------------------------------------------------------------
 # Custom segments (not zle)
@@ -448,12 +445,13 @@ fi
 #-------------------------------------------------------------
 
 # Segment git branch
-source ~/.zsh/bin/git-prompt.sh
-
-function segmt_git_branch
+source ~/.zsh/bin/git-prompt.sh # for __git_ps1
+function segmt::git_branch
 {
+	[ -n "$NO_SEGMT_GIT_BRANCH" ] && return
+
 	local branchName=$(__git_ps1 "%s")
-	if [[ -z ${branchName} ]]; then
+	if [ -z "${branchName}" ]; then
 		return
 	fi
 	local branchNameStyle="%{$fg[red]%}${branchName}"
@@ -465,7 +463,7 @@ function segmt_git_branch
 }
 
 # Segment last exit code
-function segmt_last_exit_code()
+function segmt::last_exit_code
 {
 	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
 		local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
@@ -475,54 +473,56 @@ function segmt_last_exit_code()
 }
 
 # Segment is shell in vim
-function segmt_in_vim
+function segmt::in_vim
 {
-	if [[ $VIM != "" ]]; then
+	if [ -n "$VIM" ]; then
 		echo -n " In Vim "
 	fi
 }
 
 # Segment is shell in sudo session
-function segmt_in_sudo
+function segmt::in_sudo
 {
 	local result=$(sudo -n echo -n bla 2>/dev/null)
-	if test "$result" = "bla"; then
-		local inSudo="In sudo"
-		local inSudoStyle="%{$bg[red]$fg_bold[white]%} $inSudo %{$reset_color%}"
-		echo $inSudoStyle
+
+	if [ "$result" = "bla" ]; then
+		local in_sudo="In sudo"
+		local in_sudo_style="%{$bg[red]$fg_bold[white]%} $in_sudo %{$reset_color%}"
+		echo -n "$in_sudo_style"
 	fi
 }
 
 # Segment prompt vim mode (normal/insert)
-function segmt_vim_mode()
+function segmt::vim_mode
 {
-	local keymap=$KEYMAP
+	local keymap="$KEYMAP"
 	local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
 	local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
 
-	if [[ "$keymap" == "vicmd" ]]; then
+	if [ "$keymap" = "vicmd" ]; then
 		echo -n ${normal_mode_style}
 		return
 	fi
-	if [[ $keymap =~ "(main|viins)" ]]; then
+	if [[ "$keymap" =~ "(main|viins)" ]]; then
 		echo -n ${insert_mode_style}
 		return
 	fi
-	if [[ -z $keymap ]]; then
+	if [ -z "$keymap" ]; then
 		echo -n ${insert_mode_style}
 		return
 	fi
-	echo -n $keymap
+
+	echo -n "$keymap"
 }
 
-function regen-prompt()
+function regen-prompt
 {
 	zle && zle reset-prompt
 }
 hooks-add-hook zle_keymap_select_hook regen-prompt
 
 #
-function get-last-exit()
+function get-last-exit
 {
 	LAST_EXIT_CODE=$?
 }
@@ -531,12 +531,10 @@ hooks-add-hook precmd_hook get-last-exit
 zmodload zsh/system
 
 # Scroll when prompt get too close to bottom edge
-function prompt-auto-scroll()
+function prompt-auto-scroll
 {
 	# Don't attempt to scroll in a tty
-	if [[ "$TERM" = "linux" ]]; then
-		return
-	fi
+	[ "$TERM" = "linux" ] && return
 
 	# check if there is a command in the stdin buffer
 	# (as the get_cursor_pos will discard it)
@@ -560,14 +558,13 @@ function prompt-auto-scroll()
 hooks-add-hook precmd_hook prompt-auto-scroll
 
 
-function segmt_battery
+function segmt::battery
 {
-	#local battery='$(battery.lua percentage)%%'
-	local bat_perc=$(cat /sys/class/power_supply/BAT0/capacity)
+	local capacity=$(cat /sys/class/power_supply/BAT0/capacity)
 	local bat_status=$(cat /sys/class/power_supply/BAT0/status)
 
 	# color
-	if [[ $bat_perc < 10 ]]; then
+	if [[ "$capacity" < 10 ]]; then
 		echo -n "%{$fg_bold[red]%}"
 	else
 		echo -n "%{$fg[green]%}"
@@ -576,20 +573,18 @@ function segmt_battery
 	# status
 	[[ "$bat_status" =~ "Charging" ]] && echo -n "+"
 
-	[[ $bat_status =~ "Discharging" ]] && printf "%s" "-" # printf because we cannot echo "-"
+	[[ "$bat_status" =~ "Discharging" ]] && printf "%s" "-" # printf because we cannot echo "-"
 
 	# percentage
-	echo -n $bat_perc"%%"
+	echo -n "${capacity}%%"
 
 	# reset color
 	echo -n "%{$fg[default]%}"
 }
 
-function segmt_shlvl
+function segmt::shlvl
 {
-	if [[ $SHLVL = 1 ]]; then
-		return
-	fi
+	[ $SHLVL = 1 ] && return
 
 	local shlvl='%L'
 	local shlvlStyle="%{$fg_bold[red]%}$shlvl  %{$reset_color%}"
@@ -603,15 +598,15 @@ local usernameStyle="%{$fg[yellow]%}${username}%{$fg[default]%}"
 local currDir='%2~'
 local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$fg[default]%}"
 
-local cmdSeparator="%%"
+local cmdSeparator='%%'
 local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
 
 ## Prompt
 ##############################################
 autoload -U promptinit && promptinit
 
-PROMPT_LINE='$(segmt_shlvl)''$(segmt_battery)'" [${usernameStyle}] ${currDir} ▷ "
-PROMPT_LINE_OLD='$(segmt_shlvl)'"%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
+PROMPT_LINE='$(segmt::shlvl)''$(segmt::battery)'" [${usernameStyle}] ${currDir} ▷ "
+PROMPT_LINE_OLD='$(segmt::shlvl)'"%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
 
 
 
@@ -620,12 +615,12 @@ PROMPT_LINE_OLD='$(segmt_shlvl)'"%{$bg[black]%} ${currDirStyle} %{$bg[default]%}
 ##############################################
 
 
-RPROMPT_LINE='$(segmt_in_vim)''$(segmt_in_sudo)''$(segmt_git_branch)''$(segmt_vim_mode)'
-RPROMPT_LINE_OLD='$(segmt_in_vim)''$(segmt_in_sudo)'
+RPROMPT_LINE='$(segmt::in_vim)''$(segmt::in_sudo)''$(segmt::git_branch)''$(segmt::vim_mode)'
+RPROMPT_LINE_OLD='$(segmt::in_vim)''$(segmt::in_sudo)'
 
 # set prompts hooks
 
-function set-normal-prompts()
+function set-normal-prompts
 {
 	PROMPT="${statuslineContainer}"$PROMPT_LINE
 	RPROMPT=$RPROMPT_LINE
@@ -647,7 +642,7 @@ hooks-add-hook pre_accept_line_hook set-custom-prompts
 # Segment date
 #----------------------------------------
 
-function segmt_time()
+function segmt::time
 {
 	local currentTime=$(date "+%H:%M [%d/%m]")
 	local currentTimeStyle=" ${currentTime} "
@@ -657,7 +652,7 @@ function segmt_time()
 # Segment variable debug
 #----------------------------------------
 
-function segmt_debug()
+function segmt::debug
 {
 	local debugVar=$*
 	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
@@ -704,7 +699,7 @@ local initStatusline="${slResetColor}${_clearLine}"
 # The statusline content
 
 # FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
-local statusline='$(segmt_vim_mode)'"${slResetColor}"'$(segmt_time)'"${slResetColor}"'$(segmt_in_sudo)'"${slResetColor}""  "'$(segmt_last_exit_code)'
+local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slResetColor}"'$(segmt::in_sudo)'"${slResetColor}""  "'$(segmt::last_exit_code)'
 
 #
 #-------------------------------------------------------------
@@ -720,7 +715,7 @@ TMOUT=60
 # This special function is run every $TMOUT seconds
 TRAPALRM () {
 	# Reset prompt only when we are not in complete mode
-	if [[ "$WIDGET" != "expand-or-complete" ]]; then
+	if [[ "$WIDGET" != 'expand-or-complete' ]]; then
 		zle reset-prompt
 	fi
 }
@@ -773,7 +768,7 @@ function zle::utils::check_git
 }
 
 # toggle sudo at <bol>
-function zwidget-toggle-sudo ()
+function zwidget::toggle-sudo
 {
 	if [ "${BUFFER[1, 5]}" = "sudo " ]; then
 		local cursor=$CURSOR
@@ -785,10 +780,10 @@ function zwidget-toggle-sudo ()
 		CURSOR=$(( cursor + 5 ))
 	fi
 }
-zle -N zwidget-toggle-sudo
+zle -N zwidget::toggle-sudo
 
 # Git status
-function zwidget-git-status
+function zwidget::git-status
 {
 	zle::utils::check_git || return
 
@@ -796,34 +791,34 @@ function zwidget-git-status
 	git status
 	zle reset-prompt
 }
-zle -N zwidget-git-status
+zle -N zwidget::git-status
 
 # Git log
-function zwidget-git-log
+function zwidget::git-log
 {
 	zle::utils::check_git || return
 
 	git l
 }
-zle -N zwidget-git-log
+zle -N zwidget::git-log
 
 # Git diff
-function zwidget-git-diff
+function zwidget::git-diff
 {
 	zle::utils::check_git || return
 
 	git d
 }
-zle -N zwidget-git-diff
+zle -N zwidget::git-diff
 
-function zwidget-fg
+function zwidget::fg
 {
 	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
 
 	eval fg
 	zle reset-prompt
 }
-zle -N zwidget-fg
+zle -N zwidget::fg
 
 #-------------------------------------------------------------
 # Builtin ZLE wrappers
@@ -862,17 +857,17 @@ function vibindkey
 }
 compdef _bindkey vibindkey
 
-. ~/.zsh/fzf/key-bindings.zsh
+source ~/.zsh/fzf/key-bindings.zsh
 
 # TODO: better binds organization
 
-vibindkey 's' zwidget-toggle-sudo
+vibindkey 's' zwidget::toggle-sudo
 
 
 # fast git
-bindkey 'g' zwidget-git-status
-bindkey 'd' zwidget-git-diff
-#bindkey 'l' zwidget-git-log # handled by go-right_or_git-log
+bindkey 'g' zwidget::git-status
+bindkey 'd' zwidget::git-diff
+#bindkey 'l' zwidget::git-log # handled by go-right_or_git-log
 
 autoload -U edit-command-line
 zle -N edit-command-line
@@ -884,7 +879,7 @@ vibindkey 'f' fzf-file-widget
 vibindkey 'c' fzf-directory-widget
 
 # Ctrl-Z => fg
-vibindkey '^z' zwidget-fg
+vibindkey '^z' zwidget::fg
 
 
 
@@ -934,19 +929,19 @@ bindkey -M menuselect 'l' forward-char
 # Allow Alt+l to do:
 # - Go right if possible (there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
-function go-right_or_git-log
+function zwidget::go-right_or_git-log
 {
 	if [ -z "$RBUFFER" ]; then
-		zwidget-git-log
+		zwidget::git-log
 	else
 		zle forward-char
 	fi
 }
-zle -N go-right_or_git-log
+zle -N zwidget::go-right_or_git-log
 
 # Alt-hl to move in insert mode
 bindkey -M viins 'h' backward-char
-bindkey -M viins 'l' go-right_or_git-log
+bindkey -M viins 'l' zwidget::go-right_or_git-log
 # Alt-j & Alt-k are the same as Esc-j & Esc-k
 # Doing so will go to normal mode, then go down/up
 #
