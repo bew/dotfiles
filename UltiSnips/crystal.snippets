@@ -1,3 +1,8 @@
+snippet ini "def initialize without body"
+def initialize${1:(${2:args})}
+end$0
+endsnippet
+
 snippet init "def initialize"
 def initialize${1:(${2:args})}
   ${VISUAL}${0}
@@ -20,13 +25,13 @@ module ${1:ModuleName}
 end
 endsnippet
 
-snippet !st(ruct)?! "Struct definition" rb
+snippet !st(ruct)?! "Struct definition" r
 struct ${1:StructName}
   ${VISUAL}$0
 end
 endsnippet
 
-snippet !cl(ass)?! "Class definition" rb
+snippet !cl(ass)?! "Class definition" r
 class ${1:ClassName}
   ${VISUAL}$0
 end
