@@ -75,41 +75,28 @@ Plug 'lepture/vim-jinja'				" Jinja templating syntax & indent
 
 call plug#end()
 
-" Change color of cursor in insert/normal modes
-"
-" Start insert mode
-let &t_SI = "]12;#009688\007"
-" Start replace mode
-let &t_SR = "]12;#ff5722\007"
-
-let &t_EI = "]12;white\007"
-
-
 " Config Helper - TODO: convert as a vim plugin (customizable)
-if has('win32') || has ('win64')
-	let $VIMHOME = $VIM."/vimfiles"
+if has('win32') || has('win64')
+	let $VIMHOME = $VIM."/vimfiles" " Note: I never tested on windows!
 else
 	let $VIMHOME = $HOME."/.config/nvim"
 endif
 
 " Configuration file loader
 
-let $TRUE = 1
-let $FALSE = 0
-
 function! s:sourceFile(path)
 	if filereadable(a:path)
 		exec "source " . a:path
-		return $TRUE
+		return v:true
 	endif
-	return $FALSE
+	return v:false
 endfunction
 
 function! s:loadConfigFile(path)
-	if s:sourceFile(a:path) == $TRUE
+	if s:sourceFile(a:path)
 		return
 	endif
-	if s:sourceFile($VIMHOME . "/config.rc/" . a:path) == $TRUE
+	if s:sourceFile($VIMHOME . "/config.rc/" . a:path)
 		return
 	endif
 	if s:sourceFile($VIMHOME . "/config.rc/" . a:path . ".rc.vim")
