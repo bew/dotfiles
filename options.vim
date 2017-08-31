@@ -91,7 +91,7 @@ set wildignore+=target/streams*
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set noexpandtab
+set expandtab " Always expand TAB to spaces
 
 
 " TODO Setup X clipboard
