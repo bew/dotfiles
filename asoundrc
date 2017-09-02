@@ -1,0 +1,11 @@
+# May be unnecessary, but it works, so I don't want to touch!!!!
+
+pcm.!default {
+	type hw
+	card 0
+}
+
+ctl.!default {
+	type hw
+	card 0
+}
