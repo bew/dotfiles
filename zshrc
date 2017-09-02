@@ -31,8 +31,6 @@ zmodload zsh/complist
 ! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
 [ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
 
-
-
 #----------------------------------------------------------------------------------
 # LOAD PLUGINS
 #----------------------------------------------------------------------------------
@@ -48,10 +46,8 @@ source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # Configuration
 #----------------------------------------
 
-# Enable highlighters
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 
-# Override highlighter colors
 ZSH_HIGHLIGHT_STYLES[default]=none
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=009,standout
@@ -63,17 +59,16 @@ ZSH_HIGHLIGHT_STYLES[precommand]=fg=white,underline
 ZSH_HIGHLIGHT_STYLES[commandseparator]=none
 ZSH_HIGHLIGHT_STYLES[hashed-command]=fg=009
 ZSH_HIGHLIGHT_STYLES[path]=fg=yellow
-ZSH_HIGHLIGHT_STYLES[globbing]=fg=063
+ZSH_HIGHLIGHT_STYLES[globbing]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=white,underline
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
 ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=fg=blue
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=063
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=063
-ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=009
-ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=009
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=cyan
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=cyan
+ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
+ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[assign]=none
-
 
 # advanced zsh-hooks
 ##############################################
@@ -581,7 +576,7 @@ function segmt::battery
 	echo -n "${capacity}%%"
 
 	# reset color
-	echo -n "%{$fg[default]%}"
+	echo -n "%{$reset_color%}"
 }
 
 function segmt::shlvl
@@ -595,20 +590,20 @@ function segmt::shlvl
 }
 
 local username='%n'
-local usernameStyle="%{$fg[yellow]%}${username}%{$fg[default]%}"
+local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
 
 local currDir='%2~'
-local currDirStyle="%{$fg_bold[cyan]%}${currDir}%{$fg[default]%}"
+local currDirStyle="%{$fg_bold[cyan]%} ${currDir} %{$reset_color%}"
 
 local cmdSeparator='%%'
-local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$fg[default]%}"
+local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
 
 ## Prompt
 ##############################################
 autoload -U promptinit && promptinit
 
 PROMPT_LINE='$(segmt::shlvl)''$(segmt::battery)'" [${usernameStyle}] ${currDir} ▷ "
-PROMPT_LINE_OLD='$(segmt::shlvl)'"%{$bg[black]%} ${currDirStyle} %{$bg[default]%} ${cmdSeparatorStyle} "
+PROMPT_LINE_OLD='$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle}%{$bg[default]%} ${cmdSeparatorStyle} "
 
 
 
