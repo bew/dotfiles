@@ -20,9 +20,6 @@ setxkbmap -config ~/.config/xkbmap.config
 
 xset -b # no beep
 
-# Run sound server
-pulseaudio --start
-
 # Load all ssh keys
 eval `ssh-agent`
 ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
