@@ -1,8 +1,5 @@
 # this is the global git ignore
 
-# misc
-/*.pdf
-
 # vim files
 .cs_*
 .ycm_extra_conf.py*
