@@ -28,7 +28,7 @@
 	# remote interaction
 	ph = push
 	pl = pull
-	rem = remote
+	rem = remote -v
 
 	# info only
 	#----------------------------
