@@ -283,7 +283,19 @@ alias cdt='cd /tmp;'
 
 # pacman
 
-alias pacmanuseless="command sudo pacman -Rnsv \$(command sudo pacman -Qtdq)"
+
+alias pac::list_useless_deps='pacman -Qtdq'
+
+function pac::show_useless_deps
+{
+    for package in $(pac::list_useless_deps); do
+        echo "Package: $package"
+        pacman -Qi $package | ack 'Description'
+        echo
+    done
+}
+
+alias pac::remove_useless_deps='command sudo pacman -Rsv $(pac::list_useless_deps)'
 
 
 # sudo
