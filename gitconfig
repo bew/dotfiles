@@ -42,6 +42,7 @@
 	lo = "!f() { git pretty-log --oneline $@; }; f"
 
 	# diff
+	dd = diff
 	d = diff --word-diff=color --ignore-all-space
 	dc = "!f() { git d --staged $@; }; f"
 
