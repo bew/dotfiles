@@ -15,6 +15,7 @@ __fsel()
 
 	if [ -n "$2" ]; then
 		local base_dir="$2"
+        base_dir=${~base_dir} # expand ~ (at least)
 	else
 		local base_dir='.'
 	fi
