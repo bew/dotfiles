@@ -13,6 +13,8 @@ Plug 'tpope/vim-surround'				" vim-surround
 Plug 'scrooloose/nerdcommenter'			" Dark powred commenter
 Plug 'itchyny/lightline.vim'			" statusline builder
 Plug 'Shougo/vimfiler.vim'				" File explorer
+Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
+            \ { 'do': ':UpdateRemotePlugins' }
 
 " Dependency of vimfiler, as it doesn't support denite...
 Plug 'Shougo/unite.vim'
@@ -30,8 +32,6 @@ Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
-Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
-			\ { 'do': ':UpdateRemotePlugins' }
 
 " -- UI
 
