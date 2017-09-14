@@ -24,6 +24,9 @@ Plug 'SirVer/ultisnips'					" Advanced snippets
 
 " -- Text refactor / formater
 
+Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
+            \ { 'do': ':UpdateRemotePlugins' }
+
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
