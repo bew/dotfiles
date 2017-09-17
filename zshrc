@@ -384,6 +384,13 @@ alias vimzshrc="vim ~/.zshrc"
 alias vimnviminit="vim ~/.config/nvim/init.vim"
 
 
+# Named directores
+
+# Now use '~cr/' to access crystal directory
+hash -d cr=~/Projects/opensource/crystal
+
+hash -d open=~/Projects/opensource
+
 #----------------------------------------------------------------------------------
 # Completion
 #----------------------------------------------------------------------------------

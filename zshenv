@@ -16,8 +16,5 @@ export VISUAL="$EDITOR"
 
 export GIT_EDITOR="$EDITOR"
 
-# Where to look for completion for `cd`
-CDPATH=".:$HOME/Projects/opensource/:$HOME/Projects/"
-
 SAVEHIST=1000000 # in history file
 HISTSIZE=10000   # in session
