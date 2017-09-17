@@ -879,7 +879,6 @@ source ~/.zsh/fzf/key-bindings.zsh
 
 vibindkey 's' zwidget::toggle-sudo
 
-
 # fast git
 bindkey 'g' zwidget::git-status
 bindkey 'd' zwidget::git-diff
@@ -903,9 +902,18 @@ vibindkey '^z' zwidget::fg
 #bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
 
 # Fix keybinds when returning from command mode
-bindkey '^?' backward-delete-char # Backspace (on some term)
-bindkey '^h' backward-delete-char # Backspace
+bindkey '^?' backward-delete-char # Backspace
+
+function backward-kill-partial-word
+{
+    # Remove '/' from being a part of a word
+    local WORDCHARS="${WORDCHARS:s#/#}"
+    zle backward-kill-word
+}
+zle -N backward-kill-partial-word
+
 bindkey '^w' backward-kill-word
+bindkey '^h' backward-kill-partial-word # Ctrl-Backspace
 
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
