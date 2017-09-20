@@ -836,6 +836,18 @@ function zwidget::fg
 }
 zle -N zwidget::fg
 
+function zwidget::replay-last
+{
+	local last_command=${history[$((HISTCMD - 1))]}
+
+	echo
+	echo "Executing last command: $last_command"
+
+	eval "$last_command"
+	zle reset-prompt
+}
+zle -N zwidget::replay-last
+
 #-------------------------------------------------------------
 # Builtin ZLE wrappers
 #-------------------------------------------------------------
@@ -896,10 +908,9 @@ vibindkey 'c' fzf-directory-widget
 # Ctrl-Z => fg
 vibindkey '^z' zwidget::fg
 
+# Alt => r
+vibindkey 'r' zwidget::replay-last
 
-
-# Ctrl-R => history fuzzy search
-#bindkey -M viins '^r' fzf-history-widget  # sorting is reversed :(
 
 # Fix keybinds when returning from command mode
 bindkey '^?' backward-delete-char # Backspace
