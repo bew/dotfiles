@@ -10,11 +10,11 @@ Plug 'thinca/vim-visualstar'			" * for visualy selected text
 Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 "Plug 'pelodelfuego/vim-swoop'			" Search everywhere with context
 Plug 'tpope/vim-surround'				" vim-surround
-Plug 'scrooloose/nerdcommenter'			" Dark powred commenter
 Plug 'itchyny/lightline.vim'			" statusline builder
 Plug 'Shougo/vimfiler.vim'				" File explorer
 Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
             \ { 'do': ':UpdateRemotePlugins' }
+Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 
 " Dependency of vimfiler, as it doesn't support denite...
 Plug 'Shougo/unite.vim'
@@ -46,44 +46,39 @@ Plug 'ryanoasis/vim-devicons'
 
 " -- Per language plugins
 
-" Vimperator
+"# Vimperator
 Plug 'superbrothers/vim-vimperator'
 
-" Markdown
+"# Markdown
 "Plug 'gabrielelana/vim-markdown' " markdown advanced syntax highlighter and editor
 
-" C / CPP
+"# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 
-" Arduino
+"# Arduino
 "Plug 'jplaut/vim-arduino-ino'			" Arduino project compilation and deploy
 "Plug 'sudar/vim-arduino-syntax'			" Arduino syntax
 "Plug 'sudar/vim-arduino-snippets'		" Arduino snippets
 
-" OCaml
+"# OCaml
 "Plug 'the-lambda-church/merlin'			" Context sensitive completion for OCaml + errors + type infos + source browsing
 "Plug 'vim-scripts/omlet.vim'			" This mode offers automatic indentation and keyword highlighting
 
-" Crystal lang
+"# Crystal lang
 Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 
-" Scala
+"# Scala
 Plug 'derekwyatt/vim-scala'				" Syntax highlighting
-Plug 'ensime/ensime-vim'
+"Plug 'ensime/ensime-vim'				" IDE functionalities for Scala
 
-" Python
-Plug 'hynek/vim-python-pep8-indent'		" PEP8 python indentation
+"# Python
+Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
 Plug 'zchee/deoplete-jedi'				" Jedi powered autocompletion
 Plug 'lepture/vim-jinja'				" Jinja templating syntax & indent
 
 call plug#end()
 
-" Config Helper - TODO: convert as a vim plugin (customizable)
-if has('win32') || has('win64')
-	let $VIMHOME = $VIM."/vimfiles" " Note: I never tested on windows!
-else
-	let $VIMHOME = $HOME."/.config/nvim"
-endif
+let $VIMHOME = $HOME . "/.config/nvim"
 
 " Configuration file loader
 
@@ -119,10 +114,10 @@ endfunction
 call s:loadConfigDir("plugins")
 let g:deoplete#enable_at_startup = 1
 
-if (has("gui"))
+if has("gui")
 	" Disable every gvim gui stuff
 	set guioptions=
-	set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 11
+	set guifont="DejaVu Sans Mono for Powerline 11"
 endif
 
 " map leader definition
