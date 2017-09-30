@@ -308,17 +308,6 @@ alias sudo="sudo "
 alias nosudo="sudo -k;"
 
 
-# history search
-function hsearch
-{
-	if test "$1" = ""; then
-		history 1
-	else
-		history 1 | \grep --color=auto $1
-	fi
-}
-
-
 # original vim
 alias ovim="command vim -X"
 
@@ -894,7 +883,7 @@ vibindkey 's' zwidget::toggle-sudo
 # fast git
 bindkey 'g' zwidget::git-status
 bindkey 'd' zwidget::git-diff
-#bindkey 'l' zwidget::git-log # handled by go-right_or_git-log
+#bindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
 
 autoload -U edit-command-line
 zle -N edit-command-line
@@ -962,7 +951,7 @@ bindkey -M menuselect 'k' up-line-or-history
 bindkey -M menuselect 'l' forward-char
 
 # Allow Alt+l to do:
-# - Go right if possible (there is text on the right)
+# - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
 function zwidget::go-right_or_git-log
 {
@@ -974,11 +963,11 @@ function zwidget::go-right_or_git-log
 }
 zle -N zwidget::go-right_or_git-log
 
-# Alt-hl to move in insert mode
+# Alt-h/l to move in insert mode
 bindkey -M viins 'h' backward-char
 bindkey -M viins 'l' zwidget::go-right_or_git-log
-# Alt-j & Alt-k are the same as Esc-j & Esc-k
-# Doing so will go to normal mode, then go down/up
+# Alt-j/k are the same as Esc-j/k
+# Doing Esc-j/k will go to normal mode, then go down/up
 #
 # Why: it's almost never useful to go up/down, while staying in insert mode
 
@@ -991,6 +980,7 @@ bindkey -M menuselect 'a' accept-and-hold
 # disable some keybinds
 #-------------------------------------------------------------
 
+# Disable Alt-/ to ensure that it'll do the same as Esc then '/'.
 bindkey -r '/' # Alt-/
 bindkey -r '[29~' # Menu key
 
