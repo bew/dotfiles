@@ -103,7 +103,9 @@ FZF_Z_OPTIONS=(--tac --tiebreak=index --nth 2..)
 
 function zwidget::fzf::z
 {
-    local selected=( $( z | $(__fzfcmd) $FZF_Z_OPTIONS) )
+    local last_pwd=$PWD
+
+    local selected=( $( z | $(__fzfcmd) $FZF_Z_OPTIONS ) )
     if [ -n "$selected" ]; then
         local directory=$selected[2]
         if [ -n "$directory" ]; then
@@ -111,5 +113,9 @@ function zwidget::fzf::z
         fi
     fi
     zle reset-prompt
+
+    if [ $last_pwd != $PWD ]; then
+        zle -M "cd'ed to '$PWD'"
+    fi
 }
 zle -N zwidget::fzf::z
