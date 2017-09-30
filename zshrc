@@ -879,10 +879,10 @@ zle -N edit-command-line
 # Alt-E => edit line in $EDITOR
 bindkey -M viins 'e' edit-command-line
 
-vibindkey 'f' fzf-file-widget
-vibindkey 'c' fzf-directory-widget
-# TODO: 'v' zwidget::fzf::vim-file
-bindkey -M vicmd '/' fzf-history-widget # hard to use sorting?
+vibindkey 'f' zwidget::fzf::file
+vibindkey 'c' zwidget::fzf::directory
+vibindkey 'z' zwidget::fzf::z
+bindkey -M vicmd '/' zwidget::fzf::history
 
 # Ctrl-Z => fg
 vibindkey '^z' zwidget::fg

@@ -9,7 +9,7 @@ FIND_IGNORE_OPTIONS="\\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -
 FIND_FILTER_ALL_FILES="-o -type f -print -o -type d -print"
 FIND_FILTER_DIRS="-o -type d -print"
 
-__fsel()
+function __fsel
 {
 	local filters="$1"
 
@@ -38,17 +38,19 @@ FZF_KEYBINDINGS+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
 FZF_KEYBINDINGS+=(--bind 'alt-j:down' --bind 'alt-k:up')
 FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
 
-FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down') # select
+# other
+FZF_KEYBINDINGS+=(--bind 'ctrl-j:accept')
+FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down')
 FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
 
 FZF_OPTIONS=(--height=40% --multi --reverse --inline-info --border)
 
-__fzfcmd()
+function __fzfcmd
 {
 	echo "fzf ${FZF_OPTIONS} ${FZF_KEYBINDINGS}"
 }
 
-fzf-file-widget()
+function zwidget::fzf::file
 {
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
@@ -60,9 +62,9 @@ fzf-file-widget()
 	fi
 	zle reset-prompt
 }
-zle -N fzf-file-widget
+zle -N zwidget::fzf::file
 
-fzf-directory-widget()
+function zwidget::fzf::directory
 {
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
@@ -74,16 +76,16 @@ fzf-directory-widget()
 	fi
 	zle reset-prompt
 }
-zle -N fzf-directory-widget
+zle -N zwidget::fzf::directory
 
-# -l  list the commands
-# -r  show in reverse order (most recent first)
-# 1   start at command n° 1 (the oldest still in history)
+# -l  | list the commands
+# -r  | show in reverse order (=> most recent first)
+# 1   | start at command n° 1 (the oldest still in history)
 HISTORY_CMD=(fc -lr 1)
 
-FZF_HISTORY_OPTIONS=(--no-multi --reverse -n2..,.. --tiebreak=index)
+FZF_HISTORY_OPTIONS=(--no-multi -n2..,.. --tiebreak=index)
 
-fzf-history-widget()
+function zwidget::fzf::history
 {
 	local selected=( $( $HISTORY_CMD | $(__fzfcmd) $FZF_HISTORY_OPTIONS -q "${LBUFFER//$/\\$}") )
 	if [ -n "$selected" ]; then
@@ -94,4 +96,20 @@ fzf-history-widget()
 	fi
 	zle reset-prompt
 }
-zle -N fzf-history-widget
+zle -N zwidget::fzf::history
+
+# --nth 2..         | ignore first field (the popularity of the dir) when matching
+FZF_Z_OPTIONS=(--tac --tiebreak=index --nth 2..)
+
+function zwidget::fzf::z
+{
+    local selected=( $( z | $(__fzfcmd) $FZF_Z_OPTIONS) )
+    if [ -n "$selected" ]; then
+        local directory=$selected[2]
+        if [ -n "$directory" ]; then
+            cd $directory
+        fi
+    fi
+    zle reset-prompt
+}
+zle -N zwidget::fzf::z
