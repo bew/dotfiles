@@ -881,6 +881,8 @@ bindkey -M viins 'e' edit-command-line
 
 vibindkey 'f' fzf-file-widget
 vibindkey 'c' fzf-directory-widget
+# TODO: 'v' zwidget::fzf::vim-file
+bindkey -M vicmd '/' fzf-history-widget # hard to use sorting?
 
 # Ctrl-Z => fg
 vibindkey '^z' zwidget::fg

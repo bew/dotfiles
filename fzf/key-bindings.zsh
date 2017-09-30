@@ -76,15 +76,20 @@ fzf-directory-widget()
 }
 zle -N fzf-directory-widget
 
-# CTRL-R - Paste the selected command from history into the command line
+# -l  list the commands
+# -r  show in reverse order (most recent first)
+# 1   start at command n° 1 (the oldest still in history)
+HISTORY_CMD=(fc -lr 1)
+
+FZF_HISTORY_OPTIONS=(--no-multi --reverse -n2..,.. --tiebreak=index)
+
 fzf-history-widget()
 {
-	local selected num
-	selected=( $(fc -l 1 | $(__fzfcmd) +s +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r ${=FZF_CTRL_R_OPTS} -q "${LBUFFER//$/\\$}") )
+	local selected=( $( $HISTORY_CMD | $(__fzfcmd) $FZF_HISTORY_OPTIONS -q "${LBUFFER//$/\\$}") )
 	if [ -n "$selected" ]; then
-		num=$selected[1]
-		if [ -n "$num" ]; then
-			zle vi-fetch-history -n $num
+		local history_index=$selected[1]
+		if [ -n "$history_index" ]; then
+			zle vi-fetch-history -n $history_index
 		fi
 	fi
 	zle reset-prompt
