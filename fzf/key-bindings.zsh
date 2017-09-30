@@ -28,9 +28,24 @@ __fsel()
 	echo
 }
 
+FZF_KEYBINDINGS=()
+
+# input nav
+FZF_KEYBINDINGS+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
+FZF_KEYBINDINGS+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
+
+# suggestions nav
+FZF_KEYBINDINGS+=(--bind 'alt-j:down' --bind 'alt-k:up')
+FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
+
+FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down') # select
+FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
+
+FZF_OPTIONS=(--height=40% --multi --reverse --inline-info --border)
+
 __fzfcmd()
 {
-	echo "fzf --height=40% --multi --reverse --inline-info --border"
+	echo "fzf ${FZF_OPTIONS} ${FZF_KEYBINDINGS}"
 }
 
 fzf-file-widget()
