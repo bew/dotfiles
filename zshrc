@@ -75,6 +75,17 @@ ZSH_HIGHLIGHT_STYLES[assign]=none
 #-------------------------------------------------------------
 source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
+# Git branch in prompt
+#-------------------------------------------------------------
+
+source ~/.zsh/bin/git-prompt.sh # for __git_ps1
+
+# Show if there are unstaged (with *) and/or staged (with +) files
+GIT_PS1_SHOWDIRTYSTATE=1
+
+# Show if there are untracked (with %) files
+GIT_PS1_SHOWUNTRACKEDFILES=1
+
 
 #----------------------------------------------------------------------------------
 # UTILS
@@ -443,7 +454,6 @@ zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
 #----------------------------------------------------------------------------------
 
 # Segment git branch
-source ~/.zsh/bin/git-prompt.sh # for __git_ps1
 function segmt::git_branch
 {
 	[ -n "$NO_SEGMT_GIT_BRANCH" ] && return
