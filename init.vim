@@ -60,10 +60,6 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 "Plug 'sudar/vim-arduino-syntax'			" Arduino syntax
 "Plug 'sudar/vim-arduino-snippets'		" Arduino snippets
 
-"# OCaml
-"Plug 'the-lambda-church/merlin'			" Context sensitive completion for OCaml + errors + type infos + source browsing
-"Plug 'vim-scripts/omlet.vim'			" This mode offers automatic indentation and keyword highlighting
-
 "# Crystal lang
 Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 
@@ -78,7 +74,7 @@ Plug 'lepture/vim-jinja'				" Jinja templating syntax & indent
 
 call plug#end()
 
-let $VIMHOME = $HOME . "/.config/nvim"
+let g:vimhome = $HOME . "/.config/nvim"
 
 " Configuration file loader
 
@@ -94,16 +90,16 @@ function! s:loadConfigFile(path)
 	if s:sourceFile(a:path)
 		return
 	endif
-	if s:sourceFile($VIMHOME . "/config.rc/" . a:path)
+	if s:sourceFile(g:vimhome . "/config.rc/" . a:path)
 		return
 	endif
-	if s:sourceFile($VIMHOME . "/config.rc/" . a:path . ".rc.vim")
+	if s:sourceFile(g:vimhome . "/config.rc/" . a:path . ".rc.vim")
 		return
 	endif
 endfunction
 
 function! s:loadConfigDir(dirpath)
-	for filepath in split(globpath($VIMHOME . "/config.rc/" . a:dirpath, "*.rc.vim"), "\n")
+	for filepath in split(globpath(g:vimhome . "/config.rc/" . a:dirpath, "*.rc.vim"), "\n")
 		call s:loadConfigFile(filepath)
 	endfor
 endfunction
