@@ -1,3 +1,7 @@
+snippet #! "crystal run shebang!" b
+#!/usr/bin/env crystal
+endsnippet
+
 snippet ini "def initialize without body"
 def initialize${1:(${2:args})}
 end$0
@@ -91,6 +95,6 @@ snippet mps "Short Macro printed stmt {{blabla}}" w
 {{${VISUAL}$1}}$2
 endsnippet
 
-snippet md "Macro debug here" b
+snippet md "Macro debug here" w
 {% debug() %}$1
 endsnippet
