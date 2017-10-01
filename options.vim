@@ -9,8 +9,6 @@ set omnifunc=syntaxcomplete#Complete
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-set backup		" keep a backup file
-
 " always show the statusline
 set laststatus=2
 
@@ -112,43 +110,17 @@ endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-" Set backup / swp / undo dirs in ~/.vim/
+" Put swap & undo files in ~/.nvim/swap_undo/{swap,undo}files/
 
-" Save your backups to a less annoying place than the current directory.
-" If you have .vim-backup in the current directory, it'll use that.
-" Otherwise it saves it to ~/.vim/backup or . if all else fails.
-if isdirectory($HOME . '/.vim/backup') == 0
-	:silent !mkdir -p ~/.vim/backup >/dev/null 2>&1
-endif
-set backupdir-=.
-set backupdir+=.
-set backupdir-=~/
-set backupdir^=~/.vim/backup/
-set backupdir^=./.vim-backup/
-set backup
+let swap_undo_dir = g:vimhome . '/swap_undo'
 
-" Save your swp files to a less annoying place than the current directory.
-" If you have .vim-swap in the current directory, it'll use that.
-" Otherwise it saves it to ~/.vim/swap, ~/tmp or .
-if isdirectory($HOME . '/.vim/swap') == 0
-	:silent !mkdir -p ~/.vim/swap >/dev/null 2>&1
-endif
-set directory=./.vim-swap//
-set directory+=~/.vim/swap//
-set directory+=~/tmp//
-set directory+=.
+set undofile
+set swapfile
 
-if exists("+undofile")
-	" undofile - This allows you to use undos after exiting and restarting
-	" This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
-	" :help undo-persistence
-	" This is only present in 7.3+
-	if isdirectory($HOME . '/.vim/undo') == 0
-		:silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
-	endif
-	set undodir=./.vim-undo//
-	set undodir+=~/.vim/undo//
-	set undofile
-endif
+let &directory = swap_undo_dir . '/swapfiles'
+let &undodir = swap_undo_dir . '/undofiles'
 
+" Ensures the directofies exists!
+call mkdir(swap_undo_dir . '/swapfiles', 'p')
+call mkdir(swap_undo_dir . '/undofiles', 'p')
 
