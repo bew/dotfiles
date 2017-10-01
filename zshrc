@@ -28,8 +28,9 @@ autoload -U compinit && compinit
 zmodload zsh/complist
 
 # colors for common binaries (ls, tree, etc..)
-! [ -f ~/.dircolors ] && dircolors -p > ~/.dircolors
-[ -f ~/.dircolors ] && eval `dircolors ~/.dircolors`
+DIRCOLORS_FILE=~/.dircolors
+! [ -f $DIRCOLORS_FILE ] && dircolors -p > $DIRCOLORS_FILE
+[ -f $DIRCOLORS_FILE ] && eval `dircolors $DIRCOLORS_FILE`
 
 #----------------------------------------------------------------------------------
 # LOAD PLUGINS
@@ -70,8 +71,8 @@ ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[assign]=none
 
-# advanced zsh-hooks
-##############################################
+# better zsh-hooks
+#-------------------------------------------------------------
 source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
 
@@ -181,11 +182,6 @@ setopt LOCAL_OPTIONS
 
 # Allow functions to have local traps
 setopt LOCAL_TRAPS
-
-# Required for global alias completion: m c<TAB>
-# Unknown why it destroy completion....
-#setopt COMPLETE_ALIASES
-
 
 
 
@@ -445,9 +441,6 @@ zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
 #----------------------------------------------------------------------------------
 # Custom segments (not zle)
 #----------------------------------------------------------------------------------
-
-# Git branch
-#-------------------------------------------------------------
 
 # Segment git branch
 source ~/.zsh/bin/git-prompt.sh # for __git_ps1
