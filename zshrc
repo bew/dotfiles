@@ -114,17 +114,17 @@ function get_cursor_pos
 
 # precmd_hook
 hooks-define-hook precmd_hook
-function precmd-wrapper() { hooks-run-hook precmd_hook }
+function precmd-wrapper { hooks-run-hook precmd_hook }
 add-zsh-hook precmd precmd-wrapper
 
 # preexec_hook
 hooks-define-hook preexec_hook
-function preexec-wrapper() { hooks-run-hook preexec_hook }
+function preexec-wrapper { hooks-run-hook preexec_hook }
 add-zsh-hook preexec preexec-wrapper
 
 # chpwd_hook
 hooks-define-hook chpwd_hook
-function chpwd-wrapper() { hooks-run-hook chpwd_hook }
+function chpwd-wrapper { hooks-run-hook chpwd_hook }
 add-zsh-hook chpwd chpwd-wrapper
 
 # CUSTOM HOOKS
@@ -721,7 +721,8 @@ local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline
 TMOUT=60
 
 # This special function is run every $TMOUT seconds
-TRAPALRM () {
+function TRAPALRM
+{
 	# Reset prompt only when we are not in complete mode
 	if [[ "$WIDGET" != 'expand-or-complete' ]]; then
 		zle reset-prompt
