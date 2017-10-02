@@ -11,13 +11,9 @@ Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 "Plug 'pelodelfuego/vim-swoop'			" Search everywhere with context
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
-Plug 'Shougo/vimfiler.vim'				" File explorer
 Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
             \ { 'do': ':UpdateRemotePlugins' }
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
-
-" Dependency of vimfiler, as it doesn't support denite...
-Plug 'Shougo/unite.vim'
 
 " -- Insert mode helpers
 
