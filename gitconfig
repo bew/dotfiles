@@ -43,7 +43,7 @@
 
 	# diff
 	dd = diff
-	d = diff --word-diff=color --ignore-all-space
+	d = diff --color-words --ignore-all-space
 	dc = "!f() { git d --staged $@; }; f"
 
 	# last merge stats
