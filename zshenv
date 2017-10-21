@@ -4,8 +4,12 @@ ruby_path=~/.gem/ruby/2.3.0/bin
 # Lua bins
 luarocks_path=~/.luarocks/bin
 
+# adb & fastboot PATH, installed using install.sh script at
+# https://github.com/corbindavenport/nexus-tools
+nexustools_path=~/.nexustools
+
 typeset -U path
-path=(~/.bin $luarocks_path $ruby_path $path)
+path=(~/.bin $luarocks_path $ruby_path $nexustools_path $path)
 
 export GOPATH=$HOME/gocode
 
