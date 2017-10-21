@@ -11,9 +11,6 @@
 ########################################################################################
 
 export SHELL=zsh
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
 
 # enable vim mode
 bindkey -v
@@ -156,6 +153,14 @@ setopt PROMPT_SUBST
 
 # History options
 #-------------------------------------------------------------
+
+HISTFILE=~/.histfile
+
+# Lines of history to keep in memory
+HISTSIZE=1000
+
+# Lines to keep in the history file
+SAVEHIST=1000000
 
 # ignore history duplications
 setopt HIST_IGNORE_DUPS
