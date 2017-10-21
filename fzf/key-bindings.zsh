@@ -110,6 +110,7 @@ function zwidget::fzf::z
         local directory=$selected[2]
         if [ -n "$directory" ]; then
             cd $directory
+            HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
         fi
     fi
     zle reset-prompt

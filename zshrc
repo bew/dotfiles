@@ -110,6 +110,55 @@ GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 
 
+# remember recent directories (use with 'cdr')
+#-------------------------------------------------------------
+autoload -Uz cdr
+
+# The original chpwd_recent_dirs (retreived with autoload) doesn't work when the
+# chpwd hook is called after a non-toplevel `cd`, e.g when we `cd` from a script
+# or a function.
+#
+# This chpwd_recent_dirs adds a way to force the hook to run, when $HOOK_LIKE_TOPLEVEL
+# is defined.
+#
+# It allows you to write:
+#
+#   HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
+#
+# to run the hooks related to chpwd_hook, forcing their execution (at least for
+# chpwd_recent_dirs).
+function chpwd_recent_dirs
+{
+    emulate -L zsh
+    setopt extendedglob
+    local -aU reply
+    integer changed
+    autoload -Uz chpwd_recent_filehandler chpwd_recent_add
+
+    # BEGIN ADDITION
+    local is_toplevel_or_forced=1
+    if [[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT != toplevel(:[a-z]#func|)# ]]; then
+        # not called from toplevel (=> script)
+        is_toplevel_or_forced=0
+        if [[ -n "$HOOK_LIKE_TOPLEVEL" ]]; then
+            is_toplevel_or_forced=1
+        fi
+    fi
+    # END ADDITION
+
+    if [[ ! -o interactive || $ZSH_SUBSHELL -ne 0 || $is_toplevel_or_forced == 0 ]]; then
+        return
+    fi
+    chpwd_recent_filehandler
+    if [[ $reply[1] != $PWD ]]; then
+        chpwd_recent_add $PWD && changed=1
+        (( changed )) && chpwd_recent_filehandler $reply
+    fi
+}
+hooks-add-hook chpwd_hook chpwd_recent_dirs
+
+
+
 #----------------------------------------------------------------------------------
 # UTILS
 #----------------------------------------------------------------------------------
