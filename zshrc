@@ -434,7 +434,27 @@ alias vimzshrc="vim ~/.zshrc"
 alias vimnviminit="vim ~/.config/nvim/init.vim"
 
 
+# Helper functions
+#----------------------------------------
+
+function repeat_every_while
+{
+    interval=$1; shift
+    cmd=( $* )
+
+    while $cmd; do
+        sleep 1
+    done
+}
+
+function repeat_while
+{
+    repeat_every_while 1 $*
+}
+
+
 # Named directores
+#----------------------------------------
 
 # Now use '~cr/' to access crystal directory
 hash -d cr=~/Projects/opensource/crystal
