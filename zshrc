@@ -30,10 +30,39 @@ DIRCOLORS_FILE=~/.dircolors
 [ -f $DIRCOLORS_FILE ] && eval `dircolors $DIRCOLORS_FILE`
 
 #----------------------------------------------------------------------------------
-# LOAD PLUGINS
+# Setup Hooks
 #----------------------------------------------------------------------------------
 
-# smart cd
+# better zsh-hooks
+source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
+
+## ZSH HOOKS
+
+# precmd_hook
+hooks-define-hook precmd_hook
+function precmd-wrapper { hooks-run-hook precmd_hook }
+add-zsh-hook precmd precmd-wrapper
+
+# preexec_hook
+hooks-define-hook preexec_hook
+function preexec-wrapper { hooks-run-hook preexec_hook }
+add-zsh-hook preexec preexec-wrapper
+
+# chpwd_hook
+hooks-define-hook chpwd_hook
+function chpwd-wrapper { hooks-run-hook chpwd_hook }
+add-zsh-hook chpwd chpwd-wrapper
+
+# CUSTOM HOOKS
+#-------------------------------------------------------------
+
+hooks-define-hook pre_accept_line_hook
+
+#----------------------------------------------------------------------------------
+# Load Plugins
+#----------------------------------------------------------------------------------
+
+# cd with 'frecency' (recent + frequence)
 #-------------------------------------------------------------
 source ~/.zsh/z/z.sh
 
@@ -68,9 +97,6 @@ ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[assign]=none
 
-# better zsh-hooks
-#-------------------------------------------------------------
-source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
 
 # Git branch in prompt
 #-------------------------------------------------------------
@@ -102,32 +128,6 @@ function get_cursor_pos
 	CURSOR_POS_ROW=${pos%;*} # remove ';col'
 	CURSOR_POS_COL=${pos#*;} # remove 'row;'
 }
-
-#----------------------------------------------------------------------------------
-# Setup Hooks
-#----------------------------------------------------------------------------------
-
-## ZSH HOOKS
-
-# precmd_hook
-hooks-define-hook precmd_hook
-function precmd-wrapper { hooks-run-hook precmd_hook }
-add-zsh-hook precmd precmd-wrapper
-
-# preexec_hook
-hooks-define-hook preexec_hook
-function preexec-wrapper { hooks-run-hook preexec_hook }
-add-zsh-hook preexec preexec-wrapper
-
-# chpwd_hook
-hooks-define-hook chpwd_hook
-function chpwd-wrapper { hooks-run-hook chpwd_hook }
-add-zsh-hook chpwd chpwd-wrapper
-
-# CUSTOM HOOKS
-#-------------------------------------------------------------
-
-hooks-define-hook pre_accept_line_hook
 
 #----------------------------------------------------------------------------------
 # Options
@@ -738,12 +738,6 @@ function TRAPALRM
 #----------------------------------------------------------------------------------
 # Misc
 #----------------------------------------------------------------------------------
-
-
-# remember recent directories (use with 'cdr')
-#-------------------------------------------------------------
-autoload -Uz chpwd_recent_dirs cdr
-add-zsh-hook chpwd chpwd_recent_dirs # this add a function hook everytime the pwd change
 
 
 # load ssh keys in the current shell
