@@ -59,6 +59,9 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 "# Crystal lang
 Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 
+"# LLVM IR
+Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
+
 "# Scala
 Plug 'derekwyatt/vim-scala'				" Syntax highlighting
 "Plug 'ensime/ensime-vim'				" IDE functionalities for Scala
