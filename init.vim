@@ -69,7 +69,13 @@ Plug 'derekwyatt/vim-scala'				" Syntax highlighting
 "# Python
 Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
 Plug 'zchee/deoplete-jedi'				" Jedi powered autocompletion
-Plug 'lepture/vim-jinja'				" Jinja templating syntax & indent
+
+" More Python tools (e.g: goto def)
+Plug 'davidhalter/jedi-vim'
+let g:jedi#completions_enabled = 0
+
+" Jinja templating syntax & indent
+Plug 'lepture/vim-jinja'
 
 call plug#end()
 
