@@ -1,21 +1,5 @@
 " VIM - mappings
 
-" Easy short navigation in insert mode
-inoremap <A-h> <Left>
-inoremap <A-l> <Right>
-
-" Easy windows navigation
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
-" When mapping <C-j> has no effect
-nmap <cr> <C-j>
-
-" When mapping <C-h> has no effect
-nmap <BS> <C-h>
-
 " Redraw
 nnoremap <C-r> <C-l>
 
@@ -51,6 +35,24 @@ nnoremap <M-g> :<C-u>IndentGuidesToggle<cr>
 "-- Navigation
 "------------------------------------------------------------------
 
+" Short navigation left/right in insert mode
+inoremap <A-h> <Left>
+inoremap <A-l> <Right>
+
+
+" Windows navigation
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" When mapping <C-j> has no effect
+nmap <cr> <C-j>
+
+" When mapping <C-h> has no effect
+nmap <BS> <C-h>
+
+
 " Goto tabs
 nnoremap <M-J> gT
 nnoremap <M-K> gt
@@ -78,14 +80,21 @@ inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
+
+" Navigation in quickfix locations
+nnoremap <M-j> :<C-u>:cnext<cr>
+nnoremap <M-k> :<C-u>:cprevious<cr>
+
+
 " Exit the terminal grabber
 tnoremap <A-q> <C-\><C-n>
 
 " Shortcut
-nnoremap Q :q<cr>
+nnoremap Q :<C-u>q<cr>
 
 " THE missing one (and still not working :/)
 "nnoremap ci( f(ci)
+"nnoremap ci) F)ci)
 
 " Insert a TAB (thanks Epitech for that habit)
 inoremap <M-i> <C-v><Tab>
@@ -94,18 +103,16 @@ inoremap <M-i> <C-v><Tab>
 nnoremap <M-i> <nop>
 
 
-" Indent line
+" Indent line(s)
 nnoremap <Tab> mi==`i
 inoremap <Tab> <Esc>mi==`il
 
-" note that '<,'> is automatically inserted on ':'
+" note: '<,'> is automatically inserted on ':'
 vnoremap <Tab> :normal! ==<cr>
 
 " Format the file
 nnoremap <C-f> gg=G``
 
-" Toggle PASTE mode
-nnoremap <M-p> :set paste! paste?<CR>
 
 " Copy/Paste with system clipboard
 vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
@@ -117,7 +124,7 @@ cnoremap w!! w !sudo tee % >/dev/null
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
+inoremap <C-u> <C-g>u<C-u>
 
 " logical undo
 nnoremap U <C-r>
@@ -125,7 +132,6 @@ nnoremap U <C-r>
 
 " Taken from visual-at.vim from Practical Vim 2nd Edition
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
-
 function! ExecuteMacroOverVisualRange()
 	echo "@".getcmdline()
 	execute ":'<,'>normal @".nr2char(getchar())
@@ -136,5 +142,5 @@ endfunction
 nnoremap <F5> :GundoToggle<cr>
 
 " Show highlight infos
-nmap <F2> :echom "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
+nmap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
 
