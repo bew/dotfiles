@@ -15,6 +15,9 @@ Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
             \ { 'do': ':UpdateRemotePlugins' }
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 
+" Motions on speed!
+Plug 'easymotion/vim-easymotion'
+
 " -- Insert mode helpers
 
 Plug 'Raimondi/delimitMate'				" auto insert of second ()''{}[]\"\" etc...
@@ -44,9 +47,6 @@ Plug 'ryanoasis/vim-devicons'
 
 "# Vimperator
 Plug 'superbrothers/vim-vimperator'
-
-"# Markdown
-"Plug 'gabrielelana/vim-markdown' " markdown advanced syntax highlighter and editor
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
