@@ -41,6 +41,12 @@ class ${1:ClassName}
 end
 endsnippet
 
+snippet enum "Class definition"
+enum ${1:EnumName}
+  ${VISUAL}$0
+end
+endsnippet
+
 snippet do "do ... end"
 do
   ${VISUAL}$0
@@ -59,6 +65,18 @@ endsnippet
 
 snippet idoa "inline block { |args| ... }"
 { |${1:args}| ${VISUAL}$0 }
+endsnippet
+
+# C helpers
+
+snippet lib "lib binding" b
+lib ${1:LibName}
+  ${VISUAL}$2
+end$0
+endsnippet
+
+snippet fun "C function or binding" b
+fun ${1:fun_name}${2:(${3:args})}${4: : ${5:ReturnType}}$0
 endsnippet
 
 # Spec helpers
