@@ -437,6 +437,8 @@ alias vimnviminit="vim ~/.config/nvim/init.vim"
 # Helper functions
 #----------------------------------------
 
+# Do program multiple times
+
 function repeat_every_while
 {
     interval=$1; shift
@@ -450,6 +452,45 @@ function repeat_every_while
 function repeat_while
 {
     repeat_every_while 1 $*
+}
+
+# Mesure time (arbitrary)
+
+function countdown
+{
+    local quit
+    trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+
+    local from_seconds=$1
+    if [ -z "$from_seconds" ]; then
+        from_seconds=60
+    fi
+
+    local original_timestamp=$(( `date +%s` + $from_seconds ))
+
+    echo "Counting down from ${from_seconds}s"
+
+    while [ "$original_timestamp" -ge `date +%s` ] && [ -z $quit ]; do
+        echo -ne "$(date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S)\r"
+        sleep .1
+    done
+
+    date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S
+}
+
+function chronometer
+{
+    local quit
+    trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+
+    local original_timestamp=`date +%s`
+
+    while [ -z $quit ]; do
+        echo -ne "$(date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S)\r"
+        sleep .1
+    done
+
+    date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S
 }
 
 
