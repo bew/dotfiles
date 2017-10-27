@@ -81,9 +81,28 @@ nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
 
-" Navigation in quickfix locations
-nnoremap <M-j> :<C-u>:cnext<cr>
-nnoremap <M-k> :<C-u>:cprevious<cr>
+" Quickely navigate between quickfix or location list's lines
+
+nnoremap <M-j> :<C-u>call GotoQfOrLoc("next")<cr>
+nnoremap <M-k> :<C-u>call GotoQfOrLoc("previous")<cr>
+
+" First try the quickfix list, if empty, uses the location list
+function! GotoQfOrLoc(direction)
+    let qflist = getqflist()
+    let loclist = getloclist(0)
+
+    if len(qflist) == 1
+        exe ":cc"
+    elseif len(qflist) > 1
+        exe ":c" . a:direction
+    elseif len(loclist) == 1
+        exe ":ll"
+    elseif len(loclist) > 1
+        exe ":l" . a:direction
+    else
+        echo "Nothing in quickfix or location list"
+    endif
+endfunction
 
 
 " Exit the terminal grabber
