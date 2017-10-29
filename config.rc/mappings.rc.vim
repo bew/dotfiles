@@ -83,22 +83,32 @@ nnoremap <M-O> O<esc>
 
 " Quickely navigate between quickfix or location list's lines
 
-nnoremap <M-j> :<C-u>call GotoQfOrLoc("next")<cr>
-nnoremap <M-k> :<C-u>call GotoQfOrLoc("previous")<cr>
+nnoremap <M-j> :<C-u>call GotoQfOrLoc("next", "first")<cr>
+nnoremap <M-k> :<C-u>call GotoQfOrLoc("previous", "last")<cr>
 
 " First try the quickfix list, if empty, uses the location list
-function! GotoQfOrLoc(direction)
+function! GotoQfOrLoc(direction, rewind_name)
     let qflist = getqflist()
     let loclist = getloclist(0)
 
     if len(qflist) == 1
         exe ":cc"
     elseif len(qflist) > 1
-        exe ":c" . a:direction
+        try
+            exe ":c" . a:direction
+        catch
+            echom "No more items, rewinding.."
+            exe ":c" . a:rewind_name
+        endtry
     elseif len(loclist) == 1
         exe ":ll"
     elseif len(loclist) > 1
-        exe ":l" . a:direction
+        try
+            exe ":l" . a:direction
+        catch
+            echom "No more items, rewinding.."
+            exe ":l" . a:rewind_name
+        endtry
     else
         echo "Nothing in quickfix or location list"
     endif
