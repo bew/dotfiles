@@ -1,8 +1,8 @@
-playlists
 cache
 
 command-history
 search-history
 
 lib.pl
+playlists/
 playlist.pl
