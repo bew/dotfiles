@@ -13,6 +13,10 @@ def initialize${1:(${2:args})}
 end
 endsnippet
 
+snippet uninit "uninitialized"
+uninitialized ${1:Type}
+endsnippet
+
 snippet req "require" b
 require "${1:file}"$0
 endsnippet
@@ -41,8 +45,15 @@ class ${1:ClassName}
 end
 endsnippet
 
-snippet enum "Class definition"
+snippet enum "Enum definition"
 enum ${1:EnumName}
+  ${VISUAL}$0
+end
+endsnippet
+
+snippet case "Case node" b
+case ${1:expr}
+when ${2:expr}
   ${VISUAL}$0
 end
 endsnippet
@@ -60,18 +71,18 @@ end
 endsnippet
 
 snippet ido "inline block { ... }"
-{ ${VISUAL}$0 }
+{ ${VISUAL}$1 }$0
 endsnippet
 
 snippet idoa "inline block { |args| ... }"
-{ |${1:args}| ${VISUAL}$0 }
+{ |${1:args}| ${VISUAL}$2 }$0
 endsnippet
 
 # C helpers
 
 snippet lib "lib binding" b
-lib ${1:LibName}
-  ${VISUAL}$2
+lib ${1:Lib${2:Name}}
+  ${VISUAL}$3
 end$0
 endsnippet
 
