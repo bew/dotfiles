@@ -66,6 +66,10 @@ nnoremap <M-L> :tabmove +1<cr>
 inoremap <M-H> <esc>:tabmove -1<cr>
 inoremap <M-L> <esc>:tabmove +1<cr>
 
+" Goto next/previous buffer
+nnoremap <M-n> :bprevious<cr>
+nnoremap <M-p> :bnext<cr>
+
 
 " Visual - Move a selection of text
 vnoremap <Left> <gv
