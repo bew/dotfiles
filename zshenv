@@ -8,8 +8,18 @@ luarocks_path=~/.luarocks/bin
 # https://github.com/corbindavenport/nexus-tools
 nexustools_path=~/.nexustools
 
+# Python bins
+python_path=~/.local/bin
+
 typeset -U path
-path=(~/.bin $luarocks_path $ruby_path $nexustools_path $path)
+path=(
+  ~/.bin
+  $luarocks_path
+  $ruby_path
+  $python_path
+  $nexustools_path
+  $path
+)
 
 export GOPATH=$HOME/gocode
 
