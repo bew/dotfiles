@@ -493,6 +493,36 @@ function chronometer
     date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S
 }
 
+function watch_and_seen
+{
+    local media_path=$1
+
+    if mpv $*; then
+        echo "The player ended successfully"
+
+        if [ ! -f "$media_path" ] && [[ "$media_path" == *.part ]]; then
+            echo "The file '$media_path' doesn't exist anymore, it was a .part file"
+            # The file doesn't exist anymore, it was a .part file
+            # the final file is without .part
+            local len=${#media_path}
+            media_path=${media_path[1, (( len - 5 )) ]} # remove .part
+        fi
+
+        # see the man for the "<var>?<prompt>" syntax
+        read "reply?Move '$media_path' to 'seen/' ? [y/N] "
+
+        case $reply in
+            [Yy])
+                mv -i "$media_path" "seen/"
+                ;;
+
+            *) # everything (even "") means "no"
+                echo "Moving denied."
+        esac
+    fi
+}
+compdef _mpv watch_and_seen
+
 
 # Named directores
 #----------------------------------------
