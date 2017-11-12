@@ -929,6 +929,15 @@ function zwidget::git-diff
 }
 zle -N zwidget::git-diff
 
+# Git diff cached
+function zwidget::git-diff-cached
+{
+	zle::utils::check_git || return
+
+	git dc
+}
+zle -N zwidget::git-diff-cached
+
 function zwidget::fg
 {
 	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
@@ -984,6 +993,7 @@ vibindkey 's' zwidget::toggle-sudo
 # fast git
 bindkey 'g' zwidget::git-status
 bindkey 'd' zwidget::git-diff
+bindkey 'D' zwidget::git-diff-cached
 #bindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
 
 autoload -U edit-command-line
