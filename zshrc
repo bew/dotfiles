@@ -445,7 +445,7 @@ function repeat_every_while
     cmd=( $* )
 
     while $cmd; do
-        sleep 1
+        sleep $interval
     done
 }
 
