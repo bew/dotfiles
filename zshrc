@@ -10,7 +10,7 @@
 #|#                                                                                    #|#
 ########################################################################################
 
-export SHELL=zsh
+export SHELL=/bin/zsh
 
 # enable vim mode
 bindkey -v
