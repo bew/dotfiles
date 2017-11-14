@@ -1021,16 +1021,16 @@ source ~/.zsh/fzf/key-bindings.zsh
 vibindkey 's' zwidget::toggle-sudo
 
 # fast git
-bindkey 'g' zwidget::git-status
-bindkey 'd' zwidget::git-diff
-bindkey 'D' zwidget::git-diff-cached
-#bindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
+vibindkey 'g' zwidget::git-status
+vibindkey 'd' zwidget::git-diff
+vibindkey 'D' zwidget::git-diff-cached
+#vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
 
 autoload -U edit-command-line
 zle -N edit-command-line
 
 # Alt-E => edit line in $EDITOR
-bindkey -M viins 'e' edit-command-line
+vibindkey 'e' edit-command-line
 
 vibindkey 'f' zwidget::fzf::file
 vibindkey 'c' zwidget::fzf::directory
