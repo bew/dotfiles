@@ -2,17 +2,19 @@
 
 # vim files
 .cs_*
-.ycm_extra_conf.py*
-__pycache__
+.*.py # from neomake
 
 
 # C/C++ compilation
 *.o
 *.out
 
-# temp
-cnorm
-pyrser
-
 # Put any dir link you want to a __vcs_ignore__ directory!
 __vcs_ignore__/
+
+# Python compilation
+__pycache__/
+
+# Pipenv
+Pipfile
+Pipfile.lock
