@@ -1075,21 +1075,6 @@ bindkey -M vicmd ds delete-surround
 bindkey -M vicmd ys add-surround
 bindkey -M visual S add-surround
 
-# menuselect keybindings
-#-------------------------------------------------------------
-
-# enable go back in completions with S-Tab
-bindkey -M menuselect '[Z' reverse-menu-complete
-
-# Cancel current completion with Esc
-bindkey -M menuselect '' send-break
-
-# Alt-hjkl to move in complete menu
-bindkey -M menuselect 'h' backward-char
-bindkey -M menuselect 'j' down-line-or-history
-bindkey -M menuselect 'k' up-line-or-history
-bindkey -M menuselect 'l' forward-char
-
 # Allow Alt+l to do:
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
@@ -1110,6 +1095,21 @@ bindkey -M viins 'l' zwidget::go-right_or_git-log
 # Doing Esc-j/k will go to normal mode, then go down/up
 #
 # Why: it's almost never useful to go up/down, while staying in insert mode
+
+# menuselect keybindings
+#-------------------------------------------------------------
+
+# enable go back in completions with S-Tab
+bindkey -M menuselect '[Z' reverse-menu-complete
+
+# Cancel current completion with Esc
+bindkey -M menuselect '' send-break
+
+# Alt-hjkl to move in complete menu
+bindkey -M menuselect 'h' backward-char
+bindkey -M menuselect 'j' down-line-or-history
+bindkey -M menuselect 'k' up-line-or-history
+bindkey -M menuselect 'l' forward-char
 
 # Alt-$ & Alt-0 => got to first & last results
 bindkey -M menuselect '0' beginning-of-line
