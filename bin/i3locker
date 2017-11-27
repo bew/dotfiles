@@ -59,7 +59,7 @@ function exit_clean
 {
 	rm -f ${buffer_path}
 	rm -f ${final_img}
-	unclutter &!
+	[ "$relaunch_unclutter" = "1" ] && unclutter &!
 	exit 0
 }
 
@@ -115,7 +115,10 @@ function generate_img
 init_logger
 
 # Tidy up X mouse / keyboard grabbers
-pkill unclutter
+if pgrep unclutter; then
+    relaunch_unclutter=1
+    pkill unclutter
+fi
 
 # Loading locker
 i3lock -n ${i3lock_options[@]} -i "$loading_img" >> ${log_file} &!

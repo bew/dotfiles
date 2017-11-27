@@ -34,7 +34,7 @@ eval `ssh-agent`
 ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 
 # Hide mouse automatically
-background_run unclutter
+#background_run unclutter
 
 # Warmer screen temperature at night
 background_run redshift-gtk
