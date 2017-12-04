@@ -548,6 +548,8 @@ compdef _mpv watch_and_seen
 # Now use '~cr/' to access crystal directory
 hash -d cr=~/Projects/opensource/crystal
 
+alias ccr='~cr/bin/crystal'
+
 hash -d open=~/Projects/opensource
 
 #----------------------------------------------------------------------------------
