@@ -2,7 +2,7 @@
 
 # vim files
 .cs_*
-.*.py # from neomake
+.*neomake* # from neomake
 
 
 # C/C++ compilation
