@@ -1015,6 +1015,14 @@ zle -N accept-line
 # Keybinds
 #----------------------------------------------------------------------------------
 
+# disable some keybinds
+#-------------------------------------------------------------
+
+bindkey -r '[29~' # Menu key
+
+
+#-------------------------------------------------------------
+
 # Allows to have fast switch Insert => Normal, but still be able to
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 function helper::setup_keytimeout_per_keymap
@@ -1056,6 +1064,7 @@ vibindkey 'f' zwidget::fzf::file
 vibindkey 'c' zwidget::fzf::directory
 vibindkey 'z' zwidget::fzf::z
 bindkey -M vicmd '/' zwidget::fzf::history
+bindkey -M viins '/' zwidget::fzf::history
 
 # Ctrl-Z => fg
 vibindkey '^z' zwidget::fg
@@ -1136,11 +1145,4 @@ bindkey -M menuselect '0' beginning-of-line
 bindkey -M menuselect '$' end-of-line
 
 bindkey -M menuselect 'a' accept-and-hold
-
-# disable some keybinds
-#-------------------------------------------------------------
-
-# Disable Alt-/ to ensure that it'll do the same as Esc then '/'.
-bindkey -r '/' # Alt-/
-bindkey -r '[29~' # Menu key
 
