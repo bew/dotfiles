@@ -6,7 +6,8 @@ fi
 
 FIND_IGNORE_OPTIONS="\\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune"
 
-FIND_FILTER_ALL_FILES="-o -type f -print -o -type d -print"
+#FIND_FILTER_ALL_FILES="-o -type f -print -o -type d -print"
+FIND_FILTER_ALL_FILES="-o -type f -print"
 FIND_FILTER_DIRS="-o -type d -print"
 
 function __fsel
