@@ -302,7 +302,7 @@ alias mkdir="mkdir -v"
 
 # ls
 
-alias ls="ls --color --group-directories-first"
+alias ls="ls --color=auto --group-directories-first"
 alias ll="ls -lh"
 alias la='ll -a'
 alias l="la"
