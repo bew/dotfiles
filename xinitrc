@@ -12,6 +12,16 @@ function run
     which $1 >/dev/null && $*
 }
 
+function debug
+{
+    echo $* >> /t/xinitrc_debug
+}
+
+debug
+debug "xinitrc startup"
+debug "---------------"
+debug
+
 if [ -d /etc/X11/xinit/xinitrc.d ]; then
     for f in /etc/X11/xinit/xinitrc.d/*; do
         [ -x "$f" ] && . "$f"
@@ -42,5 +52,32 @@ background_run redshift-gtk
 # Run the compositor
 [ -f ~/.config/compton ] && run compton --config ~/.config/compton -b
 
-# Run the WM
-exec awesome
+# Find the session
+debug "Session is $1"
+case $1 in
+    awesome)
+        session_args+=(awesome)
+        ;;
+    hlwm|herbstluftwm)
+        session_args+=(herbstluftwm)
+        ;;
+    i3|i3wm)
+        session_args+=(i3)
+        ;;
+    bsp|bspwm)
+        session_args+=(bspwm)
+        ;;
+    *)
+        # No known session, try to run it as command
+        session_args+=($1)
+        ;;
+esac
+
+
+# Run The WM
+debug "Session args: ${session_args[*]}"
+${session_args[*]} &
+wm_pid=$!
+
+# HANG POINT! wait for the WM, then end X (end of this script)
+wait $wm_pid
