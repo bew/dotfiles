@@ -13,7 +13,7 @@ def initialize${1:(${2:args})}
 end
 endsnippet
 
-snippet uninit "uninitialized"
+snippet unini "uninitialized"
 uninitialized ${1:Type}
 endsnippet
 
@@ -51,7 +51,7 @@ enum ${1:EnumName}
 end
 endsnippet
 
-snippet case "Case node" b
+snippet case "Case node"
 case ${1:expr}
 when ${2:expr}
   ${VISUAL}$0
@@ -76,6 +76,14 @@ endsnippet
 
 snippet idoa "inline block { |args| ... }"
 { |${1:args}| ${VISUAL}$2 }$0
+endsnippet
+
+snippet !beg(in)?! "begin .. rescue .. end" r
+begin
+  ${VISUAL}$1
+rescue ${2:ex${3: : ${4:SomeException}}}
+  $5
+end$0
 endsnippet
 
 # C helpers
