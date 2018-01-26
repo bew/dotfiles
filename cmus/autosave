@@ -50,6 +50,8 @@ set dsp.ao.buffer_size=16384
 set dsp.ao.driver=
 set dsp.ao.wav_counter=1
 set dsp.ao.wav_dir=/home/lesell_b
+set dsp.jack.resampling_quality=2
+set dsp.jack.server_name=
 set dsp.oss.device=
 set follow=false
 set format_current= %a - %l -%3n. %t%= %y 
