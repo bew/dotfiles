@@ -87,8 +87,8 @@ nnoremap <M-O> O<esc>
 
 " Quickely navigate between quickfix or location list's lines
 
-nnoremap <M-j> :<C-u>call GotoQfOrLoc("next", "first")<cr>
-nnoremap <M-k> :<C-u>call GotoQfOrLoc("previous", "last")<cr>
+nnoremap <leader>j :<C-u>call GotoQfOrLoc("next", "first")<cr>
+nnoremap <leader>k :<C-u>call GotoQfOrLoc("previous", "last")<cr>
 
 " First try the quickfix list, if empty, uses the location list
 function! GotoQfOrLoc(direction, rewind_name)
