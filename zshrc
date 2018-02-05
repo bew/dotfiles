@@ -361,6 +361,10 @@ function pac::show_useless_deps
 alias pac::remove_useless_deps='command sudo pacman -Rsv $(pac::list_useless_deps)'
 
 
+# git
+
+alias git::status_in_all_repos='find -name .git -prune -print -execdir git status \;'
+
 # sudo
 
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
