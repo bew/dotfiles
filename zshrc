@@ -206,7 +206,7 @@ setopt PROMPT_SUBST
 HISTFILE=~/.histfile
 
 # Lines of history to keep in memory
-HISTSIZE=1000
+HISTSIZE=10000
 
 # Lines to keep in the history file
 SAVEHIST=1000000
@@ -282,6 +282,8 @@ alias tre=tree
 alias py=python
 
 alias j=jobs
+
+alias com=command
 
 # Big-one letter aliases
 
