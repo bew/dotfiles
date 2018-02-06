@@ -32,21 +32,21 @@ endsnippet
 snippet main "main() (main)"
 int main(${1:int ac, char *av[]})
 {
-	${VISUAL}${0}
-	return (0);
+  ${VISUAL}${0}
+  return (0);
 }
 endsnippet
 
 snippet for "for loop (for)"
 for (${2:i} = 0; $2 < ${1:count}; ${3:++$2}) {
-	${VISUAL}${0}
+  ${VISUAL}${0}
 }
 endsnippet
 
 snippet enum "Enumeration"
 enum ${1:name}
 {
-	$0
+  $0
 };
 endsnippet
 
@@ -70,24 +70,24 @@ snippet td "Typedef"
 typedef ${1:int} ${2:MyCustomType};
 endsnippet
 
-snippet tden "typedef enum (Epitech)" b
-typedef enum	e_$1
+snippet tden "typedef enum" b
+typedef enum e_$1
 {
   ${VISUAL}${0},
-}		t_${1:enum};
+} t_${1:enum};
 endsnippet
 
-snippet tdst "typedef struct (Epitech)" b
-typedef struct	s_$1
+snippet tdst "typedef struct" b
+typedef struct s_$1
 {
   ${VISUAL}${0}
-}		t_${1:struct};
+} t_${1:struct};
 endsnippet
 
 snippet wh "while loop"
 while (${1:/* condition */})
 {
-	${VISUAL}${0}
+  ${VISUAL}${0}
 }
 endsnippet
 
@@ -98,7 +98,7 @@ endsnippet
 snippet eli "else if .. (eli)"
 else if (${1:/* condition */})
 {
-	${VISUAL}${0}
+  ${VISUAL}${0}
 }
 endsnippet
 
@@ -109,14 +109,14 @@ endsnippet
 snippet st "struct"
 struct ${1:`!p snip.rv = "t_" + (snip.basename or "name")`}
 {
-	${0:/* data */}
+  ${0:/* data */}
 };
 endsnippet
 
 snippet fun "function" b
 ${2:void} ${1:function_name}(${3})
 {
-	${VISUAL}${0}
+  ${VISUAL}${0}
 }
 endsnippet
 
