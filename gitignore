@@ -2,7 +2,9 @@
 
 # vim files
 .cs_*
-.*neomake* # from neomake
+
+# neomake tmp files
+.*neomake*
 
 
 # C/C++ compilation
