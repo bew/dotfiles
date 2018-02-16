@@ -4,78 +4,78 @@ endsnippet
 
 snippet ini "def initialize without body"
 def initialize${1:(${2:args})}
-end$0
+end$99
 endsnippet
 
 snippet init "def initialize"
 def initialize${1:(${2:args})}
-  ${VISUAL}${0}
+  ${VISUAL}$99
 end
 endsnippet
 
-snippet unini "uninitialized"
-uninitialized ${1:Type}
+snippet unini "uninitialized Type"
+uninitialized ${1:Type}$99
 endsnippet
 
 snippet req "require" b
-require "${1:file}"$0
+require "${1:file}"$99
 endsnippet
 
-snippet def "method definition - no args"
+snippet def "method definition"
 def ${1:method_name}${2:(${3:args})}
   ${VISUAL}$4
-end$0
+end$99
 endsnippet
 
 snippet !mod(ule)?! "Module definition" rb
 module ${1:ModuleName}
-  ${VISUAL}$0
+  ${VISUAL}$99
 end
 endsnippet
 
 snippet !st(ruct)?! "Struct definition" r
-struct ${1:StructName}
-  ${VISUAL}$0
+struct ${1:StructName}${2: < ${3:BaseStruct}}
+  ${VISUAL}$99
 end
 endsnippet
 
 snippet !cl(ass)?! "Class definition" r
-class ${1:ClassName}
-  ${VISUAL}$0
+class ${1:ClassName}${2: < ${3:BaseClass}}
+  ${VISUAL}$99
 end
 endsnippet
 
 snippet enum "Enum definition"
 enum ${1:EnumName}
-  ${VISUAL}$0
+  ${VISUAL}$99
 end
 endsnippet
 
 snippet case "Case node"
 case ${1:expr}
 when ${2:expr}
-  ${VISUAL}$0
+  ${VISUAL}$99
 end
 endsnippet
 
 snippet do "do ... end"
 do
-  ${VISUAL}$0
-end
+  ${VISUAL}$1
+end$99
 endsnippet
 
 snippet doa "do |args| ... end"
 do |${1:args}|
-  ${VISUAL}$0
-end
+  ${VISUAL}$2
+end$99
 endsnippet
 
 snippet ido "inline block { ... }"
-{ ${VISUAL}$1 }$0
+{ ${VISUAL}$1 }$99
 endsnippet
 
 snippet idoa "inline block { |args| ... }"
-{ |${1:args}| ${VISUAL}$2 }$0
+{ |${1:args}| ${VISUAL}$2 }$99
 endsnippet
 
 snippet !beg(in)?! "begin .. rescue .. end" r
@@ -83,7 +83,7 @@ begin
   ${VISUAL}$1
 rescue ${2:ex${3: : ${4:SomeException}}}
   $5
-end$0
+end$99
 endsnippet
 
 # C helpers
@@ -91,25 +91,25 @@ endsnippet
 snippet lib "lib binding" b
 lib ${1:Lib${2:Name}}
   ${VISUAL}$3
-end$0
+end$99
 endsnippet
 
 snippet fun "C function or binding" b
-fun ${1:fun_name}${2:(${3:args})}${4: : ${5:ReturnType}}$0
+fun ${1:fun_name}${2:(${3:args})}${4: : ${5:ReturnType}}$99
 endsnippet
 
 # Spec helpers
 
-snippet describe "Spec - describe 'desc' do ... end" b
+snippet !desc(ribe)?! "Spec - describe 'desc' do ... end" rb
 describe "${1:description}" do
   ${VISUAL}$2
-end
+end$99
 endsnippet
 
 snippet it "Spec - it 'desc' do ... end" b
 it "${1:description}" do
   ${VISUAL}$2
-end
+end$99
 endsnippet
 
 # Macro helpers
@@ -117,21 +117,25 @@ endsnippet
 snippet !mac(ro)?! "Create a macro" rb
 macro ${1:macro_name}${2:(${3:args})}
   ${VISUAL}$4
-end
+end$99
 endsnippet
 
 snippet ms "Macro stmt {% blabla %}" w
-{% ${VISUAL}$1 %}$2
+{% ${VISUAL}$1 %}$99
+endsnippet
+
+snippet mend "Macro end" w
+{% end %}$0
 endsnippet
 
 snippet mp "Macro printed stmt {{ blabla }}" w
-{{ ${VISUAL}$1 }}$2
+{{ ${VISUAL}$1 }}$99
 endsnippet
 
 snippet mps "Short Macro printed stmt {{blabla}}" w
-{{${VISUAL}$1}}$2
+{{${VISUAL}$1}}$99
 endsnippet
 
 snippet md "Macro debug here" w
-{% debug() %}$1
+{% debug() %}
 endsnippet

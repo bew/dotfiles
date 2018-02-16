@@ -8,7 +8,7 @@ priority -49
 snippet doxcom "Doxygen comment" b
 /**
  * ${1:Comment}
- */$0
+ */$99
 endsnippet
 
 # TODO: how to set length of ======= to 80 columns automatically..
@@ -106,7 +106,7 @@ endsnippet
 snippet enumcla "enum class" b
 enum class ${1:EnumClass} : ${2:int}
 {
-	${VISUAL}${3}
+	${VISUAL}$99
 };
 endsnippet
 
@@ -116,7 +116,7 @@ snippet ctor "Constructor implementation"
 ${1:`!p snip.rv = snip.basename or "ClassName"`}::$1(${2})${3: :}
 {${4}
 }
-${0}
+$99
 endsnippet
 
 ###########################################################################
@@ -125,7 +125,7 @@ snippet dtor "Destructor implementation"
 ${1:`!p snip.rv = snip.basename or "ClassName"`}::~$1()
 {${2}
 }
-${0}
+$99
 endsnippet
 
 ###########################################################################
@@ -133,36 +133,36 @@ endsnippet
 snippet ns "namespace .. (namespace)"
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`}
 {
-	${VISUAL}${0}
+	${VISUAL}$99
 };
 endsnippet
 
 ###########################################################################
 
 snippet map "std::map (map)"
-std::map<${1:key}, ${2:value}> map$0;
+std::map<${1:key}, ${2:value}> ${3:map}$99;
 endsnippet
 
 ###########################################################################
 
 snippet vector "std::vector (v)"
-std::vector<${1:char}> v$0;
+std::vector<${1:char}> ${2:vector}$99;
 endsnippet
 
 ###########################################################################
 
 snippet tp "template <typename ..> (template)"
-template <typename ${1:_InputIter}>
+template <typename ${1:T}>
 endsnippet
 
 ###########################################################################
 
 snippet cout "std::cout std::endl"
-std::cout << ${1} << std::endl;${0}
+std::cout << $1 << std::endl;$99
 endsnippet
 
 snippet cerr "std::cerr std::endl"
-std::cerr << ${1} << std::endl;${0}
+std::cerr << $1 << std::endl;$99
 endsnippet
 
 ###########################################################################
