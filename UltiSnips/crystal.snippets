@@ -78,7 +78,7 @@ snippet idoa "inline block { |args| ... }"
 { |${1:args}| ${VISUAL}$2 }$99
 endsnippet
 
-snippet !beg(in)?! "begin .. rescue .. end" r
+snippet beg "begin .. rescue .. end"
 begin
   ${VISUAL}$1
 rescue ${2:ex${3: : ${4:SomeException}}}
@@ -96,6 +96,12 @@ endsnippet
 
 snippet fun "C function or binding" b
 fun ${1:fun_name}${2:(${3:args})}${4: : ${5:ReturnType}}$99
+endsnippet
+
+snippet funmain "main C function" b
+fun main(argc : Int32, argv : UInt8**) : Int32
+  ${VISUAL}$99
+end
 endsnippet
 
 # Spec helpers
@@ -137,5 +143,12 @@ snippet mps "Short Macro printed stmt {{blabla}}" w
 endsnippet
 
 snippet md "Macro debug here" w
-{% debug() %}
+{% debug %}
 endsnippet
+
+snippet mbeg "{% begin %} .. {% end %}"
+{% begin %}
+  ${VISUAL}$1
+{% end %}$99
+endsnippet
+
