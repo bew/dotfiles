@@ -2,7 +2,7 @@
 
 local capi
 
-function require_init()
+local function require_init()
 	-- Grab environment
 	capi = {
 		print = print,
@@ -10,9 +10,6 @@ function require_init()
 end
 
 require_init()
-
-local Socket = require("socket")
-local MsgPack = require("MessagePack")
 
 if #arg == 0 then
 	print()
@@ -40,7 +37,7 @@ local AwmRemote
 -- Main function
 --
 
-function main(arg)
+local function main(arg)
 
 	local eventName = arg[1] -- i.e "my::event"
 	local strEventArgs, eventArgs
@@ -76,9 +73,9 @@ end
 -- Locally Required Packages
 --
 
-function require_func(package)
+local function require_func(package)
 
-	function require_awmremote()
+	local function require_awmremote()
 
 		-- Module environment
 		local AwesomeRemote = {}
@@ -178,7 +175,7 @@ function require_func(package)
 		-- Public functions
 
 		function AwesomeRemote.init(conf)
-			local conf = conf or {}
+			conf = conf or {}
 			config.verbose = conf.verbose or false
 			findRunningServers()
 			print("There is " .. #servers .. " running Awesome instances")
