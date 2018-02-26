@@ -24,8 +24,13 @@ Plug 'SirVer/ultisnips'					" Advanced snippets
 
 " -- Text refactor / formater
 
-"Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
-"            \ { 'do': ':UpdateRemotePlugins' }
+" One more try with Scry (25 Feb 2018), but @faustinoaq did everything in his
+" vscode plugin, not in Scry :/ So not much fancy in Scry for now..
+" Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
+"             \ {
+"             \   'branch': 'next',
+"             \   'do': 'bash install.sh',
+"             \ }
 
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
