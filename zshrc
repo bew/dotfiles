@@ -280,6 +280,7 @@ alias pac=pacman
 alias wpa=wpa_cli
 alias tre=tree
 alias py=python
+alias ipy=ipython
 
 alias j=jobs
 
