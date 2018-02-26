@@ -8,7 +8,6 @@ Plug 'szw/vim-ctrlspace'				" Control your space (buffers/tags/workspaces/etc..)
 Plug 'tpope/vim-abolish'				" Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'			" * for visualy selected text
 Plug 'mileszs/ack.vim'					" Use ack for vimgrep
-"Plug 'pelodelfuego/vim-swoop'			" Search everywhere with context
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
 Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
@@ -61,10 +60,6 @@ Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 
 "# LLVM IR
 Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
-
-"# Scala
-Plug 'derekwyatt/vim-scala'				" Syntax highlighting
-"Plug 'ensime/ensime-vim'				" IDE functionalities for Scala
 
 "# Markdown
 Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
