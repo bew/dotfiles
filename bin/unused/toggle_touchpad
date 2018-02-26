@@ -1,9 +1,0 @@
-#!/bin/zsh
-
-touchpad_device_id=$(xinput | grep -i touchpad | tr -s "[:blank:]*" " " | cut -d = -f 2 | cut -d " " -f 1)
-
-if [[ $touchpad_device_id -lt "0" ]]; then
-
-
-
-touchpad_status=$()
