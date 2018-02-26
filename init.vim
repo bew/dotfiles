@@ -66,6 +66,10 @@ Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
 Plug 'derekwyatt/vim-scala'				" Syntax highlighting
 "Plug 'ensime/ensime-vim'				" IDE functionalities for Scala
 
+"# Markdown
+Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
+" 'plasticboy/vim-markdown' might be nice too
+
 "# Python
 Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
 Plug 'zchee/deoplete-jedi'				" Jedi powered autocompletion
