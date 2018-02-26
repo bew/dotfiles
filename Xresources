@@ -81,7 +81,7 @@ XTerm.*backarrowKey: false
 /* 3:bold		jaune */
 *color11: #ffc123
 
-/* DarkBlue + Blue (pas de darkblue, orange à la place (couleur des commandes dans emacs) */
+/* DarkBlue + Blue */
 
 /* bleu foncé */
 /**color4:  #204a87 */
