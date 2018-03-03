@@ -27,20 +27,32 @@ def ${1:method_name}${2:(${3:args})}
 end$99
 endsnippet
 
-snippet !mod(ule)?! "Module definition" rb
+snippet mod "Module definition"
 module ${1:ModuleName}
   ${VISUAL}$99
 end
 endsnippet
 
-snippet !st(ruct)?! "Struct definition" r
-struct ${1:StructName}${2: < ${3:BaseStruct}}
+snippet st "Struct definition"
+struct ${1:StructName}
   ${VISUAL}$99
 end
 endsnippet
 
-snippet !cl(ass)?! "Class definition" r
-class ${1:ClassName}${2: < ${3:BaseClass}}
+snippet dst "Struct definition"
+struct ${1:StructName} < ${2:BaseStruct}
+  ${VISUAL}$99
+end
+endsnippet
+
+snippet cl "Class definition"
+class ${1:ClassName}
+  ${VISUAL}$99
+end
+endsnippet
+
+snippet dcl "Derived Class definition"
+class ${1:ClassName} < ${2:BaseClass}
   ${VISUAL}$99
 end
 endsnippet
@@ -130,7 +142,7 @@ snippet ms "Macro stmt {% blabla %}" w
 {% ${VISUAL}$1 %}$99
 endsnippet
 
-snippet mend "Macro end" w
+snippet me "Macro end" w
 {% end %}$0
 endsnippet
 

@@ -93,7 +93,7 @@ fprintf(${1:stderr}, "${2:%s}\n"${2/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$3${2/([^%]|%
 endsnippet
 
 snippet eli "else if .."
-else if (${1:/* condition */})
+else if ($1)
 {
   ${VISUAL}$99
 }
@@ -106,7 +106,7 @@ endsnippet
 snippet st "struct"
 struct ${1:`!p snip.rv = "t_" + (snip.basename or "name")`}
 {
-  ${0:/* data */}
+  $99
 };
 endsnippet
 
