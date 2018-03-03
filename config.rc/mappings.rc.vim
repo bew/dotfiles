@@ -118,6 +118,10 @@ function! GotoQfOrLoc(direction, rewind_name)
     endif
 endfunction
 
+" Trigger deoplete completion manually
+inoremap <expr> <C-b>
+            \ deoplete#mappings#manual_complete()
+
 
 " Exit the terminal grabber
 tnoremap <A-q> <C-\><C-n>

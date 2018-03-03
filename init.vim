@@ -1,6 +1,8 @@
 set nocompatible
 call plug#begin('~/.config/nvim/plugged')
 
+Plug 'embear/vim-localvimrc'			" Load local .lvimrc files
+
 " -- Vim feature enhancer
 
 Plug 'sjl/gundo.vim'					" undo tree
@@ -54,6 +56,7 @@ Plug 'superbrothers/vim-vimperator'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
+Plug 'zchee/deoplete-clang'
 
 "# Arduino
 "Plug 'jplaut/vim-arduino-ino'			" Arduino project compilation and deploy
