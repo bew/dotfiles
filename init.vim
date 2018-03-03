@@ -30,11 +30,18 @@ Plug 'SirVer/ultisnips'					" Advanced snippets
 
 " One more try with Scry (25 Feb 2018), but @faustinoaq did everything in his
 " vscode plugin, not in Scry :/ So not much fancy in Scry for now..
-" Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
-"             \ {
-"             \   'branch': 'next',
-"             \   'do': 'bash install.sh',
-"             \ }
+Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
+            \ {
+            \   'branch': 'next',
+            \   'do': 'bash install.sh',
+            \ }
+let g:LanguageClient_serverCommands = {
+    \ 'crystal': [$HOME + '/Projects/opensource/scry/bin/scry'],
+    \ }
+
+nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+inoremap <expr> <A-c> LanguageClient_textDocument_completion()
 
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
