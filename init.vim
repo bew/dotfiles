@@ -84,6 +84,9 @@ let g:jedi#completions_enabled = 0
 " Jinja templating syntax & indent
 Plug 'lepture/vim-jinja'
 
+"# Typescript
+Plug 'leafgarland/typescript-vim'
+
 call plug#end()
 
 let g:vimhome = $HOME . "/.config/nvim"
