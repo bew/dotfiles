@@ -110,8 +110,8 @@ struct ${1:`!p snip.rv = "t_" + (snip.basename or "name")`}
 };
 endsnippet
 
-snippet fun "function" b
-${2:void} ${1:function_name}(${3})
+snippet fun "function"
+${2:${3:void} }${1:function_name}(${4})
 {
   ${VISUAL}$99
 }
