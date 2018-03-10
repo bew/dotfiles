@@ -12,8 +12,10 @@ Plug 'thinca/vim-visualstar'			" * for visualy selected text
 Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
-Plug 'Shougo/deoplete.nvim',			" Dark powered asynchronous completion framework
-            \ { 'do': ':UpdateRemotePlugins' }
+Plug 'roxma/nvim-completion-manager'
+let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
+
+
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 
 " Motions on speed!
@@ -56,7 +58,7 @@ Plug 'superbrothers/vim-vimperator'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-Plug 'zchee/deoplete-clang'
+Plug 'roxma/ncm-clang'
 
 "# Arduino
 "Plug 'jplaut/vim-arduino-ino'			" Arduino project compilation and deploy
@@ -75,7 +77,6 @@ Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown file
 
 "# Python
 Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
-Plug 'zchee/deoplete-jedi'				" Jedi powered autocompletion
 
 " More Python tools (e.g: goto def)
 Plug 'davidhalter/jedi-vim'
@@ -86,6 +87,9 @@ Plug 'lepture/vim-jinja'
 
 "# Typescript
 Plug 'leafgarland/typescript-vim'
+
+"# Vimscript
+Plug 'Shougo/neco-vim'
 
 call plug#end()
 
@@ -123,7 +127,6 @@ endfunction
 """""""""""""""""""""""""""""""""
 
 call s:loadConfigDir("plugins")
-let g:deoplete#enable_at_startup = 1
 
 if has("gui")
 	" Disable every gvim gui stuff
