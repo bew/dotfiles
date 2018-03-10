@@ -36,7 +36,7 @@ Plug 'autozimu/LanguageClient-neovim',	" Language Server Protocol support
             \   'do': 'bash install.sh',
             \ }
 let g:LanguageClient_serverCommands = {
-    \ 'crystal': [$HOME + '/Projects/opensource/scry/bin/scry'],
+    \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
     \ }
 
 nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
