@@ -73,6 +73,9 @@ case $1 in
         ;;
 esac
 
+# Empty the shell level, so terminal emulators thinks they are the first one
+# in the chain
+export SHLVL=
 
 # Run The WM
 debug "Session args: ${session_args[*]}"
