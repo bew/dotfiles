@@ -556,6 +556,7 @@ compdef _mpv watch_and_seen
 
 # Now use '~cr/' to access crystal directory
 hash -d cr=~/Projects/opensource/crystal
+hash -d cr_alt=~/Projects/opensource/crystal_alt
 
 alias ccr='~cr/bin/crystal'
 
