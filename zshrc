@@ -114,7 +114,7 @@ GIT_PS1_SHOWUNTRACKEDFILES=1
 #-------------------------------------------------------------
 autoload -Uz cdr
 
-# The original chpwd_recent_dirs (retreived with autoload) doesn't work when the
+# The original chpwd_recent_dirs (from autoload) doesn't work when the
 # chpwd hook is called after a non-toplevel `cd`, e.g when we `cd` from a script
 # or a function.
 #
@@ -144,9 +144,11 @@ function chpwd_recent_dirs
             is_toplevel_or_forced=1
         fi
     fi
+
+    [[ $is_toplevel_or_forced == 0 ]] && return
     # END ADDITION
 
-    if [[ ! -o interactive || $ZSH_SUBSHELL -ne 0 || $is_toplevel_or_forced == 0 ]]; then
+    if [[ ! -o interactive || $ZSH_SUBSHELL -ne 0 ]]; then
         return
     fi
     chpwd_recent_filehandler
