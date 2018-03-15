@@ -18,6 +18,8 @@ let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 
+Plug 'airblade/vim-gitgutter'			" Git diff in the gutter
+
 " Motions on speed!
 Plug 'easymotion/vim-easymotion'
 
