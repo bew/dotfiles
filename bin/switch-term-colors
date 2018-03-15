@@ -1,6 +1,8 @@
 #!/usr/bin/sh
-
+#
 # Reference: https://unix.stackexchange.com/questions/232881/urxvt-change-background-color-on-the-fly/295520#295520
+#
+# Created: 2018-03-14 by Benoit de Chezelles
 
 LIGHT_BG=${LIGHT_BG:-#FFF3E0}
 LIGHT_FG=${LIGHT_FG:-black}
