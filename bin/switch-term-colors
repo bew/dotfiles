@@ -59,6 +59,17 @@ check_compatibility
 case $1 in
     dark)
         switch_dark;;
+
     light)
         switch_light;;
+
+    toggle)
+        if [[ $TERM_COLOR_MODE == 'light' ]]; then
+            switch_dark
+        elif [[ $TERM_COLOR_MODE == 'dark' ]]; then
+            switch_light
+        else
+            # Assume the default is 'dark'
+            switch_light
+        fi
 esac
