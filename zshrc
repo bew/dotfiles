@@ -550,6 +550,12 @@ function watch_and_seen
 }
 compdef _mpv watch_and_seen
 
+function switch-term-colors
+{
+    local color_mode=$(command switch-term-colors $*)
+    export TERM_COLOR_MODE=$color_mode
+}
+
 
 # Named directores
 #----------------------------------------
