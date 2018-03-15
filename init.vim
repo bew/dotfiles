@@ -39,8 +39,6 @@ let g:LanguageClient_serverCommands = {
     \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
     \ }
 
-let g:LanguageClient_loggingLevel = 'DEBUG'
-
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
@@ -55,6 +53,8 @@ Plug 'mhinz/vim-startify'					" add a custom startup screen for vim
 Plug 'Bew78LesellB/vim-colors-solarized'	" vim-colors-solarized - favorite colorscheme <3
 Plug 'vim-scripts/xterm-color-table.vim'	" Provide some commands to display all cterm colors
 Plug 'ryanoasis/vim-devicons'
+
+Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per language plugins
 
