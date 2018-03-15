@@ -101,11 +101,13 @@ set expandtab " Always expand TAB to spaces
 set t_Co=256
 let g:solarized_termcolors = 256
 syntax enable " Not 'syntax on' which overrides colorscheme
-colorscheme solarized
 
-set background=dark
-if (!has("gui_running"))
-	set background=light " this is weird but it fixes dark color...
+colorscheme solarized
+if $TERM_COLOR_MODE == 'light'
+    " Default for solarized is light
+else
+    set background=dark
+    set background=light " Weird I know..
 endif
 
 
