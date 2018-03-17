@@ -164,6 +164,22 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
+vnoremap <M-P> :call VisualPasteKeepUnnamedRegister(v:true)<cr>
+vnoremap <M-p> :call VisualPasteKeepUnnamedRegister(v:false)<cr>
+function! VisualPasteKeepUnnamedRegister(before)
+    let old_reg = getreg('"', 1, v:true)
+    let old_regtype = getregtype('"')
+
+    if a:before
+        normal gvP
+    else
+        normal gvp
+    endif
+
+    echo string(old_reg) . '  ' . old_regtype
+    call setreg('"', old_reg, old_regtype)
+endfunction
+
 
 " Taken from visual-at.vim from Practical Vim 2nd Edition
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
