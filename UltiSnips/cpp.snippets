@@ -54,19 +54,19 @@ endsnippet
 snippet class "class .."
 class ${1:`!p snip.rv = snip.basename or "ClassName"`}
 {
-${2:public}:
-	${0}
+  ${2:public}:
+    ${0}
 };
 endsnippet
 
 snippet claiface "class .. (Interface)" b
 class ${1:`!p snip.rv = snip.basename or "ClassName"`}
 {
-public:
-	virtual ~${1/(\w+).*/$1/}() {};
+  public:
+    virtual ~${1/(\w+).*/$1/}() {};
 
-public:
-	${0}
+  public:
+    ${0}
 };
 endsnippet
 
@@ -75,15 +75,15 @@ endsnippet
 snippet claexcept "class .. (Exception class)"
 class ${1:`!p snip.rv = snip.basename or "ClassName"`} : public std::exception
 {
-public:
-	${1/(\w+).*/$1/}(${2:arguments});
-	virtual ~${1/(\w+).*/$1/}() throw();
+  public:
+    ${1/(\w+).*/$1/}(${2:arguments});
+    virtual ~${1/(\w+).*/$1/}() throw();
 
-public:
-	const char * what() const throw();
+  public:
+    const char * what() const throw();
 
-private:
-	${0:/* data */}
+  private:
+    ${0:/* data */}
 };
 endsnippet
 
@@ -92,21 +92,21 @@ endsnippet
 snippet clacanon "class .. (Canonical class)"
 class ${1:`!p snip.rv = snip.basename or "ClassName"`}
 {
-public:
-	${1/(\w+).*/$1/}(${2:arguments});
-	${1/(\w+).*/$1/}(${1/(\w+).*/$1/} const & other);
-	${1/(\w+).*/$1/} & operator=(${1/(\w+).*/$1/} const & other);
-	virtual ~${1/(\w+).*/$1/}();
+  public:
+    ${1/(\w+).*/$1/}(${2:arguments});
+    ${1/(\w+).*/$1/}(${1/(\w+).*/$1/} const & other);
+    ${1/(\w+).*/$1/} & operator=(${1/(\w+).*/$1/} const & other);
+    virtual ~${1/(\w+).*/$1/}();
 
-protected:
-	${0:/* data */}
+  protected:
+    ${0:/* data */}
 };
 endsnippet
 
 snippet enumcla "enum class" b
 enum class ${1:EnumClass} : ${2:int}
 {
-	${VISUAL}$99
+  ${VISUAL}$99
 };
 endsnippet
 
@@ -133,7 +133,7 @@ endsnippet
 snippet ns "namespace .. (namespace)"
 namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`}
 {
-	${VISUAL}$99
+  ${VISUAL}$99
 };
 endsnippet
 
