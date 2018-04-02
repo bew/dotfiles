@@ -420,6 +420,11 @@ alias mpv-audio='mpv --no-video'
 alias clock='tty-clock -sc -C6 -d 0.5'
 alias c=clock
 
+# text translation (with https://github.com/soimort/translate-shell)
+
+alias fr:en='trans fr:en -b'
+alias en:fr='trans en:fr -b'
+
 #
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
