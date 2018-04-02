@@ -1009,6 +1009,7 @@ function zwidget::git-diff-cached
 }
 zle -N zwidget::git-diff-cached
 
+# fg
 function zwidget::fg
 {
 	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
@@ -1017,6 +1018,50 @@ function zwidget::fg
 	zle reset-prompt
 }
 zle -N zwidget::fg
+
+# Cycle quoting for current argument
+
+function zwidget::cycle-quoting-for-arg
+{
+    autoload -U modify-current-argument
+
+    if [[ ! $WIDGET == $LASTWIDGET ]]; then
+        # First use, or something else happened since last time
+        # (e.g: the cursor has moved)
+        # => We're not in a change-quoting-method chain
+        # => Reset quoting method
+        ZWIDGET_CURRENT_QUOTING_METHOD=none
+    fi
+
+    function zwidget::cycle-quoting-for-arg::inner
+    {
+        # ARG is the current argument in the cmdline
+
+        # cycle order: none -> single -> double -> none
+
+        local unquoted_arg="${(Q)ARG}"
+
+        if [[ $ZWIDGET_CURRENT_QUOTING_METHOD == none ]]; then
+            # current: none
+            # next: single quotes
+            REPLY="${(qq)${unquoted_arg}}"
+            ZWIDGET_CURRENT_QUOTING_METHOD=single
+        elif [[ $ZWIDGET_CURRENT_QUOTING_METHOD == single ]]; then
+            # current: single quotes
+            # next: double quotes
+            REPLY="${(qqq)${unquoted_arg}}"
+            ZWIDGET_CURRENT_QUOTING_METHOD=double
+        elif [[ $ZWIDGET_CURRENT_QUOTING_METHOD == double ]]; then
+            # current: double quotes
+            # next: no quotes (none)
+            REPLY="${(q)${unquoted_arg}}"
+            ZWIDGET_CURRENT_QUOTING_METHOD=none
+        fi
+    }
+
+    modify-current-argument zwidget::cycle-quoting-for-arg::inner
+}
+zle -N zwidget::cycle-quoting-for-arg
 
 #-------------------------------------------------------------
 # Builtin ZLE wrappers
@@ -1068,6 +1113,8 @@ source ~/.zsh/fzf/key-bindings.zsh
 # TODO: better binds organization
 
 vibindkey 's' zwidget::toggle-sudo
+
+vibindkey 'q' zwidget::cycle-quoting-for-arg
 
 # fast git
 vibindkey 'g' zwidget::git-status
