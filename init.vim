@@ -77,8 +77,12 @@ Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
 
 "# Markdown
-Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
 " 'plasticboy/vim-markdown' might be nice too
+Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
+
+" E.g disable auto change of << to «
+let g:markdown_enable_input_abbreviations = 0
+
 
 "# Python
 Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
