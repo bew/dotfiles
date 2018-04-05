@@ -422,8 +422,13 @@ alias c=clock
 
 # text translation (with https://github.com/soimort/translate-shell)
 
+# translation
 alias fr:en='trans fr:en -b'
 alias en:fr='trans en:fr -b'
+
+# definition
+alias en:def='trans en: -d'
+alias fr:def='trans fr: -d'
 
 #
 
