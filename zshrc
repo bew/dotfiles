@@ -1085,15 +1085,26 @@ function zwidget::git-diff-cached
 }
 zle -N zwidget::git-diff-cached
 
-# fg
+# fg %+
 function zwidget::fg
 {
-	[ -z "$(jobs)" ] && zle -M "No running jobs" && return
+    [ -z "$(jobs)" ] && zle -M "No running jobs" && return
 
-	eval fg
-	zle reset-prompt
+    eval fg %+
+    zle reset-prompt
 }
 zle -N zwidget::fg
+
+# fg %-
+function zwidget::fg2
+{
+    [ -z "$(jobs)" ] && zle -M "No running jobs" && return
+    [ -z "$(jobs | command grep '  - suspended')" ] && zle -M "Not enough running jobs" && return
+
+    eval fg %-
+    zle reset-prompt
+}
+zle -N zwidget::fg2
 
 # Cycle quoting for current argument
 #
@@ -1219,6 +1230,7 @@ bindkey -M viins '/' zwidget::fzf::history
 
 # Ctrl-Z => fg
 vibindkey '^z' zwidget::fg
+vibindkey '^z' zwidget::fg2
 
 
 # Fix keybinds when returning from command mode
