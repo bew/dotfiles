@@ -70,33 +70,103 @@ source ~/.zsh/z/z.sh
 #-------------------------------------------------------------
 # Sourcing happens at end of zshrc (more info at eof)
 
-# Configuration
-#----------------------------------------
-
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(
+  main # the base highlighter, and the only one active by default.
+  brackets # matches brackets and parenthesis.
+  #pattern # matches user-defined patterns.
+  #cursor # matches the cursor position.
+  #root # highlights the whole command line if the current user is root.
+  #line # applied to the whole command line.
+)
 
 typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[default]=none
-ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
-ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=009,standout
-ZSH_HIGHLIGHT_STYLES[alias]=fg=cyan,bold
-ZSH_HIGHLIGHT_STYLES[builtin]=fg=cyan,bold
-ZSH_HIGHLIGHT_STYLES[function]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[command]=fg=blue,bold
-ZSH_HIGHLIGHT_STYLES[precommand]=fg=white,underline
-ZSH_HIGHLIGHT_STYLES[commandseparator]=none
-ZSH_HIGHLIGHT_STYLES[hashed-command]=fg=009
-ZSH_HIGHLIGHT_STYLES[path]=fg=yellow
-ZSH_HIGHLIGHT_STYLES[globbing]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=white,underline
-ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
-ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
-ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=fg=blue
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[assign]=none
+
+# main highlighter config:
+#----------------------------------------
+
+# ┌─ unknown tokens / errors
+ZSH_HIGHLIGHT_STYLES[unknown-token]='bg=red,bold'
+# ┌─ shell reserved words (if, for)
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=208,bold' # orange
+# ┌─ aliases
+ZSH_HIGHLIGHT_STYLES[alias]='fg=cyan,bold'
+# ┌─ suffix aliases (requires zsh 5.1.1 or newer)
+ZSH_HIGHLIGHT_STYLES[suffix-alias]= # unset
+# ┌─ shell builtin commands (shift, pwd, zstyle)
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=208' # orange
+# ┌─ function names
+ZSH_HIGHLIGHT_STYLES[function]='fg=cyan'
+# ┌─ command names
+ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
+# ┌─ precommand modifiers (e.g., noglob, builtin)
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=white,underline'
+# ┌─ command separation tokens (;, &&)
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=208' # orange
+# ┌─ hashed commands
+ZSH_HIGHLIGHT_STYLES[hashed-command]= # unset
+# ┌─ existing filenames
+ZSH_HIGHLIGHT_STYLES[path]='fg=yellow'
+# ┌─ path separators in filenames (/); if unset, path is used (default)
+ZSH_HIGHLIGHT_STYLES[path_pathseparator]='fg=202' # cool red
+# ┌─ prefixes of existing filenames
+ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=172' # yellow dark
+# ┌─ path separators in prefixes of existing filenames (/); if unset, path_prefix is used (default)
+ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]='fg=202' # cool red
+# ┌─ globbing expressions (*.txt)
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
+# ┌─ history expansion expressions (!foo and ^foo^bar)
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=white,underline'
+# ┌─ single-hyphen options (-o)
+ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=green'
+# ┌─ double-hyphen options (--option)
+ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=green'
+# ┌─ backtick command substitution (`foo`)
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=blue'
+# ┌─ unclosed backtick command substitution (`foo)
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument-unclosed]='fg=blue,underline'
+# ┌─ single-quoted arguments ('foo')
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=cyan'
+# ┌─ unclosed single-quoted arguments ('foo)
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument-unclosed]='fg=cyan,underline'
+# ┌─ double-quoted arguments ("foo")
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=cyan'
+# ┌─ unclosed double-quoted arguments ("foo)
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=cyan,underline'
+# ┌─ dollar-quoted arguments ($'foo')
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]= # unset
+# ┌─ unclosed dollar-quoted arguments ($'foo)
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument-unclosed]= # unset
+# ┌─ two single quotes inside single quotes when the RC_QUOTES option is set ('foo''bar')
+ZSH_HIGHLIGHT_STYLES[rc-quote]= # unset
+# ┌─ parameter expansion inside double quotes ($foo inside "")
+ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]='fg=cyan'
+# ┌─ backslash escape sequences inside double-quoted arguments (\" in "foo\"bar")
+ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]='fg=cyan'
+# ┌─ backslash escape sequences inside dollar-quoted arguments (\x in $'\x48')
+ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]= # unset
+# ┌─ parameter assignments (x=foo and x=( ))
+ZSH_HIGHLIGHT_STYLES[assign]= # unset
+# ┌─ redirection operators (<, >, etc)
+ZSH_HIGHLIGHT_STYLES[redirection]= # unset
+# ┌─ comments, when setopt INTERACTIVE_COMMENTS is in effect (echo # foo)
+ZSH_HIGHLIGHT_STYLES[comment]= # unset
+# ┌─ a command word other than one of those enumrated above (other than a command, precommand, alias, function, or shell builtin command).
+ZSH_HIGHLIGHT_STYLES[arg0]= # unset
+# ┌─ everything else
+ZSH_HIGHLIGHT_STYLES[default]='none'
+
+# brackets highlighter config:
+#----------------------------------------
+
+# ┌─ unmatched brackets
+ZSH_HIGHLIGHT_STYLES[bracket-error]='bg=red'
+# ┌─ brackets with nest level N
+ZSH_HIGHLIGHT_STYLES[bracket-level-1]='fg=blue,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-2]='fg=green,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-3]='fg=yellow,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-4]='fg=magenta,bold'
+# ┌─ the matching bracket, if cursor is on a bracket
+ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]='standout'
 
 
 # Git branch in prompt
