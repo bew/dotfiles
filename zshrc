@@ -1251,8 +1251,8 @@ bindkey '^h' backward-kill-partial-word # Ctrl-Backspace
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
 bindkey '\e[3~' delete-char # Del (Suppr) key
-bindkey '\e[7~' beginning-of-line # Home key
-bindkey '\e[8~' end-of-line # End key
+vibindkey '\e[7~' beginning-of-line # Home key
+vibindkey '\e[8~' end-of-line # End key
 
 # cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
