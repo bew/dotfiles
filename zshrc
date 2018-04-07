@@ -1025,20 +1025,27 @@ function zwidget::fg
 zle -N zwidget::fg
 
 # Cycle quoting for current argument
-
-function zwidget::cycle-quoting-for-arg
+#
+# Given this command:
+# $ cmd foo bar\ baz
+#
+# Multiple call to this widget will give:
+# $ cmd foo 'bar baz'
+# $ cmd foo "bar baz"
+# $ cmd foo bar\ baz
+function zwidget::cycle-quoting
 {
     autoload -U modify-current-argument
 
     if [[ ! $WIDGET == $LASTWIDGET ]]; then
-        # First use, or something else happened since last time
-        # (e.g: the cursor has moved)
+        # First call, or something else happened since last call
+        # (e.g: the cursor moved)
         # => We're not in a change-quoting-method chain
         # => Reset quoting method
         ZWIDGET_CURRENT_QUOTING_METHOD=none
     fi
 
-    function zwidget::cycle-quoting-for-arg::inner
+    function zwidget::cycle-quoting::inner
     {
         # ARG is the current argument in the cmdline
 
@@ -1064,9 +1071,9 @@ function zwidget::cycle-quoting-for-arg
         fi
     }
 
-    modify-current-argument zwidget::cycle-quoting-for-arg::inner
+    modify-current-argument zwidget::cycle-quoting::inner
 }
-zle -N zwidget::cycle-quoting-for-arg
+zle -N zwidget::cycle-quoting
 
 #-------------------------------------------------------------
 # Builtin ZLE wrappers
@@ -1119,7 +1126,7 @@ source ~/.zsh/fzf/key-bindings.zsh
 
 vibindkey 's' zwidget::toggle-sudo
 
-vibindkey 'q' zwidget::cycle-quoting-for-arg
+vibindkey 'q' zwidget::cycle-quoting
 
 # fast git
 vibindkey 'g' zwidget::git-status
