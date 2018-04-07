@@ -1152,6 +1152,8 @@ vibindkey '^z' zwidget::fg
 
 # Fix keybinds when returning from command mode
 bindkey '^?' backward-delete-char # Backspace
+bindkey '^w' backward-kill-word
+bindkey '^u' backward-kill-line
 
 function backward-kill-partial-word
 {
@@ -1161,7 +1163,6 @@ function backward-kill-partial-word
 }
 zle -N backward-kill-partial-word
 
-bindkey '^w' backward-kill-word
 bindkey '^h' backward-kill-partial-word # Ctrl-Backspace
 
 # Sane default
