@@ -1184,6 +1184,9 @@ bindkey -M vicmd ds delete-surround
 bindkey -M vicmd ys add-surround
 bindkey -M visual S add-surround
 
+# Logical redo (u U)
+bindkey -M vicmd 'U' redo
+
 # Allow Alt+l to do:
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
