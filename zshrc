@@ -68,13 +68,14 @@ source ~/.zsh/z/z.sh
 
 # Syntax hightlighting
 #-------------------------------------------------------------
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Sourcing happens at end of zshrc (more info at eof)
 
 # Configuration
 #----------------------------------------
 
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 
+typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[default]=none
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=009,standout
@@ -1230,3 +1231,11 @@ bindkey -M menuselect '$' end-of-line
 
 bindkey -M menuselect 'a' accept-and-hold
 
+
+# Syntax hightlighting special end-of-file sourcing
+#
+# `zsh-syntax-highlighting.zsh` wraps ZLE widgets.
+# It must be sourced after all custom widgets have been created (i.e., after
+# all `zle -N` calls and after running `compinit`).
+# Widgets created later will work, but will not update the syntax highlighting.
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
