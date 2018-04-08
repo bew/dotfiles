@@ -1,4 +1,4 @@
-########################################################################################
+##########################################################################################
 #|#                                                                                    #|#
 #|#  ::::::::: ::::::::  :::    :::       ::::::::   ::::::::  ::::    ::: ::::::::::  #|#
 #|#       :+: :+:    :+: :+:    :+:      :+:    :+: :+:    :+: :+:+:   :+: :+:         #|#
@@ -8,19 +8,19 @@
 #|#   #+#     #+#    #+# #+#    #+#      #+#    #+# #+#    #+# #+#   #+#+# #+#         #|#
 #|#  ######### ########  ###    ###       ########   ########  ###    #### ###         #|#
 #|#                                                                                    #|#
-########################################################################################
+##########################################################################################
 
-export SHELL=/bin/zsh
-
-# enable vim mode
+# Enable vim mode
 bindkey -v
 
 # ESC timeout
 KEYTIMEOUT=1 # 10ms
-# see helper::setup_keytimeout_per_keymap for setup per selected keymap
+# See helper::setup_keytimeout_per_keymap for setup per selected keymap
 
+# Import color helpers
 autoload -U colors && colors
 
+# Initialize the completion system
 autoload -U compinit && compinit
 zmodload zsh/complist
 
@@ -299,9 +299,8 @@ setopt HIST_FIND_NO_DUPS
 # Remove extra blanks from each command line being added to history
 setopt HIST_REDUCE_BLANKS
 
-# TODO: search what they do
+# Remove duplicated history entries on history save (usually at end of shell session)
 setopt HIST_SAVE_NO_DUPS
-setopt HIST_EXPIRE_DUPS_FIRST
 
 # OTHERS
 #-------------------------------------------------------------
@@ -397,6 +396,7 @@ alias pg="ping google.fr"
 
 alias mkd="mkdir -p"
 
+# Creates 1 or more directories, then cd into the first one
 function mkcd
 {
 	mkd $*
@@ -463,9 +463,6 @@ alias vmi="v"
 alias imv="v"
 alias ivm="v"
 
-alias view="vim -R -c 'set nomod nolist'"
-
-alias ":h"="vimhelp"
 alias ":q"="exit"
 
 # man in vim
@@ -501,7 +498,7 @@ alias en:fr='trans en:fr -b'
 alias en:def='trans en: -d'
 alias fr:def='trans fr: -d'
 
-#
+# misc
 
 alias valgrindleak="valgrind --leak-check=full --show-reachable=yes"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
@@ -583,6 +580,7 @@ function chronometer
     date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S
 }
 
+# Watch a media with 'mpv' player, then ask to move the media file to 'seen/' directory.
 function watch_and_seen
 {
     local media_path=$1
@@ -631,6 +629,7 @@ function watch_and_seen
 }
 compdef _mpv watch_and_seen
 
+# Switch terminal colors dark/light at runtime
 function switch-term-colors
 {
     local color_mode=$(command switch-term-colors $*)
@@ -638,7 +637,7 @@ function switch-term-colors
 }
 
 
-# Named directores
+# Named directories
 #----------------------------------------
 
 # Now use '~cr/' to access crystal directory
@@ -653,14 +652,13 @@ hash -d open=~/Projects/opensource
 # Completion
 #----------------------------------------------------------------------------------
 
-# menu completion style
+# Activate interactive menu completion
 zstyle ':completion:*' menu select
-zstyle ':completion:*' list-colors yes
 
 # Directories first when completing files
 zstyle ':completion:*' list-dirs-first on
 
-# formatting and messages
+# Formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*:descriptions' format "$fg[yellow]%B--- %d%b"
@@ -681,8 +679,8 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*:(cd|rm|vim):*' ignore-parents parent pwd
 
 # Color completion for some things.
+zstyle ':completion:*' list-colors yes
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-colors ''
 zstyle ':completion:*:original' list-colors "=*=$color[red];$color[bold]"
 zstyle ':completion:*:commands' list-colors "=*=$color[green];$color[bold]"
 zstyle ':completion:*:builtins' list-colors "=*=$color[cyan];$color[bold]"
@@ -703,13 +701,7 @@ local vimIgnore='*.pdf'
 # Ignore *.o & *.pdf on file complete, when completing vim
 vimIgnore="$vimIgnore"'|*.o'
 
-# Ignore OCaml compilations files
-vimIgnore="$vimIgnore"'|*.cmx|*.cmi|*.cmo'
-
 zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
-
-# Activate completion for AWS
-[ -f /usr/sbin/aws_zsh_completer.sh ] && source /usr/sbin/aws_zsh_completer.sh
 
 #----------------------------------------------------------------------------------
 # Custom segments (not zle)
@@ -731,6 +723,15 @@ function segmt::git_branch
 
 	echo -n ${gitInfoStyle}
 }
+
+# Hook to get the last command exit code
+#
+# This should be the first hook run after a command, otherwise the exit code won't be correct.
+function get-last-exit
+{
+	LAST_EXIT_CODE=$?
+}
+hooks-add-hook precmd_hook get-last-exit
 
 # Segment last exit code
 function segmt::last_exit_code
@@ -791,16 +792,9 @@ function regen-prompt
 }
 hooks-add-hook zle_keymap_select_hook regen-prompt
 
-#
-function get-last-exit
-{
-	LAST_EXIT_CODE=$?
-}
-hooks-add-hook precmd_hook get-last-exit
-
 zmodload zsh/system
 
-# Scroll when prompt get too close to bottom edge
+# Scroll when prompt gets too close to bottom edge
 function prompt-auto-scroll
 {
 	# Don't attempt to scroll in a tty
@@ -828,30 +822,6 @@ function prompt-auto-scroll
 hooks-add-hook precmd_hook prompt-auto-scroll
 
 
-function segmt::battery
-{
-	local capacity=$(cat /sys/class/power_supply/BAT0/capacity)
-	local bat_status=$(cat /sys/class/power_supply/BAT0/status)
-
-	# color
-	if [[ "$capacity" < 10 ]]; then
-		echo -n "%{$fg_bold[red]%}"
-	else
-		echo -n "%{$fg[green]%}"
-	fi
-
-	# status
-	[[ "$bat_status" =~ "Charging" ]] && echo -n "+"
-
-	[[ "$bat_status" =~ "Discharging" ]] && printf "%s" "-" # printf because we cannot echo "-"
-
-	# percentage
-	echo -n "${capacity}%%"
-
-	# reset color
-	echo -n "%{$reset_color%}"
-}
-
 function segmt::shlvl
 {
 	[ $SHLVL = 1 ] && return
@@ -861,6 +831,23 @@ function segmt::shlvl
 
 	echo -n "${shlvlStyle}"
 }
+
+# Segment datetime
+function segmt::time
+{
+	local currentTime=$(date "+%H:%M [%d/%m]")
+	local currentTimeStyle=" ${currentTime} "
+	echo -n ${currentTimeStyle}
+}
+
+# Segment variable debug
+function segmt::debug
+{
+	local debugVar=$*
+	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
+	echo ${debugVarStyle}
+}
+
 
 local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
@@ -906,29 +893,6 @@ function set-custom-prompts
 	zle reset-prompt
 }
 hooks-add-hook pre_accept_line_hook set-custom-prompts
-
-
-
-# Segment date
-#----------------------------------------
-
-function segmt::time
-{
-	local currentTime=$(date "+%H:%M [%d/%m]")
-	local currentTimeStyle=" ${currentTime} "
-	echo -n ${currentTimeStyle}
-}
-
-# Segment variable debug
-#----------------------------------------
-
-function segmt::debug
-{
-	local debugVar=$*
-	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
-	echo ${debugVarStyle}
-}
-
 
 
 #----------------------------------------------------------------------------------
@@ -1024,6 +988,7 @@ function in_a_git_repo
 # ZLE Widgets
 #----------------------------------------------------------------------------------
 
+# Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
 {
 	if ! in_a_git_repo; then
@@ -1032,7 +997,7 @@ function zle::utils::check_git
 	fi
 }
 
-# toggle sudo at <bol>
+# Toggle sudo at <bol>
 function zwidget::toggle-sudo
 {
 	if [ "${BUFFER[1, 5]}" = "sudo " ]; then
@@ -1085,6 +1050,7 @@ function zwidget::git-diff-cached
 }
 zle -N zwidget::git-diff-cached
 
+# FG to the most recent ctrl-z'ed process
 # fg %+
 function zwidget::fg
 {
@@ -1095,6 +1061,7 @@ function zwidget::fg
 }
 zle -N zwidget::fg
 
+# FG to the 2nd most recent ctrl-z'ed process
 # fg %-
 function zwidget::fg2
 {
@@ -1108,7 +1075,7 @@ zle -N zwidget::fg2
 
 # Cycle quoting for current argument
 #
-# Given this command:
+# Given this command, with the cursor anywhere on bar (or baz):
 # $ cmd foo bar\ baz
 #
 # Multiple call to this widget will give:
@@ -1202,8 +1169,6 @@ function vibindkey
 }
 compdef _bindkey vibindkey
 
-source ~/.zsh/fzf/key-bindings.zsh
-
 # TODO: better binds organization
 
 vibindkey 's' zwidget::toggle-sudo
@@ -1222,14 +1187,17 @@ zle -N edit-command-line
 # Alt-E => edit line in $EDITOR
 vibindkey 'e' edit-command-line
 
+source ~/.zsh/fzf/key-bindings.zsh
+
 vibindkey 'f' zwidget::fzf::file
 vibindkey 'c' zwidget::fzf::directory
 vibindkey 'z' zwidget::fzf::z
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
 
-# Ctrl-Z => fg
+# Ctrl-Z => fg %+
 vibindkey '^z' zwidget::fg
+# Ctrl-Alt-Z => fg %-
 vibindkey '^z' zwidget::fg2
 
 
@@ -1238,15 +1206,16 @@ bindkey '^?' backward-delete-char # Backspace
 bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
-function backward-kill-partial-word
+# Delete backward until a path separator
+function backward-kill-partial-path
 {
     # Remove '/' from being a part of a word
     local WORDCHARS="${WORDCHARS:s#/#}"
     zle backward-kill-word
 }
-zle -N backward-kill-partial-word
+zle -N backward-kill-partial-path
 
-bindkey '^h' backward-kill-partial-word # Ctrl-Backspace
+bindkey '^h' backward-kill-partial-path # Ctrl-Backspace
 
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
@@ -1254,7 +1223,7 @@ bindkey '\e[3~' delete-char # Del (Suppr) key
 vibindkey '\e[7~' beginning-of-line # Home key
 vibindkey '\e[8~' end-of-line # End key
 
-# cut the buffer and push it on the buffer stack
+# Cut the buffer and push it on the buffer stack
 bindkey -M vicmd '#' push-input
 bindkey -M viins '#' push-input
 
@@ -1271,7 +1240,6 @@ bindkey -M visual S add-surround
 # Logical redo (u U)
 bindkey -M vicmd 'U' redo
 
-# Allow Alt+l to do:
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
 function zwidget::go-right_or_git-log
@@ -1287,7 +1255,7 @@ zle -N zwidget::go-right_or_git-log
 # Alt-h/l to move in insert mode
 bindkey -M viins 'h' backward-char
 bindkey -M viins 'l' zwidget::go-right_or_git-log
-# Alt-j/k are the same as Esc-j/k
+# Alt-j/k are the same as: Esc then j/k
 # Doing Esc-j/k will go to normal mode, then go down/up
 #
 # Why: it's almost never useful to go up/down, while staying in insert mode
@@ -1307,10 +1275,11 @@ bindkey -M menuselect 'j' down-line-or-history
 bindkey -M menuselect 'k' up-line-or-history
 bindkey -M menuselect 'l' forward-char
 
-# Alt-$ & Alt-0 => got to first & last results
+# Alt-$ & Alt-0 => go to first & last results
 bindkey -M menuselect '0' beginning-of-line
 bindkey -M menuselect '$' end-of-line
 
+# Accept the completion entry but continue to show the completion list
 bindkey -M menuselect 'a' accept-and-hold
 
 
