@@ -244,11 +244,11 @@ hooks-add-hook chpwd_hook chpwd_recent_dirs
 #-------------------------------------------------------------
 function get_cursor_pos
 {
-	echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
+    echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
 
-	# pos has format 'row;col'
-	CURSOR_POS_ROW=${pos%;*} # remove ';col'
-	CURSOR_POS_COL=${pos#*;} # remove 'row;'
+    # pos has format 'row;col'
+    CURSOR_POS_ROW=${pos%;*} # remove ';col'
+    CURSOR_POS_COL=${pos#*;} # remove 'row;'
 }
 
 #----------------------------------------------------------------------------------
@@ -328,11 +328,11 @@ setopt LOCAL_TRAPS
 
 function reload_zsh
 {
-	if [ -n "$(jobs)" ]; then
-		echo "Error: $(jobs | wc -l) job(s) in background"
-	else
-		exec zsh
-	fi
+    if [ -n "$(jobs)" ]; then
+        echo "Error: $(jobs | wc -l) job(s) in background"
+    else
+        exec zsh
+    fi
 }
 
 alias zshrc=reload_zsh
@@ -399,8 +399,8 @@ alias mkd="mkdir -p"
 # Creates 1 or more directories, then cd into the first one
 function mkcd
 {
-	mkd $*
-	cd $1
+    mkd $*
+    cd $1
 }
 
 # for emacs users :p
@@ -468,7 +468,7 @@ alias ":q"="exit"
 # man in vim
 function man
 {
-	/usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
+    /usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
 }
 compdef _man man
 
@@ -710,18 +710,18 @@ zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
 # Segment git branch
 function segmt::git_branch
 {
-	[ -n "$NO_SEGMT_GIT_BRANCH" ] && return
+    [ -n "$NO_SEGMT_GIT_BRANCH" ] && return
 
-	local branchName=$(__git_ps1 "%s")
-	if [ -z "${branchName}" ]; then
-		return
-	fi
-	local branchNameStyle="%{$fg[red]%}${branchName}"
+    local branchName=$(__git_ps1 "%s")
+    if [ -z "${branchName}" ]; then
+        return
+    fi
+    local branchNameStyle="%{$fg[red]%}${branchName}"
 
-	local gitInfo=" On ${branchNameStyle} "
-	local gitInfoStyle="%{$bg[black]%}${gitInfo}%{$reset_color%}"
+    local gitInfo=" On ${branchNameStyle} "
+    local gitInfoStyle="%{$bg[black]%}${gitInfo}%{$reset_color%}"
 
-	echo -n ${gitInfoStyle}
+    echo -n ${gitInfoStyle}
 }
 
 # Hook to get the last command exit code
@@ -729,66 +729,66 @@ function segmt::git_branch
 # This should be the first hook run after a command, otherwise the exit code won't be correct.
 function get-last-exit
 {
-	LAST_EXIT_CODE=$?
+    LAST_EXIT_CODE=$?
 }
 hooks-add-hook precmd_hook get-last-exit
 
 # Segment last exit code
 function segmt::last_exit_code
 {
-	if [[ $LAST_EXIT_CODE -ne 0 ]]; then
-		local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
-		local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} ${lastExitCode} %{$reset_color%}"
-		echo -n ${lastExitCodeStyle}
-	fi
+    if [[ $LAST_EXIT_CODE -ne 0 ]]; then
+        local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
+        local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} ${lastExitCode} %{$reset_color%}"
+        echo -n ${lastExitCodeStyle}
+    fi
 }
 
 # Segment is shell in vim
 function segmt::in_vim
 {
-	if [ -n "$VIM" ]; then
-		echo -n " In Vim "
-	fi
+    if [ -n "$VIM" ]; then
+        echo -n " In Vim "
+    fi
 }
 
 # Segment is shell in sudo session
 function segmt::in_sudo
 {
-	local result=$(sudo -n echo -n bla 2>/dev/null)
+    local result=$(sudo -n echo -n bla 2>/dev/null)
 
-	if [ "$result" = "bla" ]; then
-		local in_sudo="In sudo"
-		local in_sudo_style="%{$bg[red]$fg_bold[white]%} $in_sudo %{$reset_color%}"
-		echo -n "$in_sudo_style"
-	fi
+    if [ "$result" = "bla" ]; then
+        local in_sudo="In sudo"
+        local in_sudo_style="%{$bg[red]$fg_bold[white]%} $in_sudo %{$reset_color%}"
+        echo -n "$in_sudo_style"
+    fi
 }
 
 # Segment prompt vim mode (normal/insert)
 function segmt::vim_mode
 {
-	local keymap="$KEYMAP"
-	local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
-	local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
+    local keymap="$KEYMAP"
+    local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
+    local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
 
-	if [ "$keymap" = "vicmd" ]; then
-		echo -n ${normal_mode_style}
-		return
-	fi
-	if [[ "$keymap" =~ "(main|viins)" ]]; then
-		echo -n ${insert_mode_style}
-		return
-	fi
-	if [ -z "$keymap" ]; then
-		echo -n ${insert_mode_style}
-		return
-	fi
+    if [ "$keymap" = "vicmd" ]; then
+        echo -n ${normal_mode_style}
+        return
+    fi
+    if [[ "$keymap" =~ "(main|viins)" ]]; then
+        echo -n ${insert_mode_style}
+        return
+    fi
+    if [ -z "$keymap" ]; then
+        echo -n ${insert_mode_style}
+        return
+    fi
 
-	echo -n "$keymap"
+    echo -n "$keymap"
 }
 
 function regen-prompt
 {
-	zle && zle reset-prompt
+    zle && zle reset-prompt
 }
 hooks-add-hook zle_keymap_select_hook regen-prompt
 
@@ -797,55 +797,55 @@ zmodload zsh/system
 # Scroll when prompt gets too close to bottom edge
 function prompt-auto-scroll
 {
-	# Don't attempt to scroll in a tty
-	[ "$TERM" = "linux" ] && return
+    # Don't attempt to scroll in a tty
+    [ "$TERM" = "linux" ] && return
 
-	# check if there is a command in the stdin buffer
-	# (as the get_cursor_pos will discard it)
-	# FIXME: find how to turn on raw input
-	local buff
-	sysread -t 0.1 -i 0 buff
-	#echo "Buff: '$buff'"
-	if ! [ -z "$buff" ]; then
-		# push it on the ZLE input stack
-		print -z "${buff}"
-	fi
+    # check if there is a command in the stdin buffer
+    # (as the get_cursor_pos will discard it)
+    # FIXME: find how to turn on raw input
+    local buff
+    sysread -t 0.1 -i 0 buff
+    #echo "Buff: '$buff'"
+    if ! [ -z "$buff" ]; then
+        # push it on the ZLE input stack
+        print -z "${buff}"
+    fi
 
-	# Get the cursor position for the (new) current prompt
-	get_cursor_pos
+    # Get the cursor position for the (new) current prompt
+    get_cursor_pos
 
-	if (( CURSOR_POS_ROW > (LINES - 4) )) then
-		echo $'\e[4S'	# scroll the terminal
-		echo $'\e[6A'
-	fi
+    if (( CURSOR_POS_ROW > (LINES - 4) )) then
+        echo $'\e[4S' # scroll the terminal
+        echo $'\e[6A'
+    fi
 }
 hooks-add-hook precmd_hook prompt-auto-scroll
 
 
 function segmt::shlvl
 {
-	[ $SHLVL = 1 ] && return
+    [ $SHLVL = 1 ] && return
 
-	local shlvl='%L'
-	local shlvlStyle="%{$fg_bold[red]%}$shlvl  %{$reset_color%}"
+    local shlvl='%L'
+    local shlvlStyle="%{$fg_bold[red]%}$shlvl  %{$reset_color%}"
 
-	echo -n "${shlvlStyle}"
+    echo -n "${shlvlStyle}"
 }
 
 # Segment datetime
 function segmt::time
 {
-	local currentTime=$(date "+%H:%M [%d/%m]")
-	local currentTimeStyle=" ${currentTime} "
-	echo -n ${currentTimeStyle}
+    local currentTime=$(date "+%H:%M [%d/%m]")
+    local currentTimeStyle=" ${currentTime} "
+    echo -n ${currentTimeStyle}
 }
 
 # Segment variable debug
 function segmt::debug
 {
-	local debugVar=$*
-	local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
-	echo ${debugVarStyle}
+    local debugVar=$*
+    local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
+    echo ${debugVarStyle}
 }
 
 
@@ -879,18 +879,18 @@ RPROMPT_LINE_OLD='$(segmt::in_vim)''$(segmt::in_sudo)'
 
 function set-normal-prompts
 {
-	PROMPT="${statuslineContainer}"$PROMPT_LINE
-	RPROMPT=$RPROMPT_LINE
+    PROMPT="${statuslineContainer}"$PROMPT_LINE
+    RPROMPT=$RPROMPT_LINE
 }
 hooks-add-hook precmd_hook set-normal-prompts
 
 function set-custom-prompts
 {
-	#set custom prompt
-	PROMPT=$PROMPT_LINE_OLD
-	RPROMPT=$RPROMPT_LINE_OLD
+    #set custom prompt
+    PROMPT=$PROMPT_LINE_OLD
+    RPROMPT=$RPROMPT_LINE_OLD
 
-	zle reset-prompt
+    zle reset-prompt
 }
 hooks-add-hook pre_accept_line_hook set-custom-prompts
 
@@ -949,10 +949,10 @@ TMOUT=60
 # This special function is run every $TMOUT seconds
 function TRAPALRM
 {
-	# Reset prompt only when we are not in complete mode
-	if [[ "$WIDGET" != 'expand-or-complete' ]]; then
-		zle reset-prompt
-	fi
+    # Reset prompt only when we are not in complete mode
+    if [[ "$WIDGET" != 'expand-or-complete' ]]; then
+        zle reset-prompt
+    fi
 }
 
 
@@ -965,8 +965,8 @@ function TRAPALRM
 #-------------------------------------------------------------
 function loadsshkeys
 {
-	eval `ssh-agent`
-	ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
+    eval `ssh-agent`
+    ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 }
 
 
@@ -976,12 +976,12 @@ function loadsshkeys
 
 function no_output
 {
-	$@ >/dev/null 2>&1
+    $@ >/dev/null 2>&1
 }
 
 function in_a_git_repo
 {
-	no_output git rev-parse --is-inside-work-tree
+    no_output git rev-parse --is-inside-work-tree
 }
 
 #----------------------------------------------------------------------------------
@@ -991,62 +991,62 @@ function in_a_git_repo
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
 {
-	if ! in_a_git_repo; then
-		zle -M "Error: Not a git repository"
-		return 1
-	fi
+    if ! in_a_git_repo; then
+        zle -M "Error: Not a git repository"
+        return 1
+    fi
 }
 
 # Toggle sudo at <bol>
 function zwidget::toggle-sudo
 {
-	if [ "${BUFFER[1, 5]}" = "sudo " ]; then
-		local cursor=$CURSOR
-		BUFFER="${BUFFER[6, ${#BUFFER}]}"
-		CURSOR=$(( cursor - 5 ))
-	else
-		local cursor=$CURSOR
-		BUFFER="sudo $BUFFER"
-		CURSOR=$(( cursor + 5 ))
-	fi
+    if [ "${BUFFER[1, 5]}" = "sudo " ]; then
+        local cursor=$CURSOR
+        BUFFER="${BUFFER[6, ${#BUFFER}]}"
+        CURSOR=$(( cursor - 5 ))
+    else
+        local cursor=$CURSOR
+        BUFFER="sudo $BUFFER"
+        CURSOR=$(( cursor + 5 ))
+    fi
 }
 zle -N zwidget::toggle-sudo
 
 # Git status
 function zwidget::git-status
 {
-	zle::utils::check_git || return
+    zle::utils::check_git || return
 
-	echo
-	git status
-	zle reset-prompt
+    echo # move cursor on a new line after the line editor
+    git status
+    zle reset-prompt
 }
 zle -N zwidget::git-status
 
 # Git log
 function zwidget::git-log
 {
-	zle::utils::check_git || return
+    zle::utils::check_git || return
 
-	git l
+    git l
 }
 zle -N zwidget::git-log
 
 # Git diff
 function zwidget::git-diff
 {
-	zle::utils::check_git || return
+    zle::utils::check_git || return
 
-	git d
+    git d
 }
 zle -N zwidget::git-diff
 
 # Git diff cached
 function zwidget::git-diff-cached
 {
-	zle::utils::check_git || return
+    zle::utils::check_git || return
 
-	git dc
+    git dc
 }
 zle -N zwidget::git-diff-cached
 
@@ -1132,9 +1132,9 @@ zle -N zwidget::cycle-quoting
 #----------------------------------------
 function accept-line
 {
-	hooks-run-hook pre_accept_line_hook
-	zle .accept-line
-	ZSH_CUR_KEYMAP=
+    hooks-run-hook pre_accept_line_hook
+    zle .accept-line
+    ZSH_CUR_KEYMAP=
 }
 zle -N accept-line
 
@@ -1154,18 +1154,18 @@ bindkey -r '[29~' # Menu key
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 function helper::setup_keytimeout_per_keymap
 {
-	if [ "$KEYMAP" = "viins" ]; then
-		KEYTIMEOUT=1 # 10ms
-	else
-		KEYTIMEOUT=30 # 300ms
-	fi
+    if [ "$KEYMAP" = "viins" ]; then
+        KEYTIMEOUT=1 # 10ms
+    else
+        KEYTIMEOUT=50 # 500ms
+    fi
 }
 hooks-add-hook zle_keymap_select_hook helper::setup_keytimeout_per_keymap
 
 function vibindkey
 {
-	bindkey -M viins $@
-	bindkey -M vicmd $@
+    bindkey -M viins $@
+    bindkey -M vicmd $@
 }
 compdef _bindkey vibindkey
 
@@ -1244,11 +1244,11 @@ bindkey -M vicmd 'U' redo
 # - Call `git log` if no text on the right (or empty input line)
 function zwidget::go-right_or_git-log
 {
-	if [ -z "$RBUFFER" ]; then
-		zwidget::git-log
-	else
-		zle forward-char
-	fi
+    if [ -z "$RBUFFER" ]; then
+        zwidget::git-log
+    else
+        zle forward-char
+    fi
 }
 zle -N zwidget::go-right_or_git-log
 
