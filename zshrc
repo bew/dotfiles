@@ -1154,7 +1154,7 @@ bindkey -r '[29~' # Menu key
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 function helper::setup_keytimeout_per_keymap
 {
-    if [ "$KEYMAP" = "viins" ]; then
+    if [[ "$KEYMAP" =~ (viins|main) ]]; then
         KEYTIMEOUT=1 # 10ms
     else
         KEYTIMEOUT=50 # 500ms
