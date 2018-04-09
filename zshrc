@@ -693,15 +693,10 @@ zstyle ':completion:*:options' list-colors "=^(-- *)=$color[green]"
 
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
 
-# Vim ignore files for completion
+# Ignore some files when completing a text editor command
 #----------------------------------------
 
-local vimIgnore='*.pdf'
-
-# Ignore *.o & *.pdf on file complete, when completing vim
-vimIgnore="$vimIgnore"'|*.o'
-
-zstyle ':completion:*:*:vim:*:*files' ignored-patterns ${vimIgnore}
+zstyle ":completion:*:*:${EDITOR}:*:*files" ignored-patterns '*.pdf|*.o'
 
 #----------------------------------------------------------------------------------
 # Custom segments (not zle)
