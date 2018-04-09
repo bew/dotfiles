@@ -806,7 +806,7 @@ function prompt-auto-scroll
     local buff
     sysread -t 0.1 -i 0 buff
     #echo "Buff: '$buff'"
-    if ! [ -z "$buff" ]; then
+    if [ -n "$buff" ]; then
         # push it on the ZLE input stack
         print -z "${buff}"
     fi
@@ -815,8 +815,8 @@ function prompt-auto-scroll
     get_cursor_pos
 
     if (( CURSOR_POS_ROW > (LINES - 4) )) then
-        echo $'\e[4S' # scroll the terminal
-        echo $'\e[6A'
+        echo -n $'\e[4S' # Scroll the terminal
+        echo -n $'\e[4A' # Move the cursor back up
     fi
 }
 hooks-add-hook precmd_hook prompt-auto-scroll
