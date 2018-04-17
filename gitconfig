@@ -34,6 +34,7 @@
 	#----------------------------
 
 	br = branch
+	brv = "!f() { git --no-pager branch -vv $@; }; f"
 	st = status --ignore-submodules
 
 	# log
