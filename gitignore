@@ -16,6 +16,7 @@ __vcs_ignore__/
 
 # Python compilation
 __pycache__/
+*.egg
 
 # Pipenv
 Pipfile
