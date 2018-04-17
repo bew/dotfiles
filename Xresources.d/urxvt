@@ -247,7 +247,7 @@ URxvt.keysym.C-Right: \033[1;5C
 ! Perl extensions loading
 
 ! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance.
-URxvt*perl-ext-common: fake-wheel-on-alt-screen
+URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly
 
 ! If both of these resources are the empty string, then the perl interpreter will not be initialized.
 ! The rationale for having two options is that perl-ext-common will be used for extensions that
