@@ -1,0 +1,56 @@
+#!/bin/perl
+
+# Scroll wheel does up/down on secondary screen
+
+use constant {
+    KEYCODE_UP => 111,
+    KEYCODE_DOWN => 116,
+};
+
+use constant {
+    MOVE_UP => 1,
+    MOVE_DOWN => 2,
+};
+
+sub simulate_keypress {
+    my ($self, $type, $times) = @_;
+
+    my $keycode = 0;
+    if ($type eq MOVE_UP) {
+        $keycode = KEYCODE_UP;
+    } elsif ($type eq MOVE_DOWN) {
+        $keycode = KEYCODE_DOWN;
+    } else {
+        return;
+    }
+
+    for (my $i = 0 ; $i ne $times ; $i++) {
+        $self->key_press(0, $keycode);
+        $self->key_release(0, $keycode);
+    }
+}
+
+sub on_button_release {
+    my ($self, $event) = @_;
+
+    # Return if we're not on secondary screen
+    #!$self->current_screen and return;
+    return () if $self->current_screen eq 0;
+
+    my $scroll_by_lines = 1;
+
+    if ($event->{state} & urxvt::ShiftMask) {
+        $scroll_by_lines = 5;
+    }
+
+    if ($event->{button} eq "4") { # scroll up
+        $self->simulate_keypress(MOVE_UP, $scroll_by_lines);
+        return 1;
+    } elsif ($event->{button} eq "5") { # scroll down
+        $self->simulate_keypress(MOVE_DOWN, $scroll_by_lines);
+        return 1;
+    }
+
+    return ();
+}
+

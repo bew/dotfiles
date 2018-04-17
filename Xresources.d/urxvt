@@ -226,7 +226,7 @@ URxvt*modifier: alt
 ! URxvt*secondaryScreen: boolean
 
 ! Turn on/off secondary screen scroll (default enabled). If this option is enabled, scrolls on the secondary screen will change the scrollback buffer and, when secondaryScreen is off, switching
-! URxvt*secondaryScroll: boolean
+URxvt*secondaryScroll: false
 
 ! Turn on/off hold window after exit support. If enabled, urxvt will not immediately destroy its window when the program executed within it exits. Instead, it will wait till it is being killed or
 ! URxvt*hold: boolean
@@ -246,12 +246,13 @@ URxvt.keysym.C-Right: \033[1;5C
 
 ! Perl extensions loading
 
-! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance; option -pe.
-URxvt*perl-ext-common: overlay-osc
+! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance.
+URxvt*perl-ext-common: fake-wheel-on-alt-screen
 
-! If both of these resources are the empty string, then the perl interpreter will not be initialized. The rationale for having two options is that perl-ext-common will be used for extensions that
+! If both of these resources are the empty string, then the perl interpreter will not be initialized.
+! The rationale for having two options is that perl-ext-common will be used for extensions that
 ! should be available to all instances, while perl-ext is used for specific instances.
-URxvt*perl-ext:
+! URxvt*perl-ext: string
 
 ! Perl code to be evaluated when all extensions have been registered. See the urxvtperl(3) manpage.
 ! URxvt*perl-eval: string
