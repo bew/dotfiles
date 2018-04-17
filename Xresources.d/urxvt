@@ -274,9 +274,6 @@ URxvt*perl-ext-common: font-size-on-the-fly
 ! Selection auto-transform patterns, see the urxvtperl(3) manpage for details.
 ! URxvt*selection-autotransform.idx: perl-transform
 
-! This resource is deprecated and will be removed. Use a keysym resource instead, e.g.:
-! URxvt*searchable-scrollback: keysym *DEPRECATED*
-
 ! Specifies the program to be started with a URL argument. Used by the "selection-popup" and "matcher" perl extensions.
 ! URxvt*url-launcher: string
 
