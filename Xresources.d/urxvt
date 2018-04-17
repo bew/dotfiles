@@ -247,7 +247,15 @@ URxvt.keysym.C-Right: \033[1;5C
 ! Perl extensions loading
 
 ! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance.
-URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly
+URxvt*perl-ext-common: font-size-on-the-fly
+
+! FIXME: problem with fake-wheel-on-alt-screen:
+!   in vim, when mouse reporting is on, the plugin is still active (it always is)
+!   and e.g I can scroll in insert mode
+!
+!   => I should disable completely this plugin when program is vim
+!
+! URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly
 
 ! If both of these resources are the empty string, then the perl interpreter will not be initialized.
 ! The rationale for having two options is that perl-ext-common will be used for extensions that
