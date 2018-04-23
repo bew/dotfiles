@@ -505,9 +505,6 @@ alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
-# use ack instead !!
-alias grep="echo Use ack"
-
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
