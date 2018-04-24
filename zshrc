@@ -1105,7 +1105,7 @@ zle -N zwidget::fg
 function zwidget::fg2
 {
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
-    [ -z "$(jobs | command grep '  - suspended')" ] && zle -M "Not enough running jobs" && return
+    [ "$(jobs | wc -l)" -lt 2 ] && zle -M "Not enough running jobs" && return
 
     eval fg %-
     zle reset-prompt
