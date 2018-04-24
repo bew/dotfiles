@@ -30,7 +30,7 @@ sub simulate_keypress {
     }
 }
 
-sub get_wm_title {
+sub get_terminal_title {
     my ($self) = @_;
 
     my $atom = $self->XInternAtom("WM_NAME");
@@ -48,7 +48,7 @@ sub on_button_release {
     }
 
     # Return if we are in (neo)vim, as the mouse is well handled there
-    if ($self->get_wm_title() =~ m/vim/) {
+    if ($self->get_terminal_title() =~ m/vim/) {
         return ();
     }
 
