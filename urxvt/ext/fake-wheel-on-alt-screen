@@ -30,12 +30,27 @@ sub simulate_keypress {
     }
 }
 
+sub get_wm_title {
+    my ($self) = @_;
+
+    my $atom = $self->XInternAtom("WM_NAME");
+    my ($type, $format, $wm_name) = $self->XGetWindowProperty ($self->parent, $atom);
+    return $wm_name;
+}
+
+
 sub on_button_release {
     my ($self, $event) = @_;
 
     # Return if we're not on secondary screen
-    #!$self->current_screen and return;
-    return () if $self->current_screen eq 0;
+    if ($self->current_screen eq 0) {
+        return ();
+    }
+
+    # Return if we are in (neo)vim, as the mouse is well handled there
+    if ($self->get_wm_title() =~ m/vim/) {
+        return ();
+    }
 
     my $scroll_by_lines = 1;
 
