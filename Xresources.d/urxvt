@@ -247,7 +247,13 @@ URxvt.keysym.C-Right: \033[1;5C
 ! Perl extensions loading
 
 ! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance.
-URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly
+URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly,matcher
+
+URxvt.url-launcher: xdg-open
+URxvt.keysym.C-M-s: perl:matcher:select
+URxvt.matcher.button: C-M-1
+URxvt.matcher.underline: false
+
 
 ! If both of these resources are the empty string, then the perl interpreter will not be initialized.
 ! The rationale for having two options is that perl-ext-common will be used for extensions that
@@ -259,15 +265,6 @@ URxvt*perl-ext-common: fake-wheel-on-alt-screen,font-size-on-the-fly
 
 ! Colon-separated list of additional directories that hold extension scripts. When looking for perl extensions, urxvt will first look in these directories, then in $URXVT_PERL_LIB,
 ! URxvt*perl-lib: path
-
-! Additional selection patterns, see the urxvtperl(3) manpage for details.
-! URxvt*selection.pattern-idx: perl-regex
-
-! Selection auto-transform patterns, see the urxvtperl(3) manpage for details.
-! URxvt*selection-autotransform.idx: perl-transform
-
-! Specifies the program to be started with a URL argument. Used by the "selection-popup" and "matcher" perl extensions.
-! URxvt*url-launcher: string
 
 ! Compile frills: Sets the WM_TRANSIENT_FOR property to the given window id.
 ! URxvt*transient-for: windowid
