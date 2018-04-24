@@ -71,11 +71,13 @@
 
 [merge]
 	tool = vimdiff
-	conflictstyle = diff3
+
+[mergetool]
+    prompt = true
 
 [mergetool "vimdiff"]
-	cmd = nvim -d
-	conflictstyle = diff3
+    cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
+    conflictstyle = diff3
 
 [help]
 	autocorrect = -1
