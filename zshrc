@@ -45,7 +45,7 @@ add-zsh-hook precmd precmd-wrapper
 
 # preexec_hook
 hooks-define-hook preexec_hook
-function preexec-wrapper { hooks-run-hook preexec_hook }
+function preexec-wrapper { hooks-run-hook preexec_hook $@ }
 add-zsh-hook preexec preexec-wrapper
 
 # chpwd_hook
@@ -249,6 +249,20 @@ function get_cursor_pos
     # pos has format 'row;col'
     CURSOR_POS_ROW=${pos%;*} # remove ';col'
     CURSOR_POS_COL=${pos#*;} # remove 'row;'
+}
+
+# Sets the status line (title bar for most terminal emulator)
+function set_status_line
+{
+    local text="$1"
+
+    # tsl (to_status_line): Move cursor to status line
+    # fsl (from_status_line): Move cursor from status line
+    if [[ -n "$terminfo[tsl]" ]] && [[ -n "$terminfo[fsl]" ]]; then
+        echoti tsl # to status line
+        print -Pn "$text"
+        echoti fsl # from status line
+    fi
 }
 
 #----------------------------------------------------------------------------------
@@ -933,8 +947,13 @@ local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slReset
 # The statusline container
 local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
 
-## Reset Prompt every N seconds
-##############################################
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+
+# NOTE: no idea where to put these..
+
+# Reset Prompt every N seconds
+#----------------------------------------
 
 TMOUT=60
 
@@ -946,6 +965,34 @@ function TRAPALRM
         zle reset-prompt
     fi
 }
+
+# Set terminal title
+#----------------------------------------
+
+function set_title_on_idle
+{
+    set_status_line 'urxvt - %~'
+}
+hooks-add-hook precmd_hook set_title_on_idle
+
+function set_title_on_exec
+{
+    local typed_cmd="$1"
+    local expanded_cmd="$2"
+
+    local cmd="$typed_cmd"
+
+    if [[ "$expanded_cmd" =~ nvim ]]; then
+        # I need to have 'vim' in the terminal title, to be able to disable mouse
+        # scrolling in vim
+        cmd="$expanded_cmd"
+    fi
+
+    # local truncation_offset=20
+    # local truncated_cmd="%${truncation_offset}<...<$typed_cmd"
+    set_status_line "urxvt - $cmd"
+}
+hooks-add-hook preexec_hook set_title_on_exec
 
 
 #----------------------------------------------------------------------------------
