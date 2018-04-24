@@ -422,7 +422,7 @@ alias ne="echo 'Use: vim'"
 
 # tree
 
-alias tree="tree -C --dirsfirst -F"
+alias tree="tree --dirsfirst -F"
 
 # cd
 
