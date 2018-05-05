@@ -1294,7 +1294,8 @@ zle -N zwidget::go-right_or_git-log
 # When in zsh-vim normal mode, the cursor is never after the last char, we must ignore it
 function zwidget::go-right_or_git-log::vicmd
 {
-    if [[ ${#RBUFFER} == 1 ]]; then
+    if [[ ${#RBUFFER} == 1 ]] || [[ -z $BUFFER ]]; then
+        # cursor on last char, or empty buffer
         zwidget::git-log
     else
         zle forward-char
