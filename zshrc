@@ -1283,7 +1283,7 @@ bindkey -M vicmd 'U' redo
 # - Call `git log` if no text on the right (or empty input line)
 function zwidget::go-right_or_git-log
 {
-    if [ -z "$RBUFFER" ]; then
+    if [[ -z "$RBUFFER" ]]; then
         zwidget::git-log
     else
         zle forward-char
@@ -1291,9 +1291,22 @@ function zwidget::go-right_or_git-log
 }
 zle -N zwidget::go-right_or_git-log
 
-# Alt-h/l to move in insert mode
+# When in zsh-vim normal mode, the cursor is never after the last char, we must ignore it
+function zwidget::go-right_or_git-log::vicmd
+{
+    if [[ ${#RBUFFER} == 1 ]]; then
+        zwidget::git-log
+    else
+        zle forward-char
+    fi
+}
+zle -N zwidget::go-right_or_git-log::vicmd
+
+# Alt-h/l to move left/right in insert mode
 bindkey -M viins 'h' backward-char
-bindkey -M viins 'l' zwidget::go-right_or_git-log
+bindkey -M viins 'l' zwidget::go-right_or_git-log # + git log
+
+bindkey -M vicmd 'l' zwidget::go-right_or_git-log::vicmd # fix git log in normal mode
 # Alt-j/k are the same as: Esc then j/k
 # Doing Esc-j/k will go to normal mode, then go down/up
 #
