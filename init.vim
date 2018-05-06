@@ -100,6 +100,9 @@ Plug 'leafgarland/typescript-vim'
 "# Vimscript
 Plug 'Shougo/neco-vim'
 
+"# Elixir
+Plug 'elixir-editors/vim-elixir'
+
 call plug#end()
 
 let g:vimhome = $HOME . "/.config/nvim"
