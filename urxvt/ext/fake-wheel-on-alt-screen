@@ -12,6 +12,23 @@ use constant {
     MOVE_DOWN => 2,
 };
 
+sub on_init {
+    my ($self) = @_;
+
+    $self->{enable} = 0;
+}
+
+sub on_action
+{
+    my ($self, $action) = @_;
+
+    if ($action eq "enable") {
+        $self->{enable} = 1;
+    } elsif ($action eq "disable") {
+        $self->{enable} = 0;
+    }
+}
+
 sub simulate_keypress {
     my ($self, $type, $times) = @_;
 
@@ -30,15 +47,6 @@ sub simulate_keypress {
     }
 }
 
-sub get_terminal_title {
-    my ($self) = @_;
-
-    my $atom = $self->XInternAtom("WM_NAME");
-    my ($type, $format, $wm_name) = $self->XGetWindowProperty ($self->parent, $atom);
-    return $wm_name;
-}
-
-
 sub on_button_release {
     my ($self, $event) = @_;
 
@@ -47,10 +55,11 @@ sub on_button_release {
         return ();
     }
 
-    # Return if we are in (neo)vim, as the mouse is well handled there
-    if ($self->get_terminal_title() =~ m/vim/) {
+    # Return if we're not enabled
+    unless ($self->{enable} eq 1) {
         return ();
     }
+    warn $self->{enable};
 
     my $scroll_by_lines = 1;
 
