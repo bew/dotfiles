@@ -1170,11 +1170,6 @@ zle -N accept-line
 # Enable vim mode
 bindkey -v
 
-# ESC timeout
-KEYTIMEOUT=1 # 10ms
-# See helper::setup_keytimeout_per_keymap for setup per selected keymap
-
-
 # disable some keybinds
 #-------------------------------------------------------------
 
@@ -1185,6 +1180,8 @@ bindkey -r '[29~' # Menu key
 
 # Allows to have fast switch Insert => Normal, but still be able to
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
+#
+# NOTE: default is KEYTIMEOUT=40
 function helper::setup_keytimeout_per_keymap
 {
     if [[ "$KEYMAP" =~ (viins|main) ]]; then
