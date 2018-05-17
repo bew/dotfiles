@@ -230,7 +230,7 @@ hooks-add-hook chpwd_hook chpwd_recent_dirs
 #-------------------------------------------------------------
 # FIXME: if the read buffer is not empty, need to discard it
 #-------------------------------------------------------------
-function get_cursor_pos
+function term::get_cursor_pos
 {
     echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
 
@@ -240,7 +240,7 @@ function get_cursor_pos
 }
 
 # Sets the status line (title bar for most terminal emulator)
-function set_status_line
+function term::set_status_line
 {
     local text="$1"
 
@@ -799,7 +799,7 @@ function prompt-auto-scroll
     [ "$TERM" = "linux" ] && return
 
     # check if there is a command in the stdin buffer
-    # (as the get_cursor_pos will discard it)
+    # (as the term::get_cursor_pos will discard it)
     # FIXME: find how to turn on raw input
     local buff
     sysread -t 0.1 -i 0 buff
@@ -810,7 +810,7 @@ function prompt-auto-scroll
     fi
 
     # Get the cursor position for the (new) current prompt
-    get_cursor_pos
+    term::get_cursor_pos
 
     if (( CURSOR_POS_ROW > (LINES - 4) )) then
         echo -n $'\e[4S' # Scroll the terminal
@@ -963,7 +963,7 @@ function TRAPALRM
 
 function set_title_on_idle
 {
-    set_status_line 'urxvt - %~'
+    term::set_status_line 'urxvt - %~'
 }
 hooks-add-hook precmd_hook set_title_on_idle
 
@@ -976,7 +976,7 @@ function set_title_on_exec
 
     # local truncation_offset=20
     # local truncated_cmd="%${truncation_offset}<...<$typed_cmd"
-    set_status_line "urxvt - $cmd"
+    term::set_status_line "urxvt - $cmd"
 }
 hooks-add-hook preexec_hook set_title_on_exec
 
