@@ -10,13 +10,6 @@
 #|#                                                                                    #|#
 ##########################################################################################
 
-# Enable vim mode
-bindkey -v
-
-# ESC timeout
-KEYTIMEOUT=1 # 10ms
-# See helper::setup_keytimeout_per_keymap for setup per selected keymap
-
 # Import color helpers
 autoload -U colors && colors
 
@@ -1180,6 +1173,14 @@ zle -N accept-line
 #----------------------------------------------------------------------------------
 # Keybinds
 #----------------------------------------------------------------------------------
+
+# Enable vim mode
+bindkey -v
+
+# ESC timeout
+KEYTIMEOUT=1 # 10ms
+# See helper::setup_keytimeout_per_keymap for setup per selected keymap
+
 
 # disable some keybinds
 #-------------------------------------------------------------
