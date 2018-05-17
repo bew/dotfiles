@@ -974,12 +974,6 @@ function set_title_on_exec
 
     local cmd="$typed_cmd"
 
-    if [[ "$expanded_cmd" =~ nvim ]]; then
-        # I need to have 'vim' in the terminal title, to be able to disable mouse
-        # scrolling in vim
-        cmd="$expanded_cmd"
-    fi
-
     # local truncation_offset=20
     # local truncated_cmd="%${truncation_offset}<...<$typed_cmd"
     set_status_line "urxvt - $cmd"
