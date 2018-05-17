@@ -1330,6 +1330,8 @@ bindkey -M menuselect '$' end-of-line
 bindkey -M menuselect 'a' accept-and-hold
 
 
+#----------------------------------------------------------------------------------
+
 # Syntax hightlighting special end-of-file sourcing
 #
 # `zsh-syntax-highlighting.zsh` wraps ZLE widgets.
