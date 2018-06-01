@@ -12,9 +12,18 @@ def x(snip):
 		snip.rv = ""
 endglobal
 
+snippet com "HTML comment"
+<!-- $1 -->$99
+endsnippet
+
 ############
 # Doctypes #
 ############
+snippet doctype "DocType html (dead simple)" b
+<!DOCTYPE html>
+
+endsnippet
+
 snippet doctype "DocType XHTML 1.0 Strict" b
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -125,6 +134,17 @@ endsnippet
 #############
 # HTML TAGS #
 #############
+
+snippet tag "Generic tag"
+<${1:tag}${2:${10: class="${11}"}${20: id="${21}"}}>
+	${VISUAL}$88
+</$1>$99
+endsnippet
+
+snippet itag "Generic inline tag" i
+<${1:tag}${2:${10: class="${11}"}${20: id="${21}"}}>${VISUAL}$88</$1>$99
+endsnippet
+
 snippet input "Input with Label" w
 <label for="${2:${1/[[:alpha:]]+|( )/(?1:_:\L$0)/g}}">$1</label><input type="${3:text/submit/hidden/button}" name="${4:$2}" value="$5"${6: id="${7:$2}"}`!p x(snip)`>
 
@@ -168,19 +188,19 @@ endsnippet
 
 snippet div "<div>" w
 <div>
-	$0
+	${VISUAL}$0
 </div>
 endsnippet
 
 snippet div. "<div> with class" w
 <div`!p snip.rv=' class="' if t[1] else ""`${1:name}`!p snip.rv = '"' if t[1] else ""`>
-	$0
+	${VISUAL}$0
 </div>
 endsnippet
 
 snippet div# "<div> with ID & class" w
 <div`!p snip.rv=' id="' if t[1] else ""`${1:name}`!p snip.rv = '"' if t[1] else ""``!p snip.rv=' class="' if t[2] else ""`${2:name}`!p snip.rv = '"' if t[2] else ""`>
-	$0
+	${VISUAL}$0
 </div>
 endsnippet
 
@@ -195,35 +215,39 @@ snip.rv = (snip.basename or 'unnamed') + '_submit'
 endsnippet
 
 snippet h1 "XHTML <h1>" w
-<h1>$0</h1>
+<h1>$1</h1>$99
 endsnippet
 
 snippet h2 "XHTML <h2>" w
-<h2>$0</h2>
+<h2>$1</h2>$99
 endsnippet
 
 snippet h3 "XHTML <h3>" w
-<h3>$0</h3>
+<h3>$1</h3>$99
 endsnippet
 
 snippet h4 "XHTML <h4>" w
-<h4>$0</h4>
+<h4>$1</h4>$99
 endsnippet
 
 snippet head "XHTML <head>"
 <head>
 	<meta charset="utf-8">
 	<title>${1:`!p snip.rv = snip.basename or "Page Title"`}</title>
-	$0
+	$99
 </head>
 endsnippet
 
-snippet link "XHTML <link>" w
-<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}"`!p x(snip)`>
+snippet link "XHTML <link> (simple)" w
+<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css">$99
+endsnippet
+
+snippet linkfull "XHTML <link>" w
+<link rel="${1:stylesheet}" href="${2:/css/master.css}" type="text/css" media="${3:screen}" title="${4:no title}" charset="${5:utf-8}"`!p x(snip)`>$99
 endsnippet
 
 snippet meta "XHTML <meta>" w
-<meta name="${1:name}" content="${2:content}"`!p x(snip)`>
+<meta name="${1:name}" content="${2:content}"`!p x(snip)`>$99
 endsnippet
 
 snippet scriptsrc "XHTML <script src...>" w
