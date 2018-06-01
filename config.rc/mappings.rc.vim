@@ -135,7 +135,7 @@ nnoremap Q :<C-u>q<cr>
 " Insert a TAB (thanks Epitech for that habit)
 inoremap <M-i> <C-v><Tab>
 
-" Disable <M-i> in normal mode, it hangs the terminal
+" Disable <M-i> in normal mode, otherwise it hangs the terminal
 nnoremap <M-i> <nop>
 
 

@@ -51,16 +51,13 @@ Plug 'Shougo/denite.nvim'					" Generic interactive menu framework
 
 Plug 'mhinz/vim-startify'					" add a custom startup screen for vim
 
-Plug 'Bew78LesellB/vim-colors-solarized'	" vim-colors-solarized - favorite colorscheme <3
+Plug 'bew/vim-colors-solarized'				" vim-colors-solarized - favorite colorscheme <3
 Plug 'vim-scripts/xterm-color-table.vim'	" Provide some commands to display all cterm colors
 Plug 'ryanoasis/vim-devicons'
 
 Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per language plugins
-
-"# Vimperator
-Plug 'superbrothers/vim-vimperator'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
