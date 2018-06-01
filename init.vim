@@ -13,8 +13,9 @@ Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
 Plug 'tpope/vim-repeat'					" Repeat for plugins
-Plug 'roxma/nvim-completion-manager'
-let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
+Plug 'Shougo/deoplete.nvim',			" Dark-powered completion engine
+            \ { 'do': ':UpdateRemotePlugin' }
+let g:deoplete#enable_at_startup = 1
 
 
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
@@ -61,7 +62,8 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-Plug 'roxma/ncm-clang'
+Plug 'tweekmonster/deoplete-clang2'
+
 Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
 "# Arduino

@@ -120,7 +120,8 @@ function! GotoQfOrLoc(direction, rewind_name)
 endfunction
 
 " Trigger completion manually
-imap <C-b> <Plug>(cm_force_refresh)
+inoremap <expr> <C-b> deoplete#manual_complete()
+
 
 " Exit the terminal grabber
 tnoremap <A-q> <C-\><C-n>
