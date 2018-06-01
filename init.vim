@@ -12,11 +12,11 @@ Plug 'thinca/vim-visualstar'			" * for visualy selected text
 Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
+Plug 'neomake/neomake'					" Asynchronous linting and make framework
 Plug 'tpope/vim-repeat'					" Repeat for plugins
 Plug 'Shougo/deoplete.nvim',			" Dark-powered completion engine
             \ { 'do': ':UpdateRemotePlugin' }
 let g:deoplete#enable_at_startup = 1
-
 
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 
@@ -43,7 +43,6 @@ let g:LanguageClient_serverCommands = {
 
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
-Plug 'neomake/neomake'					" Asynchronous linting and make framework
 Plug 'tpope/vim-fugitive'				" A Git wrapper so awesome, it should be illegal
 
 " -- UI
@@ -81,6 +80,7 @@ Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
 "# Markdown
 " 'plasticboy/vim-markdown' might be nice too
 Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
+" 'SidOfc/mkdx' looks awesome!!!!
 
 " E.g disable auto change of << to «
 let g:markdown_enable_input_abbreviations = 0
