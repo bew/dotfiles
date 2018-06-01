@@ -9,11 +9,11 @@ let g:lightline = {
 			\   'tabline': 0,
 			\ },
 			\ 'active': {
-			\   'left': [ [ 'mode', 'paste' ], [ 'filename', 'readonly', 'modified' ] ],
-			\   'right': [ [ 'lineinfo' ], ['percent'], [ 'filetype' ] ],
+			\   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive'] ],
+			\   'right': [ ['lineinfo'], ['percent'], ['filetype'] ],
 			\ },
 			\ 'inactive': {
-			\   'left':  [ [], [ 'relativepath', 'readonly', 'modified'] ],
+			\   'left':  [ [], ['relativepath', 'readonly', 'modified', 'fugitive'] ],
 			\   'right': [ [], ['percent'] ],
 			\ },
 			\ 'component': {
@@ -32,10 +32,24 @@ let g:lightline = {
 			\   'filetype': 'LightLineFiletype',
 			\   'percent': 'LightLinePercent',
 			\   'mode': 'LightLineMode',
+            \   'fugitive': 'LightlineFugitive',
 			\ },
 			\ 'separator': { 'left': '', 'right': '' },
 			\ 'subseparator': { 'left': '', 'right': '' },
 			\ }
+
+" Taken from: `:h lightline-powerful-example`
+function! LightlineFugitive()
+    try
+        if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && exists('*fugitive#head')
+            let mark = 'On '
+            let branch = fugitive#head()
+            return branch !=# '' ? mark . branch : ''
+        endif
+    catch
+    endtry
+    return ''
+endfunction
 
 function! LightLineFilename()
 	let fname = expand('%:t')

@@ -44,6 +44,7 @@ let g:LanguageClient_serverCommands = {
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
+Plug 'tpope/vim-fugitive'				" A Git wrapper so awesome, it should be illegal
 
 " -- UI
 
