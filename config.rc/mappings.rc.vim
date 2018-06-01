@@ -28,6 +28,7 @@ nmap gea <Plug>(EasyAlign)
 nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :<C-u>CtrlSpace<cr>
+nnoremap <M-f> :<C-u>FZF<cr>
 
 " Toggle indent guides
 nnoremap <M-g> :<C-u>IndentGuidesToggle<cr>
