@@ -15,6 +15,7 @@ set laststatus=2
 set history=99		" keep 99 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
+set noshowmode	" disable -- INSERT -- (necessary for echodoc plugin)
 
 set hlsearch		" do highlight the serched text
 set incsearch		" incremental search as you type

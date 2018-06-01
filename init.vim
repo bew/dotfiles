@@ -65,6 +65,7 @@ Plug 'superbrothers/vim-vimperator'
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 Plug 'roxma/ncm-clang'
+Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
 "# Arduino
 "Plug 'jplaut/vim-arduino-ino'			" Arduino project compilation and deploy
