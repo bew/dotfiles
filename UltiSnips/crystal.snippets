@@ -2,6 +2,10 @@ snippet #! "crystal run shebang!" b
 #!/usr/bin/env crystal
 endsnippet
 
+snippet ann "Annotation @[...]" b
+@[${1:Annotation}${2:(${3:args})}]$99
+endsnippet
+
 snippet ini "def initialize without body"
 def initialize${1:(${2:args})}
 end$99
