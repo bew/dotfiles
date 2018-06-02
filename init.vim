@@ -88,6 +88,7 @@ let g:markdown_enable_input_abbreviations = 0
 
 "# Python
 Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
+Plug 'zchee/deoplete-jedi'
 
 " More Python tools (e.g: goto def)
 Plug 'davidhalter/jedi-vim'
