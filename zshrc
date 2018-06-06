@@ -574,7 +574,7 @@ alias vimzshrc="vim ~/.zshrc"
 alias vimnviminit="vim ~/.config/nvim/init.vim"
 
 
-# Helper functions
+# Functions
 #----------------------------------------
 
 # Do program multiple times
@@ -687,6 +687,25 @@ function switch-term-colors
 {
     local color_mode=$(command switch-term-colors $*)
     export TERM_COLOR_MODE=$color_mode
+}
+
+function transfer
+{
+    if [ $# -eq 0 ]; then
+        echo -e "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md";
+        return 1;
+    fi
+    tmpfile=$( mktemp -t transferXXX );
+    if tty -s; then
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g');
+        command curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile;
+    else
+        command curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ;
+    fi;
+    echo
+    command cat $tmpfile;
+    command rm -f $tmpfile;
+    echo
 }
 
 
