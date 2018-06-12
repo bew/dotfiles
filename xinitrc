@@ -1,60 +1,16 @@
 #!/bin/sh
 
-# Run the program in background if it exists
-function background_run
-{
-    which $1 >/dev/null && $* &
-}
+source ~/.xprofile
 
-# Run the program if it exists
-function run
-{
-    which $1 >/dev/null && $*
-}
-
-function debug
-{
-    echo $* >> /t/xinitrc_debug
-}
-
-debug
-debug "xinitrc startup"
-debug "---------------"
-debug
-
-if [ -d /etc/X11/xinit/xinitrc.d ]; then
-    for f in /etc/X11/xinit/xinitrc.d/*; do
-        [ -x "$f" ] && . "$f"
-    done
-    unset f
+if [ -n "$SESSION" ]; then
+    SESSION="$SESSION"
+else
+    SESSION="awesome"
 fi
 
-# Setup keyboard mapping
-[ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
-setxkbmap -config ~/.config/xkbmap.config
-
-# Setup X resources
-[ -f ~/.Xresources ] && xrdb ~/.Xresources
-
-# no beep
-xset -b
-
-# Load all ssh keys
-eval `ssh-agent`
-ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
-
-# Hide mouse automatically
-#background_run unclutter
-
-# Warmer screen temperature at night
-background_run redshift-gtk
-
-# Run the compositor
-[ -f ~/.config/compton ] && run compton --config ~/.config/compton -b
-
 # Find the session
-debug "Session is $1"
-case $1 in
+debug "Session is $SESSION"
+case $SESSION in
     awesome)
         session_args+=(awesome)
         ;;
@@ -69,7 +25,7 @@ case $1 in
         ;;
     *)
         # No known session, try to run it as command
-        session_args+=($1)
+        session_args+=($SESSION)
         ;;
 esac
 
