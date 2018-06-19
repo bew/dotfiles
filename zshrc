@@ -493,6 +493,7 @@ alias pac::remove_useless_deps='command sudo pacman -Rsv $(pac::list_useless_dep
 
 # git
 
+alias gnp='git --no-pager'
 alias git::status_in_all_repos='find -name .git -prune -print -execdir git status \;'
 
 # sudo
