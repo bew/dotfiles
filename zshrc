@@ -41,11 +41,6 @@ hooks-define-hook chpwd_hook
 function chpwd-wrapper { hooks-run-hook chpwd_hook }
 add-zsh-hook chpwd chpwd-wrapper
 
-# CUSTOM HOOKS
-#-------------------------------------------------------------
-
-hooks-define-hook pre_accept_line_hook
-
 #----------------------------------------------------------------------------------
 # Load Plugins
 #----------------------------------------------------------------------------------
@@ -897,13 +892,13 @@ hooks-add-hook precmd_hook set-normal-prompts
 
 function set-custom-prompts
 {
-    #set custom prompt
+    # Set custom prompt
     PROMPT=$PROMPT_LINE_OLD
     RPROMPT=$RPROMPT_LINE_OLD
 
     zle reset-prompt
 }
-hooks-add-hook pre_accept_line_hook set-custom-prompts
+hooks-add-hook zle_line_finish_hook set-custom-prompts
 
 
 #----------------------------------------------------------------------------------
@@ -1162,19 +1157,6 @@ function zwidget::cycle-quoting
 }
 zle -N zwidget::cycle-quoting
 
-#-------------------------------------------------------------
-# Builtin ZLE wrappers
-#-------------------------------------------------------------
-
-# Accept Line Wrapper
-#----------------------------------------
-function accept-line
-{
-    hooks-run-hook pre_accept_line_hook
-    zle .accept-line
-    ZSH_CUR_KEYMAP=
-}
-zle -N accept-line
 
 #----------------------------------------------------------------------------------
 # Keybinds
