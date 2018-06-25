@@ -784,24 +784,17 @@ function segmt::in_sudo
 # Segment prompt vim mode (normal/insert)
 function segmt::vim_mode
 {
-    local keymap="$KEYMAP"
     local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
     local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
 
-    if [ "$keymap" = "vicmd" ]; then
+    if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
+        echo -n ${insert_mode_style}
+    elif [[ "$KEYMAP" == "vicmd" ]]; then
         echo -n ${normal_mode_style}
-        return
-    fi
-    if [[ "$keymap" =~ "(main|viins)" ]]; then
-        echo -n ${insert_mode_style}
-        return
-    fi
-    if [ -z "$keymap" ]; then
-        echo -n ${insert_mode_style}
-        return
+    else
+        echo -n "$KEYMAP"
     fi
 
-    echo -n "$keymap"
 }
 
 function regen-prompt
