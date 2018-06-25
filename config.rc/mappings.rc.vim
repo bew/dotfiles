@@ -156,7 +156,7 @@ vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
 nnoremap <silent> <M-v> :r !xclip -out -selection clipboard<cr>
 
 " Save the file as sudo
-cnoremap w!! w !sudo tee % >/dev/null
+cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin/zenity_passwd.sh sudo tee % >/dev/null
 
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
