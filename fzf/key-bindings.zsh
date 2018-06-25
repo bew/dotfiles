@@ -23,32 +23,15 @@ function __fsel
 	local cmd="command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
 		$filters
 		2> /dev/null | sed 1d"
-	eval "$cmd" | $(__fzfcmd) | while read item; do
+	eval "$cmd" | $(__fzfcmd) --multi | while read item; do
 		echo -n "${(q)item} "
 	done
 	echo
 }
 
-FZF_KEYBINDINGS=()
-
-# input nav
-FZF_KEYBINDINGS+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
-FZF_KEYBINDINGS+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
-
-# suggestions nav
-FZF_KEYBINDINGS+=(--bind 'alt-j:down' --bind 'alt-k:up')
-FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
-
-# other
-FZF_KEYBINDINGS+=(--bind 'ctrl-j:accept')
-FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down')
-FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
-
-FZF_OPTIONS=(--height=40% --multi --reverse --inline-info --border)
-
 function __fzfcmd
 {
-	echo "fzf ${FZF_OPTIONS} ${FZF_KEYBINDINGS}"
+	echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
 }
 
 function zwidget::fzf::find_file

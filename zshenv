@@ -30,5 +30,25 @@ export VISUAL="$EDITOR"
 
 export GIT_EDITOR="$EDITOR"
 
-SAVEHIST=1000000 # in history file
-HISTSIZE=10000   # in session
+
+# ------------------ fzf config
+
+FZF_KEYBINDINGS=()
+
+# input nav
+FZF_KEYBINDINGS+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
+FZF_KEYBINDINGS+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
+
+# suggestions nav
+FZF_KEYBINDINGS+=(--bind 'alt-j:down' --bind 'alt-k:up')
+FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
+
+# other
+FZF_KEYBINDINGS+=(--bind 'ctrl-j:accept')
+FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down')
+FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
+
+FZF_LAYOUT=(--height=40% --reverse --inline-info --border)
+
+export FZF_BEW_KEYBINDINGS="${(j: :)${FZF_KEYBINDINGS}}"
+export FZF_BEW_LAYOUT="${(j: :)${FZF_LAYOUT}}"
