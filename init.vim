@@ -62,7 +62,7 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-Plug 'tweekmonster/deoplete-clang2'
+Plug 'zchee/deoplete-clang'
 
 Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
