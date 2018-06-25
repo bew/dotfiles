@@ -1157,6 +1157,22 @@ function zwidget::cycle-quoting
 }
 zle -N zwidget::cycle-quoting
 
+# Give a prompt where I can paste or write some text, it will then be single
+# quoted (with escapes if needed) and inserted as a single argument.
+function zwidget::insert_one_arg
+{
+    # NOTE: read-from-minibuffer's prompt is static :/ So no KEYMAP feedback
+    autoload -Uz read-from-minibuffer
+    read-from-minibuffer 'Enter argument: ' || return 1
+    [ -z "$REPLY" ] && return
+
+    local quoted_arg="${(qq)${REPLY}}"
+
+    # Insert argument in-place
+    LBUFFER+="${quoted_arg}"
+    zle reset-prompt
+}
+zle -N zwidget::insert_one_arg
 
 #----------------------------------------------------------------------------------
 # Keybinds
@@ -1199,6 +1215,7 @@ compdef _bindkey vibindkey
 vibindkey 's' zwidget::toggle-sudo
 
 vibindkey 'q' zwidget::cycle-quoting
+vibindkey 'a' zwidget::insert_one_arg
 
 # fast git
 vibindkey 'g' zwidget::git-status
