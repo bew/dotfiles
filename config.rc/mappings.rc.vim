@@ -122,6 +122,9 @@ endfunction
 " Trigger completion manually
 inoremap <expr> <C-b> deoplete#manual_complete()
 
+" Insert common string during completion
+inoremap <expr> <M-b> deoplete#complete_common_string()
+
 
 " Exit the terminal grabber
 tnoremap <A-q> <C-\><C-n>
