@@ -1239,8 +1239,8 @@ vibindkey 'e' edit-command-line
 
 source ~/.zsh/fzf/key-bindings.zsh
 
-vibindkey 'f' zwidget::fzf::file
-vibindkey 'c' zwidget::fzf::directory
+vibindkey 'f' zwidget::fzf::find_file
+vibindkey 'c' zwidget::fzf::find_directory
 vibindkey 'z' zwidget::fzf::z
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history

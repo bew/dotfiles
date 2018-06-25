@@ -51,7 +51,7 @@ function __fzfcmd
 	echo "fzf ${FZF_OPTIONS} ${FZF_KEYBINDINGS}"
 }
 
-function zwidget::fzf::file
+function zwidget::fzf::find_file
 {
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
@@ -63,9 +63,9 @@ function zwidget::fzf::file
 	fi
 	zle reset-prompt
 }
-zle -N zwidget::fzf::file
+zle -N zwidget::fzf::find_file
 
-function zwidget::fzf::directory
+function zwidget::fzf::find_directory
 {
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
@@ -77,7 +77,7 @@ function zwidget::fzf::directory
 	fi
 	zle reset-prompt
 }
-zle -N zwidget::fzf::directory
+zle -N zwidget::fzf::find_directory
 
 # -l  | list the commands
 # -r  | show in reverse order (=> most recent first)
