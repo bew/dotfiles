@@ -2,7 +2,7 @@ snippet #! "crystal run shebang!" b
 #!/usr/bin/env crystal
 endsnippet
 
-snippet ann "Annotation @[...]" b
+snippet ann "Annotation @[...]"
 @[${1:Annotation}${2:(${3:args})}]$99
 endsnippet
 
@@ -59,6 +59,14 @@ snippet dcl "Derived Class definition"
 class ${1:ClassName} < ${2:BaseClass}
   ${VISUAL}$99
 end
+endsnippet
+
+snippet inc "include Module" b
+include ${1:Module}$99
+endsnippet
+
+snippet ext "extend Module" b
+extend ${1:Module}$99
 endsnippet
 
 snippet enum "Enum definition"
