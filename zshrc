@@ -880,8 +880,8 @@ local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
 ##############################################
 autoload -U promptinit && promptinit
 
-PROMPT_LINE='$(segmt::shlvl)'" [${usernameStyle}] ${currDir} ▷ "
-PROMPT_LINE_OLD='$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle}%{$bg[default]%} ${cmdSeparatorStyle} "
+PROMPT_LINE="%{$reset_color%}"'$(segmt::shlvl)'" [${usernameStyle}] ${currDir} ▷ "
+PROMPT_LINE_OLD="%{$reset_color%}"'$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle}%{$bg[default]%} ${cmdSeparatorStyle} "
 
 
 
