@@ -4,11 +4,20 @@ if [[ $- != *i* ]]; then
 	return
 fi
 
-FIND_IGNORE_OPTIONS="\\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune"
+function __results_to_args
+{
+    local prefix="$1"
 
-#FIND_FILTER_ALL_FILES="-o -type f -print -o -type d -print"
-FIND_FILTER_ALL_FILES="-o -type f -print"
-FIND_FILTER_DIRS="-o -type d -print"
+    while read item; do
+        local full_item="${prefix}${item}"
+        echo -n "${(q)full_item} "
+    done
+}
+
+function __fzfcmd
+{
+	echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
+}
 
 function __fsel
 {
@@ -37,9 +46,14 @@ function __fzfcmd
 function zwidget::fzf::find_file
 {
 	local completion_prefix="${LBUFFER/* /}"
-	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
+	local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
-	local selected_completions="$(__fsel "$FIND_FILTER_ALL_FILES" "$completion_prefix")"
+    local base_dir=${completion_prefix:-./}
+
+    local finder_cmd=(fd --type f --type l)
+    local fzf_cmd=($(__fzfcmd) --multi --prompt "${~base_dir}")
+	local cpl=$(cd "$base_dir"; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_args "$base_dir")
+    local selected_completions=$cpl
 
 	if [ -n "$selected_completions" ]; then
 		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
@@ -53,7 +67,12 @@ function zwidget::fzf::find_directory
 	local completion_prefix="${LBUFFER/* /}"
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
 
-	local selected_completions="$(__fsel "$FIND_FILTER_DIRS" "$completion_prefix")"
+    local base_dir=${completion_prefix:-./}
+
+    local finder_cmd=(fd --type d)
+    local fzf_cmd=($(__fzfcmd) --multi --prompt "${~base_dir}")
+	local cpl=$(cd "$base_dir"; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_args "$base_dir")
+    local selected_completions=$cpl
 
 	if [ -n "$selected_completions" ]; then
 		LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
@@ -62,16 +81,18 @@ function zwidget::fzf::find_directory
 }
 zle -N zwidget::fzf::find_directory
 
-# -l  | list the commands
-# -r  | show in reverse order (=> most recent first)
-# 1   | start at command n° 1 (the oldest still in history)
-HISTORY_CMD=(fc -lr 1)
 
 FZF_HISTORY_OPTIONS=(--no-multi -n2..,.. --tiebreak=index)
 
 function zwidget::fzf::history
 {
-	local selected=( $( $HISTORY_CMD | $(__fzfcmd) $FZF_HISTORY_OPTIONS -q "${LBUFFER//$/\\$}") )
+    # -l  | list the commands
+    # -r  | show in reverse order (=> most recent first)
+    # 1   | start at command n° 1 (the oldest still in history)
+    local history_cmd=(fc -lr 1)
+
+    local fzf_cmd=($(__fzfcmd) $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
+	local selected=( $( "${history_cmd[@]}" | "${fzf_cmd[@]}" ) )
 	if [ -n "$selected" ]; then
 		local history_index=$selected[1]
 		if [ -n "$history_index" ]; then
@@ -89,7 +110,8 @@ function zwidget::fzf::z
 {
     local last_pwd=$PWD
 
-    local selected=( $( z | $(__fzfcmd) $FZF_Z_OPTIONS ) )
+    local fzf_cmd=($(__fzfcmd) $FZF_Z_OPTIONS --prompt 'Fuzzy jump to: ')
+    local selected=( $( z | "${fzf_cmd[@]}" ) )
     if [ -n "$selected" ]; then
         local directory=$selected[2]
         if [ -n "$directory" ]; then
