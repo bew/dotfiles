@@ -19,30 +19,6 @@ function __fzfcmd
 	echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
 }
 
-function __fsel
-{
-	local filters="$1"
-
-	if [ -n "$2" ]; then
-		local base_dir="$2"
-        base_dir=${~base_dir} # expand ~ (at least)
-	else
-		local base_dir='.'
-	fi
-	local cmd="command find -L '$base_dir' ${FIND_IGNORE_OPTIONS} \
-		$filters
-		2> /dev/null | sed 1d"
-	eval "$cmd" | $(__fzfcmd) --multi | while read item; do
-		echo -n "${(q)item} "
-	done
-	echo
-}
-
-function __fzfcmd
-{
-	echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
-}
-
 function zwidget::fzf::find_file
 {
 	local completion_prefix=${LBUFFER/* /}
