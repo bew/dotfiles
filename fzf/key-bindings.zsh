@@ -4,13 +4,13 @@ if [[ $- != *i* ]]; then
 	return
 fi
 
-function __results_to_args
+function __results_to_path_args
 {
     local prefix="$1"
 
     while read item; do
         local full_item="${prefix}${item}"
-        echo -n "${(q)full_item} "
+        echo -n "${(Dq)full_item} "
     done
 }
 
@@ -45,14 +45,15 @@ function __fzfcmd
 
 function zwidget::fzf::find_file
 {
-	local completion_prefix="${LBUFFER/* /}"
+	local completion_prefix=${LBUFFER/* /}
 	local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
     local base_dir=${completion_prefix:-./}
+    base_dir=${~base_dir} # expand ~ (at least)
 
     local finder_cmd=(fd --type f --type l)
-    local fzf_cmd=($(__fzfcmd) --multi --prompt "${~base_dir}")
-	local cpl=$(cd "$base_dir"; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_args "$base_dir")
+    local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
+    local cpl=$(cd ${base_dir}; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
     local selected_completions=$cpl
 
 	if [ -n "$selected_completions" ]; then
@@ -68,10 +69,11 @@ function zwidget::fzf::find_directory
 	local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
 
     local base_dir=${completion_prefix:-./}
+    base_dir=${~base_dir} # expand ~ (at least)
 
     local finder_cmd=(fd --type d)
-    local fzf_cmd=($(__fzfcmd) --multi --prompt "${~base_dir}")
-	local cpl=$(cd "$base_dir"; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_args "$base_dir")
+    local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
+	local cpl=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
     local selected_completions=$cpl
 
 	if [ -n "$selected_completions" ]; then
