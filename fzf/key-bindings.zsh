@@ -10,7 +10,7 @@ function __results_to_path_args
 
     while read item; do
         local full_item="${prefix}${item}"
-        echo -n "${(Dq)full_item} "
+        echo -n "${(D)full_item} "
     done
 }
 
