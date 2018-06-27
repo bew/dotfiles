@@ -8,34 +8,40 @@ snippet #! "Shebang header" b
 $0
 endsnippet
 
-snippet !fun(ction)?! "New function" r
+snippet fun "Function"
 function ${1:new_function}(${2:args})
-	$0
-end
+	$10
+end$99
 endsnippet
 
-snippet !afun(ction)?! "New anonyous function" r
+snippet lfun "Local function"
+local function ${1:new_function}(${2:args})
+	$10
+end$99
+endsnippet
+
+snippet afun "Anonyous function"
 function(${1:args})
-	$0
-end
+	$10
+end$99
 endsnippet
 
 snippet forp "pair for loop" b
-for ${1:name},${2:val} in pairs(${3:table_name}) do
-	$0
-end
+for ${1:name}, ${2:val} in pairs(${3:table_name}) do
+	$10
+end$99
 endsnippet
 
 snippet fori "ipair for foop" b
-for ${1:idx},${2:val} in ipairs(${3:table_name}) do
-	$0
-end
+for ${1:idx}, ${2:val} in ipairs(${3:table_name}) do
+	$10
+end$99
 endsnippet
 
 snippet for "numeric for loop" b
-for ${1:i}=${2:first},${3:last}${4/^..*/(?0:,:)/}${4:step} do
-	$0
-end
+for ${1:i} = ${2:first}, ${3:last}${4/^..*/(?0:,:)/}${4:step} do
+	$10
+end$99
 endsnippet
 
 snippet loc "local x = 1"
@@ -44,11 +50,15 @@ endsnippet
 
 snippet do "do ... end" b
 do
-	${VISUAL}$0
-end
+	${VISUAL}$1
+end$99
 endsnippet
 
 # Comments
+
+snippet com "Comment"
+-- $99
+endsnippet
 
 snippet fline "Full line ---" b
 ------------------------------------------------------------------------------------
@@ -63,14 +73,14 @@ snippet sline "Small line ---" b
 endsnippet
 
 snippet section "Comment Section" b
-${1}
+$1
 -- ${2:${VISUAL/^-- //}}
-$1${0}
+$1$99
 endsnippet
 
 snippet header "Comment Header" b
 -- ${1:${VISUAL:Comment/^-- //}}
-${2}${0}
+$2$99
 endsnippet
 
 # vim:ft=snippets:
