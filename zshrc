@@ -682,7 +682,12 @@ compdef _mpv watch_and_seen
 function switch-term-colors
 {
     local color_mode=$(command switch-term-colors $*)
-    export TERM_COLOR_MODE=$color_mode
+    if [[ "$color_mode" =~ "Usage" ]]; then
+        echo $color_mode # print error
+        return 1
+    else
+        export TERM_COLOR_MODE=$color_mode
+    fi
 }
 
 function transfer
