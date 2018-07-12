@@ -175,10 +175,6 @@ hi markdownCode ctermfg=29
 hi clear BadSpell
 hi BadSpell cterm=underline
 
-hi clear SyntasticWarningSign SyntasticErrorSign
-hi SyntasticErrorSign ctermfg=1
-hi SyntasticWarningSign ctermfg=11
-
 hi clear SignColumn
 hi SignColumn ctermbg=234
 
