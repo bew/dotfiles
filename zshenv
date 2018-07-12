@@ -50,5 +50,5 @@ FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
 
 FZF_LAYOUT=(--height=40% --reverse --inline-info --border)
 
-export FZF_BEW_KEYBINDINGS="${(j: :)${FZF_KEYBINDINGS}}"
-export FZF_BEW_LAYOUT="${(j: :)${FZF_LAYOUT}}"
+export FZF_BEW_KEYBINDINGS="${(j: :)FZF_KEYBINDINGS}"
+export FZF_BEW_LAYOUT="${(j: :)FZF_LAYOUT}"
