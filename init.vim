@@ -157,6 +157,18 @@ call s:loadConfigFile("mappings")
 " Source the options
 runtime options.vim
 
+"""""""""""""""""""""""""""""""""
+
+let g:fzf_action = {
+            \ 'alt-t': 'tab split',
+            \ 'alt-s': 'split',
+            \ 'alt-v': 'vsplit',
+            \ }
+
+let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
+
+"""""""""""""""""""""""""""""""""
+
 " Nice colors for TabLine
 hi TabLineSel  cterm=NONE    ctermfg=187 ctermbg=235
 hi TabLine     cterm=NONE    ctermfg=230 ctermbg=239
