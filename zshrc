@@ -757,6 +757,15 @@ function ffmpeg::extract-audio::rm_source
     return $ret
 }
 
+# Import zsh's massive rename helper
+autoload -U zmv
+alias zmv='noglob zmv'
+alias zcp='zmv -C'
+alias zln='zmv -L'
+alias zmv::dry-run='zmv -n'
+alias zcp::dry-run='zcp -n'
+alias zln::dry-run='zln -n'
+
 
 # Named directories
 #----------------------------------------
