@@ -711,6 +711,52 @@ function transfer
     echo
 }
 
+# ffmpeg helpers
+function ffmpeg::extract-audio
+{
+    if [[ $# == 0 ]]; then
+        echo "Usage: ffmpeg::extract-audio <filename> [<format>]"
+        echo "  <format> defaults to m4a"
+        return 1
+    fi
+
+    local filename="$1"
+    local format="${2:-m4a}"
+    local target_filename="${filename}.${format}"
+
+    echo ">>> Extracting audio from '$filename'..."
+
+    # -i    input file
+    # -vn   disable video
+    ffmpeg -hide_banner -i "$filename" -vn "$target_filename"
+    local ret=$?
+    if [[ $? == 0 ]]; then
+        echo " >> Audio extracted to '$target_filename'."
+    else
+        echo " >> Audio extract from '$filename' failed."
+    fi
+    return $ret
+}
+
+function ffmpeg::extract-audio::rm_source
+{
+    local filename="$1"
+    local format="${2:-m4a}"
+
+    ffmpeg::extract-audio "$filename" "$format"
+    local ret=$?
+    if [[ $? == 0 ]]; then
+        echo ">>> Deleting source '$filename'..."
+    else
+        return $ret
+    fi
+
+    command rm "$filename"
+    ret=$?
+    [[ $ret == 0 ]] && echo " >> Done!"
+    return $ret
+}
+
 
 # Named directories
 #----------------------------------------
