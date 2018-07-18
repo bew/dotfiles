@@ -841,29 +841,18 @@ function mpv::add-media
 
     mpv::ensure-socket-exist $channel || return 1
 
-    local select_first_media=0
-    local playlist_count=$(mpv::send_command $channel "get_property" "playlist-count" | jq .data)
-    if [[ "$playlist_count" == 0 ]]; then
-        select_first_media=1
-    fi
-
     echo ">>> Adding medias to mpv on channel '$channel'"
 
     local ret
     for media_path in $*; do
         local media_full_path=$(realpath "$media_path")
         echo ">>> Appending media '$media_path'"
-        mpv::send_command $channel "loadfile" "$media_full_path" "append"
+        mpv::send_command $channel "loadfile" "$media_full_path" "append-play"
         ret=$?
         [[ $ret != 0 ]] && return $ret
     done
 
     echo ">>> All medias added!"
-
-    if [[ $select_first_media == 1 ]]; then
-        echo ">>> Selecting first media to play!"
-        mpv::send_command $channel "set_property" "playlist-pos" "0"
-    fi
 }
 
 # Show the playlist of mpv on channel $1
