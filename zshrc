@@ -711,7 +711,9 @@ function transfer
     echo
 }
 
+# ------------------------------------------------------------------------
 # ffmpeg helpers
+
 function ffmpeg::extract-audio
 {
     if [[ $# == 0 ]]; then
@@ -756,6 +758,135 @@ function ffmpeg::extract-audio::rm_source
     [[ $ret == 0 ]] && echo " >> Done!"
     return $ret
 }
+
+# ------------------------------------------------------------------------
+# mpv daemon player
+#
+# Example usage:
+# ```zsh
+# # Start the daemon in a separate terminal
+# $ mpv::start-daemon music
+#
+# # And then
+# $ mpv::add-media music file1 file2 file3
+#
+# # Enjoy!
+# ```
+#
+# The idea of channels is to be able to remote control multiple mpv instance,
+# e.g: one for music, one for some films, one for youtube videos, ...
+
+# Start an mpv instance in daemon mode identified by channel $1
+function mpv::start-daemon
+{
+    local channel=${1:-default}; shift
+    local ipc_socket="/tmp/mpv-socket-${channel}"
+
+    echo ">>> Starting mpv daemon for channel '$channel' on IPC socket '$ipc_socket'..."
+    mpv --idle --input-ipc-server="$ipc_socket" $*
+}
+
+# Send an arbitrary command to mpv on channel $1
+#
+# For command documentation checkout `man mpv` section "JSON IPC"
+function mpv::send_command
+{
+    if [[ $# == 0 ]] || [[ $# == 1 ]]; then
+        echo "Usage: $0 <channel> <command> [<arg> ...]"
+        return 1
+    fi
+
+    local channel=$1; shift
+    local ipc_socket="/tmp/mpv-socket-${channel}"
+
+    local json='{"command": ['
+    for cmd_part in $*; do
+        # qqq to add double quotes for json strings
+        json+="${(qqq)cmd_part}, "
+    done
+    [[ $# != 0 ]] && json="${json[1, -3]}" # remove last ', '
+    json+="] }"
+
+    # echo "JSON: $json" >&2
+
+    echo "$json" | socat - "$ipc_socket"
+}
+
+# Helper function to make sure the mpv instance on channel $1 exists
+#
+# Exits with non-0 if it doesn't exist.
+function mpv::ensure-socket-exist
+{
+    local channel=$1
+    local ipc_socket="/tmp/mpv-socket-${channel}"
+
+    # -S   : socket
+    if ! [[ -S "$ipc_socket" ]]; then
+        echo >&2 ">>> ERROR: mpv channel '$channel' invalid"
+        echo >&2 "     -> '$ipc_socket' is not an mpv IPC socket."
+        return 1
+    fi
+}
+
+# Add any number of medias to mpv on channel $1,
+# then start playback if the playlist was empty before.
+function mpv::add-media
+{
+    if [[ $# == 0 ]]; then
+        echo "Usage: $0 <channel> <path> [<path> ...]"
+        return 1
+    fi
+
+    local channel=$1; shift
+
+    mpv::ensure-socket-exist $channel || return 1
+
+    local select_first_media=0
+    local playlist_count=$(mpv::send_command $channel "get_property" "playlist-count" | jq .data)
+    if [[ "$playlist_count" == 0 ]]; then
+        select_first_media=1
+    fi
+
+    echo ">>> Adding medias to mpv on channel '$channel'"
+
+    local ret
+    for media_path in $*; do
+        local media_full_path=$(realpath "$media_path")
+        echo ">>> Appending media '$media_path'"
+        mpv::send_command $channel "loadfile" "$media_full_path" "append"
+        ret=$?
+        [[ $ret != 0 ]] && return $ret
+    done
+
+    echo ">>> All medias added!"
+
+    if [[ $select_first_media == 1 ]]; then
+        echo ">>> Selecting first media to play!"
+        mpv::send_command $channel "set_property" "playlist-pos" "0"
+    fi
+}
+
+# Show the playlist of mpv on channel $1
+function mpv::show-playlist
+{
+    if [[ $# == 0 ]]; then
+        echo "Usage: $0 <channel>"
+        return 1
+    fi
+
+    local channel=$1
+
+    mpv::ensure-socket-exist "$channel" || return 1
+
+    local output=$(mpv::send_command $channel "get_property" "playlist")
+
+    local ret=$?
+    [[ $ret != 0 ]] && return $ret
+
+    echo "$output" | jq . # let's just pretty print it for now...
+}
+
+# ------------------------------------------------------------------------
 
 # Import zsh's massive rename helper
 autoload -U zmv
