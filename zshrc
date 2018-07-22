@@ -537,6 +537,7 @@ alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 # mpv
 
 alias mpv-audio='mpv --no-video'
+alias mpv-audio-loop='mpv-audio --loop-playlist'
 
 # clock in terminal
 
