@@ -398,6 +398,7 @@ alias -g nostderr=" 2>/dev/null "
 alias g=git
 alias m=make
 alias dk=docker
+alias dkc=docker-compose
 alias cr=crystal
 alias pac=pacman
 alias wpa=wpa_cli
