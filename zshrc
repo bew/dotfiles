@@ -539,6 +539,12 @@ alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 alias mpv-audio='mpv --no-video'
 alias mpv-audio-loop='mpv-audio --loop-playlist'
 
+# ffmpeg
+
+alias ffmpeg='ffmpeg -hide_banner'
+alias ffprobe='ffprobe -hide_banner'
+
+
 # clock in terminal
 
 alias clock='tty-clock -sc -C6 -d 0.5'
