@@ -59,6 +59,11 @@ nnoremap <M-J> gT
 nnoremap <M-K> gt
 inoremap <M-J> <esc>gT
 inoremap <M-K> <esc>gt
+" experimental version Alt-a/z
+nnoremap <M-a> gT
+nnoremap <M-z> gt
+inoremap <M-a> <esc>gT
+inoremap <M-z> <esc>gt
 
 
 " Move tabs
@@ -66,6 +71,11 @@ nnoremap <M-H> :tabmove -1<cr>
 nnoremap <M-L> :tabmove +1<cr>
 inoremap <M-H> <esc>:tabmove -1<cr>
 inoremap <M-L> <esc>:tabmove +1<cr>
+" experimental version Alt-Shift-a/z
+nnoremap <M-A> :tabmove -1<cr>
+nnoremap <M-Z> :tabmove +1<cr>
+inoremap <M-A> <esc>:tabmove -1<cr>
+inoremap <M-Z> <esc>:tabmove +1<cr>
 
 " Goto next/previous buffer
 nnoremap <M-n> :bprevious<cr>
