@@ -6,20 +6,20 @@ import vim
 # Tests for the existence of a variable declared by Vim's filetype detection
 # suggesting the type of shell script of the current file
 def testShell(scope, shell):
-	return vim.eval("exists('" + scope + ":is_" + shell + "')")
+    return vim.eval("exists('" + scope + ":is_" + shell + "')")
 
 # Loops over the possible variables, checking for global variables
 # first since they indicate an override by the user.
 def getShell():
-	for scope in ["g", "b"]:
-		for shell in ["bash", "posix", "sh", "kornshell"]:
-			if testShell(scope, shell) == "1":
-				if shell == "kornshell":
-					return "ksh"
-				if shell == "posix":
-					return "sh"
-				return shell
-	return "sh"
+    for scope in ["g", "b"]:
+        for shell in ["bash", "posix", "sh", "kornshell"]:
+            if testShell(scope, shell) == "1":
+                if shell == "kornshell":
+                    return "ksh"
+                if shell == "posix":
+                    return "sh"
+                return shell
+    return "sh"
 endglobal
 
 ###########################################################################
@@ -43,57 +43,67 @@ endsnippet
 
 snippet case "case .. esac (case)"
 case ${1:word} in
-	${2:pattern})
-		$99;;$0
-esac
+    ${2:pattern})
+        $10;;$11
+esac$99
 endsnippet
 
 snippet elif "elif .. (elif)"
 elif ${1:[[ ${2:condition} ]]}; then
-	$99
+    $99
 endsnippet
 
 snippet fori "for ... done (for)"
 for (( i = 0; i < ${1:10}; i++ )); do
-	$99
-done
+    $10
+done$99
 endsnippet
 
 snippet for "for ... in ... done (forin)"
 for ${1:i}${2/.+/ in /}${2:words}; do
-	$99
-done
+    $10
+done$99
 endsnippet
 
 snippet here "here document (here)"
 <<-${1:'${2:TOKEN}'}
-	$99
-${2/['"`](.+)['"`]/$1/}
+    $10
+${2/['"`](.+)['"`]/$1/}$99
 endsnippet
 
 snippet if "if ... then (if)"
 if ${1:[[ ${2:condition} ]]}; then
-	$99
-fi
+    $10
+fi$99
+endsnippet
+
+snippet cond "[[ ... ]]"
+[[ $1 ]]$99
 endsnippet
 
 snippet until "until ... (done)"
 until ${1:[[ ${2:condition} ]]}; do
-	$99
+    $99
 done
 endsnippet
 
 snippet while "while ... (done)"
 while ${1:[[ ${2:condition} ]]}; do
-	$99
-done
+    $10
+done$99
 endsnippet
 
-snippet !fun(ction)?! "Function ... { ... }" br
+snippet fun "Function ... { ... }" b
 function ${1:name}
 {
-	$99
-}
+    $10
+}$99
+endsnippet
+
+snippet do "do ... done"
+do
+    $1
+done$99
 endsnippet
 
 # Comment
@@ -111,14 +121,14 @@ snippet sline "Small line ---" b
 endsnippet
 
 snippet section "Comment Section" b
-${1}
+$1
 # ${2:${VISUAL/^# //}}
 $1$0
 endsnippet
 
 snippet header "Comment Header" b
 # ${1:${VISUAL:Comment/^# //}}
-${2}$0
+$2$0
 endsnippet
 
 
