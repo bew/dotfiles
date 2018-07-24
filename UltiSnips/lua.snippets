@@ -8,6 +8,14 @@ snippet #! "Shebang header" b
 $0
 endsnippet
 
+snippet req "local require" b
+local $2 = require("$1")$99
+endsnippet
+
+snippet doc "doc" b
+--- ${1:TODO: doc}$99
+endsnippet
+
 snippet fun "Function"
 function ${1:new_function}(${2:args})
 	$10
@@ -20,7 +28,7 @@ local function ${1:new_function}(${2:args})
 end$99
 endsnippet
 
-snippet afun "Anonyous function"
+snippet funa "Anonyous function" w
 function(${1:args})
 	$10
 end$99
@@ -58,6 +66,10 @@ endsnippet
 
 snippet com "Comment"
 -- $99
+endsnippet
+
+snippet todo "TODO comment"
+-- TODO: $99
 endsnippet
 
 snippet fline "Full line ---" b
