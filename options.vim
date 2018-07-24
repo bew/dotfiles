@@ -93,11 +93,6 @@ set shiftwidth=4
 set expandtab " Always expand TAB to spaces
 
 
-" TODO Setup X clipboard
-" > Use register "* for all yank/delete/change
-"""" > Use register "+ for X11 clipboard
-"set clipboard=unnamed
-
 " Setting colorscheme
 set t_Co=256
 let g:solarized_termcolors = 256
