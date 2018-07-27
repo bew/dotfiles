@@ -787,7 +787,7 @@ function ffmpeg::extract-audio::rm_source
 # Start an mpv instance in daemon mode identified by channel $1
 function mpv::start-daemon
 {
-    local channel=${1:-default}; shift
+    local channel=${1:-default}; [[ -n "$1" ]] && shift
     local ipc_socket="/tmp/mpv-socket-${channel}"
 
     echo ">>> Starting mpv daemon for channel '$channel' on IPC socket '$ipc_socket'..."
