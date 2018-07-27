@@ -1351,9 +1351,21 @@ zle -N zwidget::cycle-quoting
 # quoted (with escapes if needed) and inserted as a single argument.
 function zwidget::insert_one_arg
 {
+    function read-from-minibuffer::no-syntax-hl
+    {
+        local default_maxlength="$ZSH_HIGHLIGHT_MAXLENGTH"
+        ZSH_HIGHLIGHT_MAXLENGTH=0 # trick to disable syntax highlighting
+
+        read-from-minibuffer $*
+        local ret=$?
+
+        ZSH_HIGHLIGHT_MAXLENGTH="$default_maxlength"
+        return $ret
+    }
+
     # NOTE: read-from-minibuffer's prompt is static :/ So no KEYMAP feedback
     autoload -Uz read-from-minibuffer
-    read-from-minibuffer 'Enter argument: ' || return 1
+    read-from-minibuffer::no-syntax-hl 'Enter argument: ' || return 1
     [ -z "$REPLY" ] && return
 
     local quoted_arg="${(qq)${REPLY}}"
