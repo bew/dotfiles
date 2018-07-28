@@ -495,7 +495,7 @@ alias git::status_in_all_repos='find -name .git -prune -print -execdir git statu
 # sudo
 
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
-# Note: the trailing space is important (see the man for the alias builtin)
+# Note: the trailing space is important (see the man for the zsh alias builtin)
 alias sudo="sudo "
 
 # Close the current sudo session if any
