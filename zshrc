@@ -1223,12 +1223,14 @@ function zle::utils::check_git
 # Toggle sudo at <bol>
 function zwidget::toggle-sudo
 {
+    # Overwriting BUFFER will reset CURSOR to <bol>
+    # so we store its original position first
+    local cursor=$CURSOR
+
     if [ "${BUFFER[1, 5]}" = "sudo " ]; then
-        local cursor=$CURSOR
         BUFFER="${BUFFER[6, ${#BUFFER}]}"
         CURSOR=$(( cursor - 5 ))
     else
-        local cursor=$CURSOR
         BUFFER="sudo $BUFFER"
         CURSOR=$(( cursor + 5 ))
     fi
