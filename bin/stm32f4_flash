@@ -2,7 +2,6 @@
 
 if [ $# = 0 ] && [ -d "BUILD" ]; then
     echo
-    ls BUILD/*.hex | head -n1
     HEX_FILE=$(ls BUILD/*.hex | head -n1)
 else
     HEX_FILE=$1
@@ -13,6 +12,8 @@ if [ -z "${HEX_FILE}" ]; then
     exit 1
 fi
 
-echo ">>>>>> Flashing ..."
+echo ">>>>>> Flashing $HEX_FILE ..."
 openocd -f /usr/share/openocd/scripts/board/st_nucleo_f4.cfg \
             -c "init; reset halt; flash write_image erase ${HEX_FILE}; reset run; exit"
+
+[ $? == 0 ] && echo ">>>>>> Running now!"

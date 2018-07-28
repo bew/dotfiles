@@ -52,7 +52,7 @@ function check_compatibility
 }
 
 if [[ -z "$1" ]]; then
-    echo "Usage: $0 dark|light"
+    echo "Usage: $0 dark|light|toggle"
     exit 1
 fi
 
