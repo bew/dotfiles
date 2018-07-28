@@ -40,7 +40,9 @@ eval `ssh-agent`
 ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 
 # Warmer screen temperature at night
-background_run redshift-gtk
+# Locations: (<lat>:<long>)
+# - San Marcos: 29.9:-97.9
+background_run redshift-gtk -l 29.9:-97.9
 
 # Run the compositor
 [ -f ~/.config/compton ] && run compton --config ~/.config/compton -b
