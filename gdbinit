@@ -13,3 +13,6 @@ set detach-on-fork off
 # ASM
 set disassembly-flavor intel
 #set disassemble-next-line on
+
+# GEF - GDB Enhanced Features
+#source ~/.conf/gdb/gef.py
