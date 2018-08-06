@@ -578,6 +578,9 @@ alias ff_streaming="firefox -P pezop www.rotazu.com &!"
 
 alias vimzshrc="vim ~/.zshrc"
 alias vimnviminit="vim ~/.config/nvim/init.vim"
+alias vimnvimmappings="vim ~/.config/nvim/config.rc/mappings.rc.vim"
+alias cdzsh="cd ~/.zsh"
+alias cdnvim="cd ~/.nvim"
 
 
 # Functions
