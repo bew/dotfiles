@@ -886,6 +886,9 @@ function mpv::show-playlist
     echo "$output" | jq . # let's just pretty print it for now...
 }
 
+alias tv-start='mpv::start-daemon tv --no-terminal --force-window'
+alias tv-add='mpv::add-media tv'
+
 # ------------------------------------------------------------------------
 
 # Import zsh's massive rename helper
