@@ -1,5 +1,5 @@
 # Ruby bins
-ruby_path=~/.gem/ruby/2.3.0/bin
+ruby_path=~/.gem/ruby/2.5.0/bin
 
 # Lua bins
 luarocks_path=~/.luarocks/bin
