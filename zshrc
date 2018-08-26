@@ -516,6 +516,9 @@ alias vmi="v"
 alias imv="v"
 alias ivm="v"
 
+# View file (read-only)
+alias vw="nvim -R"
+
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
 
 alias ":q"="exit"
