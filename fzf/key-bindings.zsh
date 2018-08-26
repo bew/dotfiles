@@ -19,7 +19,7 @@ function __fzfcmd
     echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
 }
 
-function zwidget::fzf::find_file
+function zwidget::fzf::smart_find_file
 {
     local completion_prefix=${LBUFFER/* /}
     local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
@@ -28,6 +28,31 @@ function zwidget::fzf::find_file
     base_dir=${~base_dir} # expand ~ (at least)
 
     local finder_cmd=(fd --type f --type l)
+    local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
+    local cpl=$(cd ${base_dir}; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
+    local selected_completions=$cpl
+
+    if [ -n "$selected_completions" ]; then
+        LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
+    fi
+    zle reset-prompt
+}
+zle -N zwidget::fzf::smart_find_file
+
+function zwidget::fzf::find_file
+{
+    # NOTE: SAME AS `zwidget::fzf::smart_find_file`, DIFF IS `finder_cmd`
+
+    local completion_prefix=${LBUFFER/* /}
+    local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
+
+    local base_dir=${completion_prefix:-./}
+    base_dir=${~base_dir} # expand ~ (at least)
+
+    local finder_cmd=(find)
+    finder_cmd+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
+    finder_cmd+=(-o -type f -o -type l) # actual file filter
+
     local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
     local cpl=$(cd ${base_dir}; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
     local selected_completions=$cpl
