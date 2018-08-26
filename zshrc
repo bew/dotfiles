@@ -1394,11 +1394,6 @@ zle -N zwidget::insert_one_arg
 # Enable vim mode
 bindkey -v
 
-# disable some keybinds
-#-------------------------------------------------------------
-
-bindkey -r '[29~' # Menu key
-
 
 #-------------------------------------------------------------
 
