@@ -174,10 +174,11 @@ hi TabLineSel  cterm=NONE    ctermfg=187 ctermbg=235
 hi TabLine     cterm=NONE    ctermfg=230 ctermbg=239
 hi TabLineFill cterm=reverse ctermfg=187 ctermbg=244
 
-hi clear Visual Todo
-hi Visual ctermbg=238
+hi clear Visual Todo Comment
+hi Visual ctermbg=237
 " We need the ctermbg=NONE at the end, I don't know why...
-hi Todo cterm=bold ctermfg=11 ctermbg=NONE
+hi Todo cterm=bold ctermfg=11 ctermbg=NONE " fg: yellow
+hi Comment ctermfg=242 " bg: light grey
 
 hi Normal ctermfg=248
 
