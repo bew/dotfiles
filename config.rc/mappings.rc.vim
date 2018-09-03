@@ -191,7 +191,7 @@ function! VisualPasteKeepUnnamedRegister(before)
         normal gvp
     endif
 
-    echo string(old_reg) . '  ' . old_regtype
+    " echo string(old_reg) . '  ' . old_regtype
     call setreg('"', old_reg, old_regtype)
 endfunction
 
