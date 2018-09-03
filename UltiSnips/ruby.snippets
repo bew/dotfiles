@@ -1,22 +1,44 @@
 priority -50
 
 snippet "^#!" "#!/usr/bin/env ruby" r
-#!/usr/bin/env ruby
-$0
+#!/usr/bin/env ruby$99
 endsnippet
 
 snippet "^# ?[uU][tT][fF]-?8" "# encoding: UTF-8" r
-# encoding: UTF-8
-$0
+# encoding: UTF-8$99
 endsnippet
 
-snippet "\b(de)?f" "def <name>..." r
+snippet req "require ..." b
+require "$1"$99
+endsnippet
+
+snippet do "do ... end"
+do
+	$1
+end$99
+endsnippet
+
+snippet doa "do |args| ... end"
+do |${1:args}|
+	$10
+end$99
+endsnippet
+
+snippet ido "{ ... }"
+{ $1 }$99
+endsnippet
+
+snippet idoa "{ |args| ... }"
+{ |${1:args}| $10 }$99
+endsnippet
+
+snippet def "def <name>..."
 def ${1:function_name}${2:(${3:*args})}
-	$0
-end
+	$10
+end$99
 endsnippet
 
-snippet defi "def initialize ..."
+snippet ini "def initialize ..."
 def initialize${1:(${2:*args})}
 	$0
 end
@@ -266,18 +288,6 @@ snippet "(\S+)\.Index" ".index do |item| ... end" r
 end
 endsnippet
 
-snippet do "do |<key>| ... end" i
-do |${1:args}|
-	$0
-end
-endsnippet
-
-snippet Do "do ... end" i
-do
-	$0
-end
-endsnippet
-
 snippet until "until <expression> ... end"
 until ${1:expression}
 	$0
@@ -302,12 +312,12 @@ begin
 end while ${1:expression}
 endsnippet
 
-snippet begin "begin ... rescue ... end"
+snippet beg "begin ... rescue ... end"
 begin
 	$1
 rescue
-	$0
-end
+	$2
+end$99
 endsnippet
 
 snippet begin "begin ... rescue ... else ... ensure ... end"
@@ -328,31 +338,29 @@ snippet rescue
 rescue Exception => e
 	puts e.message
 	puts e.backtrace.inspect
-	${0:# Rescue}
+	${99:# Rescue}
 endsnippet
 
 snippet "\b(case|sw(itch)?)" "case <variable> when <expression> ... end" r
 case ${1:variable}
 when ${2:expression}
-$0
-end
+$10
+end$99
 endsnippet
 
 snippet alias "alias :<new_name> :<old_name>"
 alias :${1:new_name} :${2:old_name}
 endsnippet
 
-snippet class "class <class_name> def initialize ... end end"
-class ${1:class_name}
-	def initialize(${2:*args})
-		$0
-	end
+snippet cl "class <class_name> def initialize ... end end"
+class ${1:ClassName}
+	$99
 end
 endsnippet
 
-snippet module "module"
-module ${1:module_name}
-	$0
+snippet mod "module"
+module ${1:ModuleName}
+	$99
 end
 endsnippet
 
