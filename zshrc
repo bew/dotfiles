@@ -9,13 +9,24 @@
 #
 #
 
+osx=
+linux=
+case $(uname) in
+    Darwin)
+        osx=1;;
+    Linux)
+        linux=1;;
+esac
+
 # Import color helpers
 autoload -U colors && colors
 
 # colors for common binaries (ls, tree, etc..)
-DIRCOLORS_FILE=~/.dircolors
-! [ -f $DIRCOLORS_FILE ] && dircolors -p > $DIRCOLORS_FILE
-[ -f $DIRCOLORS_FILE ] && eval `dircolors $DIRCOLORS_FILE`
+if command -v dircolors >/dev/null; then
+    DIRCOLORS_FILE=~/.dircolors
+    ! [ -f $DIRCOLORS_FILE ] && dircolors -p > $DIRCOLORS_FILE
+    [ -f $DIRCOLORS_FILE ] && eval `dircolors $DIRCOLORS_FILE`
+fi
 
 #----------------------------------------------------------------------------------
 # Setup Hooks
@@ -422,14 +433,23 @@ alias G="command grep --color=auto -n"
 
 # add verbosity
 
-alias rm="rm -vI"
+if [[ $osx == 1 ]]; then
+    alias rm="rm -vi"
+else
+    alias rm="rm -vI"
+fi
 alias cp="cp -vi"
 alias mv="mv -vi"
 alias mkdir="mkdir -v"
 
 # ls
 
-alias ls="ls --color=auto --group-directories-first"
+if [[ $osx == 1 ]]; then
+    export CLICOLORS=1
+    alias ls="ls -G"
+elif [[ $linux == 1 ]]; then
+    alias ls="ls --color=auto --group-directories-first"
+fi
 alias ll="ls -lh"
 alias la='ll -a'
 alias l="la"
@@ -460,7 +480,7 @@ alias ne="echo 'Use: vim'"
 
 # tree
 
-alias tree="tree --dirsfirst -F"
+alias tree="tree -C --dirsfirst -F"
 
 # cd
 
@@ -1024,7 +1044,9 @@ function prompt-auto-scroll
         echo -n $'\e[4A' # Move the cursor back up
     fi
 }
-hooks-add-hook precmd_hook prompt-auto-scroll
+if ! [[ $osx == 1 ]]; then # Disable on OSX
+    hooks-add-hook precmd_hook prompt-auto-scroll
+fi
 
 
 function segmt::shlvl
@@ -1144,7 +1166,10 @@ local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slReset
 #-------------------------------------------------------------
 
 # The statusline container
-local statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
+local statuslineContainer
+if [[ $linux == 1 ]]; then
+    statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
+fi
 
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
