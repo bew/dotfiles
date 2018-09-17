@@ -168,6 +168,11 @@ let g:fzf_action = {
 
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
 
+if has("mac")
+    " Homebrew puts the fzf install in non-vim accessible directory
+    set rtp+=/usr/local/opt/fzf
+endif
+
 """""""""""""""""""""""""""""""""
 
 " Nice colors for TabLine
