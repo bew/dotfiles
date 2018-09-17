@@ -207,6 +207,11 @@ endfunction
 " Toggle Gundo tree
 nnoremap <F5> :GundoToggle<cr>
 
+" Open or focus NERDTree window
+nnoremap <F6> :call NERDTreeFocus()<CR>
+" Note: Shift-F6 is F18 (on iTerm2)
+nnoremap <F18> :NERDTreeFind<CR>
+
 " Show highlight infos
 nmap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
 
