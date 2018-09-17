@@ -1,24 +1,41 @@
-# Ruby bins
-ruby_path=~/.gem/ruby/2.5.0/bin
+typeset -a OTHER_PATHS
 
-# Lua bins
-luarocks_path=~/.luarocks/bin
+function load_other_paths
+{
+    # User bins
+    local user_bins=~/.bin
 
-# adb & fastboot PATH, installed using install.sh script at
-# https://github.com/corbindavenport/nexus-tools
-nexustools_path=~/.nexustools
+    # OSX bins
+    local osx_bin_path=/usr/local/bin
 
-# Python bins
-python_path=~/.local/bin
+    # Ruby bins
+    local rvm_bin_path=~/.rvm/bin
+
+    # Lua bins
+    local luarocks_path=~/.luarocks/bin
+
+    # adb & fastboot PATH, installed using install.sh script at
+    # https://github.com/corbindavenport/nexus-tools
+    local nexustools_bin_path=~/.nexustools
+
+    # Python bins
+    local python_bin_path=~/.local/bin
+
+    OTHER_PATHS=(
+        $user_bins
+        $luarocks_path
+        $python_bin_path
+        $nexustools_bin_path
+        $osx_bin_path
+        $rvm_bin_path
+    )
+}
+load_other_paths
 
 typeset -U path
 path=(
-  ~/.bin
-  $luarocks_path
-  $ruby_path
-  $python_path
-  $nexustools_path
-  $path
+    "${OTHER_PATHS[@]}" # Expand all other paths by elements
+    $path
 )
 
 export GOPATH=$HOME/gocode
