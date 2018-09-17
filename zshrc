@@ -989,14 +989,6 @@ function segmt::short_exit_status
     fi
 }
 
-# Segment is shell in vim
-function segmt::in_vim
-{
-    if [ -n "$VIM" ]; then
-        echo -n " In Vim "
-    fi
-}
-
 # Segment is shell in sudo session
 function segmt::in_sudo
 {
@@ -1127,8 +1119,8 @@ PROMPT_LINE_OLD="%{$reset_color%}"'$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle
 ##############################################
 
 
-RPROMPT_LINE='$(segmt::in_vim)''$(segmt::in_sudo)''$(segmt::git_branch)''$(segmt::vim_mode)'
-RPROMPT_LINE_OLD='$(segmt::in_vim)''$(segmt::in_sudo)'
+RPROMPT_LINE='$(segmt::in_sudo)''$(segmt::git_branch)''$(segmt::vim_mode)'
+RPROMPT_LINE_OLD='$(segmt::in_sudo)''$(segmt::git_branch)'
 
 # set prompts hooks
 
