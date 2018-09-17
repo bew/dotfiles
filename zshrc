@@ -975,6 +975,20 @@ function segmt::last_exit_code
     fi
 }
 
+# Segment last exit code
+function segmt::short_exit_status
+{
+    if [[ $LAST_EXIT_CODE -ne 0 ]]; then
+        local error_symb="✘"
+        local error_style="%{$fg_bold[red]%}${error_symb}%{$reset_color%}"
+        # local sep=""
+        # local sep_style="%{$fg[red]%}$sep%{$reset_color%}"
+        echo -n "${error_style}"
+    else
+        echo -n "✔"
+    fi
+}
+
 # Segment is shell in vim
 function segmt::in_vim
 {
@@ -1008,7 +1022,21 @@ function segmt::vim_mode
     else
         echo -n "$KEYMAP"
     fi
+}
 
+# Segment prompt vim mode (normal/insert)
+function segmt::short_vim_mode
+{
+    local insert_mode_style="%{$bg[green]$fg_bold[white]%} I %{$reset_color%}"
+    local normal_mode_style="%{$bg[blue]$fg_bold[white]%} N %{$reset_color%}"
+
+    if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
+        echo -n ${insert_mode_style}
+    elif [[ "$KEYMAP" == "vicmd" ]]; then
+        echo -n ${normal_mode_style}
+    else
+        echo -n "$KEYMAP"
+    fi
 }
 
 function regen-prompt
