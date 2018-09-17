@@ -5,7 +5,7 @@
 ### clone
 
 ```shell
-cd ~/.config && git clone git@github.com:Bew78LesellB/ConfigMisc.git
+cd ~/.config && git clone git@github.com:bew/ConfigMisc.git
 ```
 
 ### place config files
