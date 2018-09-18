@@ -493,7 +493,7 @@ alias cdt='cd /tmp;'
 function load_rvm
 {
     if [[ -d ~/.rvm ]]; then
-        source ~/.rvm/bin/rvm
+        source ~/.rvm/scripts/rvm
     else
         echo "rvm not installed"
         return 1
