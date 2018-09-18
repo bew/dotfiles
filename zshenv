@@ -1,3 +1,5 @@
+ORIGINAL_PATH=$PATH
+
 
 # ------------------ setup other paths
 OTHER_PATHS=()

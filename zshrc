@@ -393,6 +393,7 @@ function reload_zsh
     if [ -n "$(jobs)" ]; then
         echo "Error: $(jobs | wc -l) job(s) in background"
     else
+        [[ -n "$ORIGINAL_PATH" ]] && export PATH="$ORIGINAL_PATH"
         exec zsh
     fi
 }
