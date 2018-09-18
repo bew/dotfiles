@@ -42,7 +42,11 @@ ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 # Warmer screen temperature at night
 # Locations: (<lat>:<long>)
 # - San Marcos: 29.9:-97.9
-background_run redshift-gtk -l 29.9:-97.9
+# - Paris: 48.8:2.3
+background_run redshift-gtk -l 48.8:2.3
+
+run libinput-gestures-setup start
+# NOTE: to reload config, use: libinput-gestures-setup restart
 
 # Run the compositor
 [[ -f ~/.conf/compton.config ]] && run compton --config ~/.conf/compton.config -b
