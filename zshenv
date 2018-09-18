@@ -1,38 +1,35 @@
-typeset -a OTHER_PATHS
 
-function load_other_paths
-{
-    # User bins
-    local user_bins=~/.bin
+# ------------------ setup other paths
+OTHER_PATHS=()
 
-    # OSX bins
-    local osx_bin_path=/usr/local/bin
+# User bins
+OTHER_PATHS+=(~/.bin)
 
-    # Ruby bins
-    local rvm_bin_path=~/.rvm/bin
-    local ruby_bin_path=~/.gem/ruby/2.5.0/bin
+# OSX bins
+OTHER_PATHS+=(/usr/local/bin)
 
-    # Lua bins
-    local luarocks_path=~/.luarocks/bin
+# Ruby bins
+OTHER_PATHS+=(~/.rvm/bin)
 
-    # adb & fastboot PATH, installed using install.sh script at
-    # https://github.com/corbindavenport/nexus-tools
-    local nexustools_bin_path=~/.nexustools
+# Lua bins
+OTHER_PATHS+=(~/.luarocks/bin)
 
-    # Python bins
-    local python_bin_path=~/.local/bin
+# adb & fastboot PATH, installed using install.sh script at
+# https://github.com/corbindavenport/nexus-tools
+OTHER_PATHS+=(~/.nexustools)
 
-    OTHER_PATHS=(
-        $user_bins
-        $luarocks_path
-        $python_bin_path
-        $nexustools_bin_path
-        $osx_bin_path
-        $rvm_bin_path
-        $ruby_bin_path
-    )
-}
-load_other_paths
+# Python bins
+OTHER_PATHS+=(~/.local/bin)
+
+
+
+# ------------------ load local per-machine config
+
+[[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
+
+
+
+# ------------------ set $PATH & env avrs
 
 typeset -U path
 path=(
@@ -71,7 +68,3 @@ FZF_LAYOUT=(--height=40% --reverse --inline-info --border)
 
 export FZF_BEW_KEYBINDINGS="${(j: :)FZF_KEYBINDINGS}"
 export FZF_BEW_LAYOUT="${(j: :)FZF_LAYOUT}"
-
-# ------------------ load local per-machine config
-
-[[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
