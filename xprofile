@@ -1,15 +1,21 @@
 #!/bin/sh
 
-# Run the program in background if it exists
-function background_run
+# Checks if the given command exists
+function has_command
 {
-    which $1 >/dev/null && $* &
+    command -v $1 >/dev/null
 }
 
-# Run the program if it exists
+# Runs the program in background if it exists
+function background_run
+{
+    has_command $1 && $* &
+}
+
+# Runs the program if it exists
 function run
 {
-    which $1 >/dev/null && $*
+    has_command $1 && $*
 }
 
 function debug
@@ -26,11 +32,11 @@ xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Enabled' 1
 xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Button Mapping Enabled' 0 1
 
 # Setup keyboard mapping
-[ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
+[[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
 setxkbmap -config ~/.conf/xkbmap.config
 
 # Setup X resources
-[ -f ~/.Xresources ] && xrdb ~/.Xresources
+[[ -f ~/.Xresources ]] && xrdb ~/.Xresources
 
 # no beep
 xset -b
