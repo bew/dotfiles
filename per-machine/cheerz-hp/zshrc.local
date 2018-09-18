@@ -1,0 +1,8 @@
+function dev
+{
+    cd ~/Projects/Cheerz
+
+    echo "Loading rvm..."
+    load_rvm
+    echo "done!"
+}

@@ -1752,6 +1752,11 @@ bindkey -M menuselect 'a' accept-and-hold
 
 
 #----------------------------------------------------------------------------------
+# Load local per-machine zsh config
+
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+#----------------------------------------------------------------------------------
 
 # Syntax hightlighting special end-of-file sourcing
 #
