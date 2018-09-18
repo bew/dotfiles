@@ -10,6 +10,7 @@ function load_other_paths
 
     # Ruby bins
     local rvm_bin_path=~/.rvm/bin
+    local ruby_bin_path=~/.gem/ruby/2.5.0/bin
 
     # Lua bins
     local luarocks_path=~/.luarocks/bin
@@ -28,6 +29,7 @@ function load_other_paths
         $nexustools_bin_path
         $osx_bin_path
         $rvm_bin_path
+        $ruby_bin_path
     )
 }
 load_other_paths
