@@ -45,4 +45,4 @@ ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 background_run redshift-gtk -l 29.9:-97.9
 
 # Run the compositor
-[ -f ~/.config/compton ] && run compton --config ~/.config/compton -b
+[[ -f ~/.conf/compton.config ]] && run compton --config ~/.conf/compton.config -b
