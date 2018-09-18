@@ -1,8 +1,14 @@
 function dev
 {
-    cd ~/Projects/Cheerz
-
-    echo "Loading rvm..."
+    echo "Loading rvm"
     load_rvm
-    echo "done!"
+
+    rvm use 2.3.1 --default
+}
+
+function start_pg
+{
+    # NOTE: might need https://bbs.archlinux.org/viewtopic.php?id=151680
+    echo "Starting postgresql server"
+    pg_ctl -D /var/lib/postgres/data -l /var/lib/postgres/server.log start
 }
