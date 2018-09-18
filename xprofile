@@ -27,7 +27,7 @@ xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Button Mapping En
 
 # Setup keyboard mapping
 [ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
-setxkbmap -config ~/.config/xkbmap.config
+setxkbmap -config ~/.conf/xkbmap.config
 
 # Setup X resources
 [ -f ~/.Xresources ] && xrdb ~/.Xresources
