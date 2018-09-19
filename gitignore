@@ -2,6 +2,7 @@
 
 # vim files
 .cs_*
+CS_SESSION
 
 # neomake tmp files
 .*neomake*
