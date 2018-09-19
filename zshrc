@@ -554,14 +554,6 @@ alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles
 
 alias ":q"="exit"
 
-# man in vim
-function man
-{
-    /usr/bin/man $* | col -bp | vim -R -c "set ft=man" -
-}
-compdef _man man
-
-
 # youtube-dl
 
 alias ytdl='youtube-dl'

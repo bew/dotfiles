@@ -43,6 +43,9 @@ export GOPATH=$HOME/gocode
 
 export PAGER="most"
 
+# man in vim!
+export MANPAGER='nvim -R -c "set ft=man" -'
+
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
