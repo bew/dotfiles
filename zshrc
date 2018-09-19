@@ -464,6 +464,7 @@ alias todo="ack -i 'todo|fixme'"
 
 alias pingonce="ping -c 1"
 alias pg="ping google.fr"
+alias ppg='prettyping google.fr'
 
 # mkdir
 
@@ -553,6 +554,9 @@ alias vw="nvim -R"
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
 
 alias ":q"="exit"
+
+# ncdu
+alias ncdu='ncdu --color dark'
 
 # youtube-dl
 
