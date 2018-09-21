@@ -78,6 +78,9 @@ Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
 "# LLVM IR
 Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
 
+"# QML
+Plug 'peterhoeg/vim-qml'				" QML syntax
+
 "# Markdown
 " 'plasticboy/vim-markdown' might be nice too
 Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
