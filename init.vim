@@ -104,6 +104,9 @@ Plug 'lepture/vim-jinja'
 "# Typescript
 Plug 'leafgarland/typescript-vim'
 
+"# Slim templating (for HTML)
+Plug 'slim-template/vim-slim'
+
 "# Vimscript
 Plug 'Shougo/neco-vim'
 
