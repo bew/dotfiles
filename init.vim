@@ -104,6 +104,9 @@ Plug 'lepture/vim-jinja'
 "# Typescript
 Plug 'leafgarland/typescript-vim'
 
+"# ES6 javascript syntax
+Plug 'isRuslan/vim-es6'
+
 "# Slim templating (for HTML)
 Plug 'slim-template/vim-slim'
 
