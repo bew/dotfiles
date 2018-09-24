@@ -49,7 +49,7 @@ function zwidget::fzf::find_file
     local base_dir=${completion_prefix:-./}
     base_dir=${~base_dir} # expand ~ (at least)
 
-    local finder_cmd=(find)
+    local finder_cmd=(find -L) # follow symlinks
     finder_cmd+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
     finder_cmd+=(-o -type f -o -type l) # actual file filter
 
