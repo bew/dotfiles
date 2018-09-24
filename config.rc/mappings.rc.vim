@@ -78,8 +78,8 @@ inoremap <M-A> <esc>:tabmove -1<cr>
 inoremap <M-Z> <esc>:tabmove +1<cr>
 
 " Goto next/previous buffer
-nnoremap <M-n> :bprevious<cr>
-nnoremap <M-p> :bnext<cr>
+nnoremap <M-n> :bnext<cr>
+nnoremap <M-p> :bprevious<cr>
 
 
 " Visual - Move a selection of text
@@ -209,8 +209,13 @@ nnoremap <F5> :GundoToggle<cr>
 
 " Open or focus NERDTree window
 nnoremap <F6> :call NERDTreeFocus()<CR>
-" Note: Shift-F6 is F18 (on iTerm2)
-nnoremap <F18> :NERDTreeFind<CR>
+if !has('mac')
+    " Note: Shift-F6 is F16 (on urxvt)
+    nnoremap <F16> :NERDTreeFind<CR>
+else
+    " Note: Shift-F6 is F18 (on iTerm2)
+    nnoremap <F18> :NERDTreeFind<CR>
+endif
 
 " Show highlight infos
 nmap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
