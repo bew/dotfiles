@@ -12,23 +12,6 @@ use constant {
     MOVE_DOWN => 2,
 };
 
-sub on_init {
-    my ($self) = @_;
-
-    $self->{enable} = 0;
-}
-
-sub on_action
-{
-    my ($self, $action) = @_;
-
-    if ($action eq "enable") {
-        $self->{enable} = 1;
-    } elsif ($action eq "disable") {
-        $self->{enable} = 0;
-    }
-}
-
 sub simulate_keypress {
     my ($self, $type, $times) = @_;
 
@@ -55,11 +38,10 @@ sub on_button_release {
         return ();
     }
 
-    # Return if we're not enabled
-    unless ($self->{enable} eq 1) {
+    # Return if Alt/Meta is not pressed
+    unless ($event->{state} & urxvt::Mod1Mask) {
         return ();
     }
-    warn $self->{enable};
 
     my $scroll_by_lines = 1;
 
