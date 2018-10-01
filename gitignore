@@ -25,3 +25,6 @@ Pipfile.lock
 
 # local vimrc
 .lvimrc
+
+# Ruby bundle vendor/bundle directory
+bundle/
