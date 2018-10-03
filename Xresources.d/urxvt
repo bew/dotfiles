@@ -136,7 +136,7 @@ URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
 
 ! Save number lines in the scrollback buffer [default 1000]; option -sl.
-! URxvt*saveLines: number
+URxvt*saveLines: 100000
 
 ! Internal border of number pixels. This resource is limited to 100; option -b.
 ! URxvt*internalBorder: number
