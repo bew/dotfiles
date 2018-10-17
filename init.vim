@@ -57,6 +57,8 @@ Plug 'bew/vim-colors-solarized'				" vim-colors-solarized - favorite colorscheme
 Plug 'vim-scripts/xterm-color-table.vim'	" Provide some commands to display all cterm colors
 Plug 'ryanoasis/vim-devicons'
 
+Plug 'drzel/vim-line-no-indicator'			" Simple and expressive line number indicator
+
 Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per language plugins

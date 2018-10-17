@@ -10,11 +10,11 @@ let g:lightline = {
 			\ },
 			\ 'active': {
 			\   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive'] ],
-			\   'right': [ ['lineinfo'], ['percent'], ['filetype'] ],
+			\   'right': [ ['lineinfo'], ['progress'], ['filetype'] ],
 			\ },
 			\ 'inactive': {
 			\   'left':  [ [], ['relativepath', 'readonly', 'modified', 'fugitive'] ],
-			\   'right': [ [], ['percent'] ],
+			\   'right': [ [], ['progress'] ],
 			\ },
 			\ 'component': {
 			\   'readonly': '%{&readonly ? "" : ""}',
@@ -30,7 +30,7 @@ let g:lightline = {
 			\ 'component_function': {
 			\   'filename': 'LightLineFilename',
 			\   'filetype': 'LightLineFiletype',
-			\   'percent': 'LightLinePercent',
+			\   'progress': 'LightLineProgress',
 			\   'mode': 'LightLineMode',
             \   'fugitive': 'LightlineFugitive',
 			\ },
@@ -66,8 +66,16 @@ function! LightLineFiletype()
 	return strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft'
 endfunction
 
-function! LightLinePercent()
-	return winwidth(0) > 50 ? line('.') * 100 / line('$') . '%' : ''
+" one char wide solid vertical bar
+let g:line_no_indicator_chars = [
+  \  ' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'
+  \  ]
+function! LightLineProgress()
+    " Old 'percent' version
+	" return winwidth(0) > 50 ? line('.') * 100 / line('$') . '%' : ''
+
+    " Plugin drzel/vim-line-no-indicator version
+    return LineNoIndicator()
 endfunction
 
 function! LightLineMode()
