@@ -1,3 +1,5 @@
+set history save on
+
 # Print
 set print pretty on
 set print elements 0
