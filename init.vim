@@ -65,7 +65,8 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-Plug 'zchee/deoplete-clang'
+"Plug 'zchee/deoplete-clang'
+Plug 'Rip-Rip/clang_complete'			" Contextual completion (with deoplete support)
 
 Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
@@ -237,9 +238,9 @@ hi cBoolComparator cterm=bold ctermfg=3
 hi cVariableTag cterm=italic ctermfg=30
 
 " Because &background is not dark we have to set this manually
-let g:indent_guides_auto_colors = 0
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=233
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
+"let g:indent_guides_auto_colors = 0
+"autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=233
+"autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
 
 call s:loadConfigFile("autocmd")
 
