@@ -28,3 +28,5 @@ Pipfile.lock
 
 # Ruby bundle vendor/bundle directory
 bundle/
+
+.*_history
