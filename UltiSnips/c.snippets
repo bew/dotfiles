@@ -88,7 +88,7 @@ while (${1:/* condition */})
 }
 endsnippet
 
-snippet fprintf "fprintf ..." w
+snippet fp "fprintf ..." w
 fprintf(${1:stderr}, "${2:%s}\n"${2/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\);)/}
 endsnippet
 
@@ -99,7 +99,7 @@ else if ($1)
 }
 endsnippet
 
-snippet printf "printf .. (printf)" w
+snippet p "printf .. (printf)" w
 printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
 endsnippet
 
