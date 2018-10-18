@@ -59,7 +59,7 @@
 	slm = "!f() { git stat-last-merge $@; }; f"
 
 	# last merge diff (move as simple alias?)
-	diff-last-merge = "diff ORIG_HEAD"
+	diff-last-merge = "diff ORIG_HEAD..HEAD"
 	dlm = "!f() { git diff-last-merge $@; }; f"
 
 	# last merge logs
