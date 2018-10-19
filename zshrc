@@ -612,6 +612,12 @@ alias vimnvimmappings="vim ~/.config/nvim/config.rc/mappings.rc.vim"
 alias cdzsh="cd ~/.zsh"
 alias cdnvim="cd ~/.nvim"
 
+# helper aliases
+
+# Allow alias expansion
+#
+# So I can do: `dl_fast_and_slow.sh ytdl <link>`
+alias dl_fast_and_slow.sh='dl_fast_and_slow.sh '
 
 # Functions
 #----------------------------------------
