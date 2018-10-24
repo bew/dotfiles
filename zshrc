@@ -1217,11 +1217,40 @@ TMOUT=60
 # This special function is run every $TMOUT seconds
 function TRAPALRM
 {
-    # Reset prompt only when we are not in complete mode
-    if [[ "$WIDGET" != 'expand-or-complete' ]]; then
-        zle reset-prompt
-    fi
+    # Don't reset prompt when we are in complete mode
+    [[ "$WIDGET" == 'expand-or-complete' ]] && return
+
+    # Don't reset prompt when a widget uses the space (e.g: by running another program like fzf)
+    # (A prompt reset might hide the program or conflict with its output)
+    helper::is-prompt-autoupdate-disabled && return
+
+    zle reset-prompt
 }
+
+function helper::disable-prompt-autoupdate
+{
+    DISABLE_PROMPT_AUTOUPDATE=1
+}
+
+function helper::enable-prompt-autoupdate
+{
+    DISABLE_PROMPT_AUTOUPDATE=
+}
+
+function helper::is-prompt-autoupdate-disabled
+{
+    [[ -n "$DISABLE_PROMPT_AUTOUPDATE" ]]
+}
+
+function failsafe-reenable-prompt-autoupdate
+{
+    # Re-enable prompt autoupdate.
+    #
+    # It is needed when a widget disabled prompt autoupdate then crashed,
+    # thus failed to re-enable it.
+    helper::enable-prompt-autoupdate
+}
+hooks-add-hook zle_line_init_hook failsafe-reenable-prompt-autoupdate
 
 # Set terminal title
 #----------------------------------------
@@ -1277,6 +1306,24 @@ function in_a_git_repo
 #----------------------------------------------------------------------------------
 # ZLE Widgets
 #----------------------------------------------------------------------------------
+
+# Helper widget that calls another widget 
+function zle::utils::wrap-widget-disable-prompt-autoupdate
+{
+    local widget_to_call=$1
+
+    eval "
+    function ${widget_to_call}_wrapped
+    {
+        helper::disable-prompt-autoupdate
+
+        zle $widget_to_call -w \$*
+
+        helper::enable-prompt-autoupdate
+    }
+    "
+    zle -N ${widget_to_call}_wrapped
+}
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
@@ -1678,7 +1725,14 @@ vibindkey '\e[7~' beginning-of-line # Home key
 vibindkey '\e[8~' end-of-line # End key
 
 # Cut the buffer and push it on the buffer stack
-bindkey -M vicmd '#' push-input
+function push-input-go-insert-mode
+{
+    zle push-input
+    zle vi-insert
+}
+zle -N push-input-go-insert-mode
+
+bindkey -M vicmd '#' push-input-go-insert-mode
 bindkey -M viins '#' push-input
 
 # Mimic the vim-surround plugin
