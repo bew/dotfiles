@@ -98,6 +98,10 @@ nnoremap <M-O> O<esc>
 
 " Quickely navigate between quickfix or location list's lines
 
+" quickfix only (M-S-n/p)
+nnoremap <M-N> :cnext<cr>
+nnoremap <M-P> :cprevious<cr>
+
 nnoremap <leader>j :<C-u>call GotoQfOrLoc("next", "first")<cr>
 nnoremap <leader>k :<C-u>call GotoQfOrLoc("previous", "last")<cr>
 
