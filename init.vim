@@ -112,6 +112,9 @@ Plug 'isRuslan/vim-es6'
 "# Slim templating (for HTML)
 Plug 'slim-template/vim-slim'
 
+"# Vuejs
+Plug 'posva/vim-vue'
+
 "# Vimscript
 Plug 'Shougo/neco-vim'
 
