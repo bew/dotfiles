@@ -8,6 +8,13 @@ function dev
 
 function start_pg
 {
+    if ! [[ -d /run/postgresql ]]; then
+        echo "Fixing /run/postgresql"
+        sudo mkdir /run/postgresql
+        sudo chown $USER /run/postgresql
+        sudo -k
+    fi
+
     # NOTE: might need https://bbs.archlinux.org/viewtopic.php?id=151680
     echo "Starting postgresql server"
     pg_ctl -D /var/lib/postgres/data -l /var/lib/postgres/server.log start
