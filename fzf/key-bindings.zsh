@@ -116,9 +116,9 @@ function zwidget::fzf::z
     local fzf_cmd=($(__fzfcmd) $FZF_Z_OPTIONS --prompt 'Fuzzy jump to: ')
     local selected=( $( z | "${fzf_cmd[@]}" ) )
     if [ -n "$selected" ]; then
-        local directory=$selected[2]
+        local directory=${selected[2, -1]} # pop first element (the frecency score)
         if [ -n "$directory" ]; then
-            cd $directory
+            cd "$directory"
             HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
         fi
     fi
