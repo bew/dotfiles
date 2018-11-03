@@ -1,3 +1,6 @@
 [submodule "bin/vimpager"]
 	path = bin/vimpager
 	url = git@github.com:rkitover/vimpager.git
+[submodule "bin/repos/crun"]
+	path = bin/repos/crun
+	url = git@github.com:Val/crun.git
