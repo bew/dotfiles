@@ -7,3 +7,6 @@ let NERDTreeMouseMode=2
 
 " This option is used to change the size of the NERD tree when it is loaded.
 let NERDTreeWinSize=45
+
+" If set to 1, the 'wildignore' setting is respected.
+let NERDTreeRespectWildIgnore=1
