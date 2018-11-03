@@ -21,6 +21,7 @@
 	f = fetch
 	m = merge
 	ch = checkout
+	sth = stash
 	untrack = rm --cached
 
 	unstage = reset HEAD --
