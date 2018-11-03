@@ -183,6 +183,12 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
+" Search current visual selection (add \< & \> if relevant)
+vmap * <Plug>(visualstar-*)
+
+" Search current visual selection (never add \< & \>)
+vmap <M-*> <Plug>(visualstar-g*)
+
 vnoremap <M-P> :call VisualPasteKeepUnnamedRegister(v:true)<cr>
 vnoremap <M-p> :call VisualPasteKeepUnnamedRegister(v:false)<cr>
 function! VisualPasteKeepUnnamedRegister(before)
