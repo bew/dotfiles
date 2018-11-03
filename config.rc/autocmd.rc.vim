@@ -30,6 +30,10 @@ augroup Binary
 	au BufWritePost *.bin set nomod | endif
 augroup END
 
+augroup Asm
+    au!
+    au BufEnter *.h set ft=c
+augroup END
 
 augroup Asm
 	au!
