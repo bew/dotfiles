@@ -68,6 +68,9 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 "Plug 'zchee/deoplete-clang'
 Plug 'Rip-Rip/clang_complete'			" Contextual completion (with deoplete support)
 
+" Read why in $VIMRUNTIME/autoload/dist/ft.vim
+let g:c_syntax_for_h=1
+
 Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
 "# Arduino
