@@ -65,8 +65,7 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-"Plug 'zchee/deoplete-clang'
-Plug 'Rip-Rip/clang_complete'			" Contextual completion (with deoplete support)
+Plug 'Shougo/deoplete-clangx'			" FINALLY it works properly (C/C++)
 
 " Read why in $VIMRUNTIME/autoload/dist/ft.vim
 let g:c_syntax_for_h=1
