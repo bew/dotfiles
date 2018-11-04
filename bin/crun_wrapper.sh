@@ -15,7 +15,7 @@ if [[ -x "$CRUN_BIN_PATH" ]]; then
         echo "Binary '$CRUN_BIN_PATH' found, executing.."
     fi
 
-    exec "$CRUN_BIN_PATH" $*
+    exec "$CRUN_BIN_PATH" "$@"
 fi
 
 echo_err "crun binary not found at '$CRUN_BIN_PATH'"
