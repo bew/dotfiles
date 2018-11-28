@@ -95,6 +95,8 @@ inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
+" Move cursor to end of displayed line (useful when text wraps)
+nnoremap <M-$> g$
 
 " Quickely navigate between quickfix or location list's lines
 
