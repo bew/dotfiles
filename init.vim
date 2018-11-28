@@ -112,6 +112,9 @@ Plug 'leafgarland/typescript-vim'
 "# ES6 javascript syntax
 Plug 'isRuslan/vim-es6'
 
+"# Coffee script
+Plug 'kchmck/vim-coffee-script'
+
 "# Slim templating (for HTML)
 Plug 'slim-template/vim-slim'
 
