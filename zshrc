@@ -1368,7 +1368,7 @@ function zwidget::git-log
 {
     zle::utils::check_git || return
 
-    git l
+    git pretty-log --all
 }
 zle -N zwidget::git-log
 
