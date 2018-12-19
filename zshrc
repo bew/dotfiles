@@ -1109,6 +1109,16 @@ function segmt::debug
     echo ${debugVarStyle}
 }
 
+function segmt::git-diff-mode
+{
+  in_a_git_repo || return;
+
+  if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+    echo "Git diff (F7): by line"
+  else
+    echo "Git diff (F7): by words no spaces"
+  fi
+}
 
 local username='%n'
 local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
@@ -1194,7 +1204,7 @@ local initStatusline="${slResetColor}${_clearLine}"
 # The statusline content
 
 # FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
-local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slResetColor}"'$(segmt::in_sudo)'"${slResetColor}""  "'$(segmt::last_exit_code)'
+local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slResetColor}"'$(segmt::in_sudo)'"${slResetColor}""  "'$(segmt::last_exit_code)'"${slResetColor} "'$(segmt::git-diff-mode)'
 
 #
 #-------------------------------------------------------------
@@ -1372,12 +1382,28 @@ function zwidget::git-log
 }
 zle -N zwidget::git-log
 
+GIT_DIFF_BY_LINES=no
+
+# Toggle line mode for git diff keybindings
+function git::diff::toggle-by-lines
+{
+    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+      GIT_DIFF_BY_LINES=no
+    else
+      GIT_DIFF_BY_LINES=yes
+    fi
+}
+
 # Git diff
 function zwidget::git-diff
 {
     zle::utils::check_git || return
 
-    git d
+    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+      git dd
+    else
+      git d
+    fi
 }
 zle -N zwidget::git-diff
 
@@ -1386,9 +1412,22 @@ function zwidget::git-diff-cached
 {
     zle::utils::check_git || return
 
-    git dc
+    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+      git ddc
+    else
+      git dc
+    fi
 }
 zle -N zwidget::git-diff-cached
+
+# Toggle line mode for git diff
+function zwidget::git-diff-toggle-line
+{
+  git::diff::toggle-by-lines
+
+  zle reset-prompt
+}
+zle -N zwidget::git-diff-toggle-line
 
 # FG to the most recent ctrl-z'ed process
 # fg %+
@@ -1681,6 +1720,9 @@ vibindkey 'g' zwidget::git-status
 vibindkey 'd' zwidget::git-diff
 vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
+
+# F7: toggle line mode for git diff
+vibindkey '[18~' zwidget::git-diff-toggle-line
 
 autoload -U edit-command-line
 zle -N edit-command-line
