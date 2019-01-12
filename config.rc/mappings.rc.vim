@@ -214,8 +214,8 @@ function! ExecuteMacroOverVisualRange()
 endfunction
 
 
-" Toggle Gundo tree
-nnoremap <F5> :GundoToggle<cr>
+" Toggle Mundo tree
+nnoremap <F5> :MundoToggle<cr>
 
 " Open or focus NERDTree window
 nnoremap <F6> :call NERDTreeFocus()<CR>

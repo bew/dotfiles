@@ -5,7 +5,7 @@ Plug 'embear/vim-localvimrc'			" Load local .lvimrc files
 
 " -- Vim feature enhancer
 
-Plug 'sjl/gundo.vim'					" undo tree
+Plug 'simnalamburt/vim-mundo'			" undo tree (fork of gundo)
 Plug 'szw/vim-ctrlspace'				" Control your space (buffers/tags/workspaces/etc..)
 Plug 'tpope/vim-abolish'				" Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'			" * for visualy selected text
