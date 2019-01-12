@@ -518,6 +518,9 @@ function pac::show_useless_deps
 
 alias pac::remove_useless_deps='command sudo pacman -Rsv $(pac::list_useless_deps)'
 
+# yay
+
+alias yay='yay --builddir ~/.long_term_cache/yay_build_dir'
 
 # git
 
