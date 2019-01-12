@@ -385,6 +385,28 @@ zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33
 zstyle ":completion:*:*:${EDITOR}:*:*files" ignored-patterns '*.pdf|*.o'
 
 #----------------------------------------------------------------------------------
+# Bracketed paste
+#----------------------------------------------------------------------------------
+
+# Override the default `bracketed-paste` widget, triggered when an external paste
+# is incoming to the shell.
+
+autoload -Uz bracketed-paste-url-magic
+
+function my-bracketed-paste
+{
+    # Add an undo mark before receiving the pasted-content, so that the paste can
+    # be easily undo-able without loosing anything I might have written before.
+    zle split-undo
+
+    # Use bracketed-paste-url-magic that does what bracketed-paste does but also
+    # quotes the paste if it looks like a URL.
+    bracketed-paste-url-magic
+}
+
+zle -N bracketed-paste my-bracketed-paste
+
+#----------------------------------------------------------------------------------
 # Aliases
 #----------------------------------------------------------------------------------
 
