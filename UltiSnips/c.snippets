@@ -68,13 +68,22 @@ typedef ${1:int} ${2:MyCustomType};
 endsnippet
 
 snippet tden "typedef enum" b
-typedef enum e_$1
+enum e_$1
 {
-  ${VISUAL}$99
-}            t_${1:enum};
+  ${VISUAL}$80
+};
+typedef struct e_$1 t_${1:enum};$99
 endsnippet
 
 snippet tdst "typedef struct" b
+struct s_$1
+{
+  ${VISUAL}$80
+};
+typedef struct s_$1 t_${1:struct};$99
+endsnippet
+
+snippet tdst_tek "typedef struct" b
 typedef struct s_$1
 {
   ${VISUAL}${0}
@@ -111,10 +120,10 @@ struct ${1:`!p snip.rv = "t_" + (snip.basename or "name")`}
 endsnippet
 
 snippet fun "function"
-${2:${3:void} }${1:function_name}(${4})
+${2:void} ${1:function_name}(${3})
 {
-  ${VISUAL}$99
-}
+  ${VISUAL}$10
+}$99
 endsnippet
 
 snippet funp "function prototype" b
