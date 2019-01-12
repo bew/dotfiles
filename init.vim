@@ -124,6 +124,9 @@ Plug 'Shougo/neco-vim'
 "# Elixir
 Plug 'elixir-editors/vim-elixir'
 
+"# OpenSCAD syntax
+Plug 'sirtaj/vim-openscad'
+
 call plug#end()
 
 let g:vimhome = $HOME . "/.config/nvim"
