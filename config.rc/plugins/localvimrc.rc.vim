@@ -10,3 +10,6 @@ let g:localvimrc_enable = 0
 "   upper case (Y/N/A).
 " - Value '2': Store and restore all decisions.
 let g:localvimrc_persistent = 1
+
+" Disable auto-lvimrc load on autocmds
+let g:localvimrc_event = []
