@@ -17,6 +17,7 @@ nnoremap <M-w> :set wrap! wrap?<cr>
 " toggle relativenumber
 nnoremap <M-r>	:set relativenumber! relativenumber?<CR>
 
+nnoremap <M-m> :Neomake<cr>
 
 " Start interactive EasyAlign in visual mode (e.g. vipgea)
 xmap gea <Plug>(EasyAlign)
