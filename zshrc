@@ -627,7 +627,7 @@ alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
 # bypass language limitations on www.rotazu.com :)
-alias ff_streaming="firefox -P pezop www.rotazu.com &!"
+alias ff_streaming="firefox -P pezop www.diagrim.com &!"
 
 
 # Fast config edit
