@@ -23,6 +23,9 @@ OTHER_PATHS+=(~/.nexustools)
 # Python bins
 OTHER_PATHS+=(~/.local/bin)
 
+# NodeJS bins
+OTHER_PATHS+=(~/node_modules/.bin)
+
 
 
 # ------------------ load local per-machine config

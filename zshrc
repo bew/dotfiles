@@ -1344,7 +1344,7 @@ function in_a_git_repo
 # ZLE Widgets
 #----------------------------------------------------------------------------------
 
-# Helper widget that calls another widget 
+# Helper widget that calls another widget while disabling prompt auto-refresh until the widget is finished
 function zle::utils::wrap-widget-disable-prompt-autoupdate
 {
     local widget_to_call=$1
