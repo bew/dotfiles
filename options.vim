@@ -87,9 +87,9 @@ set wildignore+=target/scala*
 set wildignore+=target/streams*
 
 " Default indentation
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set expandtab " Always expand TAB to spaces
 
 
