@@ -1408,7 +1408,7 @@ function zwidget::git-log
 }
 zle -N zwidget::git-log
 
-GIT_DIFF_BY_LINES=no
+GIT_DIFF_BY_LINES=yes
 
 # Toggle line mode for git diff keybindings
 function git::diff::toggle-by-lines
