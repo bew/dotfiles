@@ -476,7 +476,7 @@ fi
 alias ll="ls -lh"
 alias la='ll -a'
 alias l="la"
-alias ls1="ls -1"
+alias l1="ls -1"
 
 # misc
 
