@@ -15,6 +15,7 @@
 
 	# add & commit
 	a = add
+	ap = add -p
 	com = commit --verbose
 
 	# index manipulation
