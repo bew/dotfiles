@@ -793,6 +793,25 @@ function transfer
     echo
 }
 
+function http::serve-local
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: $0 <directory> [<port> [<ip>]]"
+    return 1
+  fi
+
+  # NOTE: We force <dir> to be specified to have a no-arg form that gives the usage message
+
+  local dir="$1"
+  local port="${2:-1234}"
+  local ip="${3:-127.0.0.1}"
+
+  echo "==> Serving '$dir' on '$ip:$port' over HTTP <=="
+  echo
+
+  python -m http.server $port --bind $ip --directory $dir
+}
+
 # ------------------------------------------------------------------------
 # ffmpeg helpers
 
