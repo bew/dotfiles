@@ -25,7 +25,7 @@
 	sth = stash
 	untrack = rm --cached
 
-	unstage = reset HEAD --
+	unstage = reset HEAD
 
 	# remote interaction
 	ph = push
@@ -36,37 +36,37 @@
 	#----------------------------
 
 	br = branch
-	brv = "!f() { git --no-pager branch -vv $@; }; f"
+	brv = "!git --no-pager branch -vv"
 	st = status --ignore-submodules
 
 	# log
 	pretty-log = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n'
-	ll = "!f() { git pretty-log $@; }; f"
-	la = "!f() { git pretty-log --all $@; }; f"
-	lo = "!f() { git pretty-log --oneline $@; }; f"
+	ll = "!git pretty-log"
+	la = "!git pretty-log --all"
+	lo = "!git pretty-log --oneline"
 
 	# diff
 	dd = diff
 	ddc = diff --staged
 	d = diff --color-words --ignore-all-space
-	dc = "!f() { git d --staged $@; }; f"
+	dc = "!git d --staged"
 
-	# last merge stats
+	# last merge stats (This is a complex alias, I won't get auto-completion on this one..)
 	stat-last-merge = "!f() { \
 		sha_orig_head=$(git rev-parse --short ORIG_HEAD); \
 		sha_head=$(git rev-parse --short HEAD); \
 		echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
 		git --no-pager diff --stat ORIG_HEAD $@ && git --no-pager diff --summary ORIG_HEAD $@; \
 		}; f"
-	slm = "!f() { git stat-last-merge $@; }; f"
+	slm = "!git stat-last-merge"
 
 	# last merge diff (move as simple alias?)
 	diff-last-merge = "diff ORIG_HEAD..HEAD"
-	dlm = "!f() { git diff-last-merge $@; }; f"
+	dlm = "!git diff-last-merge"
 
 	# last merge logs
-	log-last-merge = "!f() { git pretty-log ORIG_HEAD.. $@; }; f"
-	llm = "!f() { git log-last-merge $@; }; f"
+	log-last-merge = "!git pretty-log ORIG_HEAD.."
+	llm = "!git log-last-merge"
 
 	remove-old-commits = reflog expire --all --expire=now
 	compress-repo = gc --aggressive --prune=now
