@@ -18,6 +18,8 @@ case $(uname) in
         linux=1;;
 esac
 
+fpath=(~/.zsh/fpath $fpath)
+
 # Import color helpers
 autoload -U colors && colors
 
@@ -333,6 +335,8 @@ setopt LOCAL_TRAPS
 #----------------------------------------------------------------------------------
 # Completion
 #----------------------------------------------------------------------------------
+
+fpath=(~/.zsh/fpath-completion/ $fpath)
 
 # Initialize the completion system
 autoload -U compinit && compinit
