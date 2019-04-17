@@ -117,53 +117,43 @@ console.groupEnd();
 endsnippet
 
 snippet ci "console.info" b
-console.info(${1:"${2:value}"});
+console.info(${1:"${2:value}"});$99
 endsnippet
 
 snippet cl "console.log" b
-console.log(${1:"${2:value}"});
+console.log(${1:"${2:value}"});$99
 endsnippet
 
 snippet cd "console.debug" b
-console.debug(${1:"${2:value}"});
+console.debug(${1:"${2:value}"});$99
 endsnippet
 
 snippet cprof "console.profile" b
 console.profile("${1:label}");
 ${VISUAL}$10
-console.profileEnd();
+console.profileEnd();$99
 endsnippet
 
 snippet ctable "console.table" b
-console.table(${1:"${2:value}"});
+console.table(${1:"${2:value}"});$99
 endsnippet
 
 snippet ctime "console.time" b
 console.time("${1:label}");
 ${VISUAL}$10
-console.timeEnd("$1");
+console.timeEnd("$1");$99
 endsnippet
 
 snippet ctimestamp "console.timeStamp" b
-console.timeStamp("${1:label}");
+console.timeStamp("${1:label}");$99
 endsnippet
 
 snippet ctrace "console.trace" b
-console.trace();
+console.trace();$99
 endsnippet
 
 snippet cw "console.warn" b
-console.warn(${1:"${2:value}"});
-endsnippet
-
-# AMD (Asynchronous Module Definition) snippets
-
-snippet def "define an AMD module"
-define(${1:optional_name, }[${2:'jquery'}], ${3:callback});
-endsnippet
-
-snippet req "require an AMD module"
-require([${1:'dependencies'}], ${2:callback});
+console.warn(${1:"${2:value}"});$99
 endsnippet
 
 # vim:ft=snippets:

@@ -1,6 +1,6 @@
 priority -50
 
-snippet "^#!" "#!/usr/bin/env ruby" r
+snippet |^#!| "#!/usr/bin/env ruby" r
 #!/usr/bin/env ruby$99
 endsnippet
 
@@ -8,44 +8,40 @@ snippet req "require ..." b
 require '$1'$99
 endsnippet
 
+snippet reqr "require_relative ..." b
+require_relative '$1'$99
+endsnippet
+
 snippet do "do ... end"
 do
-	$1
+	${VISUAL}$1
 end$99
 endsnippet
 
 snippet doa "do |args| ... end"
 do |${1:args}|
-	$10
+	${VISUAL}$10
 end$99
 endsnippet
 
 snippet ido "{ ... }"
-{ $1 }$99
+{ ${VISUAL}$1 }$99
 endsnippet
 
 snippet idoa "{ |args| ... }"
-{ |${1:args}| $10 }$99
+{ |${1:args}| ${VISUAL}$10 }$99
 endsnippet
 
 snippet def "def <name>..."
 def ${1:function_name}${2: ${3:*args}}
-	$10
+	${VISUAL}$10
 end$99
 endsnippet
 
 snippet ini "def initialize ..."
 def initialize${1: ${2:*args}}
-	$0
-end
-endsnippet
-
-snippet defr "def <name> ... rescue ..."
-def ${1:function_name}${2:(${3:*args})}
-	$4
-rescue
-	$0
-end
+	${VISUAL}$10
+end$99
 endsnippet
 
 snippet until "until <expression> ... end"
@@ -62,7 +58,7 @@ endsnippet
 
 snippet beg "begin ... rescue ... end"
 begin
-	$1
+	${VISUAL}$1
 rescue
 	$2
 end$99
@@ -70,7 +66,7 @@ endsnippet
 
 snippet begin "begin ... rescue ... else ... ensure ... end"
 begin
-	${1:# Raise exception}
+	${VISUAL}${1:# Raise exception}
 rescue Exception => e
 	puts e.message
 	puts e.backtrace.inspect
@@ -108,8 +104,20 @@ endsnippet
 
 snippet mod "module"
 module ${1:ModuleName}
-	$99
+	${VISUAL}$99
 end
+endsnippet
+
+snippet it "it <desc> do ... end" b
+it ${1:"${2:description}"} do
+	${VISUAL}$10
+end$99
+endsnippet
+
+snippet describe "describe <desc> do ... end" b
+describe ${1:"${2:description}"} do
+	${VISUAL}$10
+end$99
 endsnippet
 
 snippet ###
