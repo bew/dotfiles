@@ -49,6 +49,13 @@ Plug 'tpope/vim-fugitive'				" A Git wrapper so awesome, it should be illegal
 " -- UI
 
 Plug 'nathanaelkane/vim-indent-guides'		" Add colored indent guides
+
+" Adjust indent guides color (TODO: light theme version)
+let g:indent_guides_auto_colors = 0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=236
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
+
+
 Plug 'Shougo/denite.nvim'					" Generic interactive menu framework
 
 Plug 'mhinz/vim-startify'					" add a custom startup screen for vim
@@ -244,11 +251,6 @@ hi cArithmOp ctermfg=3
 hi cBoolComparator cterm=bold ctermfg=3
 
 hi cVariableTag cterm=italic ctermfg=30
-
-" Because &background is not dark we have to set this manually
-"let g:indent_guides_auto_colors = 0
-"autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=233
-"autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
 
 call s:loadConfigFile("autocmd")
 
