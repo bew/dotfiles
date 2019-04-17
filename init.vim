@@ -68,7 +68,7 @@ Plug 'drzel/vim-line-no-indicator'			" Simple and expressive line number indicat
 
 Plug 'tweekmonster/nvim-api-viewer'
 
-" -- Per language plugins
+" -- Per Lang / Tech plugins
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
@@ -136,6 +136,9 @@ Plug 'elixir-editors/vim-elixir'
 
 "# OpenSCAD syntax
 Plug 'sirtaj/vim-openscad'
+
+"# Ansible
+Plug 'pearofducks/ansible-vim'
 
 call plug#end()
 
