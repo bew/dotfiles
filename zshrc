@@ -35,7 +35,7 @@ fi
 #----------------------------------------------------------------------------------
 
 # better zsh-hooks
-source ~/.zsh/zsh-hooks/zsh-hooks.plugin.zsh
+source ~/.zsh/third-party/zsh-hooks/zsh-hooks.plugin.zsh
 
 ## ZSH HOOKS
 
@@ -60,7 +60,7 @@ add-zsh-hook chpwd chpwd-wrapper
 
 # cd with 'frecency' (recent + frequence)
 #-------------------------------------------------------------
-source ~/.zsh/z/z.sh
+source ~/.zsh/third-party/z/z.sh
 
 # Syntax hightlighting
 #-------------------------------------------------------------
@@ -1921,4 +1921,4 @@ bindkey -M menuselect 'a' accept-and-hold
 # It must be sourced after all custom widgets have been created (i.e., after
 # all `zle -N` calls and after running `compinit`).
 # Widgets created later will work, but will not update the syntax highlighting.
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/third-party/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
