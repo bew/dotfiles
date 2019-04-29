@@ -1070,7 +1070,8 @@ function segmt::git_branch_fast
     [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+="${clean} ⇣${VCS_STATUS_COMMITS_BEHIND}"
     [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+="${clean} *${VCS_STATUS_STASHES}"
 
-    echo -n "%{$bg[black]%} On ${p} %{$reset%}"
+    echo -n "%{$bg[black]%} On ${p} %{$reset$reset_color%}"
+    # FIXME: too much reset codes? but they're all needed..
 }
 
 # Hook to get the last command exit code
