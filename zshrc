@@ -1482,7 +1482,7 @@ function zwidget::git-log
 {
     zle::utils::check_git || return
 
-    git pretty-log --all
+    git pretty-log --all --max-count 42 # don't show too much commits to avoid waiting
 }
 zle -N zwidget::git-log
 
