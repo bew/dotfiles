@@ -168,13 +168,18 @@ ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]='standout'
 # Git branch in prompt
 #-------------------------------------------------------------
 
-source ~/.zsh/bin/git-prompt.sh # for __git_ps1
+# # Slow version of git prompt
+# source ~/.zsh/bin/git-prompt.sh # for __git_ps1
+#
+# # Show if there are unstaged (with *) and/or staged (with +) files
+# GIT_PS1_SHOWDIRTYSTATE=1
+#
+# # Show if there are untracked (with %) files
+# GIT_PS1_SHOWUNTRACKEDFILES=1
 
-# Show if there are unstaged (with *) and/or staged (with +) files
-GIT_PS1_SHOWDIRTYSTATE=1
-
-# Show if there are untracked (with %) files
-GIT_PS1_SHOWUNTRACKEDFILES=1
+# Fast git status daemon!
+source ~/.zsh/third-party/gitstatus/gitstatus.plugin.zsh
+gitstatus_start MY
 
 
 # remember recent directories (use with 'cdr')
@@ -1011,7 +1016,7 @@ hash -d open=~/Projects/opensource
 #----------------------------------------------------------------------------------
 
 # Segment git branch
-function segmt::git_branch
+function segmt::git_branch_slow
 {
     [ -n "$NO_SEGMT_GIT_BRANCH" ] && return
 
@@ -1025,6 +1030,47 @@ function segmt::git_branch
     local gitInfoStyle="%{$bg[black]%}${gitInfo}%{$reset_color%}"
 
     echo -n ${gitInfoStyle}
+}
+
+# Segment git branch (fast!)
+function segmt::git_branch_fast
+{
+    [ -n "$NO_SEGMT_GIT_BRANCH" ] && return
+
+    emulate -L zsh
+    typeset -g GITSTATUS_PROMPT=""
+
+    # Call gitstatus_query synchronously. Note that gitstatus_query can also be called
+    # asynchronously; see documentation in gitstatus.plugin.zsh.
+    gitstatus_query MY                  || return 1  # error
+    [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
+
+    local     reset='%f'       # no foreground
+    local     clean='%F{076}'  # green foreground
+    local untracked='%F{014}'  # teal foreground
+    local  modified='%F{011}'  # yellow foreground
+
+    local p
+    if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
+        p+=$modified
+    elif (( VCS_STATUS_HAS_UNTRACKED )); then
+        p+=$untracked
+    else
+        p+=$clean
+    fi
+    local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT}}"
+    [[ -n $VCS_STATUS_TAG ]] && current_ref+="#${VCS_STATUS_TAG}"  # escape %
+
+    p+=${current_ref//\%/%%}  # escape %
+
+    [[ $VCS_STATUS_HAS_STAGED      == 1 ]] && p+="${modified}+"
+    [[ $VCS_STATUS_HAS_UNSTAGED    == 1 ]] && p+="${modified}!"
+    [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && p+="${untracked}?"
+    [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+="${clean} ⇡${VCS_STATUS_COMMITS_AHEAD}"
+    [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+="${clean} ⇣${VCS_STATUS_COMMITS_BEHIND}"
+    [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+="${clean} *${VCS_STATUS_STASHES}"
+
+    echo -n "%{$bg[black]%} On ${p} %{$reset%}"
 }
 
 # Hook to get the last command exit code
@@ -1200,8 +1246,8 @@ PROMPT_LINE_OLD="%{$reset_color%}"'$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle
 ##############################################
 
 
-RPROMPT_LINE='$(segmt::in_sudo)''$(segmt::git_branch)''$(segmt::vim_mode)'
-RPROMPT_LINE_OLD='$(segmt::in_sudo)''$(segmt::git_branch)'
+RPROMPT_LINE='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
+RPROMPT_LINE_OLD='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 
 # set prompts hooks
 

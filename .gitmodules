@@ -7,3 +7,6 @@
 [submodule "zsh-hooks"]
 	path = third-party/zsh-hooks
 	url = git@github.com:willghatch/zsh-hooks.git
+[submodule "third-party/gitstatus"]
+	path = third-party/gitstatus
+	url = https://github.com/romkatv/gitstatus.git
