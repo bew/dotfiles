@@ -142,6 +142,10 @@ Plug 'pearofducks/ansible-vim'
 
 call plug#end()
 
+" NOTE: JE SAIS PAS OU METTRE ÇA!!!!!!!
+" Handle .god files as ruby files (see godrb.com)
+autocmd BufNewFile,BufRead *.god set ft=ruby
+
 let g:vimhome = $HOME . "/.config/nvim"
 
 " Configuration file loader
