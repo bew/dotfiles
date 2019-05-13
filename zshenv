@@ -10,9 +10,6 @@ OTHER_PATHS+=(~/.bin)
 # OSX bins
 OTHER_PATHS+=(/usr/local/bin)
 
-# Ruby bins
-OTHER_PATHS+=(~/.rvm/bin)
-
 # Lua bins
 OTHER_PATHS+=(~/.luarocks/bin)
 

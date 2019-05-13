@@ -523,16 +523,6 @@ alias ....='cd ../../..;'
 
 alias cdt='cd /tmp;'
 
-function load_rvm
-{
-    if [[ -d ~/.rvm ]]; then
-        source ~/.rvm/scripts/rvm
-    else
-        echo "rvm not installed"
-        return 1
-    fi
-}
-
 # pacman
 
 
