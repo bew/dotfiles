@@ -1035,16 +1035,16 @@ function segmt::git_branch_fast
     gitstatus_query MY                  || return 1  # error
     [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
 
-    local     reset='%f'       # no foreground
-    local     clean='%F{076}'  # green foreground
-    local untracked='%F{014}'  # teal foreground
-    local  modified='%F{011}'  # yellow foreground
+    local       reset='%f'       # no foreground
+    local       clean='%F{076}'  # green foreground
+    local c_untracked='%F{014}'  # teal foreground
+    local  c_modified='%F{011}'  # yellow foreground
 
     local p
     if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
-        p+=$modified
+        p+=$c_modified
     elif (( VCS_STATUS_HAS_UNTRACKED )); then
-        p+=$untracked
+        p+=$c_untracked
     else
         p+=$clean
     fi
@@ -1053,12 +1053,15 @@ function segmt::git_branch_fast
 
     p+=${current_ref//\%/%%}  # escape %
 
-    [[ $VCS_STATUS_HAS_STAGED      == 1 ]] && p+="${modified}+"
-    [[ $VCS_STATUS_HAS_UNSTAGED    == 1 ]] && p+="${modified}!"
-    [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && p+="${untracked}?"
-    [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+="${clean} ⇡${VCS_STATUS_COMMITS_AHEAD}"
-    [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+="${clean} ⇣${VCS_STATUS_COMMITS_BEHIND}"
-    [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+="${clean} *${VCS_STATUS_STASHES}"
+    local repo_status
+    [[ $VCS_STATUS_HAS_STAGED      == 1 ]] && repo_status+="${c_modified}+"
+    [[ $VCS_STATUS_HAS_UNSTAGED    == 1 ]] && repo_status+="${c_modified}!"
+    [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && repo_status+="${c_untracked}?"
+    [[ -n "$repo_status" ]] && p+=" ${repo_status}${clean}"
+
+    [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ⇡${VCS_STATUS_COMMITS_AHEAD}"
+    [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ⇣${VCS_STATUS_COMMITS_BEHIND}"
+    [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+=" *${VCS_STATUS_STASHES}"
 
     echo -n "%{$bg[black]%} On ${p} %{$reset$reset_color%}"
     # FIXME: too much reset codes? but they're all needed..
