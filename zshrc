@@ -489,7 +489,7 @@ alias l1="ls -1"
 
 # misc
 
-alias todo="ack -i 'todo|fixme'"
+alias todo="rg -i 'todo|fixme'"
 
 # ping
 
