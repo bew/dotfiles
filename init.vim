@@ -49,6 +49,13 @@ Plug 'tpope/vim-fugitive'				" A Git wrapper so awesome, it should be illegal
 " -- UI
 
 Plug 'nathanaelkane/vim-indent-guides'		" Add colored indent guides
+
+" Adjust indent guides color (TODO: light theme version)
+let g:indent_guides_auto_colors = 0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=236
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
+
+
 Plug 'Shougo/denite.nvim'					" Generic interactive menu framework
 
 Plug 'mhinz/vim-startify'					" add a custom startup screen for vim
@@ -61,7 +68,7 @@ Plug 'drzel/vim-line-no-indicator'			" Simple and expressive line number indicat
 
 Plug 'tweekmonster/nvim-api-viewer'
 
-" -- Per language plugins
+" -- Per Lang / Tech plugins
 
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
@@ -130,7 +137,14 @@ Plug 'elixir-editors/vim-elixir'
 "# OpenSCAD syntax
 Plug 'sirtaj/vim-openscad'
 
+"# Ansible
+Plug 'pearofducks/ansible-vim'
+
 call plug#end()
+
+" NOTE: JE SAIS PAS OU METTRE ÇA!!!!!!!
+" Handle .god files as ruby files (see godrb.com)
+autocmd BufNewFile,BufRead *.god set ft=ruby
 
 let g:vimhome = $HOME . "/.config/nvim"
 
@@ -244,11 +258,6 @@ hi cArithmOp ctermfg=3
 hi cBoolComparator cterm=bold ctermfg=3
 
 hi cVariableTag cterm=italic ctermfg=30
-
-" Because &background is not dark we have to set this manually
-"let g:indent_guides_auto_colors = 0
-"autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=233
-"autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
 
 call s:loadConfigFile("autocmd")
 
