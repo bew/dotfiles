@@ -491,6 +491,11 @@ alias l1="ls -1"
 
 alias todo="rg -i 'todo|fixme'"
 
+function cheatsh
+{
+  curl cht.sh/$1
+}
+
 # ping
 
 alias pingonce="ping -c 1"
