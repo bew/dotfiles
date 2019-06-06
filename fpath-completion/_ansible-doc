@@ -1,0 +1,19 @@
+#compdef ansible-doc
+# 
+# Description
+# -----------
+# Completion script for ansible-doc command 
+# Ansible v1.8.2 (http://www.ansible.com)
+#
+# Author
+# ------
+# Jonathan Thompson
+# https://github.com/jdottdot
+#
+
+_arguments -C \
+  '(-h --help)'{-h,--help}'[show this help message and exit]' \
+  "(--version)--version[show program's version number and exit]" \
+  '(-l --list)'{-l,--list}'[List available modules]' \
+  '(-M --module-path)'{-M\ MODULE_PATH,--module-path=MODULE_PATH}'[Ansible modules/ directory]' \
+  '(-v)-v[Show version number and exit]'
