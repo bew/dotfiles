@@ -46,6 +46,9 @@ export PAGER="most"
 # man in vim!
 export MANPAGER='nvim -R -c "set ft=man" -'
 
+# `most` does not work with colors outputed by `bat` (the `cat` clone on steroids)
+export BAT_PAGER="less"
+
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
