@@ -502,6 +502,13 @@ alias pingonce="ping -c 1"
 alias pg="ping google.fr"
 alias ppg='prettyping google.fr'
 
+# DNS lookup
+
+# `dig` is deprecated on archlinux
+if command -v drill >/dev/null; then
+  alias dig=drill
+fi
+
 # mkdir
 
 alias mkd="mkdir -p"
