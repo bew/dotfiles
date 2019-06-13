@@ -525,7 +525,7 @@ alias ne="echo 'Use: vim'"
 
 # tree
 
-alias tree="tree -C --dirsfirst -F"
+alias tree="tree -C --dirsfirst -F -h"
 
 # cd
 
