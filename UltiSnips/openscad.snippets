@@ -24,6 +24,10 @@ snippet var "variable assign" b
 ${1:variable} = ${2:value};$99
 endsnippet
 
+snippet com "// Comment"
+// $99
+endsnippet
+
 # Multi-object modifiers
 
 snippet diff "difference"
@@ -40,24 +44,35 @@ endsnippet
 
 # Single-object modifiers
 
-snippet col "color"
+snippet col "color" w
 color(${1:"${2:red}"})$99
 endsnippet
 
-snippet tr "translate"
+snippet tr "translate" w
 translate([${1:0}, ${2:0}, ${3:0}])$99
 endsnippet
 
-snippet ex "Linear Extrusion"
+snippet ex "Linear Extrusion" w
 linear_extrude(${1:height})$99
 endsnippet
 
-snippet rot "rotate"
+snippet rot "rotate" w
 rotate([${1:0}, ${2:0}, ${3:0}])$99
+endsnippet
+
+snippet mir "mirror" w
+mirror([${1:1}, ${2:0}, ${3:0}])$99
 endsnippet
 
 # 2D/3D object primitives
 
-snippet imp "import STL file"
-import(${1:"${2:path}"});$99
+snippet xyz "[<x>, <y>, <z>]" w
+[${1:0}, ${2:0}, ${3:0}]$99
 endsnippet
+
+snippet imp "import STL file"
+import(${1:"${2:path}"}, convexity = 10);$99
+endsnippet
+
+# TODO: add a `sample` snippet, which shows most of the syntax, special
+# chars (#*!%), main keywords/shapes, ...
