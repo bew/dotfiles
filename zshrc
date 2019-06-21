@@ -1937,6 +1937,13 @@ bindkey -M vicmd 'l' zwidget::go-right_or_git-log::vicmd # fix git log in norma
 vibindkey 'b' zwidget::jump-previous-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
 
+# Use Up/Down to get history with current cmd prefix..
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
+zmodload zsh/terminfo
+bindkey $terminfo[kcuu1] up-line-or-beginning-search
+bindkey $terminfo[kcud1] down-line-or-beginning-search
+
 # menuselect keybindings
 #-------------------------------------------------------------
 
