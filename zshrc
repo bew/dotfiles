@@ -520,9 +520,6 @@ function mkcd
     cd $1
 }
 
-# for emacs users :p
-alias ne="echo 'Use: vim'"
-
 # tree
 
 alias tree="tree -C --dirsfirst -F"
@@ -537,14 +534,13 @@ alias cdt='cd /tmp;'
 
 # pacman
 
-
 alias pac::list_useless_deps='pacman -Qtdq'
 
 function pac::show_useless_deps
 {
     for package in $(pac::list_useless_deps); do
         echo "Package: $package"
-        pacman -Qi $package | ack 'Description'
+        pacman -Qi $package | grep 'Description'
         echo
     done
 }
