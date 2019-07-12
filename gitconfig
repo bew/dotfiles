@@ -73,23 +73,31 @@
 	remove-old-commits = reflog expire --all --expire=now
 	compress-repo = gc --aggressive --prune=now
 
-[merge]
-	tool = vimdiff
-
-[mergetool]
-    prompt = true
-
-[mergetool "vimdiff"]
-    cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
-    conflictstyle = diff3
-
 [help]
 	autocorrect = -1
+
+[color]
+	interactive = true
 
 [color "status"]
 	untracked = "cyan dim "
 
-[diff]
-	tool = vimdiff
+[color "diff-highlight"]
+  # value is: fg [bold,..] [bg]
+  # Using the 256 colors palette
+	oldNormal = red
+	oldHighlight = red 52
+	newNormal = green
+	newHighlight = 40 22
+
+[interactive]
+	diffFilter = "diff-highlight | less -R"
+
+[pager]
+	log = "diff-highlight | less -R"
+	show = "diff-highlight | less -R"
+	diff = "diff-highlight | less -R"
+	# Set env `LESS` to `--quit-if-one-screen -+X` for better result
+	# See ~/.zshenv for details
 
 # vim:set ft=gitconfig:
