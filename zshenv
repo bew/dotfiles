@@ -43,6 +43,10 @@ export GOPATH=$HOME/gocode
 
 export PAGER="most"
 
+# --quit-if-one-screen : Does not use pager mode when < 1 'page' to display
+# -+X (Disables the `-X` option) : Send alt-screen term init sequence if necessary
+export LESS="--quit-if-one-screen -+X"
+
 # man in vim!
 export MANPAGER='nvim -R -c "set ft=man" -'
 
