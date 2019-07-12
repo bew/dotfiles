@@ -1218,10 +1218,10 @@ function segmt::git-diff-mode
 {
   in_a_git_repo || return;
 
-  if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
-    echo "Git diff (F7): by line"
+  if [[ "$GIT_DIFF_SKIP_SPACING" == "yes" ]]; then
+    echo "Git diff (F7): with spacing diff"
   else
-    echo "Git diff (F7): by words no spaces"
+    echo "Git diff (F7): skip spacing diff"
   fi
 }
 
@@ -1496,15 +1496,15 @@ function zwidget::git-log
 }
 zle -N zwidget::git-log
 
-GIT_DIFF_BY_LINES=yes
+GIT_DIFF_SKIP_SPACING=yes
 
 # Toggle line mode for git diff keybindings
 function git::diff::toggle-by-lines
 {
-    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
-      GIT_DIFF_BY_LINES=no
+    if [[ "$GIT_DIFF_SKIP_SPACING" == "yes" ]]; then
+      GIT_DIFF_SKIP_SPACING=no
     else
-      GIT_DIFF_BY_LINES=yes
+      GIT_DIFF_SKIP_SPACING=yes
     fi
 }
 
@@ -1513,7 +1513,7 @@ function zwidget::git-diff
 {
     zle::utils::check_git || return
 
-    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+    if [[ "$GIT_DIFF_SKIP_SPACING" == "yes" ]]; then
       git dd
     else
       git d
@@ -1526,7 +1526,7 @@ function zwidget::git-diff-cached
 {
     zle::utils::check_git || return
 
-    if [[ "$GIT_DIFF_BY_LINES" == "yes" ]]; then
+    if [[ "$GIT_DIFF_SKIP_SPACING" == "yes" ]]; then
       git ddc
     else
       git dc
