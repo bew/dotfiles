@@ -94,10 +94,11 @@
 	diffFilter = "diff-highlight | less -R"
 
 [pager]
-	log = "diff-highlight | less -R"
-	show = "diff-highlight | less -R"
-	diff = "diff-highlight | less -R"
-	# Set env `LESS` to `--quit-if-one-screen -+X` for better result
-	# See ~/.zshenv for details
+	log = "diff-highlight | LESS= less -R -+X"
+	show = "diff-highlight | LESS= less -R -+X"
+	diff = "diff-highlight | LESS= less -R -+X"
+	# We reset env `LESS` to disable `--quit-if-one-screen` if given in current
+	# env `LESS`. As it makes the command hang (no idea why) when there is < 1
+	# 'page'..
 
 # vim:set ft=gitconfig:
