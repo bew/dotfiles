@@ -496,6 +496,9 @@ function cheatsh
   curl cht.sh/$1
 }
 
+# Colorful diffs (https://www.colordiff.org/)
+alias diff="colordiff"
+
 # ping
 
 alias pingonce="ping -c 1"
