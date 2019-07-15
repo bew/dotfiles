@@ -50,8 +50,8 @@
 	# diff
 	dd = diff
 	ddc = diff --staged
-	d = diff --color-words --ignore-all-space
-	dc = "!git d --staged"
+	d = diff -w
+	dc = diff -w --staged
 
 	# last merge stats (This is a complex alias, I won't get auto-completion on this one..)
 	stat-last-merge = "!f() { \
