@@ -139,6 +139,8 @@ Plug 'sirtaj/vim-openscad'
 
 "# Ansible
 Plug 'pearofducks/ansible-vim'
+" Add special ft for some ansible templates
+let g:ansible_template_syntaxes = { '*haproxy*.cfg.j2': 'haproxy' }
 
 call plug#end()
 
