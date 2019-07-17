@@ -261,19 +261,19 @@ class ${1:MyClass}${2:(${3:object})}:
 $0
 endsnippet
 
-snippet def "function with simple docstring" b
+snippet def "function" b
 def ${1:function}(${2:self${3:, ${4:arg}}}):
-    ${5:${VISUAL:pass}}
+	${5:${VISUAL:pass}}
 endsnippet
 
-snippet defi "class __init__" b
+snippet defi "initializer" b
 def __init__(self${1:, ${2:arg}}):
-    ${3:${VISUAL:pass}}
+	${3:${VISUAL:pass}}
 endsnippet
 
-snippet defc "class method with simple docstring" b
+snippet defc "class method" b
 def ${1:function}(self${2:, ${3:arg}}):
-    ${4:${VISUAL:pass}}
+	${4:${VISUAL:pass}}
 endsnippet
 
 # doesn't expand when there is a word in front
@@ -376,7 +376,7 @@ endsnippet
 
 snippet ar "Assert raises" b
 with self.assertRaises(${1:exception}):
-    ${2:${VISUAL:func()}}
+	${2:${VISUAL:func()}}
 endsnippet
 
 snippet an "Assert is None" b
@@ -409,7 +409,7 @@ endsnippet
 
 snippet '' "triple quoted string (single quotes)"
 '''
-    ${VISUAL}$1
+	${VISUAL}$1
 '''$0
 endsnippet
 

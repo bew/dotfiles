@@ -12,7 +12,7 @@ priority -50
 
 snippet block "block" b
 {% block ${1:name} %}
-		$2
+	$2
 {% endblock $1 %}
 endsnippet
 
@@ -34,7 +34,7 @@ endsnippet
 
 snippet raw "escaped block" b
 {% raw %}
-		$1
+	$1
 {% endraw %}
 endsnippet
 
@@ -44,7 +44,7 @@ snippet extends "extends" b
 endsnippet
 
 
-snippet include "include" b
+snippet |inc(lude)?| "include" br
 {% include "${1:template}" %}
 endsnippet
 
@@ -66,17 +66,6 @@ snippet filter "filter" b
 endsnippet
 
 
-# Being able to quickly remove the whole 'else' block seems faster to me than
-# choosing between 'for' and 'for/else' snippets from the menu.
-# snippet for "for" b
-# {% for ${1:item} in ${2:sequence} %}
-#     $3${4:
-# {% else %}
-#     $5}
-# {% endfor %}
-# endsnippet
-
-
 snippet for "for" b
 {% for ${1:item} in ${2:sequence} %}
 	$3
@@ -84,43 +73,20 @@ snippet for "for" b
 endsnippet
 
 
-snippet for "for/else" b
-{% for ${1:item} in ${2:sequence} %}
-	$3
-{% else %}
-	$4
-{% endfor %}
-endsnippet
-
-
-snippet if "if" b
+snippet if "if ..." b
 {% if ${1:expr} %}
 	$2
 {% endif %}
 endsnippet
 
 
-snippet if "if/else" b
-{% if ${1:expr} %}
-	$2
+snippet else "else ..." b
 {% else %}
 	$3
-{% endif %}
 endsnippet
 
 
-snippet if "if/elif/else" b
-{% if ${1:expr} %}
-	$2
-{% elif %}
-	$3
-{% else %}
-	$4
-{% endif %}
-endsnippet
-
-
-snippet macro "macro" b
+snippet mac "macro" b
 {% macro ${1:name}(${2:args}) %}
 	$3
 {% endmacro %}
