@@ -33,13 +33,13 @@ snippet idoa "{ |args| ... }"
 endsnippet
 
 snippet def "def <name>..."
-def ${1:function_name}${2: ${3:*args}}
+def ${1:function_name}${2:(${3:*args})}
 	${VISUAL}$10
 end$99
 endsnippet
 
 snippet ini "def initialize ..."
-def initialize${1: ${2:*args}}
+def initialize${1:(${2:*args})}
 	${VISUAL}$10
 end$99
 endsnippet
