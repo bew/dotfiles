@@ -621,6 +621,14 @@ alias c=clock
 # translation
 alias fr:en='trans fr:en -b'
 alias en:fr='trans en:fr -b'
+function fr:en:fr
+{
+  fr_en="$(fr:en $*)" && echo "en: $fr_en" && en:fr "$fr_en"
+}
+function en:fr:en
+{
+  en_fr="$(en:fr $*)" && echo "fr: $en_fr" && fr:en "$en_fr"
+}
 
 # definition
 alias en:def='trans en: -d'
