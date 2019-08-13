@@ -125,8 +125,8 @@ Plug 'kchmck/vim-coffee-script'
 "# Slim templating (for HTML)
 Plug 'slim-template/vim-slim'
 
-"# Vuejs
-Plug 'posva/vim-vue'
+"# nftables
+Plug 'nfnty/vim-nftables'
 
 "# Vimscript
 Plug 'Shougo/neco-vim'
