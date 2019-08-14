@@ -13,49 +13,49 @@ priority -50
 snippet block "block" b
 {% block ${1:name} %}
 	$2
-{% endblock $1 %}
+{% endblock $1 %}$99
 endsnippet
 
 
 snippet val "value" w
-{{ $1 }}
+{{ $1 }}$99
 endsnippet
 
 
 snippet st "statement" w
-{% $1 %}
+{% $1 %}$99
 endsnippet
 
 
 snippet com "comment"
-{# $1 #}
+{# $1 #}$99
 endsnippet
 
 
 snippet raw "escaped block" b
 {% raw %}
 	$1
-{% endraw %}
+{% endraw %}$99
 endsnippet
 
 
 snippet extends "extends" b
-{% extends "${1:template}" %}
+{% extends "${1:template}" %}$99
 endsnippet
 
 
 snippet |inc(lude)?| "include" br
-{% include "${1:template}" %}
+{% include "${1:template}" %}$99
 endsnippet
 
 
 snippet import "import" b
-{% import "${1:template}" %}
+{% import "${1:template}" %}$99
 endsnippet
 
 
 snippet from "from/import/as" b
-{% from "${1:template}" import ${2:name}${3: as ${4:$2}} %}
+{% from "${1:template}" import ${2:name}${3: as ${4:$2}} %}$99
 endsnippet
 
 
