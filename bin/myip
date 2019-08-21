@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ip=$(curl -s https://api.my-ip.io/ip.txt)
+echo "My public IP address is: $ip"
