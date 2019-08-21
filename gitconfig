@@ -101,4 +101,10 @@
 	# env `LESS`. As it makes the command hang (no idea why) when there is < 1
 	# 'page'..
 
+[diff]
+  tool = nvim_diff
+
+[difftool "nvim_diff"]
+  cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
+
 # vim:set ft=gitconfig:
