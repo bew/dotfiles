@@ -641,6 +641,12 @@ alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
+function myip
+{
+  local ip=$(curl -s https://api.my-ip.io/ip.txt)
+  echo "My public IP address is: $ip"
+}
+
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
