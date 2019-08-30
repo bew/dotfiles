@@ -19,10 +19,6 @@ __vcs_ignore__/
 __pycache__/
 *.egg
 
-# Pipenv
-Pipfile
-Pipfile.lock
-
 # local vimrc
 .lvimrc
 
