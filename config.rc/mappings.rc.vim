@@ -38,8 +38,8 @@ nnoremap <M-g> :<C-u>IndentGuidesToggle<cr>
 "------------------------------------------------------------------
 
 " Short navigation left/right in insert mode
-inoremap <A-h> <Left>
-inoremap <A-l> <Right>
+inoremap <M-h> <Left>
+inoremap <M-l> <Right>
 
 
 " Windows navigation
@@ -144,7 +144,7 @@ inoremap <expr> <M-b> deoplete#complete_common_string()
 
 
 " Exit the terminal grabber
-tnoremap <A-q> <C-\><C-n>
+tnoremap <M-q> <C-\><C-n>
 
 " Shortcut
 nnoremap Q :<C-u>q<cr>
