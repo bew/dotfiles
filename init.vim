@@ -186,7 +186,7 @@ if has("gui")
 endif
 
 " map leader definition
-let mapleader = ","
+let mapleader = " "
 
 call s:loadConfigFile("mappings")
 
