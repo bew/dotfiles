@@ -145,6 +145,7 @@ inoremap <expr> <M-b> deoplete#complete_common_string()
 
 " Exit the terminal grabber
 tnoremap <M-q> <C-\><C-n>
+tmap  <M-q>
 
 " Shortcut
 nnoremap Q :<C-u>q<cr>
