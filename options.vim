@@ -66,8 +66,11 @@ set wildmode=longest:full,full	" commandline <Tab> completion, list matches, the
 """ Format options
 
 " Disable auto wrap comment automatically
-set formatoptions-=c
-set formatoptions-=a
+set formatoptions-=a " for text
+set formatoptions-=c " for comments
+
+" Enable auto comment new line when pressing <Enter> in insert mode
+set formatoptions+=r
 
 " Enable correct comment join (remove comment start)
 set formatoptions+=j
