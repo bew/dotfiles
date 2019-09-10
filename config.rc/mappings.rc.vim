@@ -90,7 +90,7 @@ vnoremap <Up> :move '<-2<cr>gv
 vnoremap <Down> :move '>+1<cr>gv
 
 
-" Insert empty lines up or down
+" Insert empty lines below or above
 inoremap <M-o> <C-o>o
 inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
@@ -98,6 +98,11 @@ nnoremap <M-O> O<esc>
 
 " Move cursor to end of displayed line (useful when text wraps)
 nnoremap <M-$> g$
+
+" Insert a new line below using <cr>, useful in comments when `formatoptions`
+" has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
+" is not at eol.
+inoremap <M-CR> <C-o>A<cr>
 
 " Quickely navigate between quickfix or location list's lines
 
