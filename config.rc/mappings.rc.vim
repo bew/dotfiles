@@ -28,11 +28,11 @@ nmap gea <Plug>(EasyAlign)
 " Discard last search highlight
 nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
-nnoremap <silent> <C-Space> :<C-u>CtrlSpace<cr>
-nnoremap <M-f> :<C-u>FZF<cr>
+nnoremap <silent> <C-Space> :CtrlSpace<cr>
+nnoremap <M-f> :FZF<cr>
 
 " Toggle indent guides
-nnoremap <M-g> :<C-u>IndentGuidesToggle<cr>
+nnoremap <M-g> :IndentGuidesToggle<cr>
 
 "-- Navigation
 "------------------------------------------------------------------
@@ -86,8 +86,8 @@ nnoremap <M-p> :bprevious<cr>
 " Visual - Move a selection of text
 vnoremap <Left> <gv
 vnoremap <Right> >gv
-vnoremap <Up> :m '<-2<cr>gv
-vnoremap <Down> :m '>+1<cr>gv
+vnoremap <Up> :move '<-2<cr>gv
+vnoremap <Down> :move '>+1<cr>gv
 
 
 " Insert empty lines up or down
@@ -105,8 +105,8 @@ nnoremap <M-$> g$
 nnoremap <M-N> :cnext<cr>
 nnoremap <M-P> :cprevious<cr>
 
-nnoremap <leader>j :<C-u>call GotoQfOrLoc("next", "first")<cr>
-nnoremap <leader>k :<C-u>call GotoQfOrLoc("previous", "last")<cr>
+nnoremap <leader>j :call GotoQfOrLoc("next", "first")<cr>
+nnoremap <leader>k :call GotoQfOrLoc("previous", "last")<cr>
 
 " First try the quickfix list, if empty, uses the location list
 function! GotoQfOrLoc(direction, rewind_name)
@@ -148,7 +148,7 @@ tnoremap <M-q> <C-\><C-n>
 tmap  <M-q>
 
 " Shortcut
-nnoremap Q :<C-u>q<cr>
+nnoremap Q :q<cr>
 
 " THE missing one (and still not working :/)
 "nnoremap ci( f(ci)
