@@ -647,6 +647,18 @@ function myip
   echo "My public IP address is: $ip"
 }
 
+function weather
+{
+  if [[ $# == 0 ]]; then
+    weather :help
+    return
+  fi
+
+  local url="wttr.in/$1?format=v2"
+  echo "Getting weather using url: $url"
+  curl "$url"
+}
+
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
