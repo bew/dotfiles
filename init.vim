@@ -142,6 +142,9 @@ Plug 'pearofducks/ansible-vim'
 " Add special ft for some ansible templates
 let g:ansible_template_syntaxes = { '*haproxy*.cfg.j2': 'haproxy' }
 
+"# Just - Support for 'justfile' (https://github.com/casey/just)
+Plug 'vmchale/just-vim'
+
 call plug#end()
 
 let g:vimhome = $HOME . "/.config/nvim"
