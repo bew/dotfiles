@@ -6,4 +6,5 @@ setlocal cinoptions=Ls,l1,b1,t0,c0,C0,(0,us,U1,m1,J1
 
 setlocal colorcolumn=85
 
-setlocal comments=s:/*,m:**,ex:*/
+" Ensure that o/O (in normal) does not auto insert comment line and enter (in insert) does.
+setlocal formatoptions-=o formatoptions+=r
