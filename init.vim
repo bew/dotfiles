@@ -83,6 +83,8 @@ Plug 'autozimu/LanguageClient-neovim',
 let g:LanguageClient_serverCommands = {
       \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
       \ }
+" let g:LanguageClient_loggingFile = '/tmp/lsp.log'
+" let g:LanguageClient_loggingLevel = 'DEBUG'
 
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
