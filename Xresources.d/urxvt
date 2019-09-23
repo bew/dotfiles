@@ -68,7 +68,7 @@
 ! URxvt*borderColor: colour
 
 ! Select the fonts to be used. This is a comma separated list of font names that are checked in order when trying to find glyphs for characters. The first font defines the cell size for
-URxvt*font: xft:DejaVuSansMono\ Nerd\ Font\ Mono:pixelsize=14
+URxvt*font: xft:DejaVuSansMono\ Nerd\ Font\ Mono:pixelsize=14,xft:Symbola
 
 ! URxvt*boldFont: fontlist
 
