@@ -12,7 +12,27 @@ Plug 'thinca/vim-visualstar'			" * for visualy selected text
 Plug 'mileszs/ack.vim'					" Use ack for vimgrep
 Plug 'tpope/vim-surround'				" vim-surround
 Plug 'itchyny/lightline.vim'			" statusline builder
+
 Plug 'neomake/neomake'					" Asynchronous linting and make framework
+let g:neomake_virtualtext_prefix = "  ❰❰ "
+let g:neomake_error_sign = {
+      \ 'text': '█',
+      \ 'texthl': 'NeomakeErrorSign',
+      \ }
+augroup my_neomake_hi
+  au!
+
+  " Signs
+  au ColorScheme * hi NeomakeErrorSign cterm=none ctermfg=red
+  au ColorScheme * hi NeomakeWarningSign cterm=none ctermfg=yellow
+
+  " Virtual text
+  au ColorScheme * hi NeomakeVirtualtextError cterm=italic ctermbg=none ctermfg=red
+  au ColorScheme * hi NeomakeVirtualtextInfo cterm=italic ctermbg=none ctermfg=cyan
+  au ColorScheme * hi NeomakeVirtualtextWarning cterm=italic ctermbg=none ctermfg=yellow
+augroup END
+
+
 Plug 'tpope/vim-repeat'					" Repeat for plugins
 Plug 'Shougo/deoplete.nvim',			" Dark-powered completion engine
             \ { 'do': ':UpdateRemotePlugin' }
@@ -52,8 +72,8 @@ Plug 'nathanaelkane/vim-indent-guides'		" Add colored indent guides
 
 " Adjust indent guides color (TODO: light theme version)
 let g:indent_guides_auto_colors = 0
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=236
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=235
+autocmd Colorscheme * :hi IndentGuidesOdd  ctermbg=236
+autocmd Colorscheme * :hi IndentGuidesEven ctermbg=235
 
 
 Plug 'Shougo/denite.nvim'					" Generic interactive menu framework
@@ -155,9 +175,10 @@ runtime! config.rc/plugins/*.rc.vim
 runtime! options.vim
 runtime! mappings.vim
 
-" map leader definition
+" map leader definition - space
 let mapleader = " "
 
+call togglebg#install_mapping('<f12>')
 
 """""""""""""""""""""""""""""""""
 
@@ -176,52 +197,40 @@ endif
 
 """""""""""""""""""""""""""""""""
 
-" Nice colors for TabLine
-hi TabLineSel  cterm=NONE    ctermfg=187 ctermbg=235
-hi TabLine     cterm=NONE    ctermfg=230 ctermbg=239
-hi TabLineFill cterm=reverse ctermfg=187 ctermbg=244
+augroup my_custom_language_hi
+  au!
 
-hi clear Visual Todo Comment
-hi Visual ctermbg=237
-" We need the ctermbg=NONE at the end, I don't know why...
-hi Todo cterm=bold ctermfg=11 ctermbg=NONE " fg: yellow
-hi Comment ctermfg=242 " bg: light grey
+  " Markdown
+  au ColorScheme * hi markdownCode ctermfg=29
 
-hi Normal ctermfg=248
-
-" Markdown
-hi markdownCode ctermfg=29
-
-hi clear BadSpell
-hi BadSpell cterm=underline
-
-hi clear SignColumn
-hi SignColumn ctermbg=234
+  au ColorScheme * hi clear BadSpell
+  au ColorScheme * hi BadSpell cterm=underline
 
 
-" Ruby Colors
-hi clear rubyInstanceVariable
-hi rubyInstanceVariable ctermfg=33
-hi clear rubySymbol
-hi rubySymbol ctermfg=208
+  " Ruby Colors
+  au ColorScheme * hi clear rubyInstanceVariable
+  au ColorScheme * hi rubyInstanceVariable ctermfg=33
+  au ColorScheme * hi clear rubySymbol
+  au ColorScheme * hi rubySymbol ctermfg=208
 
-" Lua Colors
-hi clear luaTableReference
-hi luaTableReference ctermfg=208
-hi clear luaFunction
-hi link luaFunction luaStatement
+  " Lua Colors
+  au ColorScheme * hi clear luaTableReference
+  au ColorScheme * hi luaTableReference ctermfg=208
+  au ColorScheme * hi clear luaFunction
+  au ColorScheme * hi link luaFunction luaStatement
 
-hi luaVariableTag cterm=italic ctermfg=30
+  au ColorScheme * hi luaVariableTag cterm=italic ctermfg=30
 
-" C Colors (can color c++ as well ?)
-hi link cStructure cStatement
-hi link cStorageClass cStatement
-hi clear cStructInstance cOperator cBoolComparator
-hi cStructInstance ctermfg=208
-hi cArithmOp ctermfg=3
-hi cBoolComparator cterm=bold ctermfg=3
+  " C Colors (can color c++ as well ?)
+  au ColorScheme * hi link cStructure cStatement
+  au ColorScheme * hi link cStorageClass cStatement
+  au ColorScheme * hi clear cStructInstance cOperator cBoolComparator
+  au ColorScheme * hi cStructInstance ctermfg=208
+  au ColorScheme * hi cArithmOp ctermfg=3
+  au ColorScheme * hi cBoolComparator cterm=bold ctermfg=3
 
-hi cVariableTag cterm=italic ctermfg=30
+  au ColorScheme * hi cVariableTag cterm=italic ctermfg=30
+augroup END
 
 runtime config.rc/autocmd.rc.vim
 

@@ -17,7 +17,7 @@ set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set noshowmode	" disable -- INSERT -- (necessary for echodoc plugin)
 
-set hlsearch		" do highlight the serched text
+set hlsearch		" do highlight the searched text
 set incsearch		" incremental search as you type
 
 " apply smart case searching
@@ -97,14 +97,16 @@ set expandtab " Always expand TAB to spaces
 
 
 " Setting colorscheme
-let g:solarized_termcolors = 256
 syntax enable " Not 'syntax on' which overrides colorscheme
 
+let g:solarized_termcolors = 256
 colorscheme solarized
+
 if $TERM_COLOR_MODE == 'light'
-    " Default for solarized is light
+  " Default for solarized is light
+  set background=light
 else
-    set background=dark
+  set background=dark
 endif
 
 
@@ -122,4 +124,3 @@ let &undodir = swap_undo_dir . '/undofiles'
 " Ensures the directofies exists!
 call mkdir(swap_undo_dir . '/swapfiles', 'p')
 call mkdir(swap_undo_dir . '/undofiles', 'p')
-
