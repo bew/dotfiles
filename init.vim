@@ -90,6 +90,9 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per Lang / Tech plugins
 
+"# git commit mode
+Plug 'rhysd/committia.vim'
+
 "# C / CPP
 Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
 Plug 'Shougo/deoplete-clangx'			" FINALLY it works properly (C/C++)
