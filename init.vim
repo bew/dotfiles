@@ -35,7 +35,7 @@ augroup END
 
 Plug 'tpope/vim-repeat'					" Repeat for plugins
 Plug 'Shougo/deoplete.nvim',			" Dark-powered completion engine
-            \ { 'do': ':UpdateRemotePlugin' }
+      \ { 'do': ':UpdateRemotePlugin' }
 let g:deoplete#enable_at_startup = 1
 
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
@@ -76,13 +76,13 @@ Plug 'SirVer/ultisnips'					" Advanced snippets
 " -- Text refactor / formater
 
 Plug 'autozimu/LanguageClient-neovim',
-            \ {
-            \   'branch': 'next',
-            \   'do': 'bash install.sh',
-            \ }
+      \ {
+      \   'branch': 'next',
+      \   'do': 'bash install.sh',
+      \ }
 let g:LanguageClient_serverCommands = {
-    \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
-    \ }
+      \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
+      \ }
 
 Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
 
@@ -131,6 +131,7 @@ Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
 
 "# Crystal lang
 Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
+let g:crystal_define_mappings = 0
 
 "# LLVM IR
 Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
@@ -199,6 +200,7 @@ runtime! config.rc/plugins/*.rc.vim
 " Source some files
 runtime! options.vim
 runtime! mappings.vim
+runtime! autocmd.vim
 
 " map leader definition - space
 let mapleader = " "
@@ -208,16 +210,16 @@ call togglebg#install_mapping('<f12>')
 """""""""""""""""""""""""""""""""
 
 let g:fzf_action = {
-            \ 'alt-t': 'tab split',
-            \ 'alt-s': 'split',
-            \ 'alt-v': 'vsplit',
-            \ }
+      \ 'alt-t': 'tab split',
+      \ 'alt-s': 'split',
+      \ 'alt-v': 'vsplit',
+      \ }
 
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
 
 if has("mac")
-    " Homebrew puts the fzf install in non-vim accessible directory
-    set rtp+=/usr/local/opt/fzf
+  " Homebrew puts the fzf install in non-vim accessible directory
+  set rtp+=/usr/local/opt/fzf
 endif
 
 """""""""""""""""""""""""""""""""
@@ -257,13 +259,11 @@ augroup my_custom_language_hi
   au ColorScheme * hi cVariableTag cterm=italic ctermfg=30
 augroup END
 
-runtime config.rc/autocmd.rc.vim
-
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
 " Only define it when not defined already.
 if !exists(":DiffOrig")
-	command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-				\ | wincmd p | diffthis
+  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+        \ | wincmd p | diffthis
 endif
 
