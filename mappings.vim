@@ -103,6 +103,8 @@ nnoremap <M-$> g$
 " has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
 " is not at eol.
 inoremap <M-CR> <C-o>A<cr>
+" Also works in normal mode, goes in insert mode with a leading comment.
+nnoremap <M-CR> A<cr>
 
 " Quickely navigate between quickfix or location list's lines
 
@@ -198,20 +200,15 @@ vmap * <Plug>(visualstar-*)
 " Search current visual selection (never add \< & \>)
 vmap <M-*> <Plug>(visualstar-g*)
 
-vnoremap <M-P> :call VisualPasteKeepUnnamedRegister(v:true)<cr>
-vnoremap <M-p> :call VisualPasteKeepUnnamedRegister(v:false)<cr>
-function! VisualPasteKeepUnnamedRegister(before)
-    let old_reg = getreg('"', 1, v:true)
-    let old_regtype = getregtype('"')
+vnoremap <M-p> :call VisualPaste()<cr>
+function! VisualPaste()
+  " NOTE: unnamed register " is preserved
+  let old_reg = getreg('"', 1, v:true)
+  let old_regtype = getregtype('"')
 
-    if a:before
-        normal gvP
-    else
-        normal gvp
-    endif
+  normal gvp
 
-    " echo string(old_reg) . '  ' . old_regtype
-    call setreg('"', old_reg, old_regtype)
+  call setreg('"', old_reg, old_regtype)
 endfunction
 
 

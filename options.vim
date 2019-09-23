@@ -111,7 +111,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""
 " Put swap & undo files in ~/.nvim/swap_undo/{swap,undo}files/
 
-let swap_undo_dir = g:vimhome . '/swap_undo'
+let swap_undo_dir = $HOME . '/.nvim/swap_undo'
 
 set undofile
 set swapfile

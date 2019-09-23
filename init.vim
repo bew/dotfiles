@@ -147,54 +147,17 @@ Plug 'vmchale/just-vim'
 
 call plug#end()
 
-let g:vimhome = $HOME . "/.config/nvim"
-
-" Configuration file loader
-
-function! s:sourceFile(path)
-	if filereadable(a:path)
-		exec "source " . a:path
-		return v:true
-	endif
-	return v:false
-endfunction
-
-function! s:loadConfigFile(path)
-	if s:sourceFile(a:path)
-		return
-	endif
-	if s:sourceFile(g:vimhome . "/config.rc/" . a:path)
-		return
-	endif
-	if s:sourceFile(g:vimhome . "/config.rc/" . a:path . ".rc.vim")
-		return
-	endif
-endfunction
-
-function! s:loadConfigDir(dirpath)
-	for filepath in split(globpath(g:vimhome . "/config.rc/" . a:dirpath, "*.rc.vim"), "\n")
-		call s:loadConfigFile(filepath)
-	endfor
-endfunction
-
-
 """""""""""""""""""""""""""""""""
 
-call s:loadConfigDir("plugins")
+runtime! config.rc/plugins/*.rc.vim
 
-if has("gui")
-	" Disable every gvim gui stuff
-	set guioptions=
-	set guifont="DejaVu Sans Mono for Powerline 11"
-endif
+" Source some files
+runtime! options.vim
+runtime! mappings.vim
 
 " map leader definition
 let mapleader = " "
 
-call s:loadConfigFile("mappings")
-
-" Source the options
-runtime options.vim
 
 """""""""""""""""""""""""""""""""
 
@@ -260,7 +223,7 @@ hi cBoolComparator cterm=bold ctermfg=3
 
 hi cVariableTag cterm=italic ctermfg=30
 
-call s:loadConfigFile("autocmd")
+runtime config.rc/autocmd.rc.vim
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
