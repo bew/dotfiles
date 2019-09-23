@@ -50,6 +50,12 @@ set pumheight=20
 set list
 set listchars=tab:·\ ,trail:@,precedes:<,extends:> " how to show differents categories of invisible chars
 
+" Set the char to use to fill some blanks
+set fillchars=
+set fillchars+=fold:╶,   " right side of a clased fold (default: '·')
+set fillchars+=diff:\ ,  " deleted lines of the 'diff' option (default: '-')
+set fillchars+=eob:\ ,   " empty lines at the end of a buffer (default: '~')
+
 set scrolloff=3					" minimum lines to keep above and below cursor
 set sidescrolloff=16			" minimum chars to keep on the left/right of the cursor
 set sidescroll=1				" scroll chars one by one
