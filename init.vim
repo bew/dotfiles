@@ -41,6 +41,28 @@ let g:deoplete#enable_at_startup = 1
 Plug 'scrooloose/nerdcommenter'			" Comment stuff out
 Plug 'scrooloose/nerdtree'				" Tree based file explorer
 
+Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
+let g:ctrlsf_confirm_save = 1
+let g:ctrlsf_auto_focus = {
+      \ 'at': 'start',
+      \ }
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \ }
+" Search interface, wishes:
+" - lives in a floating window, can hide but not close (=> easy toggle)
+" - search dashboard, with per project recent/frequent searches
+" - search results must be closed explicitely (q), will close results, previews &
+"   whole search tab
+" - new search results open a tab in this floating window
+" - duplicate search tab (to save it but continue tinkering around).
+" - in the search results:
+"   * allow to change search text (and plain/regex mode) & refresh results
+"   * view a list of matching files on top, allow to hide the result of
+"     some of them
+" - unlike ctrlsf, edit mode should be explicitely enabled (with visual feedbacks)
+
 Plug 'airblade/vim-gitgutter'			" Git diff in the gutter
 
 " Motions on speed!
