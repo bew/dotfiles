@@ -1839,7 +1839,7 @@ function helper::setup_keytimeout_per_keymap
     if [[ "$KEYMAP" =~ (viins|main) ]]; then
         KEYTIMEOUT=1 # 10ms
     else
-        KEYTIMEOUT=50 # 500ms
+        KEYTIMEOUT=100 # 1000ms | 1s
     fi
 }
 hooks-add-hook zle_keymap_select_hook helper::setup_keytimeout_per_keymap
