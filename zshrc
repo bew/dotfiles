@@ -703,7 +703,7 @@ function repeat_while
     repeat_every_while 1 $*
 }
 
-# Mesure time (arbitrary)
+# Mesure time (arbitrarily)
 
 function countdown
 {
