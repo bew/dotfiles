@@ -833,7 +833,7 @@ function transfer
 function http::serve-local
 {
   if [[ $# == 0 ]]; then
-    echo "Usage: $0 <directory> [<port> [<ip>]]"
+    echo "Usage: $0 <directory> [<port> [<ip>|all]]"
     return 1
   fi
 
@@ -842,6 +842,7 @@ function http::serve-local
   local dir="$1"
   local port="${2:-1234}"
   local ip="${3:-127.0.0.1}"
+  [[ "$ip" == "all" ]] && ip="0.0.0.0"
 
   echo "==> Serving '$dir' on '$ip:$port' over HTTP <=="
   echo
