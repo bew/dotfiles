@@ -34,7 +34,8 @@ set mouse=nv " normal & visual
 
 set display=lastline
 
-set linebreak		" when 'wrap' is on, wrap the line on word break
+set showbreak=…… " Prefix for wrapped lines
+set linebreak		" Wrapping will break lines on word boundaries
 
 set hidden
 
