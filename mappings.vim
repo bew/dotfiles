@@ -15,7 +15,7 @@ vnoremap <M-s> <Esc>:w<cr>
 nnoremap <M-w> :set wrap! wrap?<cr>
 
 " toggle relativenumber
-nnoremap <M-r>	:set relativenumber! relativenumber?<CR>
+nnoremap <M-r>  :set relativenumber! relativenumber?<CR>
 
 nnoremap <M-m> :Neomake<cr>
 
@@ -215,8 +215,8 @@ endfunction
 " Taken from visual-at.vim from Practical Vim 2nd Edition
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
 function! ExecuteMacroOverVisualRange()
-	echo "@".getcmdline()
-	execute ":'<,'>normal @".nr2char(getchar())
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
 endfunction
 
 

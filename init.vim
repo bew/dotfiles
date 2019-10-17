@@ -1,19 +1,19 @@
 set nocompatible
 call plug#begin('~/.config/nvim/plugged')
 
-Plug 'embear/vim-localvimrc'			" Load local .lvimrc files
+Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
 
 " -- Vim feature enhancer
 
-Plug 'simnalamburt/vim-mundo'			" undo tree (fork of gundo)
-Plug 'szw/vim-ctrlspace'				" Control your space (buffers/tags/workspaces/etc..)
-Plug 'tpope/vim-abolish'				" Helpers for abbreviation, cased substitution & coercion
-Plug 'thinca/vim-visualstar'			" * for visualy selected text
-Plug 'mileszs/ack.vim'					" Use ack for vimgrep
-Plug 'tpope/vim-surround'				" vim-surround
-Plug 'itchyny/lightline.vim'			" statusline builder
+Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
+Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/etc..)
+Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
+Plug 'thinca/vim-visualstar'      " * for visualy selected text
+Plug 'mileszs/ack.vim'          " Use ack for vimgrep
+Plug 'tpope/vim-surround'       " vim-surround
+Plug 'itchyny/lightline.vim'      " statusline builder
 
-Plug 'neomake/neomake'					" Asynchronous linting and make framework
+Plug 'neomake/neomake'          " Asynchronous linting and make framework
 let g:neomake_virtualtext_prefix = "  ❰❰ "
 let g:neomake_error_sign = {
       \ 'text': '█',
@@ -33,13 +33,13 @@ augroup my_neomake_hi
 augroup END
 
 
-Plug 'tpope/vim-repeat'					" Repeat for plugins
-Plug 'Shougo/deoplete.nvim',			" Dark-powered completion engine
+Plug 'tpope/vim-repeat'         " Repeat for plugins
+Plug 'Shougo/deoplete.nvim',      " Dark-powered completion engine
       \ { 'do': ':UpdateRemotePlugin' }
 let g:deoplete#enable_at_startup = 1
 
-Plug 'scrooloose/nerdcommenter'			" Comment stuff out
-Plug 'scrooloose/nerdtree'				" Tree based file explorer
+Plug 'scrooloose/nerdcommenter'     " Comment stuff out
+Plug 'scrooloose/nerdtree'        " Tree based file explorer
 
 Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
 let g:ctrlsf_confirm_save = 1
@@ -63,15 +63,15 @@ let g:ctrlsf_auto_close = {
 "     some of them
 " - unlike ctrlsf, edit mode should be explicitely enabled (with visual feedbacks)
 
-Plug 'airblade/vim-gitgutter'			" Git diff in the gutter
+Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 
 " Motions on speed!
 Plug 'easymotion/vim-easymotion'
 
 " -- Insert mode helpers
 
-Plug 'Raimondi/delimitMate'				" auto insert of second ()''{}[]\"\" etc...
-Plug 'SirVer/ultisnips'					" Advanced snippets
+Plug 'Raimondi/delimitMate'       " auto insert of second ()''{}[]\"\" etc...
+Plug 'SirVer/ultisnips'         " Advanced snippets
 
 " -- Text refactor / formater
 
@@ -86,13 +86,13 @@ let g:LanguageClient_serverCommands = {
 " let g:LanguageClient_loggingFile = '/tmp/lsp.log'
 " let g:LanguageClient_loggingLevel = 'DEBUG'
 
-Plug 'junegunn/vim-easy-align'			" An advanced, easy-to-use Vim alignment plugin.
+Plug 'junegunn/vim-easy-align'      " An advanced, easy-to-use Vim alignment plugin.
 
-Plug 'tpope/vim-fugitive'				" A Git wrapper so awesome, it should be illegal
+Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
 
 " -- UI
 
-Plug 'nathanaelkane/vim-indent-guides'		" Add colored indent guides
+Plug 'nathanaelkane/vim-indent-guides'    " Add colored indent guides
 
 " Adjust indent guides color (TODO: light theme version)
 let g:indent_guides_auto_colors = 0
@@ -100,15 +100,15 @@ autocmd Colorscheme * :hi IndentGuidesOdd  ctermbg=236
 autocmd Colorscheme * :hi IndentGuidesEven ctermbg=235
 
 
-Plug 'Shougo/denite.nvim'					" Generic interactive menu framework
+Plug 'Shougo/denite.nvim'         " Generic interactive menu framework
 
-Plug 'mhinz/vim-startify'					" add a custom startup screen for vim
+Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 
-Plug 'bew/vim-colors-solarized'				" vim-colors-solarized - favorite colorscheme <3
-Plug 'vim-scripts/xterm-color-table.vim'	" Provide some commands to display all cterm colors
+Plug 'bew/vim-colors-solarized'       " vim-colors-solarized - favorite colorscheme <3
+Plug 'vim-scripts/xterm-color-table.vim'  " Provide some commands to display all cterm colors
 Plug 'ryanoasis/vim-devicons'
 
-Plug 'drzel/vim-line-no-indicator'			" Simple and expressive line number indicator
+Plug 'drzel/vim-line-no-indicator'      " Simple and expressive line number indicator
 
 Plug 'tweekmonster/nvim-api-viewer'
 
@@ -118,32 +118,32 @@ Plug 'tweekmonster/nvim-api-viewer'
 Plug 'rhysd/committia.vim'
 
 "# C / CPP
-Plug 'octol/vim-cpp-enhanced-highlight'	" Better highlight
-Plug 'Shougo/deoplete-clangx'			" FINALLY it works properly (C/C++)
+Plug 'octol/vim-cpp-enhanced-highlight' " Better highlight
+Plug 'Shougo/deoplete-clangx'     " FINALLY it works properly (C/C++)
 
 " Read why in $VIMRUNTIME/autoload/dist/ft.vim
 let g:c_syntax_for_h=1
 
-Plug 'Shougo/echodoc.vim'	" It prints the documentation you have completed.
+Plug 'Shougo/echodoc.vim' " It prints the documentation you have completed.
 
 "# Arduino
-"Plug 'jplaut/vim-arduino-ino'			" Arduino project compilation and deploy
-"Plug 'sudar/vim-arduino-syntax'			" Arduino syntax
-"Plug 'sudar/vim-arduino-snippets'		" Arduino snippets
+"Plug 'jplaut/vim-arduino-ino'      " Arduino project compilation and deploy
+"Plug 'sudar/vim-arduino-syntax'      " Arduino syntax
+"Plug 'sudar/vim-arduino-snippets'    " Arduino snippets
 
 "# Crystal lang
-Plug 'rhysd/vim-crystal'				" Crystal lang integration for vim
+Plug 'rhysd/vim-crystal'        " Crystal lang integration for vim
 let g:crystal_define_mappings = 0
 
 "# LLVM IR
-Plug 'EdJoJob/llvmir-vim'				" LLVM IR syntax & other stuff
+Plug 'EdJoJob/llvmir-vim'       " LLVM IR syntax & other stuff
 
 "# QML
-Plug 'peterhoeg/vim-qml'				" QML syntax
+Plug 'peterhoeg/vim-qml'        " QML syntax
 
 "# Markdown
 " 'plasticboy/vim-markdown' might be nice too
-Plug 'gabrielelana/vim-markdown'		" Complete environment to create Markdown files with a syntax highlight that doesn't suck!
+Plug 'gabrielelana/vim-markdown'    " Complete environment to create Markdown files with a syntax highlight that doesn't suck!
 " 'SidOfc/mkdx' looks awesome!!!!
 
 " E.g disable auto change of << to «
@@ -151,7 +151,7 @@ let g:markdown_enable_input_abbreviations = 0
 
 
 "# Python
-Plug 'hynek/vim-python-pep8-indent'		" PEP8 indentation
+Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
 
 " More Python tools (e.g: goto def)

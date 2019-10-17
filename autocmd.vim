@@ -5,7 +5,7 @@
 " position when opening a file.
 autocmd BufReadPost *
       \ if line("'\"") > 1 && line("'\"") <= line("$") |
-      \	exe "normal! g`\"" |
+      \ exe "normal! g`\"" |
       \ endif
 
 " Close the auto-completion preview window when leaving insert mode

@@ -1,4 +1,4 @@
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+" Trigger configuration.
 let g:UltiSnipsExpandTrigger="²"
 let g:UltiSnipsJumpForwardTrigger="<M-j>"
 let g:UltiSnipsJumpBackwardTrigger="<M-k>"

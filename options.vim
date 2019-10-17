@@ -12,13 +12,13 @@ set backspace=indent,eol,start
 " always show the statusline
 set laststatus=2
 
-set history=99		" keep 99 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set noshowmode	" disable -- INSERT -- (necessary for echodoc plugin)
+set history=99    " keep 99 lines of command line history
+set ruler   " show the cursor position all the time
+set showcmd   " display incomplete commands
+set noshowmode  " disable -- INSERT -- (necessary for echodoc plugin)
 
-set hlsearch		" do highlight the searched text
-set incsearch		" incremental search as you type
+set hlsearch    " do highlight the searched text
+set incsearch   " incremental search as you type
 
 " apply smart case searching
 set ignorecase
@@ -27,15 +27,15 @@ set smartcase
 set number
 set relativenumber
 
-set cursorline		" highlight the current line
-set cursorcolumn	" highlight the current column
+set cursorline    " highlight the current line
+set cursorcolumn  " highlight the current column
 
 set mouse=nv " normal & visual
 
 set display=lastline
 
 set showbreak=…… " Prefix for wrapped lines
-set linebreak		" Wrapping will break lines on word boundaries
+set linebreak    " Wrapping will break lines on word boundaries
 
 set hidden
 
@@ -57,13 +57,13 @@ set fillchars+=fold:╶,   " right side of a clased fold (default: '·')
 set fillchars+=diff:\ ,  " deleted lines of the 'diff' option (default: '-')
 set fillchars+=eob:\ ,   " empty lines at the end of a buffer (default: '~')
 
-set scrolloff=3					" minimum lines to keep above and below cursor
-set sidescrolloff=16			" minimum chars to keep on the left/right of the cursor
-set sidescroll=1				" scroll chars one by one
+set scrolloff=3         " minimum lines to keep above and below cursor
+set sidescrolloff=16      " minimum chars to keep on the left/right of the cursor
+set sidescroll=1        " scroll chars one by one
 
 " Command line options
-set wildmenu					" show list instead of just completing
-set wildmode=longest:full,full	" commandline <Tab> completion, list matches, then longest common part, then all.
+set wildmenu          " show list instead of just completing
+set wildmode=longest:full,full  " commandline <Tab> completion, list matches, then longest common part, then all.
 
 " setup default fold
 "set foldmethod=syntax
