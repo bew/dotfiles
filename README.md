@@ -1,4 +1,5 @@
 # ConfigZsh
+
 My personnal zsh config
 
 ## Screenshot
@@ -10,7 +11,7 @@ My personnal zsh config
 ### clone
 
 ```shell
-cd ~/.config && git clone --recursive git@github.com:Bew78LesellB/ConfigZsh.git zsh
+cd ~/.config && git clone --recursive git@github.com:bew/configcsh.git zsh
 ```
 
 ### place config files
