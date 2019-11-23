@@ -194,11 +194,10 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
-" Search current visual selection (add \< & \> if relevant)
+" Search with{,out} word boundaries
 vmap * <Plug>(visualstar-*)
-
-" Search current visual selection (never add \< & \>)
 vmap <M-*> <Plug>(visualstar-g*)
+nmap <M-*> g*
 
 vnoremap <M-p> :call VisualPaste()<cr>
 function! VisualPaste()
