@@ -888,7 +888,7 @@ function extract
       ;;
 
     (*.zip)
-      unzip "$compressed_file" -vd "$target_dir"
+      unzip "$compressed_file" -d "$target_dir"
       ;;
 
     (*.rar)
