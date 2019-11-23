@@ -1159,7 +1159,7 @@ function segmt::git_branch_fast
         p+=$clean
     fi
     local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT}}"
-    [[ -n $VCS_STATUS_TAG ]] && current_ref+="#${VCS_STATUS_TAG}"  # escape %
+    [[ -n $VCS_STATUS_TAG ]] && current_ref+="#${VCS_STATUS_TAG}"
 
     p+=${current_ref//\%/%%}  # escape %
 
@@ -1350,27 +1350,27 @@ PROMPT_LINE_OLD="%{$reset_color%}"'$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle
 ##############################################
 
 
-RPROMPT_LINE='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
-RPROMPT_LINE_OLD='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
+RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
+RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 
 # set prompts hooks
 
-function set-normal-prompts
+function set-current-prompts
 {
     PROMPT="${statuslineContainer}"$PROMPT_LINE
-    RPROMPT=$RPROMPT_LINE
+    RPROMPT=$RPROMPT_CURRENT
 }
-hooks-add-hook precmd_hook set-normal-prompts
+hooks-add-hook precmd_hook set-current-prompts
 
-function set-custom-prompts
+function set-past-prompts
 {
-    # Set custom prompt
+    # Set past prompt
     PROMPT=$PROMPT_LINE_OLD
-    RPROMPT=$RPROMPT_LINE_OLD
+    RPROMPT=$RPROMPT_PAST
 
     zle reset-prompt
 }
-hooks-add-hook zle_line_finish_hook set-custom-prompts
+hooks-add-hook zle_line_finish_hook set-past-prompts
 
 
 #----------------------------------------------------------------------------------
