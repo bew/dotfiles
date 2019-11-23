@@ -1149,7 +1149,6 @@ function segmt::git_branch_fast
     gitstatus_query MY                  || return 1  # error
     [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
 
-    local       reset='%f'       # no foreground
     local       clean='%F{076}'  # green foreground
     local c_untracked='%F{014}'  # teal foreground
     local  c_modified='%F{011}'  # yellow foreground
@@ -1177,8 +1176,7 @@ function segmt::git_branch_fast
     [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ⇣${VCS_STATUS_COMMITS_BEHIND}"
     [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+=" *${VCS_STATUS_STASHES}"
 
-    echo -n "%{$bg[black]%} On ${p} %{$reset$reset_color%}"
-    # FIXME: too much reset codes? but they're all needed..
+    echo -n "%K{black} On ${p} %k"
 }
 
 # Hook to get the last command exit code
@@ -1194,24 +1192,20 @@ hooks-add-hook precmd_hook get-last-exit
 function segmt::last_exit_code
 {
     if [[ $LAST_EXIT_CODE -ne 0 ]]; then
-        local lastExitCode="Last Exit: ${LAST_EXIT_CODE}"
-        local lastExitCodeStyle="%{$bg[black]$fg_bold[red]%} ${lastExitCode} %{$reset_color%}"
-        echo -n ${lastExitCodeStyle}
+        local content="Last Exit: ${LAST_EXIT_CODE}"
+        local with_style="%B%K{black}%F{red} ${content} %f%k%b"
+        echo -n "${with_style}"
     fi
 }
 
 # Segment last exit code
-function segmt::short_exit_status
+function segmt::exit_code_on_error
 {
-    if [[ $LAST_EXIT_CODE -ne 0 ]]; then
-        local error_symb="✘"
-        local error_style="%{$fg_bold[red]%}${error_symb}%{$reset_color%}"
-        # local sep=""
-        # local sep_style="%{$fg[red]%}$sep%{$reset_color%}"
-        echo -n "${error_style}"
-    else
-        echo -n "✔"
-    fi
+  [[ $LAST_EXIT_CODE == 0 ]] && return
+
+  local content="✘"
+  local with_style="%K{124} ${content} %k"
+  echo -n "${with_style}"
 }
 
 # Segment is shell in sudo session
@@ -1219,18 +1213,18 @@ function segmt::in_sudo
 {
     local result=$(sudo -n echo -n bla 2>/dev/null)
 
-    if [ "$result" = "bla" ]; then
-        local in_sudo="In sudo"
-        local in_sudo_style="%{$bg[red]$fg_bold[white]%} $in_sudo %{$reset_color%}"
-        echo -n "$in_sudo_style"
+    if [[ "$result" == "bla" ]]; then
+        local content="In sudo"
+        local with_style="%K{red}%F{white}%B $content %b%f%k"
+        echo -n "$with_style"
     fi
 }
 
 # Segment prompt vim mode (normal/insert)
 function segmt::vim_mode
 {
-    local insert_mode_style="%{$bg[green]$fg_bold[white]%} INSERT %{$reset_color%}"
-    local normal_mode_style="%{$bg[blue]$fg_bold[white]%} NORMAL %{$reset_color%}"
+    local insert_mode_style="%B%K{green}%F{white} INSERT %f%k%b"
+    local normal_mode_style="%B%K{blue}%F{white} NORMAL %f%k%b"
 
     if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
         echo -n ${insert_mode_style}
@@ -1244,8 +1238,8 @@ function segmt::vim_mode
 # Segment prompt vim mode (normal/insert)
 function segmt::short_vim_mode
 {
-    local insert_mode_style="%{$bg[green]$fg_bold[white]%} I %{$reset_color%}"
-    local normal_mode_style="%{$bg[blue]$fg_bold[white]%} N %{$reset_color%}"
+    local insert_mode_style="%B%K{green}%F{white} I %f%k%b"
+    local normal_mode_style="%B%K{blue}%F{white} N %f%k%b"
 
     if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
         echo -n ${insert_mode_style}
@@ -1299,9 +1293,9 @@ function segmt::shlvl
     [ $SHLVL = 1 ] && return
 
     local shlvl='%L'
-    local shlvlStyle="%{$fg_bold[red]%}$shlvl  %{$reset_color%}"
+    local with_style="%B%F{red}${shlvl} %f%b"
 
-    echo -n "${shlvlStyle}"
+    echo -n "${with_style}"
 }
 
 # Segment datetime
@@ -1309,130 +1303,244 @@ function segmt::time
 {
     local currentTime=$(date "+%H:%M [%d/%m]")
     local currentTimeStyle=" ${currentTime} "
-    echo -n ${currentTimeStyle}
+    echo -n "${currentTimeStyle}"
 }
 
 # Segment variable debug
 function segmt::debug
 {
     local debugVar=$*
-    local debugVarStyle="%{$bg[blue]%} DEBUG: ${debugVar} %{$bg[default]%}"
-    echo ${debugVarStyle}
+    local debugVarStyle="%K{blue} DEBUG: ${debugVar} %k"
+    echo -n "${debugVarStyle}"
 }
 
-function segmt::git-diff-mode
+# Build a string from an array of parts.
+# A part can be a function or a simple text.
+#
+# Args: (reset_code, *parts)
+# - reset_code: The reset code to add after a function call (e.g: color reset).
+# - *parts: The parts as described below.
+#
+# Each part uses 2 elements in the parts array for the type and the value.
+# The types of parts are:
+# - func : a function call
+# - text : raw text
+# In addition there are special parts that configures parts rendering:
+# - part_separator : separator between parts
+# - func_reset : reset sequence inserted after a func call
+# - (TODO ?: part_reset)
+#
+# Example:
+#
+#   parts=(
+#     # change part config
+#     part_separator: "|"
+#     func_reset: "reset"
+#
+#     func: some_func1
+#     func: some_func2
+#     text: "xxx"
+#
+#     # change part config
+#     func_reset: "XX"
+#
+#     func: some_func3
+#   )
+#   make_prompt_str_from_parts "${parts[@]}"
+#
+# Gives literaly:
+#
+#   $(some_func1)reset|$(some_func2)reset|xxx|$(some_func3)reset
+#
+# The result will need to be re-evaluated by the prompt system to call
+# the functions (some_func{1,2,3}).
+#
+# TODO: (oneday) allow func args, like:
+#   func: 2 some_func arg1 arg2
+function make_prompt_str_from_parts
 {
-  in_a_git_repo || return;
+  local parts=("$@")
 
-  if [[ "$GIT_DIFF_SKIP_SPACING" == "yes" ]]; then
-    echo "Git diff (F7): with spacing diff"
-  else
-    echo "Git diff (F7): skip spacing diff"
+  local str
+  local func_reset
+  local part_separator
+  local user_part_idx=0 # user parts, skipping config parts
+
+  local len_parts=${#parts}
+  if (( len_parts % 2 != 0 )); then
+    echo >&2 "Error while making prompt str from parts, invalid length of parts (${#parts} - must be divisible by 2)"
+    echo "foo"
+    return 1
   fi
+
+  while [[ ${#parts} -ne 0 ]]; do
+    # read the part as "type: value"
+    local type="${parts[1]}"
+    local value="${parts[2]}"
+    shift 2 parts # NOTE: zsh only! bash does not accept array name
+
+    # No part separator before the first user part
+    local maybe_separator="$part_separator"
+    [[ "$user_part_idx" == 0 ]] && maybe_separator=""
+
+    case "$type" in
+      # Config parts handling
+      func_reset:) func_reset="$value" ;;
+      part_separator:) part_separator="$value" ;;
+
+      # User parts handling
+      func:)
+        user_part_idx=$(( user_part_idx + 1 ))
+        str+="$maybe_separator"
+        str+='$('"$value"')'
+        str+="$func_reset"
+        ;;
+      text:)
+        user_part_idx=$(( user_part_idx + 1 ))
+        str+="$maybe_separator"
+        str+="$value"
+        ;;
+    esac
+  done
+
+  echo -n $str
 }
 
-local username='%n'
-local usernameStyle="%{$fg[yellow]%}${username}%{$reset_color%}"
-
-local currDir='%2~'
-local currDirStyle="%{$fg_bold[cyan]%} ${currDir} %{$reset_color%}"
-
-local cmdSeparator='%%'
-local cmdSeparatorStyle="%{$fg_bold[magenta]%}${cmdSeparator}%{$reset_color%}"
-
-## Prompt
+## Prompts & Status line
 ##############################################
+#
+#  %B (%b)
+#         Start (stop) boldface mode.
+#
+#  %E     Clear to end of line.
+#
+#  %U (%u)
+#         Start (stop) underline mode.
+#
+#  %S (%s)
+#         Start (stop) standout mode.
+#
+#  %F (%f)
+#         Start  (stop) using a different foreground colour, if supported by the terminal.  The colour may be specified two ways: either as a numeric argument, as normal, or by a
+#         sequence in braces following the %F, for example %F{red}.  In the latter case the values allowed are as described for the  fg  zle_highlight  attribute;  see  Character
+#         Highlighting in zshzle(1).  This means that numeric colours are allowed in the second format also.
+#
+#  %K (%k)
+#         Start (stop) using a different bacKground colour.  The syntax is identical to that for %F and %f.
+
 autoload -U promptinit && promptinit
 
-PROMPT_LINE="%{$reset_color%}"'$(segmt::shlvl)'" [${usernameStyle}] ${currDir} ▷ "
-PROMPT_LINE_OLD="%{$reset_color%}"'$(segmt::shlvl)'"%{$bg[black]%}${currDirStyle}%{$bg[default]%} ${cmdSeparatorStyle} "
+# -- Status line
 
+STATUSLINE_PARTS=(
+  func: segmt::vim_mode
+  func: segmt::time
+  func: segmt::in_sudo
+  text: "  "
+  func: segmt::last_exit_code
+)
 
+# NOTE: the generated prompt str is static, the segment functions are not called.
+function sl::build_prompt_str
+{
+  local _cur_save=$'\e[s'
+  local _cur_restore=$'\e[u'
+  local _goto_bottom=$'\e[$LINES;0H'
+  local _clear_line=$'\e[2K'
 
+  local sl_default_bg="${bg[magenta]}"
+  local sl_default_fg=""
 
-## RPROMPT
-##############################################
+  local sl_color="${reset_color}${sl_default_bg}${sl_default_fg}"
 
+  local sl_init="${sl_color}${_clear_line}"
 
-RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
-RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
+  local sl_content="$(make_prompt_str_from_parts func_reset: "$sl_color" "${STATUSLINE_PARTS[@]}")"
 
-# set prompts hooks
+  local sl_container="${_cur_save}${_goto_bottom}${sl_init}${sl_content}${_cur_restore}"
+  echo -n "%{${sl_container}%}"
+}
+
+# -- Left prompt
+
+PROMPT_CURRENT_PARTS=(
+  func: segmt::shlvl
+  func: segmt::exit_code_on_error
+  text: "[%F{yellow}%n%f]" # username
+  text: " "
+  text: "%2~" # current dir
+  text: " "
+  text: "%(!.#.▷)"
+)
+PROMPT_PAST_PARTS=(
+  func: segmt::shlvl
+  func: segmt::exit_code_on_error
+  text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
+  text: " "
+  text: "%B%F{magenta}%%%f%b" # cmd separator
+)
+
+PROMPT_CURRENT="$(sl::build_prompt_str)""$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
+PROMPT_PAST="$(make_prompt_str_from_parts "${PROMPT_PAST_PARTS[@]}")"
+
+# Add space before user input
+PROMPT_CURRENT+=" "
+PROMPT_PAST+=" "
+
+# -- Right prompt
+
+RPROMPT_CURRENT_PARTS=(
+  func_reset: "%{$reset_color%}"
+
+  func: segmt::in_sudo
+  func: segmt::git_branch_fast
+  func: segmt::vim_mode
+)
+
+RPROMPT_PAST_PARTS=(
+  func_reset: "%{$reset_color%}"
+
+  func: segmt::in_sudo
+  func: segmt::git_branch_fast
+)
+
+RPROMPT_CURRENT="$(make_prompt_str_from_parts "${RPROMPT_CURRENT_PARTS[@]}")"
+RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
+# RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
+# RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
+
+# -- Setup prompts hooks
 
 function set-current-prompts
 {
-    PROMPT="${statuslineContainer}"$PROMPT_LINE
-    RPROMPT=$RPROMPT_CURRENT
+    PROMPT="%{$reset_color%}"$PROMPT_CURRENT
+    RPROMPT="%{$reset_color%}"$RPROMPT_CURRENT
 }
 hooks-add-hook precmd_hook set-current-prompts
 
 function set-past-prompts
 {
     # Set past prompt
-    PROMPT=$PROMPT_LINE_OLD
-    RPROMPT=$RPROMPT_PAST
+    PROMPT="%{$reset_color%}"$PROMPT_PAST
+    RPROMPT="%{$reset_color%}"$RPROMPT_PAST
 
     zle reset-prompt
 }
 hooks-add-hook zle_line_finish_hook set-past-prompts
 
+function simple_prompts
+{
+  PROMPT_CURRENT="%2~ ▷ "
+  PROMPT_PAST=$PROMPT_CURRENT
+  RPROMPT_CURRENT=
+  RPROMPT_PAST=
+}
 
-#----------------------------------------------------------------------------------
-# Status line
-#----------------------------------------------------------------------------------
-
-## TODO: where to put theses ?
-# useful ANSI codes
-#----------------------------------------
-
-local _positionStatusbar=$'\e[$LINES;0H'
-local _clearLine=$'\e[2K'
-local _lineup=$'\e[1A'
-local _linedown=$'\e[1B'
-local _saveCursor=$'\e[s'
-local _restoreCursor=$'\e[u'
-
-
-#----------------------------------------
-# StatusLine Config
-#----------------------------------------
-
-local slDefaultBG="$bg[magenta]"
-local slDefaultFG=""
-
-
-# TODO: 2 list of segmts for LeftStatusBar & RightStatusBar
-
-
-local slResetColor="${reset_color}${slDefaultBG}${slDefaultFG}"
-
-# statusline initializer
-local initStatusline="${slResetColor}${_clearLine}"
-
-#-------------------------------------------------------------
-#
-
-# The statusline content
-
-# FIXME: YOU NEED TO CHANGE ONLY THIS LINE FIXME
-local statusline='$(segmt::vim_mode)'"${slResetColor}"'$(segmt::time)'"${slResetColor}"'$(segmt::in_sudo)'"${slResetColor}""  "'$(segmt::last_exit_code)'"${slResetColor} "'$(segmt::git-diff-mode)'
-
-#
-#-------------------------------------------------------------
-
-# The statusline container
-local statuslineContainer
-if [[ $linux == 1 ]]; then
-    statuslineContainer="%{${_saveCursor}${_positionStatusbar}${initStatusline}${statusline}${_restoreCursor}%}"
-fi
-
-#----------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------
-
-# NOTE: no idea where to put these..
 
 # Reset Prompt every N seconds
 #----------------------------------------
+
+# TODO: use sched!
 
 TMOUT=60
 
