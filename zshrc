@@ -588,6 +588,10 @@ alias ivm="v"
 # View file (read-only)
 alias vw="nvim -R"
 
+# launch editor (- let's try that!)
+alias e="nvim"
+alias er="nvim -R"
+
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
 
 alias ":q"="exit"
