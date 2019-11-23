@@ -1557,21 +1557,25 @@ function TRAPALRM
     zle reset-prompt
 }
 
+# NOTE: !WIP! this is currently not used!!!
 function helper::disable-prompt-autoupdate
 {
     DISABLE_PROMPT_AUTOUPDATE=1
 }
-
 function helper::enable-prompt-autoupdate
 {
     DISABLE_PROMPT_AUTOUPDATE=
 }
-
 function helper::is-prompt-autoupdate-disabled
 {
     [[ -n "$DISABLE_PROMPT_AUTOUPDATE" ]]
 }
-
+function helper::with-prompt-autoupdate-disabled-do
+{
+  helper::disable-prompt-autoupdate
+  "$@"
+  helper::enable-prompt-autoupdate
+}
 function failsafe-reenable-prompt-autoupdate
 {
     # Re-enable prompt autoupdate.
@@ -1587,7 +1591,7 @@ hooks-add-hook zle_line_init_hook failsafe-reenable-prompt-autoupdate
 
 function set_title_on_idle
 {
-    term::set_status_line 'urxvt - %~'
+    term::set_status_line 'term - %~'
 }
 hooks-add-hook precmd_hook set_title_on_idle
 
@@ -1600,7 +1604,7 @@ function set_title_on_exec
 
     # local truncation_offset=20
     # local truncated_cmd="%${truncation_offset}<...<$typed_cmd"
-    term::set_status_line "urxvt - $cmd"
+    term::set_status_line "term - $cmd"
 }
 hooks-add-hook preexec_hook set_title_on_exec
 
@@ -1634,10 +1638,10 @@ fi
 
 function no_output
 {
-    $@ >/dev/null 2>&1
+    "$@" >/dev/null 2>&1
 }
 
-function in_a_git_repo
+function check::in_a_git_repo
 {
     no_output git rev-parse --is-inside-work-tree
 }
@@ -1663,11 +1667,12 @@ function zle::utils::wrap-widget-disable-prompt-autoupdate
     "
     zle -N ${widget_to_call}_wrapped
 }
+# NOTE: !WIP! this is currently not used!!!
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
 {
-    if ! in_a_git_repo; then
+    if ! check::in_a_git_repo; then
         zle -M "Error: Not a git repository"
         return 1
     fi
@@ -1695,7 +1700,7 @@ function zwidget::git-status
 {
     zle::utils::check_git || return
 
-    echo # move cursor on a new line after the line editor
+    zle -I # Invalidate zle display
     git status
     zle reset-prompt
 }
@@ -1763,6 +1768,7 @@ function zwidget::fg
 {
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
 
+    zle -I
     eval fg %+
     zle reset-prompt
 }
@@ -1775,6 +1781,7 @@ function zwidget::fg2
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
     [ "$(jobs | wc -l)" -lt 2 ] && zle -M "Not enough running jobs" && return
 
+    zle -I
     eval fg %-
     zle reset-prompt
 }
