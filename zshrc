@@ -9,15 +9,6 @@
 #
 #
 
-osx=
-linux=
-case $(uname) in
-    Darwin)
-        osx=1;;
-    Linux)
-        linux=1;;
-esac
-
 fpath=(~/.zsh/fpath $fpath)
 
 # Import color helpers
@@ -466,23 +457,14 @@ alias G="command grep --color=auto -n"
 
 # add verbosity
 
-if [[ $osx == 1 ]]; then
-    alias rm="rm -vi"
-else
-    alias rm="rm -vI"
-fi
+alias rm="rm -vI"
 alias cp="cp -vi"
 alias mv="mv -vi"
 alias mkdir="mkdir -v"
 
 # ls
 
-if [[ $osx == 1 ]]; then
-    export CLICOLORS=1
-    alias ls="ls -G"
-elif [[ $linux == 1 ]]; then
-    alias ls="ls --color=auto --group-directories-first"
-fi
+alias ls="ls --color=auto --group-directories-first"
 alias ll="ls -lh"
 alias la='ll -a'
 alias l="la"
@@ -1283,9 +1265,7 @@ function prompt-auto-scroll
         echo -n $'\e[4A' # Move the cursor back up
     fi
 }
-if ! [[ $osx == 1 ]]; then # Disable on OSX
-    hooks-add-hook precmd_hook prompt-auto-scroll
-fi
+hooks-add-hook precmd_hook prompt-auto-scroll
 
 
 function segmt::shlvl
