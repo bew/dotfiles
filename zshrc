@@ -1278,14 +1278,6 @@ function segmt::shlvl
     echo -n "${with_style}"
 }
 
-# Segment datetime
-function segmt::time
-{
-    local currentTime=$(date "+%H:%M [%d/%m]")
-    local currentTimeStyle=" ${currentTime} "
-    echo -n "${currentTimeStyle}"
-}
-
 # Segment variable debug
 function segmt::debug
 {
@@ -1414,7 +1406,6 @@ autoload -U promptinit && promptinit
 
 STATUSLINE_PARTS=(
   func: segmt::vim_mode
-  func: segmt::time
   func: segmt::in_sudo
   text: "  "
   func: segmt::last_exit_code
@@ -1517,55 +1508,6 @@ function simple_prompts
 }
 
 
-# Reset Prompt every N seconds
-#----------------------------------------
-
-# TODO: use sched!
-
-TMOUT=60
-
-# This special function is run every $TMOUT seconds
-function TRAPALRM
-{
-    # Don't reset prompt when we are in complete mode
-    [[ "$WIDGET" == 'expand-or-complete' ]] && return
-
-    # Don't reset prompt when a widget uses the space (e.g: by running another program like fzf)
-    # (A prompt reset might hide the program or conflict with its output)
-    helper::is-prompt-autoupdate-disabled && return
-
-    zle reset-prompt
-}
-
-# NOTE: !WIP! this is currently not used!!!
-function helper::disable-prompt-autoupdate
-{
-    DISABLE_PROMPT_AUTOUPDATE=1
-}
-function helper::enable-prompt-autoupdate
-{
-    DISABLE_PROMPT_AUTOUPDATE=
-}
-function helper::is-prompt-autoupdate-disabled
-{
-    [[ -n "$DISABLE_PROMPT_AUTOUPDATE" ]]
-}
-function helper::with-prompt-autoupdate-disabled-do
-{
-  helper::disable-prompt-autoupdate
-  "$@"
-  helper::enable-prompt-autoupdate
-}
-function failsafe-reenable-prompt-autoupdate
-{
-    # Re-enable prompt autoupdate.
-    #
-    # It is needed when a widget disabled prompt autoupdate then crashed,
-    # thus failed to re-enable it.
-    helper::enable-prompt-autoupdate
-}
-hooks-add-hook zle_line_init_hook failsafe-reenable-prompt-autoupdate
-
 # Set terminal title
 #----------------------------------------
 
@@ -1629,25 +1571,6 @@ function check::in_a_git_repo
 #----------------------------------------------------------------------------------
 # ZLE Widgets
 #----------------------------------------------------------------------------------
-
-# Helper widget that calls another widget while disabling prompt auto-refresh until the widget is finished
-function zle::utils::wrap-widget-disable-prompt-autoupdate
-{
-    local widget_to_call=$1
-
-    eval "
-    function ${widget_to_call}_wrapped
-    {
-        helper::disable-prompt-autoupdate
-
-        zle $widget_to_call -w \$*
-
-        helper::enable-prompt-autoupdate
-    }
-    "
-    zle -N ${widget_to_call}_wrapped
-}
-# NOTE: !WIP! this is currently not used!!!
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
