@@ -1,6 +1,3 @@
-[submodule "zsh-syntax-highlighting"]
-	path = third-party/zsh-syntax-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "z"]
 	path = third-party/z
 	url = git@github.com:rupa/z.git
