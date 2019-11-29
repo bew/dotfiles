@@ -553,22 +553,10 @@ alias sudo="sudo "
 alias nosudo="sudo -k;"
 
 
-# original vim
-alias ovim="command vim -X"
-
 # nvim
 
 alias vim=nvim
 alias v="vim"
-alias im="v"
-alias vm="v"
-alias vi="v"
-alias vmi="v"
-alias imv="v"
-alias ivm="v"
-
-# View file (read-only)
-alias vw="nvim -R"
 
 # launch editor (- let's try that!)
 alias e="nvim"
@@ -610,11 +598,11 @@ alias fr:en='trans fr:en -b'
 alias en:fr='trans en:fr -b'
 function fr:en:fr
 {
-  fr_en="$(fr:en $*)" && echo "en: $fr_en" && en:fr "$fr_en"
+  local fr_en="$(fr:en $*)" && echo "en: $fr_en" && en:fr "$fr_en"
 }
 function en:fr:en
 {
-  en_fr="$(en:fr $*)" && echo "fr: $en_fr" && fr:en "$en_fr"
+  local en_fr="$(en:fr $*)" && echo "fr: $en_fr" && fr:en "$en_fr"
 }
 
 # definition
@@ -1076,7 +1064,7 @@ function prompt-auto-scroll
     # (as the term::get_cursor_pos will discard it)
     # FIXME: find how to turn on raw input
     local buff
-    sysread -t 0.1 -i 0 buff
+    sysread -t 0 -i 0 buff
     #echo "Buff: '$buff'"
     if [ -n "$buff" ]; then
         # push it on the ZLE input stack
