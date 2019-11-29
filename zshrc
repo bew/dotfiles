@@ -1414,6 +1414,19 @@ function zle::utils::check_git
     fi
 }
 
+# Run the given command from a zle widget, as if it was written by the user
+# but without saving it to the history.
+function zle::utils::no-history-run
+{
+  local cmd="$1"
+
+  zle push-input
+  BUFFER=" " # note: skip history with a leading space
+  BUFFER+="$cmd"
+  zle .accept-line
+}
+zle -N zle::utils::no-history-run
+
 # Toggle sudo at <bol>
 function zwidget::toggle-sudo
 {
@@ -1436,9 +1449,9 @@ function zwidget::git-status
 {
     zle::utils::check_git || return
 
-    zle -I # Invalidate zle display
-    git status
-    zle reset-prompt
+    zle push-input
+    BUFFER=" git status" # note: skip history with a leading space
+    zle .accept-line
 }
 zle -N zwidget::git-status
 
@@ -1475,9 +1488,7 @@ function zwidget::fg
 {
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
 
-    zle -I
-    eval fg %+
-    zle reset-prompt
+    zle zle::utils::no-history-run "fg %+"
 }
 zle -N zwidget::fg
 
@@ -1488,9 +1499,7 @@ function zwidget::fg2
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
     [ "$(jobs | wc -l)" -lt 2 ] && zle -M "Not enough running jobs" && return
 
-    zle -I
-    eval fg %-
-    zle reset-prompt
+    zle zle::utils::no-history-run "fg %-"
 }
 zle -N zwidget::fg2
 
