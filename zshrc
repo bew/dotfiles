@@ -1091,7 +1091,7 @@ function segmt::shlvl
 {
     [[ $SHLVL == 1 ]] && return
 
-    echo -n "{%BLVL%L%b} "
+    echo -n "{%BLVL%L%b}"
 }
 
 # Segment variable debug
@@ -1313,7 +1313,7 @@ hooks-add-hook zle_line_finish_hook set-past-prompts
 
 function simple_prompts
 {
-  PROMPT_CURRENT="%2~ ▷ "
+  PROMPT_CURRENT="[%?] %2~ ▷ "
   PROMPT_PAST=$PROMPT_CURRENT
   RPROMPT_CURRENT=
   RPROMPT_PAST=
@@ -1889,3 +1889,5 @@ bindkey -M menuselect 'a' accept-and-hold
 # Load local per-machine zsh config
 
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+true # The config should always finish well!
