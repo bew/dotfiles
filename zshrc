@@ -1142,9 +1142,7 @@ function sl::build_prompt_str
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
   func: segmt::exit_symbol_on_error
-  text: " "
-  text: "%2~" # current dir
-  text: " "
+  text: "%B%F{magenta} %2~ %f%b" # current dir
   text: "%(!.#.▷)"
 )
 PROMPT_PAST_PARTS=(
@@ -1152,7 +1150,7 @@ PROMPT_PAST_PARTS=(
   func: segmt::exit_symbol_on_error
   text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
   text: " "
-  text: "%B%F{magenta}%%%f%b" # cmd separator
+  text: "%B%F{black}%%%f%b" # cmd separator
 )
 
 PROMPT_CURRENT="$(sl::build_prompt_str)""$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
