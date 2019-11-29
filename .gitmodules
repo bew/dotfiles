@@ -10,3 +10,6 @@
 [submodule "third-party/gitstatus"]
 	path = third-party/gitstatus
 	url = https://github.com/romkatv/gitstatus.git
+[submodule "third-party/zplugin"]
+	path = third-party/zplugin
+	url = git@github.com:zdharma/zplugin.git

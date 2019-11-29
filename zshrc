@@ -49,9 +49,14 @@ add-zsh-hook chpwd chpwd-wrapper
 # Load Plugins
 #----------------------------------------------------------------------------------
 
+# zplugin
+source ~/.zsh/third-party/zplugin/zplugin.zsh
+
+zplugin light zdharma/fast-syntax-highlighting
+
 # cd with 'frecency' (recent + frequence)
 #-------------------------------------------------------------
-source ~/.zsh/third-party/z/z.sh
+zplugin light ~/.zsh/third-party/z
 
 # Syntax hightlighting
 #-------------------------------------------------------------
@@ -169,7 +174,7 @@ ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]='standout'
 # GIT_PS1_SHOWUNTRACKEDFILES=1
 
 # Fast git status daemon!
-source ~/.zsh/third-party/gitstatus/gitstatus.plugin.zsh
+zplugin load ~/.zsh/third-party/gitstatus
 gitstatus_start MY
 
 
@@ -1884,13 +1889,3 @@ bindkey -M menuselect 'a' accept-and-hold
 # Load local per-machine zsh config
 
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-
-#----------------------------------------------------------------------------------
-
-# Syntax hightlighting special end-of-file sourcing
-#
-# `zsh-syntax-highlighting.zsh` wraps ZLE widgets.
-# It must be sourced after all custom widgets have been created (i.e., after
-# all `zle -N` calls and after running `compinit`).
-# Widgets created later will work, but will not update the syntax highlighting.
-source ~/.zsh/third-party/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
