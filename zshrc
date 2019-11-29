@@ -1425,6 +1425,7 @@ function zwidget::toggle-sudo
         BUFFER="sudo $BUFFER"
         CURSOR=$(( cursor + 5 ))
     fi
+    zle redisplay
 }
 zle -N zwidget::toggle-sudo
 
@@ -1535,6 +1536,7 @@ function zwidget::cycle-quoting
     }
 
     modify-current-argument zwidget::cycle-quoting::inner
+    zle redisplay
 }
 zle -N zwidget::cycle-quoting
 
@@ -1563,7 +1565,7 @@ function zwidget::insert_one_arg
 
     # Insert argument in-place
     LBUFFER+="${quoted_arg}"
-    zle reset-prompt
+    zle redisplay
 }
 zle -N zwidget::insert_one_arg
 
