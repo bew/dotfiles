@@ -1207,12 +1207,17 @@ function make_prompt_str_from_parts
 #         Start (stop) standout mode.
 #
 #  %F (%f)
-#         Start  (stop) using a different foreground colour, if supported by the terminal.  The colour may be specified two ways: either as a numeric argument, as normal, or by a
-#         sequence in braces following the %F, for example %F{red}.  In the latter case the values allowed are as described for the  fg  zle_highlight  attribute;  see  Character
-#         Highlighting in zshzle(1).  This means that numeric colours are allowed in the second format also.
+#         Start  (stop) using a different foreground colour, if supported by the
+#         terminal.  The colour may be specified two ways: either as a numeric
+#         argument, as normal, or by a sequence in braces following the %F, for
+#         example %F{red}.  In the latter case the values allowed are as described
+#         for the  fg  zle_highlight  attribute;  see  Character Highlighting in
+#         zshzle(1).  This means that numeric colours are allowed in the second
+#         format also.
 #
 #  %K (%k)
-#         Start (stop) using a different bacKground colour.  The syntax is identical to that for %F and %f.
+#         Start (stop) using a different bacKground colour.  The syntax is identical
+#         to that for %F and %f.
 
 autoload -U promptinit && promptinit
 
