@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Extract common compressed file formats
+function extract
+{
+  local dryrun=0
+  if [[ "$1" == "--dry-run" ]]; then
+    dryrun=1
+    shift
+  fi
+
+  if [[ $# == 0 ]]; then
+    echo "Usage: extract [--dry-run] <compressed_file> [<directory>]"
+    return 1
+  fi
+
+  local compressed_file="$1"
+  local target_dir="${2:-.}"
+  local source_dir="$PWD"
+
+  echo "--> Extracting '$compressed_file' to '$target_dir'..."
+  [[ "$dryrun" == 1 ]] && return
+
+  mkdir -vp "$target_dir" || return 1
+
+  case "$compressed_file" in
+    (*.tar)
+      tar xvf "$compressed_file" -C "$target_dir"
+      ;;
+    (*.tar.gz|*.tgz)
+      tar xvzf "$compressed_file" -C "$target_dir"
+      ;;
+    (*.tar.bz2|*.tbz|*.tbz2)
+      tar --bzip2 xvf "$compressed_file" -C "$target_dir"
+      ;;
+    (*.tar.xz|*.txz)
+      tar --xz xvf "$compressed_file" -C "$target_dir"
+      ;;
+
+    (*.zip)
+      unzip "$compressed_file" -d "$target_dir"
+      ;;
+
+    (*.rar)
+      (cd "$target_dir" && unrar e "${source_dir}/${compressed_file}")
+      ;;
+
+    (*.7z)
+      7z e -o"$target_dir" "$compressed_file"
+      ;;
+
+    # Single file extractors
+    (*.gz)
+      local target_file="${compressed_file%.gz}" # remove extension
+      gunzip --stdout "${compressed_file}" > "${target_dir}/${target_file}"
+      ;;
+    (*.bz2)
+      local target_file="${compressed_file%.bz2}" # remove extension
+      gunzip --stdout "${compressed_file}" > "${target_dir}/${target_file}"
+      ;;
+    (*.xz)
+      local target_file="${compressed_file%.xz}" # remove extension
+      unxz --stdout "${compressed_file}" > "${target_dir}/${target_file}"
+      ;;
+
+    (*)
+      echo "ERROR: Unsupported file extension '$compressed_file'"
+      return 1
+      ;;
+  esac
+}

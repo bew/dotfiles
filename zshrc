@@ -628,24 +628,6 @@ alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
-function myip
-{
-  local ip=$(curl -s https://api.my-ip.io/ip.txt)
-  echo "My public IP address is: $ip"
-}
-
-function weather
-{
-  if [[ $# == 0 ]]; then
-    weather :help
-    return
-  fi
-
-  local url="wttr.in/$1?format=v2"
-  echo "Getting weather using url: $url"
-  curl "$url"
-}
-
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
@@ -672,61 +654,30 @@ alias dl_fast_then_slow.sh='dl_fast_then_slow.sh '
 # Functions
 #----------------------------------------
 
-# Do program multiple times
-
 function repeat_every_while
 {
-    interval=$1; shift
-    cmd=( $* )
+    local interval=$1; shift
+    local cmd=("$@")
 
     while $cmd; do
         sleep $interval
     done
 }
+alias repeat_while="repeat_every_while 1"
 
-function repeat_while
-{
-    repeat_every_while 1 $*
-}
+autoload -U myip
+autoload -U weather
 
 # Mesure time (arbitrarily)
+autoload -U countdown chronometer
 
-function countdown
-{
-    local quit
-    trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+autoload -U transfer
 
-    local from_seconds=$1
-    if [ -z "$from_seconds" ]; then
-        from_seconds=60
-    fi
+autoload -U http::serve-local
 
-    local original_timestamp=$(( `date +%s` + $from_seconds ))
+autoload -U extract
+alias extract::dry-run='extract --dry-run'
 
-    echo "Counting down from ${from_seconds}s"
-
-    while [ "$original_timestamp" -ge `date +%s` ] && [ -z $quit ]; do
-        echo -ne "$(date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S)\r"
-        sleep .1
-    done
-
-    date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S
-}
-
-function chronometer
-{
-    local quit
-    trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
-
-    local original_timestamp=`date +%s`
-
-    while [ -z $quit ]; do
-        echo -ne "$(date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S)\r"
-        sleep .1
-    done
-
-    date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S
-}
 
 # Watch a media with 'mpv' player, then ask to move the media file to 'seen/' directory.
 function watch_and_seen
@@ -788,124 +739,6 @@ function switch-term-colors
         export TERM_COLOR_MODE=$color_mode
     fi
 }
-
-function transfer
-{
-    if [ $# -eq 0 ]; then
-        echo "No arguments specified."
-        echo
-        echo "Usages: Given \`echo some content > /tmp/test.md\`"
-        echo "  1. cat /tmp/test.md | transfer some_name"
-        echo "  2. transfer /tmp/test.md"
-        echo
-        return 1;
-    fi
-
-    tmpfile=$( mktemp -t transferXXX );
-    if tty -s; then
-        # input is from given file
-        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g');
-        command curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile;
-    else
-        # input is from stdin
-        command curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ;
-    fi;
-    echo
-    command cat $tmpfile;
-    command rm -f $tmpfile;
-    echo
-}
-
-function http::serve-local
-{
-  if [[ $# == 0 ]]; then
-    echo "Usage: $0 <directory> [<port> [<ip>|all]]"
-    return 1
-  fi
-
-  # NOTE: We force <dir> to be specified to have a no-arg form that gives the usage message
-
-  local dir="$1"
-  local port="${2:-1234}"
-  local ip="${3:-127.0.0.1}"
-  [[ "$ip" == "all" ]] && ip="0.0.0.0"
-
-  echo "==> Serving '$dir' on '$ip:$port' over HTTP <=="
-  echo
-
-  python -m http.server $port --bind $ip --directory $dir
-}
-
-# Extract common compressed file formats
-function extract
-{
-  local dryrun=0
-  if [[ "$1" == "--dry-run" ]]; then
-    dryrun=1
-    shift
-  fi
-
-  if [[ $# == 0 ]]; then
-    echo "Usage: extract [--dry-run] <compressed_file> [<directory>]"
-    return 1
-  fi
-
-  local compressed_file="$1"
-  local target_dir="${2:-.}"
-  local source_dir="$PWD"
-
-  echo "--> Extracting '$compressed_file' to '$target_dir'..."
-  [[ "$dryrun" == 1 ]] && return
-
-  mkdir -vp "$target_dir" || return 1
-
-  case "$compressed_file" in
-    (*.tar)
-      tar xvf "$compressed_file" -C "$target_dir"
-      ;;
-    (*.tar.gz|*.tgz)
-      tar xvzf "$compressed_file" -C "$target_dir"
-      ;;
-    (*.tar.bz2|*.tbz|*.tbz2)
-      tar --bzip2 xvf "$compressed_file" -C "$target_dir"
-      ;;
-    (*.tar.xz|*.txz)
-      tar --xz xvf "$compressed_file" -C "$target_dir"
-      ;;
-
-    (*.zip)
-      unzip "$compressed_file" -d "$target_dir"
-      ;;
-
-    (*.rar)
-      (cd "$target_dir" && unrar e "${source_dir}/${compressed_file}")
-      ;;
-
-    (*.7z)
-      7z e -o"$target_dir" "$compressed_file"
-      ;;
-
-    # Single file extractors
-    (*.gz)
-      local target_file="${compressed_file%.gz}" # remove extension
-      gunzip --stdout "${compressed_file}" > "${target_dir}/${target_file}"
-      ;;
-    (*.bz2)
-      local target_file="${compressed_file%.bz2}" # remove extension
-      gunzip --stdout "${compressed_file}" > "${target_dir}/${target_file}"
-      ;;
-    (*.xz)
-      local target_file="${compressed_file%.xz}" # remove extension
-      unxz --stdout "${compressed_file}" > "${target_dir}/${target_file}"
-      ;;
-
-    (*)
-      echo "ERROR: Unsupported file extension '$compressed_file'"
-      return 1
-      ;;
-  esac
-}
-alias extract::dry-run='extract --dry-run'
 
 # ------------------------------------------------------------------------
 # ffmpeg helpers
