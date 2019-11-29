@@ -994,33 +994,26 @@ function segmt::git_branch_fast
     echo -n "%K{black} On ${p} %k"
 }
 
-# Hook to get the last command exit code
-#
-# This should be the first hook run after a command, otherwise the exit code won't be correct.
-function get-last-exit
+# Segment last exit code
+function segmt::exit_code_long_on_error
 {
-    LAST_EXIT_CODE=$?
+    local content="Last Exit: %?"
+    local on_error="%B%K{black}%F{red} $content %f%k%b"
+    echo -n "%(?||$on_error)"
 }
-hooks-add-hook precmd_hook get-last-exit
 
 # Segment last exit code
-function segmt::last_exit_code
+function segmt::exit_symbol_on_error
 {
-    if [[ $LAST_EXIT_CODE -ne 0 ]]; then
-        local content="Last Exit: ${LAST_EXIT_CODE}"
-        local with_style="%B%K{black}%F{red} ${content} %f%k%b"
-        echo -n "${with_style}"
-    fi
+  local on_error="%K{124} ✘ %k"
+  echo -n "%(?||$on_error)"
 }
 
 # Segment last exit code
 function segmt::exit_code_on_error
 {
-  [[ $LAST_EXIT_CODE == 0 ]] && return
-
-  local content="✘"
-  local with_style="%K{124} ${content} %k"
-  echo -n "${with_style}"
+  local on_error="%K{124}%F{white}%B %? %b%f%k"
+  echo -n "%(?||$on_error)"
 }
 
 # Segment is shell in sudo session
@@ -1103,20 +1096,15 @@ hooks-add-hook precmd_hook prompt-auto-scroll
 
 function segmt::shlvl
 {
-    [ $SHLVL = 1 ] && return
+    [[ $SHLVL == 1 ]] && return
 
-    local shlvl='%L'
-    local with_style="%B%F{red}${shlvl} %f%b"
-
-    echo -n "${with_style}"
+    echo -n "{%BLVL%L%b} "
 }
 
 # Segment variable debug
 function segmt::debug
 {
-    local debugVar=$*
-    local debugVarStyle="%K{blue} DEBUG: ${debugVar} %k"
-    echo -n "${debugVarStyle}"
+    echo -n "%K{blue} DEBUG: $* %k"
 }
 
 # Build a string from an array of parts.
@@ -1240,8 +1228,7 @@ autoload -U promptinit && promptinit
 STATUSLINE_PARTS=(
   func: segmt::vim_mode
   func: segmt::in_sudo
-  text: "  "
-  func: segmt::last_exit_code
+  func: segmt::exit_code_long_on_error
 )
 
 # NOTE: the generated prompt str is static, the segment functions are not called.
@@ -1269,8 +1256,7 @@ function sl::build_prompt_str
 
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
-  func: segmt::exit_code_on_error
-  text: "[%F{yellow}%n%f]" # username
+  func: segmt::exit_symbol_on_error
   text: " "
   text: "%2~" # current dir
   text: " "
@@ -1278,7 +1264,7 @@ PROMPT_CURRENT_PARTS=(
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
-  func: segmt::exit_code_on_error
+  func: segmt::exit_symbol_on_error
   text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
   text: " "
   text: "%B%F{magenta}%%%f%b" # cmd separator
@@ -1294,7 +1280,7 @@ PROMPT_PAST+=" "
 # -- Right prompt
 
 RPROMPT_CURRENT_PARTS=(
-  func_reset: "%{$reset_color%}"
+  func_reset: "%k%f%b%u%{$reset_color%}"
 
   func: segmt::in_sudo
   func: segmt::git_branch_fast
@@ -1302,7 +1288,7 @@ RPROMPT_CURRENT_PARTS=(
 )
 
 RPROMPT_PAST_PARTS=(
-  func_reset: "%{$reset_color%}"
+  func_reset: "%k%f%b%u%{$reset_color%}"
 
   func: segmt::in_sudo
   func: segmt::git_branch_fast
