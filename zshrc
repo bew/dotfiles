@@ -1023,7 +1023,7 @@ function segmt::debug
 #
 # Gives literaly:
 #
-#   $(some_func1)reset|$(some_func2)reset|xxx|$(some_func3)reset
+#   $(some_func1)reset|$(some_func2)reset|xxx|$(some_func3)XX
 #
 # The result will need to be re-evaluated by the prompt system to call
 # the functions (some_func{1,2,3}).
