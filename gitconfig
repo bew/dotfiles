@@ -39,7 +39,7 @@
 
   br = branch
   brv = "!git --no-pager branch -vv"
-  st = status --ignore-submodules=all
+  s = status --ignore-submodules=all
 
   # log
   pretty-log = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n'
@@ -48,10 +48,10 @@
   lo = "!git pretty-log --oneline"
 
   # diff
-  dd = diff
-  ddc = diff --staged
-  d = diff -w
-  dc = diff -w --staged
+  d = diff
+  dc = diff --staged
+  dd = diff -w
+  ddc = diff -w --staged
 
   # last merge stats (This is a complex alias, I won't get auto-completion on this one..)
   stat-last-merge = "!f() { \
