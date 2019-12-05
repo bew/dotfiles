@@ -25,16 +25,16 @@ function extract
 
   case "$compressed_file" in
     (*.tar)
-      tar xvf "$compressed_file" -C "$target_dir"
+      tar -xvf "$compressed_file" -C "$target_dir"
       ;;
     (*.tar.gz|*.tgz)
-      tar xvzf "$compressed_file" -C "$target_dir"
+      tar -xvzf "$compressed_file" -C "$target_dir"
       ;;
     (*.tar.bz2|*.tbz|*.tbz2)
-      tar --bzip2 xvf "$compressed_file" -C "$target_dir"
+      tar --bzip2 -xvf "$compressed_file" -C "$target_dir"
       ;;
     (*.tar.xz|*.txz)
-      tar --xz xvf "$compressed_file" -C "$target_dir"
+      tar --xz -xvf "$compressed_file" -C "$target_dir"
       ;;
 
     (*.zip)
@@ -64,7 +64,7 @@ function extract
       ;;
 
     (*)
-      echo "ERROR: Unsupported file extension '$compressed_file'"
+      echo "ERROR: Unsupported file '$compressed_file'"
       return 1
       ;;
   esac
