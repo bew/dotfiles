@@ -371,6 +371,8 @@ function cheatsh
   curl cht.sh/$1
 }
 
+alias dl_file="curl -L -O"
+
 # Colorful diffs (https://www.colordiff.org/)
 alias diff="colordiff"
 
