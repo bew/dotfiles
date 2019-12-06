@@ -224,7 +224,7 @@ setopt LOCAL_TRAPS
 # Completion
 #----------------------------------------------------------------------------------
 
-fpath=(~/.zsh/fpath-completion/ $fpath)
+fpath=(~/.zsh/completions/ ~/.zsh/completions/nix-completions $fpath)
 
 # Initialize the completion system
 autoload -U compinit && compinit
