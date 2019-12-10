@@ -1775,6 +1775,14 @@ bindkey -M menuselect 'l' forward-char
 bindkey -M menuselect '0' beginning-of-line
 bindkey -M menuselect '$' end-of-line
 
+# Alt-J/K => go to next/previous match group
+bindkey -M menuselect 'K' vi-backward-blank-word
+bindkey -M menuselect 'J' vi-forward-blank-word
+
+# Alt-g & Alt-G => go to first/last line (of all lines of matches)
+bindkey -M menuselect 'g' beginning-of-history
+bindkey -M menuselect 'G' end-of-history
+
 # Accept the completion entry but continue to show the completion list
 bindkey -M menuselect 'a' accept-and-hold
 
