@@ -316,8 +316,8 @@ alias zshrc=reload_zsh
 
 # global aliases
 
-alias -g nostdout=" >/dev/null "
-alias -g nostderr=" 2>/dev/null "
+alias -g noout=" >/dev/null "
+alias -g noerr=" 2>/dev/null "
 
 # Shorters
 
