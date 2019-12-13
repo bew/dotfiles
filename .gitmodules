@@ -1,12 +1,6 @@
-[submodule "z"]
-	path = third-party/z
-	url = git@github.com:rupa/z.git
 [submodule "zsh-hooks"]
 	path = third-party/zsh-hooks
 	url = git@github.com:willghatch/zsh-hooks.git
-[submodule "third-party/gitstatus"]
-	path = third-party/gitstatus
-	url = https://github.com/romkatv/gitstatus.git
 [submodule "third-party/zplugin"]
 	path = third-party/zplugin
 	url = git@github.com:zdharma/zplugin.git

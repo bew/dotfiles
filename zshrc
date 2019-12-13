@@ -58,10 +58,10 @@ zplugin light zdharma/fast-syntax-highlighting
 #   fast-theme ~/.zsh/fast-theme--bew.ini
 
 # cd with 'frecency' (recent + frequence)
-zplugin light ~/.zsh/third-party/z
+zplugin light rupa/z
 
 # Git branch in prompt (using fast gitstatusd daemon)
-zplugin load ~/.zsh/third-party/gitstatus
+zplugin load romkatv/gitstatus
 gitstatus_start MY
 
 
