@@ -373,6 +373,10 @@ function cheatsh
 
 alias dl_file="curl -L -O"
 
+# -f : full listing (show process name & args)
+# --forest : Show a processes hierarchy
+alias pss="ps -f --forest"
+
 # Colorful diffs (https://www.colordiff.org/)
 alias diff="colordiff"
 

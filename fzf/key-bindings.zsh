@@ -1,5 +1,5 @@
 # Key bindings
-# ------------
+
 if [[ $- != *i* ]]; then
     return
 fi
@@ -92,7 +92,7 @@ function zwidget::fzf::history
     # -l  | list the commands
     # -r  | show in reverse order (=> most recent first)
     # 1   | start at command n° 1 (the oldest still in history)
-    local history_cmd=(fc -lr 1)
+    local history_cmd=(fc -l -r 1)
 
     local fzf_cmd=($(__fzfcmd) $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
     local selected=( $( "${history_cmd[@]}" | "${fzf_cmd[@]}" ) )
