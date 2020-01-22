@@ -1300,7 +1300,6 @@ function zle::utils::no-history-run
   BUFFER+="$cmd"
   zle .accept-line
 }
-zle -N zle::utils::no-history-run
 
 # Toggle sudo at <bol>
 function zwidget::toggle-sudo
@@ -1364,7 +1363,7 @@ function zwidget::fg
 {
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
 
-    zle zle::utils::no-history-run "fg %+"
+    zle::utils::no-history-run "fg %+"
 }
 zle -N zwidget::fg
 
@@ -1375,7 +1374,7 @@ function zwidget::fg2
     [ -z "$(jobs)" ] && zle -M "No running jobs" && return
     [ "$(jobs | wc -l)" -lt 2 ] && zle -M "Not enough running jobs" && return
 
-    zle zle::utils::no-history-run "fg %-"
+    zle::utils::no-history-run "fg %-"
 }
 zle -N zwidget::fg2
 
