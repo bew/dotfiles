@@ -1,44 +1,11 @@
 priority -50
 
-global !p
-import vim
-
-# Tests for the existence of a variable declared by Vim's filetype detection
-# suggesting the type of shell script of the current file
-def testShell(scope, shell):
-	return vim.eval("exists('" + scope + ":is_" + shell + "')")
-
-# Loops over the possible variables, checking for global variables
-# first since they indicate an override by the user.
-def getShell():
-	for scope in ["g", "b"]:
-		for shell in ["bash", "posix", "sh", "kornshell"]:
-			if testShell(scope, shell) == "1":
-				if shell == "kornshell":
-					return "ksh"
-				if shell == "posix":
-					return "sh"
-				return shell
-	return "sh"
-endglobal
-
-###########################################################################
-#                            TextMate Snippets                            #
-###########################################################################
 snippet #!
-`!p snip.rv = '#!/bin/' + getShell() + "\n\n" `
+#!/bin/bash
 endsnippet
 
 snippet !env "#!/usr/bin/env (!env)"
-`!p snip.rv = '#!/usr/bin/env ' + getShell() + "\n\n" `
-endsnippet
-
-snippet temp "Tempfile"
-${1:TMPFILE}="$(mktemp -t ${2:`!p
-snip.rv = re.sub(r'[^a-zA-Z]', '_', snip.fn) or "untitled"
-`})"
-${3:${4/(.+)/trap "/}${4:rm -f '$${1/.*\s//}'}${4/(.+)/" 0               # EXIT\n/}${5/(.+)/trap "/}${5:rm -f '$${1/.*\s//}'; exit 1}${5/(.+)/" 2       # INT\n/}${6/(.+)/trap "/}${6:rm -f '$${1/.*\s//}'; exit 1}${6/(.+)/" 1 15    # HUP TERM\n/}}
-
+#!/usr/bin/env ${1:prog}$99
 endsnippet
 
 snippet case "case .. esac (case)"
