@@ -30,6 +30,8 @@ set relativenumber
 set cursorline    " highlight the current line
 set cursorcolumn  " highlight the current column
 
+set noequalalways " Avoid windows auto-resizing on win opened/closed
+
 set mouse=nv " Enable mouse in normal & visual
 
 set display=lastline
