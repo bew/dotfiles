@@ -7,7 +7,7 @@ filetype plugin indent on
 set omnifunc=syntaxcomplete#Complete
 
 " allow backspacing over everything in insert mode
-set backspace=indent,eol
+set backspace=indent,eol,start
 
 " always show the statusline
 set laststatus=2
