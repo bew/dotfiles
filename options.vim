@@ -7,7 +7,7 @@ filetype plugin indent on
 set omnifunc=syntaxcomplete#Complete
 
 " allow backspacing over everything in insert mode
-set backspace=indent,eol,start
+set backspace=indent,eol
 
 " always show the statusline
 set laststatus=2
@@ -30,14 +30,14 @@ set relativenumber
 set cursorline    " highlight the current line
 set cursorcolumn  " highlight the current column
 
-set mouse=nv " normal & visual
+set mouse=nv " Enable mouse in normal & visual
 
 set display=lastline
 
 set showbreak=…… " Prefix for wrapped lines
 set linebreak    " Wrapping will break lines on word boundaries
 
-set hidden
+set hidden " Allow to have unsaved hidden buffers
 
 set timeoutlen=300
 
