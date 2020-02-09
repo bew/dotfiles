@@ -2,15 +2,15 @@
 
 function chronometer
 {
-    local quit
-    trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+  local quit
+  trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
 
-    local original_timestamp=`date +%s`
+  local start_tstamp=`date +%s`
 
-    while [ -z $quit ]; do
-        echo -ne "$(date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S)\r"
-        sleep .1
-    done
+  while [[ -z $quit ]]; do
+    echo -ne "$(date -u --date @$(( `date +%s` - $start_tstamp )) +%M:%S)\r"
+    sleep .1
+  done
 
-    date -u --date @$(( `date +%s` - $original_timestamp )) +%M:%S
+  date -u --date @$(( `date +%s` - $start_tstamp )) +%M:%S
 }

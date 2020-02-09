@@ -1,17 +1,3 @@
-function kipr::remote-build
-{
-  local branch="$1"
-  if [[ -z "$branch" ]]; then
-    # default to the current branch
-    branch=$(git rev-parse --abbrev-ref HEAD)
-  fi
-
-  echo "Send assets compilation job to kipr, for branch: $branch"
-  echo "--------------------------------------------------------"
-
-  time ssh -t _kipr "~/current/build/manage_builds $branch @bew"
-}
-
 function as_postgres_user
 {
   if [[ $# == 0 ]]; then
