@@ -15,7 +15,35 @@ vnoremap <M-s> <Esc>:w<cr>
 nnoremap <M-w> :set wrap! wrap?<cr>
 
 " toggle relativenumber
-nnoremap <M-r>  :set relativenumber! relativenumber?<CR>
+nnoremap <M-r> :set relativenumber! relativenumber?<CR>
+
+" Toggles signcolumn, number & relativenumber at once
+function! ToggleSignsAndLineNumbers()
+  if get(w:, "toggle_signs_and_line_numbers_in_progress", 0) == 1
+    let w:toggle_signs_and_line_numbers_in_progress = 0
+    let status = "restored"
+
+    " Restore saved option values
+    let &signcolumn = w:saved_signcolumn
+    let &number = w:saved_number
+    let &relativenumber = w:saved_relativenumber
+  else
+    let w:toggle_signs_and_line_numbers_in_progress = 1
+    let status = "saved & disabled"
+
+    " Save options and disable them
+    let w:saved_signcolumn = &signcolumn
+    let w:saved_number = &number
+    let w:saved_relativenumber = &relativenumber
+
+    let &signcolumn = "no"
+    let &number = 0
+    let &relativenumber = 0
+  endif
+
+  echo "Signs and line numbers: " . l:status
+endf
+nnoremap <expr> <M-R>  ToggleSignsAndLineNumbers()
 
 nnoremap <M-m> :Neomake<cr>
 

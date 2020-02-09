@@ -27,6 +27,9 @@ set smartcase
 set number
 set relativenumber
 
+" Draw signcolumn only if needed and resize for up to N signs on same line
+set signcolumn=auto:2
+
 set cursorline    " highlight the current line
 set cursorcolumn  " highlight the current column
 
