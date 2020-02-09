@@ -34,7 +34,11 @@ set noequalalways " Avoid windows auto-resizing on win opened/closed
 
 set mouse=nv " Enable mouse in normal & visual
 
-set display=lastline
+" Change the way text is displayed
+set display=
+set display+=lastline  " As much as possible of the last line in a window is displayed
+set display+=truncate  " Like "lastline" but shows that last line isn't fully rendered
+set display+=msgsep    " When showing messages longer than 'cmdheight', only scroll the message lines, not the entire screen.
 
 set showbreak=…… " Prefix for wrapped lines
 set linebreak    " Wrapping will break lines on word boundaries
