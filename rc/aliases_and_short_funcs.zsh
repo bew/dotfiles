@@ -222,9 +222,9 @@ alias ff_streaming="firefox -P pezop www.diagrim.com &!"
 
 # Fast config edit
 
-alias vimzshrc="vim ~/.zshrc"
-alias vimnviminit="vim ~/.config/nvim/init.vim"
-alias vimnvimmappings="vim ~/.config/nvim/config.rc/mappings.rc.vim"
+alias ezshrc="e ~/.zshrc"
+alias enviminit="e ~/.config/nvim/init.vim"
+alias envimmappings="e ~/.config/nvim/mappings.vim"
 alias cdzsh="cd ~/.zsh"
 alias cdnvim="cd ~/.nvim"
 alias cdbin="cd ~/.bin"

@@ -371,7 +371,7 @@ zle -N edit-command-line
 # Alt-E => edit line in $EDITOR
 vibindkey 'e' edit-command-line
 
-source ~/.zsh/fzf-mappings.zsh
+source ~/.zsh/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
 vibindkey 'F' zwidget::fzf::find_file
 vibindkey 'c' zwidget::fzf::find_directory

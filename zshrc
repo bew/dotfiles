@@ -8,6 +8,15 @@
 # d8888888P  8""888P' o888o o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o
 #
 
+# colors for common binaries (ls, tree, etc..)
+#
+# NOTE: must be done early (not sure why)
+if command -v dircolors >/dev/null; then
+  DIRCOLORS_FILE=~/.dircolors
+  ! [[ -f $DIRCOLORS_FILE ]] && dircolors -p > $DIRCOLORS_FILE
+  [[ -f $DIRCOLORS_FILE ]] && eval `dircolors $DIRCOLORS_FILE`
+fi
+
 #-------------------------------------------------------------
 # Setup Hooks
 
@@ -101,11 +110,11 @@ hooks-add-hook chpwd_hook chpwd_recent_dirs
 
 #-------------------------------------------------------------
 # Options
-source ~/.zsh/options.zsh
+source ~/.zsh/rc/options.zsh
 
 #-------------------------------------------------------------
 # Completion
-source ~/.zsh/completions.zsh
+source ~/.zsh/rc/completions.zsh
 
 #-------------------------------------------------------------
 # Bracketed paste that handles URL & Undo
@@ -130,23 +139,23 @@ zle -N bracketed-paste my-bracketed-paste-with-undo
 
 #-------------------------------------------------------------
 # Aliases
-source ~/.zsh/aliases_and_short_funcs.zsh
+source ~/.zsh/rc/aliases_and_short_funcs.zsh
 
 #-------------------------------------------------------------
 # Prompt
-source ~/.zsh/prompt.zsh
+source ~/.zsh/rc/prompt.zsh
 
 #-------------------------------------------------------------
 # Keybinds
-source ~/.zsh/mappings.zsh
+source ~/.zsh/rc/mappings.zsh
 
 #-------------------------------------------------------------
 # Terminal title
-source ~/.zsh/terminal_title.zsh
+source ~/.zsh/rc/terminal_title.zsh
 
 #-------------------------------------------------------------
 # SSH Agent handling
-source ~/.zsh/ssh_agent.zsh
+source ~/.zsh/rc/ssh_agent.zsh
 
 
 #-------------------------------------------------------------
@@ -204,13 +213,6 @@ alias zln='zmv -L'
 alias zmv::dry-run='zmv -n'
 alias zcp::dry-run='zcp -n'
 alias zln::dry-run='zln -n'
-
-# colors for common binaries (ls, tree, etc..)
-if command -v dircolors >/dev/null; then
-  DIRCOLORS_FILE=~/.dircolors
-  ! [[ -f $DIRCOLORS_FILE ]] && dircolors -p > $DIRCOLORS_FILE
-  [[ -f $DIRCOLORS_FILE ]] && eval `dircolors $DIRCOLORS_FILE`
-fi
 
 
 #-------------------------------------------------------------

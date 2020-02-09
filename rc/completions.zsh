@@ -1,6 +1,9 @@
 # ----------------------------------------------
 # Completion - setup
 
+# Import color helpers
+autoload -U colors && colors
+
 fpath=(~/.zsh/completions/ $fpath)
 fpath+=(~/.zsh/completions/nix-completions)
 
