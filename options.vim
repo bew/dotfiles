@@ -55,7 +55,7 @@ set listchars=tab:·\ ,trail:@,precedes:<,extends:> " how to show differents cat
 
 " Set the char to use to fill some blanks
 set fillchars=
-set fillchars+=fold:╶,   " right side of a clased fold (default: '·')
+set fillchars+=fold:╶,   " right side of a closed fold (default: '·')
 set fillchars+=diff:\ ,  " deleted lines of the 'diff' option (default: '-')
 set fillchars+=eob:\ ,   " empty lines at the end of a buffer (default: '~')
 
