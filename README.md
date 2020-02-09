@@ -4,7 +4,7 @@ My personnal zsh config
 
 ## Screenshot
 
-![Bew's zsh config](media/zsh.png)
+![Bew's zsh config](.media/zsh.png)
 
 ## Installation
 

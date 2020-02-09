@@ -1,6 +1,0 @@
-function hello()
-{
-	echo hello world
-}
-
-# vim: ft=zsh
