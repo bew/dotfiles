@@ -112,8 +112,8 @@ nnoremap <M-CR> A<cr>
 nnoremap <M-N> :cnext<cr>
 nnoremap <M-P> :cprevious<cr>
 
-nnoremap <leader>j :call GotoQfOrLoc("next", "first")<cr>
-nnoremap <leader>k :call GotoQfOrLoc("previous", "last")<cr>
+nnoremap <expr> <leader>j  GotoQfOrLoc("next", "first")
+nnoremap <expr> <leader>k  GotoQfOrLoc("previous", "last")
 
 " First try the quickfix list, if empty, uses the location list
 function! GotoQfOrLoc(direction, rewind_name)
@@ -144,10 +144,10 @@ function! GotoQfOrLoc(direction, rewind_name)
 endfunction
 
 " Trigger completion manually
-inoremap <expr> <C-b> deoplete#manual_complete()
+inoremap <expr> <C-b>  deoplete#manual_complete()
 
 " Insert common string during completion
-inoremap <expr> <M-b> deoplete#complete_common_string()
+inoremap <expr> <M-b>  deoplete#complete_common_string()
 
 
 " Exit the terminal grabber
