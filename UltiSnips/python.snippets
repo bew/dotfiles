@@ -1,40 +1,5 @@
 priority -50
 
-###########################################################################
-#                            TEXTMATE SNIPPETS                            #
-###########################################################################
-
-#! header
-snippet #! "Shebang header for python scripts" b
-#!/usr/bin/env python3
-
-$0
-endsnippet
-
-snippet ifmain "ifmain" b
-if __name__ == `!p snip.rv = get_quoting_style(snip)`__main__`!p snip.rv = get_quoting_style(snip)`:
-	${1:${VISUAL:main()}}
-endsnippet
-
-snippet for "for loop" b
-for ${1:item} in ${2:iterable}:
-	${3:${VISUAL:pass}}
-endsnippet
-
-snippet /tq(uotes)?/ "triple quotes string" r
-"""
-    ${VISUAL}$1
-"""$0
-endsnippet
-
-snippet doc "One line doc" b
-"""${1:TODO: doc}"""$0
-endsnippet
-
-snippet p "print(...)" b
-print($1)$0
-endsnippet
-
 ##########
 # COMMON #
 ##########
@@ -251,14 +216,11 @@ def write_function_docstring(t, snip):
 
 endglobal
 
-########################################
-# Class & Special Method Name Snippets #
-########################################
+# definitions
 
-snippet class "class definition" b
+snippet cl "class definition" b
 class ${1:MyClass}${2:(${3:object})}:
-	"""${4:TODO: doc}"""
-$0
+	"""${4:TODO: doc}"""$99
 endsnippet
 
 snippet def "function" b
@@ -272,22 +234,19 @@ def __init__(self${1:, ${2:arg}}):
 endsnippet
 
 snippet defc "class method" b
-def ${1:function}(self${2:, ${3:arg}}):
+@classmethod
+def ${1:function}(cls${2:, ${3:arg}}):
 	${4:${VISUAL:pass}}
 endsnippet
 
-# doesn't expand when there is a word in front
-snippet /(^|(?<=\W))\./ "self." r
-self.
+snippet defs "static method" b
+@staticmethod
+def ${1:function}(${2:arg}):
+	${3:${VISUAL:pass}}
 endsnippet
 
-snippet from "from module import name" b
-from ${1:module} import ${2:Stuff}
-endsnippet
+# if / elif / else
 
-####################
-# If / Else / Elif #
-####################
 snippet if "If" b
 if ${1:condition}:
 	${2:${VISUAL:pass}}
@@ -300,19 +259,30 @@ else:
 	${3:pass}
 endsnippet
 
-snippet ifee "If / Elif / Else" b
-if ${1:condition}:
-	${2:${VISUAL:pass}}
-elif ${3:condition}:
-	${4:pass}
-else:
-	${5:pass}
+snippet elif "elif ..." b
+elif ${1:condition}:
+	${2:pass}
 endsnippet
 
+snippet el "else" b
+else:
+	${1:pass}
+endsnippet
 
-##########################
-# Try / Except / Finally #
-##########################
+snippet ifmain "ifmain" b
+if __name__ == `!p snip.rv = get_quoting_style(snip)`__main__`!p snip.rv = get_quoting_style(snip)`:
+	${1:${VISUAL:main()}}
+endsnippet
+
+# for
+
+snippet for "for loop" b
+for ${1:item} in ${2:iterable}:
+	${3:${VISUAL:pass}}
+endsnippet
+
+# try
+
 snippet try "Try / Except" b
 try:
 	${1:${VISUAL:pass}}
@@ -320,85 +290,10 @@ except ${2:Exception}${3: as ${4:e}}:
 	${5:raise $4}
 endsnippet
 
-snippet trye "Try / Except / Else" b
-try:
-	${1:${VISUAL:pass}}
-except ${2:Exception}${3: as ${4:e}}:
-	${5:raise $4}
-else:
-	${6:pass}
-endsnippet
+# misc
 
-snippet tryf "Try / Except / Finally" b
-try:
-	${1:${VISUAL:pass}}
-except ${2:Exception}${3: as ${4:e}}:
-	${5:raise $4}
-finally:
-	${6:pass}
-endsnippet
-
-snippet tryef "Try / Except / Else / Finally" b
-try:
-	${1:${VISUAL:pass}}
-except ${2:Exception}${3: as ${4:e}}:
-	${5:raise $4}
-else:
-	${6:pass}
-finally:
-	${7:pass}
-endsnippet
-
-
-#####################
-# Assertions & Tests #
-#####################
-
-snippet ae "Assert equal" b
-self.assertEqual(${1:${VISUAL:first}}, ${2:second})
-endsnippet
-
-snippet aii "Assert is instance" b
-self.assertIsInstance(${1:${VISUAL:obj}}, ${2:cls})
-endsnippet
-
-snippet at "Assert True" b
-self.assertTrue(${1:${VISUAL:expression}})
-endsnippet
-
-snippet af "Assert False" b
-self.assertFalse(${1:${VISUAL:expression}})
-endsnippet
-
-snippet aae "Assert almost equal" b
-self.assertAlmostEqual(${1:${VISUAL:first}}, ${2:second})
-endsnippet
-
-snippet ar "Assert raises" b
-with self.assertRaises(${1:exception}):
-	${2:${VISUAL:func()}}
-endsnippet
-
-snippet an "Assert is None" b
-self.assertIsNone(${1:${VISUAL:expression}})
-endsnippet
-
-snippet ann "Assert is not None" b
-self.assertIsNotNone(${1:${VISUAL:expression}})
-endsnippet
-
-snippet testcase "pyunit testcase" b
-class Test${1:Class}(${2:unittest.TestCase}):
-	"""${3:Test case docstring.}"""
-
-	def setUp(self):
-		${4:pass}
-
-	def tearDown(self):
-		${5:pass}
-
-	def test_${6:name}(self):
-		${7:${VISUAL:pass}}
+snippet from "from module import name" b
+from ${1:module} import ${2:Stuff}
 endsnippet
 
 snippet /""/ "triple quoted string (double quotes)" r
@@ -407,11 +302,20 @@ ${VISUAL}$1
 """$0
 endsnippet
 
-snippet '' "triple quoted string (single quotes)"
-'''
-	${VISUAL}$1
-'''$0
+snippet #! "Shebang header for python scripts" b
+#!/usr/bin/env python3
 endsnippet
 
+snippet doc "One line doc" b
+"""${1:TODO: doc}"""$99
+endsnippet
+
+snippet p "print(...)" b
+print(${1:${VISUAL}})
+endsnippet
+
+snippet f "f format str" w
+f"$1"$99
+endsnippet
 
 # vim:ft=snippets:
