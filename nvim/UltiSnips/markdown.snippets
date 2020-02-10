@@ -1,0 +1,58 @@
+priority -50
+
+###########################
+# Sections and Paragraphs #
+###########################
+snippet sec "Section" b
+# ${1:Section Name}
+$99
+endsnippet
+
+snippet ssec "Sub Section" b
+## ${1:Section Name}
+$99
+endsnippet
+
+snippet sssec "SubSub Section" b
+### ${1:Section Name}
+$99
+endsnippet
+
+snippet par "Paragraph" b
+#### ${1:Paragraph Name}
+$99
+endsnippet
+
+snippet spar "Paragraph" b
+##### ${1:Paragraph Name}
+$99
+endsnippet
+
+################
+# Common stuff #
+################
+snippet link "Link to something"
+[${1:${VISUAL:Text}}](${3:http://${2:www.url.com}})$99
+endsnippet
+
+snippet img "Image"
+![${1:pic alt}](${2:path}${3/.+/ "/}${3:opt title}${3/.+/"/})$99
+endsnippet
+
+snippet ilc "Inline Code" i
+\`$1\`$99
+endsnippet
+
+snippet `` "Codeblock" b
+\`\`\`$1
+${VISUAL}$2
+\`\`\`$99
+endsnippet
+
+snippet ``cr "Codeblock" b
+\`\`\`cr
+${VISUAL}$1
+\`\`\`$99
+endsnippet
+
+# vim:ft=snippets:

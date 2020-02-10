@@ -1,0 +1,98 @@
+priority -50
+
+#################################
+# Snippets for the Lua language #
+#################################
+snippet #! "Shebang header" b
+#!/usr/bin/env lua
+$0
+endsnippet
+
+snippet req "local require" b
+local $2 = require("$1")$99
+endsnippet
+
+snippet doc "doc" b
+--- ${1:TODO: doc}$99
+endsnippet
+
+snippet fun "Function"
+function ${1:new_function}(${2:args})
+	$10
+end$99
+endsnippet
+
+snippet lfun "Local function"
+local function ${1:new_function}(${2:args})
+	$10
+end$99
+endsnippet
+
+snippet funa "Anonyous function" w
+function(${1:args})
+	$10
+end$99
+endsnippet
+
+snippet forp "pair for loop" b
+for ${1:name}, ${2:val} in pairs(${3:table_name}) do
+	$10
+end$99
+endsnippet
+
+snippet fori "ipair for foop" b
+for ${1:idx}, ${2:val} in ipairs(${3:table_name}) do
+	$10
+end$99
+endsnippet
+
+snippet for "numeric for loop" b
+for ${1:i} = ${2:first}, ${3:last}${4/^..*/(?0:,:)/}${4:step} do
+	$10
+end$99
+endsnippet
+
+snippet loc "local x = 1"
+local ${1:x} = ${0:1}
+endsnippet
+
+snippet do "do ... end" b
+do
+	${VISUAL}$1
+end$99
+endsnippet
+
+# Comments
+
+snippet com "Comment"
+-- $99
+endsnippet
+
+snippet todo "TODO comment"
+-- TODO: $99
+endsnippet
+
+snippet fline "Full line ---" b
+------------------------------------------------------------------------------------
+endsnippet
+
+snippet mline "Mid line ---" b
+---------------------------------------------------------------
+endsnippet
+
+snippet sline "Small line ---" b
+------------------------------------------
+endsnippet
+
+snippet section "Comment Section" b
+$1
+-- ${2:${VISUAL/^-- //}}
+$1$99
+endsnippet
+
+snippet header "Comment Header" b
+-- ${1:${VISUAL:Comment/^-- //}}
+$2$99
+endsnippet
+
+# vim:ft=snippets:
