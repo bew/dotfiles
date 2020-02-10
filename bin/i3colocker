@@ -1,0 +1,142 @@
+#!/usr/bin/zsh
+
+# i3lock-color runner
+
+#----- Color vars
+C_RED_400='ef5350'
+C_GREY_300='e0e0e0'
+C_TEAL_500='009688'
+C_LIGHTBLUE_500='03a9f4'
+C_AMBER_500='ffc107'
+C_ORANGE_500='ff9800'
+
+#----- Alignment vars
+A_Center=0
+A_Left=1
+A_Right=2
+
+#----- General config
+args=()
+args+=(--nofork --force-clock)
+args+=(--pass-media-keys) # Doe not seems to work...
+args+=(--blur 1)
+
+#----- Text config
+args+=(
+  --veriftext=''
+  --wrongtext=''
+  --noinputtext=''
+  # No text, we rely on indicator colors
+)
+
+#----- Indicator config
+args+=(
+  # --indpos="x position:y position"
+  #   Sets the position for the unlock indicator. Valid variables include:
+  #
+  #   x - x position of the current display. Corresponds to the leftmost
+  #       row of pixels on that display.
+  #
+  #   y - y position of the current display. Corresponds to the topmost
+  #       row of pixels on that display.
+  #
+  #   w - width of the current display.
+  #   h - height of the current display.
+  #   r - the unlock indicator radius.
+  #
+  --indpos='x + 20 + r : y + h - 20 - r'
+  --radius='50'
+
+
+  # --insidevercolor=rrggbbaa
+  #   Sets the interior circle color while the password is being verified.
+  --insidevercolor="${C_AMBER_500}77"
+
+  # --insidewrongcolor=rrggbbaa
+  #   Sets the interior circle color for during flash for an incorrect password.
+  --insidewrongcolor="${C_RED_400}77"
+
+  # --insidecolor=rrggbbaa
+  #   Sets the default "resting" color for the interior circle.
+  --insidecolor="${C_LIGHTBLUE_500}77"
+
+  # --ringvercolor=rrggbbaa
+  #   Sets the ring color while the password is being verified.
+  --ringvercolor="${C_ORANGE_500}ff"
+
+  # --ringwrongcolor=rrggbbaa
+  #   Sets the ring color during the flash for an incorrect password.
+  --ringwrongcolor="${C_RED_400}ff"
+
+  # --ringcolor=rrggbbaa
+  #   Sets the default ring color.
+  --ringcolor="${C_LIGHTBLUE_500}77"
+
+  # --linecolor=rrggbbaa
+  #   Sets the color for the line separating the inside circle, and the outer ring.
+  --linecolor="${C_GREY_300}ff"
+
+  # --line-uses-ring
+  #   Conflicts with --line-uses-inside. Overrides --linecolor. The line will match
+  #   the ring color.
+
+  # --line-uses-inside
+  #   Conflicts	 with  --line-uses-ring. Overrides --linecolor; the line will match
+  #   the inside color.
+
+  # --keyhlcolor=rrggbbaa
+  #   Sets the color of the ring 'highlight' strokes that appear upon keypress.
+  --keyhlcolor="${C_LIGHTBLUE_500}ff"
+
+  # --bshlcolor=rrggbbaa
+  #   Sets the color of the ring 'highlight' strokes that appear upon backspace.
+  --bshlcolor="${C_RED_400}ff"
+
+  # --separatorcolor=rrggbbaa
+  #   Sets the color of the 'separtor', which is at both ends  of  the	ring  high‐
+  #   lights.
+  #
+  # Note on transparency:
+  # - with ff it's weird
+  # - with 77 it makes a nice & clean separation
+  --separatorcolor="${C_GREY_300}77"
+)
+
+#----- Time config
+args+=(
+  --timestr='%H:%M:%S'
+  --timecolor="${C_GREY_300}ff"
+
+  # --timepos="x position:y position"
+  #   Sets the position for the time string. All the variables from --indpos
+  #   may be used, in addition to:
+  #
+  #   ix - the x value of the indicator on the current display.
+  #   iy - the y value of the indicator on the current display.
+  #
+  --timepos='x + w - 20 : y + h - 40'
+  --timesize='30'
+
+  --time-align="$A_Right"
+)
+
+#----- Date config
+args+=(
+  # e.g: 2018-02-27 - Tuesday Feb 2018
+  --datestr='%Y-%m-%d - %A %b %Y'
+  --datecolor="${C_GREY_300}ff"
+
+  # --datepos="x position:y position"
+  #   Sets the position for the date string. All the variables from --indpos
+  #   and --timepos may be used, in addition to:
+  #
+  #   tx - the computed x value of the timestring, for the current display.
+  #   ty - the computed y value of the timestring, for the current display.
+  #
+  --datepos='tx : ty + 20'
+  --datesize='15'
+
+  --date-align="$A_Right"
+)
+
+i3lock $args

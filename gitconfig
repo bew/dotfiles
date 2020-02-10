@@ -1,0 +1,110 @@
+[user]
+  email = benoit.dechezelles@gmail.com
+  name = Benoit de Chezelles
+
+[github]
+  user = bew
+
+[push]
+  default = current
+
+[core]
+  excludesfile = ~/.gitignore
+
+[alias]
+
+  # add & commit
+  a = add
+  ap = add -p
+  an = add -N
+  com = commit --verbose
+  comp = !git com -p
+
+  # index manipulation
+  f = fetch
+  m = merge
+  ch = checkout
+  sth = stash
+  untrack = rm --cached
+
+  unstage = reset HEAD
+
+  # remote interaction
+  ph = push
+  pl = pull
+  rem = remote -v
+
+  # info only
+  #----------------------------
+
+  br = branch
+  brv = "!git --no-pager branch -vv"
+  s = status --ignore-submodules=all
+
+  # log
+  pretty-log = log --graph --abbrev-commit --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(dim magenta)- %an%C(reset)%n'
+  ll = "!git pretty-log"
+  la = "!git pretty-log --all"
+  lo = "!git pretty-log --oneline"
+
+  # diff
+  d = diff
+  dc = diff --staged
+  dd = diff -w
+  ddc = diff -w --staged
+
+  # last merge stats (This is a complex alias, I won't get auto-completion on this one..)
+  stat-last-merge = "!f() { \
+    sha_orig_head=$(git rev-parse --short ORIG_HEAD); \
+    sha_head=$(git rev-parse --short HEAD); \
+    echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
+    git --no-pager diff --stat ORIG_HEAD $@ && git --no-pager diff --summary ORIG_HEAD $@; \
+    }; f"
+  slm = "!git stat-last-merge"
+
+  # last merge diff (move as simple alias?)
+  diff-last-merge = "diff ORIG_HEAD..HEAD"
+  dlm = "!git diff-last-merge"
+
+  # last merge logs
+  log-last-merge = "!git pretty-log ORIG_HEAD.."
+  llm = "!git log-last-merge"
+
+  remove-old-commits = reflog expire --all --expire=now
+  compress-repo = gc --aggressive --prune=now
+
+[help]
+  autocorrect = -1
+
+[color]
+  interactive = true
+
+[color "status"]
+  untracked = "cyan"
+
+[color "diff-highlight"]
+  # value is: fg [bold,..] [bg]
+  # Using the 256 colors palette
+  oldNormal = red
+  oldHighlight = red 52
+  newNormal = green
+  newHighlight = 40 22
+
+[interactive]
+  diffFilter = "diff-highlight | less -R"
+
+[pager]
+  log = "diff-highlight | LESS= less -R -+X"
+  show = "diff-highlight | LESS= less -R -+X"
+  diff = "diff-highlight | LESS= less -R -+X"
+  # We reset env `LESS` to disable `--quit-if-one-screen` if given in current
+  # env `LESS`. As it makes the command hang (no idea why) when there is < 1
+  # 'page'..
+
+[diff]
+  tool = nvim_diff
+
+[difftool "nvim_diff"]
+  cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
+
+# vim:set ft=gitconfig:

@@ -1,0 +1,294 @@
+#! /bin/bash
+
+function clean_exit
+{
+	echo 'Exiting...'
+	xset b off
+	exit
+}
+
+trap 'clean_exit' INT # catch SIGINT, to remove the bip on exit
+
+xset b on
+
+declare -A freqs
+freqs['DO']="260"
+freqs['DO-D']="278"
+freqs['RE-B']="274"
+freqs['RE']="293"
+freqs['RE-D']="313"
+freqs['MI-B']="309"
+freqs['MI']="330"
+freqs['FA']="347"
+freqs['FA-D']="371"
+freqs['SOL-B']="366"
+freqs['SOL']="391"
+freqs['SOL-D']="417"
+freqs['LA-B']="412"
+freqs['LA']="440"
+freqs['LA-D']="469"
+freqs['SI-B']="463"
+freqs['SI']="495"
+
+freqs['DO+']="523"
+freqs['DO-D+']="554"
+freqs['RE-B+']="554"
+freqs['RE+']="587"
+
+
+#
+## Usage: do_ton freq_id freq_length wait
+##
+## example: do_ton 'LA'	300 0.3
+#
+function do_ton
+{
+    freq=${freqs[$1]}
+    note_duration=$2
+    wait=$3
+    echo xset b $VOLUME $freq $note_duration
+    #xset b $VOLUME $freq $note_duration
+    #echo -e "Ton :: "$1"\tfreq: "$f" (sleep "$wait")"
+    #echo -n -e '\a'
+    sleep $wait
+}
+
+###############################################
+#############    Begin of code    #############
+###############################################
+
+# Here you can change the duration (note), delay (sleep) & volume
+DURATION=500  # default 500 (in millisecond)
+DELAY=0.5     # default 0.5 (in second)
+VOLUME=10    # default 100 (in percent)
+
+# note: with default settings, to tetris track last about 1 minute
+
+
+# Helpers for duration & delay
+# DO NOT TOUCH!
+
+function calc
+{
+	operation=$1
+	echo "$operation" | bc
+}
+
+duration=$DURATION
+duration_mul2=$(calc "$duration * 2")
+duration_div2=$(calc "$duration / 2")
+duration_div4=$(calc "$duration / 4")
+
+delay=$DELAY
+delay_mul2=$(calc "scale=3; $delay * 2")
+delay_div2=$(calc "scale=3; $delay / 2")
+delay_div4=$(calc "scale=3; $delay / 4")
+
+
+
+##############  Debut Partie A  ################
+##############  Debut for(2)  ##################
+for i in {0 1}; do
+    do_ton 'LA'      $duration       $delay
+
+    do_ton 'MI'      $duration_div2  $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'SOL'     $duration_div2  $delay_div2
+    do_ton 'LA'      $duration_div4  $delay_div4
+    do_ton 'SOL'     $duration_div4  $delay_div4
+
+    do_ton 'FA'      $duration_div2  $delay_div2
+    do_ton 'MI'      $duration_div2  $delay_div2
+
+    do_ton 'RE'      $duration       $delay
+
+    do_ton 'RE'      $duration_div2  $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'LA'      $duration       $delay
+
+    do_ton 'SOL'     $duration_div2  $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'MI'      $duration_div2  $delay_div2
+
+    sleep $delay_div2
+    do_ton 'MI'      $duration_div4  $delay_div4
+    sleep $delay_div4
+
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'SOL'     $duration       $delay
+    do_ton 'LA'      $duration       $delay
+
+    do_ton 'FA'      $duration       $delay
+
+    do_ton 'RE'      $duration       $delay
+
+    do_ton 'RE'      $duration       $delay
+
+    sleep $delay
+
+    sleep $delay_div2
+    do_ton 'SOL'     $duration_div2  $delay_div2
+
+    do_ton 'SOL'     $duration_div2  $delay_div2
+    do_ton 'SI-B'    $duration_div2  $delay_div2
+
+    do_ton 'RE+'     $duration       $delay
+
+    do_ton 'DO+'     $duration_div2  $delay_div2
+    do_ton 'SI-B'    $duration_div2  $delay_div2
+
+    do_ton 'LA'      $duration       $delay
+
+    sleep $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'LA'      $duration_div2  $delay_div2
+    do_ton 'SI-B'    $duration_div4  $delay_div4
+    do_ton 'LA'      $duration_div4  $delay_div4
+
+    do_ton 'SOL'     $duration_div2  $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'MI'      $duration       $delay
+
+    do_ton 'MI'      $duration_div2  $delay_div2
+    do_ton 'FA'      $duration_div2  $delay_div2
+
+    do_ton 'SOL'     $duration       $delay
+
+    do_ton 'LA'      $duration       $delay
+
+    do_ton 'FA'      $duration       $delay
+
+    do_ton 'RE'      $duration       $delay
+
+    do_ton 'RE'      $duration       $delay
+
+    sleep $delay
+done
+##############  Fin for(2)  #########################
+##############  Fin Partie A  #######################
+
+##############  Debut Partie B  #####################
+do_ton 'LA'          $duration_mul2  $delay_mul2
+
+do_ton 'FA'          $duration_mul2  $delay_mul2
+
+do_ton 'SOL'         $duration_mul2  $delay_mul2
+
+do_ton 'MI'          $duration_mul2  $delay_mul2
+
+do_ton 'FA'          $duration_mul2  $delay_mul2
+
+do_ton 'RE'          $duration_mul2  $delay_mul2
+
+do_ton 'DO-D'        $duration_mul2  $delay_mul2
+
+do_ton 'MI'          $duration       $delay
+
+sleep $delay
+
+do_ton 'LA'          $duration_mul2  $delay_mul2
+
+do_ton 'FA'          $duration_mul2  $delay_mul2
+
+do_ton 'SOL'         $duration_mul2  $delay_mul2
+
+do_ton 'MI'          $duration_mul2  $delay_mul2
+
+do_ton 'FA'          $duration       $delay
+
+do_ton 'LA'          $duration       $delay
+
+do_ton 'RE+'         $duration_mul2  $delay_mul2
+
+do_ton 'DO-D+'       $duration_mul2  $delay_mul2
+
+sleep $delay_mul2
+#############  Fin Partie B  ####################
+
+#############  Debut Partie A'  #################
+do_ton 'LA'          $duration       $delay
+
+do_ton 'MI'          $duration_div2  $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'SOL'         $duration_div2  $delay_div2
+do_ton 'LA'          $duration_div4  $delay_div4
+do_ton 'SOL'         $duration_div4  $delay_div4
+
+do_ton 'FA'          $duration_div2  $delay_div2
+do_ton 'MI'          $duration_div2  $delay_div2
+
+do_ton 'RE'          $duration       $delay
+
+do_ton 'RE'          $duration_div2  $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'LA'          $duration       $delay
+
+do_ton 'SOL'         $duration_div2  $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'MI'          $duration_div2  $delay_div2
+
+sleep $delay_div2
+do_ton 'MI'          $duration_div4  $delay_div4
+sleep $delay_div4
+
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'SOL'         $duration       $delay
+do_ton 'LA'          $duration       $delay
+
+do_ton 'FA'          $duration       $delay
+
+do_ton 'RE'          $duration       $delay
+
+do_ton 'RE'          $duration       $delay
+
+sleep $delay
+
+sleep $delay_div2
+do_ton 'SOL'         $duration_div2  $delay_div2
+
+do_ton 'SOL'         $duration_div2  $delay_div2
+do_ton 'SI-B'        $duration_div2  $delay_div2
+
+do_ton 'RE+'         $duration       $delay
+
+do_ton 'DO+'         $duration_div2  $delay_div2
+do_ton 'SI-B'        $duration_div2  $delay_div2
+
+do_ton 'LA'          $duration       $delay
+
+sleep $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'LA'          $duration_div2  $delay_div2
+do_ton 'SI-B'        $duration_div4  $delay_div4
+do_ton 'LA'          $duration_div4  $delay_div4
+
+do_ton 'SOL'         $duration_div2  $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'MI'          $duration       $delay
+
+do_ton 'MI'          $duration_div2  $delay_div2
+do_ton 'FA'          $duration_div2  $delay_div2
+
+do_ton 'SOL'         $duration       $delay
+
+do_ton 'LA'          $duration       $delay
+
+do_ton 'RE'          $duration       $delay
+
+sleep $delay
+sleep $delay_mul2
+###################  Fin Partie A'  ##################
+
+clean_exit

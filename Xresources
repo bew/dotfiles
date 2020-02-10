@@ -1,0 +1,111 @@
+/* URxvt */
+
+! FIXME: can be removed once I switch to non-Xresource-based terminal
+
+#include ".Xresources.d/urxvt"
+
+! Background color
+URxvt*background: #202020
+
+! Font color
+URxvt*foreground: #eeeeee
+
+URxvt*scrollBar: false
+
+!URxvt*font:					xft:Liberation Mono:size=11
+
+
+/* --------------------------------------------------------------------------- */
+/* ------ XTERM CONFIG ------------------------------------------------------- */
+/* --------------------------------------------------------------------------- */
+
+XTerm*background:				#424242
+XTerm*foreground:				#eeeeee
+
+!XTerm*utf8:						true
+!XTerm*renderFont:				true
+!XTerm*faceName:					Liberation Mono
+!XTerm*faceName:					VeraMono
+XTerm*faceName:					DejaVu Sans Mono for Powerline
+XTerm*faceSize:					11
+XTerm*boldFont:					true
+
+XTerm*saveLines:				6500
+XTerm*cursorBlink:				true
+
+! Scroll on key press
+XTerm*scrollKey:			true
+! Scroll on tty output
+XTerm*scrollTtyOutput:		false
+
+! Fix Backspace not deleting anything in vim
+XTerm.*backarrowKey: false
+
+xterm*metaSendsEscape:		true
+
+
+
+
+/* Custom colors */
+
+/* terminal colors ----------------------------------- */
+
+/* Black + DarkGrey */
+
+/* black (almost) */
+*color0:  #2F2F2F
+
+/* dark grey */
+*color8:  #555753
+
+/* (DarkRed +) Red */
+
+/* rouge */
+*color1:  #ff6565
+
+/* rouge */
+*color9:  #ff6565
+
+/* DarkGreen + Green */
+
+/* 2:normal		vert pomme */
+*color2:  #4CAF50
+
+/* 2:bold		vert */
+*color10: #4CAF50
+
+/* DarkYellow + Yellow */
+
+/* 3:normal		jaune-orange */
+*color3:  #eab93d
+
+/* 3:bold		jaune */
+*color11: #ffc123
+
+/* DarkBlue + Blue */
+
+/* bleu foncé */
+/**color4:  #204a87 */
+
+/* bleu ciel */
+*color4:  #5788FF
+
+/* c est le bleu des dossiers de la commande ls */
+/* bleu */
+*color12: #2C82F2
+
+/* DarkMagenta + Magenta */
+
+/* orange foncé */
+*color5:  #ce5c00
+
+/* orange */
+*color13: #f57900
+
+/* DarkCyan + Cyan */
+*color6:  #89b6e2
+*color14: #89b6e2
+
+/* LightGrey + White */
+*color7:  #cccccc
+*color15: #fafafa
