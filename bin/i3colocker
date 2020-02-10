@@ -16,7 +16,9 @@ A_Left=1
 A_Right=2
 
 #----- General config
-args=(--nofork --force-clock)
+args=()
+args+=(--nofork --force-clock)
+args+=(--pass-media-keys) # Doe not seems to work...
 args+=(--blur 1)
 
 #----- Text config

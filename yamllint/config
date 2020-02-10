@@ -1,9 +1,0 @@
----
-extends: default
-
-rules:
-  comments-indentation: disable
-  line-length: {max: 100}
-  document-start: disable
-
-# vim:set ft=yaml:

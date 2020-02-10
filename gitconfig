@@ -80,7 +80,7 @@
   interactive = true
 
 [color "status"]
-  untracked = "cyan dim "
+  untracked = "cyan"
 
 [color "diff-highlight"]
   # value is: fg [bold,..] [bg]

@@ -1,5 +1,7 @@
 /* URxvt */
 
+! FIXME: can be removed once I switch to non-Xresource-based terminal
+
 #include ".Xresources.d/urxvt"
 
 ! Background color

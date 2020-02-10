@@ -20,7 +20,7 @@ function run
 
 function debug
 {
-    echo $* >> /t/xinitrc_debug
+    echo $* >> /tmp/xinitrc_debug
 }
 
 # -----------------------------------------------
@@ -32,7 +32,6 @@ xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Enabled' 1
 xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Button Mapping Enabled' 0 1
 
 # Setup keyboard mapping
-[[ -f ~/.conf/Xmodmap.config ]] && xmodmap ~/.conf/Xmodmap.config
 setxkbmap -config ~/.conf/xkbmap.config
 
 # Setup X resources

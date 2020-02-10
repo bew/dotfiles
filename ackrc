@@ -1,5 +1,0 @@
-# NOTE: Builtin ackrc can be seen with: ack --create-ackrc
-
-# Crystal
-# https://crystal-lang.org
---type-add=crystal:ext:cr
