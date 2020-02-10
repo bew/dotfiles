@@ -1,6 +1,6 @@
-[submodule "zsh-hooks"]
-	path = third-party/zsh-hooks
+[submodule "zsh/zsh-hooks"]
+	path = zsh/third-party/zsh-hooks
 	url = git@github.com:willghatch/zsh-hooks.git
-[submodule "third-party/zplugin"]
-	path = third-party/zplugin
+[submodule "zsh/third-party/zplugin"]
+	path = zsh/third-party/zplugin
 	url = git@github.com:zdharma/zplugin.git
