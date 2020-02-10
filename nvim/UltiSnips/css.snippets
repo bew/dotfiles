@@ -1,0 +1,33 @@
+priority -50
+
+snippet . "selector { }"
+$1 {
+	$2
+}$99
+endsnippet
+
+snippet com "Comment /* */"
+/* $1 */$99
+endsnippet
+
+#
+# Colors
+#
+
+snippet rgb "color rgb"
+rgb(${1:255}, ${2:255}, ${3:255})$99
+endsnippet
+
+snippet rgba "color rgba"
+rgba(${1:255}, ${2:255}, ${3:255}, ${4:0.5})$99
+endsnippet
+
+snippet hsl "color hsl"
+hsl(${1:360}, ${2:100}%, ${3:100}%)$99
+endsnippet
+
+snippet hsla "color hsla"
+hsla(${1:360}, ${2:100}%, ${3:100}%, ${4:0.5})$99
+endsnippet
+
+# vim:ft=snippets:

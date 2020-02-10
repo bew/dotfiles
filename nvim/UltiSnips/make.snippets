@@ -1,0 +1,66 @@
+snippet makectek "Makefile for C (Tek)" b
+NAME =		${1:binary}
+
+CFLAGS =	-Wall -Werror -Wextra
+
+LDFLAGS =
+
+SRCS =\
+${0}
+
+OBJS = $(SRCS:.c=.o)
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	gcc -o $@ $(LDFLAGS) $^
+
+clean:
+	rm -f $(OBJS)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean re
+endsnippet
+
+
+
+# Comment
+
+snippet fline "Full line ---" b
+#----------------------------------------------------------------------------------
+endsnippet
+
+snippet #fline "Full line ---" b
+#----------------------------------------------------------------------------------
+endsnippet
+
+snippet mline "Mid line ---" b
+#-------------------------------------------------------------
+endsnippet
+
+snippet #mline "Mid line ---" b
+#-------------------------------------------------------------
+endsnippet
+
+snippet sline "Small line ---" b
+#----------------------------------------
+endsnippet
+
+snippet #sline "Small line ---" b
+#----------------------------------------
+endsnippet
+
+snippet section "Comment Section" b
+${1}
+# ${2:${VISUAL/^# //}}
+$1${0}
+endsnippet
+
+snippet header "Comment Header" b
+# ${1:${VISUAL:Comment/^# //}}
+${2}${0}
+endsnippet
