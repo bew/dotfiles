@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function transfer
+{
+    if [ $# -eq 0 ]; then
+        echo "No arguments specified."
+        echo
+        echo "Usages: Given \`echo some content > /tmp/test.md\`"
+        echo "  1. cat /tmp/test.md | transfer some_name"
+        echo "  2. transfer /tmp/test.md"
+        echo
+        return 1;
+    fi
+
+    tmpfile=$( mktemp -t transferXXX );
+    if tty -s; then
+        # input is from given file
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g');
+        command curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile;
+    else
+        # input is from stdin
+        command curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ;
+    fi;
+    echo
+    command cat $tmpfile;
+    command rm -f $tmpfile;
+    echo
+}

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+function repeat_every_while
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: repeat_every_while <interval> <cmd...>"
+    return 1
+  fi
+
+  local interval=$1; shift
+  while "$@"; do
+    sleep $interval
+  done
+}

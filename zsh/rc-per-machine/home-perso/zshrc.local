@@ -1,0 +1,19 @@
+#----------------------------------------
+# Named directories
+
+# Now use '~cr/' to access crystal directory
+hash -d cr=~/Projects/opensource/crystal
+hash -d cr_alt=~/Projects/opensource/crystal_alt
+
+alias ccr='~cr/bin/crystal'
+
+hash -d open=~/Projects/opensource
+
+#----------------------------------------
+# Ad-hoc alias
+
+# So I can do: `dl_fast_then_slow.sh ytdl <link>`
+alias dl_fast_then_slow.sh='dl_fast_then_slow.sh '
+
+
+# FIXME: move more things here? like the 'autoload'-ed functions?

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+function myip
+{
+  local ip=$(curl -s https://api.my-ip.io/ip.txt)
+  echo "My public IP address is: $ip"
+}

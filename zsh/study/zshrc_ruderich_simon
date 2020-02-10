@@ -1,0 +1,1037 @@
+# Zsh configuration file.
+
+# Copyright (C) 2011-2014  Simon Ruderich
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# HELPER FUNCTIONS
+
+# Return the name of the program which is called in the foreground with `fg`.
+# $1 is the name of the program (optional). If it's not 'fg' or 'fg *' it's
+# returned unchanged.
+zshrc_resolve_fg_to_resumed_job_name() {
+	# $REPLY is used by convention for scalars ($reply for arrays) to return
+	# values from functions. unset it here to prevent problems when REPLY is
+	# bound to an integer or similar. Thanks to Mikachu in #zsh on Freenode
+	# (2012-09-27 17:14 CEST) for this hint.
+	unset REPLY
+
+	# Replace fg with the resumed job name.
+	if [[ $1 == fg ]]; then
+		REPLY=${jobtexts[%+]}
+	elif [[ $1 == fg\ * ]]; then
+		REPLY=${jobtexts[${1#fg }]}
+		# Normal program, return as is.
+	else
+		REPLY=$1
+	fi
+}
+
+
+# MISCELLANEOUS SETTINGS
+
+# Normal umask for root (readable by all users).
+if [[ $UID -eq 0 ]]; then
+	umask 022
+	# Restricted umask for normal users (readable only by me).
+else
+	umask 077
+fi
+
+# Disable beeps.
+setopt nobeep
+
+# Prevent overwriting existing files with '> filename', use '>| filename'
+# (or >!) instead.
+setopt noclobber
+
+# Entering the name of a directory (if it's not a command) will automatically
+# cd to that directory.
+setopt autocd
+
+# When entering a nonexistent command name automatically try to find a similar
+# one.
+setopt correct
+
+# Enable zsh's extended glob abilities.
+setopt extendedglob
+
+# Don't exit if <C-D> is pressed. Prevents exiting the shell by accident (e.g.
+# pressing <C-D> twice).
+setopt ignoreeof
+
+# Also display PID when suspending a process.
+setopt longlistjobs
+
+
+# KEY BINDINGS
+
+# Not all bindings are done here, only those not specific to a given section.
+
+# Use Vi(m) style key bindings.
+bindkey -v
+
+# Use jk to exit insert mode (jj is too slow to type).
+bindkey 'jk' vi-cmd-mode
+
+# I don't need the arrow keys, I use ^N and ^P for this (see below).
+bindkey -r '^[OA' '^[OB' '^[OC' '^[OD' '^[[A' '^[[B' '^[[C' '^[[D'
+# Also not in Vi mode.
+bindkey -a -r '^[OA' '^[OB' '^[OC' '^[OD' '^[[A' '^[[B' '^[[C' '^[[D'
+
+
+# FUNCTION SETTINGS
+
+# Make sure every entry in $fpath is unique.
+typeset -U fpath
+# ~/.zsh/functions/completion is a symbolic link to the Completion directory
+# of a Zsh Git checkout. Use it to get the newest completions if available.
+if [[ -d ~/.zsh/functions/completion ]]; then
+	fpath=(~/.zsh/functions/completion/*/*(/) $fpath)
+fi
+# Set correct fpath to allow loading my functions (including completion
+# functions).
+fpath=(~/.zsh/functions $fpath)
+# Autoload my functions (except completion functions and hidden files). Thanks
+# to caphuso from the Zsh example files for this idea.
+if [[ -d ~/.zsh/functions ]]; then
+	autoload -Uz ${fpath[1]}/^_*(^/:t)
+fi
+
+# Simulate hooks using _functions arrays for Zsh versions older than 4.3.4. At
+# the moment only precmd(), preexec() and chpwd() are simulated.
+if [[ $ZSH_VERSION != (4.3.<4->*|4.<4->*|<5->*) ]]; then
+	# Run all functions defined in the ${precmd,preexec,chpwd}_functions
+	# arrays.
+	function precmd() {
+	for function in $precmd_functions; do
+		$function "$@"
+	done
+}
+function preexec() {
+for function in $preexec_functions; do
+	$function "$@"
+done
+	}
+	function chpwd() {
+	for function in $chpwd_functions; do
+		$function "$@"
+	done
+}
+fi
+
+# Load zmv (zsh move) which is a powerful file renamer.
+autoload -Uz zmv
+
+
+# HISTORY SETTINGS
+
+# Use history and store it in ~/.zsh/history.
+HISTSIZE=1000000
+SAVEHIST=1000000
+HISTFILE=~/.zsh/history
+# Append to the history file instead of overwriting it and do it immediately
+# when a command is executed.
+setopt appendhistory
+setopt incappendhistory
+# If the same command is run multiple times store it only once in the history.
+setopt histignoredups
+# Don't add lines starting with a space to the history.
+setopt histignorespace
+
+# Vim like completions of previous executed commands (also enter Vi-mode). If
+# called at the beginning it just recalls old commands (like cursor up), if
+# called after typing something, only lines starting with the typed text are
+# returned. Very useful to get old commands quickly - in addition to the
+# history commands (!..). Thanks to Mikachu in #zsh on Freenode (2010-01-17
+# 12:47 CET) for the information how to a use function with bindkey.
+zle -N zshrc-vi-history-beginning-search-backward
+zshrc-vi-history-beginning-search-backward() {
+	local not_at_beginning_of_line
+	if [[ $CURSOR -ne 0 ]]; then
+		not_at_beginning_of_line=yes
+	fi
+
+	zle history-beginning-search-backward
+
+	# Start Vi-mode and stay at the same position (Vi-mode moves one left,
+	# this counters it).
+	zle vi-cmd-mode
+	if [[ -n $not_at_beginning_of_line ]]; then
+		zle vi-forward-char
+	fi
+}
+bindkey '^P' zshrc-vi-history-beginning-search-backward
+bindkey -a '^P' history-beginning-search-backward # binding for Vi-mode
+# Here only Vi-mode is necessary as ^P enters Vi-mode and ^N only makes sense
+# after calling ^P.
+bindkey -a '^N' history-beginning-search-forward
+
+# Enable incremental search which is especially useful when the string is an
+# argument and not the command.
+bindkey '^R' history-incremental-pattern-search-backward
+# Also enable my usual use of Ctrl-P/Ctrl-N to get the previous/next matching
+# history entry.
+if [[ $ZSH_VERSION == (4.<4->*|<5->*) ]]; then
+	bindkey -M isearch '^P' history-incremental-pattern-search-backward
+	bindkey -M isearch '^N' history-incremental-pattern-search-forward
+fi
+
+# Automatically push cd-ed directories on the directory stack.
+setopt autopushd
+# Don't push duplicates on the directory stack.
+setopt pushdignoredups
+# Exchange the meaning of + and - when specifying a directory on the stack.
+# This way cd -<Tab> lists the last used directory first, which is more
+# natural because cd - goes to the last directory.
+setopt pushdminus
+
+
+# PROMPT SETTINGS
+
+# Use colorized output, necessary for prompts and completions.
+autoload -Uz colors; colors
+
+# Necessary for $EPOCHSECONDS, the UNIX time.
+zmodload zsh/datetime
+
+# Some shortcuts for colors. The %{...%} tells zsh that the data in between
+# doesn't need any space, necessary for correct prompt drawing. Use %F{color}
+# in more recent zsh versions (here compatibility is important).
+local red="%{${fg[red]}%}"
+local blue="%{${fg[blue]}%}"
+local green="%{${fg[green]}%}"
+local yellow="%{${fg[yellow]}%}"
+local default="%{${fg[default]}%}"
+
+# vcs_info was added in 4.3.9 but it works in earlier versions too. So load it
+# if the necessary files are available in ~/.zsh/functions/vcs_info (often a
+# symbolic link to current checkout of Zsh's sources).
+if [[ $ZSH_VERSION == (4.3.<9->*|4.<4->*|<5->*) ||
+	-d ~/.zsh/functions/vcs_info ]]; then
+# Update fpath to allow loading the vcs_info functions.
+if [[ -d ~/.zsh/functions/vcs_info ]]; then
+	fpath=(~/.zsh/functions/vcs_info/
+	~/.zsh/functions/vcs_info/Backends
+	$fpath)
+fi
+
+# Load vcs_info to display information about version control repositories.
+autoload -Uz vcs_info
+# Only look for certain VCS.
+zstyle ':vcs_info:*' enable git
+# Check the repository for changes so they can be used in %u/%c (see
+# below). This comes with a speed penalty for bigger repositories.
+zstyle ':vcs_info:*' check-for-changes yes
+
+# Set style of vcs_info display. The current branch (green) and VCS (blue)
+# is displayed. If there is an special action going on (merge, rebase)
+# it's also displayed (red). Also display if there are unstaged or staged
+# (%u/%c) changes.
+if [[ $ZSH_VERSION == (4.3.<11->*|4.<4->*|<5->*) ||
+	-d ~/.zsh/functions/vcs_info ]]; then
+zstyle ':vcs_info:*' formats \
+	"(${green}%b%u%c${default}:${blue}%s${default}%m)" \
+	"${green}%u%c${default}"
+zstyle ':vcs_info:*' actionformats \
+	"(${green}%b%u%c${default}/${red}%a${default}:${blue}%s${default}%m)" \
+	"${green}%u%c${default}"
+	else
+		# In older versions %u and %c are not defined yet and are not
+		# correctly expanded.
+		zstyle ':vcs_info:*' formats \
+			"(${green}%b${default}:${blue}%s${default})"
+		zstyle ':vcs_info:*' actionformats \
+			"(${green}%b${default}/${red}%a${default}:${blue}%s${default})"
+	fi
+	# Set style for formats/actionformats when unstaged (%u) and staged (%c)
+	# changes are detected in the repository; check-for-changes must be set to
+	# true for this to work. Thanks to Bart Trojanowski
+	# (http://jukie.net/~bart/blog/pimping-out-zsh-prompt) for the idea
+	# (2010-03-11 00:20 CET).
+	zstyle ':vcs_info:*' unstagedstr '¹'
+	zstyle ':vcs_info:*' stagedstr   '²'
+
+	# Default to run vcs_info. If possible we prevent running it later for
+	# speed reasons. If set to a non empty value vcs_info is run.
+	zshrc_force_run_vcs_info=1
+
+	# Cache system inspired by Bart Trojanowski
+	# (http://jukie.net/~bart/blog/pimping-out-zsh-prompt).
+	zstyle ':vcs_info:*+pre-get-data:*' hooks pre-get-data
+	+vi-pre-get-data() {
+	# Only Git and Mercurial support and need caching. Abort if any other
+	# VCS is used.
+	[[ $vcs != git && $vcs != hg ]] && return
+
+	# If the shell just started up or we changed directories (or for other
+	# custom reasons) we must run vcs_info.
+	if [[ -n $zshrc_force_run_vcs_info ]]; then
+		zshrc_force_run_vcs_info=
+		return
+	fi
+
+	# Don't run vcs_info by default to speed up the shell.
+	ret=1
+	# If a git/hg command was run then run vcs_info as the status might
+	# need to be updated.
+	case $(fc -ln $(($HISTCMD-1))) in
+		git* | g\ *)
+			ret=0
+			;;
+		hg*)
+			ret=0
+			;;
+	esac
+}
+
+# Must run vcs_info when changing directories.
+prompt_chpwd() {
+	zshrc_force_run_vcs_info=1
+}
+chpwd_functions+=(prompt_chpwd)
+
+# Used by prompt code below to determine if vcs_info should be run.
+zshrc_use_vcs_info=1
+else
+	zshrc_use_vcs_info=
+fi
+
+typeset -a zshrc_longrun_data
+zshrc_longrun_data=()
+# Display runtime in seconds for long running programs (> 60 seconds) and send
+# a bell to notify me.
+zshrc_longrun_preexec() {
+	local program=$3
+
+	# Handle fg.
+	local REPLY
+	zshrc_resolve_fg_to_resumed_job_name $program
+	program=$REPLY
+
+	# No background process found.
+	if [[ -z $program ]]; then
+		return
+	fi
+
+	# Don't track the time for certain (possible) long running processes which
+	# need no automatic notification.
+	for ignore in elinks man mutt vim; do
+		case $program in
+			$ignore | $ignore\ *)
+				zshrc_longrun_data=()
+				return
+				;;
+		esac
+	done
+
+	zshrc_longrun_data=($program $EPOCHSECONDS)
+}
+zshrc_longrun_precmd() {
+	# No previous timestamp available or disabled for this command, ignore.
+	if [[ -z $zshrc_longrun_data ]]; then
+		return
+	fi
+
+	local difference=$(( EPOCHSECONDS - zshrc_longrun_data[2] ))
+	if [[ $difference -gt 60 ]]; then
+		echo
+		echo -n "${fg[yellow]}"
+		echo -n "~> ${(V)zshrc_longrun_data[1]} took $difference seconds."
+		echo -n "${fg[default]}"
+		echo    "\a" # send bell
+	fi
+
+	# Clear status. Prevents displaying old status information when pressing
+	# enter with an empty command line.
+	zshrc_longrun_data=()
+}
+preexec_functions+=(zshrc_longrun_preexec)
+precmd_functions+=(zshrc_longrun_precmd)
+
+# Set the prompt. A two line prompt is used. On the top left the current
+# working directory is displayed, on the right vcs_info (if available) and the
+# current time in hex. On the bottom left current user name and host is shown,
+# the exit code of the last command if it wasn't 0, the number of running jobs
+# if not 0.
+#
+# The prompt is in green and blue to make easily detectable, the error exit
+# code in red and bold and the job count in yellow. Designed for dark
+# terminals.
+#
+# Thanks to Adam's prompt for the basic idea of this prompt.
+zshrc_prompt_precmd() {
+	# Regex to remove elements which take no space. Used to calculate the
+	# width of the top prompt. Thanks to Bart's and Adam's prompt code in
+	# Functions/Prompts/prompt_*_setup.
+	local zero='%([BSUbfksu]|([FB]|){*})'
+
+	# Call vcs_info before every prompt.
+	if [[ -n $zshrc_use_vcs_info ]]; then
+		vcs_info
+	else
+		vcs_info_msg_0_=
+		vcs_info_msg_1_=
+	fi
+
+	# Setup. Create variables holding the formatted content.
+
+	# Current directory in yellow, truncated if necessary (WIDTH is replaced
+	# below).
+	local directory="${yellow}%WIDTH<..<%~%<<${default}"
+	# Minimal information about the VCS, only displayed if there are
+	# unstaged/staged changes.
+	local vcs_staged=${vcs_info_msg_1_}
+
+	# Information about the VCS in this directory.
+	local vcs=${vcs_info_msg_0_}
+	# Current time (seconds since epoch) in Hex in bright blue.
+	local seconds="${blue}%B0x$(([##16] EPOCHSECONDS))%b${default}"
+
+	# User name (%n) in bright green.
+	local user="${green}%B%n%b${default}"
+	# Host name (%m) in bright green; underlined if running on a remote system
+	# through SSH.
+	local host="${green}%B%m%b${default}"
+	if [[ -n $SSH_CONNECTION ]]; then
+		host="%U${host}%u"
+	fi
+
+	# Number of background processes in yellow if not zero.
+	local background="%(1j.${yellow}%j${default}.)"
+	# Exit code in bright red in parentheses if not zero.
+	local exitcode="%(?..(${red}%B%?%b${default}%) )"
+	# Prompt symbol, % for normal users, # in red for root.
+	local symbol="%(!.${red}#${default}.%%)"
+
+	# Prefix characters in first and second line.
+	local top_prefix="${blue}%B.-%b${default}"
+	local bottom_prefix="${blue}%B'%b${default}"
+
+	# Combine them to create the prompt.
+
+	local top_left=${vcs_staged}
+	local top_right="${vcs}(${seconds})"
+
+	local width_top_prefix=${#${(S%%)top_prefix//$~zero/}}
+	local width_top_left=${#${(S%%)top_left//$~zero/}}
+	local width_top_right=${#${(S%%)top_right//$~zero/}}
+
+	# Calculate the maximum width of ${top_left}. -2 are the braces of
+	# ${top_left}, -1 is one separator from ${top_separator} (we want at least
+	# one between left and right parts).
+	local top_left_width_max=$((
+	COLUMNS - $width_top_prefix
+	- $width_top_left - 2
+	- 1
+	- $width_top_right
+	))
+	# Truncate directory if necessary.
+	top_left="(${directory/WIDTH/${top_left_width_max}})${top_left}"
+	width_top_left=${#${(S%%)top_left//$~zero/}}
+
+	# Calculate the width of the top prompt to fill the middle with "-".
+	local width=$((
+	COLUMNS - width_top_prefix - width_top_left - width_top_right
+	))
+	local top_separator="%B${blue}${(l:${width}::-:)}%b${default}"
+
+	PROMPT="${top_prefix}${top_left}${top_separator}${top_right}
+	${bottom_prefix}${user}@${host} ${background}${symbol} ${exitcode}"
+}
+precmd_functions+=(zshrc_prompt_precmd)
+
+
+# When GNU screen, tmux, xterm or rxvt is used set the name of the window to
+# the currently running program.
+#
+# When a program is started preexec() sets the window's name to it; when it
+# stops precmd() resets the window's name to 'zsh'. 'fg' is supported and sets
+# the window's name to the resumed job.
+#
+# It works with GNU screen, tmux, xterm and rxvt.
+#
+# If a command is run with sudo or if the shell is running as root then a ! is
+# added at the beginning of the command to make this clear. If a command is
+# running on a different computer with ssh a @ is added at the beginning. If
+# screen/tmux is running on the remote machine instead of @screen @:hostname
+# (or @tmux ..; hostname replaced by the machine's hostname) is displayed.
+# This only works if the .zshrc on the server also uses this command.
+#
+# screen* is necessary as `screen` uses screen.linux for example for a linux
+# console.
+if [[ $TERM == screen* || $TERM == xterm* || $TERM == rxvt* ]]; then
+	# Is set to a non empty value to reset the window name in the next
+	# precmd() call.
+	zshrc_window_reset=yes
+
+	zshrc_window_preexec() {
+		# Get the program name with its arguments.
+		local program_name=$1
+
+		# When sudo is used, use real program name instead, but with an
+		# exclamation mark at the beginning (handled below).
+		local program_sudo=
+		if [[ $program_name == sudo* ]]; then
+			program_name=${program_name#sudo }
+			program_sudo=yes
+		fi
+
+		# Handle fg.
+		local REPLY
+		zshrc_resolve_fg_to_resumed_job_name $program_name
+		program_name=$REPLY
+
+		# Remove all arguments from the program name.
+		program_name=${program_name%% *}
+
+		# Ignore often used commands which are only running for a very short
+		# time. This prevents a "blinking" name when it's changed to "cd" for
+		# example and then some milliseconds later back to "zsh".
+		[[ $program_name == (cd*|d|ls|l|la|ll|clear|c) ]] && return
+
+		# Change my shortcuts so the real name of the program is displayed.
+		case $program_name in
+			e)
+				program_name=elinks
+				;;
+			g)
+				program_name=git
+				;;
+			m)
+				program_name=make
+				;;
+			p)
+				program_name=less
+				;;
+			v)
+				program_name=vim
+				;;
+			mu)
+				program_name=mutt
+				;;
+		esac
+
+		# Add an exclamation mark at the beginning if running with sudo or if
+		# running zsh as root.
+		if [[ -n $program_sudo || $UID -eq 0 ]]; then
+			program_name=!$program_name
+		fi
+
+		# Add an at mark at the beginning if running through ssh on a
+		# different computer.
+		if [[ -n $SSH_CONNECTION ]]; then
+			program_name="@$program_name"
+
+			# If screen is running in SSH then display "@:hostname" as title
+			# in the term/outer screen.
+			if [[ $program_name == @screen || $program_name == @tmux ]]; then
+				program_name="@:${HOST//.*/}"
+				# Use "@:!hostname" for root screens.
+			elif [[ $program_name == @!screen || $program_name == @!tmux ]]; then
+				program_name="@:!${HOST//.*/}"
+			fi
+		fi
+
+		# Set the window name to the currently running program.
+		zshrc_window_title $program_name
+
+		# Tell precmd() to reset the window name when the program stops.
+		zshrc_window_reset=yes
+	}
+
+	zshrc_window_precmd() {
+		# Abort if no window name reset is necessary.
+		[[ -z $zshrc_window_reset ]] && return
+
+		# Reset the window name to 'zsh'.
+		local name=zsh
+		# If the function was called with an argument then reset the window
+		# name to '.zsh' (used by clear alias).
+		if [[ -n $1 ]]; then
+			name=.zsh
+		fi
+
+		# Prepend prefixes like in zshrc_window_preexec().
+		if [[ $UID -eq 0 ]]; then
+			name="!$name"
+		fi
+		if [[ -n $SSH_CONNECTION ]]; then
+			name="@$name"
+		fi
+		zshrc_window_title $name
+
+		# Just reset the name, so no screen reset necessary for the moment.
+		zshrc_window_reset=
+	}
+
+	# Sets the window title. Works with GNU screen, tmux (which uses screen as
+	# TERM), xterm and rxvt. (V) escapes all non-printable characters, thanks
+	# to Mikachu in #zsh on Freenode (2010-08-07 17:09 CEST).
+	if [[ $TERM == screen* ]]; then
+		zshrc_window_title() {
+			print -n "\ek${(V)1}\e\\"
+		}
+	elif [[ $TERM == xterm* || $TERM == rxvt* ]]; then
+		zshrc_window_title() {
+			print -n "\e]2;${(V)1}\e\\"
+		}
+	else
+		# Fallback if another TERM is used.
+		zshrc_window_title() { }
+	fi
+
+	# Add the preexec() and precmd() hooks.
+	preexec_functions+=(zshrc_window_preexec)
+	precmd_functions+=(zshrc_window_precmd)
+else
+	# Fallback if another TERM is used, necessary to run screen (see below in
+	# "RUN COMMANDS").
+	zshrc_window_preexec() { }
+fi
+
+
+# COMPLETION SETTINGS
+
+# Load the complist module which provides additional features to completion
+# lists (coloring, scrolling).
+zmodload zsh/complist
+# Use new completion system, store dumpfile in ~/.zsh/cache to prevent
+# cluttering of ~/. $fpath must be set before calling this. Thanks to Adlai in
+# #zsh on Freenode (2009-08-07 21:05 CEST) for reminding me of the $fpath
+# problem.
+autoload -Uz compinit; compinit -d ~/.zsh/cache/zcompdump
+
+# Use cache to speed up some slow completions (dpkg, perl modules, etc.).
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# List all files in the current directory when pressing tab on an empty input,
+# behave like complete-word otherwise. Thanks to John Eikenberry [1] for the
+# code, read on 2014-03-15.
+#
+# [1]: http://unix.stackexchange.com/a/32426
+complete-word-or-complete-list-of-files() {
+	if [[ $#BUFFER == 0 ]]; then
+		BUFFER='ls '
+		CURSOR=3
+		zle list-choices
+		zle backward-kill-word
+	else
+		zle complete-word
+	fi
+}
+zle -N complete-word-or-complete-list-of-files
+# Let the completion system handle all completions, including expanding of
+# shell wildcards (which is handled by other shell mechanisms if the default
+# expand-or-complete is used).
+bindkey '^I' complete-word-or-complete-list-of-files
+# If there are multiple matches after pressing <Tab> always display them
+# immediately without requiring another <Tab>. a<Tab> completes to aa and
+# lists aaa, aab, aac as possible completions if the directory contains aaa,
+# aab, aac, bbb instead of only completing to aa.
+setopt nolistambiguous
+# Support completions in the middle of a word, without this option zsh jumps
+# to the end of the word before the completion process begins. Is required for
+# the _prefix completer.
+setopt completeinword
+
+# Force a reload of the completion system if nothing matched; this fixes
+# installing a program and then trying to tab-complete its name. Thanks to
+# Alex Munroe [1] for the code, read on 2014-03-03.
+#
+# [1]: https://github.com/eevee/rc/blob/master/.zshrc
+_force_rehash() {
+	if (( CURRENT == 1 )); then
+		rehash
+	fi
+	# We didn't really complete anything.
+	return 1
+}
+
+zstyle ':completion:::::' completer \
+	_force_rehash _expand _complete _prefix _ignored _approximate
+
+# Match specification to be tried when completing items. Each group ('...') is
+# tried after another if no matches were found, once matches are found no
+# other groups are tried. Thanks to Mikachu in #zsh on Freenode (2012-08-28
+# 18:48 CEST) for explanations.
+#
+# When matching also include the uppercase variant of typed characters
+# ('m:{a-z}={A-Z}'); using '' before this group would try the unmodified match
+# first, but I prefer to get all matches immediately (e.g. if Makefile and
+# makefile exist in the current directory echo m<tab> matches both, with '' it
+# would only match makefile because it found one match). This allows typing in
+# lowercase most of the time and completion fixes the case, which is faster.
+#
+# Don't perform these fixes in _approximate to prevent it from changing the
+# input too much. Thanks to the book "From Bash to Z Shell" page 249.
+zstyle ':completion:*:(^approximate):*' matcher-list 'm:{a-z}={A-Z}'
+
+# Allow one mistake per three characters. Thanks to the book "From Bash to Z
+# Shell" page 248.
+zstyle -e ':completion:*:approximate:*' max-errors \
+	'reply=( $(( ($#PREFIX + $#SUFFIX) / 3 )) )'
+
+# Expand shell wildcards to all matching files after <Tab>. echo *<Tab>
+# results in a b c if the directory contains the files a, b, c. Thanks to the
+# book "From Bash to Z Shell" page 246.
+zstyle ':completion:*:expand:*' tag-order all-expansions
+# Keep prefixes unexpanded if possible: $HOME/<Tab> doesn't expand $HOME,
+# while $HOME<Tab> does.
+zstyle ':completion:*:expand:*' keep-prefix yes
+
+# When completing multiple path components display all matching ambiguous
+# components. For example /u/s/d/r/README<Tab> lists all matching READMEs
+# instead of just the matching paths up to the r/ component. Can be slow if
+# there are many matching files.
+zstyle ':completion:*' list-suffixes yes
+
+# Use ls-like colors for completions.
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# Make completion lists scrollable so "do you wish to see all n possibilities"
+# is no longer displayed. Display current position in percent (%p).
+zstyle ':completion:*:default' list-prompt '%p'
+# Display group name (%d) (like 'external command', 'alias', etc.), in bold.
+# Also display a message if _approximate found errors and no matches were
+# found.
+zstyle ':completion:*'             format '    %B%d%b:'
+zstyle ':completion:*:corrections' format '    %B%d%b (errors: %e)'
+zstyle ':completion:*:warnings'    format '    %Bno matches for %d%b'
+# Display different types of matches separately.
+zstyle ':completion:*' group-name ''
+
+# Separate man pages by section.
+zstyle ':completion:*' separate-sections yes
+
+# Don't draw trailing / in bold (new in zsh 4.3.11). Thanks to Mikachu in #zsh
+# on Freenode for the fix (2010-12-17 13:46 CET).
+zle_highlight=(suffix:none)
+
+# Ignore completion functions.
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# When offering typo corrections, do not propose anything which starts with an
+# underscore (such as many of Zsh's shell functions). Thanks to paradigm [1]
+# for the idea (read on 2013-04-07).
+#
+# [1]: https://github.com/paradigm/dotfiles/blob/master/.zshrc
+CORRECT_IGNORE='_*'
+
+# Ignore parent directory.
+zstyle ':completion:*:(cd|mv|cp):*' ignore-parents parent pwd
+# Always complete file names only once in the current line. This makes it easy
+# to complete multiple file names because I can just press tab to get all
+# possible values. Otherwise I would have to skip the first value again and
+# again. Thanks to Mikachu in #zsh on Freenode (2011-08-11 14:42 CEST) for the
+# hint to use other. other is necessary so prefix<Tab> lists both prefix and
+# prefixrest if the directory contains prefix and prefixrest.
+zstyle ':completion:*:all-files' ignore-line other
+# Except for mv and cp, because I often want to use to similar names, so I
+# complete to the same and change it.
+zstyle ':completion:*:(mv|cp):all-files' ignore-line no
+
+# Don't complete ./config.* files, this makes running ./configure much
+# simpler. Thanks to Nomexous in #zsh on Freenode (2010-03-16 01:54 CET)
+zstyle ':completion:*:*:-command-:*' ignored-patterns './config.*'
+# Don't complete unwanted files with Vim. Thanks to Nomexous in #zsh on
+# Freenode (2010-06-06 04:54 CEST). See below for a way to complete them.
+zstyle ':completion:*:*:vim:*:all-files' ignored-patterns \
+	'*.aux' '*.log' '*.pdf' '*.bbl' '*.blg' '*.out' '*-blx.bib' '*.run.xml' \
+	'*.o' \
+	'*.pyc' \
+	'*.class'
+
+# Provide a fallback completer which always completes files. Useful when Zsh's
+# completion is too "smart". Thanks to Frank Terbeck <ft@bewatermyfriend.org>
+# (http://www.zsh.org/mla/users/2009/msg01038.html).
+zle -C complete-files complete-word _generic
+zstyle ':completion:complete-files:*' completer _files
+bindkey '^F' complete-files
+
+
+# CUSTOM ALIASES AND FUNCTIONS
+
+# If ^C is pressed while typing a command, add it to the history so it can be
+# easily retrieved later and then abort like ^C normally does. This is useful
+# when I want to abort an command to do something in between and then finish
+# typing the command.
+#
+# Thanks to Vadim Zeitlin <vz-zsh@zeitlins.org> for a fix (--) so lines
+# starting with - don't cause errors; and to Nadav Har'El
+# <nyh@math.technion.ac.il> for a fix (-r) to handle whitespace/quotes
+# correctly, both on the Zsh mailing list.
+TRAPINT() {
+	# Don't store this line in history if histignorespace is enabled and the
+	# line starts with a space.
+	if [[ -o histignorespace && ${BUFFER[1]} = ' ' ]]; then
+		return $1
+	fi
+
+	# Store the current buffer in the history.
+	zle && print -s -r -- $BUFFER
+
+	# Return the default exit code so Zsh aborts the current command.
+	return $1
+}
+
+# Load aliases and similar functions also used by other shells.
+if [[ -f ~/.shell/aliases ]]; then
+	. ~/.shell/aliases
+fi
+
+# Make sure aliases are expanded when using sudo.
+alias sudo='sudo '
+
+# Global aliases for often used redirections.
+alias -g E='2>&1'
+alias -g N='>/dev/null'
+alias -g EN='2>/dev/null'
+alias -g L='2>&1 | less'
+alias -g LS='2>&1 | less -S' # -S prevents wrapping of long lines
+alias -g D='2>&1 | colordiff | less'
+# Global aliases for often used commands.
+alias -g A='| awk'
+alias -g A1="| awk '{ print \$1 }'"
+alias -g A2="| awk '{ print \$2 }'"
+alias -g A3="| awk '{ print \$3 }'"
+alias -g G='| grep'
+alias -g GB='| grep -vE "^Binary file .+ matches\$"'
+alias -g H='| head'
+alias -g P='| perl'
+alias -g S='| sort'
+alias -g SL='| sort | less'
+alias -g T='| tail'
+alias -g U='| uniq'
+alias -g X='`xsel -p || xclip -o`' # X selection
+
+# Make going up directories simple.
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+
+# If the window naming feature is used (see above) then use ".zsh" (leading
+# dot) as title name after running clear so it's clear to me that the window
+# is empty. I open so much windows that I don't know in which I have something
+# important. This helps me to remember which windows are empty (I run clear
+# after I finished my work in a window).
+if [[ -n $zshrc_window_reset ]]; then
+	alias clear='clear; zshrc_window_reset=yes; zshrc_window_precmd reset'
+fi
+
+
+# CUSTOM COMMANDS
+
+# Display all branches (except stash) in gitk but only 200 commits as this is
+# much faster. Also put in the background and disown. Thanks to drizzd in #git
+# on Freenode (2010-04-03 17:55 CEST).
+(( $+commands[gitk] )) && gitk() {
+command gitk --max-count=200 --branches --remotes --tags "$@" &
+disown %command
+}
+# Same for tig (except the disown part as it's no GUI program).
+(( $+commands[tig] )) && tig() {
+command tig --max-count=200 --branches --remotes --tags "$@"
+}
+
+# Choose the "best" PDF viewer available. Also setup completion for `pdf`.
+if (( $+commands[katarakt] )); then
+	pdf() {
+		command katarakt "$@" 2>/dev/null &
+		disown %command
+	}
+	# No completion for katarakt yet.
+	compdef pdf=xpdf
+elif (( $+commands[xpdf] )); then
+	pdf() {
+		command xpdf "$@" 2>/dev/null &
+		disown %command
+	}
+	compdef pdf=xpdf
+elif (( $+commands[zathura] )); then
+	pdf() {
+		command zathura "$@" 2>/dev/null &
+		disown %command
+	}
+	# No completion for zathura yet.
+	compdef pdf=xpdf
+fi
+
+
+# OS SPECIFIC SETTINGS
+
+if [[ $OSTYPE == linux* ]]; then
+	# Settings when creating Debian packages.
+	export DEBEMAIL=simon@ruderich.org
+	export DEBFULLNAME='Simon Ruderich'
+fi
+
+
+# LOAD ADDITIONAL CONFIGURATION FILES
+
+# Configuration options for rc.local.
+
+# Multiplexer to use. By default GNU screen is used. Possible values: screen,
+# tmux and empty (no multiplexer).
+zshrc_use_multiplexer=screen
+# Additional arguments for fortune.
+zshrc_fortune_arguments=()
+
+test -f ~/.zshrc.local && . ~/.zshrc.local
+
+
+# RUN COMMANDS
+
+# Make sure the multiplexer is available. Otherwise the exec terminates our
+# session.
+if [[ -n $zshrc_use_multiplexer ]]; then
+	if ! (( $+commands[$zshrc_use_multiplexer] )); then
+		echo "Multiplexer '$zshrc_use_multiplexer' not found." >&2
+		zshrc_use_multiplexer=
+	fi
+fi
+
+# If not already in screen or tmux, reattach to a running session or create a
+# new one. This also starts screen/tmux on a remote server when connecting
+# through ssh.
+if [[ $TERM != dumb && $TERM != dialup && $TERM != linux
+	&& -z $STY && -z $TMUX ]]; then
+	# Get running detached sessions.
+	if [[ $zshrc_use_multiplexer = screen ]]; then
+		session=$(screen -list | grep 'Detached' | awk '{ print $1; exit }')
+	elif [[ $zshrc_use_multiplexer = tmux ]]; then
+		session=$(tmux list-sessions 2>/dev/null \
+			| sed '/(attached)$/ d; s/^\([0-9]\{1,\}\).*$/\1/; q')
+	fi
+
+	# As we exec later we have to set the title here.
+	if [[ $zshrc_use_multiplexer = screen ]]; then
+		zshrc_window_preexec screen
+	elif [[ $zshrc_use_multiplexer = tmux ]]; then
+		zshrc_window_preexec tmux
+	fi
+
+	# Create a new session if none is running.
+	if [[ -z $session ]]; then
+		if [[ $zshrc_use_multiplexer = screen ]]; then
+			exec screen
+		elif [[ $zshrc_use_multiplexer = tmux ]]; then
+			exec tmux
+		fi
+		# Reattach to a running session.
+	else
+		if [[ $zshrc_use_multiplexer = screen ]]; then
+			exec screen -r $session
+		elif [[ $zshrc_use_multiplexer = tmux ]]; then
+			exec tmux attach-session -t $session
+		fi
+	fi
+fi
+
+# Colorize stderr in bold red. Very useful when looking for errors.
+if [[ $LD_PRELOAD != *libcoloredstderr.so* ]]; then
+	# coloredstderr found, use it.
+	if [[ -f ~/.zsh/libcoloredstderr.so ]]; then
+		export LD_PRELOAD="$HOME/.zsh/libcoloredstderr.so:$LD_PRELOAD"
+		export COLORED_STDERR_FDS=2,
+		export COLORED_STDERR_PRE=$'\033[91m' # bright red
+		export COLORED_STDERR_IGNORED_BINARIES=/usr/bin/tset
+		# Use the fallback solution.
+		#
+		# Thanks to http://gentoo-wiki.com/wiki/Zsh for the basic script and
+		# Mikachu in #zsh on Freenode (2010-03-07 04:03 CET) for some improvements
+		# (-r, printf). It's not yet perfect and doesn't work with su and git for
+		# example, but it can handle most interactive output quite well (even with
+		# no trailing new line) and in cases it doesn't work, the E alias can be
+		# used as workaround.
+		#
+		# Moved in the "run commands" section to prevent one unnecessary zsh
+		# process when starting GNU screen/tmux (see above).
+	else
+		exec 2>>(while read -r -k -u 0 line; do
+		printf '\e[91m%s\e[0m' $line
+		print -n $'\0'
+	done &)
+fi
+fi
+
+# Run the following programs every 4 hours (and when zsh starts).
+PERIOD=14400
+periodic() {
+	# Display fortunes.
+	(( $+commands[fortune] )) && fortune -ac "${zshrc_fortune_arguments[@]}"
+	# Display reminders.
+	(( $+commands[rem] )) && [[ -f ~/.reminders ]] && rem -h
+}
+
+
+# RESTART SETTINGS
+
+zmodload -F zsh/stat b:zstat
+
+# Remember startup time. Used to perform automatic restarts when ~/.zshrc is
+# modified.
+zshrc_startup_time=$EPOCHSECONDS
+
+# Automatically restart Zsh if ~/.zshrc was modified.
+zshrc_restart_precmd() {
+	local stat
+	if ! zstat -A stat +mtime ~/.zshrc; then
+		return
+	fi
+
+	# ~/.zshrc wasn't modified, nothing to do.
+	if [[ $stat -le $zshrc_startup_time ]]; then
+		return
+	fi
+
+	local startup
+	strftime -s startup '%Y-%m-%d %H:%M:%S' $zshrc_startup_time
+
+	echo -n "${fg[magenta]}"
+	echo -n "~/.zshrc modified since startup ($startup) ... "
+	echo -n "${fg[default]}"
+
+	if [[ -n $zshrc_disable_restart ]]; then
+		echo 'automatic restart disabled.'
+		return
+	fi
+
+	# Don't exec if we have background processes because execing will let us
+	# lose control over them.
+	if [[ ${#${(k)jobstates}} -ne 0 ]]; then
+		echo 'active background jobs!'
+		return
+	fi
+
+	# Try to start a new interactive shell. If it fails, something is wrong.
+	# Don't kill our current session by execing it, abort instead.
+	zsh -i -c 'exit 42'
+	if [[ $? -ne 42 ]]; then
+		echo -n ${fg_bold[red]}
+		echo 'failed to start new zsh!'
+		echo -n ${fg_bold[default]}
+		return
+	fi
+
+	echo 'restarting zsh.'
+	echo
+
+	exec zsh
+}
+precmd_functions+=(zshrc_restart_precmd)
+
+# vim: ft=zsh

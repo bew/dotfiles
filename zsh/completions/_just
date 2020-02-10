@@ -1,0 +1,14 @@
+#compdef _just just
+
+# Completion script for https://github.com/casey/just
+# Taken from https://github.com/casey/just/issues/223
+
+_just () {
+    local -a subcmds
+
+    subcmds=($(just --summary 2>/dev/null))
+
+    _describe 'command' subcmds
+}
+
+_just "$@"

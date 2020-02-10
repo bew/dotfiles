@@ -1,0 +1,123 @@
+#!/usr/bin/env zsh
+
+# mpv daemon player
+#
+# Example usage:
+# ```zsh
+# # Start the daemon in a separate terminal
+# $ mpv::start-daemon music
+#
+# # And then
+# $ mpv::add-media music file1 file2 file3
+#
+# # Enjoy!
+# ```
+#
+# The idea of channels is to be able to remote control multiple mpv instance,
+# e.g: one for music, one for some films, one for youtube videos, ...
+
+# Start an mpv instance in daemon mode identified by channel $1
+function mpv::start-daemon
+{
+  local channel=${1:-default}; [[ -n "$1" ]] && shift
+  local ipc_socket="/tmp/mpv-socket-${channel}"
+
+  echo ">>> Starting mpv daemon for channel '$channel' on IPC socket '$ipc_socket'..."
+  mpv --idle --input-ipc-server="$ipc_socket" $*
+}
+
+# Send an arbitrary command to mpv on channel $1
+#
+# For command documentation checkout `man mpv` section "JSON IPC"
+function mpv::send_command
+{
+  if [[ $# == 0 ]] || [[ $# == 1 ]]; then
+    echo "Usage: $0 <channel> <command> [<arg> ...]"
+    return 1
+  fi
+
+  local channel=$1; shift
+  local ipc_socket="/tmp/mpv-socket-${channel}"
+
+  local json='{"command": ['
+  for cmd_part in $*; do
+    # qqq to add double quotes for json strings
+    json+="${(qqq)cmd_part}, "
+  done
+  [[ $# != 0 ]] && json="${json[1, -3]}" # remove last ', '
+  json+="] }"
+
+  # echo "JSON: $json" >&2
+
+  echo "$json" | socat - "$ipc_socket"
+}
+
+# Helper function to make sure the mpv instance on channel $1 exists
+#
+# Exits with non-0 if it doesn't exist.
+function mpv::ensure-socket-exist
+{
+  local channel=$1
+  local ipc_socket="/tmp/mpv-socket-${channel}"
+
+  # -S   : socket
+  if ! [[ -S "$ipc_socket" ]]; then
+    echo >&2 ">>> ERROR: mpv channel '$channel' invalid"
+    echo >&2 "     -> '$ipc_socket' is not an mpv IPC socket."
+    return 1
+  fi
+}
+
+# Add any number of medias to mpv on channel $1,
+# then start playback if the playlist was empty before.
+function mpv::add-media
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: $0 <channel> <path> [<path> ...]"
+    return 1
+  fi
+
+  local channel=$1; shift
+
+  mpv::ensure-socket-exist $channel || return 1
+
+  echo ">>> Adding medias to mpv on channel '$channel'"
+
+  local ret
+  for media_path in $*; do
+    local media_full_path=$(realpath "$media_path")
+    echo ">>> Appending media '$media_path'"
+    mpv::send_command $channel "loadfile" "$media_full_path" "append-play"
+    ret=$?
+    [[ $ret != 0 ]] && return $ret
+  done
+
+  echo ">>> All medias added!"
+}
+
+# Show the playlist of mpv on channel $1
+function mpv::show-playlist
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: $0 <channel>"
+    return 1
+  fi
+
+  local channel=$1
+
+  mpv::ensure-socket-exist "$channel" || return 1
+
+  local output=$(mpv::send_command $channel "get_property" "playlist")
+
+  local ret=$?
+  [[ $ret != 0 ]] && return $ret
+
+  echo "$output" | jq . # let's just pretty print it for now...
+}
+
+# This function only needs to exist, when I call it, this file
+# will get executed and the helper functions will be in scope.
+function mpv::load_funcs
+{
+  echo "Helper functions loaded"
+}

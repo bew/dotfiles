@@ -1,0 +1,49 @@
+#!/usr/bin/env zsh
+
+# Watch a media with 'mpv' player, then ask to move the media file to 'seen/' directory.
+function watch_and_seen
+{
+  local media_path="$1"
+
+  # returns extension length if it is a part file, 0 if it's not
+  function length_of_part_extension
+  {
+    local filepath="$1"
+    local PART_EXTENSIONS=(.part .crdownload)
+
+    for ext in $PART_EXTENSIONS; do
+      pattern=".*$ext"
+      if [[ "$filepath" =~ "$pattern" ]]; then
+        echo -n ${#ext}
+        return
+      fi
+    done
+
+    echo -n 0 # not a part file
+  }
+  local part_ext_len=$(length_of_part_extension "$media_path")
+
+  if mpv "$@"; then
+    echo "The player ended successfully"
+
+    if [ ! -f "$media_path" ] && [ $part_ext_len -gt 0 ]; then
+      echo "The file '$media_path' doesn't exist anymore, it was a download part file"
+      # The file doesn't exist anymore, it was a .part file
+      # the final file is without the extension
+      local len=${#media_path}
+      media_path=${media_path[1, (( len - part_ext_len )) ]} # remove .part
+    fi
+
+    # see the man for the "<var>?<prompt>" syntax
+    read "reply?Move '$media_path' to 'seen/' ? [y/N] "
+
+    case $reply in
+      [Yy])
+        mv -i "$media_path" "seen/"
+        ;;
+
+      *) # everything (even "") means "no"
+        echo "Moving denied."
+    esac
+  fi
+}
