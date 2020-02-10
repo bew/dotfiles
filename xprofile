@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# Checks if the given command exists
+function has_command
+{
+    command -v $1 >/dev/null
+}
+
+# Runs the program in background if it exists
+function background_run
+{
+    has_command $1 && $* &
+}
+
+# Runs the program if it exists
+function run
+{
+    has_command $1 && $*
+}
+
+function debug
+{
+    echo $* >> /tmp/xinitrc_debug
+}
+
+# -----------------------------------------------
+
+# Setup mouse options (see `man 4 libinput)
+#> Enable tap to click
+xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Enabled' 1
+#> Enable 2 finger tap for middle click
+xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Button Mapping Enabled' 0 1
+
+# Setup keyboard mapping
+setxkbmap -config ~/.conf/xkbmap.config
+
+# Setup X resources
+~/.conf/bin/load_xresources
+
+# no beep
+xset -b
+
+# Load all ssh keys
+eval `ssh-agent`
+ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
+
+# Warmer screen temperature at night
+# Locations: (<lat>:<long>)
+# - San Marcos: 29.9:-97.9
+# - Paris: 48.8:2.3
+background_run redshift-gtk -l 48.8:2.3
+background_run nm-applet
+
+run libinput-gestures-setup start
+# NOTE: to reload config, use: libinput-gestures-setup restart
+
+# Run the compositor
+[[ -f ~/.conf/compton.config ]] && run compton --config ~/.conf/compton.config -b

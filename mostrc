@@ -1,0 +1,26 @@
+% Reference:
+% https://github.com/FauxFaux/most-pager/blob/33192918496a165978e6ec06465a6d9a811fda29/most.rc
+
+% HJKL navigation
+setkey column_left  "h"
+setkey up           "k"
+setkey down         "j"
+setkey column_right "l"
+
+setkey page_left  "H"
+setkey page_up    "K"
+setkey page_down  "J"
+setkey page_right "L"
+
+% Restore help (Ctrl-H)
+setkey help "^h"
+
+% Window management
+setkey two_windows "^ws"
+setkey other_window "^wj"
+setkey other_window "^wk"
+setkey one_window "^wo"
+setkey delete_window "^wd"
+
+% Setting some colors :)
+color status black white

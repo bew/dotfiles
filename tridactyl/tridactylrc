@@ -1,0 +1,14 @@
+set theme dark
+
+bind <A-c> pin
+
+bind <A-a> tabprev
+bind <A-z> tabnext
+
+bind <C-A-t> tabduplicate
+
+
+# Reload config file
+bind <C-A-r> source
+
+# vim:set ft=conf:

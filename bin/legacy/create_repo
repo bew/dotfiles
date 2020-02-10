@@ -1,0 +1,34 @@
+#!/bin/bash
+
+USER_MAIL="benoit.lesellierdechezelles@epitech.eu"
+USER_LOGIN="lesell_b"
+
+if [[ $# == 0 ]]; then
+  echo "$0 repo_name [clone [destination]]"
+  exit 0
+fi
+
+repo_name="$1"
+action="$2"
+clone_dest="$3"
+
+blih -u "$USER_MAIL" repository create "$repo_name"
+
+echo "Setting ACL for ramassage-tek:"
+blih -u "$USER_MAIL" repository setacl "$repo_name" ramassage-tek r && echo "ramassage-tek:r"
+
+[[ -z "$action" ]] && exit 0
+
+case "$action" in
+  clone)
+    if [[ -z "$clone_dest" ]]; then
+      git clone "git@git.epitech.eu:/$USER_LOGIN/$repo_name"
+    else
+      git clone "git@git.epitech.eu:/$USER_LOGIN/$repo_name" "$clone_dest"
+    fi
+    ;;
+
+  *)
+    echo "Unknown action '$action'"
+esac
+

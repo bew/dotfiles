@@ -1,0 +1,28 @@
+# this is the global git ignore
+
+# vim files
+.cs_*
+CS_SESSION
+
+# neomake tmp files
+.*neomake*
+
+
+# C/C++ compilation
+*.o
+*.out
+
+# Put any dir link you want to a __vcs_ignore__ directory!
+__vcs_ignore__/
+
+# Python compilation
+__pycache__/
+*.egg
+
+# local vimrc
+.lvimrc
+
+# Ruby bundle vendor/bundle directory
+bundle/
+
+.*_history

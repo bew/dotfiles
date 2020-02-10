@@ -1,3 +1,6 @@
+[submodule "bin/repos/crun"]
+  path = bin/repos/crun
+  url = git@github.com:Val/crun.git
 [submodule "zsh/third-party/zplugin"]
   path = zsh/third-party/zplugin
   url = git@github.com:zdharma/zplugin.git
