@@ -1,0 +1,25 @@
+function as_postgres_user
+{
+  if [[ $# == 0 ]]; then
+    sudo -iu postgres # open a shell as postgres user
+  else
+    sudo -iu postgres "$@"
+  fi
+  local ret=$?
+  sudo -k
+  return $ret
+}
+
+function start_pg
+{
+    if ! [[ -d /run/postgresql ]]; then
+        echo "Fixing /run/postgresql"
+        sudo mkdir -p /run/postgresql
+        sudo chown postgres /run/postgresql
+        sudo -k
+    fi
+
+    # NOTE: might need https://bbs.archlinux.org/viewtopic.php?id=151680
+    echo "Starting postgresql server (as postgres user)"
+    as_postgres_user pg_ctl -D /var/lib/postgres/data -l /var/lib/postgres/server.log start
+}
