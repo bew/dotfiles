@@ -1,0 +1,5 @@
+Extract prompt setup to a plugin
+
+Extract fuzzy zle widgets to a plugin (make configurable provider? Later...)
+
+Extract cdr' hook modification to a plugin (? NO.. just extract it somewhere..)
