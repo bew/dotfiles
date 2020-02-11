@@ -1,4 +1,0 @@
-! Local override for tek-hp pc
-
-! Change font size
-URxvt*font: xft:DejaVuSansMono\ Nerd\ Font\ Mono:pixelsize=15
