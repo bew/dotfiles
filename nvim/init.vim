@@ -145,12 +145,8 @@ Plug 'EdJoJob/llvmir-vim'       " LLVM IR syntax & other stuff
 Plug 'peterhoeg/vim-qml'        " QML syntax
 
 "# Markdown
-" 'plasticboy/vim-markdown' might be nice too
-Plug 'gabrielelana/vim-markdown'    " Complete environment to create Markdown files with a syntax highlight that doesn't suck!
-" 'SidOfc/mkdx' looks awesome!!!!
-
-" E.g disable auto change of << to «
-let g:markdown_enable_input_abbreviations = 0
+Plug 'plasticboy/vim-markdown'  " Markdown vim mode
+let g:vim_markdown_folding_disabled = 1
 
 
 "# Python
