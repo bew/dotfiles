@@ -119,6 +119,9 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per Lang / Tech plugins
 
+"# Rust
+Plug 'rust-lang/rust.vim'
+
 "# git commit mode
 Plug 'rhysd/committia.vim'
 
