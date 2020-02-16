@@ -1,5 +1,10 @@
 set nocompatible
-call plug#begin('~/.config/nvim/plugged')
+call plug#begin('~/.nvim/plugged')
+
+" Manage vim-plug itself! (to auto update & handle its doc)
+Plug 'junegunn/vim-plug', {
+      \ 'do': 'ln -sf ../plugged/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
+      \ }
 
 Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
 
