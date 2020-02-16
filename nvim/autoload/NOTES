@@ -1,0 +1,6 @@
+plug.vim is a symlink to ../plugged/vim-plug/plug.vim which is managed by vim-plug itself.
+:brainfuck:
+
+To be able to bootstrap vim-plug, symlink plug.vim to `./plug--bootstrap.vim`.
+
+The installation of 'vim-plug' by vim-plug (the bootstrap) will relink the symlink to the actual file installed by vim-plug :yolo:
