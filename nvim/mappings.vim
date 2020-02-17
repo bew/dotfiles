@@ -1,7 +1,6 @@
 " VIM - mappings
 
-" Redraw
-nnoremap <C-r> <C-l>
+" TODO: improve organization!
 
 " Save buffer
 nnoremap <M-Space> :w<cr>
@@ -19,23 +18,24 @@ nnoremap <M-r> :set relativenumber! relativenumber?<CR>
 
 " Toggles signcolumn, number & relativenumber at once
 function! ToggleSignsAndLineNumbers()
-  if get(w:, "toggle_signs_and_line_numbers_in_progress", 0) == 1
-    let w:toggle_signs_and_line_numbers_in_progress = 0
+  if exists('w:saved_signs_and_linenum_options')
     let status = "restored"
 
     " Restore saved option values
-    let &signcolumn = w:saved_signcolumn
-    let &number = w:saved_number
-    let &relativenumber = w:saved_relativenumber
+    let &signcolumn = w:saved_signs_and_linenum_options['signcolumn']
+    let &number = w:saved_signs_and_linenum_options['number']
+    let &relativenumber = w:saved_signs_and_linenum_options['relativenumber']
+
+    unlet w:saved_signs_and_linenum_options
   else
-    let w:toggle_signs_and_line_numbers_in_progress = 1
     let status = "saved & disabled"
 
     " Save options and disable them
-    let w:saved_signcolumn = &signcolumn
-    let w:saved_number = &number
-    let w:saved_relativenumber = &relativenumber
-
+    let w:saved_signs_and_linenum_options = {
+          \ 'signcolumn': &signcolumn,
+          \ 'number': &number,
+          \ 'relativenumber': &relativenumber,
+          \ }
     let &signcolumn = "no"
     let &number = 0
     let &relativenumber = 0
@@ -106,15 +106,52 @@ nnoremap <M-Z> :tabmove +1<cr>
 inoremap <M-A> <esc>:tabmove -1<cr>
 inoremap <M-Z> <esc>:tabmove +1<cr>
 
+" Open current buffer in new tab (in a new window)
+nnoremap <silent> <M-t> :tab split<cr>
+" Move current window to new tab
+nnoremap <silent> <M-T> <C-w>T
+
 " Goto next/previous buffer
 nnoremap <M-n> :bnext<cr>
 nnoremap <M-p> :bprevious<cr>
 
+" Toggle zoom on current window
+" From justinmk' config https://github.com/justinmk/config/blob/a93dc73fafbdeb583ce177a9d4ebbbdfaa2d17af/.config/nvim/init.vim#L880-L894
+function! s:zoom_toggle()
+  if 1 == winnr('$')
+    " There is only one window
+    echo "No need to zoom!"
+    return
+  endif
+
+  if exists('t:zoom_restore')
+    " Restore tab layout
+    let status = "restored"
+    exe t:zoom_restore
+    unlet t:zoom_restore
+  else
+    " Save tab layout & zoom window
+    let status = "saved and window zoomed"
+    let t:zoom_restore = winrestcmd()
+    wincmd |
+    wincmd _
+  endif
+
+  echo "Tab layout: " . status
+endfunction
+nnoremap <silent> +  :call <SID>zoom_toggle()<cr>
+
+" Default <C-w>o is dangerous for the layout, hide it behind <C-w>O (maj o)
+" Make it zoom instead (saves the layout for restore)
+" FIXME: investigate why <C-w>o mapping does not seem to be overriden...
+" nnoremap <silent> <C-w>o  :call <SID>zoom_toggle()<cr>
+" nnoremap <silent> <C-w>O  :call <C-w>o<cr>
+
 
 " Visual - Move a selection of text
-vnoremap <Left> <gv
+vnoremap <Left>  <gv
 vnoremap <Right> >gv
-vnoremap <Up> :move '<-2<cr>gv
+vnoremap <Up>   :move '<-2<cr>gv
 vnoremap <Down> :move '>+1<cr>gv
 
 
@@ -206,6 +243,8 @@ vnoremap <Tab> :normal! ==<cr>
 " Format the file
 nnoremap <C-f> gg=G``
 
+" un-join (split) the current line at the cursor position
+nnoremap gj i<c-j><esc>k$
 
 " Copy/Paste with system clipboard
 vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
@@ -221,6 +260,9 @@ inoremap <C-u> <C-g>u<C-u>
 
 " logical undo
 nnoremap U <C-r>
+
+" mark position before search
+nnoremap / ms/
 
 " Search with{,out} word boundaries
 vmap * <Plug>(visualstar-*)
