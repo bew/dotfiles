@@ -38,11 +38,11 @@ ${1:move }|${2}| {
 }
 endsnippet
 
-snippet pri "print!(..)" b
+snippet p "print!(..)" b
 print!("${1}"${2/..*/, /}${2});
 endsnippet
 
-snippet pln "println!(..)" b
+snippet pl "println!(..)" b
 println!("${1}"${2/..*/, /}${2});
 endsnippet
 
@@ -101,6 +101,10 @@ snippet impl "Struct/Trait implementation" b
 impl ${1:Type/Trait}${2: for ${3:Type}} {
 	${0}
 }
+endsnippet
+
+snippet x "except(...)" w
+expect("${1:message}")$99
 endsnippet
 
 # vim:ft=snippets:
