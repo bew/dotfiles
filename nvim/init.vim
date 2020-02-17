@@ -116,6 +116,11 @@ Plug 'ryanoasis/vim-devicons'
 
 Plug 'drzel/vim-line-no-indicator'      " Simple and expressive line number indicator
 
+Plug 'chrisbra/Colorizer'  " color hex codes #112233, ANSI sequences, vim's cterm*g
+" Or just call :ColorHighlight on any file and enjoy
+let g:colorizer_auto_filetype='css,html,vim'
+let g:colorizer_colornames = 0 " Don't hl colornames (like red, yellow)
+
 Plug 'tweekmonster/nvim-api-viewer'
 
 " -- Per Lang / Tech plugins
