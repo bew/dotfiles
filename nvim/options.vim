@@ -17,7 +17,8 @@ set ruler   " show the cursor position all the time
 set showcmd   " display incomplete commands
 set noshowmode  " disable -- INSERT -- (necessary for echodoc plugin)
 
-set hlsearch    " do highlight the searched text
+" set hlsearch    " do highlight the searched text
+" This is the default, and it re-hl the last search when reloading nvim's config, so let's keep it but commented
 set incsearch   " incremental search as you type
 
 " apply smart case searching
