@@ -94,6 +94,7 @@ let g:LanguageClient_serverCommands = {
 Plug 'junegunn/vim-easy-align'      " An advanced, easy-to-use Vim alignment plugin.
 
 Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
+Plug 'junegunn/gv.vim'          " Simple (<3) git commit browser, based on vim-fugitive
 
 " -- UI
 
