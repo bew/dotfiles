@@ -15,8 +15,10 @@ Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
 Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/etc..)
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'      " * for visualy selected text
-Plug 'mileszs/ack.vim'          " Use ack for vimgrep
 Plug 'itchyny/lightline.vim'      " statusline builder
+
+Plug 'jremmen/vim-ripgrep'
+let g:rg_command = 'rg --vimgrep -S' " -S for smartcase
 
 Plug 'machakann/vim-sandwich'   " Advanced operators & textobjects to manipulate surroundings
 
