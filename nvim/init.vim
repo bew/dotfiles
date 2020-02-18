@@ -10,6 +10,7 @@ Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
 
 " -- Vim feature enhancer
 
+Plug 'wellle/targets.vim'        " Moar & improved text objects
 Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
 Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/etc..)
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
