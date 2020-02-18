@@ -28,8 +28,10 @@ set smartcase
 set number
 set relativenumber
 
-" Draw signcolumn only if needed and resize for up to N signs on same line
-set signcolumn=auto:2
+if has("nvim-0.4.0") " I don't know the exact patch
+  " Draw signcolumn only if needed and resize for up to N signs on same line
+  set signcolumn=auto:2
+endif
 
 set cursorline    " highlight the current line
 set cursorcolumn  " highlight the current column
@@ -59,7 +61,12 @@ set pumheight=20
 
 " Show non visible chars (tabs/trailing spaces/too long lines/etc..)
 set list
-set listchars=tab:·\ ,trail:@,precedes:<,extends:> " how to show differents categories of invisible chars
+" As always, read :help pages for details!
+set listchars=
+set listchars+=tab:·\ ,     " Tab char
+set listchars+=trail:@,     " Trailing spaces
+set listchars+=precedes:<,  " First char when line too long for display
+set listchars+=extends:>,   " Last char when line too long for display
 
 " Set the char to use to fill some blanks
 set fillchars=
