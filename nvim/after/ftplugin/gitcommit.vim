@@ -1,1 +1,2 @@
 setlocal nowrap
+setlocal iskeyword+=-
