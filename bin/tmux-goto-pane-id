@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function echo_err
+{
+  echo >&2 "$@"
+}
+
+function die_run
+{
+  "$@"
+  exit 1
+}
+
+if [[ $# == 0 ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+  echo_err "Usage: $0 <TARGET_PANE_ID>"
+  echo_err
+  echo_err "  Example: $0 %42"
+  echo_err
+  exit 1
+fi
+
+TARGET_PANE_ID="$1"
+
+SESSION_NAME=$(tmux list-panes -t "$TARGET_PANE_ID" -F "#{session_name}")
+WINDOW_ID=$(tmux list-panes -t "$TARGET_PANE_ID" -F "#{window_id}")
+PANE_INDEX=$(tmux list-panes -t "$TARGET_PANE_ID" -F "#{pane_index}")
+
+tmux switch-client -t "$SESSION_NAME" || die_run tmux display-message "Cannot switch to session '$SESSION_NAME'"
+tmux select-window -t "$WINDOW_ID" || die_run tmux display-message "Cannot switch to window id '$WINDOW_ID'"
+tmux select-pane -t "$PANE_INDEX" || die_run tmux display-message "Cannot switch to pane index '$PANE_INDEX'"
+
+# vim:set sw=2:
