@@ -14,7 +14,7 @@ vnoremap <M-s> <Esc>:w<cr>
 nnoremap <M-w> :set wrap! wrap?<cr>
 
 " toggle relativenumber
-nnoremap <M-r> :set relativenumber! relativenumber?<CR>
+nnoremap <M-r> :set relativenumber! relativenumber?<cr>
 
 " Toggles signcolumn, number & relativenumber at once
 function! ToggleSignsAndLineNumbers()
@@ -173,9 +173,9 @@ nnoremap <M-$> g$
 " Insert a new line below using <cr>, useful in comments when `formatoptions`
 " has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
 " is not at eol.
-inoremap <M-CR> <C-o>A<cr>
+inoremap <M-cr> <C-o>A<cr>
 " Also works in normal mode, goes in insert mode with a leading comment.
-nnoremap <M-CR> A<cr>
+nnoremap <M-cr> A<cr>
 
 " Quickely navigate between quickfix or location list's lines
 
@@ -284,7 +284,7 @@ endfunction
 
 
 " Taken from visual-at.vim from Practical Vim 2nd Edition
-xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
 function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
   execute ":'<,'>normal @".nr2char(getchar())
@@ -295,14 +295,9 @@ endfunction
 nnoremap <F5> :MundoToggle<cr>
 
 " Open or focus NERDTree window
-nnoremap <F6> :call NERDTreeFocus()<CR>
-if !has('mac')
-    " Note: Shift-F6 is F16 (on urxvt)
-    nnoremap <F16> :NERDTreeFind<CR>
-else
-    " Note: Shift-F6 is F18 (on iTerm2)
-    nnoremap <F18> :NERDTreeFind<CR>
-endif
+nnoremap <F6> :call NERDTreeFocus()<cr>
+" Note: Shift-F6 is F16 (on urxvt)
+nnoremap <F16> :NERDTreeFind<cr>
 
 " Show highlight infos
 function! s:syntax_query(verbose) abort
