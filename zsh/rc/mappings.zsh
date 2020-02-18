@@ -399,7 +399,9 @@ function backward-kill-partial-path
 }
 zle -N backward-kill-partial-path
 
-bindkey '^h' backward-kill-partial-path # Ctrl-Backspace
+# Backspace can be ^? or ^H on some terminal, so we handle both here
+bindkey '^?' backward-kill-partial-path # Alt-Backspace
+bindkey '^H' backward-kill-partial-path # Alt-Backspace
 
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
