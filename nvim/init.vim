@@ -20,6 +20,14 @@ Plug 'itchyny/lightline.vim'      " statusline builder
 Plug 'jremmen/vim-ripgrep'
 let g:rg_command = 'rg --vimgrep -S' " -S for smartcase
 
+Plug 'stefandtw/quickfix-reflector.vim' " Editable quickfix buffer, for bulk changes
+" Sets quickfix buffers as modifiable
+let g:qf_modifiable = 1   " FIXME: Do I hide this behind a command?
+" Changes within a single buffer will be undo-able as a single change
+let g:qf_join_changes = 1
+" TODO: change the status line / display a warning that there is a change / ..
+
+
 Plug 'machakann/vim-sandwich'   " Advanced operators & textobjects to manipulate surroundings
 
 " Load vim-surround compatible mappings
