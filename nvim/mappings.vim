@@ -66,8 +66,14 @@ nnoremap <M-g> :IndentGuidesToggle<cr>
 "------------------------------------------------------------------
 
 " Short navigation left/right in insert mode
-inoremap <M-h> <Left>
-inoremap <M-l> <Right>
+"
+" This makes it possible to use the cursor keys in Insert mode, without breaking
+" the undo sequence and therefore using . (redo) will work as expected.
+inoremap <Left>  <C-G>U<Left>
+inoremap <Right> <C-G>U<Right>
+" We use imap to use the above left/right mapping
+imap <M-h> <Left>
+imap <M-l> <Right>
 
 
 " Windows navigation
