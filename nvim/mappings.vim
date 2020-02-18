@@ -256,10 +256,6 @@ nnoremap gj i<c-j><esc>k$
 vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
 nnoremap <silent> <M-v> :r !xclip -out -selection clipboard<cr>
 
-" Save the file as sudo
-cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin/zenity_passwd.sh sudo tee % >/dev/null
-
-
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-u> <C-g>u<C-u>
@@ -324,3 +320,20 @@ endfunction
 nnoremap <silent> <F2> :call <SID>syntax_query(v:false)<cr>
 nnoremap <silent> <F3> :call <SID>syntax_query(v:true)<cr>
 
+" ---- Command mode
+
+" Save the file as sudo
+cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin/zenity_passwd.sh sudo tee % >/dev/null
+
+" Cursor movement
+cnoremap <M-h> <Left>
+cnoremap <M-l> <Right>
+cnoremap <M-w> <S-Right>
+cnoremap <M-b> <S-Left>
+
+" Command history by prefix
+cnoremap <M-k> <Up>
+cnoremap <M-j> <Down>
+" Command history
+cnoremap <M-K> <S-Up>
+cnoremap <M-J> <S-Down>
