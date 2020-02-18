@@ -140,6 +140,9 @@ Plug 'junegunn/vim-easy-align'      " An advanced, easy-to-use Vim alignment plu
 
 Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
 Plug 'junegunn/gv.vim'          " Simple (<3) git commit browser, based on vim-fugitive
+Plug 'rhysd/git-messenger.vim'  " Popup the commit message of the line under cursor
+let g:git_messenger_no_default_mappings = v:true
+nmap gc  <Plug>(git-messenger)
 
 " -- UI
 
@@ -283,6 +286,12 @@ if has("mac")
 endif
 
 """""""""""""""""""""""""""""""""
+
+augroup my_float_hi
+  au!
+
+  au ColorScheme * hi NormalFloat ctermfg=248 ctermbg=232
+augroup END
 
 augroup my_custom_language_hi
   au!
