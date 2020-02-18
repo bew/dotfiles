@@ -240,11 +240,11 @@ nnoremap <M-i> <nop>
 
 
 " Indent line(s)
-nnoremap <Tab> mi==`i
 inoremap <Tab> <Esc>mi==`il
-
-" note: '<,'> is automatically inserted on ':'
 vnoremap <Tab> :normal! ==<cr>
+" Do not add to normal mode, to keep CTRL-O CTRL-I working to navigate
+" the jump list.
+" nnoremap <Tab> mi==`i
 
 " Format the file
 nnoremap <C-f> gg=G``
