@@ -309,5 +309,18 @@ else
 endif
 
 " Show highlight infos
-nmap <F2> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" <CR>
+function! s:syntax_query(verbose) abort
+  if a:verbose == v:true
+    let cmd = "verbose hi"
+  else
+    let cmd = "hi"
+  endif
+
+  echo "--- Syntax stack at line:" . line(".") . " col:" . col(".") . " ---"
+  for id in synstack(line("."), col("."))
+    execute cmd synIDattr(id, "name")
+  endfor
+endfunction
+nnoremap <silent> <F2> :call <SID>syntax_query(v:false)<cr>
+nnoremap <silent> <F3> :call <SID>syntax_query(v:true)<cr>
 
