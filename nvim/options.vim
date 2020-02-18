@@ -49,7 +49,7 @@ set linebreak    " Wrapping will break lines on word boundaries
 
 set hidden " Allow to have unsaved hidden buffers
 
-set timeoutlen=300
+set timeoutlen=1000
 
 " Auto indent the next line
 set autoindent
