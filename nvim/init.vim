@@ -106,7 +106,10 @@ Plug 'easymotion/vim-easymotion'
 
 " -- Insert mode helpers
 
-Plug 'Raimondi/delimitMate'       " auto insert of second ()''{}[]\"\" etc...
+Plug 'Raimondi/delimitMate'      " auto insert of second ()''{}[]\"\" etc...
+let delimitMate_expand_space = 1
+let delimitMate_expand_cr = 1
+
 Plug 'SirVer/ultisnips'         " Advanced snippets
 
 " -- Text refactor / formater
