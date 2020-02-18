@@ -84,6 +84,7 @@ nnoremap <C-l> <C-w>l
 
 " When mapping <C-j> has no effect
 nmap <cr> <C-j>
+autocmd FileType qf nunmap <cr>
 
 " When mapping <C-h> has no effect
 nmap <BS> <C-h>
