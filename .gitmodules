@@ -2,7 +2,7 @@
   path = bin/repos/crun
   url = git@github.com:Val/crun.git
 [submodule "zsh/third-party/zplugin"]
-  path = zsh/third-party/zplugin
+	path = zsh/third-party/zinit
   url = git@github.com:zdharma/zplugin.git
 [submodule "zsh/third-party/zsh-hooks"]
   path = zsh/third-party/zsh-hooks

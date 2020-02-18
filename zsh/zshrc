@@ -43,19 +43,19 @@ add-zsh-hook chpwd chpwd-wrapper
 #-------------------------------------------------------------
 # Load Plugins
 
-# zplugin
-source ~/.zsh/third-party/zplugin/zplugin.zsh
+# zinit
+source ~/.zsh/third-party/zinit/zinit.zsh
 
 # Syntax highlighting
-zplugin light zdharma/fast-syntax-highlighting
+zinit light zdharma/fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme ~/.zsh/fast-theme--bew.ini
 
 # cd with 'frecency' (recent + frequence)
-zplugin light rupa/z
+zinit light rupa/z
 
 # Git branch in prompt (using fast gitstatusd daemon)
-zplugin load romkatv/gitstatus
+zinit load romkatv/gitstatus
 gitstatus_start MY
 
 
