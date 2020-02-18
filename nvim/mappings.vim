@@ -333,3 +333,13 @@ cnoremap <M-j> <Down>
 " Command history
 cnoremap <M-K> <S-Up>
 cnoremap <M-J> <S-Down>
+
+" Expand %% to dir of current file
+cnoremap <expr> %% expand("%:h") . "/"
+
+" Use this to make a few nice mappings
+" Taken from: http://vimcasts.org/episodes/the-edit-command/
+nnoremap <leader>ee  :e %%
+nnoremap <leader>es  :spl %%
+nnoremap <leader>ev  :vsp %%
+nnoremap <leader>et  :tabe %%
