@@ -3,39 +3,43 @@
 let g:lightline_solarized_background = 'dark'
 
 let g:lightline = {
-      \ 'colorscheme': 'custom_background_solarized',
-      \ 'enable': {
-      \   'statusline': 1,
-      \   'tabline': 0,
-      \ },
-      \ 'active': {
-      \   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive'] ],
-      \   'right': [ ['lineinfo'], ['progress'], ['filetype'] ],
-      \ },
-      \ 'inactive': {
-      \   'left':  [ [], ['relativepath', 'readonly', 'modified', 'fugitive'] ],
-      \   'right': [ [], ['progress'] ],
-      \ },
-      \ 'component': {
-      \   'readonly': '%{&readonly ? "" : ""}',
+      \   'enable': {
+      \     'statusline': 1,
+      \     'tabline': 0,
+      \   },
+      \   'mode_map': {
+      \     'n': 'N', 'i': 'I', 'R': 'R',
+      \     'v': 'V', 'V': 'VL', "\<C-v>": 'VB',
+      \     's': 'S', 'S': 'SL', "\<C-s>": 'SB',
+      \     'c': 'C', 't': 'T',
+      \     '?': '?',
+      \   },
+      \   'separator': { 'left': '', 'right': '' },
+      \   'subseparator': { 'left': '', 'right': '' },
+      \ }
+" let g:lightline.colorscheme = 'custom_background_solarized'
+let g:lightline.colorscheme = 'PaperColor'
+
+let g:lightline.active = {
+      \   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
+      \   'right': [ ['lineinfoprogress'], [], ['filetype'] ],
+      \ }
+let g:lightline.inactive = {
+      \   'left':  [ ['relativepath', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
+      \   'right': [ ['progress'], ['filetype'] ],
+      \ }
+let g:lightline.component = {
+      \   'readonly': '%{&readonly && &ft != "help" ? "" : ""}',
       \   'modified': '%{&modified ? "+" : ""}',
-      \ },
-      \ 'mode_map': {
-      \   'n': 'N', 'i': 'I', 'R': 'R',
-      \   'v': 'V', 'V': 'VL', "\<C-v>": 'VB',
-      \   's': 'S', 'S': 'SL', "\<C-s>": 'SB',
-      \   'c': 'C', 't': 'T',
-      \   '?': '?',
-      \ },
-      \ 'component_function': {
+      \   'lineinfoprogress': '%{LightLineProgress()} %l:%v',
+      \ }
+let g:lightline.component_function = {
       \   'filename': 'LightLineFilename',
       \   'filetype': 'LightLineFiletype',
       \   'progress': 'LightLineProgress',
       \   'mode': 'LightLineMode',
       \   'fugitive': 'LightlineFugitive',
-      \ },
-      \ 'separator': { 'left': '', 'right': '' },
-      \ 'subseparator': { 'left': '', 'right': '' },
+      \   'buffer_comment': 'LightLineBufferComment',
       \ }
 
 " Taken from: `:h lightline-powerful-example`
@@ -79,6 +83,10 @@ function! LightLineProgress()
 endfunction
 
 function! LightLineMode()
+  if &ft == 'help'
+    return 'H'
+  endif
+
   let fname = expand('%:t')
   return fname == '__Tagbar__' ? 'Tagbar' :
         \ fname == '__Gundo__' ? 'Gundo' :
@@ -90,9 +98,6 @@ function! LightLineMode()
         \ winwidth(0) > 60 ? lightline#mode() : ''
 endfunction
 
-let g:tagbar_status_func = 'TagbarStatusFunc'
-function! TagbarStatusFunc(current, sort, fname, ...) abort
-  let g:lightline.fname = a:fname
-  return lightline#statusline(0)
-endfunction
-
+function! LightLineBufferComment()
+  return exists("b:bew_statusline_comment") ? b:bew_statusline_comment : ''
+endf
