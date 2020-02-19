@@ -146,13 +146,10 @@ nmap gc  <Plug>(git-messenger)
 
 " -- UI
 
-Plug 'nathanaelkane/vim-indent-guides'    " Add colored indent guides
-
-" Adjust indent guides color (TODO: light theme version)
-let g:indent_guides_auto_colors = 0
-autocmd Colorscheme * :hi IndentGuidesOdd  ctermbg=236
-autocmd Colorscheme * :hi IndentGuidesEven ctermbg=235
-
+Plug 'Yggdroot/indentLine'
+" Each indent level uses a distinct character (rotating)
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+let g:indentLine_fileTypeExclude = ['help', 'startify']
 
 Plug 'Shougo/denite.nvim'         " Generic interactive menu framework
 
