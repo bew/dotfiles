@@ -63,6 +63,33 @@ alias la="ll -a"
 alias l="la"
 alias l1="ls -1"
 
+# curl
+
+alias dl_file="curl -L -O"
+alias curl_json='curl -H "Accept:application/json" -H "Content-Type:application/json"'
+
+function curl_auth
+{
+  local token="$1"; shift
+  if [[ -z "$token" ]]; then
+    echo 2>/dev/null "Missing <token>"
+    return 1
+  fi
+
+  curl -H "Authorization: Bearer $token" "$@"
+}
+
+function curl_auth_json
+{
+  local token="$1"; shift
+  if [[ -z "$token" ]]; then
+    echo 2>/dev/null "Missing <token>"
+    return 1
+  fi
+
+  curl_auth "$token" -H "Accept:application/json" -H "Content-Type:application/json" "$@"
+}
+
 # misc
 
 alias todo='rg -i "todo|fixme"'
@@ -72,8 +99,7 @@ function cheatsh
   curl cht.sh/$1
 }
 
-alias dl_file="curl -L -O"
-
+# ps
 # -f : full listing (show process name & args)
 # --forest : Show a processes hierarchy
 alias pss="ps -f --forest"
@@ -225,6 +251,7 @@ alias ff_streaming="firefox -P pezop www.diagrim.com &!"
 alias ezshrc="e ~/.zshrc"
 alias enviminit="e ~/.config/nvim/init.vim"
 alias envimmappings="e ~/.config/nvim/mappings.vim"
+alias cddot="cd ~/.dot"
 alias cdzsh="cd ~/.zsh"
 alias cdnvim="cd ~/.nvim"
 alias cdbin="cd ~/.bin"
