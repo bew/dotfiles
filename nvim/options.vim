@@ -81,6 +81,7 @@ set sidescroll=1        " scroll chars one by one
 " Command line options
 set wildmenu          " show list instead of just completing
 set wildmode=longest:full,full  " commandline <Tab> completion, list matches, then longest common part, then all.
+set wildignorecase    " ignore case when completing filenames
 
 " setup default fold
 "set foldmethod=syntax
