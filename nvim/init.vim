@@ -258,15 +258,15 @@ call plug#end()
 
 """""""""""""""""""""""""""""""""
 
+" map leader definition - space
+let mapleader = " "
+
 runtime! config.rc/plugins/*.rc.vim
 
 " Source some files
 runtime! options.vim
 runtime! mappings.vim
 runtime! autocmd.vim
-
-" map leader definition - space
-let mapleader = " "
 
 call togglebg#install_mapping('<f12>')
 
