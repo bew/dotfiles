@@ -85,6 +85,8 @@ Plug 'Shougo/deoplete.nvim',      " Dark-powered completion engine
       \ { 'do': ':UpdateRemotePlugin' }
 let g:deoplete#enable_at_startup = 1
 
+Plug 'tommcdo/vim-exchange'
+
 Plug 'scrooloose/nerdcommenter'     " Comment stuff out
 Plug 'scrooloose/nerdtree'        " Tree based file explorer
 
