@@ -159,7 +159,39 @@ Plug 'Yggdroot/indentLine'
 let g:indentLine_char_list = ['┆', '┊', '┆', '¦']
 let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown']
 
-Plug 'Shougo/denite.nvim'         " Generic interactive menu framework
+Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
+    \ { 'do': ':UpdateRemotePlugin' }
+" Disable devicons in denite as it slows down the filtering a LOT
+" Ref: https://github.com/ryanoasis/vim-devicons/issues/204
+let g:webdevicons_enable_denite = 0
+
+autocmd FileType denite call s:denite_my_settings()
+function! s:denite_my_settings() abort
+  nnoremap <silent><buffer><expr> <CR>
+      \ denite#do_map('do_action')
+  nnoremap <silent><buffer><expr> o
+      \ denite#do_map('do_action')
+  nnoremap <silent><buffer><expr> <M-o>
+      \ denite#do_map('do_action')
+
+  nnoremap <silent><buffer><expr> p
+      \ denite#do_map('do_action', 'preview')
+
+  nnoremap <silent><buffer><expr> q
+      \ denite#do_map('quit')
+  nnoremap <silent><buffer><expr> i
+      \ denite#do_map('open_filter_buffer')
+endfunction
+
+autocmd FileType denite-filter call s:denite_filter_my_settings()
+function! s:denite_filter_my_settings() abort
+  nnoremap <silent><buffer><expr> q
+      \ denite#do_map('quit')
+
+  call deoplete#custom#buffer_option('auto_complete', v:false)
+endfunction
+
+
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 
@@ -275,6 +307,21 @@ runtime! mappings.vim
 runtime! autocmd.vim
 
 call togglebg#install_mapping('<f12>')
+
+
+" Denite config (must be after plug#end() to work (FIXME!!!!!))
+call denite#custom#alias('source', 'grep/rg', 'grep')
+call denite#custom#var('grep/rg', 'command', ['rg'])
+call denite#custom#var('grep/rg', 'default_opts',
+    \ ['-i', '--vimgrep', '--no-heading'])
+call denite#custom#var('grep/rg', 'recursive_opts', [])
+call denite#custom#var('grep/rg', 'pattern_opt', ['--regexp'])
+call denite#custom#var('grep/rg', 'separator', ['--'])
+call denite#custom#var('grep/rg', 'final_opts', [])
+
+call denite#custom#alias('source', 'file/rec/smart', 'file/rec')
+call denite#custom#var('file/rec/smart', 'command',
+    \ ['fd', '.', '--type', 'f', '--type', 'l'])
 
 """""""""""""""""""""""""""""""""
 
