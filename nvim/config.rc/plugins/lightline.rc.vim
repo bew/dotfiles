@@ -22,7 +22,7 @@ let g:lightline.colorscheme = 'PaperColor'
 
 let g:lightline.active = {
       \   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
-      \   'right': [ ['lineinfoprogress'], [], ['filetype'] ],
+      \   'right': [ ['lineinfoprogress'], ['linter_warnings', 'linter_errors'], ['filetype'] ],
       \ }
 let g:lightline.inactive = {
       \   'left':  [ ['relativepath', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
@@ -40,7 +40,13 @@ let g:lightline.component_function = {
       \   'mode': 'LightLineMode',
       \   'fugitive': 'LightlineFugitive',
       \   'buffer_comment': 'LightLineBufferComment',
+      \   'linter_errors': 'LightLineLinterErrors',
+      \   'linter_warnings': 'LightLineLinterWarnings',
       \ }
+let g:lightline.component_type = {
+    \   'linter_errors': 'error',
+    \   'linter_warnings': 'warning',
+    \ }
 
 " Taken from: `:h lightline-powerful-example`
 function! LightlineFugitive()
@@ -100,4 +106,22 @@ endfunction
 
 function! LightLineBufferComment()
   return exists("b:bew_statusline_comment") ? b:bew_statusline_comment : ''
+endf
+
+function! LightLineLinterErrors()
+  try
+    let status = neomake#statusline#LoclistCounts()
+    return status['E'] == 0 ? '' : 'E:' . status['E']
+  catch
+    return ''
+  endtry
+endf
+
+function! LightLineLinterWarnings()
+  try
+    let status = neomake#statusline#LoclistCounts()
+    return status['W'] == 0 ? '' : 'W:' . status['W']
+  catch
+    return ''
+  endtry
 endf
