@@ -117,9 +117,21 @@ let g:ctrlsf_auto_close = {
 " - unlike ctrlsf, edit mode should be explicitely enabled (with visual feedbacks)
 
 Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
+let g:gitgutter_map_keys = 0
+nmap <leader>hp <Plug>(GitGutterPreviewHunk)
+nmap <leader>hu <Plug>(GitGutterUndoHunk)
+nnoremap <leader>hf :GitGutterFold<cr>
 
-" Motions on speed!
-Plug 'easymotion/vim-easymotion'
+nnoremap ]h :GitGutterNextHunk<cr>
+nnoremap [h :GitGutterPrevHunk<cr>
+
+" Hunk text object
+omap ih <Plug>(GitGutterTextObjectInnerPending)
+omap ah <Plug>(GitGutterTextObjectOuterPending)
+xmap ih <Plug>(GitGutterTextObjectInnerVisual)
+xmap ah <Plug>(GitGutterTextObjectOuterVisual)
+
+Plug 'easymotion/vim-easymotion' " Motions on speed!
 
 Plug 'liuchengxu/vim-which-key'
 " My floating win highlightings aren't ready for this...
