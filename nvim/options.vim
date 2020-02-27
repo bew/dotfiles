@@ -52,6 +52,7 @@ set linebreak    " Wrapping will break lines on word boundaries
 set hidden " Allow to have unsaved hidden buffers
 
 set timeoutlen=1000
+set updatetime=500  " Time (ms) before swapfile & CursorHold autocmd triggers
 
 " Auto indent the next line
 set autoindent
