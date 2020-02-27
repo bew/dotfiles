@@ -120,6 +120,10 @@ set softtabstop=2
 set shiftwidth=2
 set expandtab " Always expand TAB to spaces
 
+" vim's continuation line indent defaults to 3 * shiftwidth, it's
+" too much, let's reduce it:
+let g:vim_indent_cont = 4
+
 
 " Setting colorscheme
 syntax enable " Not 'syntax on' which overrides colorscheme

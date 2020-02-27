@@ -32,10 +32,10 @@ function! ToggleSignsAndLineNumbers()
 
     " Save options and disable them
     let w:saved_signs_and_linenum_options = {
-          \ 'signcolumn': &signcolumn,
-          \ 'number': &number,
-          \ 'relativenumber': &relativenumber,
-          \ }
+        \ 'signcolumn': &signcolumn,
+        \ 'number': &number,
+        \ 'relativenumber': &relativenumber,
+        \ }
     let &signcolumn = "no"
     let &number = 0
     let &relativenumber = 0
