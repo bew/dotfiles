@@ -2,6 +2,10 @@
 
 " TODO: improve organization!
 
+" Helper guide on <Leader>
+nnoremap <Leader> :WhichKey '<Leader>'<cr>
+vnoremap <Leader> :WhichKeyVisual '<Leader>'<cr>
+
 " Save buffer
 nnoremap <M-Space> :w<cr>
 inoremap <M-Space> <Esc>:w<cr>
