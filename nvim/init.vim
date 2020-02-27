@@ -137,6 +137,7 @@ Plug 'liuchengxu/vim-which-key'
 " My floating win highlightings aren't ready for this...
 let g:which_key_use_floating_win = 0
 let g:which_key_sep = '--'
+autocmd! FileType which_key
 autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
 
 " -- Insert mode helpers
@@ -181,14 +182,20 @@ Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
 " Ref: https://github.com/ryanoasis/vim-devicons/issues/204
 let g:webdevicons_enable_denite = 0
 
+autocmd! FileType denite
 autocmd FileType denite call s:denite_my_settings()
 function! s:denite_my_settings() abort
   nnoremap <silent><buffer><expr> <CR>
       \ denite#do_map('do_action')
   nnoremap <silent><buffer><expr> o
       \ denite#do_map('do_action')
-  nnoremap <silent><buffer><expr> <M-o>
-      \ denite#do_map('do_action')
+  nnoremap <silent><buffer><expr> <M-v>
+      \ denite#do_map('do_action', 'vsplit')
+  nnoremap <silent><buffer><expr> <M-s>
+      \ denite#do_map('do_action', 'split')
+  nnoremap <silent><buffer><expr> <M-t>
+      \ denite#do_map('do_action', 'tabopen')
+  " FIXME: how can I add my own custom actions?
 
   nnoremap <silent><buffer><expr> p
       \ denite#do_map('do_action', 'preview')
@@ -199,6 +206,7 @@ function! s:denite_my_settings() abort
       \ denite#do_map('open_filter_buffer')
 endfunction
 
+autocmd! FileType denite-filter
 autocmd FileType denite-filter call s:denite_filter_my_settings()
 function! s:denite_filter_my_settings() abort
   nnoremap <silent><buffer><expr> q
