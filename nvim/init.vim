@@ -1,4 +1,8 @@
 set nocompatible
+
+" map leader definition - space
+let mapleader = " "
+
 call plug#begin('~/.nvim/plugged')
 
 " Manage vim-plug itself! (to auto update & handle its doc)
@@ -295,9 +299,6 @@ Plug 'vmchale/just-vim'
 call plug#end()
 
 """""""""""""""""""""""""""""""""
-
-" map leader definition - space
-let mapleader = " "
 
 runtime! config.rc/plugins/*.rc.vim
 
