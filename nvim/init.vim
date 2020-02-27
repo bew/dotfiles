@@ -3,8 +3,8 @@ call plug#begin('~/.nvim/plugged')
 
 " Manage vim-plug itself! (to auto update & handle its doc)
 Plug 'junegunn/vim-plug', {
-      \ 'do': 'ln -sf ../plugged/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
-      \ }
+    \ 'do': 'ln -sf ../plugged/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
+    \ }
 
 Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
 
@@ -52,20 +52,20 @@ omap am <Plug>(textobj-sandwich-literal-query-a)
 " Add spaces inside () [] {} when using ( [ or {. (mimicking vim-surround)
 " Ref: https://github.com/machakann/vim-sandwich/wiki/Bracket-with-spaces
 let g:sandwich#recipes += [
-      \   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
-      \   {'buns': ['[ ', ' ]'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['[']},
-      \   {'buns': ['( ', ' )'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['(']},
-      \   {'buns': ['{\s*', '\s*}'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['{']},
-      \   {'buns': ['\[\s*', '\s*\]'], 'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['[']},
-      \   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['(']},
-      \ ]
+    \   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
+    \   {'buns': ['[ ', ' ]'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['[']},
+    \   {'buns': ['( ', ' )'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['(']},
+    \   {'buns': ['{\s*', '\s*}'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['{']},
+    \   {'buns': ['\[\s*', '\s*\]'], 'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['[']},
+    \   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['(']},
+    \ ]
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
 let g:neomake_virtualtext_prefix = "  ❰❰ "
 let g:neomake_error_sign = {
-      \ 'text': '█',
-      \ 'texthl': 'NeomakeErrorSign',
-      \ }
+    \ 'text': '█',
+    \ 'texthl': 'NeomakeErrorSign',
+    \ }
 augroup my_neomake_hi
   au!
 
@@ -82,7 +82,7 @@ augroup END
 
 Plug 'tpope/vim-repeat'         " Repeat for plugins
 Plug 'Shougo/deoplete.nvim',      " Dark-powered completion engine
-      \ { 'do': ':UpdateRemotePlugin' }
+    \ { 'do': ':UpdateRemotePlugin' }
 let g:deoplete#enable_at_startup = 1
 
 Plug 'tommcdo/vim-exchange'
@@ -93,12 +93,12 @@ Plug 'scrooloose/nerdtree'        " Tree based file explorer
 Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
 let g:ctrlsf_confirm_save = 1
 let g:ctrlsf_auto_focus = {
-      \ 'at': 'start',
-      \ }
+    \ 'at': 'start',
+    \ }
 let g:ctrlsf_auto_close = {
-      \ "normal" : 0,
-      \ "compact": 0
-      \ }
+    \ "normal" : 0,
+    \ "compact": 0
+    \ }
 " Search interface, wishes:
 " - lives in a floating window, can hide but not close (=> easy toggle)
 " - search dashboard, with per project recent/frequent searches
@@ -128,13 +128,13 @@ Plug 'SirVer/ultisnips'         " Advanced snippets
 " -- Text refactor / formater
 
 Plug 'autozimu/LanguageClient-neovim',
-      \ {
-      \   'branch': 'next',
-      \   'do': 'bash install.sh',
-      \ }
+    \ {
+    \   'branch': 'next',
+    \   'do': 'bash install.sh',
+    \ }
 let g:LanguageClient_serverCommands = {
-      \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
-      \ }
+    \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
+    \ }
 " let g:LanguageClient_loggingFile = '/tmp/lsp.log'
 " let g:LanguageClient_loggingLevel = 'DEBUG'
 
@@ -272,10 +272,10 @@ call togglebg#install_mapping('<f12>')
 """""""""""""""""""""""""""""""""
 
 let g:fzf_action = {
-      \ 'alt-t': 'tab split',
-      \ 'alt-s': 'split',
-      \ 'alt-v': 'vsplit',
-      \ }
+    \ 'alt-t': 'tab split',
+    \ 'alt-s': 'split',
+    \ 'alt-v': 'vsplit',
+    \ }
 
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
 
@@ -327,11 +327,21 @@ augroup my_custom_language_hi
   au ColorScheme * hi cVariableTag cterm=italic ctermfg=30
 augroup END
 
+let g:solarized_termcolors = 256
+colorscheme solarized
+
+if $TERM_COLOR_MODE == 'light'
+  " Default for solarized is light
+  set background=light
+else
+  set background=dark
+endif
+
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
 " Only define it when not defined already.
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-        \ | wincmd p | diffthis
+      \ | wincmd p | diffthis
 endif
 

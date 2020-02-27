@@ -4,9 +4,9 @@
 " Also don't do it when the mark is in the first line, that is the default
 " position when opening a file.
 autocmd BufReadPost *
-      \ if line("'\"") > 1 && line("'\"") <= line("$") |
-      \ exe "normal! g`\"" |
-      \ endif
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \ exe "normal! g`\"" |
+    \ endif
 
 " Close the auto-completion preview window when leaving insert mode
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
