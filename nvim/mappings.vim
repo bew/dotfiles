@@ -65,8 +65,8 @@ nnoremap <silent> <C-Space> :CtrlSpace<cr>
 nnoremap <M-f> :Denite -start-filter file/rec/smart<cr>
 nnoremap <M-F> :Denite -start-filter file/rec<cr>
 
-nnoremap <Leader>/ :Denite grep<cr>
-nnoremap <Leader><M-/> :Denite grep/rg<cr>
+nnoremap <Leader>/ :Denite grep/rg<cr>
+nnoremap <Leader><M-/> :Denite grep<cr>
 
 "-- Navigation
 "------------------------------------------------------------------
