@@ -156,8 +156,8 @@ nmap gc  <Plug>(git-messenger)
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ['|', '¦', '┆', '┊']
-let g:indentLine_fileTypeExclude = ['help', 'startify']
+let g:indentLine_char_list = ['┆', '┊', '┆', '¦']
+let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown']
 
 Plug 'Shougo/denite.nvim'         " Generic interactive menu framework
 
@@ -194,6 +194,7 @@ Plug 'Shougo/deoplete-clangx'     " FINALLY it works properly (C/C++)
 " Read why in $VIMRUNTIME/autoload/dist/ft.vim
 let g:c_syntax_for_h=1
 
+" FIXME: is this plugin still used????
 Plug 'Shougo/echodoc.vim' " It prints the documentation you have completed.
 
 "# Arduino
@@ -243,7 +244,7 @@ Plug 'slim-template/vim-slim'
 Plug 'nfnty/vim-nftables'
 
 "# Vimscript
-Plug 'Shougo/neco-vim'
+Plug 'Shougo/neco-vim'   " deoplete completion source
 
 "# Elixir
 Plug 'elixir-editors/vim-elixir'

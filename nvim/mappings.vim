@@ -63,9 +63,6 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 nnoremap <M-f> :FZF<cr>
 
-" Toggle indent guides
-nnoremap <M-g> :IndentGuidesToggle<cr>
-
 "-- Navigation
 "------------------------------------------------------------------
 
@@ -188,37 +185,6 @@ nnoremap <M-cr> A<cr>
 nnoremap <M-N> :cnext<cr>
 nnoremap <M-P> :cprevious<cr>
 
-nnoremap <expr> <leader>j  GotoQfOrLoc("next", "first")
-nnoremap <expr> <leader>k  GotoQfOrLoc("previous", "last")
-
-" First try the quickfix list, if empty, uses the location list
-function! GotoQfOrLoc(direction, rewind_name)
-    let qflist = getqflist()
-    let loclist = getloclist(0)
-
-    if len(qflist) == 1
-        exe ":cc"
-    elseif len(qflist) > 1
-        try
-            exe ":c" . a:direction
-        catch
-            echom "No more items, rewinding.."
-            exe ":c" . a:rewind_name
-        endtry
-    elseif len(loclist) == 1
-        exe ":ll"
-    elseif len(loclist) > 1
-        try
-            exe ":l" . a:direction
-        catch
-            echom "No more items, rewinding.."
-            exe ":l" . a:rewind_name
-        endtry
-    else
-        echo "Nothing in quickfix or location list"
-    endif
-endfunction
-
 " Trigger completion manually
 inoremap <expr> <C-b>  deoplete#manual_complete()
 
@@ -233,22 +199,10 @@ tmap  <M-q>
 " Shortcut
 nnoremap Q :q<cr>
 
-" THE missing one (and still not working :/)
-"nnoremap ci( f(ci)
-"nnoremap ci) F)ci)
-
-" Insert a TAB (thanks Epitech for that habit)
-inoremap <M-i> <C-v><Tab>
-
-" Disable <M-i> in normal mode, otherwise it hangs the terminal
-nnoremap <M-i> <nop>
-
-
 " Indent line(s)
 inoremap <Tab> <Esc>mi==`il
 vnoremap <Tab> :normal! ==<cr>
-" Do not add to normal mode, to keep CTRL-O CTRL-I working to navigate
-" the jump list.
+" Do not add to normal mode, to keep CTRL-O CTRL-I working to navigate the jump list.
 " nnoremap <Tab> mi==`i
 
 " Format the file

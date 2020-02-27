@@ -128,16 +128,6 @@ let g:vim_indent_cont = 4
 " Setting colorscheme
 syntax enable " Not 'syntax on' which overrides colorscheme
 
-let g:solarized_termcolors = 256
-colorscheme solarized
-
-if $TERM_COLOR_MODE == 'light'
-  " Default for solarized is light
-  set background=light
-else
-  set background=dark
-endif
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 " Put swap & undo files in ~/.nvim/swap_undo/{swap,undo}files/
