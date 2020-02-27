@@ -117,6 +117,12 @@ Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 " Motions on speed!
 Plug 'easymotion/vim-easymotion'
 
+Plug 'liuchengxu/vim-which-key'
+" My floating win highlightings aren't ready for this...
+let g:which_key_use_floating_win = 0
+let g:which_key_sep = '--'
+autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
+
 " -- Insert mode helpers
 
 Plug 'Raimondi/delimitMate'      " auto insert of second ()''{}[]\"\" etc...
