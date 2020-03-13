@@ -133,6 +133,9 @@ function my-bracketed-paste-with-undo
   # Use bracketed-paste-url-magic that does what bracketed-paste does but also
   # quotes the paste if it looks like a URL.
   bracketed-paste-url-magic
+
+  # FIXME: when cursor is in an already quoted arg, do not quote the url
+  #        OR unquote the whole arg and requote afterward
 }
 zle -N bracketed-paste my-bracketed-paste-with-undo
 
