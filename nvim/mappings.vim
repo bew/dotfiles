@@ -7,9 +7,6 @@ nnoremap <Leader> :WhichKey '<Leader>'<cr>
 vnoremap <Leader> :WhichKeyVisual '<Leader>'<cr>
 
 " Save buffer
-nnoremap <M-Space> :w<cr>
-inoremap <M-Space> <Esc>:w<cr>
-vnoremap <M-Space> <Esc>:w<cr>
 nnoremap <M-s> :w<cr>
 inoremap <M-s> <Esc>:w<cr>
 vnoremap <M-s> <Esc>:w<cr>

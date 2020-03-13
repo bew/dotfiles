@@ -512,3 +512,4 @@ bindkey -M menuselect 'G' end-of-history
 
 # Accept the completion entry but continue to show the completion list
 bindkey -M menuselect 'a' accept-and-hold
+bindkey -M menuselect ' ' accept-and-hold

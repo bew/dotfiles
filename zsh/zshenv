@@ -74,6 +74,7 @@ FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
 # other
 FZF_KEYBINDINGS+=(--bind 'ctrl-j:accept')
 FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down')
+FZF_KEYBINDINGS+=(--bind 'alt-space:toggle+down')
 FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
 
 FZF_LAYOUT=(--height=40% --reverse --inline-info --border)
