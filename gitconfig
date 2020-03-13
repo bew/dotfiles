@@ -18,7 +18,7 @@
   ap = add -p
   an = add -N
   com = commit --verbose
-  comp = !git com -p
+  comp = com -p
 
   # index manipulation
   f = fetch
@@ -43,9 +43,9 @@
 
   # log
   pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d%C(reset)%n          %C(white)%s%C(reset)   %C(dim magenta)by %an%C(reset)%n'
-  ll = "!git pretty-log"
-  la = "!git pretty-log --all"
-  lo = "!git pretty-log --oneline"
+  ll = pretty-log
+  la = pretty-log --all
+  lo = pretty-log --oneline
 
   # diff
   d = diff
@@ -60,15 +60,15 @@
     echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
     git --no-pager diff --stat ORIG_HEAD $@ && git --no-pager diff --summary ORIG_HEAD $@; \
     }; f"
-  slm = "!git stat-last-merge"
+  slm = stat-last-merge
 
   # last merge diff (move as simple alias?)
   diff-last-merge = "diff ORIG_HEAD..HEAD"
-  dlm = "!git diff-last-merge"
+  dlm = diff-last-merge
 
   # last merge logs
-  log-last-merge = "!git pretty-log ORIG_HEAD.."
-  llm = "!git log-last-merge"
+  log-last-merge = pretty-log ORIG_HEAD..
+  llm = log-last-merge
 
   remove-old-commits = reflog expire --all --expire=now
   compress-repo = gc --aggressive --prune=now
