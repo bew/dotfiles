@@ -197,6 +197,9 @@ function! s:denite_my_settings() abort
       \ denite#do_map('do_action', 'tabopen')
   " FIXME: how can I add my own custom actions?
 
+  nnoremap <silent><buffer><expr> <M-Space>
+      \ denite#do_map('toggle_select') . 'j'
+
   nnoremap <silent><buffer><expr> p
       \ denite#do_map('do_action', 'preview')
 
