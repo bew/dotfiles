@@ -107,4 +107,11 @@
 [difftool "nvim_diff"]
   cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
 
+# Useful when I can't use SSH to communicate with github and I don't want to
+# type my password/personal token everyting
+#
+# [credential "https://github.com"]
+#   username = bew
+#   helper = github-bew-password-from-env
+
 # vim:set ft=gitconfig:
