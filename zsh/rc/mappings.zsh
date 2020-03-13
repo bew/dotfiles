@@ -127,22 +127,28 @@ function zwidget::cycle-quoting
 
     local unquoted_arg="${(Q)ARG}"
 
-    if [[ $ZWIDGET_CURRENT_QUOTING_METHOD == none ]]; then
-      # current: none
-      # next: single quotes
-      REPLY="${(qq)${unquoted_arg}}"
-      ZWIDGET_CURRENT_QUOTING_METHOD=single
-    elif [[ $ZWIDGET_CURRENT_QUOTING_METHOD == single ]]; then
-      # current: single quotes
-      # next: double quotes
-      REPLY="${(qqq)${unquoted_arg}}"
-      ZWIDGET_CURRENT_QUOTING_METHOD=double
-    elif [[ $ZWIDGET_CURRENT_QUOTING_METHOD == double ]]; then
-      # current: double quotes
-      # next: no quotes (none)
-      REPLY="${(q)${unquoted_arg}}"
-      ZWIDGET_CURRENT_QUOTING_METHOD=none
-    fi
+    case "$ZWIDGET_CURRENT_QUOTING_METHOD" in
+      none)
+        # current: none
+        # next: single quotes
+        REPLY="${(qq)${unquoted_arg}}"
+        ZWIDGET_CURRENT_QUOTING_METHOD=single
+        ;;
+
+      single)
+        # current: single quotes
+        # next: double quotes
+        REPLY="${(qqq)${unquoted_arg}}"
+        ZWIDGET_CURRENT_QUOTING_METHOD=double
+        ;;
+
+      double)
+        # current: double quotes
+        # next: no quotes (none)
+        REPLY="${(q)${unquoted_arg}}"
+        ZWIDGET_CURRENT_QUOTING_METHOD=none
+        ;;
+    esac
   }
 
   modify-current-argument zwidget::cycle-quoting::inner
