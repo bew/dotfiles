@@ -171,6 +171,12 @@ alias git_watch="watch --color -- git --no-pager -c color.ui=always"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 # Clone git repository and cd to it
+#
+# Handles the following invocations:
+# - gclonecd <url>
+# - gclonecd <url>.git
+# - gclonecd <url>      destination_dir
+# - gclonecd <url>.git  destination_dir
 function gclonecd
 {
   local clone_dir
@@ -180,8 +186,6 @@ function gclonecd
     # basename of url, removing '.git' if present
     clone_dir=$(basename "$1" .git)
   fi
-
-  # NOTE: works for links both with and without `.git`
   git clone "$@" && cd "$clone_dir"
 }
 
