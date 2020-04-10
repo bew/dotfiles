@@ -393,6 +393,7 @@ vibindkey '^z' zwidget::fg2
 
 # Fix keybinds when returning from command mode
 bindkey '^?' backward-delete-char # Backspace
+bindkey '^h' backward-delete-char # Backspace (alternate)
 bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
@@ -407,7 +408,7 @@ zle -N backward-kill-partial-path
 
 # Backspace can be ^? or ^H on some terminal, so we handle both here
 bindkey '^?' backward-kill-partial-path # Alt-Backspace
-bindkey '^H' backward-kill-partial-path # Alt-Backspace
+bindkey '^H' backward-kill-partial-path # Alt-Backspace (alternate)
 
 # Sane default
 bindkey '\e[2~' overwrite-mode # Insert key
