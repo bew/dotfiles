@@ -260,17 +260,17 @@ alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
-# bypass language limitations on www.rotazu.com :)
+# bypass language limitations on some sites :)
 alias ff_streaming="firefox -P pezop www.diagrim.com &!"
 
 
 # Fast config edit
 
-alias ezshrc="e ~/.zshrc"
-alias enviminit="e ~/.config/nvim/init.vim"
-alias envimmappings="e ~/.config/nvim/mappings.vim"
+alias ezshrc="e ~/.dot/zsh/zshrc"
+alias enviminit="e ~/.dot/nvim/init.vim"
+alias envimmappings="e ~/.dot/nvim/mappings.vim"
 alias cddot="cd ~/.dot"
-alias cdzsh="cd ~/.zsh"
-alias cdnvim="cd ~/.nvim"
-alias cdbin="cd ~/.bin"
+alias cdzsh="cd ~/.dot/zsh"
+alias cdnvim="cd ~/.dot/nvim"
+alias cdbin="cd ~/.dot/bin"
 
