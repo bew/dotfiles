@@ -173,6 +173,13 @@ inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
+" Insert: M-Space <-- [] --> Space
+"
+" <Space>: add space to the left of cursor:    ab[c]d -> ab [c]d
+" <M-Space>: add space to the right of cursor: ab[c]d -> ab[ ]cd
+" Note: <C-G>U is used to avoid breaking the undo sequence on cursor movement
+inoremap <expr> <M-Space> ' <C-G>U<Left>'
+
 " Move cursor to end of displayed line (useful when text wraps)
 nnoremap <M-$> g$
 
