@@ -193,6 +193,9 @@ alias ":q"="exit"
 # ncdu
 alias ncdu='ncdu --color dark'
 
+# ssh
+alias ssh-password-only='ssh -o PubkeyAuthentication=no'
+
 # Media commands
 
 # youtube-dl
