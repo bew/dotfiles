@@ -170,6 +170,21 @@ alias git::status_in_all_repos="find -name .git -prune -print -execdir git statu
 alias git_watch="watch --color -- git --no-pager -c color.ui=always"
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
+# Clone git repository and cd to it
+function gclonecd
+{
+  local clone_dir
+  if [[ -n "$2" ]] && ! [[ "$2" =~ "-" ]]; then
+    clone_dir="$2"
+  else
+    # basename of url, removing '.git' if present
+    clone_dir=$(basename "$1" .git)
+  fi
+
+  # NOTE: works for links both with and without `.git`
+  git clone "$@" && cd "$clone_dir"
+}
+
 # sudo
 
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
