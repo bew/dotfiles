@@ -9,6 +9,12 @@ nnoremap <buffer> <M-p>  <C-o>
 nnoremap <buffer> <M-n>  <C-i>
 
 " Move cursor on next/previous help link
+"
+" FIXME: does not handle options links (format: 'someoption')
+"   /'[a-z]\{-\}'
+" But it also matches in code example... Would need to detect those using the
+" syntax group maybe? Or do the search for the code delimiters (can be tricky,
+" since they aren't always present)
 function! s:SearchHelpLink(backward)
   let flags = "wz" " w: wrap at eof | z: from cursor column not 0
   if a:backward
