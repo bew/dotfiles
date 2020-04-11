@@ -215,6 +215,9 @@ alias ncdu='ncdu --color dark'
 # ssh
 alias ssh-password-only='ssh -o PubkeyAuthentication=no'
 
+# nix
+alias nix-prefetch-url-tarball='nix-prefetch-url --unpack'
+
 # Media commands
 
 # youtube-dl
