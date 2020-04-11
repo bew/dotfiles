@@ -180,7 +180,7 @@ function segmt::shlvl
 {
   [[ $SHLVL == 1 ]] && return
 
-  echo -n "{%BLVL%L%b}"
+  echo -n "%BL%L%b"
 }
 
 # Segment variable debug
