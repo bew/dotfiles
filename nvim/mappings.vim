@@ -220,7 +220,7 @@ vnoremap <Tab> :normal! ==<cr>
 nnoremap <C-f> gg=G``
 
 " un-join (split) the current line at the cursor position
-nnoremap gj i<c-j><esc>k$
+nnoremap <M-J> i<c-j><esc>k$
 
 " Copy/Paste with system clipboard
 vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
