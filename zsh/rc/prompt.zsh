@@ -313,7 +313,7 @@ autoload -U promptinit && promptinit
 # -- Status line
 
 STATUSLINE_PARTS=(
-  func: segmt::vim_mode
+  func: segmt::short_vim_mode
   func: segmt::in_sudo
   func: segmt::exit_code_long_on_error
 )
@@ -371,7 +371,7 @@ RPROMPT_CURRENT_PARTS=(
 
   func: segmt::in_sudo
   func: segmt::git_branch_fast
-  func: segmt::vim_mode
+  func: segmt::short_vim_mode
 )
 
 RPROMPT_PAST_PARTS=(
@@ -383,7 +383,7 @@ RPROMPT_PAST_PARTS=(
 
 RPROMPT_CURRENT="$(make_prompt_str_from_parts "${RPROMPT_CURRENT_PARTS[@]}")"
 RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
-# RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::vim_mode)'
+# RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::short_vim_mode)'
 # RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 
 # -- Setup prompts hooks
