@@ -55,4 +55,4 @@ run libinput-gestures-setup start
 # NOTE: to reload config, use: libinput-gestures-setup restart
 
 # Run the compositor
-[[ -f ~/.conf/compton.config ]] && run compton --config ~/.conf/compton.config -b
+[[ -f ~/.config/picom.config ]] && run picom --config ~/.config/picom.config -b
