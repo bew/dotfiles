@@ -92,16 +92,9 @@ function segmt::exit_code_long_on_error
 }
 
 # Segment last exit code
-function segmt::exit_symbol_on_error
-{
-  local on_error="%K{124} ✘ %k"
-  echo -n "%(?||$on_error)"
-}
-
-# Segment last exit code
 function segmt::exit_code_on_error
 {
-  local on_error="%K{124}%F{white}%B %? %b%f%k"
+  local on_error="%K{back}%F{red} %? %f%k"
   echo -n "%(?||$on_error)"
 }
 
@@ -350,13 +343,15 @@ function sl::build_prompt_str
 
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
-  func: segmt::exit_symbol_on_error
+  func: segmt::exit_code_on_error
   text: "%B%F{magenta} %2~ %f%b" # current dir
+  func: segmt::short_vim_mode
+  text: " "
   text: "%(!.#.▷)"
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
-  func: segmt::exit_symbol_on_error
+  func: segmt::exit_code_on_error
   text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
   text: " "
   text: "%B%F{black}%%%f%b" # cmd separator
