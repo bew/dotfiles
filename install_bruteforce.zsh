@@ -59,6 +59,7 @@ make-link .dot/gui/xprofile      ~/.xprofile
 make-link .dot/gui/xkbmap.config ~/.config/
 make-link .dot/gui/Xresources    ~/.Xresources
 make-link .dot/gui/Xresources.d  ~/.Xresources.d
+make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
 
 label "X apps configs"
 make-link .dot/gui/urxvt     ~/.urxvt
