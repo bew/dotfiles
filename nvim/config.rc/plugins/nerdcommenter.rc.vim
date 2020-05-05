@@ -8,3 +8,8 @@ let g:NERDSpaceDelims = 1
 " alignment padding. With this option enabled any trailing whitespace will be
 " deleted when uncommenting a line.
 let g:NERDTrimTrailingWhitespace = 1
+
+" when g:NERDSpaceDelims==1, then NERDComment results in double space
+let g:NERDCustomDelimiters = {
+    \ 'python': { 'left': '#' }
+    \ }
