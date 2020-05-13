@@ -4,6 +4,11 @@ set nocompatible
 " (e.g: for filetype on)
 runtime! options.vim
 
+" Specify the python binary to use for the plugins, this is necessary to be
+" able to use them while inside a project' venv (which does not have pynvim)
+" FIXME: move somewhere else?
+let g:python3_host_prog = "/usr/bin/python3"
+
 " map leader definition - space
 let mapleader = " "
 
