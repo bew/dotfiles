@@ -1,5 +1,9 @@
 set nocompatible
 
+" Load options early in case the initialization of some plugin requires them.
+" (e.g: for filetype on)
+runtime! options.vim
+
 " map leader definition - space
 let mapleader = " "
 
@@ -326,7 +330,6 @@ call plug#end()
 runtime! config.rc/plugins/*.rc.vim
 
 " Source some files
-runtime! options.vim
 runtime! mappings.vim
 runtime! autocmd.vim
 
