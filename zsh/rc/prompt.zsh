@@ -116,6 +116,7 @@ function segmt::vim_mode
   local insert_mode_style="%B%K{green}%F{white} INSERT %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} NORMAL %f%k%b"
 
+  # FIXME: vi-replace mode gives viins! Is there a way to disambiguate?
   if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
     echo -n ${insert_mode_style}
   elif [[ "$KEYMAP" == "vicmd" ]]; then
@@ -131,6 +132,7 @@ function segmt::short_vim_mode
   local insert_mode_style="%B%K{green}%F{white} I %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} N %f%k%b"
 
+  # FIXME: vi-replace mode gives viins! Is there a way to disambiguate?
   if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
     echo -n ${insert_mode_style}
   elif [[ "$KEYMAP" == "vicmd" ]]; then
