@@ -75,6 +75,7 @@ set fillchars=
 set fillchars+=fold:╶,   " right side of a closed fold (default: '·')
 set fillchars+=diff:\ ,  " deleted lines of the 'diff' option (default: '-')
 set fillchars+=eob:\ ,   " empty lines at the end of a buffer (default: '~')
+set fillchars+=vert:\ ,  " separator between vertical splits
 
 set scrolloff=3         " minimum lines to keep above and below cursor
 set sidescrolloff=16      " minimum chars to keep on the left/right of the cursor
