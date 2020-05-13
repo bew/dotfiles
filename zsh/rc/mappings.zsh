@@ -410,8 +410,8 @@ zle -N backward-kill-partial-path
 bindkey '^?' backward-kill-partial-path # Alt-Backspace
 bindkey '^H' backward-kill-partial-path # Alt-Backspace (alternate)
 
-# Sane default
-bindkey '\e[2~' overwrite-mode # Insert key
+# Sane default (FIXME: use terminfo ($terminfo[xxxx]) to find escape sequences!)
+bindkey '\e[2~' overwrite-mode # Insert key (FIXME: use vi-replace mode for ins & cmd?)
 bindkey '\e[3~' delete-char # Del (Suppr) key
 vibindkey '\e[7~' beginning-of-line # Home key
 vibindkey '\e[8~' end-of-line # End key
