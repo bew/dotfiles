@@ -92,7 +92,7 @@ function curl_auth_json
 
 # misc
 
-alias todo='rg -i "todo|fixme"'
+alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
 
 function cheatsh
 {
