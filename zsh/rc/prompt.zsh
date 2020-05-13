@@ -140,6 +140,26 @@ function segmt::short_vim_mode
   fi
 }
 
+# Segment with the current active venv directory if any
+function segmt::python_venv
+{
+  [[ -n "$VIRTUAL_ENV" ]] || return
+
+  local venv_dir=$(basename "$VIRTUAL_ENV")
+  local venv_display
+
+  # 'venv' is ambiguous, show the parent dir name as well
+  local venv_parent_dir=$(basename "$(dirname "$VIRTUAL_ENV")")
+  if [[ "$venv_dir" == "venv" ]]; then
+    venv_display="venv in $venv_parent_dir"
+  else
+    venv_display="venv '$venv_dir' in $venv_parent_dir"
+  fi
+
+  echo -n "($venv_display) "
+  # FIXME: find a way to not have to specify before/after spacing in the segements!!!
+}
+
 function zle::utils::reset-prompt
 {
   zle && zle reset-prompt
@@ -343,6 +363,7 @@ function sl::build_prompt_str
 
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
+  func: segmt::python_venv
   func: segmt::exit_code_on_error
   text: "%B%F{magenta} %2~ %f%b" # current dir
   func: segmt::short_vim_mode
@@ -351,6 +372,7 @@ PROMPT_CURRENT_PARTS=(
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
+  func: segmt::python_venv
   func: segmt::exit_code_on_error
   text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
   text: " "

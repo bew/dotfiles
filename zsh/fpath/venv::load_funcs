@@ -1,0 +1,101 @@
+#!/usr/bin/env zsh
+
+function venv_init
+{
+  local venv_dir="${1:-venv}"
+
+  if [[ -d "$venv_dir" ]]; then
+    echo "ERROR: $venv_dir/ directory already exists"
+    return 1
+  fi
+
+  python -m venv "$venv_dir"
+}
+
+function venv__ensure_exists
+{
+  local venv_dir="${1:-venv}"
+
+  if ! [[ -d "$venv_dir" ]]; then
+    echo "ERROR: $venv_dir/ directory does NOT exist"
+    return 1
+  fi
+}
+
+function venv__ensure_inside
+{
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    echo "ERROR: not in a virtual env"
+    return 1
+  fi
+}
+
+function venv_on
+{
+  local venv_dir="${1:-venv}"
+
+  if ! venv__ensure_exists "$venv_dir"; then
+    echo "  Use venv_init to create a venv there."
+    return 1
+  fi
+
+  source "$venv_dir/bin/activate"
+}
+
+function venv_off
+{
+  venv__ensure_inside "$venv_dir" || return 1
+
+  deactivate
+}
+
+function venv_do
+{
+  # NOTE: here venv_dir is assumed to be "venv"
+
+  venv_on || return 1
+
+  local ret=0
+  "$@" || ret=$?
+
+  venv_off
+  return $ret
+}
+
+function venv_info
+{
+  venv__ensure_inside "$venv_dir" || return 1
+
+  echo "Location: $VIRTUAL_ENV"
+
+  local where_is_pip="$(which pip)"
+  echo "pip is at: $where_is_pip"
+}
+
+# Helper to activate a venv, deactivating an existing one and/or
+# creating it if necessary.
+function venv_here
+{
+  local venv_dir="${1:-venv}"
+
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    echo "Deactivating active virtual env.."
+    deactivate
+  fi
+
+  if ! [[ -d "$venv_dir" ]]; then
+    echo "Venv directory $venv_dir missing, creating venv now.."
+    venv_init "$venv_dir" || return 1
+  fi
+
+  echo "Enabling virtual env.."
+  venv_on "$venv_dir"
+}
+
+# This function only needs to exist, when I call it, this file
+# will get executed and the helper functions will be in scope.
+function venv::load_funcs
+{
+  echo "Helper functions already loaded"
+}
+echo "Helper functions loaded!"
