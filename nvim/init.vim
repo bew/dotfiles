@@ -74,11 +74,9 @@ let g:sandwich#recipes += [
     \ ]
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
-let g:neomake_virtualtext_prefix = "  ❰❰ "
-let g:neomake_error_sign = {
-    \ 'text': '█',
-    \ 'texthl': 'NeomakeErrorSign',
-    \ }
+let g:neomake_virtualtext_prefix = "  <<  "
+let g:neomake_error_sign = { 'text': 'x', 'texthl': 'NeomakeErrorSign', }
+let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeWarningSign', }
 augroup my_neomake_hi
   au!
 
