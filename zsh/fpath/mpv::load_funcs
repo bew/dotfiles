@@ -119,5 +119,6 @@ function mpv::show-playlist
 # will get executed and the helper functions will be in scope.
 function mpv::load_funcs
 {
-  echo "Helper functions loaded"
+  echo "Helper functions already loaded!"
 }
+echo "Helper functions loaded!"

@@ -55,5 +55,6 @@ function ffmpeg::extract-audio::rm_source
 # will get executed and the helper functions will be in scope.
 function ffmpeg::load_funcs
 {
-  echo "Helper functions loaded"
+  echo "Helper functions already loaded!"
 }
+echo "Helper functions loaded!"
