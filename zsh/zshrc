@@ -193,6 +193,8 @@ function switch-term-colors
   fi
 }
 
+autoload -U venv::load_funcs
+
 # ------------------------------------------------------------
 # Media helper funcs
 
