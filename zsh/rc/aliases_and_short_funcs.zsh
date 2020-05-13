@@ -189,6 +189,10 @@ function gclonecd
   git clone "$@" && cd "$clone_dir"
 }
 
+# Open git viewer in nvim
+# (https://github.com/junegunn/gv.vim)
+alias gv="e +GV"
+
 # sudo
 
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
