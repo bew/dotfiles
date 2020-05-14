@@ -180,7 +180,7 @@ nmap gc  <Plug>(git-messenger)
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ['┆', '┊', '┆', '¦']
+let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["┆", "┊", "┆", "¦"] : ["|"])
 let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown']
 
 Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
@@ -463,8 +463,6 @@ command! HiDumpToSplit so $VIMRUNTIME/syntax/hitest.vim
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
 " Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-      \ | wincmd p | diffthis
-endif
+command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+    \ | wincmd p | diffthis
 
