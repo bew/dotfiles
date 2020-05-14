@@ -229,7 +229,8 @@ endfunction
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 
-Plug 'bew/vim-colors-solarized'       " vim-colors-solarized - favorite colorscheme <3
+Plug 'owickstrom/vim-colors-paramount' " Very simple colorscheme
+
 Plug 'vim-scripts/xterm-color-table.vim'  " Provide some commands to display all cterm colors
 Plug 'ryanoasis/vim-devicons'
 
@@ -336,8 +337,6 @@ runtime! config.rc/plugins/*.rc.vim
 runtime! mappings.vim
 runtime! autocmd.vim
 
-call togglebg#install_mapping('<f12>')
-
 
 " Denite config (must be after plug#end() to work (FIXME!!!!!))
 call denite#custom#alias('source', 'grep/rg', 'grep')
@@ -407,19 +406,59 @@ augroup my_custom_language_hi
   au ColorScheme * hi cStructInstance ctermfg=208
   au ColorScheme * hi cArithmOp ctermfg=3
   au ColorScheme * hi cBoolComparator cterm=bold ctermfg=3
-
   au ColorScheme * hi cVariableTag cterm=italic ctermfg=30
+
+  " Javascript Colors
+  au ColorScheme * hi javaScriptDocParam ctermfg=25
+  au ColorScheme * hi javaScriptDocTags ctermfg=88
 augroup END
 
-let g:solarized_termcolors = 256
-colorscheme solarized
+" Set a colorScheme based on current 'background'.
+" If *force* is v:false, do not change the colorScheme if the current one
+" is not one of the given target colorschemes.
+function! SetColorschemeForBackground(dark_color, light_color, force)
+  let cur = get(g:, "colors_name", "default")
+  if !a:force && l:cur != a:dark_color && l:cur != a:light_color
+    " Another colorscheme than our targets is set, ignore the change.
+    echom "Colorscheme kept to " . l:cur . " [background is " . &background . "] - Use :SetColorscheme to override"
+    return
+  endif
+  if &background == 'light'
+    exe "colorscheme " . a:light_color
+  else
+    exe "colorscheme " . a:dark_color
+  endif
+  echom "Colorscheme set to " . g:colors_name . " [background is " . &background . "]"
+endf
+function! SetColorscheme(force)
+  call SetColorschemeForBackground("bew256-dark", "paramount", a:force)
+endf
+augroup my_colorscheme_setup
+  au!
+  au OptionSet background call SetColorscheme(v:false)
+augroup END
+command! SetColorscheme call SetColorscheme(v:true)
 
-if $TERM_COLOR_MODE == 'light'
-  " Default for solarized is light
-  set background=light
+if has("vim_starting")
+  " Set the colorscheme on startup
+  if $TERM_COLOR_MODE == 'light'
+    set background=light
+  else
+    set background=dark
+  endif
+  call SetColorscheme(v:true)
 else
-  set background=dark
+  call SetColorscheme(v:false)
 endif
+
+" Fix lightline not refreshing on &background change
+" NOTE: must be done after 'my_colorscheme_setup' autocmd group
+augroup lightline_fix_hightlight
+  au!
+  au OptionSet background call lightline#highlight()
+augroup END
+
+command! HiDumpToSplit so $VIMRUNTIME/syntax/hitest.vim
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
