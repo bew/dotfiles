@@ -12,11 +12,11 @@ autoload -U colors && colors
 #-------------------------------------------------------------
 function term::get_cursor_pos
 {
-    echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
+  echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
 
-    # pos has format 'row;col'
-    CURSOR_POS_ROW=${pos%;*} # remove ';col'
-    CURSOR_POS_COL=${pos#*;} # remove 'row;'
+  # pos has format 'row;col'
+  CURSOR_POS_ROW=${pos%;*} # remove ';col'
+  CURSOR_POS_COL=${pos#*;} # remove 'row;'
 }
 
 # Segment git branch

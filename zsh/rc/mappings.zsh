@@ -282,19 +282,19 @@ zle -N zwidget::jump-previous-shell-arg
 # |   abc   de[f]   |  =>  |   abc   def   []|
 function zwidget::jump-next-shell-arg
 {
-    autoload -U split-shell-arguments
+  autoload -U split-shell-arguments
 
-    local reply REPLY REPLY2
-    split-shell-arguments
-    local word_idx=$REPLY char_idx_in_word=$REPLY2
-    local sh_args=("${reply[@]}") # copy $reply array, keeping blank and empty elements
+  local reply REPLY REPLY2
+  split-shell-arguments
+  local word_idx=$REPLY char_idx_in_word=$REPLY2
+  local sh_args=("${reply[@]}") # copy $reply array, keeping blank and empty elements
 
-    if (( word_idx == ${#sh_args})); then
-        # CURSOR is on space after last argument
-        # move CURSOR after the end of the buffer
-        (( CURSOR = ${#BUFFER} ))
-        return
-    fi
+  if (( word_idx == ${#sh_args})); then
+    # CURSOR is on space after last argument
+    # move CURSOR after the end of the buffer
+    (( CURSOR = ${#BUFFER} ))
+    return
+  fi
 
   if (( word_idx % 2 != 0 )); then
     # CURSOR is on a space

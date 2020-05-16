@@ -128,8 +128,8 @@ alias mkd="mkdir -p"
 # Creates 1 or more directories, then cd into the first one
 function mkcd
 {
-    mkd "$@"
-    cd "$1"
+  mkd "$@"
+  cd "$1"
 }
 
 # tree
@@ -150,11 +150,11 @@ alias pac::list_useless_deps="pacman -Qtdq"
 
 function pac::show_useless_deps
 {
-    for package in $(pac::list_useless_deps); do
-        echo "Package: $package"
-        pacman -Qi $package | grep 'Description'
-        echo
-    done
+  for package in $(pac::list_useless_deps); do
+    echo "Package: $package"
+    pacman -Qi $package | grep 'Description'
+    echo
+  done
 }
 
 alias pac::remove_useless_deps="command sudo pacman -Rsv \$(pac::list_useless_deps)"
