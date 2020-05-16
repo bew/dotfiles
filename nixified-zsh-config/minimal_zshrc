@@ -1,0 +1,30 @@
+if [[ "$TERM" =~ "rxvt-unicode-*" ]] && [[ -f "/usr/share/terminfo/r/$TERM" ]]; then
+  # For an unknown reason, zsh packaged with Nix cannot find the terminfo DB for
+  # urxvt (using nix-on-arch at least), whereas there is no problem with every
+  # other terminal I tested (alacritty, kitty, wezterm, xterm).
+  export TERMINFO=/usr/share/terminfo
+fi
+
+echo
+echo "Welcome to the minimal zsh config packaged with Nix!"
+
+echo
+echo "TERM: $TERM"
+echo "TERMINFO: $TERMINFO"
+echo "TERMINFO_DIRS: $TERMINFO_DIRS"
+
+echo
+echo "infocmp: path to terminfo db:"
+infocmp | head -n1
+
+zmodload zsh/terminfo
+echo
+echo "zsh: Num of terminfo entries: ${#terminfo}"
+
+echo
+
+
+PROMPT="%2~ > "
+
+
+# vim:ft=zsh:
