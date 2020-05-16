@@ -35,8 +35,8 @@ OTHER_PATHS+=(~/node_modules/.bin)
 
 typeset -U path
 path=(
-    "${OTHER_PATHS[@]}" # Expand all other paths by elements
-    $path
+  "${OTHER_PATHS[@]}" # Expand all other paths by elements
+  $path
 )
 
 export GOPATH=$HOME/gocode
