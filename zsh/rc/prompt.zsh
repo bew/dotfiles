@@ -110,20 +110,30 @@ function segmt::in_sudo
   fi
 }
 
+# Set $REPLY with the current vim mode (insert, normal)
+function helper::get-vim-mode
+{
+  if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
+    REPLY="insert"
+  elif [[ "$KEYMAP" == "vicmd" ]]; then
+    REPLY="normal"
+  else
+    REPLY="unknown"
+  fi
+}
+
 # Segment prompt vim mode (normal/insert)
 function segmt::vim_mode
 {
   local insert_mode_style="%B%K{green}%F{white} INSERT %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} NORMAL %f%k%b"
 
-  # FIXME: vi-replace mode gives viins! Is there a way to disambiguate?
-  if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
-    echo -n ${insert_mode_style}
-  elif [[ "$KEYMAP" == "vicmd" ]]; then
-    echo -n ${normal_mode_style}
-  else
-    echo -n "$KEYMAP"
-  fi
+  helper::get-vim-mode
+  case "$REPLY" in
+    insert) echo -n "$insert_mode_style";;
+    normal) echo -n "$normal_mode_style";;
+    *) echo -n "$KEYMAP";;
+  esac
 }
 
 # Segment prompt vim mode (normal/insert)
@@ -132,14 +142,12 @@ function segmt::short_vim_mode
   local insert_mode_style="%B%K{green}%F{white} I %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} N %f%k%b"
 
-  # FIXME: vi-replace mode gives viins! Is there a way to disambiguate?
-  if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
-    echo -n ${insert_mode_style}
-  elif [[ "$KEYMAP" == "vicmd" ]]; then
-    echo -n ${normal_mode_style}
-  else
-    echo -n "$KEYMAP"
-  fi
+  helper::get-vim-mode
+  case "$REPLY" in
+    insert) echo -n "$insert_mode_style";;
+    normal) echo -n "$normal_mode_style";;
+    *) echo -n "$KEYMAP";;
+  esac
 }
 
 # Segment with the current active venv directory if any
