@@ -110,11 +110,15 @@ function segmt::in_sudo
   fi
 }
 
-# Set $REPLY with the current vim mode (insert, normal)
+# Set $REPLY with the current vim mode (insert, normal, replace)
 function helper::get-vim-mode
 {
   if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
-    REPLY="insert"
+    if [[ $ZLE_STATE == *overwrite* ]]; then
+      REPLY="replace"
+    else
+      REPLY="insert"
+    fi
   elif [[ "$KEYMAP" == "vicmd" ]]; then
     REPLY="normal"
   else
@@ -127,11 +131,13 @@ function segmt::vim_mode
 {
   local insert_mode_style="%B%K{green}%F{white} INSERT %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} NORMAL %f%k%b"
+  local replace_mode_style="%B%K{red}%F{white} REPLACE %f%k%b"
 
   helper::get-vim-mode
   case "$REPLY" in
     insert) echo -n "$insert_mode_style";;
     normal) echo -n "$normal_mode_style";;
+    replace) echo -n "$replace_mode_style";;
     *) echo -n "$KEYMAP";;
   esac
 }
@@ -141,11 +147,13 @@ function segmt::short_vim_mode
 {
   local insert_mode_style="%B%K{green}%F{white} I %f%k%b"
   local normal_mode_style="%B%K{blue}%F{white} N %f%k%b"
+  local replace_mode_style="%B%K{red}%F{white} R %f%k%b"
 
   helper::get-vim-mode
   case "$REPLY" in
     insert) echo -n "$insert_mode_style";;
     normal) echo -n "$normal_mode_style";;
+    replace) echo -n "$replace_mode_style";;
     *) echo -n "$KEYMAP";;
   esac
 }
@@ -169,12 +177,6 @@ function segmt::python_venv
   echo -n "($venv_display) "
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
 }
-
-function zle::utils::reset-prompt
-{
-  zle && zle reset-prompt
-}
-hooks-add-hook zle_keymap_select_hook zle::utils::reset-prompt
 
 zmodload zsh/system
 

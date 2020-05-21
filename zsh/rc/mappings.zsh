@@ -401,6 +401,12 @@ keysym_with_fallback Enter "^M"
 
 #-------------------------------------------------------------
 
+function zle::utils::reset-prompt
+{
+  zle && zle reset-prompt
+}
+hooks-add-hook zle_keymap_select_hook zle::utils::reset-prompt
+
 
 # Allows to have fast switch Insert => Normal, but still be able to
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
@@ -472,8 +478,21 @@ zle -N backward-kill-partial-path
 
 bindkey "${keysym[Backspace]}" backward-kill-partial-path # Alt-Backspace
 
+function toggle-replace-mode
+{
+  if [[ $ZLE_STATE == *overwrite* ]]; then
+    zle vi-insert
+  else
+    zle vi-replace
+  fi
+  zle::utils::reset-prompt
+}
+zle -N toggle-replace-mode
+
+bindkey -M vicmd "${keysym[Insert]}" vi-replace
+bindkey "${keysym[Insert]}" toggle-replace-mode
+
 # Sane default
-bindkey "${keysym[Insert]}" overwrite-mode
 bindkey "${keysym[Delete]}" delete-char
 bindkey -M vicmd "${keysym[Delete]}" zwidget::noop
 
