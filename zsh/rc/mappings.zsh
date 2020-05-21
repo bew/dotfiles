@@ -329,6 +329,13 @@ function zwidget::jump-next-shell-arg
   (( CURSOR = CURSOR + ${#sh_args[word_idx + 2]}))
 }
 zle -N zwidget::jump-next-shell-arg
+
+function zwidget::noop
+{
+  # do nothing!
+}
+zle -N zwidget::noop
+
 #-------------------------------------------------------------
 # Mappings
 
@@ -336,12 +343,70 @@ zle -N zwidget::jump-next-shell-arg
 bindkey -v
 
 #-------------------------------------------------------------
+# Proper keys definitions
+
+zmodload zsh/terminfo
+
+# Make sure that the terminal is in application mode when zle is active, since
+# only then values from `$terminfo` are valid.
+#
+# We don't always enable application mode since some terminal does not define
+# smkx/rmkx terminfo entries (like the linux vt terminal).
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+  function zle::utils::enable-app-mode {
+    echoti smkx
+  }
+  function zle::utils::disable-app-mode {
+    echoti rmkx
+  }
+  hooks-add-hook zle_line_init_hook zle::utils::enable-app-mode
+  hooks-add-hook zle_line_finish_hook zle::utils::disable-app-mode
+fi
+
+typeset -gA keysym
+
+function keysym_with_fallback
+{
+  local sym="$1"
+  local prefered_val="$2"
+  local fallback_val="$3" # may be empty
+
+  if [[ -n "$prefered_val" ]]; then
+    keysym[$sym]="$prefered_val"
+  else
+    keysym[$sym]="$fallback_val"
+  fi
+}
+
+keysym_with_fallback Home "${terminfo[khome]}" "[1~"
+keysym_with_fallback End  "${terminfo[kend]}"  "[4~"
+
+keysym_with_fallback Insert "${terminfo[kich1]}" "[2~"
+keysym_with_fallback Delete "${terminfo[kdch1]}" "[3~"
+keysym_with_fallback PageUp "${terminfo[kpp]}" "[5~"
+keysym_with_fallback PageDown "${terminfo[knp]}" "[6~"
+
+keysym_with_fallback Left "${terminfo[kcub1]}" "[D"
+keysym_with_fallback Down "${terminfo[kcud1]}" "[B"
+keysym_with_fallback Up "${terminfo[kcuu1]}" "[A"
+keysym_with_fallback Right "${terminfo[kcuf1]}" "[C"
+
+# Note: can be ^h on some terminal
+keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+
+keysym_with_fallback Tab   "^I"
+keysym_with_fallback S-Tab "${terminfo[kcbt]}" "^I" # on linux console: S-Tab == M-Tab
+
+keysym_with_fallback Enter "^M"
+
+#-------------------------------------------------------------
+
 
 # Allows to have fast switch Insert => Normal, but still be able to
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 #
 # NOTE: default is KEYTIMEOUT=40
-function helper::setup_keytimeout_per_keymap
+function zle::utils::setup_keytimeout_per_keymap
 {
   if [[ "$KEYMAP" =~ (viins|main) ]]; then
     KEYTIMEOUT=1 # 10ms
@@ -349,7 +414,7 @@ function helper::setup_keytimeout_per_keymap
     KEYTIMEOUT=100 # 1000ms | 1s
   fi
 }
-hooks-add-hook zle_keymap_select_hook helper::setup_keytimeout_per_keymap
+hooks-add-hook zle_keymap_select_hook zle::utils::setup_keytimeout_per_keymap
 
 function vibindkey
 {
@@ -392,8 +457,7 @@ vibindkey '^z' zwidget::fg2
 
 
 # Fix keybinds when returning from command mode
-bindkey '^?' backward-delete-char # Backspace
-bindkey '^h' backward-delete-char # Backspace (alternate)
+bindkey "${keysym[Backspace]}" backward-delete-char # Backspace
 bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
@@ -406,15 +470,18 @@ function backward-kill-partial-path
 }
 zle -N backward-kill-partial-path
 
-# Backspace can be ^? or ^H on some terminal, so we handle both here
-bindkey '^?' backward-kill-partial-path # Alt-Backspace
-bindkey '^H' backward-kill-partial-path # Alt-Backspace (alternate)
+bindkey "${keysym[Backspace]}" backward-kill-partial-path # Alt-Backspace
 
-# Sane default (FIXME: use terminfo ($terminfo[xxxx]) to find escape sequences!)
-bindkey '\e[2~' overwrite-mode # Insert key (FIXME: use vi-replace mode for ins & cmd?)
-bindkey '\e[3~' delete-char # Del (Suppr) key
-vibindkey '\e[7~' beginning-of-line # Home key
-vibindkey '\e[8~' end-of-line # End key
+# Sane default
+bindkey "${keysym[Insert]}" overwrite-mode
+bindkey "${keysym[Delete]}" delete-char
+bindkey -M vicmd "${keysym[Delete]}" zwidget::noop
+
+vibindkey "${keysym[Home]}" beginning-of-line
+vibindkey "${keysym[End]}" end-of-line
+
+vibindkey "${keysym[PageUp]}" beginning-of-buffer-or-history # like gg in vicmd
+vibindkey "${keysym[PageDown]}" vi-fetch-history             # like G in vicmd
 
 # Cut the buffer and push it on the buffer stack
 function push-input-go-insert-mode
@@ -480,15 +547,14 @@ vibindkey 'w' zwidget::jump-next-shell-arg
 # Use Up/Down to get history with current cmd prefix..
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
-zmodload zsh/terminfo
-bindkey $terminfo[kcuu1] up-line-or-beginning-search
-bindkey $terminfo[kcud1] down-line-or-beginning-search
+bindkey "${keysym[Up]}" up-line-or-beginning-search
+bindkey "${keysym[Down]}" down-line-or-beginning-search
 
 # menuselect keybindings
 #-------------------------------------------------------------
 
 # enable go back in completions with S-Tab
-bindkey -M menuselect '[Z' reverse-menu-complete
+bindkey -M menuselect "${keysym[S-Tab]}" reverse-menu-complete
 
 # Cancel current completion with Esc
 bindkey -M menuselect '' send-break
