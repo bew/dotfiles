@@ -65,6 +65,32 @@ nnoremap <M-F> :Denite -start-filter file/rec<cr>
 nnoremap <Leader>/ :Denite grep/rg<cr>
 nnoremap <Leader><M-/> :Denite grep<cr>
 
+" Focus or create a Floaterm with the given name.
+" Hides the current Floaterm if any.
+function! s:FloatermFocusOrNew(name, cmd)
+  let target_bufnr = floaterm#terminal#get_bufnr(a:name)
+  let curr_bufnr = bufnr()
+
+  if getwininfo(win_getid())[0].terminal == 1
+    " Hide the floaterm if the current terminal is a floaterm
+    call floaterm#window#hide_floaterm(l:curr_bufnr)
+    if l:curr_bufnr == l:target_bufnr
+      return
+    endif
+  endif
+
+  if l:target_bufnr != -1
+    call floaterm#terminal#open_existing(l:target_bufnr)
+  else
+    call floaterm#new(a:cmd, {"name": a:name}, {}, v:false)
+  endif
+endf
+nnoremap <silent> <M-y> :call <SID>FloatermFocusOrNew("scratch", "zsh")<cr>
+tnoremap <silent> <M-y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch", "zsh")<cr>
+
+nnoremap <silent> <M-Y> :call <SID>FloatermFocusOrNew("scratch-alt", "zsh")<cr>
+tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "zsh")<cr>
+
 "-- Navigation
 "------------------------------------------------------------------
 
