@@ -146,6 +146,11 @@ source ~/.zsh/rc/aliases_and_short_funcs.zsh
 
 #-------------------------------------------------------------
 # Prompt
+
+# disable the status line (in the prompt) when run in neovim, as the terminal implementation
+# of neovim does not handle cursor save/restore terminal capabilities.
+[[ -n "$NVIM_LISTEN_ADDRESS" ]] && ZSH_DISABLE_STATUS_LINE=1
+
 source ~/.zsh/rc/prompt.zsh
 
 #-------------------------------------------------------------
