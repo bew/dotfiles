@@ -235,14 +235,18 @@ tmap  <M-q>
 " Shortcut
 nnoremap Q :q<cr>
 
-" Indent line(s)
-inoremap <Tab> <Esc>mi==`il
-vnoremap <Tab> :normal! ==<cr>
-" Do not add to normal mode, to keep CTRL-O CTRL-I working to navigate the jump list.
-" nnoremap <Tab> mi==`i
+" Indent/Format lines/file
+" I: Indent line, stay in insert mode (see :h i_CTRL-F)
+inoremap <M-C-f> <C-f>
+" I: Indent line, back to normal mode
+inoremap <C-f> <Esc>mi==`il
+" V: Indent visual selection, back to normal mode
+vnoremap <C-f> :normal! ==<cr>
+" N: Indent current line
+nnoremap <C-f> mi==`i
+" N: Format the entire file
+nnoremap <M-C-f> gg=G``
 
-" Format the file
-nnoremap <C-f> gg=G``
 
 " un-join (split) the current line at the cursor position
 nnoremap <M-J> i<c-j><esc>k$
