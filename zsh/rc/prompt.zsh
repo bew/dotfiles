@@ -353,6 +353,8 @@ STATUSLINE_PARTS=(
 # NOTE: the generated prompt str is static, the segment functions are not called.
 function sl::build_prompt_str
 {
+  [[ -n "$ZSH_DISABLE_STATUS_LINE" ]] && return
+
   local _cur_save=$'\e[s'
   local _cur_restore=$'\e[u'
   local _goto_bottom=$'\e[$LINES;0H'
