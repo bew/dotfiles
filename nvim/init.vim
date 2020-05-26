@@ -202,7 +202,7 @@ nmap gc  <Plug>(git-messenger)
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
 let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["┆", "┊", "┆", "¦"] : ["|"])
-let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown']
+let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown', 'codi']
 
 Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
     \ { 'do': ':UpdateRemotePlugin' }
@@ -271,6 +271,9 @@ let g:colorizer_auto_filetype='css,html,vim'
 let g:colorizer_colornames = 0 " Don't hl colornames (like red, yellow)
 
 Plug 'tweekmonster/nvim-api-viewer'
+
+Plug 'metakirby5/codi.vim'  " Interactive scratchpad (file on the left, interpreter outputs on the right)
+let g:codi#width = 50.0  " Split the windows in half
 
 " -- Per Lang / Tech plugins
 
