@@ -98,6 +98,27 @@ let g:deoplete#enable_at_startup = 1
 
 Plug 'tommcdo/vim-exchange'
 
+Plug 'voldikss/vim-floaterm'    " Nice floating terminal with super powers
+if $ASCII_ONLY == "1"
+  let g:floaterm_borderchars = ['-', '|', '-', '|', '+', '+', '+', '+']
+endif
+" Command used for opening a file from within :terminal, using the binary `floaterm <some-file>`
+let g:floaterm_open_command = 'split'  " So I can move it where I want without overwriting my current window
+
+function! s:InstallFloatermBorderColorChange()
+  au TermLeave <buffer> hi FloatermBorder cterm=bold ctermfg=124
+  au TermEnter <buffer> hi FloatermBorder cterm=NONE ctermfg=28
+endf
+
+augroup my_floaterm
+  au!
+  au ColorScheme * hi Floaterm ctermbg=235
+  au ColorScheme * hi FloatermBorder ctermfg=130
+
+  au FileType floaterm call <SID>InstallFloatermBorderColorChange()
+augroup END
+
+
 Plug 'scrooloose/nerdcommenter'     " Comment stuff out
 Plug 'scrooloose/nerdtree'        " Tree based file explorer
 
@@ -228,6 +249,14 @@ endfunction
 
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
+augroup my_startify
+  au!
+
+  " Makes the Startify buffer listed in the buffer list, this fixes an issue
+  " with Floaterm which leaves an empty buffer when opened on a Startify
+  " buffer.
+  autocmd User Startified setlocal buflisted
+augroup END
 
 Plug 'owickstrom/vim-colors-paramount' " Very simple colorscheme
 
