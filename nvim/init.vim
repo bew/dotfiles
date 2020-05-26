@@ -367,7 +367,7 @@ runtime! mappings.vim
 runtime! autocmd.vim
 
 
-" Denite config (must be after plug#end() to work (FIXME!!!!!))
+" Denite config (must be after plug#end() to work (FIXME?))
 call denite#custom#alias('source', 'grep/rg', 'grep')
 call denite#custom#var('grep/rg', 'command', ['rg'])
 call denite#custom#var('grep/rg', 'default_opts',
@@ -494,4 +494,3 @@ command! HiDumpToSplit so $VIMRUNTIME/syntax/hitest.vim
 " Only define it when not defined already.
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
     \ | wincmd p | diffthis
-

@@ -46,8 +46,6 @@ function! ToggleSignsAndLineNumbers()
 endf
 nnoremap <expr> <M-R>  ToggleSignsAndLineNumbers()
 
-nnoremap <M-m> :Neomake<cr>
-
 " Start interactive EasyAlign in visual mode (e.g. vipgea)
 xmap gea <Plug>(EasyAlign)
 
@@ -115,27 +113,16 @@ nnoremap <C-l> <C-w>l
 " nmap <cr> <C-j>
 
 " When mapping <C-h> has no effect
-nmap <BS> <C-h>
+" nmap <BS> <C-h>
 
 
-" Goto tabs
-nnoremap <M-J> gT
-nnoremap <M-K> gt
-inoremap <M-J> <esc>gT
-inoremap <M-K> <esc>gt
-" experimental version Alt-a/z
+" Goto tabs Alt-a/z
 nnoremap <M-a> gT
 nnoremap <M-z> gt
 inoremap <M-a> <esc>gT
 inoremap <M-z> <esc>gt
 
-
-" Move tabs
-nnoremap <M-H> :tabmove -1<cr>
-nnoremap <M-L> :tabmove +1<cr>
-inoremap <M-H> <esc>:tabmove -1<cr>
-inoremap <M-L> <esc>:tabmove +1<cr>
-" experimental version Alt-Shift-a/z
+" Move tabs Alt-A/Z
 nnoremap <M-A> :tabmove -1<cr>
 nnoremap <M-Z> :tabmove +1<cr>
 inoremap <M-A> <esc>:tabmove -1<cr>
@@ -151,7 +138,7 @@ nnoremap <M-n> :bnext<cr>
 nnoremap <M-p> :bprevious<cr>
 " FIXME: I'll probably remove these since they're not that common,
 " and the keys could be better used.
-
+" > Maybe use <Tab> <S-Tab> for tab-local-n/p-buffer & <M-Tab> <M-S-Tab> for global-n/p-buffer
 " Toggle zoom on current window
 " From justinmk' config https://github.com/justinmk/config/blob/a93dc73fafbdeb583ce177a9d4ebbbdfaa2d17af/.config/nvim/init.vim#L880-L894
 function! s:zoom_toggle()
@@ -185,9 +172,12 @@ nnoremap <silent> +  :call <SID>zoom_toggle()<cr>
 " nnoremap <silent> <C-w>O  :call <C-w>o<cr>
 
 
-" Visual - Move a selection of text
+" V: Move a selection of text
+" Indent/Dedent
 vnoremap <Left>  <gv
 vnoremap <Right> >gv
+" Move Up/Down
+" TODO: make it work with v:count ?
 vnoremap <Up>   :move '<-2<cr>gv
 vnoremap <Down> :move '>+1<cr>gv
 
@@ -198,11 +188,13 @@ inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
 
-" Insert: M-Space <-- [] --> Space
+" I: M-Space <-- [] --> Space
 "
 " <Space>: add space to the left of cursor:    ab[c]d -> ab [c]d
 " <M-Space>: add space to the right of cursor: ab[c]d -> ab[ ]cd
 " Note: <C-G>U is used to avoid breaking the undo sequence on cursor movement
+" meaning that we can repeat (with .) a change that includes a cursor
+" movement.
 inoremap <expr> <M-Space> ' <C-G>U<Left>'
 
 " Move cursor to end of displayed line (useful when text wraps)
@@ -266,13 +258,16 @@ nnoremap U <C-r>
 nnoremap / ms/
 
 " Search with{,out} word boundaries
+" V: search selection with word boundaries
 vmap * <Plug>(visualstar-*)
+" V: search selection without word boundaries
 vmap <M-*> <Plug>(visualstar-g*)
-nmap <M-*> g*
+" N: search current word without word boundaries
+nnoremap <M-*> g*
 
 vnoremap <M-p> :call VisualPaste()<cr>
+" Paste the unnamed register Unnamed register " is preserved
 function! VisualPaste()
-  " NOTE: unnamed register " is preserved
   let old_reg = getreg('"', 1, v:true)
   let old_regtype = getregtype('"')
 
