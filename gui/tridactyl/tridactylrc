@@ -5,10 +5,19 @@ bind <A-c> pin
 bind <A-a> tabprev
 bind <A-z> tabnext
 
+bind <A-A> tabmove -1
+bind <A-Z> tabmove +1
+
+bind <A-r> reload
+bind <A-R> reloadhard
+
 bind <C-A-t> tabduplicate
 
+bind <A-d> bdelete
+bind <A-u> undo
 
-# Reload config file
-bind <C-A-r> source
+
+# Reload config file (Ctrl+Shift+R)
+bind <C-R> source
 
 # vim:set ft=conf:
