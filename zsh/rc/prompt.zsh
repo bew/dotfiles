@@ -369,7 +369,7 @@ function sl::build_prompt_str
 
   local sl_content="$(make_prompt_str_from_parts func_reset: "$sl_col_reset" "${STATUSLINE_PARTS[@]}")"
 
-  local sl_container="${_cur_save}${_goto_bottom}${sl_init}${sl_content}${_cur_restore}"
+  local sl_container="${_cur_save}${_goto_bottom}${sl_init}${sl_content}${_cur_restore}${reset_color}"
   echo -n "%{${sl_container}%}"
 }
 
