@@ -73,7 +73,7 @@ function! LightLineFilename()
 endfunction
 
 function! LightLineFiletype()
-  return strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft'
+  return strlen(&filetype) ? &filetype : 'no ft'
 endfunction
 
 " one char wide solid vertical bar

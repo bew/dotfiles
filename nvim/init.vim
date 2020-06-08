@@ -206,9 +206,6 @@ let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown
 
 Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
     \ { 'do': ':UpdateRemotePlugin' }
-" Disable devicons in denite as it slows down the filtering a LOT
-" Ref: https://github.com/ryanoasis/vim-devicons/issues/204
-let g:webdevicons_enable_denite = 0
 
 autocmd! FileType denite
 autocmd FileType denite call s:denite_my_settings()
@@ -261,7 +258,6 @@ augroup END
 Plug 'owickstrom/vim-colors-paramount' " Very simple colorscheme
 
 Plug 'vim-scripts/xterm-color-table.vim'  " Provide some commands to display all cterm colors
-Plug 'ryanoasis/vim-devicons'
 
 Plug 'drzel/vim-line-no-indicator'      " Simple and expressive line number indicator
 
