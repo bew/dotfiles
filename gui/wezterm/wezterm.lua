@@ -68,6 +68,41 @@ local cfg_colors_and_appearance = {
   hide_tab_bar_if_only_one_tab = true,
 }
 
+-- Font
+---------------------------------------------------------------
+
+local cfg_fonts = {
+  font_size = 12.0,
+
+  -- default font config comes from fontconfig and manages to find a lot of fonts,
+  -- but to have a more all-included config I'll list everything.
+  ------------
+
+  font_dirs = {"fonts"}, -- relative to this config file
+  font_locator = "ConfigDirsOnly",
+
+  -- FIXME (<--- this is an example of bolded text)
+  font_rules = { -- must be ordered, first match will be used
+    {
+      italic = true,
+      intensity = "Bold",
+      font = wezterm.font("Iosevka Term Bold Italic"),
+    },
+    {
+      italic = true,
+      font = wezterm.font("Iosevka Term Light Italic"),
+    },
+    {
+      intensity = "Bold",
+      font = wezterm.font("Iosevka Term Bold"),
+    },
+  },
+  font = wezterm.font_with_fallback({ -- family names, not file names
+    "Iosevka Term Light",
+    "Font Awesome 5 Free Solid",
+  }),
+}
+
 -- Key/Mouse bindings
 ---------------------------------------------------------------
 
@@ -150,15 +185,19 @@ table.insert(mouse_bindings, bind_with_mods("SUPER", bind_middle_to_primary))
 
 local cfg_mouse_bindings = { mouse_bindings = mouse_bindings }
 
-print("------ MOUSE BINDINGS ------")
-print(inspect(cfg_mouse_bindings))
+-- print("------ MOUSE BINDINGS ------")
+-- print(inspect(cfg_mouse_bindings))
 
 -- Merge configs and return!
 ---------------------------------------------------------------
 
-return mytable.merge_all(
+local config = mytable.merge_all(
   cfg_colors_and_appearance,
+  cfg_fonts,
   cfg_key_bindings,
   cfg_mouse_bindings,
   {} -- so the last table can have an ending comma for git diffs :)
 )
+
+print(inspect(config))
+return config
