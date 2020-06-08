@@ -289,9 +289,6 @@ Plug 'Shougo/deoplete-clangx'     " FINALLY it works properly (C/C++)
 " Read why in $VIMRUNTIME/autoload/dist/ft.vim
 let g:c_syntax_for_h=1
 
-" FIXME: is this plugin still used????
-Plug 'Shougo/echodoc.vim' " It prints the documentation you have completed.
-
 "# Arduino
 "Plug 'jplaut/vim-arduino-ino'      " Arduino project compilation and deploy
 "Plug 'sudar/vim-arduino-syntax'      " Arduino syntax
@@ -311,14 +308,11 @@ Plug 'peterhoeg/vim-qml'        " QML syntax
 Plug 'plasticboy/vim-markdown'  " Markdown vim mode
 let g:vim_markdown_folding_disabled = 1
 
-
 "# Python
 Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
-
-" More Python tools (e.g: goto def)
-Plug 'davidhalter/jedi-vim'
-let g:jedi#completions_enabled = 0
+Plug 'davidhalter/jedi-vim'         " IDE-like tooling
+let g:jedi#completions_enabled = 0  " Let my async completion engine do that, using omnifunc
 
 " Jinja templating syntax & indent
 Plug 'lepture/vim-jinja'
