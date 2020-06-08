@@ -349,6 +349,12 @@ let g:ansible_template_syntaxes = { '*haproxy*.cfg.j2': 'haproxy' }
 "# Just - Support for 'justfile' (https://github.com/casey/just)
 Plug 'vmchale/just-vim'
 
+"# Lua
+Plug 'tbastos/vim-lua'
+" NOTE: setting to 0 for disabling is currently not supported -- just don't set
+"       the option at all to keep it disabled.
+let g:lua_syntax_nofold = 1  " Disable auto code folding
+
 call plug#end()
 
 """""""""""""""""""""""""""""""""
