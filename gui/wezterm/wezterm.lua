@@ -100,6 +100,7 @@ local cfg_fonts = {
   font = wezterm.font_with_fallback({ -- family names, not file names
     "Iosevka Term Light",
     "Font Awesome 5 Free Solid",
+    "Noto Color Emoji", -- for emoji support, weather icons, etc...
   }),
 }
 
