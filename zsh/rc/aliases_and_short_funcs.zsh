@@ -221,7 +221,8 @@ alias nosudo="sudo -k;"
 
 # launch editor (- let's try that!)
 alias e="nvim"
-alias er="nvim -R"
+alias v="nvim -R"
+# e: edit | v: view
 
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
 
