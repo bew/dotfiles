@@ -87,9 +87,6 @@ scrolling:
   # scrollback is enabled (history > 0).
   multiplier: 3
 
-  # Scroll to the bottom when new text is written to the terminal.
-  auto_scroll: false
-
 # Spaces per Tab (changes require restart)
 #
 # This setting defines the width of a tab in cells.
@@ -104,51 +101,22 @@ font:
   # Normal (roman) font face
   normal:
     # Font family
-    #
-    # Default:
-    #   - (macOS) Menlo
-    #   - (Linux/BSD) monospace
-    #   - (Windows) Consolas
     family: DejaVuSansMono Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     #style: Regular
 
-  # Bold font face
+  # Bold, Italic, Bold&Italic font faces
+  #
+  # Format is same as the `normal` font.
+  # If these font families are not specified, it will fall back to the
+  # value specified for the normal font.
   #bold:
-    # Font family
-    #
-    # If the bold family is not specified, it will fall back to the
-    # value specified for the normal font.
-    #family: monospace
-
-    # The `style` can be specified to pick a specific face.
-    #style: Bold
-
-  # Italic font face
   #italic:
-    # Font family
-    #
-    # If the italic family is not specified, it will fall back to the
-    # value specified for the normal font.
-    #family: monospace
-
-    # The `style` can be specified to pick a specific face.
-    #style: Italic
-
-  # Bold italic font face
   #bold_italic:
-    # Font family
-    #
-    # If the bold italic family is not specified, it will fall back to the
-    # value specified for the normal font.
-    #family: monospace
-
-    # The `style` can be specified to pick a specific face.
-    #style: Bold Italic
 
   # Point size
-  size: 8.0
+  size: 7.0
 
   # Offset is the extra space around each character. `offset.y` can be thought of
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
@@ -182,7 +150,7 @@ font:
 # If `true`, bold text is drawn using the bright color variants.
 #draw_bold_text_with_bright_colors: true
 
-# Colors (Tomorrow Night Bright)
+# Colors
 colors:
   # Default colors
   primary:
@@ -213,28 +181,6 @@ colors:
   #selection:
   #  text: '0xeaeaea'
   #  background: '0x404040'
-
-  # Normal colors
-  #normal:
-  #  black:   '0x000000'
-  #  red:     '0xd54e53'
-  #  green:   '0xb9ca4a'
-  #  yellow:  '0xe6c547'
-  #  blue:    '0x7aa6da'
-  #  magenta: '0xc397d8'
-  #  cyan:    '0x70c0ba'
-  #  white:   '0xeaeaea'
-
-  # Bright colors
-  #bright:
-  #  black:   '0x666666'
-  #  red:     '0xff3334'
-  #  green:   '0x9ec400'
-  #  yellow:  '0xe7c547'
-  #  blue:    '0x7aa6da'
-  #  magenta: '0xb77ee0'
-  #  cyan:    '0x54ced6'
-  #  white:   '0xffffff'
 
   # Normal colors
   normal:
