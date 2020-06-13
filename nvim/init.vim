@@ -159,6 +159,14 @@ omap ah <Plug>(GitGutterTextObjectOuterPending)
 xmap ih <Plug>(GitGutterTextObjectInnerVisual)
 xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 
+if $ASCII_ONLY != "1"
+  let g:gitgutter_sign_added              = "┃"
+  let g:gitgutter_sign_modified           = "┃"
+  let g:gitgutter_sign_removed            = "▁"
+  let g:gitgutter_sign_removed_first_line = "▔"
+  let g:gitgutter_sign_modified_removed   = "~▁"
+endif
+
 Plug 'easymotion/vim-easymotion' " Motions on speed!
 
 Plug 'liuchengxu/vim-which-key'
