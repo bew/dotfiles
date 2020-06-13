@@ -67,13 +67,18 @@ endfunction
 
 function! LightLineFilename()
   let fname = expand('%:t')
+  if filereadable(expand("~/" . expand('%:t')))
+    let formatted_filename = "~/" . expand("%:t") " ~ & filename
+  else
+    let formatted_filename = expand("%:h:t") . "/" . expand("%:t") " parent dir & filename
+  endif
   return fname == 'ControlP' ? g:lightline.ctrlp_item :
         \ fname == '__Tagbar__' ? g:lightline.fname :
-        \ fname =~ '__Gundo\|NERD_tree' ? '' :
+        \ fname =~ '__Mundo\|NERD_tree' ? '' :
         \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
         \ &ft == 'unite' ? unite#get_status_string() :
         \ &ft == 'vimshell' ? vimshell#get_status_string() :
-        \ ('' != fname ? fname : '[No Name]')
+        \ ('' != fname ? formatted_filename : '[No Name]')
 endfunction
 
 function! LightLineFiletype()
