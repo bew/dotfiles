@@ -71,8 +71,17 @@ local cfg_colors_and_appearance = {
 -- Font
 ---------------------------------------------------------------
 
+local function font_with_sym_fallback(font_family)
+  -- family names, not file names
+  return wezterm.font_with_fallback({
+    font_family,
+    "Font Awesome 5 Free Solid",
+    "Noto Color Emoji", -- for emoji support, weather icons, etc...
+  })
+end
+
 local cfg_fonts = {
-  font_size = 12.0,
+  font_size = 13.0,
 
   -- default font config comes from fontconfig and manages to find a lot of fonts,
   -- but to have a more all-included config I'll list everything.
@@ -81,27 +90,23 @@ local cfg_fonts = {
   font_dirs = {"fonts"}, -- relative to this config file
   font_locator = "ConfigDirsOnly",
 
-  -- FIXME (<--- this is an example of bolded text)
+  -- FIXME (<-- this is an example of bolded text)
   font_rules = { -- must be ordered, first match will be used
     {
       italic = true,
       intensity = "Bold",
-      font = wezterm.font("Iosevka Term Bold Italic"),
+      font = font_with_sym_fallback("Iosevka Term Bold Italic"),
     },
     {
       italic = true,
-      font = wezterm.font("Iosevka Term Light Italic"),
+      font = font_with_sym_fallback("Iosevka Term Light Italic"),
     },
     {
       intensity = "Bold",
-      font = wezterm.font("Iosevka Term Bold"),
+      font = font_with_sym_fallback("Iosevka Term Bold"),
     },
   },
-  font = wezterm.font_with_fallback({ -- family names, not file names
-    "Iosevka Term Light",
-    "Font Awesome 5 Free Solid",
-    "Noto Color Emoji", -- for emoji support, weather icons, etc...
-  }),
+  font = font_with_sym_fallback("Iosevka Term Light"),
 }
 
 -- Key/Mouse bindings
