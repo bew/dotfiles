@@ -1,0 +1,209 @@
+#!/usr/bin/env lua
+
+local capi
+
+local function require_init()
+	-- Grab environment
+	capi = {
+		print = print,
+	}
+end
+
+require_init()
+
+if #arg == 0 then
+	print()
+	print("USAGE : " .. arg[0] .. " [--in] <eventName> [<eventArgs>]")
+	print()
+	print([[awmremote "my::event" "'my string'"]])
+	print([[awmremote "my::event" "{ arg1 = 42 }"]])
+	print()
+	print([[Use options '--in-table' or '--in-string' to send argument through stdin]])
+	print()
+	print([[awmremote --in-table "my::event" <<EOF]])
+	print([[    {]])
+	print([[        arg1 = "value1",]])
+	print([[        arg2 = "value2",]])
+	print([[        arg3 = "value3",]])
+	print([[    }]])
+	print([[EOF]])
+	print()
+	os.exit(false)
+end
+
+local AwmRemote
+
+--
+-- Main function
+--
+
+local function main(arg)
+
+	local eventName = arg[1] -- i.e "my::event"
+	local strEventArgs, eventArgs
+
+	if eventName == "--in-string" or eventName == "--in-table" then
+		if eventName == "--in-string" then
+			eventArgs = io.read("*a")
+		elseif eventName == "--in-table" then
+			strEventArgs = io.read("*a")
+		end
+		eventName = arg[2]
+	else
+		strEventArgs = arg[2]
+	end
+
+	if not eventArgs and strEventArgs then
+		local f = assert( loadstring("return " .. tostring(strEventArgs)) )
+		eventArgs = f()
+	end
+
+	AwmRemote.init({verbose = true})
+	print("sending...")
+	local status = AwmRemote.sendEvent(eventName, eventArgs)
+	print("sent")
+
+	------------------------------------------
+
+	print("success", status and "status: " .. tostring(status) or "")
+
+end
+
+--
+-- Locally Required Packages
+--
+
+local function require_func(package)
+
+	local function require_awmremote()
+
+		-- Module environment
+		local AwesomeRemote = {}
+
+		-- Grab dependancies
+		local Socket = require("socket")
+		local MsgPack = require("MessagePack")
+
+		-- Private variables
+
+		local config = {
+			verbose = false,
+		}
+
+		local host = "localhost"
+		local remotePortDir = "/tmp/awesome-remote"
+
+		local servers = {}
+
+		-- Private functions
+
+		local function print(...)
+			if not config.verbose then
+				return false
+			end
+			return capi.print(...)
+		end
+
+		local function extractServerInfo(fileName)
+			if not fileName then return end
+
+			local file = io.open(fileName, "r")
+			if not file then return end
+
+			local infos = {
+				port = file,
+			}
+			-- no more info to extract from file right now...
+			file:close()
+
+			return infos
+		end
+
+		local function lsFiles(directory)
+			local files = {}
+			for filename in io.popen('ls "' .. directory .. '"'):lines() do
+				table.insert(files, filename)
+			end
+			return files
+		end
+
+		local function findRunningServers()
+			local files = lsFiles(remotePortDir)
+
+			print("finding running servers")
+
+			-- empty the list of servers
+			servers = {}
+
+			for _, file in ipairs(files) do
+				print("found " .. file)
+				table.insert(servers, {
+					port = file,
+					info = extractServerInfo(file),
+				})
+			end
+		end
+
+		local function sendToServer(serverInfo, data)
+			local tcp = Socket.tcp()
+			if not tcp then return false end
+
+			print("sending data at (" .. tostring(data) .. ") to server " .. serverInfo.port)
+
+			local success, status = tcp:connect(host, serverInfo.port)
+			if not success then return false end
+
+			local packet = MsgPack.pack(data)
+			local sent, status = tcp:send(string.len(packet) .. "\n")
+			local sent, status = tcp:send(packet)
+			-- TODO: do something with sent & status (to return false)
+			return true
+		end
+
+		local function sendToAllServers(data)
+			if not servers then return false end
+
+			local all_ok = true
+			for _, serverInfo in ipairs(servers) do
+				if not sendToServer(serverInfo, data) then
+					all_ok = false
+				end
+			end
+			return all_ok
+		end
+
+		-- Public functions
+
+		function AwesomeRemote.init(conf)
+			conf = conf or {}
+			config.verbose = conf.verbose or false
+			findRunningServers()
+			print("There is " .. #servers .. " running Awesome instances")
+		end
+
+		function AwesomeRemote.sendEvent(eventName, eventArgs)
+			local data = {
+				format = "awesome",
+				type = "event",
+				data = {
+					name = eventName,
+					args = eventArgs,
+				}
+			}
+			return sendToAllServers(data)
+		end
+
+		return AwesomeRemote
+
+	end
+
+	if package == "awmremote" then
+		return require_awmremote()
+	end
+end
+
+
+
+AwmRemote = require_func("awmremote")
+
+main(arg)

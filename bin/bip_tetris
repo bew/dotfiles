@@ -2,9 +2,9 @@
 
 function clean_exit
 {
-	echo 'Exiting...'
-	xset b off
-	exit
+  echo 'Exiting...'
+  xset b off
+  exit
 }
 
 trap 'clean_exit' INT # catch SIGINT, to remove the bip on exit
@@ -43,14 +43,14 @@ freqs['RE+']="587"
 #
 function do_ton
 {
-    freq=${freqs[$1]}
-    note_duration=$2
-    wait=$3
-    echo xset b $VOLUME $freq $note_duration
-    #xset b $VOLUME $freq $note_duration
-    #echo -e "Ton :: "$1"\tfreq: "$f" (sleep "$wait")"
-    #echo -n -e '\a'
-    sleep $wait
+  freq=${freqs[$1]}
+  note_duration=$2
+  wait=$3
+  echo xset b $VOLUME $freq $note_duration
+  #xset b $VOLUME $freq $note_duration
+  #echo -e "Ton :: "$1"\tfreq: "$f" (sleep "$wait")"
+  #echo -n -e '\a'
+  sleep $wait
 }
 
 ###############################################
@@ -70,8 +70,8 @@ VOLUME=10    # default 100 (in percent)
 
 function calc
 {
-	operation=$1
-	echo "$operation" | bc
+  operation=$1
+  echo "$operation" | bc
 }
 
 duration=$DURATION
@@ -89,86 +89,86 @@ delay_div4=$(calc "scale=3; $delay / 4")
 ##############  Debut Partie A  ################
 ##############  Debut for(2)  ##################
 for i in {0 1}; do
-    do_ton 'LA'      $duration       $delay
+  do_ton 'LA'      $duration       $delay
 
-    do_ton 'MI'      $duration_div2  $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'MI'      $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'SOL'     $duration_div2  $delay_div2
-    do_ton 'LA'      $duration_div4  $delay_div4
-    do_ton 'SOL'     $duration_div4  $delay_div4
+  do_ton 'SOL'     $duration_div2  $delay_div2
+  do_ton 'LA'      $duration_div4  $delay_div4
+  do_ton 'SOL'     $duration_div4  $delay_div4
 
-    do_ton 'FA'      $duration_div2  $delay_div2
-    do_ton 'MI'      $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'MI'      $duration_div2  $delay_div2
 
-    do_ton 'RE'      $duration       $delay
+  do_ton 'RE'      $duration       $delay
 
-    do_ton 'RE'      $duration_div2  $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'RE'      $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'LA'      $duration       $delay
+  do_ton 'LA'      $duration       $delay
 
-    do_ton 'SOL'     $duration_div2  $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'SOL'     $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'MI'      $duration_div2  $delay_div2
+  do_ton 'MI'      $duration_div2  $delay_div2
 
-    sleep $delay_div2
-    do_ton 'MI'      $duration_div4  $delay_div4
-    sleep $delay_div4
+  sleep $delay_div2
+  do_ton 'MI'      $duration_div4  $delay_div4
+  sleep $delay_div4
 
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'SOL'     $duration       $delay
-    do_ton 'LA'      $duration       $delay
+  do_ton 'SOL'     $duration       $delay
+  do_ton 'LA'      $duration       $delay
 
-    do_ton 'FA'      $duration       $delay
+  do_ton 'FA'      $duration       $delay
 
-    do_ton 'RE'      $duration       $delay
+  do_ton 'RE'      $duration       $delay
 
-    do_ton 'RE'      $duration       $delay
+  do_ton 'RE'      $duration       $delay
 
-    sleep $delay
+  sleep $delay
 
-    sleep $delay_div2
-    do_ton 'SOL'     $duration_div2  $delay_div2
+  sleep $delay_div2
+  do_ton 'SOL'     $duration_div2  $delay_div2
 
-    do_ton 'SOL'     $duration_div2  $delay_div2
-    do_ton 'SI-B'    $duration_div2  $delay_div2
+  do_ton 'SOL'     $duration_div2  $delay_div2
+  do_ton 'SI-B'    $duration_div2  $delay_div2
 
-    do_ton 'RE+'     $duration       $delay
+  do_ton 'RE+'     $duration       $delay
 
-    do_ton 'DO+'     $duration_div2  $delay_div2
-    do_ton 'SI-B'    $duration_div2  $delay_div2
+  do_ton 'DO+'     $duration_div2  $delay_div2
+  do_ton 'SI-B'    $duration_div2  $delay_div2
 
-    do_ton 'LA'      $duration       $delay
+  do_ton 'LA'      $duration       $delay
 
-    sleep $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  sleep $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'LA'      $duration_div2  $delay_div2
-    do_ton 'SI-B'    $duration_div4  $delay_div4
-    do_ton 'LA'      $duration_div4  $delay_div4
+  do_ton 'LA'      $duration_div2  $delay_div2
+  do_ton 'SI-B'    $duration_div4  $delay_div4
+  do_ton 'LA'      $duration_div4  $delay_div4
 
-    do_ton 'SOL'     $duration_div2  $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'SOL'     $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'MI'      $duration       $delay
+  do_ton 'MI'      $duration       $delay
 
-    do_ton 'MI'      $duration_div2  $delay_div2
-    do_ton 'FA'      $duration_div2  $delay_div2
+  do_ton 'MI'      $duration_div2  $delay_div2
+  do_ton 'FA'      $duration_div2  $delay_div2
 
-    do_ton 'SOL'     $duration       $delay
+  do_ton 'SOL'     $duration       $delay
 
-    do_ton 'LA'      $duration       $delay
+  do_ton 'LA'      $duration       $delay
 
-    do_ton 'FA'      $duration       $delay
+  do_ton 'FA'      $duration       $delay
 
-    do_ton 'RE'      $duration       $delay
+  do_ton 'RE'      $duration       $delay
 
-    do_ton 'RE'      $duration       $delay
+  do_ton 'RE'      $duration       $delay
 
-    sleep $delay
+  sleep $delay
 done
 ##############  Fin for(2)  #########################
 ##############  Fin Partie A  #######################
