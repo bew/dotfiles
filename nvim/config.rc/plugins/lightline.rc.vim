@@ -1,20 +1,18 @@
 " LightLine Configuration :
 
-let g:lightline_solarized_background = 'dark'
-
-let g:lightline = {
-      \   'enable': {
+let g:lightline = {}
+let g:lightline.enable = {
       \     'statusline': 1,
       \     'tabline': 0,
-      \   },
-      \   'mode_map': {
+      \   }
+
+let g:lightline.mode_map = {
       \     'n': 'N', 'i': 'I', 'R': 'R',
       \     'v': 'V', 'V': 'VL', "\<C-v>": 'VB',
       \     's': 'S', 'S': 'SL', "\<C-s>": 'SB',
       \     'c': 'C', 't': 'T',
-      \     '?': '?',
-      \   },
-      \ }
+      \     '?': '?!',
+      \   }
 
 " I resign to use the popular powerline "arrow" symbol, since the
 " diagonal blocks usually does not render correctly with a lot of font..
@@ -24,12 +22,11 @@ let g:lightline.subseparator = { 'left': '', 'right': '' }
 " let g:lightline.separator = { 'left': '', 'right': '' }
 " let g:lightline.subseparator = { 'left': '', 'right': '' }
 
-" let g:lightline.colorscheme = 'custom_background_solarized'
 let g:lightline.colorscheme = 'PaperColor'
 
 let g:lightline.active = {
-      \   'left': [ ['mode', 'paste'], ['filename', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
-      \   'right': [ ['lineinfoprogress'], ['linter_warnings', 'linter_errors'], ['filetype'] ],
+      \   'left': [ ['mode', 'paste'], ['linter_warnings', 'linter_errors', 'filename', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
+      \   'right': [ ['lineinfoprogress'], [], ['filetype'] ],
       \ }
 let g:lightline.inactive = {
       \   'left':  [ ['relativepath', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
