@@ -4,12 +4,12 @@ autoload -U colors && colors
 
 function symbols_info()
 {
-	title=$1
-	symbols=$2
+  title=$1
+  symbols=$2
 
-	echo ${bg[red]}$title${reset_color}
-	echo ${fg[yellow]}$symbols${reset_color}
-	echo
+  echo ${bg[red]}$title${reset_color}
+  echo ${fg[yellow]}$symbols${reset_color}
+  echo
 }
 
 symbols_info "Box Drawing" " ─ │ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ ━ ┃ ┄ ┅ ┆ ┇ ┉ ┊ ┋ ┍ ┎ ┏ ┑ ┒ ┓ ┕ ┖ ┗ ┙ ┚ ┛ ┝ ┞ ┟ ┠ ┡ ┢ ┣ ┥ ┦ ┧ ┨ ┩ ┪ ┫ ┭ ┮ ┯ ┰ ┱ ┲ ┳ ┵ ┶ ┷ ┸ ┹ ┺ ┻ ┽ ┾ ┿ ╀ ╁ ╂ ╃ ╄ ╅ ╆ ╇ ╈ ╉ ╊ ╋ ╌ ╍ ╎ ╏ ═ ║ ╒ ╓ ╔ ╕ ╖ ╗ ╘ ╙ ╚ ╛ ╜ ╝ ╞ ╟ ╠ ╡ ╢ ╣ ╤ ╥ ╦ ╧ ╨ ╩ ╪ ╫ ╬ ╭ ╮ ╯ ╰ ╱ ╲ ╳ ╴ ╵ ╶ ╷ ╸ ╹ ╺ ╻ ╼ ╽ ╾ ╿ ┈"

@@ -37,13 +37,13 @@ max_loading_time=60 # in seconds
 
 function echo_debug
 {
-	[[ -t 1 ]] && echo $@
+  [[ -t 1 ]] && echo $@
 
-	if [ $# = 0 ]; then
-		echo >> ${log_file}
-	else
-		echo 'DEBUG:' $@ >> ${log_file}
-	fi
+  if [ $# = 0 ]; then
+    echo >> ${log_file}
+  else
+    echo 'DEBUG:' $@ >> ${log_file}
+  fi
 }
 
 ############################################################################
@@ -51,62 +51,62 @@ function echo_debug
 
 function init_logger
 {
-	echo >> ${log_file}
-	echo '==>' `date` >> ${log_file}
+  echo >> ${log_file}
+  echo '==>' `date` >> ${log_file}
 }
 
 function exit_clean
 {
-	rm -f ${buffer_path}
-	rm -f ${final_img}
-	[ "$relaunch_unclutter" = "1" ] && unclutter &!
-	exit 0
+  rm -f ${buffer_path}
+  rm -f ${final_img}
+  [ "$relaunch_unclutter" = "1" ] && unclutter &!
+  exit 0
 }
 
 function init_buffer
 {
-	local buffer=$1
-	import -window root -quality 0 "$buffer"
+  local buffer=$1
+  import -window root -quality 0 "$buffer"
 }
 
 function process_img
 {
-	local buffer=$1
-	local final_buffer=$2
+  local buffer=$1
+  local final_buffer=$2
 
-	# ➤ blur
-	convert "$buffer" -blur 0x10 "$final_buffer"
+  # ➤ blur
+  convert "$buffer" -blur 0x10 "$final_buffer"
 }
 
 function generate_img
 {
-	function debug_gen
-	{
-		echo_debug "[GEN]:" $*
-	}
+  function debug_gen
+  {
+    echo_debug "[GEN]:" $*
+  }
 
-	local timestamp_start=`date +%s`
+local timestamp_start=`date +%s`
 
-	debug_gen "start at $timestamp_start"
+debug_gen "start at $timestamp_start"
 
-	# Screenshot of desktop
-	init_buffer "$buffer_path"
+  # Screenshot of desktop
+  init_buffer "$buffer_path"
 
-	# Generating real lockscreen image
-	process_img "$buffer_path" "$final_img"
+  # Generating real lockscreen image
+  process_img "$buffer_path" "$final_img"
 
-	local timestamp_end=`date +%s`
+  local timestamp_end=`date +%s`
 
-	debug_gen "end at $timestamp_end"
+  debug_gen "end at $timestamp_end"
 
-	local generation_time=$(( timestamp_end - timestamp_start ))
+  local generation_time=$(( timestamp_end - timestamp_start ))
 
-	debug_gen "diff is ${generation_time}s"
+  debug_gen "diff is ${generation_time}s"
 
-	if [ $generation_time -gt $max_loading_time ]; then
-		echo_debug "Too long to generate new image (maybe computer hibernated ?)"
-		exit_clean
-	fi
+  if [ $generation_time -gt $max_loading_time ]; then
+    echo_debug "Too long to generate new image (maybe computer hibernated ?)"
+    exit_clean
+  fi
 }
 
 ############################################################################
@@ -116,8 +116,8 @@ init_logger
 
 # Tidy up X mouse / keyboard grabbers
 if pgrep unclutter; then
-    relaunch_unclutter=1
-    pkill unclutter
+  relaunch_unclutter=1
+  pkill unclutter
 fi
 
 # Loading locker
@@ -137,8 +137,8 @@ i3lock ${i3lock_options[@]} -i "$final_img" >> ${log_file}
 locker_status=$?
 
 if ! [ "$locker_status" -eq 0 ]; then
-	echo_debug "bad locker_status: $locker_status"
-	i3lock -i "$loading_img" >> ${log_file};
+  echo_debug "bad locker_status: $locker_status"
+  i3lock -i "$loading_img" >> ${log_file};
 fi
 
 # Everything worked correctly, bye !

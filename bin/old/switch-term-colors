@@ -1,0 +1,77 @@
+#!/usr/bin/sh
+#
+# Reference: https://unix.stackexchange.com/questions/232881/urxvt-change-background-color-on-the-fly/295520#295520
+#
+# Created: 2018-03-14 by Benoit de Chezelles
+
+LIGHT_BG=${LIGHT_BG:-#FFF3E0}
+LIGHT_FG=${LIGHT_FG:-black}
+
+DARK_BG=${DARK_BG:-#202020}
+DARK_FG=${DARK_FG:-#eeeeee}
+
+function printf_tty
+{
+  printf $* > /dev/tty
+}
+
+function set_fg
+{
+  printf_tty '\033]10;'
+  printf_tty $1
+  printf_tty '\007'
+}
+
+function set_bg
+{
+  printf_tty '\033]11;'
+  printf_tty $1
+  printf_tty '\007'
+}
+
+function switch_light
+{
+  set_bg $LIGHT_BG
+  set_fg $LIGHT_FG
+
+  echo "light"
+}
+
+function switch_dark
+{
+  set_bg $DARK_BG
+  set_fg $DARK_FG
+
+  echo "dark"
+}
+
+function check_compatibility
+{
+  local term="$TERM"
+  # TODO: check compat.. later..
+}
+
+if [[ -z "$1" ]]; then
+  echo "Usage: $0 dark|light|toggle"
+  exit 1
+fi
+
+check_compatibility
+
+case $1 in
+  dark)
+    switch_dark;;
+
+  light)
+    switch_light;;
+
+  toggle)
+    if [[ $TERM_COLOR_MODE == 'light' ]]; then
+      switch_dark
+    elif [[ $TERM_COLOR_MODE == 'dark' ]]; then
+      switch_light
+    else
+      # Assume the default is 'dark'
+      switch_light
+    fi
+esac
