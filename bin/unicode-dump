@@ -1,0 +1,295 @@
+#!/usr/bin/env bash
+
+# Taken from https://stackoverflow.com/a/59040037/5655255
+# and adapted to be a proper cli tool.
+function UnicodePointToUtf8
+{
+  # Normalize input
+  local x="$1"               # ok if '0x2620'
+  x=${x/\\u/0x}              # '\u2620' -> '0x2620'
+  x=${x/U+/0x}; x=${x/u+/0x} # 'U+2620' -> '0x2620'
+  x=${x/U-/0x}; x=${x/u-/0x} # 'U-2620' -> '0x2620'
+
+  x=$((x)) # from hex to decimal
+  [ $x -ge 0 ] || return 1
+
+  local y=$x n=0
+  while [ $y -gt 0 ]; do y=$((y>>1)); n=$((n+1)); done
+
+  if [ $n -le 7 ]; then       # 7
+    y=$x
+  elif [ $n -le 11 ]; then    # 5+6
+    y=" $(( ((x>> 6)&0x1F)+0xC0 )) \
+        $(( (x&0x3F)+0x80 ))"
+  elif [ $n -le 16 ]; then    # 4+6+6
+    y=" $(( ((x>>12)&0x0F)+0xE0 )) \
+        $(( ((x>> 6)&0x3F)+0x80 )) \
+        $(( (x&0x3F)+0x80 ))"
+  else                        # 3+6+6+6
+    y=" $(( ((x>>18)&0x07)+0xF0 )) \
+        $(( ((x>>12)&0x3F)+0x80 )) \
+        $(( ((x>> 6)&0x3F)+0x80 )) \
+        $(( (x&0x3F)+0x80 ))"
+  fi
+  printf -v y '\\x%x' $y
+  echo -n -e $y
+}
+
+function DumpUnicodePointRange
+{
+  local verbose=1
+  if [[ "$1" == "--quiet" ]]; then
+    shift
+    verbose=0
+  fi
+
+  local start_point="$1" end_point="$2"
+
+  [ "$verbose" == 1 ] && echo "Unicode range $start_point -> $end_point"
+
+  local pt
+  for (( pt = "$start_point"; pt < "$end_point"; pt++ )); do
+    UnicodePointToUtf8 "$pt"
+    [ "$(( pt+1 & 0x1F ))" == 0 ] && echo
+  done
+  [ "$(( pt & 0x1F ))" != 0 ] && echo
+}
+
+# List taken from https://jrgraphix.net/research/unicode_blocks.php
+UNICODE_CATEGORIES=(
+  "Basic Latin"                             0x0020 0x007F
+  "Latin-1 Supplement"                      0x00A0 0x00FF
+  "Latin Extended-A"                        0x0100 0x017F
+  "Latin Extended-B"                        0x0180 0x024F
+  "IPA Extensions"                          0x0250 0x02AF
+  "Spacing Modifier Letters"                0x02B0 0x02FF
+  "Combining Diacritical Marks"             0x0300 0x036F
+  "Greek and Coptic"                        0x0370 0x03FF
+  "Cyrillic"                                0x0400 0x04FF
+  "Cyrillic Supplementary"                  0x0500 0x052F
+  "Armenian"                                0x0530 0x058F
+  "Hebrew"                                  0x0590 0x05FF
+  "Arabic"                                  0x0600 0x06FF
+  "Syriac"                                  0x0700 0x074F
+  "Thaana"                                  0x0780 0x07BF
+  "Devanagari"                              0x0900 0x097F
+  "Bengali"                                 0x0980 0x09FF
+  "Gurmukhi"                                0x0A00 0x0A7F
+  "Gujarati"                                0x0A80 0x0AFF
+  "Oriya"                                   0x0B00 0x0B7F
+  "Tamil"                                   0x0B80 0x0BFF
+  "Telugu"                                  0x0C00 0x0C7F
+  "Kannada"                                 0x0C80 0x0CFF
+  "Malayalam"                               0x0D00 0x0D7F
+  "Sinhala"                                 0x0D80 0x0DFF
+  "Thai"                                    0x0E00 0x0E7F
+  "Lao"                                     0x0E80 0x0EFF
+  "Tibetan"                                 0x0F00 0x0FFF
+  "Myanmar"                                 0x1000 0x109F
+  "Georgian"                                0x10A0 0x10FF
+  "Hangul Jamo"                             0x1100 0x11FF
+  "Ethiopic"                                0x1200 0x137F
+  "Cherokee"                                0x13A0 0x13FF
+  "Unified Canadian Aboriginal Syllabics"   0x1400 0x167F
+  "Ogham"                                   0x1680 0x169F
+  "Runic"                                   0x16A0 0x16FF
+  "Tagalog"                                 0x1700 0x171F
+  "Hanunoo"                                 0x1720 0x173F
+  "Buhid"                                   0x1740 0x175F
+  "Tagbanwa"                                0x1760 0x177F
+  "Khmer"                                   0x1780 0x17FF
+  "Mongolian"                               0x1800 0x18AF
+  "Limbu"                                   0x1900 0x194F
+  "Tai Le"                                  0x1950 0x197F
+  "Khmer Symbols"                           0x19E0 0x19FF
+  "Phonetic Extensions"                     0x1D00 0x1D7F
+  "Latin Extended Additional"               0x1E00 0x1EFF
+  "Greek Extended"                          0x1F00 0x1FFF
+  "General Punctuation"                     0x2000 0x206F
+  "Superscripts and Subscripts"             0x2070 0x209F
+  "Currency Symbols"                        0x20A0 0x20CF
+  "Combining Diacritical Marks for Symbols" 0x20D0 0x20FF
+  "Letterlike Symbols"                      0x2100 0x214F
+  "Number Forms"                            0x2150 0x218F
+  "Arrows"                                  0x2190 0x21FF
+  "Mathematical Operators"                  0x2200 0x22FF
+  "Miscellaneous Technical"                 0x2300 0x23FF
+  "Control Pictures"                        0x2400 0x243F
+  "Optical Character Recognition"           0x2440 0x245F
+  "Enclosed Alphanumerics"                  0x2460 0x24FF
+  "Box Drawing"                             0x2500 0x257F
+  "Block Elements"                          0x2580 0x259F
+  "Geometric Shapes"                        0x25A0 0x25FF
+  "Miscellaneous Symbols"                   0x2600 0x26FF
+  "Dingbats"                                0x2700 0x27BF
+  "Miscellaneous Mathematical Symbols-A"    0x27C0 0x27EF
+  "Supplemental Arrows-A"                   0x27F0 0x27FF
+  "Braille Patterns"                        0x2800 0x28FF
+  "Supplemental Arrows-B"                   0x2900 0x297F
+  "Miscellaneous Mathematical Symbols-B"    0x2980 0x29FF
+  "Supplemental Mathematical Operators"     0x2A00 0x2AFF
+  "Miscellaneous Symbols and Arrows"        0x2B00 0x2BFF
+  "CJK Radicals Supplement"                 0x2E80 0x2EFF
+  "Kangxi Radicals"                         0x2F00 0x2FDF
+  "Ideographic Description Characters"      0x2FF0 0x2FFF
+  "CJK Symbols and Punctuation"             0x3000 0x303F
+  "Hiragana"                                0x3040 0x309F
+  "Katakana"                                0x30A0 0x30FF
+  "Bopomofo"                                0x3100 0x312F
+  "Hangul Compatibility Jamo"               0x3130 0x318F
+  "Kanbun"                                  0x3190 0x319F
+  "Bopomofo Extended"                       0x31A0 0x31BF
+  "Katakana Phonetic Extensions"            0x31F0 0x31FF
+  "Enclosed CJK Letters and Months"         0x3200 0x32FF
+  "CJK Compatibility"                       0x3300 0x33FF
+  "CJK Unified Ideographs Extension A"      0x3400 0x4DBF
+  "Yijing Hexagram Symbols"                 0x4DC0 0x4DFF
+  "CJK Unified Ideographs"                  0x4E00 0x9FFF
+  "Yi Syllables"                            0xA000 0xA48F
+  "Yi Radicals"                             0xA490 0xA4CF
+  "Hangul Syllables"                        0xAC00 0xD7AF
+  "High Surrogates"                         0xD800 0xDB7F
+  "High Private Use Surrogates"             0xDB80 0xDBFF
+  "Low Surrogates"                          0xDC00 0xDFFF
+  "Private Use Area"                        0xE000 0xF8FF
+  "CJK Compatibility Ideographs"            0xF900 0xFAFF
+  "Alphabetic Presentation Forms"           0xFB00 0xFB4F
+  "Arabic Presentation Forms-A"             0xFB50 0xFDFF
+  "Variation Selectors"                     0xFE00 0xFE0F
+  "Combining Half Marks"                    0xFE20 0xFE2F
+  "CJK Compatibility Forms"                 0xFE30 0xFE4F
+  "Small Form Variants"                     0xFE50 0xFE6F
+  "Arabic Presentation Forms-B"             0xFE70 0xFEFF
+  "Halfwidth and Fullwidth Forms"           0xFF00 0xFFEF
+  "Specials"                                0xFFF0 0xFFFF
+  "Linear B Syllabary"                      0x10000 0x1007F
+  "Linear B Ideograms"                      0x10080 0x100FF
+  "Aegean Numbers"                          0x10100 0x1013F
+  "Old Italic"                              0x10300 0x1032F
+  "Gothic"                                  0x10330 0x1034F
+  "Ugaritic"                                0x10380 0x1039F
+  "Deseret"                                 0x10400 0x1044F
+  "Shavian"                                 0x10450 0x1047F
+  "Osmanya"                                 0x10480 0x104AF
+  "Cypriot Syllabary"                       0x10800 0x1083F
+  "Byzantine Musical Symbols"               0x1D000 0x1D0FF
+  "Musical Symbols"                         0x1D100 0x1D1FF
+  "Tai Xuan Jing Symbols"                   0x1D300 0x1D35F
+  "Mathematical Alphanumeric Symbols"       0x1D400 0x1D7FF
+  "CJK Unified Ideographs Extension B"      0x20000 0x2A6DF
+  "CJK Compatibility Ideographs Supplement" 0x2F800 0x2FA1F
+  "Tags"                                    0xE0000 0xE007F
+)
+
+function PrintListCategories
+{
+  echo "All supported categories:"
+
+  local idx=0
+  while [[ "${UNICODE_CATEGORIES[idx]}" != "" ]]; do
+    local name="${UNICODE_CATEGORIES[idx + 0]}"
+    local start="${UNICODE_CATEGORIES[idx + 1]}"
+    local end="${UNICODE_CATEGORIES[idx + 2]}"
+    idx=$(( idx + 3 ))
+
+    echo "[$start -> $end] $name"
+  done
+}
+
+function FindStartStopForCategory
+{
+  local category="$1"
+
+  local idx=0
+  while [[ "${UNICODE_CATEGORIES[idx]}" != "" ]]; do
+    local name="${UNICODE_CATEGORIES[idx]}"
+    if [[ "$category" == "$name" ]]; then
+      REPLY=(
+        "${UNICODE_CATEGORIES[idx + 1]}"
+        "${UNICODE_CATEGORIES[idx + 2]}"
+      )
+      return
+    fi
+    idx=$(( idx + 3 ))
+  done
+  return 1
+}
+
+function PrintAllFromCategory
+{
+  local category="$1"
+
+  if ! FindStartStopForCategory "$category"; then
+    echo >&2 "Unknown unicode category '$category', check supported ones with '--list-categories'."
+    return 1
+  fi
+  local start_point="${REPLY[0]}" end_point="${REPLY[1]}"
+
+  echo "-- Category '$category' [$start_point -> $end_point]"
+  DumpUnicodePointRange --quiet "$start_point" "$end_point"
+}
+
+function PrintAllCategories
+{
+  local idx=0
+  while [[ "${UNICODE_CATEGORIES[idx]}" != "" ]]; do
+    local name="${UNICODE_CATEGORIES[idx]}"
+
+    [[ "$idx" != 0 ]] && echo
+    PrintAllFromCategory "$name"
+
+    idx=$(( idx + 3 ))
+  done
+}
+
+function help
+{
+  local prog_name="$0"
+  if [[ "$PATH" =~ "$(dirname "$0")" ]]; then
+    # if prog parent dir is in PATH, use only file name as prog name
+    prog_name="$(basename "$0")"
+  fi
+
+  echo "Inspect unicode point or range of points."
+  echo
+  echo "Usages:"
+  echo "  $prog_name --help|-h              | print this help"
+  echo "  $prog_name <point>                | print the given unicode point"
+  echo "  $prog_name --range <start> <end>  | dump unicode point range from <start> to <end>"
+  echo "  $prog_name --sample               | same as: --range 0x2500 0x2600"
+  echo "  $prog_name --list-categories      | list all unicode categories supported for --by-category"
+  echo "  $prog_name --category <category>  | dump unicode point from the given category"
+  echo "  $prog_name --by-categories        | dump unicode points from all supported categories"
+  echo
+  echo "Supported point format: 0x2620 | \\u2620 | U-2620 | U+2620"
+}
+
+case "$1" in
+  "")
+    help
+    exit 1
+    ;;
+  -h|--help)
+    help
+    exit
+    ;;
+  --range)
+    DumpUnicodePointRange "$2" "$3"
+    ;;
+  --sample)
+    echo "Similar to passing: --range 0x2500 0x2600"
+    DumpUnicodePointRange 0x2500 0x2600
+    ;;
+  --list-categories)
+    PrintListCategories
+    ;;
+  --category)
+    PrintAllFromCategory "$2"
+    ;;
+  --by-categories)
+    PrintAllCategories
+    ;;
+  *)
+    echo "$1 -> $(UnicodePointToUtf8 "$1")"
+    ;;
+esac
