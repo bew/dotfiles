@@ -474,9 +474,9 @@ if has("vim_starting")
   else
     set background=dark
   endif
-  call SetColorscheme(v:true)
+  silent call SetColorscheme(v:true)
 else
-  call SetColorscheme(v:false)
+  silent call SetColorscheme(v:false)
 endif
 
 " Fix lightline not refreshing on &background change
