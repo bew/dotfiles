@@ -228,10 +228,8 @@ tmap  <M-q>
 nnoremap Q :q<cr>
 
 " Indent/Format lines/file
-" I: Indent line, stay in insert mode (see :h i_CTRL-F)
-inoremap <M-C-f> <C-f>
-" I: Indent line, back to normal mode
-inoremap <C-f> <Esc>mi==`il
+" I: Indent line, stay in insert mode (default, see :h i_CTRL-F)
+inoremap <C-f> <C-f>
 " V: Indent visual selection, back to normal mode
 vnoremap <C-f> :normal! ==<cr>
 " N: Indent current line
