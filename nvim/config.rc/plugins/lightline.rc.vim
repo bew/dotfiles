@@ -14,9 +14,16 @@ let g:lightline = {
       \     'c': 'C', 't': 'T',
       \     '?': '?',
       \   },
-      \   'separator': { 'left': '', 'right': '' },
-      \   'subseparator': { 'left': '', 'right': '' },
       \ }
+
+" I resign to use the popular powerline "arrow" symbol, since the
+" diagonal blocks usually does not render correctly with a lot of font..
+" (the top/bottom are not 'exactly' at the top/bottom, -> looks pretty bad)
+let g:lightline.separator = { 'left': '', 'right': '' }
+let g:lightline.subseparator = { 'left': '', 'right': '' }
+" let g:lightline.separator = { 'left': '', 'right': '' }
+" let g:lightline.subseparator = { 'left': '', 'right': '' }
+
 " let g:lightline.colorscheme = 'custom_background_solarized'
 let g:lightline.colorscheme = 'PaperColor'
 
