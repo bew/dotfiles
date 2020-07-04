@@ -1,19 +1,35 @@
 set theme dark
 
+# A : Alt
+# CA : Ctrl-Alt
+
 bind <A-c> pin
 
+unbind J
+unbind K
 bind <A-a> tabprev
 bind <A-z> tabnext
 
 bind <A-A> tabmove -1
 bind <A-Z> tabmove +1
 
+unbind r
+unbind R
 bind <A-r> reload
 bind <A-R> reloadhard
 
-bind <C-A-t> tabduplicate
+# history
+unbind H
+unbind L
+bind <CA-a> back
+bind <CA-z> forward
 
+bind <CA-t> tabduplicate
+
+unbind d
 bind <A-d> bdelete
+
+unbind u
 bind <A-u> undo
 
 
