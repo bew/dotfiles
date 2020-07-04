@@ -87,4 +87,8 @@ bind --mode=ex <A-p> ex.prev_completion
 bindurl reddit.com <Escape> js tri.dom.simulateClick(document.querySelector("*[aria-label=Close]"))
 bindurl reddit.com <A-Escape> composite mode normal | hide cmdline
 
+# FIXME: <Escape> should not be set per site, but should be a generic key binding, that switch to
+# Tridactyl's "ignore" mode, inject the "Escape" key and go back to "normal" mode.. (and maybe
+# also hide the cmdline to get the normal <Escape> behavior of Tridactyl)
+
 # vim:set ft=conf:
