@@ -36,6 +36,21 @@ zstyle ':completion:*' completer _compl_force_rehash _complete _ignored _match _
 # Case insensitive tab-completion <3
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
+# Handle ambiguous partial completion suggestions (e.g: /u/b/s<TAB>)
+# Taken from: https://scriptingosx.com/2019/07/moving-to-zsh-part-5-completions/
+
+# If completion is attempted on a string containing multiple partially typed pathname
+# components, all ambiguous components will be shown. Otherwise, completion stops at the
+# first ambiguous component.
+zstyle ':completion:*' list-suffixes
+# 'expand' is used when completing strings consisting of multiple parts, such as path names.
+# - 'prefix', the partially typed word from the line will be expanded as far as possible even
+#   if trailing parts cannot be completed.
+# - 'suffix', matching names for components after the first ambiguous one will also be added.
+#   This means that the resulting string is the longest unambiguous string possible. However,
+#   menu completion can be used to cycle through all matches.
+zstyle ':completion:*' expand prefix suffix
+
 # Formatting and messages
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
 zstyle ':completion:*' verbose yes
