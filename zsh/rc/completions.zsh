@@ -72,15 +72,15 @@ zstyle ':completion:*:(cd|nvim):*' ignore-parents parent pwd
 
 # Color completion for some things.
 zstyle ':completion:*' list-colors yes
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*:original' list-colors "=*=$color[red];$color[bold]"
-zstyle ':completion:*:commands' list-colors "=*=$color[green];$color[bold]"
-zstyle ':completion:*:builtins' list-colors "=*=$color[cyan];$color[bold]"
-zstyle ':completion:*:functions' list-colors "=*=$color[cyan]"
-zstyle ':completion:*:parameters' list-colors "=*=$color[red]"
-zstyle ':completion:*:aliases' list-colors "=*=$color[cyan];$color[bold]"
+zstyle ':completion:*:default'        list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:original'       list-colors "=*=$color[red];$color[bold]"
+zstyle ':completion:*:commands'       list-colors "=*=$color[green];$color[bold]"
+zstyle ':completion:*:builtins'       list-colors "=*=$color[cyan];$color[bold]"
+zstyle ':completion:*:functions'      list-colors "=*=$color[cyan]"
+zstyle ':completion:*:parameters'     list-colors "=*=$color[red]"
+zstyle ':completion:*:aliases'        list-colors "=*=$color[cyan];$color[bold]"
 zstyle ':completion:*:reserved-words' list-colors "=*=$color[magenta]"
-zstyle ':completion:*:options' list-colors "=^(-- *)=$color[green]"
+zstyle ':completion:*:options'        list-colors "=^(-- *)=$color[green]"
 
 # Pretty 'kill' completion
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'

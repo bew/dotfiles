@@ -22,7 +22,7 @@ alias zshrc=reload_zsh
 
 alias -g NOOUT=">/dev/null"
 alias -g NOERR="2>/dev/null"
-alias -g OUT2ERR="2>&1"
+alias -g ERR2OUT="2>&1"
 alias -g NOOUTPUT="NOOUT NOERR"
 # interesting link on redirections order: https://wiki.bash-hackers.org/howto/redirection_tutorial
 # alias -g NOOUTPUT="3>/dev/null 1>&3 2>&3"
