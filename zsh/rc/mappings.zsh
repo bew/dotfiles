@@ -23,23 +23,40 @@ function zle::utils::no-history-run
   zle .accept-line
 }
 
-# Toggle sudo at <bol>
-function zwidget::toggle-sudo # TODO: refactor to a re-usable function
+# Toggle between "sudo "/"nosudo "/"" at <bol>
+function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
 {
   # Overwriting BUFFER will reset CURSOR to <bol>
   # so we store its original position first
   local saved_cursor=$CURSOR
 
-  if [ "${BUFFER[1, 5]}" = "sudo " ]; then
-    BUFFER="${BUFFER[6, ${#BUFFER}]}"
-    (( CURSOR = saved_cursor - 5 ))
+  local remove_text
+  local add_text
+
+  if [[ "${BUFFER[1, 5]}" == "sudo " ]]; then
+    remove_text="sudo "
+    add_text="nosudo "
+  elif [[ "${BUFFER[1, 7]}" == "nosudo " ]]; then
+    remove_text="nosudo "
   else
-    BUFFER="sudo $BUFFER"
-    (( CURSOR = saved_cursor + 5 ))
+    add_text="sudo "
   fi
+
+  if [[ -n "$remove_text" ]]; then
+    BUFFER="${BUFFER[${#remove_text} + 1, ${#BUFFER}]}"
+    (( CURSOR = saved_cursor - ${#remove_text} ))
+    (( saved_cursor = CURSOR )) # needed if -n "$add_text"
+  fi
+  if [[ -n "$add_text" ]]; then
+    BUFFER="${add_text}$BUFFER"
+    (( CURSOR = saved_cursor + ${#add_text} ))
+  fi
+
   zle redisplay
 }
-zle -N zwidget::toggle-sudo
+zle -N zwidget::toggle-sudo-nosudo
+# TODO: is there a way to handle commands not at <bol> ? (mapped to M-S instead of M-s)
+# e.g: echo 400 | [NEED TOGGLE SUDO HERE] tee /foo/bar
 
 # Git status
 function zwidget::git-status
@@ -431,7 +448,7 @@ compdef _bindkey vibindkey
 
 # TODO: better binds organization
 
-vibindkey 's' zwidget::toggle-sudo
+vibindkey 's' zwidget::toggle-sudo-nosudo
 
 vibindkey 'q' zwidget::cycle-quoting
 vibindkey 'a' zwidget::insert_one_arg
