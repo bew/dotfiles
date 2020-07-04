@@ -93,4 +93,9 @@ zstyle ":completion:*:*:${EDITOR}:*:*files" ignored-patterns '*.pdf|*.o'
 # (http://www.zsh.org/mla/users/2009/msg01038.html).
 zle -C complete-files complete-word _generic
 zstyle ':completion:complete-files:*' completer _files
+bindkey '^x^f' complete-files # Force complete file names
 bindkey '^F' complete-files
+
+zle -C complete-history complete-word _generic
+zstyle ':completion:complete-history:*' completer _history
+bindkey '^x^h' complete-history # Force complete words from history
