@@ -3,28 +3,26 @@ set theme dark
 # A : Alt
 # CA : Ctrl-Alt
 
+#tab
 bind <A-c> pin
+
+unbind t
+bind <A-t> fillcmdline tabopen
 
 unbind J
 unbind K
 bind <A-a> tabprev
 bind <A-z> tabnext
+bind --mode=insert <A-a> tabprev
+bind --mode=insert <A-z> tabnext
+bind --mode=ex <A-a> tabprev
+bind --mode=ex <A-z> tabnext
 
 bind <A-A> tabmove -1
 bind <A-Z> tabmove +1
 
-unbind r
-unbind R
-bind <A-r> reload
-bind <A-R> reloadhard
-
-# history
-unbind H
-unbind L
-bind <CA-a> back
-bind <CA-z> forward
-
 bind <CA-t> tabduplicate
+bind <CA-n> tabdetach
 
 unbind d
 bind <A-d> bdelete
@@ -32,8 +30,61 @@ bind <A-d> bdelete
 unbind u
 bind <A-u> undo
 
+# hint
+unbind f
+unbind F
+bind <A-f> hint
+bind <A-F> hint -b
+
+# page
+unbind r
+unbind R
+bind <A-r> reload
+bind <A-R> reloadhard
+
+unbind o
+bind <A-o> fillcmdline open
+
+# rudimentary search mode
+bind <A-/> fillcmdline find
+bind <A-?> fillcmdline find -?
+bind <A-n> findnext 1
+bind <A-N> findnext -1
+bind § nohlsearch
+
+# history
+unbind H
+unbind L
+bind <CA-a> back
+bind <CA-z> forward
 
 # Reload config file (Ctrl+Shift+R)
-bind <C-R> source
+command reload_my_config composite source ; fillcmdline_tmp 1000 Config reloaded!
+bind <C-R> reload_my_config
+bind --mode=ignore <C-R> reload_my_config
+bind --mode=insert <C-R> reload_my_config
+
+# insert mode bindings that don't belong to any other category
+bind --mode=insert <A-:> fillcmdline_notrail
+
+# ex mode bindings
+bind --mode=ex <A-h> text.backward_char
+bind --mode=ex <A-j> ex.next_history
+bind --mode=ex <A-k> ex.prev_history
+bind --mode=ex <A-l> text.forward_char
+
+bind --mode=ex <A-w> text.forward_word
+bind --mode=ex <A-b> text.backward_word
+bind --mode=ex <A-g> text.beginning_of_line
+bind --mode=ex <A-G> text.end_of_line
+
+bind --mode=ex <A-n> ex.next_completion
+bind --mode=ex <A-p> ex.prev_completion
+
+# URL based binds
+
+# reddit.com, simulate clicking on the Close button of an opened post
+bindurl reddit.com <Escape> js tri.dom.simulateClick(document.querySelector("*[aria-label=Close]"))
+bindurl reddit.com <A-Escape> composite mode normal | hide cmdline
 
 # vim:set ft=conf:
