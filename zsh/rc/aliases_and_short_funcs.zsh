@@ -213,8 +213,19 @@ alias gv="e +GV"
 # Note: the trailing space is important (see the man for the zsh alias builtin)
 alias sudo="sudo "
 
-# Close the current sudo session if any
-alias nosudo="sudo -k;"
+# Without args: close the current sudo session if any.
+# With args: run args _then_ close current sudo session.
+function nosudo
+{
+  if [[ $# == 0 ]]; then
+    sudo -k # Close the current sudo session if any
+  else
+    sudo "$@"
+    sudo -k # Close the current sudo session
+  fi
+}
+compdef _sudo nosudo
+alias nosudo="nosudo " # allow alias expansion after 'nosudo'
 
 
 # nvim
