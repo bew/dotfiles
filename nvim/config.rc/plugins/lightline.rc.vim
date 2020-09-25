@@ -35,7 +35,7 @@ let g:lightline.inactive = {
 let g:lightline.component = {
       \   'readonly': '%{&readonly && &ft != "help" ? "" : ""}',
       \   'modified': '%{&modified ? "+" : ""}',
-      \   'lineinfoprogress': '%{LightLineProgress()} %l:%v',
+      \   'lineinfoprogress': '%{LightLineProgress()} %l:%02v',
       \ }
 let g:lightline.component_function = {
       \   'filename': 'LightLineFilename',
