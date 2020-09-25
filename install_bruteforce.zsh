@@ -47,6 +47,9 @@ label "git links"
 make-link .dot/gitconfig ~/.gitconfig
 make-link .dot/gitignore ~/.gitignore
 
+label "Nix stuff"
+make-link .dot/nixpkgs    ~/.config/nixpkgs
+
 label "other cli tools"
 make-link .dot/mostrc    ~/.mostrc
 make-link .dot/gdbinit   ~/.gdbinit
