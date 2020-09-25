@@ -14,13 +14,9 @@ let g:lightline.mode_map = {
       \     '?': '?!',
       \   }
 
-" I resign to use the popular powerline "arrow" symbol, since the
-" diagonal blocks usually does not render correctly with a lot of font..
-" (the top/bottom are not 'exactly' at the top/bottom, -> looks pretty bad)
-let g:lightline.separator = { 'left': '', 'right': '' }
-let g:lightline.subseparator = { 'left': '', 'right': '' }
-" let g:lightline.separator = { 'left': '', 'right': '' }
-" let g:lightline.subseparator = { 'left': '', 'right': '' }
+" Use simple separators (I resigned...)
+let g:lightline.separator = { 'left': '', 'right': '' }
+let g:lightline.subseparator = { 'left': '', 'right': '' }
 
 let g:lightline.colorscheme = 'PaperColor'
 
@@ -33,14 +29,14 @@ let g:lightline.inactive = {
       \   'right': [ ['progress'], ['filetype'] ],
       \ }
 let g:lightline.component = {
-      \   'readonly': '%{&readonly && &ft != "help" ? "" : ""}',
+      \   'readonly': '%{&readonly && &ft != "help" ? "RO" : ""}',
       \   'modified': '%{&modified ? "+" : ""}',
-      \   'lineinfoprogress': '%{LightLineProgress()} %l:%02v',
+      \   'lineinfoprogress': '%P %l:%02v',
+      \   'progress': '%P L%l',
       \ }
 let g:lightline.component_function = {
       \   'filename': 'LightLineFilename',
       \   'filetype': 'LightLineFiletype',
-      \   'progress': 'LightLineProgress',
       \   'mode': 'LightLineMode',
       \   'fugitive': 'LightlineFugitive',
       \   'buffer_comment': 'LightLineBufferComment',
@@ -83,18 +79,6 @@ endfunction
 
 function! LightLineFiletype()
   return strlen(&filetype) ? &filetype : 'no ft'
-endfunction
-
-" one char wide solid vertical bar
-let g:line_no_indicator_chars = [
-      \  ' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'
-      \  ]
-function! LightLineProgress()
-  " Old 'percent' version
-  " return winwidth(0) > 50 ? line('.') * 100 / line('$') . '%' : ''
-
-  " From plugin drzel/vim-line-no-indicator
-  return LineNoIndicator()
 endfunction
 
 function! LightLineMode()
