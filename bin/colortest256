@@ -54,8 +54,6 @@ Contributors
         - 88 color rgb display bugfix
 
 """
-from __future__ import print_function
-
 __version__ = __doc__.split('\n')[0]
 
 import sys
