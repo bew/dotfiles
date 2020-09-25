@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/bin/bash
 
 # i3lock-color runner
 
@@ -139,4 +139,4 @@ args+=(
   --date-align="$A_Right"
 )
 
-i3lock $args
+i3lock "${args[@]}"
