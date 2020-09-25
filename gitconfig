@@ -8,6 +8,9 @@
 [push]
   default = current
 
+[pull]
+  ff = only # fast-forward only on pull, merges will be done manually if needed
+
 [core]
   excludesfile = ~/.gitignore
 
