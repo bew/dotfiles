@@ -3,9 +3,14 @@
 # vim files
 .cs_*
 CS_SESSION
+.vimsession*
 
 # neomake tmp files
 .*neomake*
+
+# Nix result
+result
+result-*
 
 
 # C/C++ compilation
@@ -25,4 +30,5 @@ __pycache__/
 # Ruby bundle vendor/bundle directory
 bundle/
 
+# History files of various tools
 .*_history
