@@ -82,24 +82,41 @@
 [color "status"]
   untracked = "cyan"
 
-[color "diff-highlight"]
-  # value is: fg [bold,..] [bg]
-  # Using the 256 colors palette
-  oldNormal = red
-  oldHighlight = red 52
-  newNormal = green
-  newHighlight = 40 22
+# -- BEGIN delta config
+
+[core]
+  pager = delta
 
 [interactive]
-  diffFilter = "diff-highlight | less -R"
+  diffFilter = delta --color-only
 
-[pager]
-  log = "diff-highlight | LESS= less -R -+X"
-  show = "diff-highlight | LESS= less -R -+X"
-  diff = "diff-highlight | LESS= less -R -+X"
-  # We reset env `LESS` to disable `--quit-if-one-screen` if given in current
-  # env `LESS`. As it makes the command hang (no idea why) when there is < 1
-  # 'page'..
+[delta]
+  features = line-numbers decorations
+  ; whitespace-error-style = 22 reverse
+  syntax-theme = DarkNeon
+
+  # Removed lines
+  minus-style = normal 52
+  minus-emph-style = normal bold 88
+
+  # Added lines
+  plus-style = syntax 22
+  plus-emph-style = syntax bold 28
+
+[delta "decorations"]
+  commit-decoration-style = bold yellow box ul
+
+  file-style = bold yellow ul # yellow underlined
+  file-decoration-style = ul
+  # NOTE: the styles `ul` & `box` uses unicode chars AFAIK
+
+  hunk-header-style = white bold 59 # white on grey
+  hunk-header-decoration-style = bold
+
+  line-numbers-left-format = {nm:^4}|
+  line-numbers-right-format = {np:^4}|
+
+# -- END delta config
 
 [diff]
   tool = nvim_diff
