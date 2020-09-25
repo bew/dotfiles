@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-"""2.3.0 John Eikenberry <jae@zhar.net> GPL-3+ http://zhar.net/projects/
+"""
+NOTE (bew): this is my customised version of an existing script!
+"""
+
+"""
+2.3.0 John Eikenberry <jae@zhar.net> GPL-3+ http://zhar.net/projects/
 
 Copyright
     Copyright (C) 2010-2015 John Eikenberry <jae@zhar.net>
@@ -99,6 +104,10 @@ def _get_options(args):
                     default=False, help="Double size of geometries."),
         make_option("-3", "--triple", action="store_true", dest="triple",
                     default=False, help="Triple size of geometries."),
+        make_option("-B", "--background-color", dest="background_color",
+                    default=None, help="Set background color of each cell (better used with -f)"),
+        make_option("-F", "--foreground-color", dest="foreground_color",
+                    default=None, help="Set foreground color of each cell (useless with -f)"),
     ]
 
     parser = OptionParser(version=__version__, option_list=option_list)
@@ -123,6 +132,8 @@ def _get_options(args):
 options = _get_options(sys.argv[1:])
 # don't allow -f by itself
 options.foreground = options.foreground and (options.numbers or options.hex or options.rgb)
+options.background_color = options.background_color and int(options.background_color)
+options.foreground_color = options.foreground_color and int(options.foreground_color)
 
 # Geometry multiplier
 geo_multiplier = options.double and 2 or 1
@@ -186,10 +197,17 @@ class term16(object):
         >>> len(term16._render()[0])
         8
         """
+
         if options.foreground:
-            esc = lambda n: fg_escape % n
+            if options.background_color is not None:
+                esc = lambda n: bg_escape % options.background_color + fg_escape % n
+            else:
+                esc = lambda n: fg_escape % n
         else:
-            esc = lambda n: bg_escape % n + fg_escape % (15 if n < 9 else 0)
+            if options.foreground_color is not None:
+                esc = lambda n: bg_escape % n + fg_escape % options.foreground_color
+            else:
+                esc = lambda n: bg_escape % n + fg_escape % (15 if n < 9 else 0)
         return [[term16.label(n, esc) + clear for n in range(8)],
                 [term16.label(n, esc) + clear for n in range(8, 16)]]
 
@@ -328,11 +346,17 @@ class term256(term16):
         """ compact 256 color info
         """
         if options.foreground:
-            esc = lambda n: fg_escape % n
+            if options.background_color is not None:
+                esc = lambda n: bg_escape % options.background_color + fg_escape % n
+            else:
+                esc = lambda n: fg_escape % n
             render = lambda n: term256.label(n, esc) + clear
         else:
-            esc = lambda n: fg_escape % \
-                    (16 if term256._to_rgb(n).is_light() else 255)
+            if options.foreground_color is not None:
+                esc = lambda n: bg_escape % n + fg_escape % options.foreground_color
+            else:
+                esc = lambda n: fg_escape % \
+                        (16 if term256._to_rgb(n).is_light() else 255)
             render = lambda n: bg_escape % n + term256.label(n, esc) + clear
         return [[render(n) for n in i] for i in iter(palette)]
 
