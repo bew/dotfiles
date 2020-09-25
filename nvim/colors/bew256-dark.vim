@@ -214,10 +214,10 @@ exe "hi SignifySignDelete" .s:fg_red
 
 hi! link SignColumn LineNr
 exe "HiResetTo Conceal"   .s:fg_blue
-exe "HiResetTo SpellBad"       .s:fmt_curl
-exe "HiResetTo SpellCap"       .s:fmt_curl
-exe "HiResetTo SpellRare"      .s:fmt_curl
-exe "HiResetTo SpellLocal"     .s:fmt_curl
+exe "HiResetTo SpellBad"       .s:fmt_undr
+exe "HiResetTo SpellCap"       .s:fmt_undr
+exe "HiResetTo SpellRare"      .s:fmt_undr
+exe "HiResetTo SpellLocal"     .s:fmt_undr
 exe "HiResetTo Pmenu"   .s:fg_base0  .s:bg_base02  .s:fmt_revr
 exe "HiResetTo PmenuSel"       .s:fmt_bold   .s:fg_orange .s:bg_base2   .s:fmt_revr
 exe "HiResetTo PmenuSbar"   .s:fg_base2  .s:bg_base0   .s:fmt_revr
