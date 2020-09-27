@@ -81,36 +81,45 @@ local function font_with_sym_fallback(font_family)
 end
 
 local cfg_fonts = {
-  font_size = 13.0,
+  font_size = 11.0,
 
   -- default font config comes from fontconfig and manages to find a lot of fonts,
-  -- but to have a more all-included config I'll list everything.
-  ------------
+  -- but to have a more all-included config I'll list everything myself.
 
   font_dirs = {"fonts"}, -- relative to this config file
-  font_locator = "ConfigDirsOnly",
+  font_locator = "ConfigDirsOnly", -- for a pure config, but might break if fonts can't be found
 
   -- FIXME (<-- this is an example of bolded text)
   font_rules = { -- must be ordered, first match will be used
     {
       italic = true,
       intensity = "Bold",
-      font = font_with_sym_fallback("Iosevka Term Bold Italic"),
+      font = font_with_sym_fallback("Iosevka Term Bold Extended Italic"),
     },
     {
       italic = true,
-      font = font_with_sym_fallback("Iosevka Term Light Italic"),
+      font = font_with_sym_fallback("Iosevka Term Light Extended Italic"),
     },
     {
       intensity = "Bold",
-      font = font_with_sym_fallback("Iosevka Term Bold"),
+      font = font_with_sym_fallback("Iosevka Term Bold Extended"),
     },
   },
-  font = font_with_sym_fallback("Iosevka Term Light"),
+  font = font_with_sym_fallback("Iosevka Term Light Extended"),
+
+  -- Iosevka Font:
+  -- + Has 2 variants for terminals: Term & Fixed. Fixed is same as Term but without ligatures.
+  --   in the long run, I'd like to have a keybinding to enable/disable ligatures on demand,
+  --   by switching font for example.
+  --   --> for now, use Term (with ligatures)
+  --
+  -- + Has 2 additional variants for horizontal size: Normal & Extended. The Normal is the one
+  --   which does not mention 'Extended'. Extended is wider than Normal.
+  --   --> use Extended variant, the normal one is way too thin!!!
 }
 
 -- Key/Mouse bindings
----------------------------------------------------------------
+------------------------------------------
 
 local function bind_with_mods(mods, reference_bind)
   local new_bind = mytable.deepclone(reference_bind)
