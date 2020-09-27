@@ -38,28 +38,29 @@ local bew_colors = {
   background = "#202020",
   foreground = "#eeeeee",
 
+  cursor_border = "#eeeeee",
   cursor_bg = "#eeeeee",
   cursor_fg = "#202020",
 
   ansi = {
-    "#2F2F2F", -- blacks
-    "#ff6565", -- reds
-    "#4CAF50", -- greens
-    "#eab93d", -- yellows
-    "#5788FF", -- blues
-    "#ce5c00", -- oranges (magentas usually)
-    "#89b6e2", -- cyans
-    "#cccccc", -- whites
+    "#2F2F2F", -- black
+    "#ff6565", -- red
+    "#4CAF50", -- green
+    "#eab93d", -- yellow
+    "#5788FF", -- blue
+    "#ce5c00", -- orange (magentas usually)
+    "#89b6e2", -- cyan
+    "#cccccc", -- white
   },
   brights = {
-    "#555753", -- blacks
-    "#ff6565", -- reds
-    "#4CAF50", -- greens
-    "#ffc123", -- yellows
-    "#2C82F2", -- blues
-    "#f57900", -- oranges (magentas usually)
-    "#89b6e2", -- cyans
-    "#fafafa", -- whites
+    "#555753", -- black
+    "#ff6565", -- red
+    "#4CAF50", -- green
+    "#ffc123", -- yellow
+    "#2C82F2", -- blue
+    "#f57900", -- orange (magentas usually)
+    "#89b6e2", -- cyan
+    "#fafafa", -- white
   },
 }
 
@@ -69,7 +70,7 @@ local cfg_colors_and_appearance = {
 }
 
 -- Font
----------------------------------------------------------------
+------------------------------------------
 
 local function font_with_sym_fallback(font_family)
   -- family names, not file names
@@ -143,9 +144,9 @@ local cfg_key_bindings = {
     {mods = "CTRL|SHIFT", key = "F", action = wezterm.action{Search = {CaseInSensitiveString = ""}}},
 
     -- Copy (to Clipboard) / Paste (from Clipboard or PrimarySelection)
-    {mods = "SHIFT", key = "Insert", action = "PastePrimarySelection"},
     {mods = "CTRL|SHIFT", key = "C", action = "Copy"},
     {mods = "CTRL|SHIFT", key = "V", action = "Paste"},
+    {mods = "SHIFT", key = "Insert", action = "PastePrimarySelection"},
 
     -- Tabs
     {mods = "CTRL|SHIFT", key = "T", action = wezterm.action{SpawnTab="DefaultDomain"}},
@@ -153,7 +154,7 @@ local cfg_key_bindings = {
     {mods = "CTRL|SHIFT", key = "Tab", action = wezterm.action{ActivateTabRelative=-1}},
     {mods = "CTRL|SHIFT", key = "W", action = "CloseCurrentTab"},
 
-    -- Zoom
+    -- Font size
     {mods = "CTRL|SHIFT", key = "0", action = "ResetFontSize"},
     {mods = "CTRL|SHIFT", key = "6", action = "DecreaseFontSize"}, -- (key with -)
     {mods = "CTRL|SHIFT", key = "+", action = "IncreaseFontSize"},
@@ -213,7 +214,7 @@ add_extend_mouse_select(mouse_bindings, "Right", 1, "Cell")
 add_extend_mouse_select(mouse_bindings, "Right", 2, "Word")
 add_extend_mouse_select(mouse_bindings, "Right", 3, "Line")
 
--- Ctrl-Left click opens the link if any.
+-- Ctrl-Left click opens the link under the mouse pointer if any.
 table.insert(mouse_bindings, {
   mods="CTRL",
   event={Up={streak=1, button="Left"}},
@@ -246,7 +247,7 @@ local cfg_mouse_bindings = {
 }
 
 -- Merge configs and return!
----------------------------------------------------------------
+------------------------------------------
 
 local config = mytable.merge_all(
   cfg_colors_and_appearance,
