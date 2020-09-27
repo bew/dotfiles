@@ -155,29 +155,71 @@ local cfg_key_bindings = {
 
 local mouse_bindings = {}
 
--- Change the default click behavior
--- > LeftClick only selects text and doesn't open hyperlinks
--- > CTRL-LeftClick open hyperlinks
-table.insert(mouse_bindings, {
-  mods="NONE",
-  event={Down={streak=1, button="Left"}},
-  action="CompleteSelection",
-})
+-- Define all mouse bindings (we disable the defaults)
+
+-- Left click always starts a new selection.
+-- The number of clicks determines the selection mode: 1:Cell 2:Word: 3:Line
+function add_mouse_select(bindings, button, streak, selection_mode)
+  -- Select on Down event
+  table.insert(bindings, {
+    mods="NONE",
+    event={Down={streak=streak, button=button}},
+    action=wezterm.action{SelectTextAtMouseCursor=selection_mode},
+  })
+
+  -- Extend on Drag event
+  table.insert(bindings, {
+    mods="NONE",
+    event={Drag={streak=streak, button=button}},
+    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+  })
+
+  -- Complete on Up event
+  table.insert(bindings, {
+    mods="NONE",
+    event={Up={streak=streak, button=button}},
+    action="CompleteSelection",
+  })
+end
+add_mouse_select(mouse_bindings, "Left", 1, "Cell")
+add_mouse_select(mouse_bindings, "Left", 2, "Word")
+add_mouse_select(mouse_bindings, "Left", 3, "Line")
+
+-- Right click always extends the selection.
+-- The number of clicks determines the selection mode: 1:Cell 2:Word: 3:Line
+function add_extend_mouse_select(bindings, button, streak, selection_mode)
+  -- Extend the selection on Down & Drag events
+  table.insert(bindings, {
+    mods="NONE",
+    event={Down={streak=streak, button=button}},
+    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+  })
+  table.insert(bindings, {
+    mods="NONE",
+    event={Drag={streak=streak, button=button}},
+    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+  })
+end
+add_extend_mouse_select(mouse_bindings, "Right", 1, "Cell")
+add_extend_mouse_select(mouse_bindings, "Right", 2, "Word")
+add_extend_mouse_select(mouse_bindings, "Right", 3, "Line")
+
+-- Ctrl-Left click opens the link if any.
 table.insert(mouse_bindings, {
   mods="CTRL",
-  event={Down={streak=1, button="Left"}},
+  event={Up={streak=1, button="Left"}},
   action="OpenLinkAtMouseCursor",
 })
 
 -- Clipboard / PrimarySelection paste
--- > ALT-MiddleClick pastes from the clipboard
--- > MiddleClick pastes from the primary selection (for any mods)
+-- Alt-Middle click pastes from the clipboard selection
 table.insert(mouse_bindings, {
   mods="ALT",
   event={Down={streak=1, button="Middle"}},
   action="Paste",
 })
--- Wezterm wants an exact match so we must register the bind for all the mods we want to 'ignore'
+-- Middle click pastes from the primary selection (for any other mods).
+-- Wezterm wants an exact match so we must register the bind for all the mods to 'ignore'
 local bind_middle_to_primary = {
   event={Down={streak=1, button="Middle"}},
   action="PastePrimarySelection",
@@ -189,10 +231,10 @@ table.insert(mouse_bindings, bind_with_mods("SHIFT", bind_middle_to_primary))
 -- make it work even when SUPER is pressed
 table.insert(mouse_bindings, bind_with_mods("SUPER", bind_middle_to_primary))
 
-local cfg_mouse_bindings = { mouse_bindings = mouse_bindings }
-
--- print("------ MOUSE BINDINGS ------")
--- print(inspect(cfg_mouse_bindings))
+local cfg_mouse_bindings = {
+  disable_default_mouse_bindings = true,
+  mouse_bindings = mouse_bindings,
+}
 
 -- Merge configs and return!
 ---------------------------------------------------------------
