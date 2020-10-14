@@ -127,6 +127,7 @@ local cfg_fonts = {
     },
     {
       intensity = "Bold",
+      -- FIXME: this bold font is too heavy (compared to my font on urxvt)
       font = font_with_sym_fallback("Iosevka Term Bold Extended"),
     },
   },
@@ -162,6 +163,7 @@ local cfg_key_bindings = {
   disable_default_key_bindings = true,
 
   -- NOTE: for bindings with mod SHIFT, the `key` field must be uppercase'd.
+  -- FIXME: fixed in nightly, will need to update my bindings on next stable.
   keys = {
     {mods = "SHIFT", key = "PageUp", action = wezterm.action{ScrollByPage = -1}},
     {mods = "SHIFT", key = "PageDown", action = wezterm.action{ScrollByPage = 1}},
