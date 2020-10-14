@@ -30,6 +30,30 @@ function mytable.deepclone(original)
   return clone
 end
 
+local is_list = function(t)
+  if type(t) ~= "table" then
+    return false
+  end
+  -- a list has list indices, an object does not
+  return ipairs(t)(t, 0) and true or false
+end
+
+--- Flatten the given list of (item or (list of (item or ...)) to a list of item.
+-- (nested lists are supported)
+function mytable.flatten_list(list)
+  local flattened_list = {}
+  for _, item in ipairs(list) do
+    if is_list(item) then
+      for _, sub_item in ipairs(mytable.flatten_list(item)) do
+        table.insert(flattened_list, sub_item)
+      end
+    else
+      table.insert(flattened_list, item)
+    end
+  end
+  return flattened_list
+end
+
 -- WezTerm configuration
 ---------------------------------------------------------------
 
@@ -122,10 +146,14 @@ local cfg_fonts = {
 -- Key/Mouse bindings
 ------------------------------------------
 
-local function bind_with_mods(mods, reference_bind)
-  local new_bind = mytable.deepclone(reference_bind)
-  new_bind.mods = mods
-  return new_bind
+local function binds_with_any_mods(all_mods, reference_bind)
+  local bindings = {}
+  for _, mod in ipairs(all_mods) do
+    local new_bind = mytable.deepclone(reference_bind)
+    new_bind.mods = mod
+    table.insert(bindings, new_bind)
+  end
+  return bindings
 end
 
 -- Key bindings
@@ -163,56 +191,64 @@ local cfg_key_bindings = {
 
 -- Mouse bindings
 
-local mouse_bindings = {}
+-- Define all mouse bindings (defaults are disabled)
 
--- Define all mouse bindings (we disable the defaults)
+local mouse_bindings = {}
 
 -- Left click always starts a new selection.
 -- The number of clicks determines the selection mode: 1:Cell 2:Word: 3:Line
-function add_mouse_select(bindings, button, streak, selection_mode)
-  -- Select on Down event
-  table.insert(bindings, {
-    mods="NONE",
-    event={Down={streak=streak, button=button}},
-    action=wezterm.action{SelectTextAtMouseCursor=selection_mode},
-  })
+function binds_for_mouse_select(button, streak, selection_mode)
+  return {
+    -- Select on Down event
+    {
+      mods="NONE",
+      event={Down={streak=streak, button=button}},
+      action=wezterm.action{SelectTextAtMouseCursor=selection_mode},
+    },
 
-  -- Extend on Drag event
-  table.insert(bindings, {
-    mods="NONE",
-    event={Drag={streak=streak, button=button}},
-    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
-  })
+    -- Extend on Drag event
+    {
+      mods="NONE",
+      event={Drag={streak=streak, button=button}},
+      action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+    },
 
-  -- Complete on Up event
-  table.insert(bindings, {
-    mods="NONE",
-    event={Up={streak=streak, button=button}},
-    action="CompleteSelection",
-  })
+    -- Complete on Up event
+    {
+      mods="NONE",
+      event={Up={streak=streak, button=button}},
+      action="CompleteSelection",
+    },
+  }
 end
-add_mouse_select(mouse_bindings, "Left", 1, "Cell")
-add_mouse_select(mouse_bindings, "Left", 2, "Word")
-add_mouse_select(mouse_bindings, "Left", 3, "Line")
+table.insert(mouse_bindings, {
+  binds_for_mouse_select("Left", 1, "Cell"),
+  binds_for_mouse_select("Left", 2, "Word"),
+  binds_for_mouse_select("Left", 3, "Line"),
+})
 
 -- Right click always extends the selection.
 -- The number of clicks determines the selection mode: 1:Cell 2:Word: 3:Line
-function add_extend_mouse_select(bindings, button, streak, selection_mode)
-  -- Extend the selection on Down & Drag events
-  table.insert(bindings, {
-    mods="NONE",
-    event={Down={streak=streak, button=button}},
-    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
-  })
-  table.insert(bindings, {
-    mods="NONE",
-    event={Drag={streak=streak, button=button}},
-    action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
-  })
+function binds_extend_mouse_select(button, streak, selection_mode)
+  return {
+    -- Extend the selection on Down & Drag events
+    {
+      mods="NONE",
+      event={Down={streak=streak, button=button}},
+      action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+    },
+    {
+      mods="NONE",
+      event={Drag={streak=streak, button=button}},
+      action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
+    },
+  }
 end
-add_extend_mouse_select(mouse_bindings, "Right", 1, "Cell")
-add_extend_mouse_select(mouse_bindings, "Right", 2, "Word")
-add_extend_mouse_select(mouse_bindings, "Right", 3, "Line")
+table.insert(mouse_bindings, {
+  binds_extend_mouse_select("Right", 1, "Cell"),
+  binds_extend_mouse_select("Right", 2, "Word"),
+  binds_extend_mouse_select("Right", 3, "Line"),
+})
 
 -- Ctrl-Left click opens the link under the mouse pointer if any.
 table.insert(mouse_bindings, {
@@ -222,28 +258,27 @@ table.insert(mouse_bindings, {
 })
 
 -- Clipboard / PrimarySelection paste
--- Alt-Middle click pastes from the clipboard selection
 table.insert(mouse_bindings, {
-  mods="ALT",
-  event={Down={streak=1, button="Middle"}},
-  action="Paste",
+  -- Alt-Middle click pastes from the clipboard selection
+  {
+    mods="ALT",
+    event={Down={streak=1, button="Middle"}},
+    action="Paste",
+  },
+  -- Middle click pastes from the primary selection (for any other mods).
+  -- Wezterm wants an exact match so we must register the bind for all the mods to 'ignore'
+  binds_with_any_mods({"NONE", "CTRL", "SHIFT", "SUPER"}, {
+    event={Down={streak=1, button="Middle"}},
+    action="PastePrimarySelection",
+  }),
 })
--- Middle click pastes from the primary selection (for any other mods).
--- Wezterm wants an exact match so we must register the bind for all the mods to 'ignore'
-local bind_middle_to_primary = {
-  event={Down={streak=1, button="Middle"}},
-  action="PastePrimarySelection",
-  mods = "invalid", -- to ensure this bind is not used directly
-}
-table.insert(mouse_bindings, bind_with_mods("NONE", bind_middle_to_primary))
-table.insert(mouse_bindings, bind_with_mods("CTRL", bind_middle_to_primary))
-table.insert(mouse_bindings, bind_with_mods("SHIFT", bind_middle_to_primary))
--- make it work even when SUPER is pressed
-table.insert(mouse_bindings, bind_with_mods("SUPER", bind_middle_to_primary))
 
 local cfg_mouse_bindings = {
   disable_default_mouse_bindings = true,
-  mouse_bindings = mouse_bindings,
+  -- To simplify config composability, `mouse_bindings` is a
+  -- nested list of (bind or list of (bind or ...)), so we must
+  -- flatten the list first.
+  mouse_bindings = mytable.flatten_list(mouse_bindings),
 }
 
 -- Merge configs and return!
