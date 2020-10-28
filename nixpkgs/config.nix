@@ -7,14 +7,14 @@ let
   mypkgsFn = basePkgs: {
     delta-bin = let
       version = "0.4.3"; # out on 4 sept 2020
-      asset = fetchTarball {
+      extractedRelease = fetchTarball {
         url =
           "https://github.com/dandavison/delta/releases/download/${version}/delta-${version}-x86_64-unknown-linux-musl.tar.gz";
-          sha256 = "0an33yncn34xb47cr3spmq38fkghw719k8airjaac3nksigxkkd4";
+        sha256 = "0an33yncn34xb47cr3spmq38fkghw719k8airjaac3nksigxkkd4";
       };
-    in basePkgs.runCommand "delta-bin-${version}" {} ''
+    in basePkgs.runCommand "delta-bin-${version}" { } ''
       mkdir -p $out/bin
-      ln -s ${asset}/delta $out/bin/
+      ln -s ${extractedRelease}/delta $out/bin/
     '';
   };
 
