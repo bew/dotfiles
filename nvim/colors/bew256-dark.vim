@@ -178,7 +178,7 @@ exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_yellow_bright
 " Extended highlighting "{{{
 " ---------------------------------------------------------------------
 exe "HiResetTo SpecialKey" .s:fmt_bold   .s:fg_base00 .s:bg_base02
-exe "HiResetTo NonText"    .s:fmt_bold   .s:fg_base00
+exe "HiResetTo NonText"    .s:fg_base00
 exe "HiResetTo StatusLine"   .s:fg_base0  .s:bg_base02 .s:fmt_revr
 exe "HiResetTo StatusLineNC"   .s:fg_base00 .s:bg_base02 .s:fmt_revr
 exe "HiResetTo Directory"   .s:fg_blue
@@ -187,14 +187,13 @@ exe "HiResetTo IncSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
 exe "HiResetTo Search"         .s:fmt_bold   .s:fg_base03 .s:bg_yellow
 exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
-exe "HiResetTo LineNr"   .s:fg_base01 .s:bg_base02
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
 
 exe "HiResetTo Visual cterm=none ctermbg=" .s:visual_light
+hi! link VisualNOS Visual
 
 exe "HiResetTo Title"          .s:fmt_bold   .s:fg_orange
-hi! link VisualNOS Visual
 exe "HiResetTo WarningMsg"     .s:fmt_bold   .s:fg_red
 exe "HiResetTo WildMenu"   .s:fg_base2  .s:bg_base02 .s:fmt_revr
 exe "HiResetTo Folded"   .s:fg_base0  ." ctermbg=236"
@@ -205,14 +204,13 @@ exe "HiResetTo DiffAdd"          .s:fmt_bold   .s:bg_base03_g
 exe "HiResetTo DiffChange cterm=none"
 exe "HiResetTo DiffDelete"       .s:bg_base03_r
 exe "HiResetTo DiffText"         .s:fmt_bold   .s:bg_base03_b
-exe "hi GitGutterAdd"      .s:fg_green
-exe "hi GitGutterChange"   .s:fg_yellow
-exe "hi GitGutterDelete"   .s:fg_red
-exe "hi SignifySignAdd"    .s:fg_green
-exe "hi SignifySignChange" .s:fg_yellow
-exe "hi SignifySignDelete" .s:fg_red
 
+" Signs
 hi! link SignColumn LineNr
+exe "HiResetTo SignVcsAdd"      .s:fg_green
+exe "HiResetTo SignVcsChange"   .s:fg_yellow
+exe "HiResetTo SignVcsDelete"   .s:fg_red
+
 exe "HiResetTo Conceal"   .s:fg_blue
 exe "HiResetTo SpellBad"       .s:fmt_undr
 exe "HiResetTo SpellCap"       .s:fmt_undr
@@ -228,7 +226,6 @@ exe "HiResetTo PmenuThumb"   .s:fg_base0  .s:bg_base03  .s:fmt_revr
 exe "HiResetTo TabLineSel  cterm=bold  ctermfg=".s:tab_contrast ." ctermbg=".s:tab_current
 exe "HiResetTo TabLine     ctermfg=".s:tab_contrast ." ctermbg=".s:tab_others
 
-" exe "hi! TabLineFill ctermbg=" .s:tab_contrast
 exec "HiResetTo TabLineFill ctermbg=".s:tab_contrast
 
 " Wanted with DynHi for tab line hi config:
@@ -238,11 +235,15 @@ exec "HiResetTo TabLineFill ctermbg=".s:tab_contrast
 
 exe "HiResetTo CursorColumn"   .s:bg_base02
 exe "HiResetTo CursorLine"   .s:bg_base02
+
+exe "HiResetTo LineNr"   .s:fg_base01 .s:bg_base02
 exe "HiResetTo CursorLineNr"   .s:fg_cyan   .s:bg_base02
 hi! link ColorColumn CursorColumn
 exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
-hi! link lCursor Cursor
+
 exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_red    .s:bg_base01
+
+hi NormalFloat ctermfg=248 ctermbg=236
 
 "}}}
 " vim syntax highlighting "{{{

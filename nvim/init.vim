@@ -75,19 +75,19 @@ let g:sandwich#recipes += [
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
 let g:neomake_virtualtext_prefix = "  <<  "
-let g:neomake_error_sign = { 'text': 'x', 'texthl': 'NeomakeErrorSign', }
-let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeWarningSign', }
+let g:neomake_error_sign = { 'text': 'x', 'texthl': 'NeomakeSignError', }
+let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeSignWarning', }
 augroup my_neomake_hi
   au!
 
   " Signs
-  au ColorScheme * hi NeomakeErrorSign cterm=none ctermfg=red
-  au ColorScheme * hi NeomakeWarningSign cterm=none ctermfg=yellow
+  au ColorScheme * hi NeomakeSignError   cterm=none ctermfg=red
+  au ColorScheme * hi NeomakeSignWarning cterm=none ctermfg=yellow
 
   " Virtual text
-  au ColorScheme * hi NeomakeVirtualtextError cterm=italic ctermbg=none ctermfg=red
-  au ColorScheme * hi NeomakeVirtualtextInfo cterm=italic ctermbg=none ctermfg=cyan
+  au ColorScheme * hi NeomakeVirtualtextError   cterm=italic ctermbg=none ctermfg=red
   au ColorScheme * hi NeomakeVirtualtextWarning cterm=italic ctermbg=none ctermfg=yellow
+  au ColorScheme * hi NeomakeVirtualtextInfo    cterm=italic ctermbg=none ctermfg=cyan
 augroup END
 
 
@@ -166,6 +166,13 @@ if $ASCII_ONLY != "1"
   let g:gitgutter_sign_removed_first_line = "▔"
   let g:gitgutter_sign_modified_removed   = "~▁"
 endif
+
+augroup my_git_signs_hi
+  " NOTE: all SignVcs* highlights are defined in my color scheme
+  au ColorScheme * hi link GitGutterAdd    SignVcsAdd
+  au ColorScheme * hi link GitGutterChange SignVcsChange
+  au ColorScheme * hi link GitGutterDelete SignVcsDelete
+augroup END
 
 Plug 'easymotion/vim-easymotion' " Motions on speed!
 
@@ -403,20 +410,11 @@ endif
 
 """""""""""""""""""""""""""""""""
 
-augroup my_float_hi
-  au!
-
-  au ColorScheme * hi NormalFloat ctermfg=248 ctermbg=232
-augroup END
-
 augroup my_custom_language_hi
   au!
 
   " Markdown
   au ColorScheme * hi markdownCode ctermfg=29
-
-  au ColorScheme * hi clear BadSpell
-  au ColorScheme * hi BadSpell cterm=underline
 
 
   " Ruby Colors
