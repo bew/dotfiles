@@ -1,5 +1,6 @@
 setlocal nonumber
 setlocal norelativenumber
+setlocal nocursorcolumn
 setlocal nomodifiable
 setlocal nolist
 
