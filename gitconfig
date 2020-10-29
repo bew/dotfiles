@@ -97,6 +97,7 @@
   features = line-numbers decorations
   ; whitespace-error-style = 22 reverse
   syntax-theme = DarkNeon
+  pager = always
 
   # Removed lines
   minus-style = normal 52
@@ -104,7 +105,7 @@
 
   # Added lines
   plus-style = syntax 22
-  plus-emph-style = syntax bold 28
+  plus-emph-style = normal bold 28
 
 [delta "decorations"]
   commit-decoration-style = bold yellow box ul
