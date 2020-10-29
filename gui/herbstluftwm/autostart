@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+
+# this is a simple config for herbstluftwm
+
+function hc {
+    herbstclient "$@"
+}
+
+hc emit_hook reload
+
+# reset keybind, mousebind, theme attr, rules
+# FIXME: no way to reset options (set/get)?
+hc keyunbind --all
+hc mouseunbind --all
+hc attr theme.reset 1
+hc unrule -F
+
+# keybindings
+M=Mod4   # Use the super key as the main modifier
+C=Control
+S=Shift
+
+hc keybind $M-$C-q   quit
+hc keybind $M-$C-r   reload
+hc keybind $M-$S-c   close
+
+# WM agnostic keys
+
+# lock (& sleep)
+hc keybind Pause   spawn ~/.bin/i3colocker
+hc keybind $C-Pause   spawn sh -c "~/.bin/i3colocker&  sleep 0.5; systemctl suspend"
+# FIXME? (but how to fix?) the screen flashes with the 'theme.background_color' just
+# before i3lock is displayed with a blurry screenshot.
+# --> Seems to be related with the bash script starting i3lock. Starting i3lock
+#     without script does not flicker.
+
+hc keybind $M-space   spawn urxvt
+hc keybind $M-x       spawn rofi -show drun
+# TODO: need an (interactive) action menu for chains: M-x space, M-x f, M-x t
+# could also be used for window state (toggle on top, floating, ..)
+
+# basic random wallpaper selection
+hc keybind $M-w   spawn feh --recursive --bg-scale --randomize ~/wallpapers/
+
+# TODO: add brightness & volume (up/down/mute) keys
+# TODO: add network pinger
+
+# end of WM agnostic keys
+
+# FIXME: how to implement window locking? (On $M-$C-l ?)
+
+# basic movement
+# focusing clients
+hc keybind $M-h   focus left
+hc keybind $M-j   focus down
+hc keybind $M-k   focus up
+hc keybind $M-l   focus right
+
+# moving clients (inside a frame, or to the next frame in the given direction)
+hc keybind $M-$S-h   shift left
+hc keybind $M-$S-j   shift down
+hc keybind $M-$S-k   shift up
+hc keybind $M-$S-l   shift right
+
+# splitting frames
+# create an empty frame in the specified direction and focus it
+hc keybind $M-$C-Left    chain , split left    0.5 , focus -e left
+hc keybind $M-$C-Right   chain , split right   0.5 , focus -e right
+hc keybind $M-$C-Down    chain , split bottom  0.5 , focus -e down
+hc keybind $M-$C-Up      chain , split top     0.5 , focus -e up
+
+# Splits the frame in such a way that the window sizes and positions are kept
+# as much as possible.
+# NOTE: When there are 3+ windows, the new frame is created after the focused window.
+hc keybind $M-$C-e   split explode
+
+# Remove a frame
+hc keybind $M-r   remove # FIXME: $M-$C-r is already "reload!"
+
+# FIXME: what is the workflow (and minimal keys) I want, to:
+# - open a terminal quickely somewhere specific
+# - move a window to somewhere specific
+# - move a window to another tag/monitor (tag: done!)
+# - open scratch terminal (using a monitor? with special mappings to layouting (ex: max))
+# move a frame somewhere else (to another tag? --> does it even make sense?)
+
+# focus frames
+hc keybind $M-Left    focus -e left
+hc keybind $M-Down    focus -e down
+hc keybind $M-Up      focus -e up
+hc keybind $M-Right   focus -e right
+
+# tags
+tag_names=( {1..9} )
+tag_keys=( {1..9} 0 )
+
+hc rename default "${tag_names[0]}" || true
+for i in ${!tag_names[@]} ; do
+    hc add "${tag_names[$i]}"
+    key="${tag_keys[$i]}"
+    hc echo $key
+    if ! [ -z "$key" ] ; then
+        hc keybind "$M-$key" use_index "$i"
+        hc keybind "$M-$S-$key" move_index "$i"
+    fi
+done
+
+# FIXME: how to implement dynamic tags (with traversing)
+#   What about tag groups? (would need a special keymap to navigate groups..
+#   not enough keys otherwise)
+
+# cycle through tags
+hc keybind $M-a   use_index -1 --skip-visible
+hc keybind $M-z   use_index +1 --skip-visible
+
+# Move window to prev/next tag and make it floating (so I can place it where I want)
+hc keybind $M-$S-a \
+  chain , attr clients.focus.floating true \
+        , move_index -1 \
+        , use_index -1
+hc keybind $M-$S-z \
+  chain , attr clients.focus.floating true \
+        , move_index +1 \
+        , use_index +1
+
+# layouting
+
+# Toggle floating state.
+# Note that when floating is turned off, the window will be inserted in the currently
+# selected frame, not its original frame.
+hc keybind $M-f   attr clients.focus.floating toggle
+# FIXME: would it make sense to have a way to remember the parent frame?
+
+hc keybind $M-$C-m   fullscreen toggle # fullscreen current client
+# hc keybind $M-$C-f floating toggle # all clients of current tag become floating (and stacked..)
+
+# if frame layout is not max
+#   remember current frame layout (in the frame attr system?)
+#   switch to max
+# else
+#   switch back to saved frame layout
+# end
+# FIXME: how to do this???
+# hc keybind $M-m \
+#   or , and . compare frames.focus.layout   # !! frames object does not exist...
+
+# NOTE: for now we only cycle between max & vertical. So if the layout was horizontal
+# I'll have to re-do select horizontal after going maximized
+# It seems that if it's horizontal it'll first select vertical, them max >< oh well..
+hc keybind $M-m   cycle_layout +1 max vertical
+
+# Cycle through frame layouts, skipping 'max' layout (which is toggled by another key).
+#   - layouts for 2 clients: vertical, horizontal
+#   - layouts for 1 or 3+ clients: vertical, horizontal, grid
+hc keybind $M-s                                      \
+  or , and . compare tags.focus.curframe_wcount = 2  \
+           . cycle_layout +1 vertical horizontal     \
+     , cycle_layout +1 vertical horizontal grid
+# FIXME: Will need a way to see the current frame layout 'somewhere' (maybe on demand)
+
+# mouse
+
+# Does nothing for tiled windows
+hc mousebind $M-Button1   move
+
+# Can resize frames and floating windows
+hc mousebind $M-Button3   resize
+
+# Resizes the window into all four directions while keeping the center of the
+# window constant (at the same place).
+hc mousebind $M-$S-Button3   zoom
+
+# focus
+hc keybind $M-BackSpace   cycle_monitor
+hc keybind $M-Tab         cycle_all +1   # FIXME: I want to select the LAST window.. not possible builtin..
+hc keybind $M-$S-Tab   cycle_all -1
+hc keybind $M-c   cycle
+hc keybind $M-i   jumpto urgent
+
+# theme
+
+# a frame has a border, then some permanent lines for the frame's rectangle.
+# since I cannot remove those lines and keep only the borders, I hide the borders.
+hc set frame_border_width 0
+hc set frame_border_active_color "#f00"
+hc set frame_border_normal_color "#00f"
+
+# If set, all frames are displayed.
+# If unset, only frames with focus or with windows in them are displayed.
+# NOTE: the frame in question is the frame's border, which is the only visible
+# thing when the frame is empty.
+hc set always_show_frame 1
+
+hc set frame_bg_normal_color "#565656"
+hc set frame_bg_active_color "#aaaaaa"
+hc set frame_bg_transparent 1
+hc set frame_transparent_width 5
+hc set frame_gap 0
+hc set frame_padding 5
+
+# FIXME: why are there xyz_border_width options and theme.xyz.border_width attributes ????
+# also I don't get the usage for sooo many borders (inner -> border -> outer)
+hc attr theme.active.color "#33B5E5"
+hc attr theme.normal.color "#202020"
+hc attr theme.urgent.color orange
+hc attr theme.border_width 5
+hc attr theme.background_color "#FFFFFF"
+
+hc set window_gap 5
+hc set smart_window_surroundings 0
+hc set smart_frame_surroundings 1
+hc set mouse_recenter_gap 0
+
+# If set, a client’s window content is resized immediately during resizing it
+# with the mouse. If unset, the client’s content is resized after the mouse
+# button is released.
+hc set update_dragged_clients 1
+
+hc set focus_follows_mouse true
+hc set raise_on_focus false
+hc set raise_on_focus_temporarily false
+
+# rules
+#hc rule class=XTerm tag=3 # move all xterms to tag 3
+hc rule focus=on # normally focus new clients
+#hc rule focus=off # normally do not focus new clients
+# give focus to most common terminals
+#hc rule class~"(.*[Rr]xvt.*|.*[Tt]erm|Konsole)" focus=on
+hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)" pseudotile=on
+hc rule --windowtype="_NET_WM_WINDOW_TYPE_DIALOG" focus=on
+hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)" manage=off
+
+# FIXME: when it lands in a release, add: `floatplacement=center`
+hc rule --instance="pavucontrol" floating=true
+
+# unlock, just to be sure
+hc unlock
+
+herbstclient set tree_style "╾│ ├└╼─┐"
+
+# -- multi monitor setup (making a monitor per physical display)
+# hc set_monitors 1280x1024+0+0 1280x1024+1280+0
+# or simply:
+# hc detect_monitors
+
+# -- PANEL
+# TODO: use barpyrus for the bar! https://github.com/t-wissmann/barpyrus
+# It's a python wrapper for lemonbar, written by herbstluftwm's author

@@ -1,0 +1,67 @@
+
+- no way to reset options? same for attributes (but can break current win arrangement..) ?
+
+- when using i3lock from a >>>bash<<< locker script, the screen flickers with the
+  'theme.background_color' and then i3lock is shown.
+  Running i3lock without the bash script does not flicker.
+  Actually, might be specific to i3lock-color and my config which blurs the screen with a slight delay
+
+- Mousebind resize for frames works only in a single direction
+
+- what is `hc drag ...` for ? It's buggy: cannot be bound to a mousebind, once the frame is resized (with mouse click) the window inside is not resized (when update_dragged_clients is unset).
+
+- no builtin focus history, I can't say "focus the last window"
+  NOTE: this script is pretty interesting for a "focus the last tag" system:
+  https://github.com/herbstluftwm/herbstluftwm/blob/master/scripts/lasttag.sh
+  But it does not provide "history", only "last X". It could be generalized (in bash/python) to keep "the last one" of many different things like: windows, tags, layout for a frame (with a good frame tracking from the events), etc..
+
+  Hmm there is a command `use_previous` (to select the last tag on a monitor), which was added 8 !! years ago (commit 3a5ed75ccb1e).
+  I'd love to have 'last' tracking for all the things and have a special syntax when referencing a tag/window/monitor/frame/.. that would select the 'last' one!
+
+  There are A LOT of hooks missing, no frame_focus_changed, frame_layout_changed, nor other hooks for other use case  like frame_created, frame_removed, window_created, window_destroyed, ... (TODO: list missing & useful ones)
+
+- wtf: border, inner, outer, frame background, gap, etc..
+  I don't know what to (un)set to have a simple setup........
+
+- wtf: xyz_border_width options vs theme.(xyz.)border_width attributes ????
+
+- wtf: frames have borders & something else, with the options frame_bg_*
+
+- no way to move tags to an index, add tag at a specific index.
+  It seems I can ONLY add tags at the end (TO CHECK)
+
+- does not support to make a rule that floats a window and place it at a specific placement
+  (e.g: center with specific width & height)
+
+- no way to 'rotate' the frame orientation of a subframe (not the root frame)
+  `hc rotate` rotates the top lovel frames (switch between horizontal/vertical)
+  It would help to be able to interactively select a non-leaf frame...
+  (but then where to spawn a window if asked? in the last focused leaf frame?)
+
+- mousebind resize does not work when starting on an empty frame, works when the frame
+  has 1+ windows though.
+  IIRC there is an (opened?) issue about frame not being selectable with the mouse.
+
+- TO CHECK: when a window is floating, it's not easy to select a specific frame and move the floating window to it (without auto-selecting the frame, and want to select it manually)
+
+- when I move a floating window to another tag and switch to that tag, the floating window flickers, as if it was being rendered after the tiled windows.
+
+- split explode on a 2 window frame does not keep focused window focused
+  (seems to select the first window)
+
+- opacity is not on windows (nor per windows..), the only options around opacity are `frame_normal_opacity` & `frame_active_opacity`, to control the opacity of the 'lines' symbolizing the frame itself, not the windows inside a frame.
+  I would like attributes like `clients.{normal,focus,floating,..}.opacity`
+
+- no way to make multiple keymap of keys (can be emulated with a looonnng chain command and lots of duplications, but it's not ideal AT ALL..)
+
+- would be nice to have a toplevel `hlwm` object, where usual options would translate to a `hlwm.some_option` attribute (which supports hierarchy if the future needs it!)
+
+- would be nice to be able to create a unix socket for the server, to open a fast bidirectional channel between a client and the server, and be able to send many commands in batch, or for always running daemons (without spawning herbstclient every time).
+
+  Will probably need to use a serialization format like json for communication!
+  TBD serialization format:
+    -> Current `hc --idle` format uses a simple un structured format, `hook<tab>arg1<tab>arg2...`
+    -> Maybe use a serialization format like json? So sending a list of commands is easy! but we loose shell separation of args..
+      But we can have a mix: `["cmd1 argument", ["cmd2", "arg with spaces"], "cmd3"]`, when the item is a string, split on spaces & execute, else take the list and execute.
+
+
