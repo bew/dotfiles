@@ -380,6 +380,15 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   hooks-add-hook zle_line_finish_hook zle::utils::disable-app-mode
 fi
 
+# Helper commands to see which keys are sent in normal mode / application mode:
+# For normal mode:
+#   cat -e
+# For application mode: (enables app mode first, and disable afterward)
+#   printf "\x1b[?1h" ; cat -e ; printf "\x1b[?1l"
+#
+# Also some good doc on the 2 modes, and below the difference it means for some keys:
+# https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#mode-changes
+
 typeset -gA keysym
 
 function keysym_with_fallback
@@ -395,6 +404,12 @@ function keysym_with_fallback
   fi
 }
 
+# Define keysyms for main non-letter keys.
+# Few rules:
+# - Prefer using the sequence from terminfo first, if terminfo spec has an entry for it.
+# - Always add a fallback if the first value may be empty (e.g: `terminfo` var can be
+#   empty when terminfo is not available)
+
 keysym_with_fallback Home "${terminfo[khome]}" "[1~"
 keysym_with_fallback End  "${terminfo[kend]}"  "[4~"
 
@@ -408,8 +423,21 @@ keysym_with_fallback Down "${terminfo[kcud1]}" "[B"
 keysym_with_fallback Up "${terminfo[kcuu1]}" "[A"
 keysym_with_fallback Right "${terminfo[kcuf1]}" "[C"
 
-# Note: can be ^h on some terminal
-keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+# The backspace key is usually ^? but can be ^h on some terminal.
+# NOTE: None of my installed ones (xterm, urxvt, termite, konsole, kitty, wezterm) uses ^h
+# so it's pretty unusual anyway (maybe on macos?).
+# It would be great to simply read the sequence defined in terminfo,
+# unfortunately the value may be wrong:
+# For example the xterm-256color terminfo says that Backspace is ^h, but in practice
+# xterm always sends ^? (in normal mode & application mode).
+#
+# That's why we default to ^? by default unless the following env var is set..
+if [[ -n "$_ZLE_MAP_BACKSPACE_FROM_TERMINFO" ]]; then
+  # Note: Backspace can be ^h on some terminal
+  keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+else
+  keysym_with_fallback Backspace "^?"
+fi
 
 keysym_with_fallback Tab   "^I"
 keysym_with_fallback S-Tab "${terminfo[kcbt]}" "^I" # on linux console: S-Tab == M-Tab
