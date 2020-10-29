@@ -65,10 +65,16 @@ make-link .dot/gui/Xresources.d  ~/.Xresources.d
 make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
 
 label "X apps configs"
+# terms
 make-link .dot/gui/urxvt     ~/.urxvt
 make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
 make-link .dot/gui/kitty     ~/.config/kitty
+
+# WM
+make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm
+
+# tools
 make-link .dot/gui/mpv       ~/.config/mpv
 make-link .dot/gui/tridactyl ~/.config/tridactyl
 
