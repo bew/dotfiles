@@ -97,7 +97,7 @@
   features = line-numbers decorations
   ; whitespace-error-style = 22 reverse
   syntax-theme = DarkNeon
-  pager = always
+  paging = always
 
   # Removed lines
   minus-style = normal 52
