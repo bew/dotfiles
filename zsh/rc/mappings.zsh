@@ -82,6 +82,8 @@ function zwidget::git-diff
   zle::utils::check_git || return
 
   git d
+
+  zle reset-prompt
 }
 zle -N zwidget::git-diff
 
@@ -91,6 +93,8 @@ function zwidget::git-diff-cached
   zle::utils::check_git || return
 
   git dc
+
+  zle reset-prompt
 }
 zle -N zwidget::git-diff-cached
 
