@@ -48,7 +48,7 @@ export PAGER="most"
 export LESS="--quit-if-one-screen -+X"
 
 # man in vim!
-export MANPAGER='nvim -R -c "set ft=man" -'
+export MANPAGER='nvim -R +Man!'
 
 # `most` does not work with colors outputed by `bat` (the `cat` clone on steroids)
 export BAT_PAGER="less"
