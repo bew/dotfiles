@@ -23,7 +23,7 @@ function zle::utils::no-history-run
   zle .accept-line
 }
 
-# Toggle between "sudo "/"nosudo "/"" at <bol>
+# Toggle between "nosudo "/"sudo "/"" at <bol>
 function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
 {
   # Overwriting BUFFER will reset CURSOR to <bol>
@@ -33,13 +33,14 @@ function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
   local remove_text
   local add_text
 
-  if [[ "${BUFFER[1, 5]}" == "sudo " ]]; then
-    remove_text="sudo "
-    add_text="nosudo "
-  elif [[ "${BUFFER[1, 7]}" == "nosudo " ]]; then
+  # Cycle <bol>: "nosudo " > "sudo " > ""
+  if [[ "${BUFFER[1, 7]}" == "nosudo " ]]; then
     remove_text="nosudo "
-  else
     add_text="sudo "
+  elif [[ "${BUFFER[1, 5]}" == "sudo " ]]; then
+    remove_text="sudo "
+  else
+    add_text="nosudo "
   fi
 
   if [[ -n "$remove_text" ]]; then
