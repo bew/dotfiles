@@ -71,14 +71,14 @@ make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
 make-link .dot/gui/kitty     ~/.config/kitty
 
-# WM
+# Desktop env
 make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm
+make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
+make-link .dot/gui/polybar ~/.config/polybar
 
 # tools
 make-link .dot/gui/mpv       ~/.config/mpv
 make-link .dot/gui/tridactyl ~/.config/tridactyl
-
-make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
 
 if [[ "$DRYRUN_ONLY" == "true" ]]; then
   echo
