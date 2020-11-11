@@ -321,7 +321,14 @@ Plug 'peterhoeg/vim-qml'        " QML syntax
 
 "# Markdown
 Plug 'plasticboy/vim-markdown'  " Markdown vim mode
+
 let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
+
+" Highlight YAML at start of file, useful to add metadata to a
+" markdown file.
+let g:vim_markdown_frontmatter = 1
 
 "# Python
 " Add colors to 'arg=' in 'func_call(arg=1)'
