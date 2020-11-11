@@ -6,8 +6,10 @@ runtime! options.vim
 
 " Specify the python binary to use for the plugins, this is necessary to be
 " able to use them while inside a project' venv (which does not have pynvim)
-" FIXME: move somewhere else?
-let g:python3_host_prog = "/usr/bin/python3"
+let $NVIM_DATA_HOME = ($XDG_DATA_HOME != '' ? $XDG_DATA_HOME : $HOME . "/.local/share") . "/nvim"
+let $NVIM_PY_VENV = $NVIM_DATA_HOME . "/py-venv"
+let g:python3_host_prog = $NVIM_PY_VENV . "/bin/python3"
+" NOTE: Make sure to install pynvim in this environment! (and jedi for py dev)
 
 " map leader definition - space
 let mapleader = " "
@@ -322,10 +324,31 @@ Plug 'plasticboy/vim-markdown'  " Markdown vim mode
 let g:vim_markdown_folding_disabled = 1
 
 "# Python
+" Add colors to 'arg=' in 'func_call(arg=1)'
+autocmd FileType python syn match pythonFunctionCallKwargs '\h\w\+='
+autocmd FileType python hi pythonFunctionCallKwargs ctermfg=137
+
+" NOTE: specifying `'for': 'python'` for this Plug breaks something when opening
+" multiple files from cli, resulting in 'Not an editor command: Semshi enable'
+" for each opened files.
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'} " Semantic highlighting for python
+let g:semshi#error_sign = v:false " This is already handled by neomake linters
+let g:semshi#mark_selected_nodes = 2 " Also highlight the word under cursor
+" Override some highlights
+autocmd FileType python hi semshiSelected ctermfg=NONE ctermbg=NONE cterm=underline
+autocmd FileType python hi semshiBuiltin ctermfg=131
+autocmd FileType python hi semshiParameterUnused ctermfg=240
+
 Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
 Plug 'davidhalter/jedi-vim'         " IDE-like tooling
+" NOTE: you might need to install 'jedi' in neovim's python virtual env,
+" because the default install of the plugin does not always work
+" (e.g when inside a project's venv..)
+
 let g:jedi#completions_enabled = 0  " Let my async completion engine do that, using omnifunc
+" Do not show call signature by hacking buffer content (breaks some completion)
+let g:jedi#show_call_signatures = "2"
 
 " Jinja templating syntax & indent
 Plug 'lepture/vim-jinja'
