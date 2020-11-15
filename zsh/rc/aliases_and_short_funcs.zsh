@@ -52,6 +52,8 @@ alias ipy=ipython
 alias com=command
 alias j=jobs
 
+alias hc=herbstclient
+
 # Big-one letter aliases
 
 alias A=ack
