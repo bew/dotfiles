@@ -16,7 +16,7 @@
 ;
 ;==========================================================
 
-; ---- Variables (in arbitrary sections
+; ---- Variables (in arbitrary sections)
 
 [colors]
 bg = #222
@@ -67,7 +67,7 @@ module-margin = 1
 font-0 = ${fonts.text}
 font-1 = ${fonts.icons}
 
-modules-left = ewmh
+modules-left = hlwm-tags
 modules-center = xwindow
 modules-right = xkeyboard date
 
@@ -109,8 +109,8 @@ separator = 
 font-0 = ${fonts.text}
 font-1 = ${fonts.icons}
 
-modules-left = filesystem 
-modules-center = 
+modules-left = filesystem
+modules-center =
 modules-right = cpu memory battery temperature wlan eth
 
 
@@ -138,6 +138,11 @@ label-active-padding = 2
 label-empty = %name%
 label-empty-foreground = #55
 label-empty-padding = 2
+
+[module/hlwm-tags]
+type = custom/script
+exec = ~/.config/herbstluftwm/scripts/polybar_hlwm_tags.py
+tail = true
 
 [module/xkeyboard]
 type = internal/xkeyboard
