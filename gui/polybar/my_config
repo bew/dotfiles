@@ -103,8 +103,7 @@ padding = 5
 module-margin = 2
 
 ; Separator between each visible module
-; icon font-awesome: grip-vertical
-separator = 
+separator = ⠿
 
 font-0 = ${fonts.text}
 font-1 = ${fonts.icons}
