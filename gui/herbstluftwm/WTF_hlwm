@@ -58,10 +58,22 @@
 
 - would be nice to be able to create a unix socket for the server, to open a fast bidirectional channel between a client and the server, and be able to send many commands in batch, or for always running daemons (without spawning herbstclient every time).
 
-  Will probably need to use a serialization format like json for communication!
+  So we can do RPC! (see i3wm' RPC for examples!)
+
+  Will need to use a serialization format like json for communication!
   TBD serialization format:
     -> Current `hc --idle` format uses a simple un structured format, `hook<tab>arg1<tab>arg2...`
-    -> Maybe use a serialization format like json? So sending a list of commands is easy! but we loose shell separation of args..
-      But we can have a mix: `["cmd1 argument", ["cmd2", "arg with spaces"], "cmd3"]`, when the item is a string, split on spaces & execute, else take the list and execute.
+    -> Maybe use a serialization format like json? So sending a list of commands in one go is easy!
+    -> When we get information from hlwm, we can have ~full state dump of tags / monitor / theme / ... All info about tags, all info about a window, etc
 
+  ==> I would like to use hlwm for the 'backend' of my desktop environment, and build a little framework to be the brain: get info, process, decide what to do, and send action to the backend (hlwm).
 
+- options are global, there is no way to have frame options for a specific monitor/tag for example.
+  Would be good to have global config, and specific monitor (like a scratch buffer on top of the rest) that has no frame gaps/colors/etc..
+
+- From author on IRC: "there must be at least as many tags as monitors".
+  So adding monitors (when new screen for example) would necessarily use an existing tag.
+
+- output of `tag_status` is not complete about the tags. For example the state '!' tells us there is a window in urgent state in that tag, but we don't know if the tag is visible (in a monitor) or focused (the urgent win could be in another frame of the same tag).
+
+  In general, the model of monitors, tags, frames, windows is GREAT, it is well implemented and it works very well, but the interface to get informations about the current state of things is 'meh', it's okay for simple scripts that shows info in a bar, but it's NOT enough to make a framework to 'remote control' hlwm, there are a lot of info we can't get (easily or at all).
