@@ -16,7 +16,10 @@ def print_now(text, **kwargs):
 def format_tag_label(tag: hlwm.Tag):
     begin = ""
     end = ""
-    if tag.state.focused and tag.state.this_monitor:
+    if tag.state.urgent:
+        begin += "%{F#f00}"
+        end = "%{F-}" + end
+    elif tag.state.focused and tag.state.this_monitor:
         begin += "%{u#ff7043}"
         end = "%{-u}" + end
 
