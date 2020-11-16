@@ -70,8 +70,8 @@ class Tag:
         self.state = state
 
     def __str__(self):
-        return (f"<Tag index={self.index} name='{self.name}' "
-                f"state='{self.state}'>")
+        return (f"Tag(index={self.index}, name='{self.name}', "
+                f"state='{self.state}')")
 
     # def get_attr(self, attr_name) -> str:
     #     # FIXME: cannot import Hlwm here, circular imports!

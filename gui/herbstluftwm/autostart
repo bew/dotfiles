@@ -19,6 +19,7 @@ hc unrule -F
 M=Mod4   # Use the super key as the main modifier
 C=Control
 S=Shift
+A=Alt
 
 # WM-level actions
 hc keybind $M-$C-q   quit
@@ -159,6 +160,8 @@ hc keybind $M-$S-z \
   chain , attr clients.focus.floating true \
         , move_index +1 \
         , use_index +1 --skip-visible
+
+hc keybind $M-$A-r   spawn ~/.config/herbstluftwm/scripts/hlwm_rename_current_tag.py
 
 # layouting
 
