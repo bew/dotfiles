@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# External binaries:
+# - herbstclient
+
 # Insert script dir in the module lookup path. This is necessary since the
 # script will not be launched from its directory by polybar.
 import os
