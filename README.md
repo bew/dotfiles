@@ -10,6 +10,13 @@ git clone git@github.com:bew/dotfiles.git ~/.config/dotfiles
 ~/.config/dotfiles/install_bruteforce.zsh --dry-run
 ```
 
+## git lfs
+
+Some big binaries are tracked using git-lfs, you'll need to install it in your environment, then ask it to install itself in your project's git config with:
+```
+git lfs install --local
+```
+
 
 ## GUI config
 
