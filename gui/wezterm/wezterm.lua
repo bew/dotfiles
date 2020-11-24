@@ -81,47 +81,37 @@ local cfg_fonts = {
 -- Key/Mouse bindings
 ------------------------------------------
 
-local function binds_with_any_mods(all_mods, reference_bind)
-  local bindings = {}
-  for _, mod in ipairs(all_mods) do
-    local new_bind = mytable.deepclone(reference_bind)
-    new_bind.mods = mod
-    table.insert(bindings, new_bind)
-  end
-  return bindings
-end
-
 -- Key bindings
 
 local cfg_key_bindings = {
   disable_default_key_bindings = true,
 
-  -- NOTE: for bindings with mod SHIFT, the `key` field must be uppercase'd.
-  -- FIXME: fixed in nightly, will need to update my bindings on next stable.
+  -- NOTE: For bindings with mod SHIFT and a letter, the `key` field (the letter)
+  --       must be uppercase'd and the mods should NOT contain 'SHIFT'.
   keys = {
     {mods = "SHIFT", key = "PageUp", action = wezterm.action{ScrollByPage = -1}},
     {mods = "SHIFT", key = "PageDown", action = wezterm.action{ScrollByPage = 1}},
 
     -- Wezterm features
-    {mods = "CTRL|SHIFT", key = "R", action = "ReloadConfiguration"},
-    {mods = "CTRL|SHIFT", key = "L", action = "ClearScrollback"},
-    {mods = "CTRL|SHIFT", key = "F", action = wezterm.action{Search = {CaseInSensitiveString = ""}}},
+    {mods = "CTRL", key = "R", action = "ReloadConfiguration"}, -- Ctrl-Shift-r
+    {mods = "CTRL", key = "L", action = "ClearScrollback"}, -- Ctrl-Shift-l
+    {mods = "CTRL", key = "F", action = wezterm.action{Search = {CaseInSensitiveString = ""}}}, -- Ctrl-Shift-f
 
     -- Copy (to Clipboard) / Paste (from Clipboard or PrimarySelection)
-    {mods = "CTRL|SHIFT", key = "C", action = "Copy"},
-    {mods = "CTRL|SHIFT", key = "V", action = "Paste"},
+    {mods = "CTRL", key = "C", action = "Copy"}, -- Ctrl-Shift-c
+    {mods = "CTRL", key = "V", action = "Paste"}, -- Ctrl-Shift-v
     {mods = "SHIFT", key = "Insert", action = "PastePrimarySelection"},
 
     -- Tabs
-    {mods = "CTRL|SHIFT", key = "T", action = wezterm.action{SpawnTab="DefaultDomain"}},
+    {mods = "CTRL",       key = "T", action = wezterm.action{SpawnTab="DefaultDomain"}}, -- Ctrl-Shift-t
     {mods = "CTRL",       key = "Tab", action = wezterm.action{ActivateTabRelative=1}},
     {mods = "CTRL|SHIFT", key = "Tab", action = wezterm.action{ActivateTabRelative=-1}},
-    {mods = "CTRL|SHIFT", key = "W", action = "CloseCurrentTab"},
+    {mods = "CTRL",       key = "W", action = wezterm.action{CloseCurrentTab={confirm=false}}}, -- Ctrl-Shift-w
 
     -- Font size
-    {mods = "CTRL|SHIFT", key = "0", action = "ResetFontSize"},
-    {mods = "CTRL|SHIFT", key = "6", action = "DecreaseFontSize"}, -- (key with -)
-    {mods = "CTRL|SHIFT", key = "+", action = "IncreaseFontSize"},
+    {mods = "CTRL|SHIFT", key = "0", action = "ResetFontSize"}, -- Ctrl-Shift-0
+    {mods = "CTRL|SHIFT", key = "6", action = "DecreaseFontSize"}, -- Ctrl-Shift-- (key with -)
+    {mods = "CTRL|SHIFT", key = "+", action = "IncreaseFontSize"}, -- Ctrl-Shift-+
   },
 }
 
@@ -195,18 +185,18 @@ table.insert(mouse_bindings, {
 
 -- Clipboard / PrimarySelection paste
 table.insert(mouse_bindings, {
+  -- Middle click pastes from the primary selection (for any other mods).
+  wezterm.permute_any_or_no_mods({
+    event={Down={streak=1, button="Middle"}},
+    action="PastePrimarySelection",
+  }),
   -- Alt-Middle click pastes from the clipboard selection
+  -- NOTE: Must be last to overwrite the existing Alt-Middle binding done by permute_any_or_no_mods.
   {
     mods="ALT",
     event={Down={streak=1, button="Middle"}},
     action="Paste",
   },
-  -- Middle click pastes from the primary selection (for any other mods).
-  -- Wezterm wants an exact match so we must register the bind for all the mods to 'ignore'
-  binds_with_any_mods({"NONE", "CTRL", "SHIFT", "SUPER"}, {
-    event={Down={streak=1, button="Middle"}},
-    action="PastePrimarySelection",
-  }),
 })
 
 local cfg_mouse_bindings = {
