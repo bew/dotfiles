@@ -52,7 +52,6 @@ local function font_with_sym_fallback(font_family)
   return wezterm.font_with_fallback({
     font_family,
     "Font Awesome 5 Free Solid",
-    "Noto Color Emoji", -- for emoji support, weather icons, etc...
   })
 end
 
@@ -66,23 +65,7 @@ local cfg_fonts = {
   font_locator = "ConfigDirsOnly", -- for a pure config, but might break if fonts can't be found
 
   -- FIXME (<-- this is an example of bolded text)
-  font_rules = { -- must be ordered, first match will be used
-    {
-      italic = true,
-      intensity = "Bold",
-      font = font_with_sym_fallback("Iosevka Term Bold Extended Italic"),
-    },
-    {
-      italic = true,
-      font = font_with_sym_fallback("Iosevka Term Light Extended Italic"),
-    },
-    {
-      intensity = "Bold",
-      -- FIXME: this bold font is too heavy (compared to my font on urxvt)
-      font = font_with_sym_fallback("Iosevka Term Bold Extended"),
-    },
-  },
-  font = font_with_sym_fallback("Iosevka Term Light Extended"),
+  font = font_with_sym_fallback("Iosevka Term Extended"),
 
   -- Iosevka Font:
   -- + Has 2 variants for terminals: Term & Fixed. Fixed is same as Term but without ligatures.
