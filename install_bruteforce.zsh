@@ -63,6 +63,7 @@ make-link .dot/gui/xkbmap.config ~/.config/
 make-link .dot/gui/Xresources    ~/.Xresources
 make-link .dot/gui/Xresources.d  ~/.Xresources.d
 make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
+make-link .dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg default apps
 
 label "X apps configs"
 # terms
