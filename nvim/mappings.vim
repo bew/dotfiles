@@ -57,11 +57,8 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 
-nnoremap <M-f> :Denite -start-filter file/rec/smart<cr>
-nnoremap <M-F> :Denite -start-filter file/rec<cr>
-
-nnoremap <Leader>/ :Denite grep/rg<cr>
-nnoremap <Leader><M-/> :Denite grep<cr>
+nnoremap <M-f> :FilesSmart<cr>
+nnoremap <M-F> :Files<cr>
 
 " Focus or create a Floaterm with the given name.
 " Hides the current Floaterm if any.

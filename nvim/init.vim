@@ -221,46 +221,18 @@ Plug 'Yggdroot/indentLine'
 let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["┆", "┊", "┆", "¦"])
 let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown', 'codi']
 
-Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
-    \ { 'do': ':UpdateRemotePlugin' }
-
-autocmd! FileType denite
-autocmd FileType denite call s:denite_my_settings()
-function! s:denite_my_settings() abort
-  nnoremap <silent><buffer><expr> <CR>
-      \ denite#do_map('do_action')
-  nnoremap <silent><buffer><expr> o
-      \ denite#do_map('do_action')
-  nnoremap <silent><buffer><expr> <M-v>
-      \ denite#do_map('do_action', 'vsplit')
-  nnoremap <silent><buffer><expr> <M-s>
-      \ denite#do_map('do_action', 'split')
-  nnoremap <silent><buffer><expr> <M-t>
-      \ denite#do_map('do_action', 'tabopen')
-  " FIXME: how can I add my own custom actions?
-
-  nnoremap <silent><buffer><expr> <M-Space>
-      \ denite#do_map('toggle_select') . 'j'
-
-  nnoremap <silent><buffer><expr> p
-      \ denite#do_map('do_action', 'preview')
-
-  nnoremap <silent><buffer><expr> q
-      \ denite#do_map('quit')
-  nnoremap <silent><buffer><expr> i
-      \ denite#do_map('open_filter_buffer')
-endfunction
-
-autocmd! FileType denite-filter
-autocmd FileType denite-filter call s:denite_filter_my_settings()
-function! s:denite_filter_my_settings() abort
-  nnoremap <silent><buffer><expr> q
-      \ denite#do_map('quit')
-
-  call deoplete#custom#buffer_option('auto_complete', v:false)
-endfunction
-
-
+" File opening
+Plug '~/.nix-profile/share/vim-plugins/fzf'
+let g:fzf_action = {
+    \ "alt-t": "tab split",
+    \ "alt-s": "split",
+    \ "alt-v": "vsplit",
+    \ }
+let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
+let g:fzf_layout = {"window": "bot 20new"}
+let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
+command! FilesSmart call fzf#run(fzf#wrap({"source": "fd --type f --type l --follow"}))
+command! Files      FZF
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 augroup my_startify
@@ -408,35 +380,6 @@ runtime! config.rc/plugins/*.rc.vim
 runtime! mappings.vim
 runtime! autocmd.vim
 
-
-" Denite config (must be after plug#end() to work (FIXME?))
-call denite#custom#alias('source', 'grep/rg', 'grep')
-call denite#custom#var('grep/rg', 'command', ['rg'])
-call denite#custom#var('grep/rg', 'default_opts',
-    \ ['-i', '--vimgrep', '--no-heading'])
-call denite#custom#var('grep/rg', 'recursive_opts', [])
-call denite#custom#var('grep/rg', 'pattern_opt', ['--regexp'])
-call denite#custom#var('grep/rg', 'separator', ['--'])
-call denite#custom#var('grep/rg', 'final_opts', [])
-
-call denite#custom#alias('source', 'file/rec/smart', 'file/rec')
-call denite#custom#var('file/rec/smart', 'command',
-    \ ['fd', '.', '--type', 'f', '--type', 'l'])
-
-"""""""""""""""""""""""""""""""""
-
-let g:fzf_action = {
-    \ 'alt-t': 'tab split',
-    \ 'alt-s': 'split',
-    \ 'alt-v': 'vsplit',
-    \ }
-
-let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
-
-if has("mac")
-  " Homebrew puts the fzf install in non-vim accessible directory
-  set rtp+=/usr/local/opt/fzf
-endif
 
 """""""""""""""""""""""""""""""""
 
