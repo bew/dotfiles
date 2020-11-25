@@ -14,12 +14,13 @@ function __results_to_path_args
   done
 }
 
-function __fzfcmd
-{
-  echo "fzf ${FZF_BEW_LAYOUT} ${FZF_BEW_KEYBINDINGS}"
-}
+# Those layout & keybindings vars come from ~/.zshenv
+FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
-function zwidget::fzf::smart_find_file
+FZF_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers"
+FZF_PREVIEW_CMD_FOR_DIR="ls --color=always --group-directories-first -F --dereference"
+
+function __fzf_widget_file_impl
 {
   local completion_prefix=${LBUFFER/* /}
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
@@ -27,40 +28,36 @@ function zwidget::fzf::smart_find_file
   local base_dir=${completion_prefix:-./}
   base_dir=${~base_dir} # expand ~ (at least)
 
-  local finder_cmd=(fd --type f --type l)
-  local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
-  local cpl=$(cd ${base_dir}; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
-  local selected_completions=$cpl
+  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_FILE"" {}")
+  local selected_completions=$(cd ${base_dir}; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" |
+    __results_to_path_args "$base_dir"
+  )
 
   if [ -n "$selected_completions" ]; then
     LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
   fi
   zle reset-prompt
+}
+
+function zwidget::fzf::smart_find_file
+{
+  FZF_FINDER_CMD=(fd --type f --type l --follow) # follow symlinks
+
+  __fzf_widget_file_impl
+
+  unset FZF_FINDER_CMD
 }
 zle -N zwidget::fzf::smart_find_file
 
 function zwidget::fzf::find_file
 {
-  # NOTE: SAME AS `zwidget::fzf::smart_find_file`, DIFF IS `finder_cmd`
+  FZF_FINDER_CMD=(find -L) # follow symlinks
+  FZF_FINDER_CMD+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
+  FZF_FINDER_CMD+=(-o -type f -o -type l) # actual file filter
 
-  local completion_prefix=${LBUFFER/* /}
-  local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
+  __fzf_widget_file_impl
 
-  local base_dir=${completion_prefix:-./}
-  base_dir=${~base_dir} # expand ~ (at least)
-
-  local finder_cmd=(find -L) # follow symlinks
-  finder_cmd+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
-  finder_cmd+=(-o -type f -o -type l) # actual file filter
-
-  local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
-  local cpl=$(cd ${base_dir}; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
-  local selected_completions=$cpl
-
-  if [ -n "$selected_completions" ]; then
-    LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
-  fi
-  zle reset-prompt
+  unset FZF_FINDER_CMD
 }
 zle -N zwidget::fzf::find_file
 
@@ -72,8 +69,8 @@ function zwidget::fzf::find_directory
   local base_dir=${completion_prefix:-./}
   base_dir=${~base_dir} # expand ~ (at least)
 
-  local finder_cmd=(fd --type d)
-  local fzf_cmd=($(__fzfcmd) --multi --prompt "$base_dir")
+  local finder_cmd=(fd --type d --type l --follow) # follow symlinks
+  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {}")
   local cpl=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
   local selected_completions=$cpl
 
@@ -84,8 +81,9 @@ function zwidget::fzf::find_directory
 }
 zle -N zwidget::fzf::find_directory
 
-
-FZF_HISTORY_OPTIONS=(--no-multi -n2..,.. --tiebreak=index)
+# --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
+# --nth 2..         | ignore first field (the popularity of the dir) when matching
+FZF_HISTORY_OPTIONS=(--no-multi --tiebreak=index --nth 2..)
 
 function zwidget::fzf::history
 {
@@ -94,7 +92,7 @@ function zwidget::fzf::history
   # 1   | start at command n° 1 (the oldest still in history)
   local history_cmd=(fc -l -r 1)
 
-  local fzf_cmd=($(__fzfcmd) $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
+  local fzf_cmd=($FZF_BASE_CMD $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
   local selected=( $( "${history_cmd[@]}" | "${fzf_cmd[@]}" ) )
   if [ -n "$selected" ]; then
     local history_index=$selected[1]
@@ -106,6 +104,7 @@ function zwidget::fzf::history
 }
 zle -N zwidget::fzf::history
 
+# --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
 # --nth 2..         | ignore first field (the popularity of the dir) when matching
 FZF_Z_OPTIONS=(--tac --tiebreak=index --nth 2..)
 
@@ -113,10 +112,10 @@ function zwidget::fzf::z
 {
   local last_pwd=$PWD
 
-  local fzf_cmd=($(__fzfcmd) $FZF_Z_OPTIONS --prompt 'Fuzzy jump to: ')
+  local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {2..}")
   local selected=( $( z | "${fzf_cmd[@]}" ) )
   if [ -n "$selected" ]; then
-    local directory=${selected[2, -1]} # pop first element (the frecency score)
+    local directory="${selected[2, -1]}" # pop first element (the frecency score)
     if [ -n "$directory" ]; then
       cd "$directory"
       HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
@@ -125,7 +124,7 @@ function zwidget::fzf::z
   zle reset-prompt
 
   if [ $last_pwd != $PWD ]; then
-    zle -M "cd'ed to '$PWD'"
+    zle -M "cd'ed to '${(D)PWD}'"
   fi
 }
 zle -N zwidget::fzf::z

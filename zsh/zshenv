@@ -60,23 +60,34 @@ export GIT_EDITOR="$EDITOR"
 
 # ------------------ fzf config
 
-FZF_KEYBINDINGS=()
+FZF_BEW_KEYBINDINGS_ARRAY=()
 
 # input nav
-FZF_KEYBINDINGS+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
-FZF_KEYBINDINGS+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
 
 # suggestions nav
-FZF_KEYBINDINGS+=(--bind 'alt-j:down' --bind 'alt-k:up')
-FZF_KEYBINDINGS+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-j:down' --bind 'alt-k:up')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
 
-# other
-FZF_KEYBINDINGS+=(--bind 'ctrl-j:accept')
-FZF_KEYBINDINGS+=(--bind 'alt-a:toggle+down')
-FZF_KEYBINDINGS+=(--bind 'alt-space:toggle+down')
-FZF_KEYBINDINGS+=(--bind 'change:top') # select best result on input change
+# preview nav
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-p:toggle-preview')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'pgup:preview-page-up' --bind 'pgdn:preview-page-down')
 
-FZF_LAYOUT=(--height=40% --reverse --inline-info --border)
+# selection
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-j:accept')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-a:toggle+down')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-space:toggle+down')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:select-all')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'change:top') # select best result on input change
 
-export FZF_BEW_KEYBINDINGS="${(j: :)FZF_KEYBINDINGS}"
-export FZF_BEW_LAYOUT="${(j: :)FZF_LAYOUT}"
+FZF_BEW_LAYOUT_ARRAY=(--height=40% --reverse --inline-info)
+# NOTE: --border is made of unicode symbols, and can break the display
+#  (--> removed for now)
+
+# highlight the current line, since bold doesn't work with my current terminal :/
+FZF_BEW_LAYOUT_ARRAY+=(--color='bg+:232,gutter:0')
+
+export FZF_BEW_KEYBINDINGS="${(j: :)FZF_BEW_KEYBINDINGS_ARRAY}"
+export FZF_BEW_LAYOUT="${(j: :)FZF_BEW_LAYOUT_ARRAY}"
+alias fzf-bew="fzf $FZF_BEW_KEYBINDINGS $FZF_BEW_LAYOUT"
