@@ -70,9 +70,12 @@ function zwidget::fzf::find_directory
   base_dir=${~base_dir} # expand ~ (at least)
 
   local finder_cmd=(fd --type d --type l --follow) # follow symlinks
-  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {}")
-  local cpl=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" | __results_to_path_args "$base_dir")
-  local selected_completions=$cpl
+
+  # --preview-window :25%    | set preview window width to 25%
+  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {}" --preview-window :25%)
+  local selected_completions=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" |
+    __results_to_path_args "$base_dir"
+  )
 
   if [ -n "$selected_completions" ]; then
     LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
@@ -112,7 +115,8 @@ function zwidget::fzf::z
 {
   local last_pwd=$PWD
 
-  local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {2..}")
+  # --preview-window :25%    | set preview window width to 25%
+  local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "$FZF_PREVIEW_CMD_FOR_DIR"" {2..}" --preview-window :25%)
   local selected=( $( z | "${fzf_cmd[@]}" ) )
   if [ -n "$selected" ]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
