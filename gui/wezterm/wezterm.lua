@@ -66,6 +66,11 @@ local cfg_fonts = {
 
   -- FIXME (<-- this is an example of bolded text)
   font = font_with_sym_fallback("Iosevka Term Extended"),
+  -- Correct color changed by antialiasing.
+  -- The default is Subpixel. With Subpixel, the rendered color is beige-ish
+  -- and slightly darker.
+  -- (explanation: https://gitter.im/wezterm/Lobby?at=5fbc5fb129cc4d7348294eb6)
+  font_antialias = "Greyscale",
 
   -- Iosevka Font:
   -- + Has 2 variants for terminals: Term & Fixed. Fixed is same as Term but without ligatures.
