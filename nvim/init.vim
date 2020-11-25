@@ -218,7 +218,7 @@ nmap gc  <Plug>(git-messenger)
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["┆", "┊", "┆", "¦"] : ["|"])
+let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["┆", "┊", "┆", "¦"])
 let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown', 'codi']
 
 Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
