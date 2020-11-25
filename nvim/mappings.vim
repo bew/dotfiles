@@ -2,6 +2,15 @@
 
 " TODO: improve organization!
 
+" Disable keybindings
+
+" <C-LeftMouse> default to <C-]> but it's annoying to have it everywhere
+" (like in markdown files).
+" Also, I use Ctrl LeftMouse's Up event on my terminal to open links, the Down
+" event will always be passed to the application (neovim) so I must handle it
+" gracefully (disable!).
+nnoremap <C-LeftMouse> <nop>
+
 " Helper guide on <Leader>
 nnoremap <Leader> :WhichKey '<Leader>'<cr>
 vnoremap <Leader> :WhichKeyVisual '<Leader>'<cr>
