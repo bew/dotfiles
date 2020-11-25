@@ -81,6 +81,8 @@ local cfg_fonts = {
   -- + Has 2 additional variants for horizontal size: Normal & Extended. The Normal is the one
   --   which does not mention 'Extended'. Extended is wider than Normal.
   --   --> use Extended variant, the normal one is way too thin!!!
+
+  allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace",
 }
 
 -- Key/Mouse bindings
