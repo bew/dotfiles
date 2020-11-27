@@ -27,7 +27,7 @@ done$99
 endsnippet
 
 snippet for "for ... in ... done (forin)"
-for ${1:i}${2/.+/ in /}${2:words}; do
+for ${1:var}${2: in ${3:words}}; do
 	$10
 done$99
 endsnippet
