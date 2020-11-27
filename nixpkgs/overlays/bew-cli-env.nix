@@ -16,7 +16,7 @@ self: super:
       p.git-lfs
       p.htop
       p.jq
-      p.less
+      # p.less # When enabled, less can't find the terminfo of my arch terminal (urxvt) :/
       p.ripgrep
       p.tmux
       p.tree
