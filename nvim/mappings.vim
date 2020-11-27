@@ -98,15 +98,19 @@ tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "
 "-- Navigation
 "------------------------------------------------------------------
 
-" Short navigation left/right in insert mode
+" Short navigation on the line in insert mode
 "
 " This makes it possible to use the cursor keys in Insert mode, without breaking
 " the undo sequence and therefore using . (redo) will work as expected.
-inoremap <Left>  <C-G>U<Left>
-inoremap <Right> <C-G>U<Right>
+inoremap <Left>  <C-g>U<Left>
+inoremap <Right> <C-g>U<Right>
 " We use imap to use the above left/right mapping
 imap <M-h> <Left>
 imap <M-l> <Right>
+" Move back/forward by word, I'm too used to it in the shell and nvim's
+" cmdline!
+inoremap <M-b> <C-g>U<S-Left>
+inoremap <M-w> <C-g>U<S-Right>
 
 
 " Windows navigation
@@ -221,9 +225,6 @@ nnoremap <M-P> :cprevious<cr>
 
 " Trigger completion manually
 inoremap <expr> <C-b>  deoplete#manual_complete()
-
-" Insert common string during completion
-inoremap <expr> <M-b>  deoplete#complete_common_string()
 
 
 " Exit the terminal grabber
