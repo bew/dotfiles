@@ -231,7 +231,10 @@ let g:fzf_action = {
 let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
 let g:fzf_layout = {"window": "bot 20new"}
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
-command! FilesSmart call fzf#run(fzf#wrap({"source": "fd --type f --type l --follow"}))
+command! FilesSmart call fzf#run(fzf#wrap({
+    \   "source": "fd --type f --type l --follow",
+    \   "options": ["--multi"]
+    \ }))
 command! Files      FZF
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
