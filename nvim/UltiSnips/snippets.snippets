@@ -1,5 +1,3 @@
-priority -50
-
 # We use a little hack so that the snippet is expanded
 # and parsed correctly
 snippet snip "Snippet definition" b
@@ -14,8 +12,19 @@ $0
 `!p snip.rv = "endglobal"`
 endsnippet
 
-snippet vis "${VISUAL}" i
-\$\{VISUAL${1:${2:default}${3:/transform/}}\}
+# e.g: ${VISUAL:some_default}
+snippet vis "VISUAL placeholder w/ default" w
+\${VISUAL${1::${2:default}}}
+endsnippet
+
+# e.g: ${42:some_default}
+snippet n "Numeric placeholder w/ default" w
+\${${1:42}:${2:${VISUAL:default}}}
+endsnippet
+
+# e.g: ${42:${VISUAL:some_default}}
+snippet nvis "Numeric placeholder to VISUAL w/ default" w
+\${${1:42}:\${VISUAL:${2:default}}}
 endsnippet
 
 # vim:ft=snippets:
