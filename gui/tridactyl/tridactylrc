@@ -1,56 +1,118 @@
+# Restore default config first!
+sanitize tridactyllocal
+
+# --------------------------------------------------------
+# Options & Setup
+
 set theme dark
+
+set smoothscroll true
+
+set incsearch true
+
+# Set the browser's homepage to the newtab page of the plugin
+# NOTE: This works by changing the user.js file in my profile, and needs
+#       a firefox restart to be applied.
+composite jsb browser.runtime.getURL("static/newtab.html") | setpref browser.startup.homepage
+
+# --------------------------------------------------------
+# Key bindings
 
 # A : Alt
 # CA : Ctrl-Alt
 
-#tab
-bind <A-c> pin
+# Reload config file
+# NOTE: The config takes some time to load completely (~10s), because of a bug
+#       somewhere in Tridactyl that was loading only some parts of config file.
+#       Each line of the config is loaded with a delay to workaround that issue.
+#       Ref: https://matrix.to/#/!xmubtggllUtLrQiGyn:matrix.org/$1607877211548340BLAuN:matrix.org
+#            https://github.com/tridactyl/tridactyl/issues/1409
+command reload_my_config composite \
+    fillcmdline_tmp 5000 Starting config reload...... (takes a ~15s seconds) \
+    | source \
+    | fillcmdline_tmp 1000 Config reloaded!
+bind <CA-r> reload_my_config
+bind --mode=ignore <CA-r> reload_my_config
+bind --mode=insert <CA-r> reload_my_config
 
+# Get back C-a to select all text!
+unbind <C-a>
+unbind <C-x> # unbind it as well for coherence (since C-a & C-x go in pair)
+
+# Open Tridactyl' cmdline from any mode
+bind --mode=insert <A-:> fillcmdline_notrail
+bind --mode=normal <A-:> fillcmdline_notrail
+bind --mode=hint   <A-:> fillcmdline_notrail
+bind --mode=visual <A-:> fillcmdline_notrail
+
+# --- Open bindings
+
+# open in new tab
 unbind t
 bind <A-t> fillcmdline tabopen
 
+# open
+unbind o
+bind <A-o> fillcmdline open
+
+# open with search engine
+unbind s
+bind <A-s> fillcmdline open search
+
+# open by hint on the page
+unbind f
+unbind F
+bind <A-f> hint
+# Open target in background
+bind <A-F> hint -b
+# NOTE: There are MANY options for `hint`, see `:h hint` :)
+
+# --- hint mode bindings
+
+# Same as backspace, to remove a key in case of mistake
+bind --mode=hint <C-h> hint.popKey
+# Focus the hint!
+bind --mode=hint <A-h> hint.focusLeftHint
+bind --mode=hint <A-j> hint.focusBottomHint
+bind --mode=hint <A-k> hint.focusTopHint
+bind --mode=hint <A-l> hint.focusRightHint
+# Select the hint just after focusing it (Alt still pressed)
+bind --mode=hint <A-Space> hint.selectFocusedHint
+
+# --- Tab bindings
+
+# tab goto & movement
 unbind J
 unbind K
+# TODO: Try with --mode=browser to set it everywhere at once
+#       ==> Does not seems to work :/
 bind <A-a> tabprev
 bind <A-z> tabnext
 bind --mode=insert <A-a> tabprev
 bind --mode=insert <A-z> tabnext
 bind --mode=ex <A-a> tabprev
 bind --mode=ex <A-z> tabnext
-
 bind <A-A> tabmove -1
 bind <A-Z> tabmove +1
 
+# tab operations
 bind <CA-t> tabduplicate
 bind <CA-n> tabdetach
 
+# tab close
 unbind d
 bind <A-d> bdelete
+bind --mode=insert <A-d> bdelete
+bind --mode=visual <A-d> bdelete
+bind --mode=hint <A-d> bdelete
+# TODO: check if pinned before deleting it! (Will need some js!)
 
+# tab pin
+bind <A-c> pin
+
+# undo tab close
 unbind u
 bind <A-u> undo
-
-# hint
-unbind f
-unbind F
-bind <A-f> hint
-bind <A-F> hint -b
-
-# page
-unbind r
-unbind R
-bind <A-r> reload
-bind <A-R> reloadhard
-
-unbind o
-bind <A-o> fillcmdline open
-
-# rudimentary search mode
-bind <A-/> fillcmdline find
-bind <A-?> fillcmdline find -?
-bind <A-n> findnext 1
-bind <A-N> findnext -1
-bind § nohlsearch
 
 # history
 unbind H
@@ -58,19 +120,31 @@ unbind L
 bind <CA-a> back
 bind <CA-z> forward
 
-# Reload config file (Ctrl+Shift+R)
-command reload_my_config composite source ; fillcmdline_tmp 1000 Config reloaded!
-bind <C-R> reload_my_config
-bind --mode=ignore <C-R> reload_my_config
-bind --mode=insert <C-R> reload_my_config
+# --- Page bindings
 
-# insert mode bindings that don't belong to any other category
-bind --mode=insert <A-:> fillcmdline_notrail
+# page movement
+# The default jump of 10 is a bit much.
+bind j scrollline 5
+bind k scrollline -5
 
-# ex mode bindings
+# page reload
+unbind r
+unbind R
+bind <A-r> reload
+bind <A-R> reloadhard
+
+# rudimentary page search mode
+bind <A-/> fillcmdline find
+bind <A-?> fillcmdline find -?
+bind <A-n> findnext 1
+bind <A-N> findnext -1
+bind § nohlsearch
+
+# --- ex mode bindings
+
+# text actions (movement, changes)
+
 bind --mode=ex <A-h> text.backward_char
-bind --mode=ex <A-j> ex.next_history
-bind --mode=ex <A-k> ex.prev_history
 bind --mode=ex <A-l> text.forward_char
 
 bind --mode=ex <A-w> text.forward_word
@@ -78,10 +152,22 @@ bind --mode=ex <A-b> text.backward_word
 bind --mode=ex <A-g> text.beginning_of_line
 bind --mode=ex <A-G> text.end_of_line
 
+bind --mode=ex <A-Backspace> text.backward_kill_word
+
+# cmdline actions
+
+bind --mode=ex <A-j> ex.next_history
+bind --mode=ex <A-k> ex.prev_history
+
 bind --mode=ex <A-n> ex.next_completion
 bind --mode=ex <A-p> ex.prev_completion
+bind --mode=ex <Down> ex.next_completion
+bind --mode=ex <Up> ex.prev_completion
 
 # URL based binds
+
+# Quick go to notifications!
+bindurl github.com nn js tri.dom.simulateClick(document.querySelector("a.notification-indicator"))
 
 # reddit.com, simulate clicking on the Close button of an opened post
 bindurl reddit.com <Escape> js tri.dom.simulateClick(document.querySelector("*[aria-label=Close]"))
