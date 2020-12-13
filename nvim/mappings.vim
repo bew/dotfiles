@@ -13,7 +13,7 @@ nnoremap <C-LeftMouse> <nop>
 
 " Helper guide on <Leader>
 nnoremap <Leader> :WhichKey '<Leader>'<cr>
-vnoremap <Leader> :WhichKeyVisual '<Leader>'<cr>
+vnoremap <Leader> <cmd>WhichKeyVisual '<Leader>'<cr>
 
 " Save buffer
 nnoremap <M-s> :w<cr>
@@ -238,7 +238,7 @@ nnoremap Q :q<cr>
 " I: Indent line, stay in insert mode (default, see :h i_CTRL-F)
 inoremap <C-f> <C-f>
 " V: Indent visual selection, back to normal mode
-vnoremap <C-f> :normal! ==<cr>
+vnoremap <C-f> =
 " N: Indent current line
 nnoremap <C-f> mi==`i
 " N: Format the entire file
@@ -286,7 +286,7 @@ endfunction
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
 function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
-  execute ":'<,'>normal @".nr2char(getchar())
+  execute ":'<,'>normal! @".nr2char(getchar())
 endfunction
 
 
