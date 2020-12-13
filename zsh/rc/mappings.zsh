@@ -59,41 +59,79 @@ zle -N zwidget::toggle-sudo-nosudo
 # TODO: is there a way to handle commands not at <bol> ? (mapped to M-S instead of M-s)
 # e.g: echo 400 | [NEED TOGGLE SUDO HERE] tee /foo/bar
 
-# Git status
+# When set, git mappings will show status/log/diff for the current directory
+# instead of the whole repo.
+GIT_MAPPINGS_ARE_FOR_CWD=
+
+# Git status (for repo or cwd)
 function zwidget::git-status
 {
   zle::utils::check_git || return
 
-  zle::utils::no-history-run "git status"
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    zle::utils::no-history-run "git status"
+  else
+    zle::utils::no-history-run "git status .  # for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+  fi
 }
 zle -N zwidget::git-status
 
-# Git log
+# Git log (for repo or cwd)
 function zwidget::git-log
 {
   zle::utils::check_git || return
 
-  git pretty-log --all --max-count 42 # don't show too much commits to avoid waiting
+  local cmd=(git pretty-log --all --max-count 42) # don't show too much commits to avoid waiting
+
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    "${cmd[@]}"
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git logs of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    "${cmd[@]}" .
+  fi
+
+  zle reset-prompt
 }
 zle -N zwidget::git-log
 
-# Git diff
+# Git log (always for repo, never for cwd)
+function zwidget::git-log-always-for-repo
+{
+  # Ensure git log call is for the whole repo
+  GIT_MAPPINGS_ARE_FOR_CWD= zwidget::git-log
+}
+zle -N zwidget::git-log-always-for-repo
+
+# Git diff (for repo or cwd)
 function zwidget::git-diff
 {
   zle::utils::check_git || return
 
-  git d
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    git d
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    git d .
+  fi
 
   zle reset-prompt
 }
 zle -N zwidget::git-diff
 
-# Git diff cached
+# Git diff cached (for repo or cwd)
 function zwidget::git-diff-cached
 {
   zle::utils::check_git || return
 
-  git dc
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    git dc
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    git dc .
+  fi
 
   zle reset-prompt
 }
@@ -491,6 +529,7 @@ vibindkey 'g' zwidget::git-status
 vibindkey 'd' zwidget::git-diff
 vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
+vibindkey 'L' zwidget::git-log-always-for-repo
 
 autoload -U edit-command-line
 zle -N edit-command-line
