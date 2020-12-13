@@ -72,12 +72,23 @@ function segmt::git_branch_fast
   [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && repo_status+="${c_untracked}?"
   [[ -n "$repo_status" ]] && p+=" ${repo_status}${clean}"
 
-  # %G : Within a %{...%} sequence, include a 'glitch': assume that a single character width will be output.
-  local arrow_up_unicode="%{⇡%G%}"
-  local arrow_down_unicode="%{⇣%G%}"
+  local arrow_up
+  local arrow_down
+  if [[ -z "$ASCII_ONLY" ]]; then
+    # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
+    #      character width will be output.
+    #
+    #      Needed sometimes because that unicode char can be considered 2 chars by mistake.
+    #      (NOTE 2020-12-13: don't remember in which cases..)
+    arrow_up="%{⇡%G%}"
+    arrow_down="%{⇣%G%}"
+  else
+    arrow_up="+"
+    arrow_down="-"
+  fi
 
-  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ${arrow_up_unicode}${VCS_STATUS_COMMITS_AHEAD}"
-  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ${arrow_down_unicode}${VCS_STATUS_COMMITS_BEHIND}"
+  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ${arrow_up}${VCS_STATUS_COMMITS_AHEAD}"
+  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ${arrow_down}${VCS_STATUS_COMMITS_BEHIND}"
   [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+=" *${VCS_STATUS_STASHES}"
 
   echo -n "%K{black} On ${p} %k"
@@ -394,7 +405,7 @@ PROMPT_CURRENT_PARTS=(
   text: "%B%F{magenta} %2~ %f%b" # current dir
   func: segmt::short_vim_mode
   text: " "
-  text: "%(!.#.▷)"
+  text: "%(!.#.>)"
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
@@ -454,7 +465,7 @@ hooks-add-hook zle_line_finish_hook set-past-prompts
 
 function simple_prompts
 {
-  PROMPT_CURRENT="[%?] %2~ ▷ "
+  PROMPT_CURRENT="[%?] %F{cyan}%2~%f > "
   PROMPT_PAST=$PROMPT_CURRENT
   RPROMPT_CURRENT= # no right prompt
   RPROMPT_PAST=    # no right prompt
