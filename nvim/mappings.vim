@@ -249,9 +249,14 @@ nnoremap <M-C-f> gg=G``
 nnoremap <M-J> i<c-j><esc>k$
 
 " Copy/Paste with system clipboard (using nvim's clipboard provider)
+" Copy
 vnoremap <silent> <M-c> "+y :echo "Copied!"<cr>
+" Paste
 nnoremap <silent> <M-v> "+p
+nnoremap <silent> <M-V> o<C-u><esc>"+p
 vnoremap <silent> <M-v> "+p
+" Paste in insert mode inserts an undo breakpoint
+inoremap <silent> <M-v> <C-g>u<C-r>+
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
