@@ -1,27 +1,35 @@
-priority -50
+priority 0
 
 snippet head "Yaml header" b
 ---
 $1
----$99
+---
 endsnippet
 
 snippet ln "Link to something"
-[${1:${VISUAL:Text}}](${2:http://${3:www.url.com}})$99
+[${1:${VISUAL:Text}}](${2:http://${3:www.url.com}})
 endsnippet
 
 snippet img "Image"
-![${1:pic alt}](${2:path}${3/.+/ "/}${3:opt title}${3/.+/"/})$99
+![${1:pic alt}](${2:path}${3/.+/ "/}${3:opt title}${3/.+/"/})
 endsnippet
 
 snippet ic "Inline Code" i
-\`$1\`$99
+\`$1\`
+endsnippet
+
+snippet em "Italic" w
+_${1:${VISUAL}}_
+endsnippet
+
+snippet b "Bold" w
+**${1:${VISUAL}}**
 endsnippet
 
 snippet `` "Codeblock" b
 \`\`\`$1
 ${VISUAL}$2
-\`\`\`$99
+\`\`\`
 endsnippet
 
 # vim:ft=snippets:
