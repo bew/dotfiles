@@ -29,7 +29,7 @@ hc keybind $M-$C-r   reload
 
 # lock (& sleep)
 hc keybind Pause   spawn ~/.bin/i3colocker
-hc keybind $C-Pause   spawn sh -c "~/.bin/i3colocker&  sleep 0.5; systemctl suspend"
+hc keybind $C-Pause   spawn ~/.bin/desktop--lock-and-sleep ~/.bin/i3colocker
 # FIXME? (but how to fix?) the screen flashes with the 'theme.background_color' just
 # before i3lock is displayed with a blurry screenshot.
 # --> Seems to be related with the bash script starting i3lock. Starting i3lock
