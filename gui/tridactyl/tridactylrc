@@ -50,10 +50,12 @@ bind --mode=visual <A-:> fillcmdline_notrail
 # open in new tab
 unbind t
 bind <A-t> fillcmdline tabopen
+bind --mode=insert <A-t> fillcmdline tabopen
 
 # open
 unbind o
 bind <A-o> fillcmdline open
+bind --mode=insert <A-o> fillcmdline open
 
 # open with search engine
 unbind s
@@ -152,7 +154,8 @@ bind --mode=ex <A-b> text.backward_word
 bind --mode=ex <A-g> text.beginning_of_line
 bind --mode=ex <A-G> text.end_of_line
 
-bind --mode=ex <A-Backspace> text.backward_kill_word
+# FIXME: I want to kill to last / or the last word
+# bind --mode=ex <A-Backspace> 
 
 # cmdline actions
 
