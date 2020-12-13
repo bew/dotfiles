@@ -248,9 +248,10 @@ nnoremap <M-C-f> gg=G``
 " un-join (split) the current line at the cursor position
 nnoremap <M-J> i<c-j><esc>k$
 
-" Copy/Paste with system clipboard
-vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
-nnoremap <silent> <M-v> :r !xclip -out -selection clipboard<cr>
+" Copy/Paste with system clipboard (using nvim's clipboard provider)
+vnoremap <silent> <M-c> "+y :echo "Copied!"<cr>
+nnoremap <silent> <M-v> "+p
+vnoremap <silent> <M-v> "+p
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
