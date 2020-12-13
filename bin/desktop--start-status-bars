@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Binary dependencies:
+# - polybar
+# - pkill
+
+echo script: Starting bars
+
+polybar info-bar --reload &
+polybar sys-bar --reload
+
+echo script: Stopping bars
+
+# If the previous bars are stopped (e.g by SIGINT),
+# make sure to stop the other one.
+pkill polybar

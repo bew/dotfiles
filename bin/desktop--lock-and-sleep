@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Binary dependencies:
+# - i3lock (as the default locker)
+# - sleep
+# - systemctl
+
+DEFAULT_LOCKER_BIN=i3lock
+
+if [[ $# = 0 ]]; then
+  locker_bin="$DEFAULT_LOCKER_BIN"
+  echo "Using default locker: $locker_bin"
+else
+  locker_bin="$1"
+  echo "Using passed locker: $locker_bin"
+fi
+
+"$locker_bin" &
+
+sleep 2
+
+systemctl suspend
