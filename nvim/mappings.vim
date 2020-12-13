@@ -271,15 +271,18 @@ vmap <M-*> <Plug>(visualstar-g*)
 " N: search current word without word boundaries
 nnoremap <M-*> g*
 
-vnoremap <M-p> :call VisualPaste()<cr>
-" Paste the unnamed register Unnamed register " is preserved
+vnoremap <M-p> <cmd>call VisualPaste()<cr>
+" Visual paste with the current register, preserving the content of
+" the unnamed register.
 function! VisualPaste()
-  let old_reg = getreg('"', 1, v:true)
-  let old_regtype = getregtype('"')
+  " Save unnamed register (will be overwritten with the normal visual paste)
+  let save_reg = getreg('"', 1, v:true)
+  let save_regtype = getregtype('"')
 
-  normal gvp
+  exe 'normal! "' . v:register . 'p'
 
-  call setreg('"', old_reg, old_regtype)
+  " Restore unnamed register
+  call setreg('"', save_reg, save_regtype)
 endfunction
 
 
