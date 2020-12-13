@@ -1,0 +1,14 @@
+pynvim
+
+# Python language support
+flake8
+jedi
+
+# LSP
+# python-language-server
+
+# LSP in nvim 0.5.0+ requires a specific version of this lib
+# Ref: https://github.com/davidhalter/jedi/issues/1484
+# parso==0.5.2
+
+# vim: ft=conf:
