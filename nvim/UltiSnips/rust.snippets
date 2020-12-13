@@ -2,8 +2,6 @@
 #                            Rust Snippets                            #
 #######################################################################
 
-priority -50
-
 snippet let "let variable declaration" b
 let ${1:name}${2:: ${3:type}} = ${4};
 endsnippet
@@ -12,43 +10,43 @@ snippet letm "let mut variable declaration" b
 let mut ${1:name}${2:: ${3:type}} = ${4};
 endsnippet
 
-snippet fn "A function, optionally with arguments and return type."
-fn ${1:function_name}(${2})${3/..*/ -> /}${3} {
-	${VISUAL}${0}
+# Increase priority of this 'fn' snippet, to avoid conflict with the
+# other 'fn' snippet, used for closure when the cursor is not at BOL.
+priority 10
+snippet fn "A function, optionally with arguments and return type." b
+fn ${1:function_name}(${2:arg: type})${3: -> ${4:ret_type}} {
+	${10:${VISUAL}}
 }
 endsnippet
+priority 0
 
-snippet pfn "A public function, optionally with arguments and return type."
-pub fn ${1:function_name}(${2})${3/..*/ -> /}${3} {
-	${VISUAL}${0}
-}
+snippet fn "Closure, anonymous function (inline)" w
+|${1}| ${2:{$3}}
 endsnippet
 
-snippet arg "Function Arguments" i
-${1:a}: ${2:T}${3:, arg}
+snippet p "println!(..) with endline" w
+println!("${1}"${2});
 endsnippet
 
-snippet || "Closure, anonymous function (inline)" i
-${1:move }|${2}| { $3 }
+snippet pi "print!(..) inline" w
+print!("${1}"${2});
 endsnippet
 
-snippet |} "Closure, anonymous function (block)" i
-${1:move }|${2}| {
-	$3
-}
+snippet fmt "format!(..)" w
+format!("${1}"${2});
 endsnippet
 
-snippet p "print!(..)" b
-print!("${1}"${2/..*/, /}${2});
+snippet dbg "Debug expression" w
+dbg!(${1:${VISUAL}})
 endsnippet
 
-snippet pl "println!(..)" b
-println!("${1}"${2/..*/, /}${2});
+snippet ma "match .. { .. }" w
+match ${1:expr} {$2}
 endsnippet
 
-snippet fmt "format!(..)"
-format!("${1}"${2/..*/, /}${2});
-endsnippet
+# snippet b "{ .. } block" w
+# {${1:${VISUAL}}}
+# endsnippet
 
 snippet macro "macro_rules!" b
 macro_rules! ${1:name} (
@@ -58,47 +56,40 @@ macro_rules! ${1:name} (
 )
 endsnippet
 
-snippet mod "A module" b
-mod ${1:`!p snip.rv = snip.basename.lower() or "name"`} {
-	${VISUAL}${0}
-}
-endsnippet
-
 snippet for "for .. in .." b
 for ${1:i} in ${2} {
 	${VISUAL}${0}
 }
 endsnippet
 
+snippet com "Comment"
+// $0
+endsnippet
+
 snippet todo "A Todo comment"
-// [TODO]: ${1:Description} - `!v strftime("%Y-%m-%d %I:%M%P")`
+// TODO: $0
+endsnippet
+
+snippet note "A Note comment"
+// NOTE: $0
 endsnippet
 
 snippet st "Struct" b
-struct ${1:`!p snip.rv = snip.basename.title() or "Name"`} {
+struct ${1:Name} {
 	${VISUAL}${0}
 }
 endsnippet
 
-# TODO: fancy dynamic field mirroring like Python slotclass
-snippet stn "Struct with new constructor." b
-pub struct ${1:`!p snip.rv = snip.basename.title() or "Name"`} {
-	fd${0}
-}
-
-impl $1 {
-	pub fn new(${2}) -> $1 {
-		$1 { ${3} };
-	}
-}
+snippet ann "#[...] annotation" b
+#[${1:derive(${2:Debug$3})}]
 endsnippet
 
-snippet fd "Struct field definition" w
-${1:name}: ${2:Type},
+snippet en "Enum" b
+enum ${1:Name} {$2}
 endsnippet
 
 snippet impl "Struct/Trait implementation" b
-impl ${1:Type/Trait}${2: for ${3:Type}} {
+impl ${1:TypeOrTrait}${2: for ${3:Type}} {
 	${0}
 }
 endsnippet
