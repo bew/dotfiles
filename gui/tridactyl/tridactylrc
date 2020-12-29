@@ -134,8 +134,11 @@ unbind r
 unbind R
 bind <A-r> reload
 bind <A-R> reloadhard
+bind --mode=insert <A-r> reload
+bind --mode=insert <A-R> reloadhard
 
 # rudimentary page search mode
+unbind <C-f>
 bind <A-/> fillcmdline find
 bind <A-?> fillcmdline find -?
 bind <A-n> findnext 1
