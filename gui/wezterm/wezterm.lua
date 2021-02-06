@@ -2,8 +2,18 @@
 ---------------------------------------------------------------
 
 local wezterm = require "wezterm"
-local inspect = require "vendor/inspect"
 local mytable = require "lib/mystdlib".mytable
+
+-- Misc
+------------------------------------------
+
+local cfg_misc = {
+  window_close_confirmation = "NeverPrompt",
+  show_update_window = false,
+
+  -- Avoid unexpected config breakage and unusable terminal
+  automatically_reload_config = false,
+}
 
 -- Colors & Appearance
 ------------------------------------------
@@ -101,13 +111,13 @@ local cfg_key_bindings = {
 
     -- Wezterm features
     {mods = "CTRL", key = "R", action = "ReloadConfiguration"}, -- Ctrl-Shift-r
-    {mods = "CTRL", key = "L", action = "ClearScrollback"}, -- Ctrl-Shift-l
+    {mods = "CTRL", key = "L", action = wezterm.action{ClearScrollback = "ScrollbackAndViewport"}}, -- Ctrl-Shift-l
     {mods = "CTRL", key = "F", action = wezterm.action{Search = {CaseInSensitiveString = ""}}}, -- Ctrl-Shift-f
 
     -- Copy (to Clipboard) / Paste (from Clipboard or PrimarySelection)
-    {mods = "CTRL", key = "C", action = "Copy"}, -- Ctrl-Shift-c
-    {mods = "CTRL", key = "V", action = "Paste"}, -- Ctrl-Shift-v
-    {mods = "SHIFT", key = "Insert", action = "PastePrimarySelection"},
+    {mods = "CTRL", key = "C", action = wezterm.action{CopyTo = "Clipboard"}}, -- Ctrl-Shift-c
+    {mods = "CTRL", key = "V", action = wezterm.action{PasteFrom = "Clipboard"}}, -- Ctrl-Shift-v
+    {mods = "SHIFT", key = "Insert", action = wezterm.action{PasteFrom = "PrimarySelection"}},
 
     -- Tabs
     {mods = "CTRL",       key = "T", action = wezterm.action{SpawnTab="DefaultDomain"}}, -- Ctrl-Shift-t
@@ -150,7 +160,7 @@ function binds_for_mouse_select(button, streak, selection_mode)
     {
       mods="NONE",
       event={Up={streak=streak, button=button}},
-      action="CompleteSelection",
+      action=wezterm.action{CompleteSelection="PrimarySelection"}
     },
   }
 end
@@ -195,14 +205,14 @@ table.insert(mouse_bindings, {
   -- Middle click pastes from the primary selection (for any other mods).
   wezterm.permute_any_or_no_mods({
     event={Down={streak=1, button="Middle"}},
-    action="PastePrimarySelection",
+    action=wezterm.action{PasteFrom = "PrimarySelection"},
   }),
   -- Alt-Middle click pastes from the clipboard selection
   -- NOTE: Must be last to overwrite the existing Alt-Middle binding done by permute_any_or_no_mods.
   {
     mods="ALT",
     event={Down={streak=1, button="Middle"}},
-    action="Paste",
+    action=wezterm.action{PasteFrom = "Clipboard"},
   },
 })
 
@@ -218,6 +228,7 @@ local cfg_mouse_bindings = {
 ------------------------------------------
 
 local config = mytable.merge_all(
+  cfg_misc,
   cfg_colors_and_appearance,
   cfg_fonts,
   cfg_key_bindings,
@@ -225,5 +236,4 @@ local config = mytable.merge_all(
   {} -- so the last table can have an ending comma for git diffs :)
 )
 
-print(inspect(config))
 return config
