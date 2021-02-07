@@ -131,9 +131,9 @@ local cfg_key_bindings = {
     {mods = "CTRL",       key = "W", action = wezterm.action{CloseCurrentTab={confirm=false}}}, -- Ctrl-Shift-w
 
     -- Font size
-    {mods = "CTRL|SHIFT", key = "0", action = "ResetFontSize"}, -- Ctrl-Shift-0
-    {mods = "CTRL|SHIFT", key = "6", action = "DecreaseFontSize"}, -- Ctrl-Shift-- (key with -)
-    {mods = "CTRL|SHIFT", key = "+", action = "IncreaseFontSize"}, -- Ctrl-Shift-+
+    {mods = "CTRL", key = "0", action = "ResetFontSize"}, -- Ctrl-Shift-0
+    {mods = "CTRL", key = "6", action = "DecreaseFontSize"}, -- Ctrl-Shift-- (key with -)
+    {mods = "CTRL", key = "+", action = "IncreaseFontSize"}, -- Ctrl-Shift-+ (key with =)
   },
 }
 
