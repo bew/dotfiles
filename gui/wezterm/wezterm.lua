@@ -13,6 +13,11 @@ local cfg_misc = {
 
   -- Avoid unexpected config breakage and unusable terminal
   automatically_reload_config = false,
+
+  -- Make sure word selection stops on punctuations
+  -- dot (.) & slash (/) are allowed though to keep easy
+  -- selection of paths.
+  selection_word_boundary = " \t\n{}[]()\"'`,;:",
 }
 
 -- Colors & Appearance
