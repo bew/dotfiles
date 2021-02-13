@@ -123,7 +123,17 @@
 # -- END delta config
 
 [diff]
-  tool = nvim_diff
+  tool = nvim_diff # NOTE: I _never_ use this....
+
+  # Moved lines of code are colored differently.
+  colorMoved = default
+  # Ignore whitespace changes for indentation only.
+  colorMovedWS = allow-indentation-change
+
+[color "diff"]
+  # color settings for 'colorMoved' option
+  oldMoved = cyan 17
+  newMoved = cyan 17
 
 [difftool "nvim_diff"]
   cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
