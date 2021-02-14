@@ -28,7 +28,7 @@ composite jsb browser.runtime.getURL("static/newtab.html") | setpref browser.sta
 #       Ref: https://matrix.to/#/!xmubtggllUtLrQiGyn:matrix.org/$1607877211548340BLAuN:matrix.org
 #            https://github.com/tridactyl/tridactyl/issues/1409
 command reload_my_config composite \
-    fillcmdline_tmp 5000 Starting config reload...... (takes a ~15s seconds) \
+    fillcmdline_tmp 5000 Starting config reload...... (takes ~15s seconds) \
     | source \
     | fillcmdline_tmp 1000 Config reloaded!
 bind <CA-r> reload_my_config
@@ -111,6 +111,7 @@ bind --mode=hint <A-d> bdelete
 
 # tab pin
 bind <A-c> pin
+bind --mode=insert <A-c> pin
 
 # undo tab close
 unbind u
