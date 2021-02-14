@@ -102,12 +102,23 @@ bind <CA-t> tabduplicate
 bind <CA-n> tabdetach
 
 # tab close
+
+command tabclose_safe \
+    jsb (async () => { \
+      const tab = await tri.webext.activeTab(); \
+      if (!tab.pinned) { \
+        browser.tabs.remove(tab.id) \
+      } else { \
+        tri.excmds.fillcmdline_tmp(2000, "# tab is pinned, cannot close!") \
+      } \
+    })()
+
 unbind d
-bind <A-d> bdelete
-bind --mode=insert <A-d> bdelete
-bind --mode=visual <A-d> bdelete
-bind --mode=hint <A-d> bdelete
-# TODO: check if pinned before deleting it! (Will need some js!)
+unbind D
+bind <A-d> tabclose_safe
+bind --mode=insert <A-d> tabclose_safe
+bind --mode=visual <A-d> tabclose_safe
+bind --mode=hint <A-d> tabclose_safe
 
 # tab pin
 bind <A-c> pin
