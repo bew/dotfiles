@@ -157,6 +157,12 @@ bind <A-n> findnext 1
 bind <A-N> findnext -1
 bind § nohlsearch
 
+# Send Escape to the page itself
+# NOTE: (on windows) couldn't map <A-Escape> for some reason, maybe related to my autohotkey setup w.r.t caps>>ctrl/escape
+bind <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
+bind --mode=insert <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
+bind --mode=visual <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
+
 # --- ex mode bindings
 
 # text actions (movement, changes)
