@@ -2,7 +2,7 @@ local wezterm = require "wezterm"
 
 local cfg = {}
 
-cfg.font_size = 13.0
+cfg.font_size = 12.0
 
 -- Makes FontAwesome's double-width glyphs display properly!
 cfg.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
@@ -38,7 +38,7 @@ local function font_and_rules_for_iosevka()
 end
 
 local function font_and_rules_for_cascadia()
-  local font = font_with_fallback("Cascadia Code")
+  local font = font_with_fallback("Cascadia Code Light")
   local font_rules = {
     {
       italic = true,
@@ -51,10 +51,6 @@ local function font_and_rules_for_cascadia()
     {
       intensity = "Bold",
       font = font_with_fallback("Cascadia Code Bold"),
-    },
-    {
-      intensity = "Half",
-      font = font_with_fallback("Cascadia Code Light"),
     },
   }
   return font, font_rules
