@@ -11,6 +11,6 @@ polybar sys-bar --reload
 
 echo script: Stopping bars
 
-# If the previous bars are stopped (e.g by SIGINT),
+# If the previous bar is stopped (e.g by SIGINT),
 # make sure to stop the other one.
 pkill polybar

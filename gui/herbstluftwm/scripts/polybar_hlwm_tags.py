@@ -25,11 +25,19 @@ def format_tag_label(tag: hlwm.Tag):
     elif tag.state.focused and tag.state.this_monitor:
         begin += "%{u#ff7043}"
         end = "%{-u}" + end
+        # FIXME: these underline above doesn't seem to work anymore :/
+        # (with version polybar 3.5.0)
+        # DIRTY HACK until the underline is fixed
+        begin += "%{F#ff7043}"
+        end = "%{F-}" + end
 
     client_count = int(Hlwm.hc("attr", f"tags.{tag.index}.client_count"))
     if client_count == 0:
-        begin += "%{F#555}"
-        end = "%{F-}" + end
+        # NOTE: Focused tag is not visible anymore because the underline is broken
+        #       This condition is tmp until the above 'fixme' is resolved
+        if not tag.state.focused:
+            begin += "%{F#555}"
+            end = "%{F-}" + end
 
     return begin + "  " + tag.name + "  " + end
 
