@@ -274,6 +274,8 @@ hc rule --instance="pavucontrol" floating=true floatplacement=center
 
 hc rule --instance="yad" floating=true
 
+hc rule --instance~".*kazam.*" floating=true
+
 # unlock, just to be sure
 hc unlock
 
