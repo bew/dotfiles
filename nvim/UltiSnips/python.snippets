@@ -4,35 +4,41 @@ priority -50
 
 snippet cl "class definition" b
 class ${1:MyClass}${2:(${3:object})}:
-	$99
+	${20:${VISUAL:pass}}
 endsnippet
 
 snippet def "function" b
-def ${1:function_name}(${2:self${3:, ${4:arg}}}):
-	${5:${VISUAL:pass}}
+def ${1:function_name}(${10:self${11:, ${12:arg}}})${20: -> ${21:None}}:
+	${30:${VISUAL:pass}}
 endsnippet
 
 snippet defi "initializer" b
 def __init__(self${1:, ${2:arg}}):
-	${3:${VISUAL:pass}}
+	${10:${VISUAL:pass}}
 endsnippet
 
 snippet defc "class method" b
 @classmethod
-def ${1:function_name}(cls${2:, ${3:arg}}):
-	${4:${VISUAL:pass}}
+def ${1:function_name}(cls${10:, ${11:arg}})${20: -> ${21:None}}:
+	${30:${VISUAL:pass}}
 endsnippet
 
 snippet defs "static method" b
 @staticmethod
-def ${1:function_name}(${2:arg}):
-	${3:${VISUAL:pass}}
+def ${1:function_name}(${10:arg})${20: -> ${21:None}}:
+	${30:${VISUAL:pass}}
 endsnippet
 
 snippet defp "property method" b
 @property
-def ${1:function_name}(self):
-	${2:${VISUAL:pass}}
+def ${1:function_name}(self)${10: -> ${11:None}}:
+	${20:${VISUAL:pass}}
+endsnippet
+
+snippet data "Dataclass definition" b
+@dataclass$1
+class ${10:MyClass}:
+	${20:${VISUAL:pass}}
 endsnippet
 
 # if / elif / else

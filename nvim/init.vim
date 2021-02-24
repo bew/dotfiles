@@ -77,14 +77,16 @@ let g:sandwich#recipes += [
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
 let g:neomake_virtualtext_prefix = "  <<  "
-let g:neomake_error_sign = { 'text': 'x', 'texthl': 'NeomakeSignError', }
+let g:neomake_error_sign = { 'text': 'x',   'texthl': 'NeomakeSignError', }
 let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeSignWarning', }
+let g:neomake_info_sign = { 'text': 'i',    'texthl': 'NeomakeSignInfo', }
 augroup my_neomake_hi
   au!
 
   " Signs
   au ColorScheme * hi NeomakeSignError   cterm=none ctermfg=red
   au ColorScheme * hi NeomakeSignWarning cterm=none ctermfg=yellow
+  au ColorScheme * hi NeomakeSignInfo    cterm=none ctermfg=cyan
 
   " Virtual text
   au ColorScheme * hi NeomakeVirtualtextError   cterm=italic ctermbg=none ctermfg=red
@@ -201,7 +203,6 @@ Plug 'autozimu/LanguageClient-neovim',
     \   'do': 'bash install.sh',
     \ }
 let g:LanguageClient_serverCommands = {
-    \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
     \ }
 " let g:LanguageClient_loggingFile = '/tmp/lsp.log'
 " let g:LanguageClient_loggingLevel = 'DEBUG'
