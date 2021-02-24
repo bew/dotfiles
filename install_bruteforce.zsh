@@ -71,6 +71,7 @@ make-link .dot/gui/urxvt     ~/.urxvt
 make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
 make-link .dot/gui/kitty     ~/.config/kitty
+make-link .dot/gui/dunst     ~/.config/dunst
 
 # Desktop env
 make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm
