@@ -14,26 +14,26 @@ endsnippet
 # other 'fn' snippet, used for closure when the cursor is not at BOL.
 priority 10
 snippet fn "A function, optionally with arguments and return type." b
-fn ${1:function_name}(${2:arg: type})${3: -> ${4:ret_type}} {
+${1:pub }fn ${2:function_name}(${3:arg: type})${4: -> ${5:ret_type}} {
 	${10:${VISUAL}}
 }
 endsnippet
 priority 0
 
 snippet fn "Closure, anonymous function (inline)" w
-|${1}| ${2:{$3}}
+|$1| ${2:{$3}}
 endsnippet
 
 snippet p "println!(..) with endline" w
-println!("${1}"${2});
+println!("$1"$2);
 endsnippet
 
 snippet pi "print!(..) inline" w
-print!("${1}"${2});
+print!("$1"$2);
 endsnippet
 
 snippet fmt "format!(..)" w
-format!("${1}"${2});
+format!("$1"$2)
 endsnippet
 
 snippet dbg "Debug expression" w
@@ -66,6 +66,10 @@ snippet com "Comment"
 // $0
 endsnippet
 
+snippet doc "Doc comment" b
+/// $0
+endsnippet
+
 snippet todo "A Todo comment"
 // TODO: $0
 endsnippet
@@ -85,7 +89,7 @@ snippet ann "#[...] annotation" b
 endsnippet
 
 snippet en "Enum" b
-enum ${1:Name} {$2}
+${1:pub }enum ${2:Name} {$3}
 endsnippet
 
 snippet impl "Struct/Trait implementation" b
@@ -94,8 +98,14 @@ impl ${1:TypeOrTrait}${2: for ${3:Type}} {
 }
 endsnippet
 
-snippet x "except(...)" w
-expect("${1:message}")$99
+snippet implgen "Struct/Trait generic implementation" b
+impl<${1:T}> ${2:TypeOrTrait}<${3:T}>${4: for ${5:Type}<${6:T}>} {
+	${0}
+}
+endsnippet
+
+snippet tr "Trait declaration" b
+trait ${1:Type} {$2}
 endsnippet
 
 # vim:ft=snippets:
