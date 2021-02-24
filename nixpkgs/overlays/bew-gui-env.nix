@@ -26,6 +26,7 @@ in {
 
       # desktop/wm related (TODO? nixify config)
       p.polybar
+      p.dunst
       # FIXME: herbstluftwm is missing here (can't get it to compile last version)
       p.stalonetray # TODO: use it!
 
