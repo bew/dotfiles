@@ -11,6 +11,8 @@ import sys; sys.path.append(os.path.dirname(__file__))  # noqa: E702
 import hlwm
 from hlwm import Hlwm
 
+from bar_fmt import action_start, action_end
+
 
 def print_now(text, **kwargs):
     print(text, flush=True, **kwargs)
@@ -46,7 +48,7 @@ def regen_polybar_tags_list():
     tags = Hlwm.get_tags(monitor="")
     formatted_tags = [format_tag_label(tag) for tag in tags]
     clickable_tags = [
-        "%{A1:herbstclient use '" + str(tag.name) + "':}" + tag_fmt + "%{A}"
+        action_start(f"herbstclient use '{tag.name}'") + tag_fmt + action_end()
         for tag, tag_fmt in zip(tags, formatted_tags)
     ]
     return "".join(clickable_tags)
