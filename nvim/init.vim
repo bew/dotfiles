@@ -213,8 +213,6 @@ augroup my_git_signs_hi
   au ColorScheme * hi link GitGutterDelete SignVcsDelete
 augroup END
 
-Plug 'easymotion/vim-easymotion' " Motions on speed!
-
 " -- Insert mode helpers
 
 Plug 'Raimondi/delimitMate'      " auto insert of second ()''{}[]\"\" etc...
@@ -360,7 +358,6 @@ Plug 'davidhalter/jedi-vim'         " IDE-like tooling
 let g:jedi#completions_enabled = 0  " Let my async completion engine do that, using omnifunc
 " Do not show call signature by hacking buffer content (breaks some completion)
 let g:jedi#show_call_signatures = "2"
-
 
 let g:jedi#auto_initialization = 0  " Do not auto-init jedi (mappings, ..)
 autocmd FileType python call <SID>setup_python_jedi()
