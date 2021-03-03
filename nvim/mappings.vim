@@ -11,10 +11,6 @@
 " gracefully (disable!).
 nnoremap <C-LeftMouse> <nop>
 
-" Helper guide on <Leader>
-nnoremap <Leader> :WhichKey '<Leader>'<cr>
-vnoremap <Leader> <cmd>WhichKeyVisual '<Leader>'<cr>
-
 " Save buffer
 nnoremap <M-s> :w<cr>
 inoremap <M-s> <Esc>:w<cr>
@@ -344,9 +340,58 @@ cnoremap <M-J> <S-Down>
 " Expand %% to dir of current file
 cnoremap <expr> %% expand("%:h") . "/"
 
+
+" ---- Various Leader key mappings ----
+" (NOTE: some mappings are in init.vim)
+"
+" Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
+
+" Helper guide on <Leader>
+nnoremap <Leader> <cmd>WhichKey '<Space>'<cr>
+vnoremap <Leader> <cmd>WhichKeyVisual '<Space>'<cr>
+
+" -- Code
+let g:which_key_map.c = {"name": "+code"}
+
+" code comment
+let g:which_key_map.c.c = {"name": "+comment"}
+nmap <Leader>cc<space> <plug>NERDCommenterToggle
+vmap <Leader>cc<space> <plug>NERDCommenterToggle
+nmap <Leader>ccc       <plug>NERDCommenterComment
+nmap <Leader>ccu       <plug>NERDCommenterUncomment
+nmap <Leader>cci       <plug>NERDCommenterInvert
+let g:which_key_map.c.c["<space>"] = "toggle"
+let g:which_key_map.c.c.c = "force"
+let g:which_key_map.c.c.u = "remove"
+let g:which_key_map.c.c.i = "invert"
+
+" code language tools (not done globally.. LSP would solve this..)
+" cr   rename
+" cu   show usages
+" cd   goto definition
+"
+" Currently my main usage is with jedi-vim, which I configure manually
+" when a python buffer opens.
+" NOTE: I don't know how to set a which_key_map for a single buffer
+
+" -- Edit
+let g:which_key_map.e = {"name": "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
 nmap <leader>ee  :e %%
 nmap <leader>es  :spl %%
 nmap <leader>ev  :vsp %%
 nmap <leader>et  :tabe %%
+let g:which_key_map.e.e = "relative here"
+let g:which_key_map.e.s = "relative in split"
+let g:which_key_map.e.v = "relative in vertical split"
+let g:which_key_map.e.t = "relative in tab"
+
+" -- Git
+nmap <leader>hp <Plug>(GitGutterPreviewHunk)
+nmap <leader>hu <Plug>(GitGutterUndoHunk)
+nmap <leader>hf <cmd>GitGutterFold<cr>
+let g:which_key_map.h = {"name": "+git-hunks"}
+let g:which_key_map.h.p = "preview"
+let g:which_key_map.h.u = "undo"
+let g:which_key_map.h.f = "fold non-hunk"

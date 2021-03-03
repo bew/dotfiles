@@ -12,7 +12,7 @@ let g:python3_host_prog = $NVIM_PY_VENV . "/bin/python3"
 " NOTE: Make sure to install pynvim in this environment! (and jedi for py dev)
 
 " map leader definition - space
-let mapleader = " "
+let g:mapleader = " "
 
 call plug#begin('~/.nvim/plugged')
 
@@ -31,6 +31,23 @@ Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/et
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'      " * for visualy selected text
 Plug 'itchyny/lightline.vim'      " statusline builder
+
+Plug 'liuchengxu/vim-which-key'
+" My floating win highlightings aren't ready for this...
+let g:which_key_use_floating_win = 0
+" let g:which_key_timeout = 0  " Does not seem to work, it still takes &timeoutlen to open.
+let g:which_key_sep = '->'
+autocmd! FileType which_key
+autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
+let g:which_key_map = {}  " Fill this map for which-key helper!
+autocmd User PluginsLoaded call which_key#register("<space>", "g:which_key_map")
+" Create a per-buffer map, to avoid crashing WhichKey when the variable
+" does not exist, we must create a buffer dict, empty for most files,
+" which will be filled for some file types
+" FIXME: This does NOT work, because vim-which-key does NOT merge the
+"        dicts of multiple register('same-prefix', different-dict).
+" autocmd BufRead * let b:which_key_map = {}
+" autocmd User PluginsLoaded call which_key#register("<space>", "b:which_key_map")
 
 Plug 'jremmen/vim-ripgrep'
 let g:rg_command = 'rg --vimgrep -S' " -S for smartcase
@@ -123,8 +140,26 @@ augroup my_floaterm
 augroup END
 
 
-Plug 'scrooloose/nerdcommenter'     " Comment stuff out
-Plug 'scrooloose/nerdtree'        " Tree based file explorer
+Plug 'preservim/nerdcommenter'         " Comment stuff out
+let g:NERDCreateDefaultMappings = 0
+
+" Specifies the default alignment to use when inserting comments.
+let g:NERDDefaultAlign = 'left'
+
+" Add some spaces between the comment delimiter (e.g: `#`) and the commented text
+let g:NERDSpaceDelims = 1
+
+" When uncommenting an empty line some whitespace may be left as a result of
+" alignment padding. With this option enabled any trailing whitespace will be
+" deleted when uncommenting a line.
+let g:NERDTrimTrailingWhitespace = 1
+
+let g:NERDCustomDelimiters = {}
+let g:NERDCustomDelimiters.python = {"left": "#"}
+
+" --
+
+Plug 'preservim/nerdtree'    " Tree based file explorer
 
 Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
 let g:ctrlsf_confirm_save = 1
@@ -150,18 +185,6 @@ let g:ctrlsf_auto_close = {
 
 Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 let g:gitgutter_map_keys = 0
-nmap <leader>hp <Plug>(GitGutterPreviewHunk)
-nmap <leader>hu <Plug>(GitGutterUndoHunk)
-nnoremap <leader>hf :GitGutterFold<cr>
-
-nnoremap ]h :GitGutterNextHunk<cr>
-nnoremap [h :GitGutterPrevHunk<cr>
-
-" Hunk text object
-omap ih <Plug>(GitGutterTextObjectInnerPending)
-omap ah <Plug>(GitGutterTextObjectOuterPending)
-xmap ih <Plug>(GitGutterTextObjectInnerVisual)
-xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 
 if $ASCII_ONLY != "1"
   let g:gitgutter_sign_added              = "┃"
@@ -169,7 +192,19 @@ if $ASCII_ONLY != "1"
   let g:gitgutter_sign_removed            = "▁"
   let g:gitgutter_sign_removed_first_line = "▔"
   let g:gitgutter_sign_modified_removed   = "~▁"
+else
+  " The default for this is a unicode symbol, which can break the display
+  let g:gitgutter_sign_removed_first_line = "-"
 endif
+
+" TODO: move these mappings to 'mappings.vim' ?
+nnoremap ]h :GitGutterNextHunk<cr>
+nnoremap [h :GitGutterPrevHunk<cr>
+" Hunk text object
+omap ih <Plug>(GitGutterTextObjectInnerPending)
+omap ah <Plug>(GitGutterTextObjectOuterPending)
+xmap ih <Plug>(GitGutterTextObjectInnerVisual)
+xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 
 augroup my_git_signs_hi
   " NOTE: all SignVcs* highlights are defined in my color scheme
@@ -179,13 +214,6 @@ augroup my_git_signs_hi
 augroup END
 
 Plug 'easymotion/vim-easymotion' " Motions on speed!
-
-Plug 'liuchengxu/vim-which-key'
-" My floating win highlightings aren't ready for this...
-let g:which_key_use_floating_win = 0
-let g:which_key_sep = '--'
-autocmd! FileType which_key
-autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
 
 " -- Insert mode helpers
 
@@ -333,6 +361,29 @@ let g:jedi#completions_enabled = 0  " Let my async completion engine do that, us
 " Do not show call signature by hacking buffer content (breaks some completion)
 let g:jedi#show_call_signatures = "2"
 
+
+let g:jedi#auto_initialization = 0  " Do not auto-init jedi (mappings, ..)
+autocmd FileType python call <SID>setup_python_jedi()
+function! s:setup_python_jedi()
+  " Inspired from <jedi-vim-plugin-dir>/ftplugin/python/jedi.vim
+  nnoremap <buffer>  <leader>cd   <cmd>call jedi#goto()<CR>
+  nnoremap <buffer>  <leader>cu   <cmd>call jedi#usages()<CR>
+  nnoremap <buffer>  <leader>cr   <cmd>call jedi#rename()<CR>
+  vnoremap <buffer>  <leader>cr   <cmd>call jedi#rename_visual()<CR>
+  " NOTE: vim-which-key does NOT work with global & local maps,
+  "       see the config of vim-which-key for more details.
+  " let b:which_key_map.c = {"name": "+code"}
+  " let b:which_key_map.c.d = "goto definition"
+  " let b:which_key_map.c.u = "goto usages"
+  " let b:which_key_map.c.r = "rename"
+
+  nnoremap <silent> <buffer> K   <cmd>call jedi#show_documentation()<CR>
+
+  if g:jedi#show_call_signatures > 0
+    call jedi#configure_call_signatures()
+  endif
+endf
+
 " Jinja templating syntax & indent
 Plug 'lepture/vim-jinja'
 
@@ -375,6 +426,7 @@ Plug 'tbastos/vim-lua'
 let g:lua_syntax_nofold = 1  " Disable auto code folding
 
 call plug#end()
+doautocmd User PluginsLoaded
 
 """""""""""""""""""""""""""""""""
 
