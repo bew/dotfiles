@@ -43,6 +43,7 @@
   br = branch
   brv = "!git --no-pager branch -vv"
   s = status --ignore-submodules=all
+  suf = status --untracked-files
 
   # log
   pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d%C(reset)%n          %C(white)%s%C(reset)   %C(dim magenta)by %an%C(reset)%n'
