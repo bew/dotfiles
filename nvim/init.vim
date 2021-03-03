@@ -263,6 +263,10 @@ command! FilesSmart call fzf#run(fzf#wrap({
     \   "options": ["--multi"]
     \ }))
 command! Files      FZF
+command! OldFiles call fzf#run(fzf#wrap({
+    \   "source": v:oldfiles,
+    \   "options": ["--multi"]
+    \ }))
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 augroup my_startify
