@@ -244,6 +244,16 @@ function segmt::debug
   echo -n "%K{blue} DEBUG: $* %k"
 }
 
+PROMPT_OVERRIDE_PWD=
+function segmt::short_pwd_no_color
+{
+  if [[ -n "$PROMPT_OVERRIDE_PWD" ]]; then
+    echo -n "$PROMPT_OVERRIDE_PWD"
+  else
+    echo -n "%2~"
+  fi
+}
+
 # Build a string from an array of parts.
 # A part can be a function or a simple text.
 #
@@ -396,13 +406,17 @@ function sl::build_prompt_str
   echo -n "%{${sl_container}%}"
 }
 
+VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
+
 # -- Left prompt
 
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%B%F{magenta} %2~ %f%b" # current dir
+  text: "%B%F{magenta} "
+  func: segmt::short_pwd_no_color
+  text: " %f%b" # current dir
   func: segmt::short_vim_mode
   text: " "
   text: "%(!.#.>)"
@@ -411,7 +425,9 @@ PROMPT_PAST_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
+  text: "%K{black}%B%F{cyan} "
+  func: segmt::short_pwd_no_color
+  text: " %f%b%k" # current dir
   text: " "
   text: "%B%F{black}%%%f%b" # cmd separator
 )
