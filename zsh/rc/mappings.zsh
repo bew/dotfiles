@@ -614,6 +614,60 @@ bindkey -M visual S add-surround
 # Logical redo (u U)
 bindkey -M vicmd 'U' redo
 
+# START OF COPY/PASTE SETUP
+
+function zwidget::clipboard-visual-paste
+{
+  local content=$(cli-clipboard-provider paste-from smart-session)
+  zle copy-region-as-kill "$content" # copy content in the kill buffer
+  zle put-replace-selection
+}
+zle -N zwidget::clipboard-visual-paste
+
+function zwidget::clipboard-paste-before
+{
+  CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
+  zle vi-put-before
+}
+zle -N zwidget::clipboard-paste-before
+
+function zwidget::clipboard-paste-after
+{
+  CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
+  zle vi-put-after
+}
+zle -N zwidget::clipboard-paste-after
+
+function zwidget::clipboard-visual-copy
+{
+  zle vi-yank # copy region to kill buffer
+  local content="$CUTBUFFER"
+  printf "%s" "$content" | cli-clipboard-provider copy-to smart-session
+  zle -M "Copied to session clipboard!"
+}
+zle -N zwidget::clipboard-visual-copy
+
+# Copy/paste in the session (or system as fallback)
+bindkey -M visual 'c' zwidget::clipboard-visual-copy
+bindkey -M visual 'v' zwidget::clipboard-visual-paste
+bindkey -M viins 'v' zwidget::clipboard-paste-before
+bindkey -M vicmd 'v' zwidget::clipboard-paste-after
+
+# copy selection to host system (via osc52)
+function zwidget::clipboard-visual-copy-to-system
+{
+  zle vi-yank # copy region to kill buffer
+  local content="$CUTBUFFER"
+  export CLIPBOARD_REQUESTOR_TTY=$TTY # needed for osc52 (see its provider for details)
+  printf "%s" "$content" | cli-clipboard-provider copy-to system
+  zle -M "Copied to system clipboard! ('$content')"
+}
+zle -N zwidget::clipboard-visual-copy-to-system
+
+bindkey -M visual 'C' zwidget::clipboard-visual-copy-to-system
+
+# END OF COPY/PASTE SETUP
+
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
 function zwidget::go-right_or_git-log
