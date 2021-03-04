@@ -93,8 +93,11 @@ set wildignorecase    " ignore case when completing filenames
 """ Format options
 
 " Disable auto wrap comment automatically
-set formatoptions-=a " for text
+set formatoptions-=t " for text
 set formatoptions-=c " for comments
+
+" Disable auto-format of paragraphs
+set formatoptions-=a
 
 " Enable auto comment new line when pressing <Enter> in insert mode
 set formatoptions+=r
@@ -130,18 +133,17 @@ let g:vim_indent_cont = 4
 " Setting colorscheme
 syntax enable " Not 'syntax on' which overrides colorscheme
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""
-" Put swap & undo files in ~/.nvim/swap_undo/{swap,undo}files/
-
-let swap_undo_dir = $HOME . '/.nvim/swap_undo'
-
+" Setup swap/undo files
+"
+" The 'directory' & 'undodir' option ends with '//' so that the swap/undo file
+" name will be built from the absolute path to the file with all path separators
+" substituted to percent '%' signs. This will ensure file name uniqueness in the
+" directory.
 set undofile
 set swapfile
-
-let &directory = swap_undo_dir . '/swapfiles'
-let &undodir = swap_undo_dir . '/undofiles'
-
+let swap_undo_dir = $HOME . "/.nvim/swap_undo"
+let &directory = swap_undo_dir . "/swapfiles//"
+let &undodir = swap_undo_dir . "/undofiles//"
 " Ensures the directofies exists!
-call mkdir(swap_undo_dir . '/swapfiles', 'p')
-call mkdir(swap_undo_dir . '/undofiles', 'p')
+call mkdir(&directory, "p")
+call mkdir(&undodir, "p")
