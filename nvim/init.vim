@@ -256,16 +256,20 @@ let g:fzf_action = {
     \ "alt-v": "vsplit",
     \ }
 let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
-let g:fzf_layout = {"window": "bot 20new"}
+" let g:fzf_layout = {"window": "bot 25new"}
+let g:fzf_layout = {"window": {"width": 0.5, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
 command! FilesSmart call fzf#run(fzf#wrap({
     \   "source": "fd --type f --type l --follow",
-    \   "options": ["--multi"]
+    \   "options": ["--multi", "--prompt", "FilesSmart-> "]
     \ }))
-command! Files      FZF
+command! Files call fzf#run(fzf#wrap({
+    \   " Using the default source of fzf to find ALL files
+    \   "options": ["--multi", "--prompt", "Files-> "]
+    \ }))
 command! OldFiles call fzf#run(fzf#wrap({
     \   "source": v:oldfiles,
-    \   "options": ["--multi"]
+    \   "options": ["--multi", "--prompt", "OldFiles-> "]
     \ }))
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
