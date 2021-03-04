@@ -2,6 +2,15 @@ snippet #!
 #!/usr/bin/env ${1:bash}
 endsnippet
 
+snippet init "Init guard for all scripts" b
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+endsnippet
+
 
 # Control flow
 
