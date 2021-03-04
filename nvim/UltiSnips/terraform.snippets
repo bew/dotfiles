@@ -1,0 +1,52 @@
+snippet prov "Provider block" b
+provider "${1:name}" {
+  $10
+}
+endsnippet
+
+snippet var "Variable" b
+variable "${1:name}" {
+  description = "${2:description}"
+  type        = ${3:string}
+}
+endsnippet
+
+snippet out "Output" b
+output "${1:name}" {
+  value = ${2:the.value}
+}
+endsnippet
+
+snippet mod "Module instantiation" b
+module "${1:name}" {
+  source = "${2:path/to/module}"
+}
+endsnippet
+
+snippet dat "Data instantiation" b
+data "${1:type}" "${2:name}" {
+  $10
+}
+endsnippet
+
+snippet res "Resource instantiation" b
+resource "${1:type}" "${2:name}" {
+  $10
+}
+endsnippet
+
+snippet loc "Locals block" b
+locals {
+  $1
+}
+endsnippet
+
+snippet is "Interpolated string"
+"$1${${2:${VISUAL}}}"
+endsnippet
+
+snippet here "Heredoc" w
+<<${1:EOT}
+  $2
+$1
+endsnippet
