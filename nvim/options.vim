@@ -63,7 +63,6 @@ set pumheight=20
 
 " Show non visible chars (tabs/trailing spaces/too long lines/etc..)
 set list
-" As always, read :help pages for details!
 set listchars=
 set listchars+=tab:·\ ,     " Tab char
 set listchars+=trail:@,     " Trailing spaces

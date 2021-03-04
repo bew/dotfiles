@@ -33,7 +33,6 @@ Plug 'thinca/vim-visualstar'      " * for visualy selected text
 Plug 'itchyny/lightline.vim'      " statusline builder
 
 Plug 'liuchengxu/vim-which-key'
-" My floating win highlightings aren't ready for this...
 let g:which_key_use_floating_win = 0
 " let g:which_key_timeout = 0  " Does not seem to work, it still takes &timeoutlen to open.
 let g:which_key_sep = '->'
@@ -70,16 +69,6 @@ xmap is <Plug>(textobj-sandwich-query-i)
 xmap as <Plug>(textobj-sandwich-query-a)
 omap is <Plug>(textobj-sandwich-query-i)
 omap as <Plug>(textobj-sandwich-query-a)
-" Textobjects to select the nearest surrounded text automatically
-xmap iss <Plug>(textobj-sandwich-auto-i)
-xmap ass <Plug>(textobj-sandwich-auto-a)
-omap iss <Plug>(textobj-sandwich-auto-i)
-omap ass <Plug>(textobj-sandwich-auto-a)
-" Textobjects to select a text surrounded by same characters user input
-xmap im <Plug>(textobj-sandwich-literal-query-i)
-xmap am <Plug>(textobj-sandwich-literal-query-a)
-omap im <Plug>(textobj-sandwich-literal-query-i)
-omap am <Plug>(textobj-sandwich-literal-query-a)
 
 " Add spaces inside () [] {} when using ( [ or {. (mimicking vim-surround)
 " Ref: https://github.com/machakann/vim-sandwich/wiki/Bracket-with-spaces
@@ -246,7 +235,16 @@ nmap gc  <Plug>(git-messenger)
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
 let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["┆", "┊", "┆", "¦"])
-let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown', 'codi']
+let g:indentLine_fileTypeExclude = [
+    \   "help",
+    \   "startify",
+    \   "man",
+    \   "defx",
+    \   "markdown",
+    \   "codi",
+    \   "json",
+    \   "nerdtree"
+    \ ]
 
 " File opening
 Plug '~/.nix-profile/share/vim-plugins/fzf'
