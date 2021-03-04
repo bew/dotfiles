@@ -104,8 +104,10 @@ set formatoptions+=r
 
 " Enable correct comment join (remove comment start)
 set formatoptions+=j
-
 """
+
+" Remove builtin preview window on completion
+set completeopt-=preview
 
 """ search ignore
 
