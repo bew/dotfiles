@@ -175,6 +175,10 @@ let g:ctrlsf_auto_close = {
 Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 let g:gitgutter_map_keys = 0
 
+" Set a high sign priority, to avoid mixing signs based on order of appearance
+" (default: 10, lower is higher priority)
+let g:gitgutter_sign_priority = 5
+
 if $ASCII_ONLY != "1"
   let g:gitgutter_sign_added              = "┃"
   let g:gitgutter_sign_modified           = "┃"
