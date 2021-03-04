@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+# Clipboard provider for the current session (e.g: when in tmux) if available,
+# and fallback to the system provider otherwise.
+
+if [[ -n ${TMUX:-} ]]; then
+  # we are running under a tmux session, use it!
+  copy_provider=tmux
+  paste_provider=tmux
+else
+  copy_provider=system
+  paste_provider=system
+fi
+
+action="$1"
+case "$action" in
+  copy)
+    cli-clipboard-provider copy-to $copy_provider
+    ;;
+  paste)
+    cli-clipboard-provider paste-from $paste_provider
+    ;;
+  *)
+    >&2 echo "ERROR: invalid action '$action', must be copy or paste"
+    exit 1
+    ;;
+esac
+
+# vim:set sw=2:

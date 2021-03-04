@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+# Clipboard provider using xclip.
+
+command -v xclip >/dev/null || exit 1
+
+action="$1"
+case "$action" in
+  copy)
+    xclip -i -selection clipboard
+    ;;
+  paste)
+    xclip -o -selection clipboard
+    ;;
+  *)
+    >&2 echo "ERROR: invalid action '$action', must be copy or paste"
+    exit 1
+    ;;
+esac
+
+# vim:set sw=2:

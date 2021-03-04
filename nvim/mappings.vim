@@ -245,14 +245,32 @@ nnoremap <M-C-f> gg=G``
 nnoremap <M-J> i<c-j><esc>k$
 
 " Copy/Paste with system clipboard (using nvim's clipboard provider)
+" Register "+ is session clipboard
+" Register "* is OS/system clipboard
+let g:clipboard = {
+    \   'name': 'myClipboard',
+    \   'copy': {
+    \      '+': 'cli-clipboard-provider copy-to smart-session',
+    \      '*': 'cli-clipboard-provider copy-to system',
+    \    },
+    \   'paste': {
+    \      '+': 'cli-clipboard-provider paste-from smart-session',
+    \      '*': 'cli-clipboard-provider paste-from system',
+    \   },
+    \ }
+
 " Copy
-vnoremap <silent> <M-c> "+y :echo "Copied!"<cr>
+xnoremap <M-c> "+y :echo "Copied to session clipboard!"<cr>
+xnoremap <M-C> "*y :echo "Copied to system clipboard!"<cr>
+
 " Paste
-nnoremap <silent> <M-v> "+p
-nnoremap <silent> <M-V> o<C-u><esc>"+p
-vnoremap <silent> <M-v> "+p
+nnoremap <M-v> "+p
+nnoremap <M-V> o<esc>"+p
+xnoremap <M-v> "+p
+cnoremap <M-v> <C-r>+
 " Paste in insert mode inserts an undo breakpoint
 inoremap <silent> <M-v> <C-g>u<C-r>+
+" TODO?: Add system paste bindings
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.

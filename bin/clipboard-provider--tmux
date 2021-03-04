@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Clipboard provider using tmux buffer.
+
+[[ -n $TMUX ]] || exit 1
+
+action="$1"
+case "$action" in
+  copy)
+    tmux load-buffer - # consumes stdin here
+    ;;
+  paste)
+    tmux save-buffer -
+    ;;
+  *)
+    >&2 echo "ERROR: invalid action '$action', must be copy or paste"
+    exit 1
+    ;;
+esac
+
+# vim:set sw=2:
