@@ -531,11 +531,10 @@ vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
 vibindkey 'L' zwidget::git-log-always-for-repo
 
+# Alt-CTRL-E => edit line in $EDITOR
 autoload -U edit-command-line
 zle -N edit-command-line
-
-# Alt-E => edit line in $EDITOR
-vibindkey 'e' edit-command-line
+vibindkey '^e' edit-command-line
 
 source ~/.zsh/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
