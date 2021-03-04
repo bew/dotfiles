@@ -1,0 +1,215 @@
+#!/bin/bash
+# Inspired from https://iterm2.com/utilities/imgcat
+# Protocol documentation, from: https://iterm2.com/documentation-images.html
+#
+# ESC ] 1337 ; File = [arguments] : base-64 encoded file content ^G
+#
+# The arguments are formatted as key=value with a semicolon between each key-value pair. They are described below:
+# - name    base-64 encoded filename. Defaults to "Unnamed file".
+# - size    File size in bytes. The file transfer will be canceled if this size is exceeded.
+# - width   (Optional) Width to render. See notes below.
+# - height  (Optional) Height to render. See notes below.
+# - inline  (Optional) If set to 1, the file will be displayed inline. Otherwise, it will be
+#           downloaded with no visual representation in the terminal session. Defaults to 0.
+# - preserveAspectRatio  (Optional) If set to 0, then the image's inherent aspect ratio
+#           will not be respected; otherwise, it will fill the specified width and height as
+#           much as possible without stretching. Defaults to 1.
+#
+# The width and height are given as a number or cells, or a number followed by a unit, or the word "auto".
+# - N: N character cells.
+# - Npx: N pixels.
+# - N%: N percent of the session's width or height.
+# - auto: The image's inherent size will be used to determine an appropriate dimension.
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function in_tmux() {
+  # We also check $TERM because TERM gets passed through ssh.
+  [[ -n ${TMUX:-} ]] || [[ $TERM == screen* ]] || [[ $TERM == tmux* ]]
+}
+
+# tmux requires unrecognized OSC sequences to be wrapped with DCS tmux;
+# <sequence> ST, and for all ESCs in <sequence> to be replaced with ESC ESC. It
+# only accepts ESC backslash for ST.
+function print_osc() {
+  if in_tmux; then
+    printf "\033Ptmux;\033\033]"
+  else
+    printf "\033]"
+  fi
+}
+
+# More of the tmux workaround described above.
+function print_st() {
+  if in_tmux; then
+    printf "\a\033\\"
+  else
+    printf "\a"
+  fi
+}
+
+function load_version() {
+  if [ -z ${IMGCAT_BASE64_VERSION+x} ]; then
+    IMGCAT_BASE64_VERSION=$(base64 --version 2>&1)
+    export IMGCAT_BASE64_VERSION
+  fi
+}
+
+function b64_encode() {
+  load_version
+  if [[ $IMGCAT_BASE64_VERSION =~ GNU ]]; then
+    # Disable line wrap
+    base64 -w0
+  else
+    base64
+  fi
+}
+
+function b64_decode() {
+  load_version
+  if [[ $IMGCAT_BASE64_VERSION =~ fourmilab ]]; then
+    BASE64ARG=-d
+  elif [[ $IMGCAT_BASE64_VERSION =~ GNU ]]; then
+    BASE64ARG=-di
+  else
+    BASE64ARG=-D
+  fi
+  base64 $BASE64ARG
+}
+
+# print_image filename base64content
+#   filename: Filename to convey to client
+#   b64_content: Base64-encoded content
+#   render_width: Width to render
+#   render_height: Height to render
+function print_image() {
+  local filename="$1"
+  local b64_content="$2"
+  local render_width="$3"
+  local render_height="$4"
+  print_osc
+  printf '1337;File='
+  if [[ -n $filename ]]; then
+    printf "name=%s;" "$(printf "%s" "$filename" | b64_encode)"
+  fi
+  printf "size=%d;" $(printf "%s" "$b64_content" | b64_decode | wc -c)
+  printf "inline=1;"
+  printf "width=%s;" "$render_width"
+  printf "height=%s;" "$render_height"
+  printf ":"
+  printf "%s" "$b64_content"
+  print_st
+  printf '\n'
+}
+
+function error() {
+  echo "ERROR: $*" 1>&2
+}
+
+function show_help() {
+  echo "Usage: imgcat [options] file..." 1>&2
+  echo "   or: imgcat [options] < filename" 1>&2
+  echo
+  echo "Options:"
+  echo "  -h,--help     Show this help"
+  echo "  -u,--url URL  Print image from the following URL"
+  echo "  --width N     Width for image render (default: auto)"
+  echo "  --height N    Height for image render (default: auto)"
+  echo
+  echo "Width & Height options must have following format:"
+  echo "  N        N character cells"
+  echo "  Npx      N pixels"
+  echo "  N%       N percent of the terminal's width or height"
+  echo "  auto     The image's size is used"
+
+  if in_tmux; then
+    echo
+    echo "Running in tmux, image display might not work correctly"
+  fi
+  echo
+}
+
+function check_dependency() {
+  if ! (builtin command -V "$1" >/dev/null 2>&1); then
+    echo "imgcat: missing dependency: can't find $1" 1>&2
+    exit 1
+  fi
+}
+
+## Main
+
+if [ -t 0 ]; then
+  has_stdin=false
+else
+  has_stdin=true
+fi
+
+# Show help if no arguments and no stdin.
+if [ $has_stdin = false ] && [ $# -eq 0 ]; then
+  show_help
+  exit
+fi
+
+check_dependency base64
+check_dependency wc
+
+render_width=auto
+render_height=auto
+
+# Look for command line flags.
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h | --help)
+      show_help
+      exit
+      ;;
+    --width)
+      render_width="$2"
+      shift
+      ;;
+    --height)
+      render_height="$2"
+      shift
+      ;;
+    -u | --url)
+      check_dependency curl
+      encoded_image=$(curl -s "$2" | b64_encode) || (
+      error "No such file or url $2"
+      exit 2
+    )
+    has_stdin=false
+    print_image "$2" "$encoded_image" "$render_width" "$render_height"
+    set -- "${@:1:1}" "-u" "${@:3}"
+    if [ "$#" -eq 2 ]; then
+      exit
+    fi
+    ;;
+  -*)
+    error "Unknown option flag: $1"
+    show_help
+    exit 1
+    ;;
+  *)
+    if [ -r "$1" ]; then
+      has_stdin=false
+      print_image "$1" "$(b64_encode <"$1")" "$render_width" "$render_height"
+    else
+      error "imgcat: The file '$1' cannot be read"
+      exit 2
+    fi
+    ;;
+esac
+shift
+done
+
+# Read and print stdin
+if [ $has_stdin = true ]; then
+  print_image "" "$(cat | b64_encode)" "$render_width" "$render_height"
+fi
+
+exit 0
