@@ -14,10 +14,15 @@ set -euo pipefail
 #       and fallback to xclip if available.
 # => Can take inspiration from $VIMRUNTIME/autoload/provider/clipboard.vim
 
+copy_provider=xclip
+if [[ -n ${WEZTERM_PANE:-} ]]; then
+  copy_provider=osc52
+fi
+
 action="$1"
 case "$action" in
   copy)
-    cli-clipboard-provider copy-to osc52 xclip
+    cli-clipboard-provider copy-to "$copy_provider"
     ;;
   paste)
     cli-clipboard-provider paste-from xclip
