@@ -134,6 +134,22 @@ nnoremap <M-Z> :tabmove +1<cr>
 inoremap <M-A> <esc>:tabmove -1<cr>
 inoremap <M-Z> <esc>:tabmove +1<cr>
 
+" Close tab Alt-d (with confirmation)
+nnoremap <M-d> :call <SID>TabCloseWithConfirmation()<cr>
+function! s:TabCloseWithConfirmation()
+  if len(gettabinfo()) == 1
+    echo "Cannot close last tab"
+    return
+  endif
+  let choice = confirm("Close tab?", "&Yes\n&Cancel", 0)
+  redraw " clear cmdline, remove the confirm prompt
+  if choice == 1   " Yes
+    tabclose
+  else
+    echo "Close tab cancelled"
+  endif
+endf
+
 " Open current buffer in new tab (in a new window)
 nnoremap <silent> <M-t> :tab split<cr>
 " Move current window to new tab
