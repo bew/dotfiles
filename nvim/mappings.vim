@@ -145,6 +145,7 @@ nnoremap <M-p> :bprevious<cr>
 " FIXME: I'll probably remove these since they're not that common,
 " and the keys could be better used.
 " > Maybe use <Tab> <S-Tab> for tab-local-n/p-buffer & <M-Tab> <M-S-Tab> for global-n/p-buffer
+
 " Toggle zoom on current window
 " From justinmk' config https://github.com/justinmk/config/blob/a93dc73fafbdeb583ce177a9d4ebbbdfaa2d17af/.config/nvim/init.vim#L880-L894
 function! s:zoom_toggle()
