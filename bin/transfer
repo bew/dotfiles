@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
 function transfer
 {
   if [ $# -eq 0 ]; then
@@ -12,7 +19,7 @@ function transfer
     return 1;
   fi
 
-  tmpfile=$( mktemp -t transferXXX );
+  local tmpfile=$( mktemp -t transferXXX );
   if tty -s; then
     # input is from given file
     basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g');
@@ -26,3 +33,5 @@ function transfer
   command rm -f $tmpfile;
   echo
 }
+
+transfer "$@"

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function repeat_every_while
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: repeat_every_while <interval> <cmd...>"
+    return 1
+  fi
+
+  local interval="$1"; shift
+  while "$@"; do
+    sleep $interval
+  done
+}
+
+case "$(basename $0)" in
+  repeat_every_while)
+    repeat_every_while "$@";;
+  repeat_while)
+    repeat_every_while 1 "$@";;
+  *)
+    2>&1 echo "This program doesn't know this alias"
+    exit 1
+    ;;
+esac

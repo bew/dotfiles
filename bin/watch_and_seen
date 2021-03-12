@@ -47,3 +47,5 @@ function watch_and_seen
     esac
   fi
 }
+
+watch_and_seen "$@"

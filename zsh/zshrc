@@ -171,21 +171,6 @@ source ~/.zsh/rc/ssh_agent.zsh
 
 fpath=(~/.zsh/fpath $fpath)
 
-autoload -U repeat_every_while
-alias repeat_while="repeat_every_while 1"
-
-autoload -U myip
-autoload -U weather
-
-autoload -U countdown chronometer
-
-autoload -U transfer
-
-autoload -U http::serve-local
-
-autoload -U extract
-alias extract::dry-run='extract --dry-run'
-
 # Switch terminal colors dark/light at runtime
 function switch-term-colors
 {
@@ -202,9 +187,6 @@ autoload -U venv::load_funcs
 
 # ------------------------------------------------------------
 # Media helper funcs
-
-autoload -U watch_and_seen
-compdef _mpv watch_and_seen
 
 autoload -U ffmpeg::load_funcs
 

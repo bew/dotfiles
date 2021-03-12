@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function myip
+{
+  local ip=$(curl -s https://api.my-ip.io/ip.txt)
+  echo "My public IP address is: $ip"
+}
+
+myip
