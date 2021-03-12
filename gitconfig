@@ -108,14 +108,16 @@
   plus-style = syntax 22
   plus-emph-style = normal bold 28
 
+  file-modified-label = changed:
+
 [delta "decorations"]
-  commit-decoration-style = bold yellow box ul
+  file-style = bold 166
+  file-decoration-style = none
+  # NOTE: the decoration styles ul/ol/box uses unicode chars AFAIK
 
-  file-style = bold yellow ul # yellow underlined
-  file-decoration-style = ul
-  # NOTE: the styles `ul` & `box` uses unicode chars AFAIK
+  commit-decoration-style = ol
 
-  hunk-header-style = white bold 59 # white on grey
+  hunk-header-style = 243 236 # light grey on dark grey
   hunk-header-decoration-style = bold
 
   line-numbers-left-format = {nm:^4}|
