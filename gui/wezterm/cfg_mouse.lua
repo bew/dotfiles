@@ -56,6 +56,13 @@ function binds_extend_mouse_select(button, streak, selection_mode)
       event={Drag={streak=streak, button=button}},
       action=wezterm.action{ExtendSelectionToMouseCursor=selection_mode},
     },
+
+    -- Complete on Up event
+    {
+      mods="NONE",
+      event={Up={streak=streak, button=button}},
+      action=wezterm.action{CompleteSelection="PrimarySelection"}
+    },
   }
 end
 table.insert(mouse_bindings, {
