@@ -22,7 +22,7 @@ function extract
   fi
 
   local compressed_file="$1"
-  local target_dir="${2:-.}"
+  local target_dir="${2:-${compressed_file%.*}}" # defaults to <compressed_file> without any extension
   local source_dir="$PWD"
 
   echo "--> Extracting '$compressed_file' to '$target_dir'..."
