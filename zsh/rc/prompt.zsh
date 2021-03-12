@@ -383,7 +383,7 @@ PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%B%F{magenta} "
+  text: "%B%F{166} "
   func: segmt::short_pwd_no_color
   text: " %f%b" # current dir
   func: segmt::short_vim_mode
