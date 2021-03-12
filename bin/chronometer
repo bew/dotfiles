@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
 function chronometer
 {
   local quit
@@ -14,3 +21,5 @@ function chronometer
 
   date -u --date @$(( `date +%s` - $start_tstamp )) +%M:%S
 }
+
+chronometer

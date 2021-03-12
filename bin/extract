@@ -1,17 +1,24 @@
 #!/bin/bash
 
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
 # Extract common compressed file formats
 function extract
 {
+  if [[ $# == 0 ]]; then
+    echo "Usage: extract [--dry-run] <compressed_file> [<directory>]"
+    return 1
+  fi
+
   local dryrun=0
   if [[ "$1" == "--dry-run" ]]; then
     dryrun=1
     shift
-  fi
-
-  if [[ $# == 0 ]]; then
-    echo "Usage: extract [--dry-run] <compressed_file> [<directory>]"
-    return 1
   fi
 
   local compressed_file="$1"
@@ -69,3 +76,5 @@ function extract
       ;;
   esac
 }
+
+extract "$@"

@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
 # Taken from https://stackoverflow.com/a/59040037/5655255
 # and adapted to be a proper cli tool.
 function UnicodePointToUtf8
@@ -33,12 +40,13 @@ function UnicodePointToUtf8
   fi
   printf -v y '\\x%x' $y
   echo -n -e $y
+  echo -n ' '
 }
 
 function DumpUnicodePointRange
 {
   local verbose=1
-  if [[ "$1" == "--quiet" ]]; then
+  if [[ "${1:-}" == "--quiet" ]]; then
     shift
     verbose=0
   fi
@@ -186,7 +194,7 @@ function PrintListCategories
   echo "All supported categories:"
 
   local idx=0
-  while [[ "${UNICODE_CATEGORIES[idx]}" != "" ]]; do
+  while [[ "${UNICODE_CATEGORIES[idx]:-}" != "" ]]; do
     local name="${UNICODE_CATEGORIES[idx + 0]}"
     local start="${UNICODE_CATEGORIES[idx + 1]}"
     local end="${UNICODE_CATEGORIES[idx + 2]}"
@@ -201,7 +209,7 @@ function FindStartStopForCategory
   local category="$1"
 
   local idx=0
-  while [[ "${UNICODE_CATEGORIES[idx]}" != "" ]]; do
+  while [[ "${UNICODE_CATEGORIES[idx]:-}" != "" ]]; do
     local name="${UNICODE_CATEGORIES[idx]}"
     if [[ "$category" == "$name" ]]; then
       REPLY=(
@@ -264,7 +272,7 @@ function help
   echo "Supported point format: 0x2620 | \\u2620 | U-2620 | U+2620"
 }
 
-case "$1" in
+case "${1:-}" in
   "")
     help
     exit 1
@@ -274,6 +282,8 @@ case "$1" in
     exit
     ;;
   --range)
+    [[ -z "${2:-}" ]] && help && exit 1
+    [[ -z "${3:-}" ]] && help && exit 1
     DumpUnicodePointRange "$2" "$3"
     ;;
   --sample)
@@ -284,6 +294,7 @@ case "$1" in
     PrintListCategories
     ;;
   --category)
+    [[ -z "${2:-}" ]] && help && exit 1
     PrintAllFromCategory "$2"
     ;;
   --by-categories)
