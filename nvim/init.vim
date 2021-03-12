@@ -184,7 +184,7 @@ if $ASCII_ONLY != "1"
   let g:gitgutter_sign_modified           = "┃"
   let g:gitgutter_sign_removed            = "▁"
   let g:gitgutter_sign_removed_first_line = "▔"
-  let g:gitgutter_sign_modified_removed   = "~▁"
+  let g:gitgutter_sign_modified_removed   = "▁" " NOTE: modified state is visible with sign' color
 else
   " The default for this is a unicode symbol, which can break the display
   let g:gitgutter_sign_removed_first_line = "-"
