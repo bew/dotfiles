@@ -346,7 +346,7 @@ function make_prompt_str_from_parts
   echo -n $str
 }
 
-## Prompts & Status line
+## Prompts
 ##############################################
 #
 #  %B (%b)
@@ -375,37 +375,6 @@ function make_prompt_str_from_parts
 
 autoload -U promptinit && promptinit
 
-# -- Status line
-
-STATUSLINE_PARTS=(
-  func: segmt::short_vim_mode
-  func: segmt::in_sudo
-  func: segmt::exit_code_long_on_error
-)
-
-# NOTE: the generated prompt str is static, the segment functions are not called.
-function sl::build_prompt_str
-{
-  [[ -n "$ZSH_DISABLE_STATUS_LINE" ]] && return
-
-  local _cur_save=$'\e[s'
-  local _cur_restore=$'\e[u'
-  local _goto_bottom=$'\e[$LINES;0H'
-  local _clear_line=$'\e[2K'
-
-  local sl_default_bg="${bg[magenta]}" # in my setup, magenta is orange
-  local sl_default_fg=""
-
-  local sl_col_reset="${reset_color}${sl_default_bg}${sl_default_fg}"
-
-  local sl_init="${sl_col_reset}${_clear_line}"
-
-  local sl_content="$(make_prompt_str_from_parts func_reset: "$sl_col_reset" "${STATUSLINE_PARTS[@]}")"
-
-  local sl_container="${_cur_save}${_goto_bottom}${sl_init}${sl_content}${_cur_restore}${reset_color}"
-  echo -n "%{${sl_container}%}"
-}
-
 VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
 
 # -- Left prompt
@@ -432,7 +401,7 @@ PROMPT_PAST_PARTS=(
   text: "%B%F{black}%%%f%b" # cmd separator
 )
 
-PROMPT_CURRENT="$(sl::build_prompt_str)""$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
+PROMPT_CURRENT="$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
 PROMPT_PAST="$(make_prompt_str_from_parts "${PROMPT_PAST_PARTS[@]}")"
 
 # Add space before user input
@@ -486,4 +455,3 @@ function simple_prompts
   RPROMPT_CURRENT= # no right prompt
   RPROMPT_PAST=    # no right prompt
 }
-
