@@ -62,19 +62,27 @@ function! LightlineFugitive()
 endfunction
 
 function! LightLineFilename()
-  let fname = expand('%:t')
-  if filereadable(expand("~/" . expand('%:t')))
-    let formatted_filename = "~/" . expand("%:t") " ~ & filename
+  let raw_fname = expand('%:t')
+  if raw_fname != ""
+    if filereadable(expand("~/" . expand('%:t')))
+      let formatted_fname = "~/" . expand("%:t") " ~ & filename
+    else
+      let formatted_fname = expand("%:h:t") . "/" . expand("%:t") " parent dir & filename
+    endif
   else
-    let formatted_filename = expand("%:h:t") . "/" . expand("%:t") " parent dir & filename
+    let formatted_fname = "[No Name]"
   endif
-  return fname == 'ControlP' ? g:lightline.ctrlp_item :
-        \ fname == '__Tagbar__' ? g:lightline.fname :
-        \ fname =~ '__Mundo\|NERD_tree' ? '' :
-        \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-        \ &ft == 'unite' ? unite#get_status_string() :
-        \ &ft == 'vimshell' ? vimshell#get_status_string() :
-        \ ('' != fname ? formatted_filename : '[No Name]')
+
+  let plugin_fname = ""
+  if raw_fname == "__Mundo__"
+    let plugin_fname = "Mundo"
+  elseif raw_fname == "__Mundo_Preview__"
+    let plugin_fname = "Mundo Prev"
+  elseif raw_fname =~ "NERD_tree"
+    let plugin_fname = ""
+  endif
+
+  return plugin_fname != "" ? plugin_fname : formatted_fname
 endfunction
 
 function! LightLineFiletype()
@@ -87,14 +95,16 @@ function! LightLineMode()
   endif
 
   let fname = expand('%:t')
-  return fname == '__Tagbar__' ? 'Tagbar' :
-        \ fname == '__Gundo__' ? 'Gundo' :
-        \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
-        \ fname =~ 'NERD_tree' ? 'NERDTree' :
-        \ &ft == 'unite' ? 'Unite' :
-        \ &ft == 'vimfiler' ? '' :
-        \ &ft == 'vimshell' ? 'VimShell' :
-        \ winwidth(0) > 60 ? lightline#mode() : ''
+  let plugin_mode = ""
+  if fname == "__Mundo__"
+    let plugin_mode = "Mundo"
+  elseif fname == "__Mundo_Preview__"
+    let plugin_mode = "Mundo Prev"
+  elseif fname =~ "NERD_tree"
+    let plugin_mode = "Tree"
+  endif
+
+  return plugin_mode != "" ? plugin_mode : lightline#mode()
 endfunction
 
 function! LightLineBufferComment()
