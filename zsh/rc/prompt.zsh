@@ -4,21 +4,6 @@
 # Import color helpers
 autoload -U colors && colors
 
-# Get the cursor position on the terminal.
-#
-# It saves the result in CURSOR_POS_ROW & CURSOR_POS_COL
-#-------------------------------------------------------------
-# NOTE: if the read buffer is not empty, behavior is undifined
-#-------------------------------------------------------------
-function term::get_cursor_pos
-{
-  echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
-
-  # pos has format 'row;col'
-  CURSOR_POS_ROW=${pos%;*} # remove ';col'
-  CURSOR_POS_COL=${pos#*;} # remove 'row;'
-}
-
 # Segment git branch
 function segmt::git_branch_slow
 {
@@ -202,34 +187,6 @@ function segmt::python_venv
 }
 
 zmodload zsh/system
-
-# Scroll when prompt gets too close to bottom edge
-function prompt-auto-scroll
-{
-  # Don't attempt to scroll in a tty
-  [ "$TERM" = "linux" ] && return
-
-  # check if there is a command in the stdin buffer
-  # (as the term::get_cursor_pos will discard it)
-  # FIXME: find how to turn on raw input
-  local buff
-  sysread -t 0 -i 0 buff
-  #echo "Buff: '$buff'"
-  if [ -n "$buff" ]; then
-    # push it on the ZLE input stack
-    print -z "${buff}"
-  fi
-
-  # Get the cursor position for the (new) current prompt
-  term::get_cursor_pos
-
-  if (( CURSOR_POS_ROW > (LINES - 4) )) then
-    echo -n $'\e[4S' # Scroll the terminal
-    echo -n $'\e[4A' # Move the cursor back up
-  fi
-}
-hooks-add-hook precmd_hook prompt-auto-scroll
-
 
 function segmt::shlvl
 {

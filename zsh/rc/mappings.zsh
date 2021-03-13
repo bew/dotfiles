@@ -59,6 +59,22 @@ zle -N zwidget::toggle-sudo-nosudo
 # TODO: is there a way to handle commands not at <bol> ? (mapped to M-S instead of M-s)
 # e.g: echo 400 | [NEED TOGGLE SUDO HERE] tee /foo/bar
 
+# Force scroll the window to give some space for the prompt
+#
+# It's not technically required, but it sometimes help to have blank lines
+# to think about things..
+function zwidget::force-scroll-window
+{
+  # Don't attempt to scroll in a tty
+  [ "$TERM" = "linux" ] && return
+
+  echo -n $'\e[4S' # Scroll the terminal
+  echo -n $'\e[4A' # Move the cursor back up
+
+  zle redisplay
+}
+zle -N zwidget::force-scroll-window
+
 # When set, git mappings will show status/log/diff for the current directory
 # instead of the whole repo.
 GIT_MAPPINGS_ARE_FOR_CWD=
@@ -526,6 +542,9 @@ vibindkey 'a' zwidget::insert_one_arg
 
 # Alt-Enter => insert a newline
 vibindkey "${keysym[Enter]}" self-insert-unmeta
+
+# Ctrl-Alt-L => force scroll window for free thinking :)
+vibindkey '^l' zwidget::force-scroll-window
 
 # fast git
 vibindkey 'g' zwidget::git-status
