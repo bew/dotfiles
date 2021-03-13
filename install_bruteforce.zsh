@@ -53,8 +53,8 @@ make-link .dot/nixpkgs    ~/.config/nixpkgs
 label "other cli tools"
 make-link .dot/mostrc    ~/.mostrc
 make-link .dot/gdbinit   ~/.gdbinit
-make-link .dot/tmux.conf ~/.tmux.conf
 make-link .dot/htop      ~/.config/htop
+make-link .dot/tmux/tmux.conf ~/.tmux.conf
 
 label "X configs"
 make-link .dot/gui/xinitrc       ~/.xinitrc
