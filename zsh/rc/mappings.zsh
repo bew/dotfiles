@@ -524,6 +524,9 @@ vibindkey 's' zwidget::toggle-sudo-nosudo
 vibindkey 'q' zwidget::cycle-quoting
 vibindkey 'a' zwidget::insert_one_arg
 
+# Alt-Enter => insert a newline
+vibindkey "${keysym[Enter]}" self-insert-unmeta
+
 # fast git
 vibindkey 'g' zwidget::git-status
 vibindkey 'd' zwidget::git-diff
@@ -531,7 +534,7 @@ vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
 vibindkey 'L' zwidget::git-log-always-for-repo
 
-# Alt-CTRL-E => edit line in $EDITOR
+# Ctrl-Alt-E => edit line in $EDITOR
 autoload -U edit-command-line
 zle -N edit-command-line
 vibindkey '^e' edit-command-line
