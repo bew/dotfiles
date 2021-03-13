@@ -241,7 +241,7 @@ exe "HiResetTo CursorLineNr"   .s:fg_cyan   .s:bg_base02
 hi! link ColorColumn CursorColumn
 exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
 
-exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_red    .s:bg_base01
+exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_yellow_bright    .s:bg_base01
 
 hi NormalFloat ctermfg=248 ctermbg=236
 
