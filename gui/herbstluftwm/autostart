@@ -238,7 +238,7 @@ hc set frame_bg_active_color "#aaaaaa"
 hc set frame_bg_transparent 1
 hc set frame_transparent_width 3
 hc set frame_gap 0
-hc set frame_padding 10
+hc set frame_padding 5
 
 # FIXME: why are there xyz_border_width options and theme.xyz.border_width attributes ????
 # also I don't get the usage for sooo many borders (inner -> border -> outer)
