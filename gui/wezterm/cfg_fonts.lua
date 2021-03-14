@@ -37,9 +37,31 @@ local function font_and_rules_for_iosevka()
   return font, font_rules
 end
 
-local function font_and_rules_for_cascadia()
-  local font = font_with_fallback("Cascadia Code Light")
+local function font_and_rules_for_jetbrains()
+  -- Use a _very slightly_ lighter variant, so that regular bold really stand out
+  local font = font_with_fallback("JetBrains Mono Light")
   local font_rules = {
+    {
+      italic = true,
+      font = font_with_fallback("JetBrains Mono Light Italic"),
+    },
+    {
+      italic = true, intensity = "Bold",
+      font = font_with_fallback("JetBrains Mono Bold Italic"),
+    },
+    {
+      intensity = "Bold",
+      font = font_with_fallback("JetBrains Mono Bold"),
+    },
+  }
+  return font, font_rules
+end
+
+local function font_and_rules_for_cascadia()
+  local font = font_with_fallback("Cascadia Code")
+  -- local font = font_with_fallback("Cascadia Code Light")
+  local font_rules = {
+    -- NOTE: There is no Italic in font Cascadia...
     {
       italic = true,
       font = font_with_fallback("JetBrains Mono Italic"),
@@ -50,16 +72,20 @@ local function font_and_rules_for_cascadia()
     },
     {
       intensity = "Bold",
+      -- font = font_with_fallback("JetBrains Mono Bold"),
       font = font_with_fallback("Cascadia Code Bold"),
     },
   }
   return font, font_rules
 end
 
--- FIXME (<-- this is an example of bolded text)
+-- FIXME (<- this is an example of bolded text)
 -- 0 1 2 3 4 5 6 7 8 9
+-- Some ligatures: != <-> <-  -> ----> => ==> ===> -- --- /../;;/ #{}
+--  <> <!-- --> ->> --> <= >= ++ == === := a::b::c a&&b a||b
 
-cfg.font, cfg.font_rules = font_and_rules_for_cascadia()
+cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
+-- cfg.font, cfg.font_rules = font_and_rules_for_cascadia()
 -- cfg.font, cfg.font_rules = font_and_rules_for_iosevka()
 
 -- Enable various OpenType features
