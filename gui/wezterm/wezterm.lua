@@ -13,12 +13,18 @@ local cfg_misc = {
   -- Avoid unexpected config breakage and unusable terminal
   automatically_reload_config = false,
 
-  -- Make sure word selection stops on punctuations
-  -- dot (.) & slash (/) are allowed though to keep easy
-  -- selection of paths.
+  -- Make sure word selection stops on most punctuations.
+  -- Note that dot (.) & slash (/) are allowed though for
+  -- easy selection of paths.
   selection_word_boundary = " \t\n{}[]()\"'`,;:",
 
   hide_tab_bar_if_only_one_tab = true,
+
+  -- Do not hold on exit by default.
+  -- Because the default 'CloseOnCleanExit' can be annoying when exiting with
+  -- Ctrl-D and the last command exited with non-zero: the shell will exit
+  -- with non-zero and the terminal would hang until the window is closed manually.
+  exit_behavior = "Close",
 }
 
 -- Colors & Appearance
