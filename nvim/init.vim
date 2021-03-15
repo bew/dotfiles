@@ -271,7 +271,8 @@ command! FilesSmart call fzf#run(fzf#wrap({
     \   "source": "fd --type f --type l --follow",
     \   "options": ["--multi", "--prompt", "FilesSmart-> "]
     \ }))
-command! Files call fzf#run(fzf#wrap({ " Using the default source to find ALL files
+" Using the default source to find ALL files
+command! Files call fzf#run(fzf#wrap({
     \   "options": ["--multi", "--prompt", "Files-> "]
     \ }))
 command! OldFiles call fzf#run(fzf#wrap({
