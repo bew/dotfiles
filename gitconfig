@@ -120,8 +120,12 @@
   hunk-header-style = 243 236 # light grey on dark grey
   hunk-header-decoration-style = bold
 
-  line-numbers-left-format = {nm:^4}|
-  line-numbers-right-format = {np:^4}|
+  ; >> Using ASCII separator
+  ; line-numbers-left-format = {nm:^4}|
+  ; line-numbers-right-format = {np:^4}|
+  ; >> Using Unicode separator
+  line-numbers-left-format = {nm:^4}│
+  line-numbers-right-format = {np:^4}│
 
 # -- END delta config
 
