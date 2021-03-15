@@ -35,8 +35,8 @@ hc keybind $C-Pause   spawn ~/.bin/desktop--lock-and-sleep ~/.bin/i3colocker
 # --> Seems to be related with the bash script starting i3lock. Starting i3lock
 #     without script does not flicker.
 
-hc keybind $M-space   spawn urxvt
-hc keybind $M-$S-space spawn ~/.bin/wezterm
+hc keybind $M-space   spawn ~/.bin/wezterm
+hc keybind $M-$S-space spawn urxvt
 hc keybind $M-x       spawn rofi -show drun
 # TODO: need an (interactive) action menu for chains: M-x space, M-x f, M-x t
 # could also be used for window state (toggle on top, floating, ..)
