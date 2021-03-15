@@ -238,9 +238,10 @@ nmap gc  <Plug>(git-messenger)
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["┆", "┊", "┆", "¦"])
+let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["│"])
+let g:indentLine_bufTypeExclude = ["help", "terminal"]
+let g:indentLine_bufNameExclude = ["_.*", "NERD_tree.*"]
 let g:indentLine_fileTypeExclude = [
-    \   "help",
     \   "startify",
     \   "man",
     \   "defx",
@@ -249,6 +250,11 @@ let g:indentLine_fileTypeExclude = [
     \   "json",
     \   "nerdtree"
     \ ]
+augroup indentline_hi_group
+  au!
+  au ColorScheme * hi IndentLines cterm=none ctermfg=237
+augroup END
+let g:indentLine_defaultGroup = "IndentLines"
 
 " File opening
 Plug '~/.nix-profile/share/vim-plugins/fzf'
