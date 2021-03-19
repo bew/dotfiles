@@ -265,7 +265,7 @@ let g:fzf_action = {
     \ }
 let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
 " let g:fzf_layout = {"window": "bot 25new"}
-let g:fzf_layout = {"window": {"width": 0.5, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
+let g:fzf_layout = {"window": {"width": 0.9, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
 command! FilesSmart call fzf#run(fzf#wrap({
     \   "source": "fd --type f --type l --follow",
