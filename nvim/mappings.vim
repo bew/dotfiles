@@ -393,8 +393,11 @@ let g:which_key_map.c.c = {"name": "+comment"}
 nmap <Leader>cc<space> <plug>NERDCommenterToggle
 vmap <Leader>cc<space> <plug>NERDCommenterToggle
 nmap <Leader>ccc       <plug>NERDCommenterComment
+vmap <Leader>ccc       <plug>NERDCommenterComment
 nmap <Leader>ccu       <plug>NERDCommenterUncomment
+vmap <Leader>ccu       <plug>NERDCommenterUncomment
 nmap <Leader>cci       <plug>NERDCommenterInvert
+vmap <Leader>cci       <plug>NERDCommenterInvert
 let g:which_key_map.c.c["<space>"] = "toggle"
 let g:which_key_map.c.c.c = "force"
 let g:which_key_map.c.c.u = "remove"
