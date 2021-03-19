@@ -304,6 +304,8 @@ Plug 'tweekmonster/nvim-api-viewer'
 Plug 'metakirby5/codi.vim'  " Interactive scratchpad (file on the left, interpreter outputs on the right)
 let g:codi#width = 50.0  " Split the windows in half
 
+Plug 'junegunn/goyo.vim'
+
 " -- Per Lang / Tech plugins
 
 "# Rust
