@@ -124,7 +124,7 @@
   ; line-numbers-left-format = {nm:^4}|
   ; line-numbers-right-format = {np:^4}|
   ; >> Using Unicode separator
-  line-numbers-left-format = {nm:^4}│
+  line-numbers-left-format = {nm:^4}|
   line-numbers-right-format = {np:^4}│
 
 # -- END delta config
