@@ -6,11 +6,35 @@
 
 echo script: Starting bars
 
-polybar info-bar --reload &
-polybar sys-bar --reload
+monitors=($(xrandr --query | awk '/ connected/ { print $1 }'))
+primary_monitor="${monitors[0]}" # xrandr puts the primary first
+unset monitors[0] # remove the primary monitor
+
+echo "primary_monitor: $primary_monitor"
+echo "other monitors: ${monitors[@]}"
+
+function run_bars
+{
+  polybar info-bar --reload &
+  polybar sys-bar --reload &
+}
+
+# Start bars on Primary monitor
+MONITOR_NAME="$primary_monitor" run_bars
+# Wait a little to ensure the bars starts up, and the systray is
+# properly grabbed/managed by the bars of primary monitor.
+# Without this, the bars of another monitor could race it and manage
+# the systray before primary' bars.
+sleep .1
+
+# Start bars on other monitors if any
+for mon in "${monitors[@]}"; do
+  MONITOR_NAME="$mon" run_bars
+done
+
+wait
 
 echo script: Stopping bars
 
-# If the previous bar is stopped (e.g by SIGINT),
-# make sure to stop the other one.
+# Make sure to stop all bars if we've been Ctrl-C'ed
 pkill polybar
