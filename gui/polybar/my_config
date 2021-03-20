@@ -37,7 +37,7 @@ icons = "Font Awesome 5 Free:style=Solid:size=10;1"
 ; ---- Bars
 
 [bar/info-bar]
-;monitor = ${env:MONITOR:HDMI-1}
+monitor = ${env:MONITOR_NAME}
 width = 100%
 height = 25
 bottom = false
@@ -75,7 +75,7 @@ tray-position = right
 tray-padding = 2
 
 [bar/sys-bar]
-;monitor = ${env:MONITOR:HDMI-1}
+monitor = ${env:MONITOR_NAME}
 width = 100%
 height = 25
 bottom = true
