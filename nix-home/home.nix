@@ -40,8 +40,10 @@
     pkgs.tree
     pkgs.ripgrep
     pkgs.niv
-    pkgs.git
     pkgs.fd
+
+    pkgs.git
+    pkgs.gitAndTools.delta
 
     pkgs.hexchat
   ];
