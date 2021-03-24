@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 
 function make-link
 {
@@ -51,28 +51,28 @@ label "Nix stuff"
 make-link .dot/nixpkgs    ~/.config/nixpkgs
 
 label "other cli tools"
-make-link .dot/mostrc    ~/.mostrc
-make-link .dot/gdbinit   ~/.gdbinit
+#make-link .dot/mostrc    ~/.mostrc
+#make-link .dot/gdbinit   ~/.gdbinit
 make-link .dot/tmux.conf ~/.tmux.conf
 make-link .dot/htop      ~/.config/htop
 
 label "X configs"
-make-link .dot/gui/xinitrc       ~/.xinitrc
-make-link .dot/gui/xprofile      ~/.xprofile
-make-link .dot/gui/xkbmap.config ~/.config/
-make-link .dot/gui/Xresources    ~/.Xresources
-make-link .dot/gui/Xresources.d  ~/.Xresources.d
-make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
+#make-link .dot/gui/xinitrc       ~/.xinitrc
+#make-link .dot/gui/xprofile      ~/.xprofile
+#make-link .dot/gui/xkbmap.config ~/.config/
+#make-link .dot/gui/Xresources    ~/.Xresources
+#make-link .dot/gui/Xresources.d  ~/.Xresources.d
+#make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
 
 label "X apps configs"
-make-link .dot/gui/urxvt     ~/.urxvt
+#make-link .dot/gui/urxvt     ~/.urxvt
 make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
-make-link .dot/gui/kitty     ~/.config/kitty
+#make-link .dot/gui/kitty     ~/.config/kitty
 make-link .dot/gui/mpv       ~/.config/mpv
 make-link .dot/gui/tridactyl ~/.config/tridactyl
 
-make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
+#make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
 
 if [[ "$DRYRUN_ONLY" == "true" ]]; then
   echo
