@@ -4,21 +4,6 @@
 # Import color helpers
 autoload -U colors && colors
 
-# Get the cursor position on the terminal.
-#
-# It saves the result in CURSOR_POS_ROW & CURSOR_POS_COL
-#-------------------------------------------------------------
-# NOTE: if the read buffer is not empty, behavior is undifined
-#-------------------------------------------------------------
-function term::get_cursor_pos
-{
-  echo -en "\e[6n"; read -u0 -sd'[' _; read -u0 -sdR pos
-
-  # pos has format 'row;col'
-  CURSOR_POS_ROW=${pos%;*} # remove ';col'
-  CURSOR_POS_COL=${pos#*;} # remove 'row;'
-}
-
 # Segment git branch
 function segmt::git_branch_slow
 {
@@ -72,12 +57,23 @@ function segmt::git_branch_fast
   [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && repo_status+="${c_untracked}?"
   [[ -n "$repo_status" ]] && p+=" ${repo_status}${clean}"
 
-  # %G : Within a %{...%} sequence, include a 'glitch': assume that a single character width will be output.
-  local arrow_up_unicode="%{⇡%G%}"
-  local arrow_down_unicode="%{⇣%G%}"
+  local arrow_up
+  local arrow_down
+  if [[ -z "$ASCII_ONLY" ]]; then
+    # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
+    #      character width will be output.
+    #
+    #      Needed sometimes because that unicode char can be considered 2 chars by mistake.
+    #      (NOTE 2020-12-13: don't remember in which cases..)
+    arrow_up="%{⇡%G%}"
+    arrow_down="%{⇣%G%}"
+  else
+    arrow_up="+"
+    arrow_down="-"
+  fi
 
-  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ${arrow_up_unicode}${VCS_STATUS_COMMITS_AHEAD}"
-  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ${arrow_down_unicode}${VCS_STATUS_COMMITS_BEHIND}"
+  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ${arrow_up}${VCS_STATUS_COMMITS_AHEAD}"
+  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ${arrow_down}${VCS_STATUS_COMMITS_BEHIND}"
   [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+=" *${VCS_STATUS_STASHES}"
 
   echo -n "%K{black} On ${p} %k"
@@ -164,49 +160,33 @@ function segmt::python_venv
   [[ -n "$VIRTUAL_ENV" ]] || return
 
   local venv_dir=$(basename "$VIRTUAL_ENV")
-  local venv_display
+  local venv_display="venv"
 
-  # 'venv' is ambiguous, show the parent dir name as well
-  local venv_parent_dir=$(basename "$(dirname "$VIRTUAL_ENV")")
-  if [[ "$venv_dir" == "venv" ]]; then
-    venv_display="venv in $venv_parent_dir"
-  else
-    venv_display="venv '$venv_dir' in $venv_parent_dir"
+  # Add venv name if not 'venv'
+  if [[ "$venv_dir" != "venv" ]]; then
+    venv_display+=" '$venv_dir'"
   fi
+
+  local venv_parent_dir_path=$(realpath $(dirname "$VIRTUAL_ENV"))
+  if [[ "$PWD" == "$venv_parent_dir_path" ]]; then
+    # venv is in PWD, no need to repeat the dir name
+    venv_display+=" here"
+  else
+    # venv is not in $PWD, show the venv parent dir name to avoid ambiguity.
+    local venv_parent_dir=$(basename "$venv_parent_dir_path")
+    venv_display+=" in $venv_parent_dir"
+  fi
+  # Example venv_display:
+  #   - venv here
+  #   - venv 'myvenv' here
+  #   - venv in SomeDir
+  #   - venv 'myvenv' in SomeDir
 
   echo -n "($venv_display) "
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
 }
 
 zmodload zsh/system
-
-# Scroll when prompt gets too close to bottom edge
-function prompt-auto-scroll
-{
-  # Don't attempt to scroll in a tty
-  [ "$TERM" = "linux" ] && return
-
-  # check if there is a command in the stdin buffer
-  # (as the term::get_cursor_pos will discard it)
-  # FIXME: find how to turn on raw input
-  local buff
-  sysread -t 0 -i 0 buff
-  #echo "Buff: '$buff'"
-  if [ -n "$buff" ]; then
-    # push it on the ZLE input stack
-    print -z "${buff}"
-  fi
-
-  # Get the cursor position for the (new) current prompt
-  term::get_cursor_pos
-
-  if (( CURSOR_POS_ROW > (LINES - 4) )) then
-    echo -n $'\e[4S' # Scroll the terminal
-    echo -n $'\e[4A' # Move the cursor back up
-  fi
-}
-hooks-add-hook precmd_hook prompt-auto-scroll
-
 
 function segmt::shlvl
 {
@@ -219,6 +199,16 @@ function segmt::shlvl
 function segmt::debug
 {
   echo -n "%K{blue} DEBUG: $* %k"
+}
+
+PROMPT_OVERRIDE_PWD=
+function segmt::short_pwd_no_color
+{
+  if [[ -n "$PROMPT_OVERRIDE_PWD" ]]; then
+    echo -n "$PROMPT_OVERRIDE_PWD"
+  else
+    echo -n "%2~"
+  fi
 }
 
 # Build a string from an array of parts.
@@ -313,7 +303,7 @@ function make_prompt_str_from_parts
   echo -n $str
 }
 
-## Prompts & Status line
+## Prompts
 ##############################################
 #
 #  %B (%b)
@@ -342,36 +332,7 @@ function make_prompt_str_from_parts
 
 autoload -U promptinit && promptinit
 
-# -- Status line
-
-STATUSLINE_PARTS=(
-  func: segmt::short_vim_mode
-  func: segmt::in_sudo
-  func: segmt::exit_code_long_on_error
-)
-
-# NOTE: the generated prompt str is static, the segment functions are not called.
-function sl::build_prompt_str
-{
-  [[ -n "$ZSH_DISABLE_STATUS_LINE" ]] && return
-
-  local _cur_save=$'\e[s'
-  local _cur_restore=$'\e[u'
-  local _goto_bottom=$'\e[$LINES;0H'
-  local _clear_line=$'\e[2K'
-
-  local sl_default_bg="${bg[magenta]}" # in my setup, magenta is orange
-  local sl_default_fg=""
-
-  local sl_col_reset="${reset_color}${sl_default_bg}${sl_default_fg}"
-
-  local sl_init="${sl_col_reset}${_clear_line}"
-
-  local sl_content="$(make_prompt_str_from_parts func_reset: "$sl_col_reset" "${STATUSLINE_PARTS[@]}")"
-
-  local sl_container="${_cur_save}${_goto_bottom}${sl_init}${sl_content}${_cur_restore}${reset_color}"
-  echo -n "%{${sl_container}%}"
-}
+VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
 
 # -- Left prompt
 
@@ -379,21 +340,25 @@ PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%B%F{magenta} %2~ %f%b" # current dir
+  text: "%B%F{166} "
+  func: segmt::short_pwd_no_color
+  text: " %f%b" # current dir
   func: segmt::short_vim_mode
   text: " "
-  text: "%(!.#.▷)"
+  text: "%(!.#.>)"
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%K{black}%B%F{cyan} %2~ %f%b%k" # current dir
+  text: "%K{black}%B%F{cyan} "
+  func: segmt::short_pwd_no_color
+  text: " %f%b%k" # current dir
   text: " "
   text: "%B%F{black}%%%f%b" # cmd separator
 )
 
-PROMPT_CURRENT="$(sl::build_prompt_str)""$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
+PROMPT_CURRENT="$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
 PROMPT_PAST="$(make_prompt_str_from_parts "${PROMPT_PAST_PARTS[@]}")"
 
 # Add space before user input
@@ -442,9 +407,8 @@ hooks-add-hook zle_line_finish_hook set-past-prompts
 
 function simple_prompts
 {
-  PROMPT_CURRENT="[%?] %2~ ▷ "
+  PROMPT_CURRENT="[%?] %F{cyan}%2~%f > "
   PROMPT_PAST=$PROMPT_CURRENT
   RPROMPT_CURRENT= # no right prompt
   RPROMPT_PAST=    # no right prompt
 }
-

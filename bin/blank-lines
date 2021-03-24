@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [[ $# == 0 ]]; then
+  echo
+  exit 0
+fi
+
+if [[ "$1" =~ ^-h|--help$ ]]; then
+  echo "Usage: $(basename $0) [N]      print N blank lines (default: 1)"
+  exit 0
+fi
+
+NB_BLANK_LINES="${1:-1}"
+
+if ! [[ "$NB_BLANK_LINES" =~ ^-?[0-9]+$ ]]; then
+  >&2 echo "ERROR: '$NB_BLANK_LINES' is not a valid number of lines"
+  exit 1
+fi
+
+# A negative number of lines means 0
+if (( NB_BLANK_LINES < 0 )); then
+  exit 0
+fi
+
+# Prin the blank lines!
+for i in $(seq $NB_BLANK_LINES); do
+  echo
+done

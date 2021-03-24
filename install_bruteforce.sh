@@ -51,10 +51,11 @@ label "Nix stuff"
 make-link .dot/nixpkgs    ~/.config/nixpkgs
 
 label "other cli tools"
+make-link .dot/tmux.conf ~/.tmux.conf
 #make-link .dot/mostrc    ~/.mostrc
 #make-link .dot/gdbinit   ~/.gdbinit
-make-link .dot/tmux.conf ~/.tmux.conf
 make-link .dot/htop      ~/.config/htop
+make-link .dot/tmux/tmux.conf ~/.tmux.conf
 
 label "X configs"
 #make-link .dot/gui/xinitrc       ~/.xinitrc
@@ -63,16 +64,23 @@ label "X configs"
 #make-link .dot/gui/Xresources    ~/.Xresources
 #make-link .dot/gui/Xresources.d  ~/.Xresources.d
 #make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
+make-link .dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg default apps
 
 label "X apps configs"
 #make-link .dot/gui/urxvt     ~/.urxvt
 make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
 #make-link .dot/gui/kitty     ~/.config/kitty
+make-link .dot/gui/dunst     ~/.config/dunst
+
+# Desktop env
+make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm
+make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
+make-link .dot/gui/polybar ~/.config/polybar
+
+# tools
 make-link .dot/gui/mpv       ~/.config/mpv
 make-link .dot/gui/tridactyl ~/.config/tridactyl
-
-#make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
 
 if [[ "$DRYRUN_ONLY" == "true" ]]; then
   echo

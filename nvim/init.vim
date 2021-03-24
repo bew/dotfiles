@@ -6,11 +6,13 @@ runtime! options.vim
 
 " Specify the python binary to use for the plugins, this is necessary to be
 " able to use them while inside a project' venv (which does not have pynvim)
-" FIXME: move somewhere else?
-let g:python3_host_prog = "/usr/bin/python3"
+let $NVIM_DATA_HOME = ($XDG_DATA_HOME != '' ? $XDG_DATA_HOME : $HOME . "/.local/share") . "/nvim"
+let $NVIM_PY_VENV = $NVIM_DATA_HOME . "/py-venv"
+let g:python3_host_prog = $NVIM_PY_VENV . "/bin/python3"
+" NOTE: Make sure to install pynvim in this environment! (and jedi for py dev)
 
 " map leader definition - space
-let mapleader = " "
+let g:mapleader = " "
 
 call plug#begin('~/.nvim/plugged')
 
@@ -29,6 +31,22 @@ Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/et
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'      " * for visualy selected text
 Plug 'itchyny/lightline.vim'      " statusline builder
+
+Plug 'liuchengxu/vim-which-key'
+let g:which_key_use_floating_win = 0
+" let g:which_key_timeout = 0  " Does not seem to work, it still takes &timeoutlen to open.
+let g:which_key_sep = '->'
+autocmd! FileType which_key
+autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
+let g:which_key_map = {}  " Fill this map for which-key helper!
+autocmd User PluginsLoaded call which_key#register("<space>", "g:which_key_map")
+" Create a per-buffer map, to avoid crashing WhichKey when the variable
+" does not exist, we must create a buffer dict, empty for most files,
+" which will be filled for some file types
+" FIXME: This does NOT work, because vim-which-key does NOT merge the
+"        dicts of multiple register('same-prefix', different-dict).
+" autocmd BufRead * let b:which_key_map = {}
+" autocmd User PluginsLoaded call which_key#register("<space>", "b:which_key_map")
 
 Plug 'jremmen/vim-ripgrep'
 let g:rg_command = 'rg --vimgrep -S' " -S for smartcase
@@ -51,16 +69,6 @@ xmap is <Plug>(textobj-sandwich-query-i)
 xmap as <Plug>(textobj-sandwich-query-a)
 omap is <Plug>(textobj-sandwich-query-i)
 omap as <Plug>(textobj-sandwich-query-a)
-" Textobjects to select the nearest surrounded text automatically
-xmap iss <Plug>(textobj-sandwich-auto-i)
-xmap ass <Plug>(textobj-sandwich-auto-a)
-omap iss <Plug>(textobj-sandwich-auto-i)
-omap ass <Plug>(textobj-sandwich-auto-a)
-" Textobjects to select a text surrounded by same characters user input
-xmap im <Plug>(textobj-sandwich-literal-query-i)
-xmap am <Plug>(textobj-sandwich-literal-query-a)
-omap im <Plug>(textobj-sandwich-literal-query-i)
-omap am <Plug>(textobj-sandwich-literal-query-a)
 
 " Add spaces inside () [] {} when using ( [ or {. (mimicking vim-surround)
 " Ref: https://github.com/machakann/vim-sandwich/wiki/Bracket-with-spaces
@@ -75,19 +83,21 @@ let g:sandwich#recipes += [
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
 let g:neomake_virtualtext_prefix = "  <<  "
-let g:neomake_error_sign = { 'text': 'x', 'texthl': 'NeomakeErrorSign', }
-let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeWarningSign', }
+let g:neomake_error_sign = { 'text': 'x',   'texthl': 'NeomakeSignError', }
+let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeSignWarning', }
+let g:neomake_info_sign = { 'text': 'i',    'texthl': 'NeomakeSignInfo', }
 augroup my_neomake_hi
   au!
 
   " Signs
-  au ColorScheme * hi NeomakeErrorSign cterm=none ctermfg=red
-  au ColorScheme * hi NeomakeWarningSign cterm=none ctermfg=yellow
+  au ColorScheme * hi NeomakeSignError   cterm=none ctermfg=red
+  au ColorScheme * hi NeomakeSignWarning cterm=none ctermfg=yellow
+  au ColorScheme * hi NeomakeSignInfo    cterm=none ctermfg=cyan
 
   " Virtual text
-  au ColorScheme * hi NeomakeVirtualtextError cterm=italic ctermbg=none ctermfg=red
-  au ColorScheme * hi NeomakeVirtualtextInfo cterm=italic ctermbg=none ctermfg=cyan
+  au ColorScheme * hi NeomakeVirtualtextError   cterm=italic ctermbg=none ctermfg=red
   au ColorScheme * hi NeomakeVirtualtextWarning cterm=italic ctermbg=none ctermfg=yellow
+  au ColorScheme * hi NeomakeVirtualtextInfo    cterm=italic ctermbg=none ctermfg=cyan
 augroup END
 
 
@@ -119,8 +129,26 @@ augroup my_floaterm
 augroup END
 
 
-Plug 'scrooloose/nerdcommenter'     " Comment stuff out
-Plug 'scrooloose/nerdtree'        " Tree based file explorer
+Plug 'preservim/nerdcommenter'         " Comment stuff out
+let g:NERDCreateDefaultMappings = 0
+
+" Specifies the default alignment to use when inserting comments.
+let g:NERDDefaultAlign = 'left'
+
+" Add some spaces between the comment delimiter (e.g: `#`) and the commented text
+let g:NERDSpaceDelims = 1
+
+" When uncommenting an empty line some whitespace may be left as a result of
+" alignment padding. With this option enabled any trailing whitespace will be
+" deleted when uncommenting a line.
+let g:NERDTrimTrailingWhitespace = 1
+
+let g:NERDCustomDelimiters = {}
+let g:NERDCustomDelimiters.python = {"left": "#"}
+
+" --
+
+Plug 'preservim/nerdtree'    " Tree based file explorer
 
 Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
 let g:ctrlsf_confirm_save = 1
@@ -146,35 +174,37 @@ let g:ctrlsf_auto_close = {
 
 Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 let g:gitgutter_map_keys = 0
-nmap <leader>hp <Plug>(GitGutterPreviewHunk)
-nmap <leader>hu <Plug>(GitGutterUndoHunk)
-nnoremap <leader>hf :GitGutterFold<cr>
 
+" Set a high sign priority, to avoid mixing signs based on order of appearance
+" (default: 10, lower is higher priority)
+let g:gitgutter_sign_priority = 5
+
+if $ASCII_ONLY != ""
+  " The default for this is a unicode symbol, which can break the display
+  let g:gitgutter_sign_removed_first_line = "-"
+else
+  let g:gitgutter_sign_added              = "│"
+  let g:gitgutter_sign_modified           = "│"
+  let g:gitgutter_sign_removed            = "▁"
+  let g:gitgutter_sign_modified_removed   = "▁" " NOTE: modified state is visible with sign' color
+  let g:gitgutter_sign_removed_first_line = "‾"
+endif
+
+" TODO: move these mappings to 'mappings.vim' ?
 nnoremap ]h :GitGutterNextHunk<cr>
 nnoremap [h :GitGutterPrevHunk<cr>
-
 " Hunk text object
 omap ih <Plug>(GitGutterTextObjectInnerPending)
 omap ah <Plug>(GitGutterTextObjectOuterPending)
 xmap ih <Plug>(GitGutterTextObjectInnerVisual)
 xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 
-if $ASCII_ONLY != "1"
-  let g:gitgutter_sign_added              = "┃"
-  let g:gitgutter_sign_modified           = "┃"
-  let g:gitgutter_sign_removed            = "▁"
-  let g:gitgutter_sign_removed_first_line = "▔"
-  let g:gitgutter_sign_modified_removed   = "~▁"
-endif
-
-Plug 'easymotion/vim-easymotion' " Motions on speed!
-
-Plug 'liuchengxu/vim-which-key'
-" My floating win highlightings aren't ready for this...
-let g:which_key_use_floating_win = 0
-let g:which_key_sep = '--'
-autocmd! FileType which_key
-autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
+augroup my_git_signs_hi
+  " NOTE: all SignVcs* highlights are defined in my color scheme
+  au ColorScheme * hi link GitGutterAdd    SignVcsAdd
+  au ColorScheme * hi link GitGutterChange SignVcsChange
+  au ColorScheme * hi link GitGutterDelete SignVcsDelete
+augroup END
 
 " -- Insert mode helpers
 
@@ -192,7 +222,6 @@ Plug 'autozimu/LanguageClient-neovim',
     \   'do': 'bash install.sh',
     \ }
 let g:LanguageClient_serverCommands = {
-    \ 'crystal': [$HOME . '/Projects/opensource/scry/bin/scry'],
     \ }
 " let g:LanguageClient_loggingFile = '/tmp/lsp.log'
 " let g:LanguageClient_loggingLevel = 'DEBUG'
@@ -209,49 +238,47 @@ nmap gc  <Plug>(git-messenger)
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["┆", "┊", "┆", "¦"] : ["|"])
-let g:indentLine_fileTypeExclude = ['help', 'startify', 'man', 'defx', 'markdown', 'codi']
+let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["│"])
+let g:indentLine_bufTypeExclude = ["help", "terminal"]
+let g:indentLine_bufNameExclude = ["_.*", "NERD_tree.*"]
+let g:indentLine_fileTypeExclude = [
+    \   "startify",
+    \   "man",
+    \   "defx",
+    \   "markdown",
+    \   "codi",
+    \   "json",
+    \   "nerdtree"
+    \ ]
+augroup indentline_hi_group
+  au!
+  au ColorScheme * hi IndentLines cterm=none ctermfg=237
+augroup END
+let g:indentLine_defaultGroup = "IndentLines"
 
-Plug 'Shougo/denite.nvim',         " Generic interactive menu framework
-    \ { 'do': ':UpdateRemotePlugin' }
-
-autocmd! FileType denite
-autocmd FileType denite call s:denite_my_settings()
-function! s:denite_my_settings() abort
-  nnoremap <silent><buffer><expr> <CR>
-      \ denite#do_map('do_action')
-  nnoremap <silent><buffer><expr> o
-      \ denite#do_map('do_action')
-  nnoremap <silent><buffer><expr> <M-v>
-      \ denite#do_map('do_action', 'vsplit')
-  nnoremap <silent><buffer><expr> <M-s>
-      \ denite#do_map('do_action', 'split')
-  nnoremap <silent><buffer><expr> <M-t>
-      \ denite#do_map('do_action', 'tabopen')
-  " FIXME: how can I add my own custom actions?
-
-  nnoremap <silent><buffer><expr> <M-Space>
-      \ denite#do_map('toggle_select') . 'j'
-
-  nnoremap <silent><buffer><expr> p
-      \ denite#do_map('do_action', 'preview')
-
-  nnoremap <silent><buffer><expr> q
-      \ denite#do_map('quit')
-  nnoremap <silent><buffer><expr> i
-      \ denite#do_map('open_filter_buffer')
-endfunction
-
-autocmd! FileType denite-filter
-autocmd FileType denite-filter call s:denite_filter_my_settings()
-function! s:denite_filter_my_settings() abort
-  nnoremap <silent><buffer><expr> q
-      \ denite#do_map('quit')
-
-  call deoplete#custom#buffer_option('auto_complete', v:false)
-endfunction
-
-
+" File opening
+Plug '~/.nix-profile/share/vim-plugins/fzf'
+let g:fzf_action = {
+    \ "alt-t": "tab split",
+    \ "alt-s": "split",
+    \ "alt-v": "vsplit",
+    \ }
+let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
+" let g:fzf_layout = {"window": "bot 25new"}
+let g:fzf_layout = {"window": {"width": 0.9, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
+let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
+command! FilesSmart call fzf#run(fzf#wrap({
+    \   "source": "fd --type f --type l --follow",
+    \   "options": ["--multi", "--prompt", "FilesSmart-> "]
+    \ }))
+" Using the default source to find ALL files
+command! Files call fzf#run(fzf#wrap({
+    \   "options": ["--multi", "--prompt", "Files-> "]
+    \ }))
+command! OldFiles call fzf#run(fzf#wrap({
+    \   "source": v:oldfiles,
+    \   "options": ["--multi", "--prompt", "OldFiles-> "]
+    \ }))
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 augroup my_startify
@@ -276,6 +303,8 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 Plug 'metakirby5/codi.vim'  " Interactive scratchpad (file on the left, interpreter outputs on the right)
 let g:codi#width = 50.0  " Split the windows in half
+
+Plug 'junegunn/goyo.vim'
 
 " -- Per Lang / Tech plugins
 
@@ -312,13 +341,63 @@ Plug 'peterhoeg/vim-qml'        " QML syntax
 
 "# Markdown
 Plug 'plasticboy/vim-markdown'  " Markdown vim mode
+
 let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_conceal_code_blocks = 0
+
+" Highlight YAML at start of file, useful to add metadata to a
+" markdown file.
+let g:vim_markdown_frontmatter = 1
 
 "# Python
+" Add colors to 'arg=' in 'func_call(arg=1)'
+autocmd FileType python syn match pythonFunctionCallKwargs '\h\w\+='
+autocmd FileType python hi pythonFunctionCallKwargs ctermfg=137
+
+" NOTE: specifying `'for': 'python'` for this Plug breaks something when opening
+" multiple files from cli, resulting in 'Not an editor command: Semshi enable'
+" for each opened files.
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'} " Semantic highlighting for python
+let g:semshi#error_sign = v:false " This is already handled by neomake linters
+let g:semshi#mark_selected_nodes = 2 " Also highlight the word under cursor
+" Override some highlights
+autocmd FileType python hi semshiSelected ctermfg=NONE ctermbg=NONE cterm=underline
+autocmd FileType python hi semshiBuiltin ctermfg=131
+autocmd FileType python hi semshiParameterUnused ctermfg=240
+
 Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
 Plug 'davidhalter/jedi-vim'         " IDE-like tooling
+" NOTE: you might need to install 'jedi' in neovim's python virtual env,
+" because the default install of the plugin does not always work
+" (e.g when inside a project's venv..)
+
 let g:jedi#completions_enabled = 0  " Let my async completion engine do that, using omnifunc
+" Do not show call signature by hacking buffer content (breaks some completion)
+let g:jedi#show_call_signatures = "2"
+
+let g:jedi#auto_initialization = 0  " Do not auto-init jedi (mappings, ..)
+autocmd FileType python call <SID>setup_python_jedi()
+function! s:setup_python_jedi()
+  " Inspired from <jedi-vim-plugin-dir>/ftplugin/python/jedi.vim
+  nnoremap <buffer>  <leader>cd   <cmd>call jedi#goto()<CR>
+  nnoremap <buffer>  <leader>cu   <cmd>call jedi#usages()<CR>
+  nnoremap <buffer>  <leader>cr   <cmd>call jedi#rename()<CR>
+  vnoremap <buffer>  <leader>cr   <cmd>call jedi#rename_visual()<CR>
+  " NOTE: vim-which-key does NOT work with global & local maps,
+  "       see the config of vim-which-key for more details.
+  " let b:which_key_map.c = {"name": "+code"}
+  " let b:which_key_map.c.d = "goto definition"
+  " let b:which_key_map.c.u = "goto usages"
+  " let b:which_key_map.c.r = "rename"
+
+  nnoremap <silent> <buffer> K   <cmd>call jedi#show_documentation()<CR>
+
+  if g:jedi#show_call_signatures > 0
+    call jedi#configure_call_signatures()
+  endif
+endf
 
 " Jinja templating syntax & indent
 Plug 'lepture/vim-jinja'
@@ -362,6 +441,7 @@ Plug 'tbastos/vim-lua'
 let g:lua_syntax_nofold = 1  " Disable auto code folding
 
 call plug#end()
+doautocmd User PluginsLoaded
 
 """""""""""""""""""""""""""""""""
 
@@ -372,51 +452,13 @@ runtime! mappings.vim
 runtime! autocmd.vim
 
 
-" Denite config (must be after plug#end() to work (FIXME?))
-call denite#custom#alias('source', 'grep/rg', 'grep')
-call denite#custom#var('grep/rg', 'command', ['rg'])
-call denite#custom#var('grep/rg', 'default_opts',
-    \ ['-i', '--vimgrep', '--no-heading'])
-call denite#custom#var('grep/rg', 'recursive_opts', [])
-call denite#custom#var('grep/rg', 'pattern_opt', ['--regexp'])
-call denite#custom#var('grep/rg', 'separator', ['--'])
-call denite#custom#var('grep/rg', 'final_opts', [])
-
-call denite#custom#alias('source', 'file/rec/smart', 'file/rec')
-call denite#custom#var('file/rec/smart', 'command',
-    \ ['fd', '.', '--type', 'f', '--type', 'l'])
-
 """""""""""""""""""""""""""""""""
-
-let g:fzf_action = {
-    \ 'alt-t': 'tab split',
-    \ 'alt-s': 'split',
-    \ 'alt-v': 'vsplit',
-    \ }
-
-let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS
-
-if has("mac")
-  " Homebrew puts the fzf install in non-vim accessible directory
-  set rtp+=/usr/local/opt/fzf
-endif
-
-"""""""""""""""""""""""""""""""""
-
-augroup my_float_hi
-  au!
-
-  au ColorScheme * hi NormalFloat ctermfg=248 ctermbg=232
-augroup END
 
 augroup my_custom_language_hi
   au!
 
   " Markdown
   au ColorScheme * hi markdownCode ctermfg=29
-
-  au ColorScheme * hi clear BadSpell
-  au ColorScheme * hi BadSpell cterm=underline
 
 
   " Ruby Colors

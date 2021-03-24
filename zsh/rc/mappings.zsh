@@ -23,7 +23,7 @@ function zle::utils::no-history-run
   zle .accept-line
 }
 
-# Toggle between "sudo "/"nosudo "/"" at <bol>
+# Toggle between "nosudo "/"sudo "/"" at <bol>
 function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
 {
   # Overwriting BUFFER will reset CURSOR to <bol>
@@ -33,13 +33,14 @@ function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
   local remove_text
   local add_text
 
-  if [[ "${BUFFER[1, 5]}" == "sudo " ]]; then
-    remove_text="sudo "
-    add_text="nosudo "
-  elif [[ "${BUFFER[1, 7]}" == "nosudo " ]]; then
+  # Cycle <bol>: "nosudo " > "sudo " > ""
+  if [[ "${BUFFER[1, 7]}" == "nosudo " ]]; then
     remove_text="nosudo "
-  else
     add_text="sudo "
+  elif [[ "${BUFFER[1, 5]}" == "sudo " ]]; then
+    remove_text="sudo "
+  else
+    add_text="nosudo "
   fi
 
   if [[ -n "$remove_text" ]]; then
@@ -58,39 +59,97 @@ zle -N zwidget::toggle-sudo-nosudo
 # TODO: is there a way to handle commands not at <bol> ? (mapped to M-S instead of M-s)
 # e.g: echo 400 | [NEED TOGGLE SUDO HERE] tee /foo/bar
 
-# Git status
+# Force scroll the window to give some space for the prompt
+#
+# It's not technically required, but it sometimes help to have blank lines
+# to think about things..
+function zwidget::force-scroll-window
+{
+  # Don't attempt to scroll in a tty
+  [ "$TERM" = "linux" ] && return
+
+  echo -n $'\e[4S' # Scroll the terminal
+  echo -n $'\e[4A' # Move the cursor back up
+
+  zle redisplay
+}
+zle -N zwidget::force-scroll-window
+
+# When set, git mappings will show status/log/diff for the current directory
+# instead of the whole repo.
+GIT_MAPPINGS_ARE_FOR_CWD=
+
+# Git status (for repo or cwd)
 function zwidget::git-status
 {
   zle::utils::check_git || return
 
-  zle::utils::no-history-run "git status"
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    zle::utils::no-history-run "git status"
+  else
+    zle::utils::no-history-run "git status .  # for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+  fi
 }
 zle -N zwidget::git-status
 
-# Git log
+# Git log (for repo or cwd)
 function zwidget::git-log
 {
   zle::utils::check_git || return
 
-  git pretty-log --all --max-count 42 # don't show too much commits to avoid waiting
+  local cmd=(git pretty-log --all --max-count 42) # don't show too much commits to avoid waiting
+
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    "${cmd[@]}"
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git logs of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    "${cmd[@]}" .
+  fi
+
+  zle reset-prompt
 }
 zle -N zwidget::git-log
 
-# Git diff
+# Git log (always for repo, never for cwd)
+function zwidget::git-log-always-for-repo
+{
+  # Ensure git log call is for the whole repo
+  GIT_MAPPINGS_ARE_FOR_CWD= zwidget::git-log
+}
+zle -N zwidget::git-log-always-for-repo
+
+# Git diff (for repo or cwd)
 function zwidget::git-diff
 {
   zle::utils::check_git || return
 
-  git d
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    git d
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    git d .
+  fi
+
+  zle reset-prompt
 }
 zle -N zwidget::git-diff
 
-# Git diff cached
+# Git diff cached (for repo or cwd)
 function zwidget::git-diff-cached
 {
   zle::utils::check_git || return
 
-  git dc
+  if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
+    git dc
+  else
+    echo # to ensure we're on a new blank line
+    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
+    git dc .
+  fi
+
+  zle reset-prompt
 }
 zle -N zwidget::git-diff-cached
 
@@ -380,6 +439,15 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   hooks-add-hook zle_line_finish_hook zle::utils::disable-app-mode
 fi
 
+# Helper commands to see which keys are sent in normal mode / application mode:
+# For normal mode:
+#   cat -e
+# For application mode: (enables app mode first, and disable afterward)
+#   printf "\x1b[?1h" ; cat -e ; printf "\x1b[?1l"
+#
+# Also some good doc on the 2 modes, and below the difference it means for some keys:
+# https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#mode-changes
+
 typeset -gA keysym
 
 function keysym_with_fallback
@@ -395,6 +463,12 @@ function keysym_with_fallback
   fi
 }
 
+# Define keysyms for main non-letter keys.
+# Few rules:
+# - Prefer using the sequence from terminfo first, if terminfo spec has an entry for it.
+# - Always add a fallback if the first value may be empty (e.g: `terminfo` var can be
+#   empty when terminfo is not available)
+
 keysym_with_fallback Home "${terminfo[khome]}" "[1~"
 keysym_with_fallback End  "${terminfo[kend]}"  "[4~"
 
@@ -408,8 +482,21 @@ keysym_with_fallback Down "${terminfo[kcud1]}" "[B"
 keysym_with_fallback Up "${terminfo[kcuu1]}" "[A"
 keysym_with_fallback Right "${terminfo[kcuf1]}" "[C"
 
-# Note: can be ^h on some terminal
-keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+# The backspace key is usually ^? but can be ^h on some terminal.
+# NOTE: None of my installed ones (xterm, urxvt, termite, konsole, kitty, wezterm) uses ^h
+# so it's pretty unusual anyway (maybe on macos?).
+# It would be great to simply read the sequence defined in terminfo,
+# unfortunately the value may be wrong:
+# For example the xterm-256color terminfo says that Backspace is ^h, but in practice
+# xterm always sends ^? (in normal mode & application mode).
+#
+# That's why we default to ^? by default unless the following env var is set..
+if [[ -n "$_ZLE_MAP_BACKSPACE_FROM_TERMINFO" ]]; then
+  # Note: Backspace can be ^h on some terminal
+  keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+else
+  keysym_with_fallback Backspace "^?"
+fi
 
 keysym_with_fallback Tab   "^I"
 keysym_with_fallback S-Tab "${terminfo[kcbt]}" "^I" # on linux console: S-Tab == M-Tab
@@ -453,17 +540,23 @@ vibindkey 's' zwidget::toggle-sudo-nosudo
 vibindkey 'q' zwidget::cycle-quoting
 vibindkey 'a' zwidget::insert_one_arg
 
+# Alt-Enter => insert a newline
+vibindkey "${keysym[Enter]}" self-insert-unmeta
+
+# Ctrl-Alt-L => force scroll window for free thinking :)
+vibindkey '^l' zwidget::force-scroll-window
+
 # fast git
 vibindkey 'g' zwidget::git-status
 vibindkey 'd' zwidget::git-diff
 vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
+vibindkey 'L' zwidget::git-log-always-for-repo
 
+# Ctrl-Alt-E => edit line in $EDITOR
 autoload -U edit-command-line
 zle -N edit-command-line
-
-# Alt-E => edit line in $EDITOR
-vibindkey 'e' edit-command-line
+vibindkey '^e' edit-command-line
 
 source ~/.zsh/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
@@ -542,6 +635,60 @@ bindkey -M visual S add-surround
 
 # Logical redo (u U)
 bindkey -M vicmd 'U' redo
+
+# START OF COPY/PASTE SETUP
+
+function zwidget::clipboard-visual-paste
+{
+  local content=$(cli-clipboard-provider paste-from smart-session)
+  zle copy-region-as-kill "$content" # copy content in the kill buffer
+  zle put-replace-selection
+}
+zle -N zwidget::clipboard-visual-paste
+
+function zwidget::clipboard-paste-before
+{
+  CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
+  zle vi-put-before
+}
+zle -N zwidget::clipboard-paste-before
+
+function zwidget::clipboard-paste-after
+{
+  CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
+  zle vi-put-after
+}
+zle -N zwidget::clipboard-paste-after
+
+function zwidget::clipboard-visual-copy
+{
+  zle vi-yank # copy region to kill buffer
+  local content="$CUTBUFFER"
+  printf "%s" "$content" | cli-clipboard-provider copy-to smart-session
+  zle -M "Copied to session clipboard!"
+}
+zle -N zwidget::clipboard-visual-copy
+
+# Copy/paste in the session (or system as fallback)
+bindkey -M visual 'c' zwidget::clipboard-visual-copy
+bindkey -M visual 'v' zwidget::clipboard-visual-paste
+bindkey -M viins 'v' zwidget::clipboard-paste-before
+bindkey -M vicmd 'v' zwidget::clipboard-paste-after
+
+# copy selection to host system (via osc52)
+function zwidget::clipboard-visual-copy-to-system
+{
+  zle vi-yank # copy region to kill buffer
+  local content="$CUTBUFFER"
+  export CLIPBOARD_REQUESTOR_TTY=$TTY # needed for osc52 (see its provider for details)
+  printf "%s" "$content" | cli-clipboard-provider copy-to system
+  zle -M "Copied to system clipboard! ('$content')"
+}
+zle -N zwidget::clipboard-visual-copy-to-system
+
+bindkey -M visual 'C' zwidget::clipboard-visual-copy-to-system
+
+# END OF COPY/PASTE SETUP
 
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)

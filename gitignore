@@ -20,9 +20,10 @@ result-*
 # Put any dir link you want to a __vcs_ignore__ directory!
 __vcs_ignore__/
 
-# Python compilation
+# Python
 __pycache__/
 *.egg
+venv*/
 
 # local vimrc
 .lvimrc

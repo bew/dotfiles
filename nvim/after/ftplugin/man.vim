@@ -1,5 +1,6 @@
 setlocal nonumber
 setlocal norelativenumber
+setlocal nocursorcolumn
 setlocal nomodifiable
 setlocal nolist
 
@@ -9,6 +10,11 @@ setlocal breakindent
 setlocal incsearch
 
 
+" Follow man page link
+nnoremap <buffer><silent> <2-LeftMouse> :Man<cr>
+nnoremap <buffer><silent> o :Man<cr>
+" Open man page link in split (easy to move afterward)
+nnoremap <buffer><silent> <M-o> :split <bar> Man<cr>
 
 " Scroll one line
 noremap <buffer> j <C-e>

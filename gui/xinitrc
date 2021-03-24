@@ -5,7 +5,7 @@ source ~/.xprofile
 if [ -n "$SESSION" ]; then
     SESSION="$SESSION"
 else
-    SESSION="awesome"
+    SESSION="hlwm"
 fi
 
 # Find the session

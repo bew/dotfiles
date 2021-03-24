@@ -2,9 +2,14 @@
 
 " TODO: improve organization!
 
-" Helper guide on <Leader>
-nnoremap <Leader> :WhichKey '<Leader>'<cr>
-vnoremap <Leader> :WhichKeyVisual '<Leader>'<cr>
+" Disable keybindings
+
+" <C-LeftMouse> default to <C-]> but it's annoying to have it everywhere
+" (like in markdown files).
+" Also, I use Ctrl LeftMouse's Up event on my terminal to open links, the Down
+" event will always be passed to the application (neovim) so I must handle it
+" gracefully (disable!).
+nnoremap <C-LeftMouse> <nop>
 
 " Save buffer
 nnoremap <M-s> :w<cr>
@@ -57,11 +62,8 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 
-nnoremap <M-f> :Denite -start-filter file/rec/smart<cr>
-nnoremap <M-F> :Denite -start-filter file/rec<cr>
-
-nnoremap <Leader>/ :Denite grep/rg<cr>
-nnoremap <Leader><M-/> :Denite grep<cr>
+nnoremap <M-f> :FilesSmart<cr>
+nnoremap <M-F> :Files<cr>
 
 " Focus or create a Floaterm with the given name.
 " Hides the current Floaterm if any.
@@ -92,15 +94,19 @@ tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "
 "-- Navigation
 "------------------------------------------------------------------
 
-" Short navigation left/right in insert mode
+" Short navigation on the line in insert mode
 "
 " This makes it possible to use the cursor keys in Insert mode, without breaking
 " the undo sequence and therefore using . (redo) will work as expected.
-inoremap <Left>  <C-G>U<Left>
-inoremap <Right> <C-G>U<Right>
+inoremap <Left>  <C-g>U<Left>
+inoremap <Right> <C-g>U<Right>
 " We use imap to use the above left/right mapping
 imap <M-h> <Left>
 imap <M-l> <Right>
+" Move back/forward by word, I'm too used to it in the shell and nvim's
+" cmdline!
+inoremap <M-b> <C-g>U<S-Left>
+inoremap <M-w> <C-g>U<S-Right>
 
 
 " Windows navigation
@@ -128,6 +134,22 @@ nnoremap <M-Z> :tabmove +1<cr>
 inoremap <M-A> <esc>:tabmove -1<cr>
 inoremap <M-Z> <esc>:tabmove +1<cr>
 
+" Close tab Alt-d (with confirmation)
+nnoremap <M-d> :call <SID>TabCloseWithConfirmation()<cr>
+function! s:TabCloseWithConfirmation()
+  if len(gettabinfo()) == 1
+    echo "Cannot close last tab"
+    return
+  endif
+  let choice = confirm("Close tab?", "&Yes\n&Cancel", 0)
+  redraw " clear cmdline, remove the confirm prompt
+  if choice == 1   " Yes
+    tabclose
+  else
+    echo "Close tab cancelled"
+  endif
+endf
+
 " Open current buffer in new tab (in a new window)
 nnoremap <silent> <M-t> :tab split<cr>
 " Move current window to new tab
@@ -139,6 +161,7 @@ nnoremap <M-p> :bprevious<cr>
 " FIXME: I'll probably remove these since they're not that common,
 " and the keys could be better used.
 " > Maybe use <Tab> <S-Tab> for tab-local-n/p-buffer & <M-Tab> <M-S-Tab> for global-n/p-buffer
+
 " Toggle zoom on current window
 " From justinmk' config https://github.com/justinmk/config/blob/a93dc73fafbdeb583ce177a9d4ebbbdfaa2d17af/.config/nvim/init.vim#L880-L894
 function! s:zoom_toggle()
@@ -216,9 +239,6 @@ nnoremap <M-P> :cprevious<cr>
 " Trigger completion manually
 inoremap <expr> <C-b>  deoplete#manual_complete()
 
-" Insert common string during completion
-inoremap <expr> <M-b>  deoplete#complete_common_string()
-
 
 " Exit the terminal grabber
 tnoremap <M-q> <C-\><C-n>
@@ -231,7 +251,7 @@ nnoremap Q :q<cr>
 " I: Indent line, stay in insert mode (default, see :h i_CTRL-F)
 inoremap <C-f> <C-f>
 " V: Indent visual selection, back to normal mode
-vnoremap <C-f> :normal! ==<cr>
+vnoremap <C-f> =
 " N: Indent current line
 nnoremap <C-f> mi==`i
 " N: Format the entire file
@@ -241,9 +261,33 @@ nnoremap <M-C-f> gg=G``
 " un-join (split) the current line at the cursor position
 nnoremap <M-J> i<c-j><esc>k$
 
-" Copy/Paste with system clipboard
-vnoremap <silent> <M-c> :'<,'>w !xclip -in -selection clipboard<cr>
-nnoremap <silent> <M-v> :r !xclip -out -selection clipboard<cr>
+" Copy/Paste with system clipboard (using nvim's clipboard provider)
+" Register "+ is session clipboard
+" Register "* is OS/system clipboard
+let g:clipboard = {
+    \   'name': 'myClipboard',
+    \   'copy': {
+    \      '+': 'cli-clipboard-provider copy-to smart-session',
+    \      '*': 'cli-clipboard-provider copy-to system',
+    \    },
+    \   'paste': {
+    \      '+': 'cli-clipboard-provider paste-from smart-session',
+    \      '*': 'cli-clipboard-provider paste-from system',
+    \   },
+    \ }
+
+" Copy
+xnoremap <M-c> "+y :echo "Copied to session clipboard!"<cr>
+xnoremap <M-C> "*y :echo "Copied to system clipboard!"<cr>
+
+" Paste
+nnoremap <M-v> "+p
+nnoremap <M-V> o<esc>"+p
+xnoremap <M-v> "+p
+cnoremap <M-v> <C-r>+
+" Paste in insert mode inserts an undo breakpoint
+inoremap <silent> <M-v> <C-g>u<C-r>+
+" TODO?: Add system paste bindings
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
@@ -263,15 +307,18 @@ vmap <M-*> <Plug>(visualstar-g*)
 " N: search current word without word boundaries
 nnoremap <M-*> g*
 
-vnoremap <M-p> :call VisualPaste()<cr>
-" Paste the unnamed register Unnamed register " is preserved
+vnoremap <M-p> <cmd>call VisualPaste()<cr>
+" Visual paste with the current register, preserving the content of
+" the unnamed register.
 function! VisualPaste()
-  let old_reg = getreg('"', 1, v:true)
-  let old_regtype = getregtype('"')
+  " Save unnamed register (will be overwritten with the normal visual paste)
+  let save_reg = getreg('"', 1, v:true)
+  let save_regtype = getregtype('"')
 
-  normal gvp
+  exe 'normal! "' . v:register . 'p'
 
-  call setreg('"', old_reg, old_regtype)
+  " Restore unnamed register
+  call setreg('"', save_reg, save_regtype)
 endfunction
 
 
@@ -279,7 +326,7 @@ endfunction
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
 function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
-  execute ":'<,'>normal @".nr2char(getchar())
+  execute ":'<,'>normal! @".nr2char(getchar())
 endfunction
 
 
@@ -328,9 +375,61 @@ cnoremap <M-J> <S-Down>
 " Expand %% to dir of current file
 cnoremap <expr> %% expand("%:h") . "/"
 
+
+" ---- Various Leader key mappings ----
+" (NOTE: some mappings are in init.vim)
+"
+" Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
+
+" Helper guide on <Leader>
+nnoremap <Leader> <cmd>WhichKey '<Space>'<cr>
+vnoremap <Leader> <cmd>WhichKeyVisual '<Space>'<cr>
+
+" -- Code
+let g:which_key_map.c = {"name": "+code"}
+
+" code comment
+let g:which_key_map.c.c = {"name": "+comment"}
+nmap <Leader>cc<space> <plug>NERDCommenterToggle
+vmap <Leader>cc<space> <plug>NERDCommenterToggle
+nmap <Leader>ccc       <plug>NERDCommenterComment
+vmap <Leader>ccc       <plug>NERDCommenterComment
+nmap <Leader>ccu       <plug>NERDCommenterUncomment
+vmap <Leader>ccu       <plug>NERDCommenterUncomment
+nmap <Leader>cci       <plug>NERDCommenterInvert
+vmap <Leader>cci       <plug>NERDCommenterInvert
+let g:which_key_map.c.c["<space>"] = "toggle"
+let g:which_key_map.c.c.c = "force"
+let g:which_key_map.c.c.u = "remove"
+let g:which_key_map.c.c.i = "invert"
+
+" code language tools (not done globally.. LSP would solve this..)
+" cr   rename
+" cu   show usages
+" cd   goto definition
+"
+" Currently my main usage is with jedi-vim, which I configure manually
+" when a python buffer opens.
+" NOTE: I don't know how to set a which_key_map for a single buffer
+
+" -- Edit
+let g:which_key_map.e = {"name": "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
 nmap <leader>ee  :e %%
 nmap <leader>es  :spl %%
 nmap <leader>ev  :vsp %%
 nmap <leader>et  :tabe %%
+let g:which_key_map.e.e = "relative here"
+let g:which_key_map.e.s = "relative in split"
+let g:which_key_map.e.v = "relative in vertical split"
+let g:which_key_map.e.t = "relative in tab"
+
+" -- Git
+nmap <leader>hp <Plug>(GitGutterPreviewHunk)
+nmap <leader>hu <Plug>(GitGutterUndoHunk)
+nmap <leader>hf <cmd>GitGutterFold<cr>
+let g:which_key_map.h = {"name": "+git-hunks"}
+let g:which_key_map.h.p = "preview"
+let g:which_key_map.h.u = "undo"
+let g:which_key_map.h.f = "fold non-hunk"

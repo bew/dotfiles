@@ -1,0 +1,115 @@
+#!/bin/bash
+#
+# clipboard provider for neovim, zsh and other cli apps
+# (:help provider-clipboard)
+#
+# Inspired from: https://seankhliao.com/blog/12020-05-14-osc-52/
+# Also refering to https://github.com/neovim/neovim/issues/8450
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function echoerr
+{
+  >&2 echo "$@"
+}
+
+# Inspired from https://stackoverflow.com/a/948117/5655255
+function all_commands_starting_with
+{
+  local cmd_start="$1"
+  echo -n $PATH |
+    xargs -d : -I {} \
+    find {} -maxdepth 1 -name "${cmd_start}*" -executable -type f \
+    -printf '%P\n'
+}
+
+function usage
+{
+  echoerr "Usage: $0 [-h|--help] <direction> PROVIDERS..."
+  echoerr
+  echoerr "<direction>   Either 'copy-to' or 'paste-from'"
+  echoerr
+  echoerr "PROVIDERS...  Clipboard providers to use"
+  echoerr "  Note that for paste-from, only the first working provider will be used."
+  echoerr
+  echoerr "Making a clipboard provider:"
+  echoerr "  A clipboard provider is a command named 'clipboard-provider--NAME'"
+  echoerr "  that accepts 2 actions 'copy' / 'paste':"
+  echoerr "  > For 'copy', the content is passed to stdin"
+  echoerr "  > For 'paste', the content must be printed to stdout"
+  echoerr
+  echoerr "Available clipboard providers (all commands clipboard-provider--*):"
+  local provider_name
+  local provider_cmd
+  for provider_cmd in $(all_commands_starting_with "clipboard-provider--"); do
+    provider_name="${provider_cmd:20}" # remove common start
+    >&2 printf " - %-20s (cmd: %s)\n" "$provider_name" "$provider_cmd"
+  done
+  echoerr
+}
+
+function check_provider_exists
+{
+  local provider_name="$1"
+  command -v "clipboard-provider--${provider_name}" >/dev/null
+}
+
+exit_code=99
+
+if [[ $# -ge 1 ]] && [[ $1 =~ ^-h|--help$ ]]; then
+  usage
+  exit
+fi
+if [[ $# -lt 2 ]]; then
+  echoerr "ERROR: Missing params"
+  usage
+  exit 1
+fi
+
+direction="$1"; shift
+
+# For neovim & osc52, the provider needs the PID of the clipboard requestor to get its tty.
+# See https://github.com/neovim/neovim/issues/8450#issuecomment-407063983
+# Since we're using sub programs, the "$PPID" would give the PID of this script which is not helpful.
+# So we save it and pass it as a special env var.
+: ${CLIPBOARD_REQUESTOR_PID:=$PPID}
+export CLIPBOARD_REQUESTOR_PID
+
+case "$direction" in
+  copy-to)
+    CONTENT_TO_COPY="$(cat)"  # consumes stdin here
+    for provider_name in "$@"; do
+      if ! check_provider_exists "$provider_name"; then
+        echoerr "Clipboard provider '$provider_name' does not exist, skipping"
+        continue
+      fi
+      printf "%s" "$CONTENT_TO_COPY" |
+        "clipboard-provider--${provider_name}" copy && exit_code=0
+    done
+    ;;
+
+  paste-from)
+    for provider_name in "$@"; do
+      if ! check_provider_exists "$provider_name"; then
+        echoerr "Clipboard provider '$provider_name' does not exist, skipping"
+        continue
+      fi
+      # break when a provider worked
+      # (we don't want to paste from multiple providers)
+      "clipboard-provider--${provider_name}" paste && exit_code=0 && break
+    done
+    ;;
+
+  *)
+    echoerr "ERROR: Invalid clipboard direction, must be copy-to | paste-from"
+    ;;
+esac
+
+exit $exit_code
+
+# vim:set sw=2:

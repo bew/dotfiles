@@ -16,7 +16,4 @@ This setup uses multiple fonts, a main one and a few fallback fonts.
    Version: 5.14.0
    Download page: https://fontawesome.com/download take the Free Desktop version
 
-3. Fallback font: Noto Color Emoji, used for emoji support, weather icons, etc..
-
-   Version: (no info)
-   Download page: https://www.google.com/get/noto/ take the `Noto Color Emoji` variant
+Some fonts are builtin in wezterm, like Noto Color Emoji for emojis, weather icons, ...

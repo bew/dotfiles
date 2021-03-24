@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function http::serve-local
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: $0 <directory> [<port> [<ip>|all]]"
+    return 1
+  fi
+
+  # NOTE: We force <dir> to be specified to have a no-arg form that gives the usage message
+
+  local dir="$1"
+  local port="${2:-1234}"
+  local ip="${3:-127.0.0.1}"
+  [[ "$ip" == "all" ]] && ip="0.0.0.0"
+
+  echo "==> Serving '$dir' on '$ip:$port' over HTTP <=="
+  echo
+
+  python3 -m http.server $port --bind $ip --directory $dir
+}
+
+http::serve-local "$@"

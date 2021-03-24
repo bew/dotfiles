@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+function chronometer
+{
+  local quit
+  trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+
+  local start_tstamp=`date +%s`
+
+  while [[ -z $quit ]]; do
+    echo -ne "$(date -u --date @$(( `date +%s` - $start_tstamp )) +%M:%S)\r"
+    sleep .1
+  done
+
+  date -u --date @$(( `date +%s` - $start_tstamp )) +%M:%S
+}
+
+chronometer

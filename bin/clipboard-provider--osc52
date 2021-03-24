@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Clipboard provider using OSC 52 (needs terminal support).
+
+# OSC 52 is a special escape sequence that can be used to manipulate
+# selections data (the clipboard) by talking to the terminal emulator directly.
+#
+# Check the xterm spec: https://www.xfree86.org/current/ctlseqs.html
+# Search 'Manipulate Selection Data' & 'clipboard'.
+#
+# The format is: \e]52 ; WHICH-SEL ; CONTENT-AS-BASE64 END
+#   \e]52;      -- tells the terminal we want to set a selection/clipboard.
+#   WHICH-SEL   -- (single char) tells the terminal which selection we want:
+#                  c      : means the clipboard selection
+#                  p or s : means the primary or secondary selection (used on Linux X11)
+#   CONTENT-AS-BASE64  -- The content to copy, encoded with base64
+#   END         -- tells the terminal to end the OSC 52 sequence.
+#               -- It should be ST (String Terminator), for xterm it is 'ESC\'
+#               -- (note: some terminal also allow the BEL ('\a') to end the sequence)
+#
+# To test that OSC 52 is supported by your terminal, run this in your shell:
+# printf "\033]52;c;Y29weXBhc3RhIQ==\e\\\n"
+# The string 'copypasta!' should appear in your system clipboard (set from your terminal).
+#
+# NOTE: if you are inside tmux, you will need to add 'set-option -g set-clipboard on'
+# to your tmux config to ensure the escape sequence is forwarded to the actual terminal.
+
+# Initial inspiration from: https://seankhliao.com/blog/12020-05-14-osc-52/
+
+# We use CLIPBOARD_REQUESTOR_PID, set by cli-clipboard-provider main script or default
+# to PPID if we've been called directly.
+: ${CLIPBOARD_REQUESTOR_PID:=$PPID}
+# Needed for neovim, see https://github.com/neovim/neovim/issues/8450#issuecomment-407063983
+: ${CLIPBOARD_REQUESTOR_TTY:=`(tty || readlink /proc/$CLIPBOARD_REQUESTOR_PID/fd/0) 2>/dev/null | grep /dev/`}
+
+function do_copy
+{
+  local content_b64="$1"
+
+  # >&2 echo "Copying '$content_b64' ('$(base64 --decode <<<"$content_b64")') to tty '$CLIPBOARD_REQUESTOR_TTY'"
+
+  local osc52_start=$'\e]52'
+  local sel="c" # the clipboard selection
+  local osc52_end=$'\e\\' # The xterm ST (String Terminator)
+  printf "${osc52_start};${sel};%s${osc52_end}" "$content_b64" > "$CLIPBOARD_REQUESTOR_TTY"
+}
+
+action="$1"
+case "$action" in
+  copy)
+    if ! [[ -n "$CLIPBOARD_REQUESTOR_TTY" ]]; then
+      >&2 echo "Cannot copy with osc52, can't find TTY.."
+      exit 1
+    fi
+    BUFFER=$(base64) # consumes stdin here
+    do_copy "$BUFFER"
+    ;;
+  *)
+    >&2 echo "ERROR: invalid action '$action', must be copy (paste is not supported)"
+    exit 1
+    ;;
+esac
+
+# vim:set sw=2:
