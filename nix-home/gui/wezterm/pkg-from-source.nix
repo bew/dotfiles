@@ -26,6 +26,5 @@ in
       homepage = "https://wezfurlong.org/wezterm/";
       license = licenses.mit;
       # maintainers = [ maintainers.tailhook ];
-      # platforms = platforms.all;
     };
   }
