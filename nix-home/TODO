@@ -19,6 +19,11 @@ Example of a smart config: https://gitlab.univ-rouen.fr/sreycoyrehourcq/dotfiles
 Run `nix registry add pkgs github:nixos/nixpkgs/nixpkgs-unstable`, so I can simply use `nix run pkgs#just` (for example) to run the latest cached version of `just`.
 
 
+## Clean git history from useless tests
+
+After I sort out wezterm setup (or remove it from git):
+Rebase on main, squash to a single commit adding propper Nix flake with home-manager setup. (or something like that
+
 
 -----------------------------------
 ## NOTES
