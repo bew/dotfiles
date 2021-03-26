@@ -1,0 +1,29 @@
+## Migrate existing overlays in ../nixpkgs/overlays
+
+To integrate with home.nix
+
+
+## Use more fixed flake registry entries
+
+Full doc for flake references: https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-flake.html#flake-references
+Full doc for format of `registry.json`: https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-registry.html#registry-format
+
+Example of a smart config: https://gitlab.univ-rouen.fr/sreycoyrehourcq/dotfiles/-/blob/2ef3b82d6a/flake.nix#L127
+==> Using 2 main registry entries:
+    - 'self' that points to its home conf' outPath itself
+    - 'nixpkgs' that points to the nixpkgs input for its home conf
+      (through a flake reference by 'path', automatically updated by its home config)
+
+## Doc/Talk about registry entry `pkgs` for unstable
+
+Run `nix registry add pkgs github:nixos/nixpkgs/nixpkgs-unstable`, so I can simply use `nix run pkgs#just` (for example) to run the latest cached version of `just`.
+
+
+
+-----------------------------------
+## NOTES
+
+I want to separate cli from gui stuff!
+
+E.g: I want to be able to share/install/test my cli config only
+  Or only do that for tool X or Y

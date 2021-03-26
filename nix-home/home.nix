@@ -10,11 +10,6 @@
   #
   #   https://rycee.gitlab.io/home-manager/options.html
 
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
-  home.username = builtins.getEnv "USER";
-  home.homeDirectory = builtins.getEnv "HOME";
-
   # If you use non-standard XDG locations, set these options to the
   # appropriate paths:
   #
@@ -34,18 +29,25 @@
   # Looking at bash' & zsh' managed configs, I con't find any hooks, so simply loading that session vars file from my  # shell config should be enough!!!
 
   home.packages = [
+    pkgs.just
     pkgs.htop
     pkgs.bat
     pkgs.jq
     pkgs.tree
     pkgs.ripgrep
-    pkgs.niv
     pkgs.fd
+    pkgs.httpie
 
     pkgs.git
     pkgs.gitAndTools.delta
 
     pkgs.hexchat
+
+    # Nix tools
+    pkgs.nix-tree # TUI to browse the dependencies of a derivation
+
+    # media tools
+    pkgs.mpv
   ];
 
   # FIXME: I'd like to be able to do:
@@ -67,5 +69,5 @@
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "20.03";
+  home.stateVersion = "20.09";
 }

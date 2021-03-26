@@ -1,0 +1,18 @@
+_default:
+  # NOTE: when https://github.com/casey/just/issues/774 is implemented,
+  # we can rewrite this to use just_executable() instead of 'just':
+  @just --list
+
+# Build the current home config WITHOUT switching to it
+build:
+  #!/usr/bin/env bash
+  cd "{{justfile_directory()}}"
+  nix build .#homeConfig.activationPackage
+
+# Build the current home config AND switch to it
+switch: build
+  #!/usr/bin/env bash
+  cd "{{justfile_directory()}}"
+  ./result/activate
+
+# vim:set ft=conf:
