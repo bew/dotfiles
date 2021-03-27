@@ -29,19 +29,19 @@
   # Looking at bash' & zsh' managed configs, I con't find any hooks, so simply loading that session vars file from my  # shell config should be enough!!!
 
   home.packages = [
-    pkgs.just
-    pkgs.htop
     pkgs.bat
-    pkgs.jq
-    pkgs.tree
-    pkgs.ripgrep
     pkgs.fd
+    pkgs.htop
     pkgs.httpie
+    pkgs.jq
+    pkgs.just
+    pkgs.ripgrep
+    pkgs.tmux
+    pkgs.tree
+    pkgs.zsh
 
     pkgs.git
     pkgs.gitAndTools.delta
-
-    pkgs.hexchat
 
     # Nix tools
     pkgs.nix-tree # TUI to browse the dependencies of a derivation
@@ -51,11 +51,12 @@
   ];
 
   # FIXME: I'd like to be able to do:
-  # home.files."some-symlink".link = "${sources.home-manager}"
+  # home.files."some-symlink".link = "${sources.home-manager}";
   # Unfortunately, the home-manager module that manages files only supports 'text',
   # not 'link'.
   # Ultimately, all 'files' put in user's home will be symlinks (to the /nix/store),
   # but I'd like to make my own links too!
+  # IDEA (or similar): what about making a dot.link."some-symlink".target = dot-path ./foo/bar;
 
   # FIXME: generated files linked in user's home are NOT modifiable!!
   # For my shell/neovim configs (at least), will need to see how to make a hackable env,

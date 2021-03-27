@@ -51,7 +51,6 @@ label "Nix stuff"
 make-link .dot/nixpkgs    ~/.config/nixpkgs
 
 label "other cli tools"
-make-link .dot/tmux.conf ~/.tmux.conf
 #make-link .dot/mostrc    ~/.mostrc
 #make-link .dot/gdbinit   ~/.gdbinit
 make-link .dot/htop      ~/.config/htop
