@@ -3,10 +3,10 @@
 #
 # i3lock options
 #
-# -e ➤ --ignore-empty-password
-# -f ➤ --show-failed-attempts
-# -n ➤ --nofork
-# -i ➤ --image=
+# -e : --ignore-empty-password
+# -f : --show-failed-attempts
+# -n : --nofork
+# -i : --image=
 #
 
 ############################################################################
@@ -16,14 +16,14 @@ log_file="/tmp/i3locker.log"
 
 i3lock_options=(-f -e)
 
-# ➤ loading_img : this img is displayed in the loading locker
+# loading_img : this img is displayed in the loading locker
 loading_img="${HOME}/wallpapers/hacker-virus-loading-computer-1920x1080-blured.png"
 
-# ➤ buffer_path : this path is used for the screenshot (the file extension
+# buffer_path : this path is used for the screenshot (the file extension
 # must be an image handled by imagemagick)
 buffer_path="/tmp/screenshot_i3.png"
 
-# ➤ final_img : this is the path of the final img to be displayed
+# final_img : this is the path of the final img to be displayed
 final_img="/tmp/screenshot_i3.png"
 
 # Max loading time for the the final img to be generated.
@@ -74,7 +74,7 @@ function process_img
   local buffer=$1
   local final_buffer=$2
 
-  # ➤ blur
+  # blur
   convert "$buffer" -blur 0x10 "$final_buffer"
 }
 
