@@ -330,6 +330,20 @@ function! ExecuteMacroOverVisualRange()
 endfunction
 
 
+" Duplicate the visual selection
+vnoremap <C-d> <cmd>call <sid>DuplicateVisualSelection()<cr>
+function! s:DuplicateVisualSelection()
+  " Save unnamed register (will be overwritten when copying current visual selection)
+  let save_reg = getreg('"', 1, v:true)
+  let save_regtype = getregtype('"')
+
+  " Copy, go to the end of the selection, paste
+  exe 'normal! y`>p'
+
+  " Restore unnamed register
+  call setreg('"', save_reg, save_regtype)
+endf
+
 " Toggle Mundo tree
 nnoremap <F5> :MundoToggle<cr>
 
