@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Safer shell script with these options
 # -e          : exit if a command exits with non-zero status
@@ -7,24 +7,72 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function repeat_every_while
+# Invert the return value of a program, always works, even in some cases
+# where `!` is not recognized as a bash builtin.
+# (e.g: when saving it to an array and running the whole cmd)
+function not
 {
+  if "$@"; then
+    false # worked, invert result to false
+  else
+    true # failed, invert result to true
+  fi
+}
+
+function usage
+{
+  local ctrl_mode="$1"; shift # The internal mode (while or until)
+  echo "Usage: repeat_every_$ctrl_mode <interval> --sep <cmd...>"
+}
+
+function repeat_every_impl
+{
+  local ctrl_mode="$1"; shift # The internal mode (while or until)
+
   if [[ $# == 0 ]]; then
-    echo "Usage: repeat_every_while <interval> <cmd...>"
-    return 1
+    usage "$ctrl_mode" && return 1
   fi
 
   local interval="$1"; shift
-  while "$@"; do
+
+  local use_separator=false
+  if [[ "${1:-}" == "--sep" ]]; then
+    use_separator=true
+    shift
+  fi
+  local cmd=("$@")
+
+  if [[ "${#cmd[@]}" == 0 ]]; then
+    usage "$ctrl_mode" && return 1
+  fi
+
+  local run_comment
+  if [[ "$ctrl_mode" == "until" ]]; then
+    run_comment="failed"
+    # Instead of changing the control structure from while to until, we change the condition.
+    # We can't use '!' to invert the return here, bash does not recognize '!' as a builting then..
+    cmd=(not "${cmd[@]}")
+  else
+    run_comment="succeded"
+  fi
+
+  local run_count=0
+  while "${cmd[@]}"; do
+    run_count=$(( run_count + 1 ))
+    [[ $use_separator == true ]] && echo "--- [repeat_$ctrl_mode] Last run ($run_count) $run_comment, re-running in ${interval}s ---"
     sleep $interval
   done
 }
 
 case "$(basename $0)" in
   repeat_every_while)
-    repeat_every_while "$@";;
+    repeat_every_impl "while" "$@";;
   repeat_while)
-    repeat_every_while 1 "$@";;
+    repeat_every_impl "while" 1 "$@";;
+  repeat_every_until)
+    repeat_every_impl "until" "$@";;
+  repeat_until)
+    repeat_every_impl "until" 1 "$@";;
   *)
     2>&1 echo "This program doesn't know this alias"
     exit 1
