@@ -505,13 +505,6 @@ keysym_with_fallback Enter "^M"
 
 #-------------------------------------------------------------
 
-function zle::utils::reset-prompt
-{
-  zle && zle reset-prompt
-}
-hooks-add-hook zle_keymap_select_hook zle::utils::reset-prompt
-
-
 # Allows to have fast switch Insert => Normal, but still be able to
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 #
