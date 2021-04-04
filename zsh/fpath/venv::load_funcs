@@ -14,7 +14,7 @@ function venv__ensure_exists
 
 function venv__ensure_inside
 {
-  if [[ -z "$VIRTUAL_ENV" ]]; then
+  if [[ -z "${VIRTUAL_ENV:-}" ]]; then
     >&2 echo "ERROR: not in a virtual env"
     return 1
   fi
@@ -22,7 +22,7 @@ function venv__ensure_inside
 
 function venv__ensure_outside
 {
-  if [[ -n "$VIRTUAL_ENV" ]]; then
+  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     >&2 echo "Deactivating active virtual env.."
     deactivate
   fi
@@ -31,13 +31,17 @@ function venv__ensure_outside
 function venv_init
 {
   local venv_dir="${1:-venv}"
+  local python_bin="${VENV_PYTHON_BIN:-python}" # default python to use
+  local python_bin_path="$(command -v "$python_bin")"
 
   if [[ -d "$venv_dir" ]]; then
     >&2 echo "ERROR: '$venv_dir' directory already exists"
     return 1
   fi
 
-  python -m venv -- "$venv_dir"
+  >&2 echo "Using python bin: '$python_bin' at '$python_bin_path' (set \$VENV_PYTHON_BIN to override)"
+
+  "$python_bin" -m venv -- "$venv_dir"
 }
 
 function venv_on
@@ -110,6 +114,78 @@ function venv_reset
   fi
 }
 
+VENV_VOLATILE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/volatile-venvs"
+# Helper to create a volatile venv with the given packages and run a command.
+#
+# E.g: venv_with_do ansible -- ansible-playbook ...
+function venv_with_do
+{
+  if [[ $# == 0 ]]; then
+    >&2 echo "Usage: venv_with_do [--new] PKGS... [-- CMD...]"
+    return 1
+  fi
+
+  # NOTE: this will be run in a subshell
+  function venv_with_do::impl
+  {
+    # split args for packages and cmd to run
+    local pkgs=()
+    local cmd=()
+    local force_new=false
+    local dashdash_found=false
+    while [[ -n "${1:-}" ]]; do
+      case "$1" in
+        --new)
+          force_new=true;;
+        --)
+          dashdash_found=true;;
+        *)
+          if [[ "$dashdash_found" == false ]]; then
+            pkgs+=("$1")
+          else
+            cmd+=("$1")
+          fi
+          ;;
+      esac
+      shift
+    done
+    if [[ "${#cmd[@]}" == 0 ]]; then
+      local venv_shell="${VENV_SHELL:-zsh}"
+      >&2 echo ">>> Command not given, defaulting to '$venv_shell' (override with \$VENV_SHELL)"
+      cmd=($venv_shell)
+    fi
+
+    # Make a venv somewhere volatile (based on cwd)
+    # We use a small hash and only the the basname (instead of the%full%path)
+    # to keep the cache dir short, and avoid potential issues like "bad interpreter"
+    # due to long paths.
+    # E.g: /home/me/.cache/5592fa21d8-service-elastic
+    local venv_dir_hash=$(echo "$PWD" | md5sum | awk '{ print $1 }')
+    local venv_path="${VENV_VOLATILE_DIR}/${venv_dir_hash[1, 10]}-$(basename "$PWD")"
+    >&2 echo ">>> venv will be created/reused in '$venv_path'"
+    if [[ "$force_new" == true ]]; then
+      >&2 echo ">>> --new passed, force create new venv.."
+      venv_reset "$venv_path" || return $?
+    else
+      venv_here "$venv_path" || return $?
+    fi
+
+    if [[ "${#pkgs[@]}" != 0 ]]; then
+      >&2 echo ">>> Installing packages: ${pkgs[@]}"
+      pip install "${pkgs[@]}" || return $?
+    else
+      >&2 echo ">>> No package to install"
+    fi
+
+    >&2 echo ">>> Running command '${cmd[@]}'"
+    VENV_IS_VOLATILE=true "${cmd[@]}"
+  }
+
+  # Run in a subshell, to ensure we don't change env vars
+  # in the current shell.
+  ( venv_with_do::impl "$@" )
+}
+
 # Disable pip unless in a virtual env or --my-env is passed
 function pip
 {
@@ -120,14 +196,19 @@ function pip
     return $?
   fi
 
-  if [[ -n "$VIRTUAL_ENV" ]] && [[ `type -p pip` =~ "$VIRTUAL_ENV/bin/pip" ]]; then
-    command pip "$@"
+  # If there is a venv, ensure the dir actually exists and pip is in there
+  # (otherwise the global pip would be used..)
+  if [[ -n "${VIRTUAL_ENV:-}" ]] && [[ -e "$VIRTUAL_ENV/bin/pip" ]]; then
+    "$VIRTUAL_ENV/bin/pip" "$@"
     return $?
   fi
   >&2 echo "Nope! 'pip' is disabled globally, use 'pip-my-env' to manage packages in the user env"
   return 1
 }
 alias pip-my-env="pip --my-env"
+
+alias pytest::no-warn="pytest --disable-warnings"
+alias pytest::no-cov-no-warn="pytest --no-cov --disable-warnings"
 
 # This function only needs to exist, when I call it, this file
 # will get executed and the helper functions will be in scope.
