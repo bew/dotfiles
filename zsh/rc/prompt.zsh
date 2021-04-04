@@ -177,8 +177,6 @@ function segmt::python_venv
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
 }
 
-zmodload zsh/system
-
 function segmt::shlvl
 {
   [[ $SHLVL == 1 ]] && return
@@ -414,3 +412,44 @@ function prompt::utils::regen-prompt
   # zle::utils::get-vim-mode && zle -M "vim mode: $REPLY"
 }
 hooks-add-hook zle_keymap_select_hook prompt::utils::regen-prompt
+
+# Set to disable cursor shape changes.
+# It is NOT set based on the current terminal and support for cursor change feature,
+# maybe this can come one day..
+CURSOR_SHAPE_CHANGE_DISABLED=
+
+# Set cursor style (DECSCUSR), VT520.
+# 0 => blinking block.
+# 1 => blinking block (default).
+# 2 => steady block.
+# 3 => blinking underline.
+# 4 => steady underline.
+# 5 => blinking bar, xterm.
+# 6 => steady bar, xterm.
+function prompt::utils::set-cursor-block
+{
+  [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
+  echo -ne "\e[2 q" # steady block
+}
+function prompt::utils::set-cursor-underline
+{
+  [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
+  echo -ne "\e[4 q" # steady underline
+}
+function prompt::utils::set-cursor-beam
+{
+  [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
+  echo -ne "\e[6 q" # steady bar
+}
+function prompt::utils::apply-cursor-shape
+{
+  zle::utils::get-vim-mode
+  case "$REPLY" in
+    insert) prompt::utils::set-cursor-beam;;
+    replace) prompt::utils::set-cursor-underline;;
+    *) prompt::utils::set-cursor-block;;
+  esac
+}
+hooks-add-hook zle_keymap_select_hook prompt::utils::apply-cursor-shape
+hooks-add-hook zle_line_init_hook prompt::utils::set-cursor-beam
+hooks-add-hook zle_line_finish_hook prompt::utils::set-cursor-block
