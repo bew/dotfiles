@@ -7,7 +7,7 @@ function venv__ensure_exists
   local venv_dir="${1:-venv}"
 
   if ! [[ -d "$venv_dir" ]]; then
-    echo "ERROR: '$venv_dir' directory does NOT exist"
+    >&2 echo "ERROR: '$venv_dir' directory does NOT exist"
     return 1
   fi
 }
@@ -15,7 +15,7 @@ function venv__ensure_exists
 function venv__ensure_inside
 {
   if [[ -z "$VIRTUAL_ENV" ]]; then
-    echo "ERROR: not in a virtual env"
+    >&2 echo "ERROR: not in a virtual env"
     return 1
   fi
 }
@@ -23,7 +23,7 @@ function venv__ensure_inside
 function venv__ensure_outside
 {
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    echo "Deactivating active virtual env.."
+    >&2 echo "Deactivating active virtual env.."
     deactivate
   fi
 }
@@ -33,7 +33,7 @@ function venv_init
   local venv_dir="${1:-venv}"
 
   if [[ -d "$venv_dir" ]]; then
-    echo "ERROR: '$venv_dir' directory already exists"
+    >&2 echo "ERROR: '$venv_dir' directory already exists"
     return 1
   fi
 
@@ -47,7 +47,7 @@ function venv_on
   venv__ensure_outside
 
   if ! venv__ensure_exists "$venv_dir"; then
-    echo "  Use venv_init to create a venv there."
+    >&2 echo "  Use venv_init to create a venv there."
     return 1
   fi
 
@@ -83,11 +83,11 @@ function venv_here
   venv__ensure_outside
 
   if ! [[ -d "$venv_dir" ]]; then
-    echo "Venv directory '$venv_dir' missing, creating venv now.."
+    >&2 echo "Venv directory '$venv_dir' missing, creating venv now.."
     venv_init "$venv_dir" || return 1
   fi
 
-  echo "Enabling virtual env.."
+  >&2 echo "Enabling virtual env.."
   venv_on "$venv_dir"
 }
 
@@ -100,10 +100,10 @@ function venv_reset
   venv__ensure_outside
 
   if [[ -d "$venv_dir" ]]; then
-    echo "Resetting existing virtual env in directory '$venv_dir'.."
+    >&2 echo "Resetting existing virtual env in directory '$venv_dir'.."
     python -m venv --clear -- "$venv_dir"
 
-    echo "Enabling virtual env.."
+    >&2 echo "Enabling virtual env.."
     venv_on "$venv_dir"
   else
     venv_here "$venv_dir"
@@ -115,7 +115,7 @@ function pip
 {
   if [[ "$1" == "--my-env" ]]; then
     shift
-    echo "NOTE: if a virtual env is currently active, you'll change that env not your user's."
+    >&2 echo "NOTE: if a virtual env is currently active, you'll change that env not your user's."
     command pip "$@"
     return $?
   fi
@@ -124,7 +124,7 @@ function pip
     command pip "$@"
     return $?
   fi
-  echo "Nope! 'pip' is disabled globally, use 'pip-my-env' to manage packages in the user env"
+  >&2 echo "Nope! 'pip' is disabled globally, use 'pip-my-env' to manage packages in the user env"
   return 1
 }
 alias pip-my-env="pip --my-env"
@@ -133,6 +133,6 @@ alias pip-my-env="pip --my-env"
 # will get executed and the helper functions will be in scope.
 function venv::load_funcs
 {
-  echo "Helper functions already loaded"
+  >&2 echo "Helper functions already loaded"
 }
 echo "Helper functions loaded!"
