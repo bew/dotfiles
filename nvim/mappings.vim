@@ -32,6 +32,10 @@ function! ToggleSignsAndLineNumbers()
     let &number = w:saved_signs_and_linenum_options['number']
     let &relativenumber = w:saved_signs_and_linenum_options['relativenumber']
 
+    if w:saved_signs_and_linenum_options["indentLine_enabled"]
+      IndentLinesEnable
+    endif
+
     unlet w:saved_signs_and_linenum_options
   else
     let status = "saved & disabled"
@@ -42,9 +46,17 @@ function! ToggleSignsAndLineNumbers()
         \ 'number': &number,
         \ 'relativenumber': &relativenumber,
         \ }
+    if exists("b:indentLine_enabled")
+      " If the buffer local var exists, g:indentLine_enabled should not be checked
+      " (it's always 1, even when disabled locally)
+      let w:saved_signs_and_linenum_options.indentLine_enabled = b:indentLine_enabled
+    else
+      let w:saved_signs_and_linenum_options.indentLine_enabled = g:indentLine_enabled
+    endif
     let &signcolumn = "no"
     let &number = 0
     let &relativenumber = 0
+    IndentLinesDisable
   endif
 
   echo "Signs and line numbers: " . l:status
