@@ -106,50 +106,41 @@ function segmt::in_sudo
   fi
 }
 
-# Set $REPLY with the current vim mode (insert, normal, replace)
-function helper::get-vim-mode
+# Set $REPLY with the current vim mode (insert, normal, visual*, replace)
+function zle::utils::get-vim-mode
 {
-  if [[ -z "$KEYMAP" ]] || [[ "$KEYMAP" =~ "(main|viins)" ]]; then
-    if [[ $ZLE_STATE == *overwrite* ]]; then
-      REPLY="replace"
-    else
-      REPLY="insert"
-    fi
-  elif [[ "$KEYMAP" == "vicmd" ]]; then
+  if [[ -z $KEYMAP ]]; then
+    REPLY="insert"
+    return
+  fi
+  if [[ "$KEYMAP" =~ "(main|viins)" ]] && [[ $ZLE_STATE == *insert* ]]; then
+    REPLY="insert"
+  elif [[ "$KEYMAP" =~ "(main|viins)" ]] && [[ $ZLE_STATE == *overwrite* ]]; then
+    REPLY="replace"
+  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 0 ]]; then
     REPLY="normal"
+  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 1 ]]; then
+    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
+    REPLY="visualchar"
+  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 2 ]]; then
+    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
+    REPLY="visualline"
   else
     REPLY="unknown"
   fi
 }
 
 # Segment prompt vim mode (normal/insert)
-function segmt::vim_mode
-{
-  local insert_mode_style="%B%K{green}%F{white} INSERT %f%k%b"
-  local normal_mode_style="%B%K{blue}%F{white} NORMAL %f%k%b"
-  local replace_mode_style="%B%K{red}%F{white} REPLACE %f%k%b"
-
-  helper::get-vim-mode
-  case "$REPLY" in
-    insert) echo -n "$insert_mode_style";;
-    normal) echo -n "$normal_mode_style";;
-    replace) echo -n "$replace_mode_style";;
-    *) echo -n "$KEYMAP";;
-  esac
-}
-
-# Segment prompt vim mode (normal/insert)
 function segmt::short_vim_mode
 {
-  local insert_mode_style="%B%K{green}%F{white} I %f%k%b"
-  local normal_mode_style="%B%K{blue}%F{white} N %f%k%b"
-  local replace_mode_style="%B%K{red}%F{white} R %f%k%b"
-
-  helper::get-vim-mode
+  zle::utils::get-vim-mode
   case "$REPLY" in
-    insert) echo -n "$insert_mode_style";;
-    normal) echo -n "$normal_mode_style";;
-    replace) echo -n "$replace_mode_style";;
+    insert) echo -n "%B%K{green}%F{white} I %f%k%b";;
+    normal) echo -n "%B%K{blue}%F{white} N %f%k%b";;
+    replace) echo -n "%B%K{red}%F{white} R %f%k%b";;
+    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
+    # visualchar) echo -n "%B%K{133}%F{white} V %f%k%b";; # bg: light violet
+    # visualline) echo -n "%B%K{133}%F{white} VL %f%k%b";; # bg: light violet
     *) echo -n "$KEYMAP";;
   esac
 }
@@ -412,3 +403,14 @@ function simple_prompts
   RPROMPT_CURRENT= # no right prompt
   RPROMPT_PAST=    # no right prompt
 }
+
+# Setup reactions to keymap changes
+
+function prompt::utils::regen-prompt
+{
+  zle reset-prompt
+
+  # NOTE: keep it commented because it is nice when debugging (:
+  # zle::utils::get-vim-mode && zle -M "vim mode: $REPLY"
+}
+hooks-add-hook zle_keymap_select_hook prompt::utils::regen-prompt
