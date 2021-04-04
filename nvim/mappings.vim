@@ -296,6 +296,9 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
+" Select last inserted region
+nnoremap gV `[v`]
+
 " mark position before search
 nnoremap / ms/
 
@@ -329,6 +332,14 @@ function! ExecuteMacroOverVisualRange()
   execute ":'<,'>normal! @".nr2char(getchar())
 endfunction
 
+" Fold ranged open/close
+" NOTE: this does not change the 'foldlevel'.
+" FIXME: these mappings must be typed fast, otherwise you get normal behavior.
+" Make sure to read `:h fold-commands` for all the details.
+" open all folds in range
+vnoremap zo  :<C-u>'<,'>foldopen!<cr>
+" close all manually opened folds in range
+vnoremap zc  zx
 
 " Duplicate the visual selection
 vnoremap <C-d> <cmd>call <sid>DuplicateVisualSelection()<cr>
