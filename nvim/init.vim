@@ -228,6 +228,10 @@ let g:LanguageClient_serverCommands = {
 
 Plug 'junegunn/vim-easy-align'      " An advanced, easy-to-use Vim alignment plugin.
 
+Plug 'AndrewRadev/splitjoin.vim'    " Switch single-line <=> multiline forms of code
+let g:splitjoin_python_brackets_on_separate_lines = 1
+let g:splitjoin_trailing_comma = 1
+
 Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
 Plug 'junegunn/gv.vim'          " Simple (<3) git commit browser, based on vim-fugitive
 Plug 'rhysd/git-messenger.vim'  " Popup the commit message of the line under cursor
