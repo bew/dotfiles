@@ -16,7 +16,7 @@ local cfg_misc = {
   -- Make sure word selection stops on most punctuations.
   -- Note that dot (.) & slash (/) are allowed though for
   -- easy selection of paths.
-  selection_word_boundary = " \t\n{}[]()\"'`,;:",
+  selection_word_boundary = " \t\n{}[]()\"'`,;:@",
 
   hide_tab_bar_if_only_one_tab = true,
 
