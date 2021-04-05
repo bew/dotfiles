@@ -25,6 +25,21 @@ local cfg_misc = {
   -- Ctrl-D and the last command exited with non-zero: the shell will exit
   -- with non-zero and the terminal would hang until the window is closed manually.
   exit_behavior = "Close",
+
+  -- cf the original issue (mine): https://github.com/wez/wezterm/issues/478 solved for me but not for everyone..
+  -- cf the addition of this flag: https://github.com/wez/wezterm/commit/336f209ede27dd801f989419155e475f677e8244
+  -- OK BUT NO, disabled because it does some weird visual artifacts:
+  --  * About cursor behaviors:
+  --    When a ligature is a the end of the line & the nvim' window
+  --    is a little bit larger than the text so that when the cursor comes
+  --    closer to the window border (and on the ligature), the buffer does
+  --    a side-scroll. Then the cursor does wonky stuff when moving w.r.t that
+  --    end-of-line ligature.
+  --
+  --  * About some symbols display:
+  --    The git above/below arrows on the right of my prompt.
+  --
+  -- experimental_shape_post_processing = true,
 }
 
 -- Colors & Appearance
