@@ -4,6 +4,7 @@ interception tools:
 ---
 Nix: repackage ffcast to reference its dependencies (ffmpeg, imagemagick, xprop, xwininfo, ..)
 Add helper or add cheatsheet for it, it's _really_ great in KISS and it works perfectly!
+Idea: rewrite it in Rust?
 
 ---
 (Try to?) unify keybindings for completion selection & history traversal
