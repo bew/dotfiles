@@ -3,6 +3,7 @@ local wezterm = require "wezterm"
 local cfg = {}
 
 cfg.font_size = 12.0
+cfg.adjust_window_size_when_changing_font_size = false
 
 -- Makes FontAwesome's double-width glyphs display properly!
 cfg.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
