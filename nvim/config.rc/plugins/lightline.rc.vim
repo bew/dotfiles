@@ -21,12 +21,26 @@ let g:lightline.subseparator = { 'left': '', 'right': '' }
 let g:lightline.colorscheme = 'PaperColor'
 
 let g:lightline.active = {
-      \   'left': [ ['mode', 'paste'], ['linter_warnings', 'linter_errors', 'filename', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
-      \   'right': [ ['lineinfoprogress'], [], ['filetype'] ],
+      \   'left': [
+      \     ['mode', 'paste'],
+      \     ['linter_warnings', 'linter_errors', 'filename', 'readonly', 'modified'],
+      \     ['fugitive', 'buffer_comment']
+      \   ],
+      \   'right': [
+      \     ['lineinfoprogress'],
+      \     [],
+      \     ['filetype']
+      \   ],
       \ }
 let g:lightline.inactive = {
-      \   'left':  [ ['relativepath', 'readonly', 'modified'], ['fugitive', 'buffer_comment'] ],
-      \   'right': [ ['progress'], ['filetype'] ],
+      \   'left':  [
+      \     ['relativepath', 'readonly', 'modified'],
+      \     ['fugitive', 'buffer_comment']
+      \   ],
+      \   'right': [
+      \     ['progress'],
+      \     ['filetype']
+      \   ],
       \ }
 let g:lightline.component = {
       \   'readonly': '%{&readonly && &ft != "help" ? "RO" : ""}',

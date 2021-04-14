@@ -271,7 +271,7 @@ let g:indentLine_fileTypeExclude = [
     \   "json",
     \   "nerdtree"
     \ ]
-augroup indentline_hi_group
+augroup my_indentline_hi_group
   au!
   au ColorScheme * hi IndentLines cterm=none ctermfg=237
 augroup END
@@ -550,7 +550,7 @@ endif
 
 " Fix lightline not refreshing on &background change
 " NOTE: must be done after 'my_colorscheme_setup' autocmd group
-augroup lightline_fix_hightlight
+augroup my_lightline_fix_hightlight
   au!
   au OptionSet background call lightline#highlight()
 augroup END
