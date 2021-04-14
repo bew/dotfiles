@@ -22,7 +22,7 @@ S=Shift
 A=Alt
 
 # WM-level actions
-hc keybind $M-$C-q   quit
+# hc keybind $M-$C-q   quit
 hc keybind $M-$C-r   reload
 
 # WM agnostic keys
@@ -42,7 +42,7 @@ hc keybind $M-x       spawn rofi -show drun
 # could also be used for window state (toggle on top, floating, ..)
 
 # basic random wallpaper selection
-hc keybind $M-w   spawn feh --recursive --bg-scale --randomize ~/wallpapers/
+hc keybind $M-w   spawn feh --bg-scale --no-fehbg --recursive --randomize ~/wallpapers/
 
 # volume management using pamixer
 hc keybind $S-XF86AudioLowerVolume  spawn pamixer --decrease 1
