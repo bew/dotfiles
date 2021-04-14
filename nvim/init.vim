@@ -28,6 +28,23 @@ Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
 Plug 'wellle/targets.vim'        " Moar & improved text objects
 Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
 Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/etc..)
+let g:CtrlSpaceUseTabline = 1
+let g:CtrlSpaceLoadLastWorkspaceOnStart = 0
+
+" Use ascii for most symbols
+" (note: some are still on their plugin' default)
+let g:CtrlSpaceSymbols = {}
+let g:CtrlSpaceSymbols.CS = "#"
+let g:CtrlSpaceSymbols.All = "all"
+let g:CtrlSpaceSymbols.Vis = "visible"
+let g:CtrlSpaceSymbols.File = "files"
+let g:CtrlSpaceSymbols.Zoom = "<Z>"
+let g:CtrlSpaceSymbols.WLoad = "|>>"
+let g:CtrlSpaceSymbols.WSave = "|<<"
+let g:CtrlSpaceSymbols.IV = "(-)"  " Item Visible or Last-active
+let g:CtrlSpaceSymbols.IA = "( )"  " Item Active
+let g:CtrlSpaceSymbols.IM = "(+)"  " Item Modified
+
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'      " * for visualy selected text
 Plug 'itchyny/lightline.vim'      " statusline builder
