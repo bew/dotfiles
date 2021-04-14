@@ -9,6 +9,7 @@ final: prev:
     name = "bew-cli-env";
     paths = let p = prev; in [
       p.neovim
+      p.rust-analyzer
 
       p.fd
       p.fzf

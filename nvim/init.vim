@@ -98,24 +98,94 @@ let g:sandwich#recipes += [
     \   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['(']},
     \ ]
 
+" Diagnostic provider agnostic signs config
+let s:code_diagnostic_cfg = {}
+let s:code_diagnostic_cfg.virt_text_prefix = "  <<  "
+let s:code_diagnostic_cfg.code_hl = "CodeDiagnosticDefaultCodeHl"
+let s:code_diagnostic_cfg.error = {
+    \   "sign": "x",
+    \   "sign_hl": "CodeDiagnosticSignError",
+    \   "virt_text_hl": "CodeDiagnosticVirtTextError",
+    \ }
+let s:code_diagnostic_cfg.warning = {
+    \   "sign": "!",
+    \   "sign_hl": "CodeDiagnosticSignWarning",
+    \   "virt_text_hl": "CodeDiagnosticVirtTextWarning",
+    \ }
+let s:code_diagnostic_cfg.info = {
+    \   "sign": "i",
+    \   "sign_hl": "CodeDiagnosticSignInfo",
+    \   "virt_text_hl": "CodeDiagnosticVirtTextInfo",
+    \ }
+let s:code_diagnostic_cfg.hint = {
+    \   "sign": "h",
+    \   "sign_hl": "CodeDiagnosticSignHint",
+    \   "virt_text_hl": "CodeDiagnosticVirtTextHint",
+    \ }
+augroup my_code_diagnostic_hi
+  au!
+  function! s:set_code_diagnostic_highlights()
+    hi CodeDiagnosticDefaultCodeHl cterm=underline
+    hi CodeDiagnosticSignError   ctermfg=red
+    hi CodeDiagnosticSignWarning ctermfg=yellow
+    hi CodeDiagnosticSignInfo    ctermfg=cyan
+    hi link CodeDiagnosticSignHint CodeDiagnosticSignInfo
+    hi CodeDiagnosticVirtTextError   cterm=italic ctermfg=red
+    hi CodeDiagnosticVirtTextWarning cterm=italic ctermfg=yellow
+    hi CodeDiagnosticVirtTextInfo    cterm=italic ctermfg=cyan
+    hi link CodeDiagnosticVirtTextHint CodeDiagnosticVirtTextInfo
+  endf
+  au ColorScheme * call <sid>set_code_diagnostic_highlights()
+augroup END
+
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
-let g:neomake_virtualtext_prefix = "  <<  "
-let g:neomake_error_sign = { 'text': 'x',   'texthl': 'NeomakeSignError', }
-let g:neomake_warning_sign = { 'text': '!', 'texthl': 'NeomakeSignWarning', }
-let g:neomake_info_sign = { 'text': 'i',    'texthl': 'NeomakeSignInfo', }
+let diag = s:code_diagnostic_cfg
+let g:neomake_virtualtext_prefix = diag.virt_text_prefix
+let s:nm_diag_gen = {cfg -> {"text": cfg.sign, "texthl": cfg.sign_hl}}
+let g:neomake_error_sign = s:nm_diag_gen(diag.error)
+let g:neomake_warning_sign = s:nm_diag_gen(diag.warning)
+let g:neomake_info_sign = s:nm_diag_gen(diag.info)
+unlet diag s:nm_diag_gen
 augroup my_neomake_hi
   au!
-
-  " Signs
-  au ColorScheme * hi NeomakeSignError   cterm=none ctermfg=red
-  au ColorScheme * hi NeomakeSignWarning cterm=none ctermfg=yellow
-  au ColorScheme * hi NeomakeSignInfo    cterm=none ctermfg=cyan
-
-  " Virtual text
-  au ColorScheme * hi NeomakeVirtualtextError   cterm=italic ctermbg=none ctermfg=red
-  au ColorScheme * hi NeomakeVirtualtextWarning cterm=italic ctermbg=none ctermfg=yellow
-  au ColorScheme * hi NeomakeVirtualtextInfo    cterm=italic ctermbg=none ctermfg=cyan
+  au ColorScheme * hi link NeomakeSignError   CodeDiagnosticSignError
+  au ColorScheme * hi link NeomakeSignWarning CodeDiagnosticSignWarning
+  au ColorScheme * hi link NeomakeSignInfo    CodeDiagnosticSignInfo
+  au ColorScheme * hi link NeomakeVirtualtextError   CodeDiagnosticVirtTextError
+  au ColorScheme * hi link NeomakeVirtualtextWarning CodeDiagnosticVirtTextWarning
+  au ColorScheme * hi link NeomakeVirtualtextInfo    CodeDiagnosticVirtTextInfo
 augroup END
+
+Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
+" note for the line above: single quote are mandatory on the whole line.
+let g:LanguageClient_useVirtualText = "Diagnostics"
+let g:LanguageClient_virtualTextPrefix = s:code_diagnostic_cfg.virt_text_prefix
+
+let s:lc_diag_gen = {name, cfg -> {
+    \   "name": name,
+    \   "texthl": s:code_diagnostic_cfg.code_hl,
+    \   "signText": cfg.sign,
+    \   "signTexthl": cfg.sign_hl,
+    \   "virtualTexthl": cfg.virt_text_hl,
+    \ }}
+let g:LanguageClient_diagnosticsDisplay = {}
+let g:LanguageClient_diagnosticsDisplay.1 =
+    \ s:lc_diag_gen("Error", s:code_diagnostic_cfg.error)
+let g:LanguageClient_diagnosticsDisplay.2 =
+    \ s:lc_diag_gen("Warning", s:code_diagnostic_cfg.warning)
+let g:LanguageClient_diagnosticsDisplay.3 =
+    \ s:lc_diag_gen("Info", s:code_diagnostic_cfg.info)
+let g:LanguageClient_diagnosticsDisplay.4 =
+    \ s:lc_diag_gen("Hint", s:code_diagnostic_cfg.hint)
+unlet s:lc_diag_gen
+augroup my_LanguageClient_config
+  autocmd!
+  autocmd User LanguageClientStarted NeomakeDisableBuffer
+  autocmd User LanguageClientStopped NeomakeEnableBuffer
+augroup END
+
+let g:LanguageClient_serverCommands = {}
+let g:LanguageClient_serverCommands.rust = ["rust-analyzer"]
 
 
 Plug 'tpope/vim-repeat'         " Repeat for plugins
@@ -232,16 +302,6 @@ let delimitMate_expand_cr = 1
 Plug 'SirVer/ultisnips'         " Advanced snippets
 
 " -- Text refactor / formater
-
-Plug 'autozimu/LanguageClient-neovim',
-    \ {
-    \   'branch': 'next',
-    \   'do': 'bash install.sh',
-    \ }
-let g:LanguageClient_serverCommands = {
-    \ }
-" let g:LanguageClient_loggingFile = '/tmp/lsp.log'
-" let g:LanguageClient_loggingLevel = 'DEBUG'
 
 Plug 'junegunn/vim-easy-align'      " An advanced, easy-to-use Vim alignment plugin.
 
