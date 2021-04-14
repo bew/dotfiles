@@ -472,18 +472,18 @@ fi
 # Also some good doc on the 2 modes, and below the difference it means for some keys:
 # https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#mode-changes
 
-typeset -gA keysym
+typeset -gA keysyms
 
-function keysym_with_fallback
+function zle::utils::register_keysym
 {
   local sym="$1"
   local prefered_val="$2"
   local fallback_val="$3" # may be empty
 
   if [[ -n "$prefered_val" ]]; then
-    keysym[$sym]="$prefered_val"
+    keysyms[$sym]="$prefered_val"
   else
-    keysym[$sym]="$fallback_val"
+    keysyms[$sym]="$fallback_val"
   fi
 }
 
@@ -493,18 +493,18 @@ function keysym_with_fallback
 # - Always add a fallback if the first value may be empty (e.g: `terminfo` var can be
 #   empty when terminfo is not available)
 
-keysym_with_fallback Home "${terminfo[khome]}" "[1~"
-keysym_with_fallback End  "${terminfo[kend]}"  "[4~"
+zle::utils::register_keysym Home "${terminfo[khome]}" "[1~"
+zle::utils::register_keysym End  "${terminfo[kend]}"  "[4~"
 
-keysym_with_fallback Insert "${terminfo[kich1]}" "[2~"
-keysym_with_fallback Delete "${terminfo[kdch1]}" "[3~"
-keysym_with_fallback PageUp "${terminfo[kpp]}" "[5~"
-keysym_with_fallback PageDown "${terminfo[knp]}" "[6~"
+zle::utils::register_keysym Insert "${terminfo[kich1]}" "[2~"
+zle::utils::register_keysym Delete "${terminfo[kdch1]}" "[3~"
+zle::utils::register_keysym PageUp "${terminfo[kpp]}" "[5~"
+zle::utils::register_keysym PageDown "${terminfo[knp]}" "[6~"
 
-keysym_with_fallback Left "${terminfo[kcub1]}" "[D"
-keysym_with_fallback Down "${terminfo[kcud1]}" "[B"
-keysym_with_fallback Up "${terminfo[kcuu1]}" "[A"
-keysym_with_fallback Right "${terminfo[kcuf1]}" "[C"
+zle::utils::register_keysym Left "${terminfo[kcub1]}" "[D"
+zle::utils::register_keysym Down "${terminfo[kcud1]}" "[B"
+zle::utils::register_keysym Up "${terminfo[kcuu1]}" "[A"
+zle::utils::register_keysym Right "${terminfo[kcuf1]}" "[C"
 
 # The backspace key is usually ^? but can be ^h on some terminal.
 # NOTE: None of my installed ones (xterm, urxvt, termite, konsole, kitty, wezterm) uses ^h
@@ -517,15 +517,15 @@ keysym_with_fallback Right "${terminfo[kcuf1]}" "[C"
 # That's why we default to ^? by default unless the following env var is set..
 if [[ -n "$_ZLE_MAP_BACKSPACE_FROM_TERMINFO" ]]; then
   # Note: Backspace can be ^h on some terminal
-  keysym_with_fallback Backspace "${terminfo[kbs]}" "^?"
+  zle::utils::register_keysym Backspace "${terminfo[kbs]}" "^?"
 else
-  keysym_with_fallback Backspace "^?"
+  zle::utils::register_keysym Backspace "^?"
 fi
 
-keysym_with_fallback Tab   "^I"
-keysym_with_fallback S-Tab "${terminfo[kcbt]}" "^I" # on linux console: S-Tab == M-Tab
+zle::utils::register_keysym Tab   "^I"
+zle::utils::register_keysym S-Tab "${terminfo[kcbt]}" "^I" # on linux console: S-Tab == M-Tab
 
-keysym_with_fallback Enter "^M"
+zle::utils::register_keysym Enter "^M"
 
 #-------------------------------------------------------------
 
@@ -558,7 +558,7 @@ vibindkey 'q' zwidget::cycle-quoting
 vibindkey 'a' zwidget::insert_one_arg
 
 # Alt-Enter => insert a newline
-vibindkey "${keysym[Enter]}" self-insert-unmeta
+vibindkey "${keysyms[Enter]}" self-insert-unmeta
 
 # Ctrl-Alt-L => force scroll window for free thinking :)
 vibindkey '^l' zwidget::force-scroll-window
@@ -590,7 +590,7 @@ vibindkey '^z' zwidget::fg2
 
 
 # Fix keybinds when returning from command mode
-bindkey "${keysym[Backspace]}" backward-delete-char # Backspace
+bindkey "${keysyms[Backspace]}" backward-delete-char # Backspace
 bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
@@ -603,7 +603,7 @@ function backward-kill-partial-path
 }
 zle -N backward-kill-partial-path
 
-bindkey "${keysym[Backspace]}" backward-kill-partial-path # Alt-Backspace
+bindkey "${keysyms[Backspace]}" backward-kill-partial-path # Alt-Backspace
 
 function toggle-replace-mode
 {
@@ -616,18 +616,18 @@ function toggle-replace-mode
 }
 zle -N toggle-replace-mode
 
-bindkey -M vicmd "${keysym[Insert]}" vi-replace
-bindkey "${keysym[Insert]}" toggle-replace-mode
+bindkey -M vicmd "${keysyms[Insert]}" vi-replace
+bindkey "${keysyms[Insert]}" toggle-replace-mode
 
 # Sane default
-bindkey "${keysym[Delete]}" delete-char
-bindkey -M vicmd "${keysym[Delete]}" zwidget::noop
+bindkey "${keysyms[Delete]}" delete-char
+bindkey -M vicmd "${keysyms[Delete]}" zwidget::noop
 
-vibindkey "${keysym[Home]}" beginning-of-line
-vibindkey "${keysym[End]}" end-of-line
+vibindkey "${keysyms[Home]}" beginning-of-line
+vibindkey "${keysyms[End]}" end-of-line
 
-vibindkey "${keysym[PageUp]}" beginning-of-buffer-or-history # like gg in vicmd
-vibindkey "${keysym[PageDown]}" vi-fetch-history             # like G in vicmd
+vibindkey "${keysyms[PageUp]}" beginning-of-buffer-or-history # like gg in vicmd
+vibindkey "${keysyms[PageDown]}" vi-fetch-history             # like G in vicmd
 
 # Cut the buffer and push it on the buffer stack
 function push-input-go-insert-mode
@@ -747,14 +747,14 @@ vibindkey 'w' zwidget::jump-next-shell-arg
 # Use Up/Down to get history with current cmd prefix..
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
-bindkey "${keysym[Up]}" up-line-or-beginning-search
-bindkey "${keysym[Down]}" down-line-or-beginning-search
+bindkey "${keysyms[Up]}" up-line-or-beginning-search
+bindkey "${keysyms[Down]}" down-line-or-beginning-search
 
 # menuselect keybindings
 #-------------------------------------------------------------
 
 # enable go back in completions with S-Tab
-bindkey -M menuselect "${keysym[S-Tab]}" reverse-menu-complete
+bindkey -M menuselect "${keysyms[S-Tab]}" reverse-menu-complete
 
 # Cancel current completion with Esc
 bindkey -M menuselect '' send-break
