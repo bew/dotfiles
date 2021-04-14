@@ -106,30 +106,6 @@ function segmt::in_sudo
   fi
 }
 
-# Set $REPLY with the current vim mode (insert, normal, visual*, replace)
-function zle::utils::get-vim-mode
-{
-  if [[ -z $KEYMAP ]]; then
-    REPLY="insert"
-    return
-  fi
-  if [[ "$KEYMAP" =~ "(main|viins)" ]] && [[ $ZLE_STATE == *insert* ]]; then
-    REPLY="insert"
-  elif [[ "$KEYMAP" =~ "(main|viins)" ]] && [[ $ZLE_STATE == *overwrite* ]]; then
-    REPLY="replace"
-  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 0 ]]; then
-    REPLY="normal"
-  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 1 ]]; then
-    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
-    REPLY="visualchar"
-  elif [[ "$KEYMAP" == "vicmd" ]] && [[ "$REGION_ACTIVE" == 2 ]]; then
-    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
-    REPLY="visualline"
-  else
-    REPLY="unknown"
-  fi
-}
-
 # Segment prompt vim mode (normal/insert)
 function segmt::short_vim_mode
 {
