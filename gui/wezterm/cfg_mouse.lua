@@ -77,6 +77,8 @@ table.insert(mouse_bindings, {
   event={Up={streak=1, button="Left"}},
   action="OpenLinkAtMouseCursor",
 })
+-- I want this to work EVEN IF the current program enabled mouse-reporting.
+-- Another binding override I'd love is the MiddleClick (to work even in tmux!)
 
 -- Clipboard / PrimarySelection paste
 table.insert(mouse_bindings, {

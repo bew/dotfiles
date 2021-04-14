@@ -26,6 +26,13 @@ local cfg_misc = {
   -- with non-zero and the terminal would hang until the window is closed manually.
   exit_behavior = "Close",
 
+  -- Pad window to avoid the content to be too close to the border,
+  -- so it's easier to see and select.
+  window_padding = {
+    left = 3, right = 3,
+    top = 3, bottom = 3,
+  },
+
   -- cf the original issue (mine): https://github.com/wez/wezterm/issues/478 solved for me but not for everyone..
   -- cf the addition of this flag: https://github.com/wez/wezterm/commit/336f209ede27dd801f989419155e475f677e8244
   -- OK BUT NO, disabled because it does some weird visual artifacts:
