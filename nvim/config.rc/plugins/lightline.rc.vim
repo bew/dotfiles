@@ -24,7 +24,7 @@ let g:lightline.active = {
       \   'left': [
       \     ['mode', 'paste'],
       \     ['linter_err_warn', 'filename', 'readonly', 'modified'],
-      \     ['fugitive', 'language_client_running', 'buffer_comment']
+      \     ['fugitive', 'language_client_active', 'buffer_comment']
       \   ],
       \   'right': [
       \     ['lineinfoprogress'],
@@ -55,7 +55,7 @@ let g:lightline.component_function = {
       \   'fugitive': 'LightlineFugitive',
       \   'buffer_comment': 'LightLineBufferComment',
       \   'linter_err_warn': 'LightLineLinterErrorsAndWarnings',
-      \   'language_client_running': 'LightLineLanguageClientRunning',
+      \   'language_client_active': 'LightLineLanguageClientActive',
       \ }
 
 " Taken from: `:h lightline-powerful-example`
@@ -71,9 +71,9 @@ function! LightlineFugitive()
   return ''
 endfunction
 
-function! LightLineLanguageClientRunning()
+function! LightLineLanguageClientActive()
   if LanguageClient#isServerRunning()
-    return "LC running"
+    return "LC active"
   endif
   return ""
 endf
