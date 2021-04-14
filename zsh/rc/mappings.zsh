@@ -535,13 +535,16 @@ zle::utils::register_keysym Enter "^M"
 # NOTE: default is KEYTIMEOUT=40
 function zle::utils::setup_keytimeout_per_keymap
 {
-  if [[ "$KEYMAP" =~ (viins|main) ]]; then
-    KEYTIMEOUT=1 # 10ms
-  else
-    KEYTIMEOUT=100 # 1000ms | 1s
-  fi
+  zle::utils::get-vim-mode
+  case "$REPLY" in
+    insert) KEYTIMEOUT=1;; # 10ms
+    *) KEYTIMEOUT=100;; # 1000ms | 1s
+  esac
+
+  # zle -M "KEYTIMEOUT = $KEYTIMEOUT"
 }
 hooks-add-hook zle_keymap_select_hook zle::utils::setup_keytimeout_per_keymap
+hooks-add-hook zle_line_init_hook zle::utils::setup_keytimeout_per_keymap
 
 function vibindkey
 {
