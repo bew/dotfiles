@@ -4,31 +4,31 @@ snippet guard "script reload guard" b
 if exists('${1:did_`!p snip.rv = snip.fn.replace('.','_')`}') || &cp
 	finish
 endif
-let $1 = 1$99
+let $1 = 1
 endsnippet
 
 snippet fun "function" b
 function! ${1:function_name}(${2})
 	${10:${VISUAL:" code}}
-endf$99
+endf
 endsnippet
 
 snippet fun! "function!" b
 function! ${1:function_name}(${2})
 	${10:${VISUAL:" code}}
-endf$99
+endf
 endsnippet
 
 snippet if "if .. endif" b
 if ${1:condition}
 	${10:${VISUAL:" code}}
-endif$99
+endif
 endsnippet
 
 snippet !p(lug)?! "Plug '...'" br
-Plug '$1'$99
+Plug '$1'
 endsnippet
 
 snippet com "Vim comment"
-" $99
+" $0
 endsnippet
