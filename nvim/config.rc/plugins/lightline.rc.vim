@@ -23,8 +23,8 @@ let g:lightline.colorscheme = 'PaperColor'
 let g:lightline.active = {
       \   'left': [
       \     ['mode', 'paste'],
-      \     ['linter_warnings', 'linter_errors', 'filename', 'readonly', 'modified'],
-      \     ['fugitive', 'buffer_comment']
+      \     ['linter_err_warn', 'filename', 'readonly', 'modified'],
+      \     ['fugitive', 'language_client_running', 'buffer_comment']
       \   ],
       \   'right': [
       \     ['lineinfoprogress'],
@@ -54,13 +54,9 @@ let g:lightline.component_function = {
       \   'mode': 'LightLineMode',
       \   'fugitive': 'LightlineFugitive',
       \   'buffer_comment': 'LightLineBufferComment',
-      \   'linter_errors': 'LightLineLinterErrors',
-      \   'linter_warnings': 'LightLineLinterWarnings',
+      \   'linter_err_warn': 'LightLineLinterErrorsAndWarnings',
+      \   'language_client_running': 'LightLineLanguageClientRunning',
       \ }
-let g:lightline.component_type = {
-    \   'linter_errors': 'error',
-    \   'linter_warnings': 'warning',
-    \ }
 
 " Taken from: `:h lightline-powerful-example`
 function! LightlineFugitive()
@@ -74,6 +70,13 @@ function! LightlineFugitive()
   endtry
   return ''
 endfunction
+
+function! LightLineLanguageClientRunning()
+  if LanguageClient#isServerRunning()
+    return "LC running"
+  endif
+  return ""
+endf
 
 function! LightLineFilename()
   let raw_fname = expand('%:t')
@@ -125,20 +128,33 @@ function! LightLineBufferComment()
   return exists("b:bew_statusline_comment") ? b:bew_statusline_comment : ''
 endf
 
-function! LightLineLinterErrors()
-  try
-    let status = neomake#statusline#LoclistCounts()
-    return status['E'] == 0 ? '' : 'E:' . status['E']
-  catch
-    return ''
-  endtry
-endf
+function! LightLineLinterErrorsAndWarnings()
+  let l:err_count = 0
+  let l:warn_count = 0
 
-function! LightLineLinterWarnings()
-  try
-    let status = neomake#statusline#LoclistCounts()
-    return status['W'] == 0 ? '' : 'W:' . status['W']
-  catch
-    return ''
-  endtry
+  if LanguageClient#isServerRunning()
+    try
+      let l:lc_status = LanguageClient#statusLineDiagnosticsCounts()
+      let l:err_count = get(l:lc_status, "E", 0)
+      let l:warn_count = get(l:lc_status, "W", 0)
+    catch
+    endtry
+  else
+    try
+      let l:nm_status = neomake#statusline#LoclistCounts()
+      let l:err_count = get(l:nm_status, "E", 0)
+      let l:warn_count = get(l:nm_status, "W", 0)
+    catch
+    endtry
+  endif
+
+  if l:err_count != 0 && l:warn_count != 0
+    return "E:" . l:err_count . " W:" . l:warn_count
+  elseif l:err_count != 0
+    return "E:" . l:err_count
+  elseif l:warn_count != 0
+    return "W:" . l:warn_count
+  else
+    return ""
+  endif
 endf
