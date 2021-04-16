@@ -581,12 +581,12 @@ augroup END
 
 " Set a colorScheme based on current 'background'.
 " If *force* is v:false, do not change the colorScheme if the current one
-" is not one of the given target colorschemes.
-function! SetColorschemeForBackground(dark_color, light_color, force)
+" is neither the given dark or given light colorscheme.
+function! ApplyColorschemeForBackground(dark_color, light_color, force)
   let cur = get(g:, "colors_name", "default")
   if !a:force && l:cur != a:dark_color && l:cur != a:light_color
     " Another colorscheme than our targets is set, ignore the change.
-    echom "Colorscheme kept to " . l:cur . " [background is " . &background . "] - Use :SetColorscheme to override"
+    echom "Colorscheme kept to " . l:cur . " [background is " . &background . "] - Use :ApplyColorscheme to override"
     return
   endif
   if &background == 'light'
@@ -596,14 +596,14 @@ function! SetColorschemeForBackground(dark_color, light_color, force)
   endif
   echom "Colorscheme set to " . g:colors_name . " [background is " . &background . "]"
 endf
-function! SetColorscheme(force)
-  call SetColorschemeForBackground("bew256-dark", "paramount", a:force)
+function! ApplyColorscheme(force)
+  call ApplyColorschemeForBackground("bew256-dark", "paramount", a:force)
 endf
 augroup my_colorscheme_setup
   au!
-  au OptionSet background call SetColorscheme(v:false)
+  au OptionSet background call ApplyColorscheme(v:false)
 augroup END
-command! SetColorscheme call SetColorscheme(v:true)
+command! ApplyColorscheme call ApplyColorscheme(v:true)
 
 if has("vim_starting")
   " Set the colorscheme on startup
@@ -612,9 +612,9 @@ if has("vim_starting")
   else
     set background=dark
   endif
-  silent call SetColorscheme(v:true)
+  silent call ApplyColorscheme(v:true)
 else
-  silent call SetColorscheme(v:false)
+  silent call ApplyColorscheme(v:false)
 endif
 
 " Fix lightline not refreshing on &background change
