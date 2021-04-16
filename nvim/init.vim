@@ -187,6 +187,11 @@ augroup END
 let g:LanguageClient_serverCommands = {}
 let g:LanguageClient_serverCommands.rust = ["rust-analyzer"]
 
+Plug 'Shougo/echodoc'  " shows (in a smart way) the signature of completed items
+let g:echodoc#enable_at_startup = v:true
+let g:echodoc#highlight_identifier = "Identifier"
+let g:echodoc#highlight_arguments = "Type"
+let g:echodoc#highlight_trailing = "Comment"
 
 Plug 'tpope/vim-repeat'         " Repeat for plugins
 Plug 'Shougo/deoplete.nvim',      " Dark-powered completion engine
@@ -370,6 +375,10 @@ augroup my_startify
   " buffer.
   autocmd User Startified setlocal buflisted
 augroup END
+
+Plug 'junegunn/vim-peekaboo'    " Show registers on usage
+let g:peekaboo_delay = 1000 " in ms (don't show it when I'm fast)
+let g:peekaboo_compact = v:false " always show section names
 
 Plug 'owickstrom/vim-colors-paramount' " Very simple colorscheme
 
