@@ -301,6 +301,9 @@ cnoremap <M-v> <C-r>+
 inoremap <silent> <M-v> <C-g>u<C-r>+
 " TODO?: Add system paste bindings
 
+" Copy absolute filepath
+nnoremap y% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
+
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-u> <C-g>u<C-u>
