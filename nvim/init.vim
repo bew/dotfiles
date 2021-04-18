@@ -87,7 +87,7 @@ xmap as <Plug>(textobj-sandwich-query-a)
 omap is <Plug>(textobj-sandwich-query-i)
 omap as <Plug>(textobj-sandwich-query-a)
 
-" Add spaces inside () [] {} when using ( [ or {. (mimicking vim-surround)
+" Add spaces inside () [] {} when using ( [ or {. (mimicking the original vim-surround)
 " Ref: https://github.com/machakann/vim-sandwich/wiki/Bracket-with-spaces
 let g:sandwich#recipes += [
     \   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
@@ -465,7 +465,7 @@ Plug 'davidhalter/jedi-vim'         " IDE-like tooling
 
 let g:jedi#completions_enabled = 0  " Let my async completion engine do that, using omnifunc
 " Do not show call signature by hacking buffer content (breaks some completion)
-let g:jedi#show_call_signatures = "2"
+let g:jedi#show_call_signatures = "0"  " Use echodoc plugin for this
 
 let g:jedi#auto_initialization = 0  " Do not auto-init jedi (mappings, ..)
 autocmd FileType python call <SID>setup_python_jedi()
