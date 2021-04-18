@@ -314,6 +314,26 @@ nnoremap gV `[v`]
 " mark position before search
 nnoremap / ms/
 
+" Vim eval-and-replace:
+" Evaluate the current selection as a vimscript expression and replace
+" the selection with the result
+" NOTE1: changes the unnamed register
+" NOTE2: <C-r><C-r>{register} takes the register content verbatim
+"   (whereas <C-r> inserts the register content as if typed)
+vnoremap <Plug>(my-EvalAndReplaceVimExpr-visual) c<C-r>=<C-r><C-r>"<cr><esc>
+
+" Vim eval-as-ex:
+" Run the current line/selection as an EX command
+" NOTE: changes the unnamed register
+function! s:EvalAsExFromUnnamed()
+  let l:splitted_reg = split(@", "\n")
+  echom "Sourcing " . len(l:splitted_reg) . " lines..."
+  execute @"
+  echom "Done sourcing " . len(l:splitted_reg) . " lines!"
+endf
+nnoremap <Plug>(my-EvalAsVimEx-normal) yy:call <SID>EvalAsExFromUnnamed()<cr>
+vnoremap <Plug>(my-EvalAsVimEx-visual) y:call <SID>EvalAsExFromUnnamed()<cr>
+
 " Search with{,out} word boundaries
 " V: search selection with word boundaries
 vmap * <Plug>(visualstar-*)
@@ -421,6 +441,16 @@ cnoremap <expr> %% expand("%:h") . "/"
 " Helper guide on <Leader>
 nnoremap <Leader> <cmd>WhichKey '<Space>'<cr>
 vnoremap <Leader> <cmd>WhichKeyVisual '<Space>'<cr>
+
+" -- Vim
+nmap <leader>vx <Plug>(my-EvalAsVimEx-normal)
+vmap <leader>vx <Plug>(my-EvalAsVimEx-visual)
+" let g:which_key_nmap.v = {"name": "+vim"}
+" let g:which_key_vmap.v = deepcopy(g:which_key_nmap.v)
+" let g:which_key_nmap.v.x = "eval current line/sel as EX"
+" let g:which_key_vmap.v.x = g:which_key_nmap.v.x
+vmap <leader>ve <Plug>(my-EvalAndReplaceVimExpr-visual)
+" let g:which_key_vmap.v.e = "eval sel as vim expression"
 
 " -- Code
 let g:which_key_map.c = {"name": "+code"}
