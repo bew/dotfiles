@@ -202,7 +202,7 @@ nnoremap <silent> +  :call <SID>zoom_toggle()<cr>
 
 " Default <C-w>o is dangerous for the layout, hide it behind <C-w>O (maj o)
 " Make it zoom instead (saves the layout for restore)
-" FIXME: investigate why <C-w>o mapping does not seem to be overriden...
+" TODO: investigate why <C-w>o mapping does not seem to be overriden...
 " nnoremap <silent> <C-w>o  :call <SID>zoom_toggle()<cr>
 " nnoremap <silent> <C-w>O  :call <C-w>o<cr>
 
@@ -234,6 +234,7 @@ inoremap <expr> <M-Space> ' <C-G>U<Left>'
 
 " Move cursor to end of displayed line (useful when text wraps)
 nnoremap <M-$> g$
+inoremap <M-$> <End>
 
 " Insert a new line below using <cr>, useful in comments when `formatoptions`
 " has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
@@ -274,8 +275,8 @@ nnoremap <M-C-f> gg=G``
 nnoremap <M-J> i<c-j><esc>k$
 
 " Copy/Paste with system clipboard (using nvim's clipboard provider)
-" Register "+ is session clipboard
-" Register "* is OS/system clipboard
+" Register '+' is session clipboard (e.g: tmux)
+" Register '*' is OS/system clipboard
 let g:clipboard = {
     \   'name': 'myClipboard',
     \   'copy': {
@@ -481,6 +482,9 @@ let g:which_key_map.c.c.i = "invert"
 " Currently my main usage is with jedi-vim, which I configure manually
 " when a python buffer opens.
 " NOTE: I don't know how to set a which_key_map for a single buffer
+
+" TODO: Setup virtual keys for language tools/actions (with default msg),
+"   and enable for python (jedi) and when the language client is active
 
 " -- Edit
 let g:which_key_map.e = {"name": "+edit"}
