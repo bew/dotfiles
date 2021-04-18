@@ -34,8 +34,9 @@ if has("nvim-0.4.0") " I don't know the exact patch
   set signcolumn=auto:2
 endif
 
-set cursorline    " highlight the current line
-set cursorcolumn  " highlight the current column
+" highlight the line/col of the cursor
+set cursorline
+" set cursorcolumn  " disabled for now, as it removes the nice ligatures above/below cursor
 
 set noequalalways " Avoid windows auto-resizing on win opened/closed
 
@@ -57,6 +58,9 @@ set updatetime=500  " Time (ms) before swapfile & CursorHold autocmd triggers
 
 " Auto indent the next line
 set autoindent
+" Round indent to multiple of 'shiftwidth'
+" (sw=4, indent=2, '>>' puts indent to 4 not 6)
+set shiftround
 
 " Completion popup
 set pumheight=20
