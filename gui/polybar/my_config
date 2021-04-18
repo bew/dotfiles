@@ -290,7 +290,7 @@ label-full = full
 [module/temperature]
 type = internal/temperature
 thermal-zone = 0
-warn-temperature = 60
+warn-temperature = 80
 
 format-prefix = "T: "
 format-prefix-foreground = ${colors.fg-prefix}
