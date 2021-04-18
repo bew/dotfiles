@@ -1,6 +1,10 @@
 " Fast quit
 nnoremap <buffer> q  :q<cr>
 
+" Fast more help
+" NOTE: I use <right> to not have a trailing space in the config
+nnoremap <M-h> :h <right>
+
 " Go to help hyper link
 nnoremap <buffer> o  <C-]>
 
@@ -29,4 +33,4 @@ nnoremap <buffer><silent> <C-n>  :call <SID>SearchHelpLink(v:false)<cr>
 nnoremap <buffer><silent> <C-p>  :call <SID>SearchHelpLink(v:true)<cr>
 
 " Set statusline comment for this buffer
-let b:bew_statusline_comment = "o: follow link | C-n/C-p: find n/p link | M-n/M-p: n/p jump | q: quit"
+let b:bew_statusline_comment = "o: open | C-n/p: find link | M-n/p: n/p jump | M-h: :h"
