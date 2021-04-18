@@ -9,55 +9,45 @@ priority -50
 # possible extends:
 #extends html
 
-
 snippet block "block" b
 {% block ${1:name} %}
-	$2
-{% endblock $1 %}$99
+	${2:${VISUAL}}
+{% endblock $1 %}
 endsnippet
-
 
 snippet val "value" w
-{{ $1 }}$99
+{{ $1 }}
 endsnippet
-
 
 snippet st "statement" w
-{% $1 %}$99
+{% $1 %}
 endsnippet
-
 
 snippet com "comment"
-{# $1 #}$99
+{# ${1:${VISUAL}} #}
 endsnippet
-
 
 snippet raw "escaped block" b
 {% raw %}
-	$1
-{% endraw %}$99
+	${1:${VISUAL}}
+{% endraw %}
 endsnippet
-
 
 snippet extends "extends" b
-{% extends "${1:template}" %}$99
+{% extends "${1:template}" %}
 endsnippet
-
 
 snippet |inc(lude)?| "include" br
-{% include "${1:template}" %}$99
+{% include "${1:template}" %}
 endsnippet
-
 
 snippet import "import" b
-{% import "${1:template}" %}$99
+{% import "${1:template}" %}
 endsnippet
-
 
 snippet from "from/import/as" b
-{% from "${1:template}" import ${2:name}${3: as ${4:$2}} %}$99
+{% from "${1:template}" import ${2:name}${3: as ${4:$2}} %}
 endsnippet
-
 
 snippet filter "filter" b
 {% filter ${1:filter} %}
@@ -65,33 +55,42 @@ snippet filter "filter" b
 {% endfilter %}
 endsnippet
 
-
 snippet for "for" b
 {% for ${1:item} in ${2:sequence} %}
 	$3
 {% endfor %}
 endsnippet
 
-
 snippet if "if ..." b
 {% if ${1:expr} %}
-	$2
+	${2:${VISUAL}}
 {% endif %}
 endsnippet
 
+snippet ifi "if ... (inline)"
+{% if ${1:expr} %}${2:${VISUAL}}{% endif %}
+endsnippet
 
 snippet else "else ..." b
 {% else %}
-	$3
+	${1:${VISUAL}}
 endsnippet
 
+snippet elsei "else ... (inline)"
+{% else %}${1:${VISUAL}}
+endsnippet
 
 snippet mac "macro" b
 {% macro ${1:name}(${2:args}) %}
-	$3
+	${3:${VISUAL}}
 {% endmacro %}
 endsnippet
 
+snippet maci "macro (for inline expansion)" b
+{% macro ${1:name}(${2:args}) -%}
+	${3:${VISUAL}}
+{%- endmacro %}
+endsnippet
 
 snippet call "call" b
 {% call ${1:name}(${2:args}) %}
@@ -99,11 +98,9 @@ snippet call "call" b
 {% endcall %}
 endsnippet
 
-
 snippet set "set" b
 {% set ${1:name} = ${2:'value'} %}
 endsnippet
-
 
 snippet trans "translation" b
 {% trans %}
@@ -111,16 +108,15 @@ snippet trans "translation" b
 {% endtrans %}
 endsnippet
 
-
 snippet with "with" b
 {% with %}
-	$1
+	${1:${VISUAL}}
 {% endwith %}
 endsnippet
 
 snippet autoescape "autoescape" b
 {% autoescape ${1:true} %}
-	$2
+	${2:${VISUAL}}
 {% endautoescape %}
 endsnippet
 
@@ -131,45 +127,36 @@ snippet batch "batch items" w
 batch(linecount=$1, fill_with=${2:None})
 endsnippet
 
-
 snippet dictsort "sort and yield (key, value) pairs" w
 dictsort(case_sensitive=${1:False}, by=${2:'key'})
 endsnippet
-
 
 snippet round "round number" w
 round(precision=${1:0}, method=${2:'common|ceil|floor'})
 endsnippet
 
-
 snippet urlize "convert plain-text url to <a/>" w
 urlize(trim_url_limit=${1:None}, nofollow=${2:False})
 endsnippet
-
 
 snippet wordwrap "wordwrap" w
 wordwrap(width=${1:79}, break_long_words=${2:True})
 endsnippet
 
-
 snippet truncate "truncate" w
 truncate(lenght=${1:79}, killwords=${2:False}, end=${3:'...''})
 endsnippet
-
 
 snippet sum "sum of sequence of numbers + start" w
 sum(attribute=${1:None}, start=${2:0})
 endsnippet
 
-
 snippet sort "sort an iterable" w
 sort(reverse=${1:False}, case_sensitive=${2:False}, attribute=${3:None})
 endsnippet
 
-
 snippet indent "indent" w
 indent(width=${1:4}, indentfirst=${2:False})
 endsnippet
-
 
 # vim:ft=snippets:
