@@ -631,3 +631,12 @@ command! HiDumpToSplit so $VIMRUNTIME/syntax/hitest.vim
 " Only define it when not defined already.
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
     \ | wincmd p | diffthis
+
+function! s:TrimTrailingWS()
+  let saved_view = winsaveview()
+  " Don't change search register
+  " e - ignore substitutions errors
+  keeppatterns %s/\s\+$//e
+  call winrestview(saved_view)
+endf
+command! TrimTrailingWS call <SID>TrimTrailingWS()
