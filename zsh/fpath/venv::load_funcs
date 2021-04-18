@@ -2,7 +2,7 @@
 
 # --- venv functions
 
-function venv__ensure_exists
+function _venv__ensure_exists
 {
   local venv_dir="${1:-venv}"
 
@@ -12,7 +12,7 @@ function venv__ensure_exists
   fi
 }
 
-function venv__ensure_inside
+function _venv__ensure_inside
 {
   if [[ -z "${VIRTUAL_ENV:-}" ]]; then
     >&2 echo "ERROR: not in a virtual env"
@@ -20,7 +20,7 @@ function venv__ensure_inside
   fi
 }
 
-function venv__ensure_outside
+function _venv__ensure_outside
 {
   if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     >&2 echo "Deactivating active virtual env.."
@@ -48,9 +48,9 @@ function venv_on
 {
   local venv_dir="${1:-venv}"
 
-  venv__ensure_outside
+  _venv__ensure_outside
 
-  if ! venv__ensure_exists "$venv_dir"; then
+  if ! _venv__ensure_exists "$venv_dir"; then
     >&2 echo "  Use venv_init to create a venv there."
     return 1
   fi
@@ -60,7 +60,7 @@ function venv_on
 
 function venv_off
 {
-  venv__ensure_inside "$venv_dir" || return 1
+  _venv__ensure_inside "$venv_dir" || return 1
 
   deactivate
 }
@@ -84,7 +84,7 @@ function venv_here
 {
   local venv_dir="${1:-venv}"
 
-  venv__ensure_outside
+  _venv__ensure_outside
 
   if ! [[ -d "$venv_dir" ]]; then
     >&2 echo "Venv directory '$venv_dir' missing, creating venv now.."
@@ -101,7 +101,7 @@ function venv_reset
 {
   local venv_dir="${1:-venv}"
 
-  venv__ensure_outside
+  _venv__ensure_outside
 
   if [[ -d "$venv_dir" ]]; then
     >&2 echo "Resetting existing virtual env in directory '$venv_dir'.."
