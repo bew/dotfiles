@@ -17,10 +17,10 @@ inoremap <M-s> <Esc>:w<cr>
 vnoremap <M-s> <Esc>:w<cr>
 
 " toggle wrap
-nnoremap <M-w> :set wrap! wrap?<cr>
+nnoremap <silent> <M-w> :set wrap! wrap?<cr>
 
 " toggle relativenumber
-nnoremap <M-r> :set relativenumber! relativenumber?<cr>
+nnoremap <silent> <M-r> :set relativenumber! relativenumber?<cr>
 
 " Toggles signcolumn, number & relativenumber at once
 function! ToggleSignsAndLineNumbers()
