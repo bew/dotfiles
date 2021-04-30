@@ -297,9 +297,10 @@ xnoremap <M-C> "*y :echo "Copied to system clipboard!"<cr>
 nnoremap <M-v> "+p
 nnoremap <M-V> o<esc>"+p
 xnoremap <M-v> "+p
-cnoremap <M-v> <C-r>+
+cnoremap <M-v> <C-r><C-o>+
 " Paste in insert mode inserts an undo breakpoint
-inoremap <silent> <M-v> <C-g>u<C-r>+
+" C-r C-o {reg}    -- inserts the reg content literaly
+inoremap <silent> <M-v> <C-g>u<C-r><C-o>+
 " TODO?: Add system paste bindings
 
 " Copy absolute filepath
