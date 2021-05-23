@@ -109,7 +109,7 @@ tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "
 " Short navigation on the line in insert mode
 "
 " This makes it possible to use the cursor keys in Insert mode, without breaking
-" the undo sequence and therefore using . (redo) will work as expected.
+" the undo sequence, therefore using `.` (redo) will work as expected.
 inoremap <Left>  <C-g>U<Left>
 inoremap <Right> <C-g>U<Right>
 " We use imap to use the above left/right mapping
@@ -470,6 +470,7 @@ let g:which_key_map.c.c.i = "invert"
 " cr   rename
 " cu   show usages
 " cd   goto definition
+" ca   code actions (from LSP + custom?)
 "
 " Currently my main usage is with jedi-vim, which I configure manually
 " when a python buffer opens.
