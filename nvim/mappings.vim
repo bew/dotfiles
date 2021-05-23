@@ -74,8 +74,8 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 
-nnoremap <silent> <M-f> :FilesSmart<cr>
-nnoremap <silent> <M-F> :Files<cr>
+nnoremap <silent> <M-f> :FuzzyFilesSmart<cr>
+nnoremap <silent> <M-F> :FuzzyFiles<cr>
 
 " Focus or create a Floaterm with the given name.
 " Hides the current Floaterm if any.
