@@ -22,6 +22,7 @@
   an = add -N
   com = commit --verbose
   comp = com -p
+  comam = com --amend
 
   # index manipulation
   f = fetch
