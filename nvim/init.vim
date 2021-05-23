@@ -68,14 +68,6 @@ autocmd User PluginsLoaded call which_key#register("<space>", "g:which_key_map")
 Plug 'jremmen/vim-ripgrep'
 let g:rg_command = 'rg --vimgrep -S' " -S for smartcase
 
-Plug 'stefandtw/quickfix-reflector.vim' " Editable quickfix buffer, for bulk changes
-" Sets quickfix buffers as modifiable
-let g:qf_modifiable = 1   " FIXME: Do I hide this behind a command?
-" Changes within a single buffer will be undo-able as a single change
-let g:qf_join_changes = 1
-" TODO: change the status line / display a warning that there is a change / ..
-
-
 Plug 'machakann/vim-sandwich'   " Advanced operators & textobjects to manipulate surroundings
 
 " Load vim-surround compatible mappings
@@ -200,6 +192,7 @@ let g:deoplete#enable_at_startup = 1
 
 Plug 'tommcdo/vim-exchange'
 
+" FIXME: I get a vim error message when triggering it with
 Plug 'voldikss/vim-floaterm'    " Nice floating terminal with super powers
 if $ASCII_ONLY == "1"
   let g:floaterm_borderchars = ['-', '|', '-', '|', '+', '+', '+', '+']
@@ -350,7 +343,6 @@ let g:fzf_action = {
     \ "alt-v": "vsplit",
     \ }
 let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
-" let g:fzf_layout = {"window": "bot 25new"}
 let g:fzf_layout = {"window": {"width": 0.9, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
 command! FilesSmart call fzf#run(fzf#wrap({
