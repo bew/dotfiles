@@ -1,44 +1,76 @@
-priority -50
-
 # definitions
 
 snippet cl "class definition" b
-class ${1:MyClass}${2:(${3:object})}:
-	${20:${VISUAL:pass}}
-endsnippet
-
-snippet def "function" b
-def ${1:function_name}(${10:self${11:, ${12:arg}}})${20: -> ${21:None}}:
+class ${10:MyClass}${20:(${21:object})}:
 	${30:${VISUAL:pass}}
 endsnippet
 
+snippet data "Dataclass definition" b
+@dataclass$10
+class ${20:MyClass}:
+	${30:${VISUAL:pass}}
+endsnippet
+
+snippet def "function" b
+def ${10:function_name}(${20:self${21:, ${22:arg}}})${30: -> ${31:Any}}:
+	${40:${VISUAL:pass}}
+endsnippet
+
 snippet defi "initializer" b
-def __init__(self${1:, ${2:arg}}):
-	${10:${VISUAL:pass}}
+def __init__(self${10:, ${11:arg}}):
+	${20:${VISUAL:pass}}
+endsnippet
+
+snippet defa "abstract method" b
+@abstractmethod
+def ${10:function_name}(self${20:, ${21:arg}})${30: -> ${31:Any}}:  # pragma: no cover
+	pass
+endsnippet
+
+snippet defap "abstract property" b
+@abstractproperty
+def ${10:function_name}(self) -> ${20:Any}:  # pragma: no cover
+	pass
 endsnippet
 
 snippet defc "class method" b
 @classmethod
-def ${1:function_name}(cls${10:, ${11:arg}})${20: -> ${21:None}}:
-	${30:${VISUAL:pass}}
+def ${10:function_name}(cls${20:, ${21:arg}})${30: -> ${31:Any}}:
+	${40:${VISUAL:pass}}
 endsnippet
 
 snippet defs "static method" b
 @staticmethod
-def ${1:function_name}(${10:arg})${20: -> ${21:None}}:
-	${30:${VISUAL:pass}}
+def ${10:function_name}(${20:arg})${30: -> ${31:Any}}:
+	${40:${VISUAL:pass}}
 endsnippet
 
 snippet defp "property method" b
 @property
-def ${1:function_name}(self)${10: -> ${11:None}}:
-	${20:${VISUAL:pass}}
+def ${10:function_name}(self) -> ${20:Any}:
+	${30:${VISUAL:pass}}
 endsnippet
 
-snippet data "Dataclass definition" b
-@dataclass$1
-class ${10:MyClass}:
-	${20:${VISUAL:pass}}
+# decorators
+
+snippet @data "@dataclass" b
+@dataclass
+endsnippet
+
+snippet @abc "@abstractmethod" b
+@abstractmethod
+endsnippet
+
+snippet @cls "@classmethod" b
+@classmethod
+endsnippet
+
+snippet @st "@staticmethod" b
+@staticmethod
+endsnippet
+
+snippet @prop "@property" b
+@property
 endsnippet
 
 # if / elif / else
@@ -91,7 +123,7 @@ endsnippet
 snippet /""/ "triple quoted string (double quotes)" r
 """
 ${VISUAL}$1
-"""$0
+"""
 endsnippet
 
 snippet #! "Shebang header for python scripts" b
@@ -99,13 +131,13 @@ snippet #! "Shebang header for python scripts" b
 endsnippet
 
 snippet doc "One line doc" b
-"""${1:${VISUAL:TODO: doc}}"""$99
+"""${1:${VISUAL:TODO: doc}}"""
 endsnippet
 
 snippet mdoc "Multi line doc" b
 """${1:TODO: oneline doc}
 ${2:${VISUAL:TODO: doc}}
-"""$99
+"""
 endsnippet
 
 snippet p "print(...)" b
@@ -117,15 +149,39 @@ from pprint import pprint; pprint(${1:${VISUAL}})  # noqa: E702
 endsnippet
 
 snippet f "f format str" w
-f"$1"$99
+f"$1"
 endsnippet
 
 snippet s "self.X = X" b
 self.${1:name} = $1
 endsnippet
 
-snippet pdb "pdb oneliner"
-__import__("pdb").set_trace()  # FIXME: remove this debug probe
+snippet opt "Optional[...]"
+Optional[${1:SomeType}]
+endsnippet
+
+snippet nocov "pragma no cover"
+# pragma: no cover
+endsnippet
+
+# NOTE: this can be necessary sometimes when the running process closes stdio
+# __import__("sys").stdin = open('/dev/tty')
+snippet bp "Add pdb breakpoint"
+breakpoint()  # FIXME: remove this debug probe
+endsnippet
+snippet bpforce "Force add pdb breakpoint" b
+__import__("sys").stdin = open('/dev/tty'); breakpoint()  # FIXME: remove this debug probe
+endsnippet
+
+# Increase priority of this 'rtype' snippet, to avoid conflict with the
+# other 'rtype' snippet, used for reveal_type when the cursor is NOT at BOL
+priority 10
+snippet rtype "reveal_type (in expr)" w
+reveal_type(${1:${VISUAL:expr}})
+endsnippet
+priority 0
+snippet rtype "reveal_type" b
+reveal_type(${1:${VISUAL:expr}})  # noqa
 endsnippet
 
 # vim:ft=snippets:
