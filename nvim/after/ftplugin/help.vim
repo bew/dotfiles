@@ -1,9 +1,9 @@
 " Fast quit
 nnoremap <buffer> q  :q<cr>
 
-" Fast more help
+" Fast more-help
 " NOTE: I use <right> to not have a trailing space in the config
-nnoremap <M-h> :h <right>
+nnoremap <buffer> <M-h> :h <right>
 
 " Go to help hyper link
 nnoremap <buffer> o  <C-]>
