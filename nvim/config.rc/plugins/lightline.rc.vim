@@ -99,16 +99,18 @@ function! LightLineFilename()
     let formatted_fname = "[No Name]"
   endif
 
-  let plugin_fname = ""
+  let plugin_fname = "not-a-plugin"
   if raw_fname == "__Mundo__"
     let plugin_fname = "Mundo"
   elseif raw_fname == "__Mundo_Preview__"
     let plugin_fname = "Mundo Prev"
   elseif raw_fname =~ "NERD_tree"
     let plugin_fname = ""
+  elseif raw_fname == "__committia_diff__"
+    let plugin_fname = "commit diff"
   endif
 
-  return plugin_fname != "" ? plugin_fname : formatted_fname
+  return plugin_fname != "not-a-plugin" ? plugin_fname : formatted_fname
 endfunction
 
 function! LightLineFiletype()
