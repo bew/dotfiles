@@ -17,11 +17,11 @@ function __results_to_path_args
 # Those layout & keybindings vars come from ~/.zshenv
 FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
-FZF_DEFAULT_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header {}"
+FZF_DEFAULT_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header -- {}"
 
 # -F : show / for dirs, and other markers
 # -C : show dirs in columns
-FZF_DEFAULT_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference {}"
+FZF_DEFAULT_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
 
 function __fzf_widget_file_impl
 {
@@ -151,7 +151,7 @@ function zwidget::fzf::git_changed_files
   # The `| uniq` is necessary in some cases to remove doubles
   # (like when rebasing, unmerged paths 'modified by both' appear twice)
   FZF_FINDER_CMD=(sh -c "git diff --name-only | uniq")
-  FZF_PREVIEW_CMD="git diff --color=always {} | delta"
+  FZF_PREVIEW_CMD="git diff --color=always -- {} | delta"
 
   __fzf_widget_file_impl
 
