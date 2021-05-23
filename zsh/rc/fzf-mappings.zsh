@@ -17,11 +17,11 @@ function __results_to_path_args
 # Those layout & keybindings vars come from ~/.zshenv
 FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
-FZF_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header {}"
+FZF_DEFAULT_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header {}"
 
 # -F : show / for dirs, and other markers
 # -C : show dirs in columns
-FZF_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference {}"
+FZF_DEFAULT_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference {}"
 
 function __fzf_widget_file_impl
 {
@@ -31,7 +31,10 @@ function __fzf_widget_file_impl
   local base_dir=${completion_prefix:-./}
   base_dir=${~base_dir} # expand ~ (at least)
 
-  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_FILE")
+  local prompt_prefix=${FZF_PROMPT_PREFIX:-}
+  local preview_cmd=${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_FILE}}
+
+  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "${prompt_prefix}${base_dir}" --preview "$preview_cmd")
   local selected_completions=$(cd ${base_dir}; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" |
     __results_to_path_args "$base_dir"
   )
@@ -73,8 +76,9 @@ function zwidget::fzf::find_directory
   base_dir=${~base_dir} # expand ~ (at least)
 
   local finder_cmd=(fd --type d --type l --follow) # follow symlinks
+  local preview_cmd=${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_DIR}}
 
-  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$FZF_PREVIEW_CMD_FOR_DIR" --preview-window down:10)
+  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$preview_cmd" --preview-window down:10)
   local selected_completions=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" |
     __results_to_path_args "$base_dir"
   )
@@ -120,7 +124,7 @@ function zwidget::fzf::z
   # Replace all {} with {2..} to ensure we don't pass the first field (popularity of the dir)
   local _braces="{}"
   local _braces_skip_first="{2..}"
-  local preview_cmd="${FZF_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
+  local preview_cmd="${FZF_DEFAULT_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
 
   local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "${preview_cmd}" --preview-window down:10)
   local selected=( $( z | "${fzf_cmd[@]}" ) )
