@@ -525,6 +525,17 @@ Plug 'tbastos/vim-lua'
 "       the option at all to keep it disabled.
 let g:lua_syntax_nofold = 1  " Disable auto code folding
 
+" tmux panes completion for deoplete <3 <3 <3
+" see deoplete config!
+Plug 'wellle/tmux-complete.vim'
+" Emoji completion (:foobar:)
+" It is auto enabled on gitcommit & markdown files
+Plug 'fszymanski/deoplete-emoji'
+
+" TODO: Add a configure properly a dictionary completion source for markdown
+" https://github.com/deoplete-plugins/deoplete-dictionary
+" alternative is https://github.com/deathlyfrantic/deoplete-spell which work if 'set spell'
+
 call plug#end()
 doautocmd User PluginsLoaded
 
@@ -535,6 +546,69 @@ runtime! config.rc/plugins/*.rc.vim
 " Source some files
 runtime! mappings.vim
 runtime! autocmd.vim
+
+
+" --- START of deoplete config
+" TODO: move in a function and run on PluginsLoaded autocmd!
+
+call deoplete#custom#option("auto_complete_delay", v:false)
+" camel_case: Lowercase letters are also matched with the corresponding uppercase ones.
+"   Ex: "foB" is matched with "FooBar" but not with "foobar".
+call deoplete#custom#option("camel_case", v:true)
+
+" Allow the use of Ctrl-N for 'complete' based completion
+call deoplete#custom#option("on_insert_enter", v:false)
+
+" Ensure file paths are ranked higher than words from around, to be able to write file paths without
+" loosing patience because 'around' words are similar and goes before the path completions.
+call deoplete#custom#source("file", "rank", 150)
+call deoplete#custom#source("member", "rank", 140)
+call deoplete#custom#source("around", "rank", 130)
+call deoplete#custom#source("buffer", "rank", 120)
+
+" Use fuzzy and more-that-typed-text matchers for 'around'
+" matcher_length: It removes candidates shorter than or equal to the user input.
+"   FIXME: it is not perfect, because sometime I want to have the same completion if that word
+"   appears somewhere else in the file (..for self-validation in some way).
+"   I JUST want to remove the current word from entering the candidates pool.
+"   TODO: Make a custom matcher that works the same as matcher_length, but
+"   only removes those from the current line. Those from other lines are OK
+"   because they're not part of the current completion prompt.
+call deoplete#custom#source("around", "matchers", ["matcher_fuzzy", "matcher_length"])
+
+" Using custom variables to configure values
+" - range_above = Search for words N lines above.
+" - range_below = Search for words N lines below.
+" - mark_above = Mark shown for words N lines above.
+" - mark_below = Mark shown for words N lines below.
+" - mark_changes = Mark shown for words in the changelist.
+" (Example from the docs)
+call deoplete#custom#var("around", {
+    \   "range_above": 50,
+    \   "range_below": 50,
+    \   "mark_above": "[↑]",
+    \   "mark_below": "[↓]",
+    \   "mark_changes": "[*]",
+    \ })
+
+" Non essential completion sources
+
+" rank higher than tmux, because if the emoji source is triggered, we are in a text file and
+" there's a leading ':' so emoji is the most likely to be wanted.
+call deoplete#custom#source("emoji", "rank", 20)
+call deoplete#custom#source("emoji", "min_pattern_length", 4) " NOTE: the leading ':' is counted here
+" FIXME: This seems to hide all results UNTIL there are 'max_candidates' results..
+"        I just want to display the top 5 or 10. Maybe a bug in deoplete?
+" call deoplete#custom#source("emoji", "max_candidates", 10)
+call deoplete#custom#source("emoji", "matchers", ["matcher_fuzzy", "matcher_length"]) " the default full fuzzy is too much for me
+
+" rank is lower than emoji, see explanation on emoji' rank
+call deoplete#custom#source("tmux-complete", "rank", 10)
+" Use this source ONLY for long completions, to avoid having too many suggestion every{time,where}
+call deoplete#custom#source("tmux-complete", "min_pattern_length", 5)
+
+" --- END of deoplete config
+
 
 
 """""""""""""""""""""""""""""""""
