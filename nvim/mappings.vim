@@ -478,6 +478,61 @@ let g:which_key_map.c.c.i = "invert"
 " TODO: Setup virtual keys for language tools/actions (with default msg),
 "   and enable for python (jedi) and when the language client is active
 
+" -- Quickfix / Location lists
+let g:which_key_map["!"] = {"name": "+qf-loc-list"}
+nmap <leader>!c   <cmd>lclose \| copen<cr>
+nmap <leader>!l   <cmd>cclose \| lopen<cr>
+let g:which_key_map["!"].c = "open qf list (global)"
+let g:which_key_map["!"].l = "open loc list (local)"
+
+" Try to detect the qf or loc list, and save which one is the last one
+function! s:TryRegisterLastUsedQfOrLocList()
+  let wininfo = getwininfo(win_getid())[0]
+  " let r = getwininfo(win_getid())[0] | echo "qf: " . r.quickfix . " loc: " . r.loclist
+  let is_qf_list = (wininfo.quickfix && !wininfo.loclist)  " qf: 1 && loc: 0
+  let is_loc_list = (wininfo.quickfix && wininfo.loclist)  " qf: 1 && loc: 1
+  if is_qf_list
+    let w:last_used_qf_or_loc_list = "qf"
+  elseif is_loc_list
+    let w:last_used_qf_or_loc_list = "loc"
+  else
+    " Do nothing, leave the current value as is.
+  endif
+endf
+augroup my_detect_last_used_qf_loc_list
+  au!
+  " Init the win variable on each new win
+  autocmd VimEnter,WinNew * let w:last_used_qf_or_loc_list = get(w:, "last_used_qf_or_loc_list", "none")
+  " Try to detect the qf or loc list, and save which one is the last one
+  autocmd BufWinEnter * call <SID>TryRegisterLastUsedQfOrLocList()
+augroup END
+function! s:OnLastQfLocListDoTryNextOrFirst()
+  let qf_cmds = {"name": "qf", "action_next": "cnext", "action_first": "cfirst"}
+  let loc_cmds = {"name": "loc", "action_next": "lnext", "action_first": "lfirst"}
+  if w:last_used_qf_or_loc_list == "qf"
+    let cmds = qf_cmds
+  elseif w:last_used_qf_or_loc_list == "loc"
+    let cmds = loc_cmds
+  else
+    " Default to the location list
+    let cmds = loc_cmds
+  endif
+
+  try
+    " echo "[". cmds.name ." list] trying next: ". cmds.action_next
+    execute cmds.action_next
+  catch
+    try
+      " echo "[". cmds.name ." list] nop.. trying first: ". cmds.action_first
+      execute cmds.action_first
+    catch
+      echo "[". cmds.name ." list] nope, it's empty!"
+    endtry
+  endtry
+endf
+nmap <leader>!! <cmd>call <SID>OnLastQfLocListDoTryNextOrFirst()<cr>
+let g:which_key_map["!"]["!"] = "jump to next/first in last list"
+
 " -- Edit
 let g:which_key_map.e = {"name": "+edit"}
 " Use this to make a few nice mappings
