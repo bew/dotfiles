@@ -71,13 +71,21 @@ table.insert(mouse_bindings, {
   binds_extend_mouse_select("Right", 3, "Line"),
 })
 
--- Ctrl-Left click opens the link under the mouse pointer if any.
+-- Ctrl-Left click (on Up) opens the link under the mouse pointer if any.
+-- (on Down, the click is disabled. This is to avoid bugging the running
+-- program which would receive _only_ the down event and not the up event)
+table.insert(mouse_bindings, {
+  mods="CTRL",
+  event={Down={streak=1, button="Left"}},
+  action="Nop",
+})
 table.insert(mouse_bindings, {
   mods="CTRL",
   event={Up={streak=1, button="Left"}},
   action="OpenLinkAtMouseCursor",
 })
--- I want this to work EVEN IF the current program enabled mouse-reporting.
+-- FIXME: I want this to work EVEN IF the current program enabled mouse-reporting.
+--        Currently I have to press Ctrl-Shift-click to make this binding work.
 -- Another binding override I'd love is the MiddleClick (to work even in tmux!)
 
 -- Clipboard / PrimarySelection paste
