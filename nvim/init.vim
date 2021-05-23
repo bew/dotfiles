@@ -309,7 +309,6 @@ Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
 Plug 'junegunn/gv.vim'          " Simple (<3) git commit browser, based on vim-fugitive
 Plug 'rhysd/git-messenger.vim'  " Popup the commit message of the line under cursor
 let g:git_messenger_no_default_mappings = v:true
-nmap gc  <Plug>(git-messenger)
 
 " -- UI
 

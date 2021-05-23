@@ -507,9 +507,11 @@ nmap <leader>hu <Plug>(GitGutterUndoHunk)
 nmap <leader>hf <cmd>GitGutterFold<cr>
 nmap <leader>hn <cmd>GitGutterNextHunk<cr>
 nmap <leader>hN <cmd>GitGutterPrevHunk<cr>
+nmap <leader>hb <Plug>(git-messenger)
 let g:which_key_map.h = {"name": "+git-hunks"}
 let g:which_key_map.h.p = "preview"
 let g:which_key_map.h.u = "undo"
 let g:which_key_map.h.f = "fold non-hunk"
 let g:which_key_map.h.n = "next hunk"
 let g:which_key_map.h.N = "prev hunk"
+let g:which_key_map.h.b = "blame"
