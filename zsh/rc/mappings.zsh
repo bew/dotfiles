@@ -558,7 +558,7 @@ compdef _bindkey vibindkey
 vibindkey 's' zwidget::toggle-sudo-nosudo
 
 vibindkey 'q' zwidget::cycle-quoting
-vibindkey 'a' zwidget::insert_one_arg
+vibindkey '^a' zwidget::insert_one_arg
 
 # Alt-Enter => insert a newline
 vibindkey "${keysyms[Enter]}" self-insert-unmeta
@@ -585,6 +585,7 @@ vibindkey 'c' zwidget::fzf::find_directory
 vibindkey 'z' zwidget::fzf::z
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
+vibindkey 'a' zwidget::fzf::git_changed_files
 
 # Ctrl-Z => fg %+
 vibindkey '^z' zwidget::fg

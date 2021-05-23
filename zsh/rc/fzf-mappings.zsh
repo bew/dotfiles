@@ -142,3 +142,21 @@ function zwidget::fzf::z
   fi
 }
 zle -N zwidget::fzf::z
+
+function zwidget::fzf::git_changed_files
+{
+  zle::utils::check_git || return
+
+  FZF_PROMPT_PREFIX="Changed files: "
+  # The `| uniq` is necessary in some cases to remove doubles
+  # (like when rebasing, unmerged paths 'modified by both' appear twice)
+  FZF_FINDER_CMD=(sh -c "git diff --name-only | uniq")
+  FZF_PREVIEW_CMD="git diff --color=always {} | delta"
+
+  __fzf_widget_file_impl
+
+  unset FZF_PREVIEW_CMD
+  unset FZF_FINDER_CMD
+  unset FZF_PROMPT_PREFIX
+}
+zle -N zwidget::fzf::git_changed_files
