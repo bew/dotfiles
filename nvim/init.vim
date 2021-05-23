@@ -387,7 +387,13 @@ Plug 'vim-scripts/xterm-color-table.vim'  " Provide some commands to display all
 Plug 'chrisbra/Colorizer'  " color hex codes #112233, ANSI sequences, vim's cterm*g
 " Or just call :ColorHighlight on any file and enjoy
 let g:colorizer_auto_filetype='css,html,vim'
-let g:colorizer_colornames = 0 " Don't hl colornames (like red, yellow)
+let g:colorizer_colornames_disable = v:true " Don't hl colornames (like red, yellow) because it can be very slow
+let g:colorizer_debug = v:false " if needed... to understand why perf is bad
+" Disable a bunch of autocmd that triggers a re-coloring AND SLOWS DOWN EVERYTHING!!
+" let g:colorizer_insertleave = v:false
+let g:colorizer_textchangedi = v:false
+let g:colorizer_cursormoved = v:false    " Why would you even have that???
+let g:colorizer_cursormovedi = v:false   " Why would you even have that???
 
 Plug 'tweekmonster/nvim-api-viewer'
 
