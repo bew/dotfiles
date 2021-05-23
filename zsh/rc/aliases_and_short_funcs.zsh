@@ -162,6 +162,7 @@ alias ...="cd ../..;"
 alias ....="cd ../../..;"
 
 alias cdt="cd /tmp;"
+alias cdl="cd -;"
 
 # pacman
 
