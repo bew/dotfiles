@@ -32,8 +32,8 @@ endf
 command! -nargs=+ HiResetTo call s:reset_highlight(<f-args>)
 "}}}
 
-let s:base03      = "234"
-let s:base02      = "235"
+let s:base03      = "233"
+let s:base02      = "234"
 let s:base01      = "239"
 let s:base00      = "240"
 let s:base0       = "248"
@@ -48,8 +48,7 @@ let s:violet      = "99"
 let s:blue        = "33"
 let s:cyan        = "37"
 let s:green       = "70"
-let s:visual_light = "237"
-let s:back    = s:base03
+let s:back        = "233"
 
 let s:bg_base03_g  = ' ctermbg=22'
 let s:bg_base03_r  = ' ctermbg=52'
@@ -82,7 +81,6 @@ exe "let s:bg_violet    = ' ctermbg=".s:violet ."'"
 exe "let s:bg_blue      = ' ctermbg=".s:blue   ."'"
 exe "let s:bg_cyan      = ' ctermbg=".s:cyan   ."'"
 
-exe "let s:fg_back      = ' ctermfg=".s:back   ."'"
 exe "let s:fg_base03    = ' ctermfg=".s:base03 ."'"
 exe "let s:fg_base02    = ' ctermfg=".s:base02 ."'"
 exe "let s:fg_base01    = ' ctermfg=".s:base01 ."'"
@@ -190,7 +188,8 @@ exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
 
-exe "HiResetTo Visual cterm=none ctermbg=" .s:visual_light
+" 17 is a dark blue
+exe "HiResetTo Visual cterm=none ctermbg=17"
 hi! link VisualNOS Visual
 
 exe "HiResetTo Title"          .s:fmt_bold   .s:fg_orange
@@ -218,8 +217,9 @@ exe "HiResetTo SpellRare"      .s:fmt_undr
 exe "HiResetTo SpellLocal"     .s:fmt_undr
 exe "HiResetTo Pmenu"   .s:fg_base0  .s:bg_base02  .s:fmt_revr
 exe "HiResetTo PmenuSel"       .s:fmt_bold   .s:fg_orange .s:bg_base2   .s:fmt_revr
+
+" TODO: review the popup-menu' scrollbar highlight!
 exe "HiResetTo PmenuSbar"   .s:fg_base2  .s:bg_base0   .s:fmt_revr
-exe "HiResetTo PmenuThumb"   .s:fg_base0  .s:bg_base03  .s:fmt_revr
 exe "HiResetTo PmenuThumb"   .s:fg_base0  .s:bg_base03  .s:fmt_revr
 
 " Tab Colors
