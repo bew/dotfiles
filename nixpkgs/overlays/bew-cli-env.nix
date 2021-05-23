@@ -30,6 +30,11 @@ final: prev:
       p.httpie
       p.strace
       p.watchexec
+
+      p.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
+
+      # Nix tools
+      p.nix-tree # TUI to browse the dependencies of a derivation
     ] ++ [ # Add packages from my overlays
       final.delta-bin
     ];
