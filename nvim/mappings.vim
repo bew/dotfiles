@@ -167,12 +167,9 @@ nnoremap <silent> <M-t> :tab split<cr>
 " Move current window to new tab
 nnoremap <silent> <M-T> <C-w>T
 
-" Goto next/previous buffer
-nnoremap <silent> <M-n> :bnext<cr>
-nnoremap <silent> <M-p> :bprevious<cr>
-" FIXME: I'll probably remove these since they're not that common,
-" and the keys could be better used.
-" > Maybe use <Tab> <S-Tab> for tab-local-n/p-buffer & <M-Tab> <M-S-Tab> for global-n/p-buffer
+" Navigate arglist
+nnoremap <silent> <M-n> :next<cr>
+nnoremap <silent> <M-N> :previous<cr>
 
 " Toggle zoom on current window
 " From justinmk' config https://github.com/justinmk/config/blob/a93dc73fafbdeb583ce177a9d4ebbbdfaa2d17af/.config/nvim/init.vim#L880-L894
@@ -242,12 +239,6 @@ inoremap <M-$> <End>
 inoremap <M-cr> <C-o>A<cr>
 " Also works in normal mode, goes in insert mode with a leading comment.
 nnoremap <M-cr> A<cr>
-
-" Quickely navigate between quickfix or location list's lines
-
-" quickfix only (M-S-n/p)
-nnoremap <M-N> :cnext<cr>
-nnoremap <M-P> :cprevious<cr>
 
 " Trigger completion manually
 inoremap <expr> <C-b>  deoplete#manual_complete()
