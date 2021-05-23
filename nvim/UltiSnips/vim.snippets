@@ -7,21 +7,17 @@ endif
 let $1 = 1
 endsnippet
 
+# NOTE: no default for the content, because the language does not require it
 snippet fun "function" b
 function! ${1:function_name}(${2})
-	${10:${VISUAL:" code}}
+	${10:${VISUAL}}
 endf
 endsnippet
 
-snippet fun! "function!" b
-function! ${1:function_name}(${2})
-	${10:${VISUAL:" code}}
-endf
-endsnippet
-
+# NOTE: no default for the content, because the language does not require it
 snippet if "if .. endif" b
 if ${1:condition}
-	${10:${VISUAL:" code}}
+	${10:${VISUAL}}
 endif
 endsnippet
 
