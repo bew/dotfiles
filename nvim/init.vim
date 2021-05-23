@@ -276,8 +276,6 @@ else
 endif
 
 " TODO: move these mappings to 'mappings.vim' ?
-nnoremap ]h :GitGutterNextHunk<cr>
-nnoremap [h :GitGutterPrevHunk<cr>
 " Hunk text object
 omap ih <Plug>(GitGutterTextObjectInnerPending)
 omap ah <Plug>(GitGutterTextObjectOuterPending)
