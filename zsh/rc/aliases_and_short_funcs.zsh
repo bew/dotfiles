@@ -110,6 +110,9 @@ function curl_auth_json
 
 alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
 
+# Always expose a known TERM (not the 256color version) to the server I'm connecting to.
+alias ssh='TERM=xterm ssh'
+
 function cheatsh
 {
   curl cht.sh/$1
