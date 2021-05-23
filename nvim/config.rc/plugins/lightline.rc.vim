@@ -79,6 +79,11 @@ function! LightLineLanguageClientActive()
 endf
 
 function! LightLineFilename()
+  let wininfo = getwininfo(win_getid())[0]
+  " let r = getwininfo(win_getid())[0] | echo "qf: " . r.quickfix . " loc: " . r.loclist
+  let is_qf_list = (wininfo.quickfix && !wininfo.loclist)  " qf: 1 && loc: 0
+  let is_loc_list = (wininfo.quickfix && wininfo.loclist)  " qf: 1 && loc: 1
+
   let raw_fname = expand('%:t')
   if raw_fname != ""
     if filereadable(expand("~/" . expand('%:t')))
@@ -86,6 +91,10 @@ function! LightLineFilename()
     else
       let formatted_fname = expand("%:h:t") . "/" . expand("%:t") " parent dir & filename
     endif
+  elseif is_qf_list
+    let formatted_fname = "~~ QF LIST ~~"
+  elseif is_loc_list
+    let formatted_fname = "~~ LOC LIST ~~"
   else
     let formatted_fname = "[No Name]"
   endif
