@@ -630,6 +630,23 @@ augroup my_custom_language_hi
   "        It is overriden by the markdown' syntax file (from the vim-markdown plugin)
   au FileType markdown hi mkdLineBreak cterm=NONE ctermbg=NONE ctermfg=NONE
 
+  " In Markdown doc, make italic & bold standout from normal text, using colors in
+  " addition to cterm's italic/bold for terminals without support for bold/italic.
+  "
+  " In plasticboy/vim-markdown, italic/bold highlights seems to come from HTML
+  " syntax groups, which is wrong.  I want to configure highlights for
+  " markdown only, not html!
+  "
+  " Tracking issue: https://github.com/plasticboy/vim-markdown/issues/521
+  "
+  " In the meantime, we need to set both html & mkd groups, because the mkd
+  " groups are used for the delimiters, and html groups are used for the
+  " content.
+  au ColorScheme * hi mkdItalic cterm=italic ctermfg=253 ctermbg=235
+  au ColorScheme * hi mkdBold cterm=bold ctermfg=253 ctermbg=235
+  au ColorScheme * hi link htmlItalic mkdItalic
+  au ColorScheme * hi link htmlBold mkdBold
+
   " Ruby Colors
   au ColorScheme * hi clear rubyInstanceVariable
   au ColorScheme * hi rubyInstanceVariable ctermfg=33
