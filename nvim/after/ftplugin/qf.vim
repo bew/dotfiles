@@ -5,4 +5,10 @@ nnoremap <buffer> O  <cr>zz<C-w>p
 nnoremap <buffer> <M-j>  j<cr>zz<C-w>p
 nnoremap <buffer> <M-k>  k<cr>zz<C-w>p
 
-let b:bew_statusline_comment = "o: preview | M-j/k: preview next/previous"
+" Quick quit
+" FIXME: how to disable quit when a macro is recording?
+nnoremap <buffer> q :q<cr>
+" Keep macro recording under Alt-q
+nnoremap <buffer> <M-q> q
+
+let b:bew_statusline_comment = "o: preview | M-j/k: preview next/previous | M-q: macro-record | q: quit"
