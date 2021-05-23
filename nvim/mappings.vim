@@ -482,10 +482,10 @@ let g:which_key_map.c.c.i = "invert"
 let g:which_key_map.e = {"name": "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
-nmap <silent> <leader>ee  :e %%
-nmap <silent> <leader>es  :spl %%
-nmap <silent> <leader>ev  :vsp %%
-nmap <silent> <leader>et  :tabe %%
+nmap <leader>ee  :e %%
+nmap <leader>es  :spl %%
+nmap <leader>ev  :vsp %%
+nmap <leader>et  :tabe %%
 let g:which_key_map.e.e = "relative here"
 let g:which_key_map.e.s = "relative in split"
 let g:which_key_map.e.v = "relative in vertical split"
