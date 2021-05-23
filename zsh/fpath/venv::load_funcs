@@ -186,30 +186,6 @@ function venv_with_do
   ( venv_with_do::impl "$@" )
 }
 
-# Disable pip unless in a virtual env or --my-env is passed
-function pip
-{
-  if [[ "$1" == "--my-env" ]]; then
-    shift
-    >&2 echo "NOTE: if a virtual env is currently active, you'll change that env not your user's."
-    command pip "$@"
-    return $?
-  fi
-
-  # If there is a venv, ensure the dir actually exists and pip is in there
-  # (otherwise the global pip would be used..)
-  if [[ -n "${VIRTUAL_ENV:-}" ]] && [[ -e "$VIRTUAL_ENV/bin/pip" ]]; then
-    "$VIRTUAL_ENV/bin/pip" "$@"
-    return $?
-  fi
-  >&2 echo "Nope! 'pip' is disabled globally, use 'pip-my-env' to manage packages in the user env"
-  return 1
-}
-alias pip-my-env="pip --my-env"
-
-alias pytest::no-warn="pytest --disable-warnings"
-alias pytest::no-cov-no-warn="pytest --no-cov --disable-warnings"
-
 # This function only needs to exist, when I call it, this file
 # will get executed and the helper functions will be in scope.
 function venv::load_funcs

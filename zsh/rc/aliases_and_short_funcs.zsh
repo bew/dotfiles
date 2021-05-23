@@ -254,6 +254,36 @@ alias ssh-password-only='ssh -o PubkeyAuthentication=no'
 # nix
 alias nix-prefetch-url-tarball='nix-prefetch-url --unpack'
 
+# python
+
+# A disabled pip unless in a virtual env or --global-env is passed
+function pip-no-global
+{
+  if [[ "$1" == "--global-env" ]]; then
+    shift
+    >&2 echo "NOTE: if a virtual env is currently active, you'll change that env not your user's."
+    command pip "$@"
+    return $?
+  fi
+
+  # If there is a venv, ensure the dir actually exists and pip is in there
+  # (otherwise the global pip would be used..)
+  if [[ -n "${VIRTUAL_ENV:-}" ]] && [[ -e "$VIRTUAL_ENV/bin/pip" ]]; then
+    "$VIRTUAL_ENV/bin/pip" "$@"
+    return $?
+  fi
+  >&2 echo "Nope! 'pip' is disabled globally, use 'pip-global-env' to manage packages in the user env"
+  return 1
+}
+alias pip-global-env="pip-no-global --global-env"
+if command -v pip 2>&1 >/dev/null; then
+  # pip is available globally, disable it:
+  alias pip=pip-no-global
+fi
+
+alias pytest::no-warn="pytest --disable-warnings"
+alias pytest::no-cov-no-warn="pytest --no-cov --disable-warnings"
+
 # Media commands
 
 # youtube-dl
