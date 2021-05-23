@@ -12,9 +12,9 @@
 nnoremap <C-LeftMouse> <nop>
 
 " Save buffer
-nnoremap <M-s> :w<cr>
-inoremap <M-s> <Esc>:w<cr>
-vnoremap <M-s> <Esc>:w<cr>
+nnoremap <silent> <M-s> :w<cr>
+inoremap <silent> <M-s> <Esc>:w<cr>
+vnoremap <silent> <M-s> <Esc>:w<cr>
 
 " toggle wrap
 nnoremap <silent> <M-w> :set wrap! wrap?<cr>
@@ -74,8 +74,8 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 
-nnoremap <M-f> :FilesSmart<cr>
-nnoremap <M-F> :Files<cr>
+nnoremap <silent> <M-f> :FilesSmart<cr>
+nnoremap <silent> <M-F> :Files<cr>
 
 " Focus or create a Floaterm with the given name.
 " Hides the current Floaterm if any.
@@ -141,13 +141,13 @@ inoremap <M-a> <esc>gT
 inoremap <M-z> <esc>gt
 
 " Move tabs Alt-A/Z
-nnoremap <M-A> :tabmove -1<cr>
-nnoremap <M-Z> :tabmove +1<cr>
-inoremap <M-A> <esc>:tabmove -1<cr>
-inoremap <M-Z> <esc>:tabmove +1<cr>
+nnoremap <silent> <M-A> :tabmove -1<cr>
+nnoremap <silent> <M-Z> :tabmove +1<cr>
+inoremap <silent> <M-A> <esc>:tabmove -1<cr>
+inoremap <silent> <M-Z> <esc>:tabmove +1<cr>
 
 " Close tab Alt-d (with confirmation)
-nnoremap <M-d> :call <SID>TabCloseWithConfirmation()<cr>
+nnoremap <silent> <M-d> :call <SID>TabCloseWithConfirmation()<cr>
 function! s:TabCloseWithConfirmation()
   if len(gettabinfo()) == 1
     echo "Cannot close last tab"
@@ -168,8 +168,8 @@ nnoremap <silent> <M-t> :tab split<cr>
 nnoremap <silent> <M-T> <C-w>T
 
 " Goto next/previous buffer
-nnoremap <M-n> :bnext<cr>
-nnoremap <M-p> :bprevious<cr>
+nnoremap <silent> <M-n> :bnext<cr>
+nnoremap <silent> <M-p> :bprevious<cr>
 " FIXME: I'll probably remove these since they're not that common,
 " and the keys could be better used.
 " > Maybe use <Tab> <S-Tab> for tab-local-n/p-buffer & <M-Tab> <M-S-Tab> for global-n/p-buffer
@@ -213,8 +213,8 @@ vnoremap <Left>  <gv
 vnoremap <Right> >gv
 " Move Up/Down
 " TODO: make it work with v:count ?
-vnoremap <Up>   :move '<-2<cr>gv
-vnoremap <Down> :move '>+1<cr>gv
+vnoremap <silent> <Up>   :move '<-2<cr>gv
+vnoremap <silent> <Down> :move '>+1<cr>gv
 
 
 " Insert empty lines below or above
@@ -258,7 +258,7 @@ tnoremap <M-q> <C-\><C-n>
 tmap  <M-q>
 
 " Shortcut
-nnoremap Q :q<cr>
+nnoremap <silent> Q :q<cr>
 
 " Indent/Format lines/file
 " I: Indent line, stay in insert mode (default, see :h i_CTRL-F)
@@ -290,8 +290,8 @@ let g:clipboard = {
     \ }
 
 " Copy
-xnoremap <M-c> "+y :echo "Copied to session clipboard!"<cr>
-xnoremap <M-C> "*y :echo "Copied to system clipboard!"<cr>
+xnoremap <silent> <M-c> "+y :echo "Copied to session clipboard!"<cr>
+xnoremap <silent> <M-C> "*y :echo "Copied to system clipboard!"<cr>
 
 " Paste
 nnoremap <M-v> "+p
@@ -304,7 +304,7 @@ inoremap <silent> <M-v> <C-g>u<C-r><C-o>+
 " TODO?: Add system paste bindings
 
 " Copy absolute filepath
-nnoremap y%% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
+nnoremap <silent> y%% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first make a new undo,
 " so that you can undo CTRL-U after inserting a line break.
@@ -363,7 +363,7 @@ endfunction
 
 
 " Taken from visual-at.vim from Practical Vim 2nd Edition
-xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
+xnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
 function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
   execute ":'<,'>normal! @".nr2char(getchar())
@@ -374,9 +374,9 @@ endfunction
 " FIXME: these mappings must be typed fast, otherwise you get normal behavior.
 " Make sure to read `:h fold-commands` for all the details.
 " open all folds in range
-vnoremap zo  :<C-u>'<,'>foldopen!<cr>
+vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>
 " close all manually opened folds in range
-vnoremap zc  zx
+vnoremap <silent> zc  zx
 
 " Duplicate the visual selection
 vnoremap <C-d> <cmd>call <sid>DuplicateVisualSelection()<cr>
@@ -393,12 +393,12 @@ function! s:DuplicateVisualSelection()
 endf
 
 " Toggle Mundo tree
-nnoremap <F5> :MundoToggle<cr>
+nnoremap <silent> <F5> :MundoToggle<cr>
 
 " Open or focus NERDTree window
-nnoremap <F6> :call NERDTreeFocus()<cr>
+nnoremap <silent> <F6> :call NERDTreeFocus()<cr>
 " Note: Shift-F6 is F16 (on urxvt)
-nnoremap <F16> :NERDTreeFind<cr>
+nnoremap <silent> <F16> :NERDTreeFind<cr>
 
 " Show highlight infos
 function! s:syntax_query(verbose) abort
@@ -491,10 +491,10 @@ let g:which_key_map.c.c.i = "invert"
 let g:which_key_map.e = {"name": "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
-nmap <leader>ee  :e %%
-nmap <leader>es  :spl %%
-nmap <leader>ev  :vsp %%
-nmap <leader>et  :tabe %%
+nmap <silent> <leader>ee  :e %%
+nmap <silent> <leader>es  :spl %%
+nmap <silent> <leader>ev  :vsp %%
+nmap <silent> <leader>et  :tabe %%
 let g:which_key_map.e.e = "relative here"
 let g:which_key_map.e.s = "relative in split"
 let g:which_key_map.e.v = "relative in vertical split"
