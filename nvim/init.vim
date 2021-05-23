@@ -342,18 +342,23 @@ let g:fzf_action = {
 let g:fzf_history_dir = "~/.local/share/nvim-fzf-history"
 let g:fzf_layout = {"window": {"width": 0.9, "height": 0.6, "border": "sharp"}} " floating window goes brrrr
 let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
-command! FilesSmart call fzf#run(fzf#wrap({
+command! FuzzyFilesSmart call fzf#run(fzf#wrap({
     \   "source": "fd --type f --type l --follow",
     \   "options": ["--multi", "--prompt", "FilesSmart-> "]
     \ }))
 " Using the default source to find ALL files
-command! Files call fzf#run(fzf#wrap({
+command! FuzzyFiles call fzf#run(fzf#wrap({
     \   "options": ["--multi", "--prompt", "Files-> "]
     \ }))
-command! OldFiles call fzf#run(fzf#wrap({
+" TODO: in FuzzyOldFiles, remove files that do not exist anymore (or are not
+" really files, like `man://foobar`.
+command! FuzzyOldFiles call fzf#run(fzf#wrap({
     \   "source": v:oldfiles,
     \   "options": ["--multi", "--prompt", "OldFiles-> "]
     \ }))
+" FIXME: oldfiles are NOT recent files (files recently opened in current
+" session are not in v:oldfiles. Need a FuzzyRecentFiles !!
+" (same dir? or general? or configurable (in fzf?) ?)
 
 Plug 'mhinz/vim-startify'         " add a custom startup screen for vim
 augroup my_startify
