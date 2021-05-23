@@ -556,6 +556,11 @@ augroup my_custom_language_hi
   " Markdown
   au ColorScheme * hi markdownCode ctermfg=29
 
+  " For some reason this group is linked to Visual by default (not in my colorscheme).
+  " This group is used for spaces-only lines in markdown files.
+  " FIXME: I'm not sure why doing this on ColorScheme autocmd like above doesn't seems to work..
+  "        It is overriden by the markdown' syntax file (from the vim-markdown plugin)
+  au FileType markdown hi mkdLineBreak cterm=NONE ctermbg=NONE ctermfg=NONE
 
   " Ruby Colors
   au ColorScheme * hi clear rubyInstanceVariable
