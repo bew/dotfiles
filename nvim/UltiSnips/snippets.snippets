@@ -14,7 +14,7 @@ endsnippet
 
 # e.g: ${VISUAL:some_default}
 snippet vis "VISUAL placeholder w/ default" w
-\${VISUAL${1::${2:default}}}
+\${VISUAL${1::${2:${VISUAL:default}}}}
 endsnippet
 
 # e.g: ${42:some_default}
@@ -24,7 +24,7 @@ endsnippet
 
 # e.g: ${42:${VISUAL:some_default}}
 snippet nvis "Numeric placeholder to VISUAL w/ default" w
-\${${1:42}:\${VISUAL:${2:default}}}
+\${${1:42}:\${VISUAL:${2:${VISUAL:default}}}}
 endsnippet
 
 # vim:ft=snippets:
