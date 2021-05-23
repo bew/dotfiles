@@ -16,6 +16,12 @@ setopt INTERACTIVE_COMMENTS
 # Allow substitution in the prompt
 setopt PROMPT_SUBST
 
+# Accept args with ? or * in them and leave them unchanged, without erroring
+# (because filename generation returns no match).
+# This also applies to file expansion of an initial ‘~’ or ‘=’.
+# E.g: `echo foo?bar` prints `foo?bar` or `echo ~foobar` prints `~foobar`.
+unsetopt NOMATCH
+
 # History options
 #-------------------------------------------------------------
 
