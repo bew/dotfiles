@@ -110,6 +110,9 @@ set formatoptions+=r
 set formatoptions+=j
 """
 
+" Do not insert 2 spaces after a '.', '?' and '!' with a join command. Use a single space.
+set nojoinspaces
+
 " Remove builtin preview window on completion
 set completeopt-=preview
 
