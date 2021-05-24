@@ -16,7 +16,7 @@ let g:lightline.mode_map = {
 
 " Use simple separators (I resigned...)
 let g:lightline.separator = { 'left': '', 'right': '' }
-let g:lightline.subseparator = { 'left': '', 'right': '' }
+let g:lightline.subseparator = { 'left': '|', 'right': '|' }
 
 let g:lightline.colorscheme = 'PaperColor'
 
@@ -58,14 +58,15 @@ let g:lightline.component_function = {
       \   'language_client_active': 'LightLineLanguageClientActive',
       \ }
 
-" Taken from: `:h lightline-powerful-example`
 function! LightlineFugitive()
+  if expand('%:t') =~? 'Mundo\|NERD'
+    return ''
+  endif
+
   try
-    if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && exists('*fugitive#head')
-      let mark = 'On '
-      let branch = fugitive#head()
-      return branch !=# '' ? mark . branch : ''
-    endif
+    let mark = 'On '
+    let branch = fugitive#head()
+    return branch !=# '' ? mark . branch : ''
   catch
   endtry
   return ''
@@ -92,9 +93,9 @@ function! LightLineFilename()
       let formatted_fname = expand("%:h:t") . "/" . expand("%:t") " parent dir & filename
     endif
   elseif is_qf_list
-    let formatted_fname = "~~ QF LIST ~~"
+    let formatted_fname = "[Quickfix List]"
   elseif is_loc_list
-    let formatted_fname = "~~ LOC LIST ~~"
+    let formatted_fname = "[Location List]"
   else
     let formatted_fname = "[No Name]"
   endif
@@ -103,11 +104,13 @@ function! LightLineFilename()
   if raw_fname == "__Mundo__"
     let plugin_fname = "Mundo"
   elseif raw_fname == "__Mundo_Preview__"
-    let plugin_fname = "Mundo Prev"
+    let plugin_fname = "Preview"
   elseif raw_fname =~ "NERD_tree"
     let plugin_fname = ""
   elseif raw_fname == "__committia_diff__"
     let plugin_fname = "commit diff"
+  elseif &filetype == "startify"
+    let plugin_fname = ""
   endif
 
   return plugin_fname != "not-a-plugin" ? plugin_fname : formatted_fname
@@ -123,20 +126,20 @@ function! LightLineMode()
   endif
 
   let fname = expand('%:t')
-  let plugin_mode = ""
-  if fname == "__Mundo__"
-    let plugin_mode = "Mundo"
-  elseif fname == "__Mundo_Preview__"
-    let plugin_mode = "Mundo Prev"
+  let plugin_mode = "not-a-plugin"
+  if fname == "__Mundo__" || fname == "__Mundo_Preview__"
+    let plugin_mode = ""
   elseif fname =~ "NERD_tree"
-    let plugin_mode = "Tree"
+    let plugin_mode = ""
+  elseif &filetype == "startify"
+    let plugin_mode = "Startify"
   endif
 
-  return plugin_mode != "" ? plugin_mode : lightline#mode()
+  return plugin_mode != "not-a-plugin" ? plugin_mode : lightline#mode()
 endfunction
 
 function! LightLineBufferComment()
-  return exists("b:bew_statusline_comment") ? b:bew_statusline_comment : ''
+  return get(b:, "bew_statusline_comment", "")
 endf
 
 function! LightLineLinterErrorsAndWarnings()
@@ -159,13 +162,14 @@ function! LightLineLinterErrorsAndWarnings()
     endtry
   endif
 
-  if l:err_count != 0 && l:warn_count != 0
-    return "E:" . l:err_count . " W:" . l:warn_count
-  elseif l:err_count != 0
-    return "E:" . l:err_count
-  elseif l:warn_count != 0
-    return "W:" . l:warn_count
+  let err_str = (l:err_count != 0 ? "E:".l:err_count : "")
+  let warn_str = (l:warn_count != 0 ? "W:".l:warn_count : "")
+  if l:err_str != "" && l:warn_str != ""
+    " Both are set, separate them
+    return l:err_str ." ". l:warn_str
   else
-    return ""
+    " Only one is set, concat
+    " (only the non-empty one will be visible anyway)
+    return l:err_str . l:warn_str
   endif
 endf
