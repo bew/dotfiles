@@ -241,7 +241,11 @@ inoremap <M-cr> <C-o>A<cr>
 nnoremap <M-cr> A<cr>
 
 " Trigger completion manually
-inoremap <expr> <C-b>  deoplete#manual_complete()
+" NOTE: deoplete#complete_common_string doesn't work for fuzzy inputs.
+" Tracked in https://github.com/Shougo/deoplete.nvim/issues/1181
+inoremap <silent><expr> <C-b>  (pumvisible() ?
+    \ deoplete#complete_common_string() :
+    \ deoplete#manual_complete())
 
 
 " Exit the terminal grabber
