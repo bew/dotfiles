@@ -1,3 +1,9 @@
+if &buftype != "help"
+  " We're probably editing a help file, we don't want these helpers when
+  " writing one!
+  finish
+endif
+
 " Fast quit
 nnoremap <buffer> q  :q<cr>
 
