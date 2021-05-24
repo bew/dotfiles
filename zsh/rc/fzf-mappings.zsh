@@ -38,12 +38,13 @@ function zwidget::utils::__fzf_generic_impl_for_paths
     local display_root_path=""
   fi
 
-  local prompt="${FZF_PROMPT:-}${display_root_path}"
-  local preview_cmd="${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_FILE}}"
+  # WARNING: this var CANNOT be named 'prompt' as it conflicts with zsh' own PROMPT/prompt vars.
+  local final_prompt="${FZF_PROMPT:-}${display_root_path}"
+  local preview_cmd="${FZF_PREVIEW_CMD:-}"
 
   local fzf_cmd=($FZF_BASE_CMD --multi)
   fzf_cmd+=(--query "$query")
-  fzf_cmd+=(--prompt "${prompt}${prefix_dir}")
+  fzf_cmd+=(--prompt "${final_prompt}")
   fzf_cmd+=(--preview "$preview_cmd")
   if [[ -n "${FZF_PREVIEW_WINDOW:-}" ]]; then
     fzf_cmd+=(--preview-window "$FZF_PREVIEW_WINDOW")
@@ -58,7 +59,6 @@ function zwidget::utils::__fzf_generic_impl_for_paths
   if [[ -n "$selected_completions" ]]; then
     LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
   fi
-  zle -M "results: $selected_completions" # FIXME: remove, and fix off-by-1-err (un \n en trop?)
   zle reset-prompt
 }
 
@@ -93,6 +93,7 @@ zle -N zwidget::fzf::find_file
 
 function zwidget::fzf::find_directory
 {
+  FZF_PROMPT="Smart dirs: "
   FZF_FINDER_CMD=(fd --type d --type l --follow) # follow symlinks
 
   # -F : show / for dirs, and other markers
@@ -102,7 +103,7 @@ function zwidget::fzf::find_directory
 
   zwidget::utils::__fzf_generic_impl_for_paths
 
-  unset FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_PREVIEW_WINDOW
+  unset FZF_PROMPT FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_PREVIEW_WINDOW
 }
 zle -N zwidget::fzf::find_directory
 
