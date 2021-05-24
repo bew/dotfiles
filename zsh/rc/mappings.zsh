@@ -585,7 +585,8 @@ vibindkey 'c' zwidget::fzf::find_directory
 vibindkey 'z' zwidget::fzf::z
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
-vibindkey 'a' zwidget::fzf::git_changed_files
+vibindkey 'a' zwidget::fzf::git_changed_files_in_cwd
+vibindkey 'A' zwidget::fzf::git_changed_files # all
 
 # Ctrl-Z => fg %+
 vibindkey '^z' zwidget::fg
