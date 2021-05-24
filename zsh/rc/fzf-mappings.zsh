@@ -4,54 +4,75 @@ if [[ $- != *i* ]]; then
   return
 fi
 
-function __results_to_path_args
+# TODO: Add some doc about the arg, and how it works.
+function zwidget::utils::results_to_relative_paths_from_root
 {
-  local prefix="$1"
+  local from_root_path="$1"
 
+  (cd "$from_root_path"; while read item; do realpath --relative-to="$OLDPWD" "$item"; done)
+}
+
+function zwidget::utils::results_to_args
+{
   while read item; do
-    local full_item="${prefix}${item}"
-    echo -n "${(D)full_item} "
+    echo -n "${(D)item} "
   done
 }
 
 # Those layout & keybindings vars come from ~/.zshenv
 FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
-FZF_DEFAULT_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header -- {}"
-
-# -F : show / for dirs, and other markers
-# -C : show dirs in columns
-FZF_DEFAULT_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
-
-function __fzf_widget_file_impl
+function zwidget::utils::__fzf_generic_impl_for_paths
 {
-  local completion_prefix=${LBUFFER/* /}
+  local completion_prefix="${LBUFFER/* /}"
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
-  local base_dir=${completion_prefix:-./}
-  base_dir=${~base_dir} # expand ~ (at least)
+  # NOTE: `~` flag will expand `~` to $HOME (at least)
+  if [[ -d "${~completion_prefix}" ]]; then
+    local query=""
+    local real_root_path="${~completion_prefix}/"
+    local display_root_path="${completion_prefix}" # ~/ is not expanded
+  else
+    local query="$completion_prefix"
+    local real_root_path="${FZF_ROOT_PATH:-.}/"
+    local display_root_path=""
+  fi
 
-  local prompt_prefix=${FZF_PROMPT_PREFIX:-}
-  local preview_cmd=${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_FILE}}
+  local prompt="${FZF_PROMPT:-}${display_root_path}"
+  local preview_cmd="${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_FILE}}"
 
-  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "${prompt_prefix}${base_dir}" --preview "$preview_cmd")
-  local selected_completions=$(cd ${base_dir}; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" |
-    __results_to_path_args "$base_dir"
+  local fzf_cmd=($FZF_BASE_CMD --multi)
+  fzf_cmd+=(--query "$query")
+  fzf_cmd+=(--prompt "${prompt}${prefix_dir}")
+  fzf_cmd+=(--preview "$preview_cmd")
+  if [[ -n "${FZF_PREVIEW_WINDOW:-}" ]]; then
+    fzf_cmd+=(--preview-window "$FZF_PREVIEW_WINDOW")
+  fi
+
+  local selected_completions=$( \
+    (cd "$real_root_path"; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}") |
+    zwidget::utils::results_to_relative_paths_from_root "$real_root_path" |
+    zwidget::utils::results_to_args
   )
 
-  if [ -n "$selected_completions" ]; then
+  if [[ -n "$selected_completions" ]]; then
     LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
   fi
+  zle -M "results: $selected_completions" # FIXME: remove, and fix off-by-1-err (un \n en trop?)
   zle reset-prompt
 }
+
+FZF_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header -- {}"
 
 function zwidget::fzf::smart_find_file
 {
   FZF_FINDER_CMD=(fd --type f --type l --follow) # follow symlinks
+  FZF_PROMPT="Smart files: "
+  FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
 
-  __fzf_widget_file_impl
+  zwidget::utils::__fzf_generic_impl_for_paths
 
-  unset FZF_FINDER_CMD
+  unset FZF_FINDER_CMD FZF_PROMPT FZF_PREVIEW_CMD
 }
 zle -N zwidget::fzf::smart_find_file
 
@@ -61,32 +82,27 @@ function zwidget::fzf::find_file
   FZF_FINDER_CMD+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
   FZF_FINDER_CMD+=(-o -type f -o -type l) # actual file filter
 
-  __fzf_widget_file_impl
+  FZF_PROMPT="All files: "
+  FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
 
-  unset FZF_FINDER_CMD
+  zwidget::utils::__fzf_generic_impl_for_paths
+
+  unset FZF_FINDER_CMD FZF_PROMPT FZF_PREVIEW_CMD
 }
 zle -N zwidget::fzf::find_file
 
 function zwidget::fzf::find_directory
 {
-  local completion_prefix="${LBUFFER/* /}"
-  local lbuffer_without_completion_prefix="${LBUFFER%$completion_prefix}"
+  FZF_FINDER_CMD=(fd --type d --type l --follow) # follow symlinks
 
-  local base_dir=${completion_prefix:-./}
-  base_dir=${~base_dir} # expand ~ (at least)
+  # -F : show / for dirs, and other markers
+  # -C : show dirs in columns
+  FZF_PREVIEW_CMD="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
+  FZF_PREVIEW_WINDOW="down:10"
 
-  local finder_cmd=(fd --type d --type l --follow) # follow symlinks
-  local preview_cmd=${FZF_PREVIEW_CMD:-${FZF_DEFAULT_PREVIEW_CMD_FOR_DIR}}
+  zwidget::utils::__fzf_generic_impl_for_paths
 
-  local fzf_cmd=($FZF_BASE_CMD --multi --prompt "$base_dir" --preview "$preview_cmd" --preview-window down:10)
-  local selected_completions=$(cd $base_dir; "${finder_cmd[@]}" | "${fzf_cmd[@]}" |
-    __results_to_path_args "$base_dir"
-  )
-
-  if [ -n "$selected_completions" ]; then
-    LBUFFER="${lbuffer_without_completion_prefix}${selected_completions}"
-  fi
-  zle reset-prompt
+  unset FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_PREVIEW_WINDOW
 }
 zle -N zwidget::fzf::find_directory
 
@@ -103,9 +119,9 @@ function zwidget::fzf::history
 
   local fzf_cmd=($FZF_BASE_CMD $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
   local selected=( $( "${history_cmd[@]}" | "${fzf_cmd[@]}" ) )
-  if [ -n "$selected" ]; then
+  if [[ -n "$selected" ]]; then
     local history_index=$selected[1]
-    if [ -n "$history_index" ]; then
+    if [[ -n "$history_index" ]]; then
       zle vi-fetch-history -n $history_index
     fi
   fi
@@ -128,17 +144,17 @@ function zwidget::fzf::z
 
   local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "${preview_cmd}" --preview-window down:10)
   local selected=( $( z | "${fzf_cmd[@]}" ) )
-  if [ -n "$selected" ]; then
+  if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
-    if [ -n "$directory" ]; then
+    if [[ -n "$directory" ]]; then
       cd "$directory"
       HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
     fi
   fi
   zle reset-prompt
 
-  if [ $last_pwd != $PWD ]; then
-    zle -M "cd'ed to '${(D)PWD}'"
+  if [[ $last_pwd != $PWD ]]; then
+    zle -M "welcome to '${(D)PWD}' :)"
   fi
 }
 zle -N zwidget::fzf::z
@@ -147,16 +163,39 @@ function zwidget::fzf::git_changed_files
 {
   zle::utils::check_git || return
 
-  FZF_PROMPT_PREFIX="Changed files: "
-  # The `| uniq` is necessary in some cases to remove doubles
+  if [[ -n "$FZF_GIT_CHANGED_FROM_CWD" ]]; then
+    # files from cwd
+    local prompt_note="in cwd"
+    local finder_cmd="git diff --name-only --relative"
+    local preview_cmd="git diff --color=always -- {}"
+    FZF_ROOT_PATH="."
+  else
+    # files from root of the repo
+    local prompt_note="in repo"
+    local finder_cmd="git diff --name-only"
+    local preview_cmd="git diff --color=always -- :/{}"
+
+    # The finder_cmd gives paths absolute to the root of the repo
+    # (without a leading '/' though). When inserting the results in the
+    # cmdline, each path will be made relative to cwd. We need to give it
+    # the git root to be able to compute correct relative paths:
+    FZF_ROOT_PATH="$(git rev-parse --show-toplevel)"
+  fi
+
+  FZF_PROMPT="Changed files ($prompt_note): "
+  # The `uniq` is necessary in some cases to remove doubles
   # (like when rebasing, unmerged paths 'modified by both' appear twice)
-  FZF_FINDER_CMD=(sh -c "git diff --name-only | uniq")
-  FZF_PREVIEW_CMD="git diff --color=always -- {} | delta"
+  FZF_FINDER_CMD=(sh -c "$finder_cmd | uniq")
+  FZF_PREVIEW_CMD="$preview_cmd | delta"
 
-  __fzf_widget_file_impl
+  zwidget::utils::__fzf_generic_impl_for_paths
 
-  unset FZF_PREVIEW_CMD
-  unset FZF_FINDER_CMD
-  unset FZF_PROMPT_PREFIX
+  unset FZF_PROMPT FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_ROOT_PATH
 }
 zle -N zwidget::fzf::git_changed_files
+
+function zwidget::fzf::git_changed_files_in_cwd
+{
+  FZF_GIT_CHANGED_FROM_CWD=1 zwidget::fzf::git_changed_files
+}
+zle -N zwidget::fzf::git_changed_files_in_cwd
