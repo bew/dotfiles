@@ -101,7 +101,7 @@ zle -N zwidget::force-scroll-window
 
 # When set, git mappings will show status/log/diff for the current directory
 # instead of the whole repo.
-GIT_MAPPINGS_ARE_FOR_CWD=
+GIT_MAPPINGS_ARE_FOR_CWD="${GIT_MAPPINGS_ARE_FOR_CWD:-}"
 
 # Git status (for repo or cwd)
 function zwidget::git-status
