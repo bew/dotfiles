@@ -1,17 +1,31 @@
-# Key bindings
+# A set of fzf-based zsh widgets, for key bindings
+# TODO: add a LICENSE for these!
 
 if [[ $- != *i* ]]; then
+  # -> This is not an interactive shell, bail out!
   return
 fi
 
-# TODO: Add some doc about the arg, and how it works.
-function zwidget::utils::results_to_relative_paths_from_root
+# Transforms a list of results to a list of relative paths to the given dir
+# (it must be given _at least_ relative to CWD, or as an absolute path).
+function zwidget::utils::results_to_paths_relative_to
 {
-  local from_root_path="$1"
-
-  (cd "$from_root_path"; while read item; do realpath --relative-to="$OLDPWD" "$item"; done)
+  local relative_to_path="$1"
+  while read item; do
+    realpath --relative-to="$relative_to_path" "$item"
+  done
 }
 
+# Transforms a list of results to a list of absolute paths.
+function zwidget::utils::results_to_absolute_paths
+{
+  while read item; do
+    realpath "$item"
+  done
+}
+
+# Transforms a list of results to zsh arguments, to be inserted at cursor
+# position in the cmdline.
 function zwidget::utils::results_to_args
 {
   while read item; do
@@ -24,35 +38,84 @@ FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
 function zwidget::utils::__fzf_generic_impl_for_paths
 {
-  local completion_prefix="${LBUFFER/* /}"
+  local completion_prefix="${LBUFFER/* /}" # we remove everything until the last space
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
-  # NOTE: `~` flag will expand `~` to $HOME (at least)
-  if [[ -d "${~completion_prefix}" ]]; then
-    local query=""
-    local real_root_path="${~completion_prefix}/"
-    local display_root_path="${completion_prefix}" # ~/ is not expanded
+  # NOTE: it's important to NOT put it inside quotes, the expansion wouldn't work :eyes:.
+  local expanded_completion_prefix=${~completion_prefix}
+
+  # --- cases ---
+  # completion_prefix ~ "foo/bar/"
+  # completion_prefix ~ "foo/bar/ba"
+  # completion_prefix = "~/" or "~special/"
+  # completion_prefix = "~/bar" or "~special/bar"
+  # (INFO: 'foo' can be anything, including . or ..)
+
+  local query_prefill
+  local maybe_root_path
+
+  if [[ -n "$expanded_completion_prefix" ]]; then
+    if [[ "$expanded_completion_prefix" =~ '.*\/$' ]]; then
+      # -> The completion prefix ends with a /
+      local query_prefill=""
+      # NOTE: var%? removes last char from var
+      # ref: https://unix.stackexchange.com/a/310243/159811
+      # (allows display_root_path to add the '/' and it's not a duplicate)
+      local maybe_root_path="${expanded_completion_prefix%?}"
+    elif [[ "$expanded_completion_prefix" =~ '\/' ]]; then
+      # -> The completion prefix has at least a /
+      local maybe_root_path="$(dirname "$expanded_completion_prefix")"
+      local query_prefill="$(basename "$expanded_completion_prefix")"
+    else
+      # -> The completion prefix is not a path (or is a partial one)
+      local query_prefill="$completion_prefix"
+      local maybe_root_path="."
+    fi
+  fi
+
+  if [[ -d "$maybe_root_path" ]]; then
+    # -> Search will be from that root path
+    local search_root_path="$maybe_root_path"
+    local display_root_path="${(D)maybe_root_path}/"
   else
-    local query="$completion_prefix"
-    local real_root_path="${FZF_ROOT_PATH:-.}/"
+    # -> Search will be from FZF_ROOT_PATH or simply CWD.
+    local search_root_path="${FZF_ROOT_PATH:-$PWD}"
     local display_root_path=""
   fi
 
-  # WARNING: this var CANNOT be named 'prompt' as it conflicts with zsh' own PROMPT/prompt vars.
+  # NOTE: the results transformers should be run from "$search_root_path", to
+  # be able to understand the result paths they take as input.
+  if [[ "$completion_prefix" =~ '^~' ]]; then
+    # -> The completion prefix starts with ~
+    # The results should not be transformed to CWD, otherwise we'll get a lot
+    # of ../../... etc..
+    # Instead, the results should be all absolute paths, and the final
+    # transformation to cmdline args will transform these absolute paths back
+    # to ~/... paths (or ~special/... if relevant).
+    local results_transformer=(zwidget::utils::results_to_absolute_paths)
+  else
+    # By default, the results are transformed back to be relative to CWD.
+    local results_transformer=( \
+      zwidget::utils::results_to_paths_relative_to "$PWD"
+    )
+  fi
+
+  # WARNING: This var CANNOT be named 'prompt' because it conflicts with zsh'
+  # own 'prompt' var.
   local final_prompt="${FZF_PROMPT:-}${display_root_path}"
-  local preview_cmd="${FZF_PREVIEW_CMD:-}"
 
   local fzf_cmd=($FZF_BASE_CMD --multi)
-  fzf_cmd+=(--query "$query")
+  fzf_cmd+=(--query "$query_prefill")
   fzf_cmd+=(--prompt "${final_prompt}")
-  fzf_cmd+=(--preview "$preview_cmd")
+  if [[ -n "${FZF_PREVIEW_CMD:-}" ]]; then
+    fzf_cmd+=(--preview "$FZF_PREVIEW_CMD")
+  fi
   if [[ -n "${FZF_PREVIEW_WINDOW:-}" ]]; then
     fzf_cmd+=(--preview-window "$FZF_PREVIEW_WINDOW")
   fi
 
   local selected_completions=$( \
-    (cd "$real_root_path"; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}") |
-    zwidget::utils::results_to_relative_paths_from_root "$real_root_path" |
+    (cd "$search_root_path"; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" | "${results_transformer[@]}") |
     zwidget::utils::results_to_args
   )
 
@@ -91,14 +154,15 @@ function zwidget::fzf::find_file
 }
 zle -N zwidget::fzf::find_file
 
+# -F : show / for dirs, and other markers
+# -C : show dirs in columns
+FZF_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
+
 function zwidget::fzf::find_directory
 {
   FZF_PROMPT="Smart dirs: "
   FZF_FINDER_CMD=(fd --type d --type l --follow) # follow symlinks
-
-  # -F : show / for dirs, and other markers
-  # -C : show dirs in columns
-  FZF_PREVIEW_CMD="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
+  FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_DIR"
   FZF_PREVIEW_WINDOW="down:10"
 
   zwidget::utils::__fzf_generic_impl_for_paths
@@ -118,21 +182,19 @@ function zwidget::fzf::history
   # 1   | start at command n° 1 (the oldest still in history)
   local history_cmd=(fc -l -r 1)
 
-  local fzf_cmd=($FZF_BASE_CMD $FZF_HISTORY_OPTIONS --query "${LBUFFER//$/\\$}")
+  local fzf_cmd=($FZF_BASE_CMD $FZF_HISTORY_OPTIONS)
+  fzf_cmd+=(--query "${LBUFFER//$/\\$}")
+
   local selected=( $( "${history_cmd[@]}" | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
-    local history_index=$selected[1]
+    local history_index="${selected[1]}"
     if [[ -n "$history_index" ]]; then
-      zle vi-fetch-history -n $history_index
+      zle vi-fetch-history -n "$history_index"
     fi
   fi
   zle reset-prompt
 }
 zle -N zwidget::fzf::history
-
-# --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
-# --nth 2..         | ignore first field (the popularity of the dir) when matching
-FZF_Z_OPTIONS=(--tac --tiebreak=index --nth 2..)
 
 function zwidget::fzf::z
 {
@@ -141,9 +203,14 @@ function zwidget::fzf::z
   # Replace all {} with {2..} to ensure we don't pass the first field (popularity of the dir)
   local _braces="{}"
   local _braces_skip_first="{2..}"
-  local preview_cmd="${FZF_DEFAULT_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
+  local preview_cmd="${FZF_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
 
-  local fzf_cmd=($FZF_BASE_CMD $FZF_Z_OPTIONS --prompt "Fuzzy jump to: " --preview "${preview_cmd}" --preview-window down:10)
+  # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
+  # --nth 2..         | ignore first field (the popularity of the dir) when matching
+  local fzf_cmd=($FZF_BASE_CMD --tac --tiebreak=index --nth 2..)
+  fzf_cmd+=(--prompt "Fuzzy jump to: ")
+  fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
+
   local selected=( $( z | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
@@ -154,7 +221,7 @@ function zwidget::fzf::z
   fi
   zle reset-prompt
 
-  if [[ $last_pwd != $PWD ]]; then
+  if [[ "$last_pwd" != "$PWD" ]]; then
     zle -M "welcome to '${(D)PWD}' :)"
   fi
 }
