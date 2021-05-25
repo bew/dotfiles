@@ -65,8 +65,8 @@ function segmt::git_branch_fast
     #
     #      Needed sometimes because that unicode char can be considered 2 chars by mistake.
     #      (NOTE 2020-12-13: don't remember in which cases..)
-    arrow_up="%{⇡%G%}"
-    arrow_down="%{⇣%G%}"
+    arrow_up="%{↑%G%}"
+    arrow_down="%{↓%G%}"
   else
     arrow_up="+"
     arrow_down="-"
