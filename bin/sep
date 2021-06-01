@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+COMPACT=false
+if [[ "${1:-}" == "--compact" ]]; then
+    COMPACT=true
+fi
+
+[[ "$COMPACT" == false ]] && echo
+echo "<---------------------->"
+[[ "$COMPACT" == false ]] && echo
+
+exit 0 # necessary to end the script with status ok
