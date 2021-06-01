@@ -733,11 +733,12 @@ command! HiDumpToSplit so $VIMRUNTIME/syntax/hitest.vim
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
     \ | wincmd p | diffthis
 
-function! s:TrimTrailingWS()
+function! s:TrimTrailingWS(line1, line2)
   let saved_view = winsaveview()
-  " Don't change search register
-  " e - ignore substitutions errors
-  keeppatterns %s/\s\+$//e
+  " keeppatterns: Don't change search register
+  " 'e' option: ignore substitutions errors
+  " NOTE: Using SINGLE QUOTES for the substitution part, to avoid having to escape \s or \+.
+  execute "keeppatterns " .a:line1.",".a:line2. 's/\s\+$//e'
   call winrestview(saved_view)
 endf
-command! TrimTrailingWS call <SID>TrimTrailingWS()
+command! -range=% TrimTrailingWS call <SID>TrimTrailingWS(<line1>, <line2>)
