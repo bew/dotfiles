@@ -23,6 +23,10 @@
         "command": "-workbench.action.closeActiveEditor"
     },
     {
+        "key": "ctrl+k w",
+        "command": "-workbench.action.closeEditorsInGroup"
+    },
+    {
         "key": "alt+k", // disable default
         "command": "-keybindings.editor.recordSearchKeys",
         "when": "inKeybindings && inKeybindingsSearch"
@@ -76,8 +80,27 @@
         "command": "-workbench.action.focusAboveGroup"
     },
     {
-        "key": "ctrl+k ctrl+down",
+        "key": "ctrl+k ctrl+down", // disable default
         "command": "-workbench.action.focusBelowGroup"
+    },
+    {
+        "key": "ctrl+w", // disable default
+        "command": "-workbench.action.closeWindow",
+        "when": "!editorIsOpen && !multipleEditorGroups"
+    },
+    {
+        "key": "ctrl+w", // disable default
+        "command": "-workbench.action.closeGroup",
+        "when": "activeEditorGroupEmpty && multipleEditorGroups"
+    },
+    {
+        "key": "ctrl+shift+w", // disable default
+        "command": "-workbench.action.closeWindow"
+    },
+    {
+        "key": "ctrl+k ctrl+a", // disable default
+        "command": "-keybindings.editor.addKeybinding",
+        "when": "inKeybindings && keybindingFocus"
     },
     // ----- MY KEYBINDINGS
     {
@@ -95,6 +118,19 @@
     {
         "key": "alt+d",
         "command": "workbench.action.closeActiveEditor"
+    },
+    {
+        "key": "alt+d",
+        "command": "workbench.action.closeGroup",
+        "when": "activeEditorGroupEmpty && multipleEditorGroups"
+    },
+    {
+        "key": "ctrl+space alt+d",
+        "command": "workbench.action.closeEditorsInGroup"
+    },
+    {
+        "key": "ctrl+space ctrl+d",
+        "command": "workbench.action.closeEditorsInGroup"
     },
     {
         "key": "shift+alt+a",
@@ -119,10 +155,6 @@
         "command": "editor.action.clipboardPasteAction"
     },
     {
-        "key": "alt+c",
-        "command": "editor.action.clipboardCopyAction"
-    },
-    {
         "key": "ctrl+alt+f",
         "command": "editor.action.formatDocument",
         "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
@@ -141,7 +173,7 @@
         "when": "listFocus && !inputFocus"
     },
     {
-        "key": "alt+j",
+        "key": "alt+k",
         "command": "list.focusUp",
         "when": "listFocus && !inputFocus"
     },
@@ -249,5 +281,49 @@
     {
         "key": "ctrl+space shift+l",
         "command": "workbench.action.moveEditorToRightGroup"
+    },
+    {
+        "key": "alt+n",
+        "command": "keybindings.editor.addKeybinding",
+        "when": "inKeybindings && keybindingFocus"
+    },
+    {
+        "key": "alt+backspace",
+        "command": "keybindings.editor.resetKeybinding"
+    },
+    {
+        "key": "ctrl+space ctrl+b",
+        "command": "workbench.action.openGlobalKeybindings"
+    },
+    {
+        "key": "ctrl+space ctrl+n",
+        "command": "workbench.action.files.newUntitledFile"
+    },
+    {
+        "key": "ctrl+space z",
+        "command": "workbench.action.toggleZenMode"
+    },
+    {
+        "key": "ctrl+space s",
+        "command": "workbench.action.splitEditorDown"
+    },
+    {
+        "key": "ctrl+space v",
+        "command": "workbench.action.splitEditorRight"
+    },
+    {
+        "key": "alt+w",
+        "command": "keybindings.editor.defineWhenExpression",
+        "when": "inKeybindings && keybindingFocus"
+    },
+    {
+        "key": "ctrl+k ctrl+e",
+        "command": "-keybindings.editor.defineWhenExpression",
+        "when": "inKeybindings && keybindingFocus"
+    },
+    {
+        "key": "alt+c",
+        "command": "editor.action.clipboardCopyAction",
+        "when": "editorTextFocus && selectionAnchorSet"
     }
 ]
