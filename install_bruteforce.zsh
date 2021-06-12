@@ -82,6 +82,11 @@ make-link .dot/gui/polybar ~/.config/polybar
 make-link .dot/gui/mpv       ~/.config/mpv
 make-link .dot/gui/tridactyl ~/.config/tridactyl
 
+# vscode (if I ever want to have it..)
+if [[ -d ~/.config/"Code - OSS" ]]; then
+  make-link ~/.dot/gui/vscode-user-config ~/.config/"Code - OSS"/User
+fi
+
 if [[ "$DRYRUN_ONLY" == "true" ]]; then
   echo
   echo "### To apply the above config, re-run without --dry-run"
