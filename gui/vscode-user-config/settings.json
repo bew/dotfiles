@@ -1,0 +1,7 @@
+{
+    "workbench.settings.openDefaultKeybindings": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.autoUpdateLanguageServer": false,
+    "python.showStartPage": false
+}
