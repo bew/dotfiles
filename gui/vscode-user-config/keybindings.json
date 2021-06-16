@@ -102,6 +102,40 @@
         "command": "-keybindings.editor.addKeybinding",
         "when": "inKeybindings && keybindingFocus"
     },
+    {
+        "key": "ctrl+k ctrl+e",
+        "command": "-keybindings.editor.defineWhenExpression",
+        "when": "inKeybindings && keybindingFocus"
+    },
+    {
+        "key": "ctrl+n",
+        "command": "-workbench.action.files.newUntitledFile"
+    },
+    {
+        "key": "ctrl+p",
+        "command": "-workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+space",
+        "command": "-editor.action.triggerSuggest",
+        "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "enter",
+        "command": "-acceptSelectedSuggestion",
+        "when": "acceptSuggestionOnEnter && suggestWidgetVisible && suggestionMakesTextEdit && textInputFocus"
+    },
+    {
+        "key": "ctrl+space",
+        "command": "-toggleSuggestionDetails",
+        "when": "suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "ctrl+u",
+        "command": "-cursorUndo",
+        "when": "textInputFocus"
+    },
+
     // ----- MY KEYBINDINGS
     {
         "key": "ctrl+alt+[Backquote]", // C-M-²
@@ -192,7 +226,7 @@
         "command": "workbench.action.files.save"
     },
     {
-        "key": "ctrl+alt+enter",
+        "key": "ctrl+space ctrl+enter",
         "command": "workbench.action.tasks.runTask"
     },
     {
@@ -216,6 +250,21 @@
         "when": "textInputFocus"
     },
     {
+        "key": "shift+alt+b",
+        "command": "cursorWordLeftSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "alt+e",
+        "command": "cursorWordEndRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+e",
+        "command": "cursorWordEndRightSelect",
+        "when": "textInputFocus"
+    },
+    {
         "key": "ctrl+u",
         "command": "deleteAllLeft",
         "when": "textInputFocus"
@@ -231,13 +280,18 @@
         "when": "textInputFocus"
     },
     {
-        "key": "alt+h",
-        "command": "cursorLeft",
+        "key": "shift+alt+[BracketRight]", // M-S-$
+        "command": "cursorEndSelect",
         "when": "textInputFocus"
     },
     {
-        "key": "alt+k",
-        "command": "cursorUp",
+        "key": "shift+alt+[BracketLeft]", // M-S-^
+        "command": "cursorHomeSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "alt+h",
+        "command": "cursorLeft",
         "when": "textInputFocus"
     },
     {
@@ -246,8 +300,33 @@
         "when": "textInputFocus"
     },
     {
+        "key": "alt+k",
+        "command": "cursorUp",
+        "when": "textInputFocus"
+    },
+    {
         "key": "alt+l",
         "command": "cursorRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+h",
+        "command": "cursorLeftSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+j",
+        "command": "cursorDownSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+k",
+        "command": "cursorUpSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+l",
+        "command": "cursorRightSelect",
         "when": "textInputFocus"
     },
     {
@@ -265,6 +344,17 @@
     {
         "key": "ctrl+j",
         "command": "workbench.action.focusBelowGroup"
+    },
+    {
+        // Used to move focus to the editor when the terminal has focus.
+        // NOTES:
+        // - Ctrl-k isn't usable in the terminal anymore,
+        //   but I don't need it in shell, and in nvim I can `<C-w>k`
+        // - focus change isn't visually clear/distinct
+        //   Waiting for: https://github.com/bew/dotfiles/issues/69
+        "key": "ctrl+k",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "terminalFocus"
     },
     {
         "key": "ctrl+space shift+k",
@@ -317,13 +407,56 @@
         "when": "inKeybindings && keybindingFocus"
     },
     {
-        "key": "ctrl+k ctrl+e",
-        "command": "-keybindings.editor.defineWhenExpression",
-        "when": "inKeybindings && keybindingFocus"
-    },
-    {
         "key": "alt+c",
         "command": "editor.action.clipboardCopyAction",
         "when": "editorTextFocus && selectionAnchorSet"
+    },
+    {
+        "key": "ctrl+alt+enter",
+        "command": "python.execInTerminal",
+        "when": "editorLangId == 'python'"
+    },
+    {
+        "key": "ctrl+n",
+        "command": "editor.action.triggerSuggest",
+        "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+n",
+        "command": "selectNextSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "ctrl+p",
+        "command": "selectPrevSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "ctrl+y",
+        "command": "acceptSelectedSuggestion",
+        "when": "acceptSuggestionOnEnter && suggestWidgetVisible && suggestionMakesTextEdit && textInputFocus"
+    },
+    {
+        "key": "alt+space",
+        "command": "toggleSuggestionDetails",
+        "when": "suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "alt+o",
+        "command": "editor.action.insertLineAfter",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+o",
+        "command": "editor.action.insertLineBefore",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "alt+u",
+        "command": "undo"
+    },
+    {
+        "key": "shift+alt+u",
+        "command": "redo"
     }
 ]
