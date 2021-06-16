@@ -1,7 +1,21 @@
 {
-    "workbench.settings.openDefaultKeybindings": true,
-    "python.linting.mypyEnabled": true,
-    "python.linting.flake8Enabled": true,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.cursorBlinking": "solid",
+    "editor.detectIndentation": false,
+    "editor.minimap.renderCharacters": false,
+    "editor.minimap.showSlider": "always",
+    "editor.snippetSuggestions": "bottom",
+    "editor.tabCompletion": "on", // force tab completion _always_
+    "files.eol": "\n",
     "python.autoUpdateLanguageServer": false,
-    "python.showStartPage": false
+    "python.linting.flake8Enabled": true,
+    // "python.linting.mypyEnabled": true,
+    "python.showStartPage": false,
+    "task.problemMatchers.neverPrompt": true,
+    "terminal.integrated.altClickMovesCursor": false,
+    // NOTE: Alt is still grabbed for the menubar on press/release
+    "window.customMenuBarAltFocus": false,
+    "window.enableMenuBarMnemonics": false,
+    "window.zoomLevel": 1,
+    "workbench.startupEditor": "none"
 }
