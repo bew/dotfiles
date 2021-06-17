@@ -204,6 +204,8 @@
     {
         "key": "alt+j",
         "command": "list.focusDown",
+        // DOES NOT WORK EVERYWHERE :/ (like in the command palette)
+        // "when": "listFocus"
         "when": "listFocus && !inputFocus"
     },
     {
@@ -267,6 +269,11 @@
     {
         "key": "ctrl+u",
         "command": "deleteAllLeft",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+alt+u",
+        "command": "deleteAllRight",
         "when": "textInputFocus"
     },
     {
@@ -458,5 +465,9 @@
     {
         "key": "shift+alt+u",
         "command": "redo"
+    },
+    {
+        "key": "ctrl+space ctrl+alt+s",
+        "command": "workbench.action.openSettings"
     }
 ]
