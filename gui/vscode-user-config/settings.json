@@ -4,9 +4,11 @@
     "editor.detectIndentation": false,
     "editor.minimap.renderCharacters": false,
     "editor.minimap.showSlider": "always",
+    "editor.renderFinalNewline": false,
     "editor.snippetSuggestions": "bottom",
     "editor.tabCompletion": "on", // force tab completion _always_
     "files.eol": "\n",
+    "files.insertFinalNewline": true,
     "python.autoUpdateLanguageServer": false,
     "python.linting.flake8Enabled": true,
     // "python.linting.mypyEnabled": true,
