@@ -15,6 +15,11 @@
     "python.showStartPage": false,
     "task.problemMatchers.neverPrompt": true,
     "terminal.integrated.altClickMovesCursor": false,
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.showExitAlert": false,
+    "terminal.integrated.tabs.enabled": true,
+    "terminal.integrated.tabs.hideCondition": "never",
+    "terminal.integrated.tabs.showActiveTerminal": "always",
     // NOTE: Alt is still grabbed for the menubar on press/release
     "window.customMenuBarAltFocus": false,
     "window.enableMenuBarMnemonics": false,
