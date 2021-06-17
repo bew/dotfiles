@@ -6,17 +6,38 @@ function _cmd_available
   command -v "$1" >/dev/null
 }
 
-function reload_zsh
+function zsh::utils::check_can_reload_or_exit
 {
-  if [ -n "$(jobs)" ]; then
-    print -P "Error: %j job(s) in background"
+  if [[ -n "$(jobs)" ]]; then
+    local prefix="Error"
+    [[ -n "${1:-}" ]] && prefix="Cannot $1"
+
+    print -P "${prefix}: %j job(s) in background"
+
+    return 1 # cannot reload nor exit!
   else
-    [[ -n "$ORIGINAL_PATH" ]] && export PATH="$ORIGINAL_PATH"
-    exec zsh
+    return 0 # all good, do whatever you want!
   fi
 }
 
-alias zshrc=reload_zsh
+function reload_zsh::safe
+{
+  zsh::utils::check_can_reload_or_exit "reload" || return
+
+  [[ -n "$ORIGINAL_PATH" ]] && export PATH="$ORIGINAL_PATH"
+  exec zsh
+}
+
+function exit_zsh::safe
+{
+  zsh::utils::check_can_reload_or_exit "quit" || return
+
+  exit
+}
+
+alias zshrc=reload_zsh::safe
+alias ":r"=reload_zsh::safe
+alias ":q"=exit_zsh::safe
 
 # global redirection aliases
 
@@ -242,8 +263,6 @@ alias v="nvim -R"
 # e: edit | v: view
 
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
-
-alias ":q"="exit"
 
 # ncdu
 alias ncdu='ncdu --color dark'
