@@ -24,7 +24,7 @@ function http::serve-local
   echo "==> Serving '$dir' on '$ip:$port' over HTTP <=="
   echo
 
-  python3 -m http.server $port --bind $ip --directory $dir
+  python3 -m http.server "$port" --bind "$ip" --directory "$dir"
 }
 
 http::serve-local "$@"
