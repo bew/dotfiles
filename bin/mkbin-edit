@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+if [[ $# == 0 ]]; then
+  >&2 echo "Usage: $0 <file> [<args for \$EDITOR>]"
+  exit 1
+fi
+
+FILE_NAME="$1"; shift
+
+touch "$FILE_NAME"
+chmod +x "$FILE_NAME"
+
+# We pass the rest of the args, to be able to write:
+#     $0 some/file +"setf sh"
+# to set the filetype to sh in (neo)vim
+"${EDITOR:-nvim}" "$FILE_NAME" "$@"
