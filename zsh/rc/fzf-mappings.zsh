@@ -12,7 +12,8 @@ function zwidget::utils::results_to_paths_relative_to
 {
   local relative_to_path="$1"
   while read item; do
-    realpath --relative-to="$relative_to_path" "$item"
+    # NOTE: --no-symlinks is used to ensure symlinks are not expanded and kept as is.
+    realpath --relative-to="$relative_to_path" --no-symlinks "$item"
   done
 }
 
