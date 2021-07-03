@@ -128,19 +128,6 @@ bind_frame_focus $M-$C-l   right
 hc keybind $M-$S-c   close
 
 # tags
-tag_names=( {1..9} )
-tag_keys=( {1..9} 0 )
-
-hc rename default "${tag_names[0]}" || true
-for i in ${!tag_names[@]} ; do
-  hc add "${tag_names[$i]}"
-  key="${tag_keys[$i]}"
-  hc echo $key
-  if ! [ -z "$key" ] ; then
-    hc keybind "$M-$key" use_index "$i"
-    hc keybind "$M-$S-$key" move_index "$i"
-  fi
-done
 
 # FIXME: how to implement dynamic tags (with traversing)
 #   What about tag groups? (would need a special keymap to navigate groups..
