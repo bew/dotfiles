@@ -139,6 +139,10 @@ hc keybind $M-$S-c   close
 hc keybind $M-a   use_index -1 --skip-visible
 hc keybind $M-z   use_index +1 --skip-visible
 
+# Move current tag to the left/right
+hc keybind $M-$C-a  attr tags.focus.index -=1
+hc keybind $M-$C-z  attr tags.focus.index +=1
+
 # Move window to prev/next tag and make it floating (so I can place it where I want)
 hc keybind $M-$S-a \
   chain , attr clients.focus.floating true \
