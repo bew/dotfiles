@@ -11,4 +11,4 @@ nnoremap <buffer> q :q<cr>
 " Keep macro recording under Alt-q
 nnoremap <buffer> <M-q> q
 
-let b:bew_statusline_comment = "o: preview | M-j/k: preview next/previous | M-q: macro-record | q: quit"
+let b:bew_statusline_comment = "o: view | M-j/k: view n/p | M-q: macro | q: quit"

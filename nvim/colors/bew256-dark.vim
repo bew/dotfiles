@@ -188,7 +188,9 @@ exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
 
-" 17 is a dark blue
+" 237 (light grey)
+" 17 (dark blue) is pretty nice (maybe too subtle)
+" 52 (dark red) is VERY visible (too much? needs to have a toggle)
 exe "HiResetTo Visual cterm=none ctermbg=17"
 hi! link VisualNOS Visual
 
@@ -205,7 +207,7 @@ exe "HiResetTo DiffDelete"       .s:bg_base03_r
 exe "HiResetTo DiffText"         .s:fmt_bold   .s:bg_base03_b
 
 " Signs
-hi! link SignColumn LineNr
+exe "HiResetTo SignColumn ctermbg=233"
 exe "HiResetTo SignVcsAdd"      .s:fg_green
 exe "HiResetTo SignVcsChange"   .s:fg_yellow
 exe "HiResetTo SignVcsDelete"   .s:fg_red

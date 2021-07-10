@@ -13,6 +13,9 @@ let g:python3_host_prog = $NVIM_PY_VENV . "/bin/python3"
 
 " map leader definition - space
 let g:mapleader = " "
+" IDEA: Change <leader> to <Ctrl-space> | Have <localleader> be <space>
+" And the CtrlSpace plugin would be <leader><space> or <leader><leader>
+" Also give a new leader possibility with <Alt-space> (:
 
 call plug#begin('~/.nvim/plugged')
 
@@ -323,13 +326,14 @@ let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["│"])
 let g:indentLine_bufTypeExclude = ["help", "terminal"]
 let g:indentLine_bufNameExclude = ["_.*", "NERD_tree.*"]
 let g:indentLine_fileTypeExclude = [
-    \   "startify",
-    \   "man",
-    \   "defx",
-    \   "markdown",
     \   "codi",
+    \   "defx",
+    \   "help",
     \   "json",
-    \   "nerdtree"
+    \   "man",
+    \   "markdown",
+    \   "nerdtree",
+    \   "startify",
     \ ]
 augroup my_indentline_hi_group
   au!
@@ -398,6 +402,7 @@ Plug 'tweekmonster/nvim-api-viewer'
 
 Plug 'metakirby5/codi.vim'  " Interactive scratchpad (file on the left, interpreter outputs on the right)
 let g:codi#width = 50.0  " Split the windows in half
+let g:codi#virtual_text_prefix = "  => "
 
 Plug 'junegunn/goyo.vim'
 
