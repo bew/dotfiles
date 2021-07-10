@@ -69,7 +69,7 @@ alias cr=crystal
 alias pac=pacman
 alias tre=tree
 alias py=python
-alias ipy=ipython
+alias ipy="ipython --no-confirm-exit"
 alias com=command
 alias j=jobs
 

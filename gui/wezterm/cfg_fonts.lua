@@ -102,9 +102,4 @@ cfg.harfbuzz_features = {
   "clig", -- (default) contextual ligatures
 }
 
--- Correct color changed by antialiasing. The default is Subpixel.
--- With Subpixel, the rendered color is beige-ish and slightly darker.
--- (explanation: https://gitter.im/wezterm/Lobby?at=5fbc5fb129cc4d7348294eb6)
-cfg.font_antialias = "Greyscale"
-
 return cfg

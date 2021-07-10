@@ -82,6 +82,15 @@ snippet here "here document (here)"
 ${2/['"`](.+)['"`]/$1/}
 endsnippet
 
+# Variables
+
+snippet loc "local var" b
+local ${10:var}=$0
+endsnippet
+
+snippet locs "local string var" b
+local ${10:var}="$20"$0
+endsnippet
 
 # Comment
 

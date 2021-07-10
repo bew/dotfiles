@@ -229,9 +229,18 @@ nnoremap <M-O> O<esc>
 " movement.
 inoremap <expr> <M-Space> ' <C-G>U<Left>'
 
-" Move cursor to end of displayed line (useful when text wraps)
+" I: Alt-Backspace to delete last word (like in most other programs)
+inoremap <M-BS> <C-w>
+cnoremap <M-BS> <C-w>
+
+" N: Move cursor to begin/end of displayed line (useful when text wraps)
 nnoremap <M-$> g$
+nnoremap <M-^> g^
+" I: Move cursor to begin/end of line
 inoremap <M-$> <End>
+" FIXME: <M-^> is waiting on https://github.com/wez/wezterm/issues/877 to work...
+inoremap <M-^> <Home>
+" TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
 
 " Insert a new line below using <cr>, useful in comments when `formatoptions`
 " has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
@@ -564,3 +573,12 @@ let g:which_key_map.h.f = "fold non-hunk"
 let g:which_key_map.h.n = "next hunk"
 let g:which_key_map.h.N = "prev hunk"
 let g:which_key_map.h.b = "blame"
+
+
+
+" -----------------
+" IDEAS: (from vscode)
+" M-Up/Down -> Move current line (or range) up/down, following indentations
+" M-S-Up/Down -> Copy current line Up/Down
+" M-S-Left/Right -> Shrink/Expand (char-)selection (can be simulated in vim?
+"     even without proper language support/detection?)

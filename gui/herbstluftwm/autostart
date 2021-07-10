@@ -179,7 +179,7 @@ hc keybind $M-$C-m   fullscreen toggle # fullscreen current client
 # NOTE: for now we only cycle between max & vertical. So if the layout was horizontal
 # I'll have to re-do select horizontal after going maximized
 # It seems that if it's horizontal it'll first select vertical, them max >< oh well..
-hc keybind $M-m   cycle_layout +1 max vertical
+hc keybind $M-m   cycle_layout +1 max horizontal
 
 # Cycle through frame layouts, skipping 'max' layout (which is toggled by another key).
 #   - layouts for 2 clients: vertical, horizontal
