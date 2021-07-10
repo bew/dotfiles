@@ -146,11 +146,11 @@ hc keybind $M-$C-z  attr tags.focus.index +=1
 # Move window to prev/next tag and make it floating (so I can place it where I want)
 hc keybind $M-$S-a \
   chain , attr clients.focus.floating true \
-        , move_index -1 \
+        , move_index -1 --skip-visible \
         , use_index -1 --skip-visible
 hc keybind $M-$S-z \
   chain , attr clients.focus.floating true \
-        , move_index +1 \
+        , move_index +1 --skip-visible \
         , use_index +1 --skip-visible
 
 hc keybind $M-$A-r   spawn ~/.config/herbstluftwm/scripts/hlwm_rename_current_tag.py
