@@ -135,6 +135,41 @@
         "command": "-cursorUndo",
         "when": "textInputFocus"
     },
+    {
+        "key": "tab",
+        "command": "-insertSnippet",
+        "when": "editorTextFocus && hasSnippetCompletions && !editorTabMovesFocus && !inSnippetMode"
+    },
+    {
+        "key": "tab",
+        "command": "-jumpToNextSnippetPlaceholder",
+        "when": "editorTextFocus && hasNextTabstop && inSnippetMode"
+    },
+    {
+        "key": "shift+tab",
+        "command": "-jumpToPrevSnippetPlaceholder",
+        "when": "editorTextFocus && hasPrevTabstop && inSnippetMode"
+    },
+    {
+        "key": "escape",
+        "command": "-leaveSnippet",
+        "when": "editorTextFocus && inSnippetMode"
+    },
+    {
+        "key": "up",
+        "command": "-selectPrevSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "down",
+        "command": "-selectNextSuggestion",
+        "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "tab",
+        "command": "-insertBestCompletion",
+        "when": "atEndOfWord && textInputFocus && !hasOtherSuggestions && !inSnippetMode && !suggestWidgetVisible && config.editor.tabCompletion == 'on'"
+    },
 
     // ----- MY KEYBINDINGS
     {
@@ -469,5 +504,32 @@
     {
         "key": "ctrl+space ctrl+alt+s",
         "command": "workbench.action.openSettings"
+    },
+    {
+        "key": "[Backquote]",
+        "command": "insertSnippet",
+        "when": "editorTextFocus && hasSnippetCompletions && !editorTabMovesFocus && !inSnippetMode"
+    },
+    {
+        "key": "alt+j",
+        "command": "jumpToNextSnippetPlaceholder",
+        "when": "editorTextFocus && hasNextTabstop && inSnippetMode"
+    },
+    {
+        "key": "alt+k",
+        "command": "jumpToPrevSnippetPlaceholder",
+        "when": "editorTextFocus && hasPrevTabstop && inSnippetMode"
+    },
+    {
+        "key": "alt+escape",
+        "command": "leaveSnippet",
+        "when": "editorTextFocus && inSnippetMode"
+    },
+    {
+        "key": "tab",
+        "command": "insertBestCompletion",
+        // The changs with the base 'tab' binding, is that it's _always_ the same behavior,
+        // even when inside a snippet (instead of jumping to next placeholder)
+        "when": "atEndOfWord && textInputFocus && !hasOtherSuggestions && !suggestWidgetVisible && config.editor.tabCompletion == 'on'"
     }
 ]
