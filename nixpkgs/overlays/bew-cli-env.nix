@@ -15,6 +15,7 @@ final: prev:
       p.fzf
       p.git
       p.git-lfs
+      p.delta # for nice git diffs
       p.jq
       p.ripgrep
       p.tree
@@ -35,8 +36,6 @@ final: prev:
 
       # Nix tools
       p.nix-tree # TUI to browse the dependencies of a derivation
-    ] ++ [ # Add packages from my overlays
-      final.delta-bin
     ];
   };
 }
