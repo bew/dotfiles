@@ -97,7 +97,7 @@ function zwidget::utils::__fzf_generic_impl_for_paths
   else
     # By default, the results are transformed back to be relative to CWD.
     local results_transformer=( \
-      zwidget::utils::results_to_paths_relative_to "$PWD"
+      zwidget::utils::results_to_paths_relative_to "$(realpath "$PWD")"
     )
   fi
 
