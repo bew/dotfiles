@@ -318,6 +318,18 @@ Plug 'junegunn/gv.vim'          " Simple (<3) git commit browser, based on vim-f
 Plug 'rhysd/git-messenger.vim'  " Popup the commit message of the line under cursor
 let g:git_messenger_no_default_mappings = v:true
 
+" sort
+Plug 'inkarkat/vim-ingo-library'       " Lib required by vim-AdvancedSorters
+Plug 'inkarkat/vim-AdvancedSorters'    " Sorting of certain areas or by special needs
+" One cool case it allows is to sort lines by block instead of by lines
+" with something like:
+"   :SortRangesByRange /^function/,/^endfunction$/
+" to sort vim functions for example.
+"
+" Or a bit more 'magic':
+"   :'<,'>SortRangesByHeader /^if/
+" to sort blocks in a range of lines, where each block starts with 'if'
+
 " -- UI
 
 Plug 'Yggdroot/indentLine'
