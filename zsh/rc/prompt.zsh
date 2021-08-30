@@ -166,6 +166,11 @@ function segmt::debug
   echo -n "%K{blue} DEBUG: $* %k"
 }
 
+# NOTE: A more flexible alternative is to use ad-hoc dir alias with: `hash -d foo=$PWD`
+#   and the prompt will show `~foo`. It is more flexible because `cd ./bla` works
+#   as expected (shows `~foo/bla`).
+# TODO?: make helper function to ease manipulation of the directory hash table,
+#   and creation of an entry for $PWD
 PROMPT_OVERRIDE_PWD=
 function segmt::short_pwd_no_color
 {
