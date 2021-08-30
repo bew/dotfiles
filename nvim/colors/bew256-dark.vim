@@ -176,7 +176,7 @@ exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_yellow_bright
 " Extended highlighting "{{{
 " ---------------------------------------------------------------------
 exe "HiResetTo SpecialKey" .s:fmt_bold   .s:fg_base00 .s:bg_base02
-exe "HiResetTo NonText"    .s:fg_base00
+exe "HiResetTo NonText ctermfg=237"
 exe "HiResetTo StatusLine"   .s:fg_base0  .s:bg_base02 .s:fmt_revr
 exe "HiResetTo StatusLineNC"   .s:fg_base00 .s:bg_base02 .s:fmt_revr
 exe "HiResetTo Directory"   .s:fg_blue
