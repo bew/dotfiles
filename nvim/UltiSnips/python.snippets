@@ -156,8 +156,16 @@ snippet s "self.X = X" b
 self.${1:name} = $1
 endsnippet
 
+snippet s_ "self._X = X" b
+self._${1:name} = $1
+endsnippet
+
 snippet opt "Optional[...]"
-Optional[${1:SomeType}]
+Optional[${1:${VISUAL:SomeType}}]
+endsnippet
+
+snippet ld "lambda"
+lambda
 endsnippet
 
 snippet nocov "pragma no cover"
@@ -176,12 +184,12 @@ endsnippet
 # Increase priority of this 'rtype' snippet, to avoid conflict with the
 # other 'rtype' snippet, used for reveal_type when the cursor is NOT at BOL
 priority 10
-snippet rtype "reveal_type (in expr)" w
-reveal_type(${1:${VISUAL:expr}})
-endsnippet
-priority 0
 snippet rtype "reveal_type" b
 reveal_type(${1:${VISUAL:expr}})  # noqa
+endsnippet
+priority 0
+snippet rtype "reveal_type (in expr)" w
+reveal_type(${1:${VISUAL:expr}})
 endsnippet
 
 # vim:ft=snippets:
