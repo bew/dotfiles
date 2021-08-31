@@ -428,6 +428,8 @@ cnoremap <M-h> <Left>
 cnoremap <M-l> <Right>
 cnoremap <M-w> <S-Right>
 cnoremap <M-b> <S-Left>
+cnoremap <M-$> <End>
+cnoremap <M-^> <Home>
 
 " Command history by prefix
 cnoremap <M-k> <Up>
@@ -446,8 +448,10 @@ cnoremap <expr> %% expand("%:h") . "/"
 " Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
 
 " Helper guide on <Leader>
-nnoremap <Leader> <cmd>WhichKey '<Space>'<cr>
-vnoremap <Leader> <cmd>WhichKeyVisual '<Space>'<cr>
+nnoremap <silent> <leader> <cmd>WhichKey '<Space>'<cr>
+vnoremap <silent> <leader> <cmd>WhichKeyVisual '<VisualBindings>'<cr>
+" NOTE: I'm trying to understand how to tell WhichKey to use '<Space>' as
+" leader indicator, AND use the g:which_key_vmap to search for descriptions
 
 " -- Vim
 nmap <leader>vx <Plug>(my-EvalAsVimEx-normal)
