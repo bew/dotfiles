@@ -1,5 +1,10 @@
 local wezterm = require "wezterm"
 
+function action_callback(event_id, func)
+  wezterm.on(event_id, func)
+  return wezterm.action{EmitEvent=event_id}
+end
+
 local cfg = {}
 
 cfg.disable_default_key_bindings = true
@@ -32,21 +37,22 @@ cfg.keys = {
   {mods = "CTRL", key = "0", action = "ResetFontSize"}, -- Ctrl-Shift-0
   {mods = "CTRL", key = "6", action = "DecreaseFontSize"}, -- Ctrl-Shift-- (key with -)
   {mods = "CTRL", key = "+", action = "IncreaseFontSize"}, -- Ctrl-Shift-+ (key with =)
+
+  ---- custom events
+
+  -- Ctrl-Shift-g
+  {mods = "CTRL", key = "G", action = action_callback("my-toggle-ligature", function(win, _pane)
+    local overrides = win:get_config_overrides() or {}
+    if not overrides.harfbuzz_features then
+      -- If we haven't overriden it yet, then override with ligatures disabled
+      overrides.harfbuzz_features =  {"calt=0", "clig=0", "liga=0"}
+    else
+      -- else we did already, and we should disable the override now
+      overrides.harfbuzz_features = nil
+    end
+    win:set_config_overrides(overrides)
+  end)}
 }
 
-wezterm.on("my-toggle-ligature", function(win, _pane)
-  local overrides = win:get_config_overrides() or {}
-  if not overrides.harfbuzz_features then
-    -- If we haven't overriden it yet, then override with ligatures disabled
-    overrides.harfbuzz_features =  {"calt=0", "clig=0", "liga=0"}
-  else
-    -- else we did already, and we should disable the override now
-    overrides.harfbuzz_features = nil
-  end
-  win:set_config_overrides(overrides)
-end)
-
-local key_ev = {mods = "CTRL", key = "G", action = wezterm.action{EmitEvent="my-toggle-ligature"}} -- Ctrl-Shift-g
-table.insert(cfg.keys, key_ev)
 
 return cfg
