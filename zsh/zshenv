@@ -26,12 +26,11 @@ FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-space:toggle+down')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:select-all')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'change:top') # select best result on input change
 
-FZF_BEW_LAYOUT_ARRAY=(--height=40% --reverse --inline-info)
-# NOTE: --border is made of unicode symbols, and can break the display
-#  (--> removed for now)
+FZF_BEW_LAYOUT_ARRAY=()
+FZF_BEW_LAYOUT_ARRAY+=(--height=40% --reverse --inline-info)
 
-# highlight the current line
-FZF_BEW_LAYOUT_ARRAY+=(--color='bg+:232,gutter:-1')
+# Better highlights (current line, substring matches, multiline markers)
+FZF_BEW_LAYOUT_ARRAY+=(--color='bg+:237,hl+:202,hl:166,gutter:-1,marker:220:bold')
 
 export FZF_BEW_KEYBINDINGS="${(j: :)FZF_BEW_KEYBINDINGS_ARRAY}"
 export FZF_BEW_LAYOUT="${(j: :)FZF_BEW_LAYOUT_ARRAY}"
