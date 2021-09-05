@@ -153,6 +153,7 @@ augroup END
 
 Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
 " note for the line above: single quote are mandatory on the whole line.
+let g:LanguageClient_rootMarkers = [".manual_root_marker"]
 let g:LanguageClient_useVirtualText = "Diagnostics"
 let g:LanguageClient_virtualTextPrefix = s:code_diagnostic_cfg.virt_text_prefix
 
@@ -181,6 +182,7 @@ augroup END
 
 let g:LanguageClient_serverCommands = {}
 let g:LanguageClient_serverCommands.rust = ["rust-analyzer"]
+let g:LanguageClient_serverCommands.lua = ["lua-language-server", "--logpath=/t/lua-lsp-logs-dir"]
 
 Plug 'Shougo/echodoc'  " shows (in a smart way) the signature of completed items
 let g:echodoc#enable_at_startup = v:true

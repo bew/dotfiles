@@ -10,6 +10,7 @@ final: prev:
     paths = let p = prev; in [
       p.neovim
       p.rust-analyzer
+      p.sumneko-lua-language-server
 
       p.fd
       p.fzf
