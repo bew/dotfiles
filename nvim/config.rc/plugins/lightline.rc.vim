@@ -63,6 +63,11 @@ function! LightlineFugitive()
     return ''
   endif
 
+  if &ft == 'man'
+    " The branch isn't useful here!
+    return ''
+  endif
+
   try
     let mark = 'On '
     let branch = fugitive#head()
