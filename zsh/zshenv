@@ -2,6 +2,12 @@ ORIGINAL_PATH=$PATH
 
 source ~/.dot/shell/env.sh
 
+# ------------------ default directory aliases
+
+hash -d dot=~/.dot
+hash -d cfg=~/.config
+
+# NOTE: more can be defined in zshrc.local for machine-specific dirs.
 
 # ------------------ fzf config
 
