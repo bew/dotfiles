@@ -133,6 +133,10 @@ unbind H
 unbind L
 bind <CA-a> back
 bind <CA-z> forward
+bind --mode=insert <CA-a> back
+bind --mode=insert <CA-z> forward
+bind --mode=ex <CA-a> back
+bind --mode=ex <CA-z> forward
 
 # --- Page bindings
 
@@ -162,6 +166,10 @@ bind § nohlsearch
 bind <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
 bind --mode=insert <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
 bind --mode=visual <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
+
+# --- insert mode bindings
+# FIXME: Can I remap keys à-la-AHK, like A-b/w to Ctrl-Left/Right?
+#   => if yes, remap all insert movements! (hjkl, w, b, ^, $, g, G)
 
 # --- ex mode bindings
 
