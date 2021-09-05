@@ -131,6 +131,11 @@ function curl_auth_json
 
 alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
 
+# Search the given bin name in PATH (ignores aliases/functions)
+# -p : always search in PATH
+# -s : show the realpath in addition to the path in PATH
+alias which::in-path='which -ps'
+
 # Always expose a known TERM (not the 256color version) to the server I'm connecting to.
 alias ssh='TERM=xterm ssh'
 
