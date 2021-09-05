@@ -129,25 +129,36 @@ function segmt::python_venv
   local venv_dir=$(basename "$VIRTUAL_ENV")
   local venv_display="venv"
 
-  # Add venv name if not 'venv'
-  if [[ "$venv_dir" != "venv" ]]; then
-    venv_display+=" '$venv_dir'"
-  fi
-
-  local venv_parent_dir_path=$(realpath $(dirname "$VIRTUAL_ENV"))
-  if [[ "$PWD" == "$venv_parent_dir_path" ]]; then
-    # venv is in PWD, no need to repeat the dir name
-    venv_display+=" here"
+  if [[ -n "${VENV_IS_VOLATILE:-}" ]]; then
+    # Current venv is volatile (created with venv_with_do)
+    venv_display+=" volatile"
   else
-    # venv is not in $PWD, show the venv parent dir name to avoid ambiguity.
-    local venv_parent_dir=$(basename "$venv_parent_dir_path")
-    venv_display+=" in $venv_parent_dir"
+    # Add venv name if not 'venv'
+    if [[ "$venv_dir" != "venv" ]]; then
+      venv_display+=" '$venv_dir'"
+    fi
+
+    local venv_parent_dir_path=$(dirname "$VIRTUAL_ENV")
+    if [[ "$(realpath $PWD)" == "$(realpath $venv_parent_dir_path)" ]]; then
+      # venv is in PWD, no need to repeat the dir name
+      venv_display+=" here"
+    else
+      # venv is not in $PWD, show the venv parent dir name to avoid ambiguity.
+      if [[ "${(D)venv_parent_dir_path}" != "$venv_parent_dir_path" ]]; then
+        # Use existing directory alias (usualy shorter than the real dirname)
+        venv_display+=" in ${(D)venv_parent_dir_path}"
+      else
+        local venv_parent_dir=$(basename "$venv_parent_dir_path")
+        venv_display+=" in $venv_parent_dir"
+      fi
+    fi
   fi
   # Example venv_display:
+  #   - venv volatile
   #   - venv here
   #   - venv 'myvenv' here
-  #   - venv in SomeDir
-  #   - venv 'myvenv' in SomeDir
+  #   - venv in SomeParentDir
+  #   - venv 'myvenv' in SomeParentDir
 
   echo -n "($venv_display) "
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
