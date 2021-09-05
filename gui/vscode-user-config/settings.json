@@ -24,5 +24,6 @@
     "window.customMenuBarAltFocus": false,
     "window.enableMenuBarMnemonics": false,
     "window.zoomLevel": 1,
-    "workbench.startupEditor": "none"
+    "workbench.startupEditor": "none",
+    "window.restoreWindows": "none"
 }
