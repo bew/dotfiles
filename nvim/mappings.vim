@@ -106,7 +106,7 @@ tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "
 "-- Navigation
 "------------------------------------------------------------------
 
-" Short navigation on the line in insert mode
+" I: Short navigation on the line in insert mode
 "
 " This makes it possible to use the cursor keys in Insert mode, without breaking
 " the undo sequence, therefore using `.` (redo) will work as expected.
@@ -120,6 +120,13 @@ imap <M-l> <Right>
 inoremap <M-b> <C-g>U<S-Left>
 inoremap <M-w> <C-g>U<S-Right>
 
+" I: Disable up/down
+"
+" This is required when running under tmux with scrolling emulation mouse bindings
+" for the alternate screen, because it would move Up/Down N times based on the
+" scrolling emulation config.
+inoremap <Up> <nop>
+inoremap <Down> <nop>
 
 " Windows navigation
 nnoremap <C-h> <C-w>h
