@@ -22,7 +22,7 @@ function not
 function usage
 {
   local ctrl_mode="$1"; shift # The internal mode (while or until)
-  echo "Usage: repeat_every_$ctrl_mode <interval> --sep <cmd...>"
+  echo "Usage: repeat_every_$ctrl_mode <interval> [--sep|--compact-sep] <cmd...>"
 }
 
 function repeat_every_impl
@@ -36,8 +36,14 @@ function repeat_every_impl
   local interval="$1"; shift
 
   local use_separator=false
+  local use_compact_separator=false
   if [[ "${1:-}" == "--sep" ]]; then
     use_separator=true
+    shift
+  fi
+  if [[ "${1:-}" == "--compact-sep" ]]; then
+    use_separator=true
+    use_compact_separator=true
     shift
   fi
   local cmd=("$@")
@@ -48,18 +54,22 @@ function repeat_every_impl
 
   local run_comment
   if [[ "$ctrl_mode" == "until" ]]; then
-    run_comment="failed"
+    run_comment="failed (expecting success)"
     # Instead of changing the control structure from while to until, we change the condition.
     # We can't use '!' to invert the return here, bash does not recognize '!' as a builting then..
     cmd=(not "${cmd[@]}")
   else
-    run_comment="succeded"
+    run_comment="succeeded (expecting failure)"
   fi
 
   local run_count=0
   while "${cmd[@]}"; do
     run_count=$(( run_count + 1 ))
-    [[ $use_separator == true ]] && echo "--- [repeat_$ctrl_mode] Last run ($run_count) $run_comment, re-running in ${interval}s ---"
+    if $use_separator; then
+      $use_compact_separator || echo
+      echo "--- [repeat_every_$ctrl_mode] Last run (n°$run_count) $run_comment, re-running in ${interval}s ---"
+      $use_compact_separator || echo
+    fi
     sleep $interval
   done
 }
@@ -74,7 +84,13 @@ case "$(basename $0)" in
   repeat_until)
     repeat_every_impl "until" 1 "$@";;
   *)
-    2>&1 echo "This program doesn't know this alias"
+    2>&1 echo "Unknown binary alias, known ones:"
+    2>&1 echo "  repeat_every_while"
+    2>&1 echo "  repeat_every_until"
+    2>&1 echo "  repeat_while"
+    2>&1 echo "  repeat_until"
     exit 1
     ;;
 esac
+
+# vim:set sw=2:
