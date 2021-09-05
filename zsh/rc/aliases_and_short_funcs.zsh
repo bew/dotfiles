@@ -20,7 +20,7 @@ function zsh::utils::check_can_reload_or_exit
   fi
 }
 
-function reload_zsh::safe
+function zsh::safe_reload
 {
   zsh::utils::check_can_reload_or_exit "reload" || return
 
@@ -28,16 +28,23 @@ function reload_zsh::safe
   exec zsh
 }
 
-function exit_zsh::safe
+function zsh::safe_exit
 {
   zsh::utils::check_can_reload_or_exit "quit" || return
 
   exit
 }
 
-alias zshrc=reload_zsh::safe
-alias ":r"=reload_zsh::safe
-alias ":q"=exit_zsh::safe
+function zsh::nuke_exit
+{
+  # Ensures the shell cannot save history before quitting!
+  kill -9 $$
+}
+
+alias zshrc=zsh::safe_reload
+alias ":r"=zsh::safe_reload
+alias ":q"=zsh::safe_exit
+alias ":qqq"=zsh::nuke_exit
 
 # global redirection aliases
 
