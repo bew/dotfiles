@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "flakes": [
+    {
+      "from": {"type": "indirect", "id": "nixpkgs"},
+      "to": {
+        "type": "github",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "ref": "nixpkgs-unstable"
+      }
+    }
+  ]
+}

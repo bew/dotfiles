@@ -20,6 +20,11 @@ git clone git@github.com:bew/dotfiles.git ~/.config/dotfiles
 
 Check READMEs in nvim/ & zsh/
 
+### Home environment managed by Nix
+
+TODO: add bootstrap commands for home managed by Nix!
+
+
 ## git lfs
 
 Some big binaries are tracked using git-lfs, you'll need to install it in your environment, then ask it to install itself in your project's git config with:
