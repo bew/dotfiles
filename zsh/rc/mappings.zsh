@@ -748,6 +748,7 @@ bindkey -M vicmd 'l' zwidget::go-right_or_git-log::vicmd # fix git log in norma
 
 vibindkey 'b' zwidget::jump-previous-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
+vibindkey '$' end-of-line
 
 # Use Up/Down to get history with current cmd prefix..
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
