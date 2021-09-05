@@ -25,6 +25,7 @@ FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-a:toggle+down')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-space:toggle+down')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:select-all')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'change:top') # select best result on input change
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-^:beginning-of-line' --bind 'alt-$:end-of-line')
 
 FZF_BEW_LAYOUT_ARRAY=()
 FZF_BEW_LAYOUT_ARRAY+=(--height=40% --reverse --inline-info)
