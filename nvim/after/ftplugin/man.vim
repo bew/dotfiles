@@ -29,6 +29,11 @@ noremap <buffer> <Space> <C-d><C-d>
 noremap <buffer> <S-Space> <C-u><C-u>
 
 " Quit
-noremap <buffer> q :q<CR>
+" Always quit a man buffer with q (and its loc list if opened).
+" This is necessary to work in all cases
+" (when involked as manpager and when using :Man in existing vim session)
+" See: https://github.com/neovim/neovim/issues/15544
+nnoremap <buffer><silent> q <cmd>lclose <bar> q<cr>
+nnoremap <buffer><silent> <M-q> q
 
 let b:bew_statusline_comment = "o/2-clicks: open | M-o: split-open"
