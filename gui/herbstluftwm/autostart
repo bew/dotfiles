@@ -37,7 +37,33 @@ hc keybind $C-Pause   spawn ~/.bin/desktop--lock-and-sleep ~/.bin/i3colocker
 
 hc keybind $M-space   spawn ~/.bin/wezterm
 hc keybind $M-$S-space spawn urxvt
-hc keybind $M-x       spawn rofi -show drun
+
+# TODO: move these 'common' options to a script, to be usable anywhere!
+ROFI_OPTS_LIST=()
+ROFI_OPTS_LIST+=(-theme Paper)
+ROFI_OPTS_LIST+=(-matching fuzzy)
+ROFI_OPTS_LIST+=(-scroll-method '1') # 0: Per page, 1: continuous.
+ROFI_OPTS_LIST+=(-kb-row-down 'Alt+j')
+ROFI_OPTS_LIST+=(-kb-row-up 'Alt+k')
+ROFI_OPTS_LIST+=(-kb-move-word-forward 'Alt+w')
+ROFI_OPTS_LIST+=(-kb-clear-line 'Control+c')
+ROFI_OPTS_LIST+=(-kb-remove-word-back 'Control+w')
+ROFI_OPTS_LIST+=(-kb-mode-next 'Alt+Tab')
+# for these 2, the keybinding is already used, so we must disable it to use it for another action
+ROFI_OPTS_LIST+=(-kb-move-end 'Alt+dollar' -kb-custom-14 '')
+# FIXME: The keybind Alt+^ (dead_circumflex) doesn't work
+#        See https://github.com/davatorium/rofi/issues/1394
+# ROFI_OPTS_LIST+=(-kb-move-front 'Alt+dead_circumflex' -kb-custom-16 '')
+
+# FIXME: {w} is desktop name, {c} is class. => There's no vertical alignment, even when forcing it..
+#        See unresolved discussion at:
+#        https://app.element.io/#/room/#rofi:libera.chat/$dAieVXu7Qr6cjIBFZh4rqgWMqeNuWQeW3WJeywQbVdo
+# ROFI_OPTS_LIST+=(-window-format '{w:20}  [{c}]  {t}')
+
+# -drun-show-actions : show actions present in the Desktop files
+#                      (like New window / New private window for Firefox)
+hc keybind $M-x       spawn rofi -modi drun,window,run -show drun -drun-show-actions "${ROFI_OPTS_LIST[@]}"
+
 # TODO: need an (interactive) action menu for chains: M-x space, M-x f, M-x t
 # could also be used for window state (toggle on top, floating, ..)
 
