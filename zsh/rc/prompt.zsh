@@ -153,10 +153,27 @@ function segmt::python_venv
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
 }
 
+function segmt::in-nix-shell
+{
+  local shell_tag
+  if [[ -n "$IN_NIX_SHELL" ]]; then
+    # We are in a `nix-shell` or `nix develop` env.
+    shell_tag="nixsh"
+  elif [[ -n "$DEVSHELL_ROOT" ]]; then
+    # We are specifically in a Nix devshell (github:numtide/devshell).
+    shell_tag="devsh"
+  else
+    return
+  fi
+
+  echo -n "(%F{red}$shell_tag%f) "
+}
+
 function segmt::shlvl
 {
   [[ $SHLVL == 1 ]] && return
 
+  # e.g: "L3"
   echo -n "%BL%L%b"
 }
 
