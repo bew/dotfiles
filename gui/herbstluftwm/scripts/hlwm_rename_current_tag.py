@@ -9,34 +9,18 @@
 import os
 import sys; sys.path.append(os.path.dirname(__file__))  # noqa: E702
 
-from typing import Optional
-import subprocess
-
+import yad_utils as yad
 from hlwm import Hlwm
-
-
-def ask_text(prefill_text: Optional[str]) -> str:
-    cmd = [
-        "yad",
-        "--on-top",
-        "--center",
-        "--close-on-unfocus",
-        "--entry",
-    ]
-    if prefill_text:
-        cmd += ["--entry-text", prefill_text]
-    proc = subprocess.run(
-        args=cmd,
-        capture_output=True,
-        encoding="utf-8",
-    )
-    return proc.stdout.strip("\n")
 
 
 def main():
     focused_tag = Hlwm.get_focused_tag(monitor="")
 
-    new_tag_name = ask_text(prefill_text=focused_tag.name)
+    new_tag_name = yad.ask_text(
+        text="<big>Rename tag</big>",
+        input_label="Name:",
+        prefill_text=focused_tag.name,
+    )
     if not new_tag_name:
         print("Tag rename discarded, bye!")
         sys.exit(1)

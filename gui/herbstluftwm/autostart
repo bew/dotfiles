@@ -180,6 +180,8 @@ hc keybind $M-$S-z \
         , use_index +1 --skip-visible
 
 hc keybind $M-$A-r   spawn ~/.config/herbstluftwm/scripts/hlwm_rename_current_tag.py
+hc keybind $M-$A-a   spawn ~/.config/herbstluftwm/scripts/hlwm_add_tag.py
+hc keybind $M-$A-x   spawn ~/.config/herbstluftwm/scripts/hlwm_execute_hc.py
 
 # layouting
 

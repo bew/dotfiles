@@ -54,7 +54,7 @@ class Tag:
     UNKNOWN_STATE = TagState()
 
     @classmethod
-    def from_desc(cls, index, tag_desc):
+    def from_status_desc(cls, index, tag_desc):
         status_char = tag_desc[0]
         tag_name = tag_desc[1:]
         state = cls.STATE_FOR_STATUS_CHAR.get(status_char, cls.UNKNOWN_STATE)
