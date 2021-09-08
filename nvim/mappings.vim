@@ -244,9 +244,9 @@ cnoremap <M-BS> <C-w>
 nnoremap <M-$> g$
 nnoremap <M-^> g^
 " I: Move cursor to begin/end of line
-inoremap <M-$> <End>
+inoremap <M-$> <C-g>U<End>
 " FIXME: <M-^> is waiting on https://github.com/wez/wezterm/issues/877 to work...
-inoremap <M-^> <Home>
+inoremap <M-^> <C-g>U<Home>
 " TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
 
 " Insert a new line below using <cr>, useful in comments when `formatoptions`
