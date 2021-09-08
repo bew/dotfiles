@@ -9,8 +9,8 @@ local cfg = {}
 
 cfg.disable_default_key_bindings = true
 
-  -- NOTE: For bindings with mod SHIFT and a letter, the `key` field (the letter)
-  --       must be uppercase'd and the mods should NOT contain 'SHIFT'.
+-- NOTE: For bindings with mod SHIFT and a letter, the `key` field (the letter)
+--       must be uppercase'd and the mods should NOT contain 'SHIFT'.
 cfg.keys = {
   {mods = "SHIFT", key = "PageUp", action = wezterm.action{ScrollByPage = -1}},
   {mods = "SHIFT", key = "PageDown", action = wezterm.action{ScrollByPage = 1}},
