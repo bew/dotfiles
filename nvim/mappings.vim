@@ -322,8 +322,10 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
-" Select last inserted region
+" I: Select last inserted region
 nnoremap gV `[v`]
+" O: Operate on last inserted region
+onoremap gV <cmd>normal! `[v`]<cr>
 
 " mark position before search
 nnoremap / ms/
