@@ -336,7 +336,7 @@ Plug 'inkarkat/vim-AdvancedSorters'    " Sorting of certain areas or by special 
 
 Plug 'Yggdroot/indentLine'
 " Each indent level uses a distinct character (rotating)
-let g:indentLine_char_list = ($ASCII_ONLY == "1" ? ["|"] : ["│"])
+let g:indentLine_char_list = ($ASCII_ONLY != "" ? ["|"] : ["¦", "│"])
 let g:indentLine_bufTypeExclude = ["help", "terminal"]
 let g:indentLine_bufNameExclude = ["_.*", "NERD_tree.*"]
 let g:indentLine_fileTypeExclude = [
