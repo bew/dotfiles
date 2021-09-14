@@ -521,6 +521,13 @@ case "${1:-}" in
   --by-blocks)
     PrintAllBlocks
     ;;
+  --*)
+    >&2 echo
+    >&2 echo "!! ERROR: Unsupported option '$1'"
+    >&2 echo
+    help
+    exit 1
+    ;;
   *)
     echo "$1 -> $(UnicodePointToUtf8 "$1")"
     ;;
