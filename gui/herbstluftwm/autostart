@@ -164,6 +164,9 @@ hc keybind $M-$S-c   close
 #       does not support insertion (yet) I can't use the 'linear' use_index +1 -1.
 hc keybind $M-a   use_index -1 --skip-visible
 hc keybind $M-z   use_index +1 --skip-visible
+# Also bind Mod-{Left,Right}, because the touchpad gestures are bound to that.
+hc keybind $M-Left   use_index -1 --skip-visible
+hc keybind $M-Right  use_index +1 --skip-visible
 
 # Move current tag to the left/right
 hc keybind $M-$C-a  attr tags.focus.index -=1
