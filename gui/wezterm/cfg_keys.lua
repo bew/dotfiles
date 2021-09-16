@@ -19,6 +19,8 @@ cfg.keys = {
   {mods = "CTRL", key = "R", action = "ReloadConfiguration"}, -- Ctrl-Shift-r
   {mods = "CTRL", key = "L", action = wezterm.action{ClearScrollback = "ScrollbackAndViewport"}}, -- Ctrl-Shift-l
   {mods = "CTRL", key = "F", action = wezterm.action{Search = {CaseInSensitiveString = ""}}}, -- Ctrl-Shift-f
+  {mods = "CTRL|SHIFT", key = " ", action = "QuickSelect"},
+  {mods = "CTRL", key = "D", action = "ShowDebugOverlay"},
 
   -- Copy (to Clipboard) / Paste (from Clipboard or PrimarySelection)
   {mods = "CTRL", key = "C", action = wezterm.action{CopyTo = "Clipboard"}}, -- Ctrl-Shift-c
