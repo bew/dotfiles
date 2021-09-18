@@ -750,6 +750,9 @@ vibindkey 'b' zwidget::jump-previous-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
 vibindkey '$' end-of-line
 
+# Alt- to undo (from anywhere)
+vibindkey 'u' undo
+
 # Use Up/Down to get history with current cmd prefix..
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
