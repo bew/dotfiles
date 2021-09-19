@@ -1,9 +1,17 @@
 local wezterm = require "wezterm"
 local act = wezterm.action
 
-function action_callback(event_id, func)
-  wezterm.on(event_id, func)
-  return wezterm.action{EmitEvent=event_id}
+-- NOTE: always use wezterm.action_callback when it's in a release version!!
+-- PR (by me!): https://github.com/wez/wezterm/pull/1151
+local function act_callback(event_id, callback)
+  if wezterm.action_callback then
+    wezterm.log_info(">> wezterm.action_callback is available for this version, use it!")
+    return wezterm.action_callback(callback)
+  else
+    wezterm.log_info(">> wezterm.action_callback is NOT available for this version, fallback to manual setup..")
+    wezterm.on(event_id, callback)
+    return wezterm.action{EmitEvent=event_id}
+  end
 end
 
 local cfg = {}
@@ -51,7 +59,7 @@ cfg.keys = {
 
   ---- custom events
 
-  {mods = "CTRL|SHIFT", key = "g", action = action_callback("my-toggle-ligature", function(win, _)
+  {mods = "CTRL|SHIFT", key = "g", action = act_callback("toggle-ligatures", function(win, _)
     local overrides = win:get_config_overrides() or {}
     if not overrides.harfbuzz_features then
       -- If we haven't overriden it yet, then override with ligatures disabled
@@ -61,7 +69,7 @@ cfg.keys = {
       overrides.harfbuzz_features = nil
     end
     win:set_config_overrides(overrides)
-  end)}
+  end)},
 }
 
 
