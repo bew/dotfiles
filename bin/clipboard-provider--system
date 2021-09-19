@@ -7,16 +7,15 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-# Clipboard provider for the system clipboard. It selects the appropriate provider
-# based on support & arbitrary availability order.
+# Clipboard provider for the system clipboard.
+# It selects the best clipboard provider based on the current environment.
 
-# TODO: Add rules to enable osc52 only for terminals supporting it
-#       and fallback to xclip if available.
-# => Can take inspiration from $VIMRUNTIME/autoload/provider/clipboard.vim
-
-copy_provider=xclip
-if [[ -n ${WEZTERM_PANE:-} ]]; then
+if [[ -n ${SSH_TTY:-} ]]; then
+  # We are under SSH, we NEED osc52 to set system's clipboard
   copy_provider=osc52
+else
+  # We are local, use xclip!
+  copy_provider=xclip
 fi
 
 action="$1"

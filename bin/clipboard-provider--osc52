@@ -22,22 +22,27 @@
 # printf "\033]52;c;Y29weXBhc3RhIQ==\e\\\n"
 # The string 'copypasta!' should appear in your system clipboard (set from your terminal).
 #
-# NOTE: if you are inside tmux, you will need to add 'set-option -g set-clipboard on'
-# to your tmux config to ensure the escape sequence is forwarded to the actual terminal.
-# FIXME: is it really necessary? doesn't that option sets system clipboard everytime a tmux copy buffer is set? (which may NOT be wanted)
-
 # Initial inspiration from: https://seankhliao.com/blog/12020-05-14-osc-52/
+#
+# NOTE: if inside tmux, apply 'tmux set-option -g set-clipboard off'
+# to ensure the escape sequence is forwarded to the actual terminal.
 
-# We use CLIPBOARD_REQUESTOR_PID, set by cli-clipboard-provider main script or default
-# to PPID if we've been called directly.
+# --- Find the TTY to send the osc52 sequence to:
+
+# > When through ssh, the most reliable tty is `$SSH_TTY`
+# (from https://www.freecodecamp.org/news/tmux-in-practice-integration-with-system-clipboard-bcd72c62ff7b/)
+: ${CLIPBOARD_REQUESTOR_TTY:=${SSH_TTY:-}}
+
+
+# > When not through ssh, fallback to finding the current tty.
+# Neovim requires to go through the /proc/ magic, see https://github.com/neovim/neovim/issues/8450#issuecomment-407063983.
+# The main cli-clipboard-provider script sets CLIPBOARD_REQUESTOR_PID,
+# use it or fallback to PPID if called directly.
 : ${CLIPBOARD_REQUESTOR_PID:=$PPID}
-# Needed for neovim, see https://github.com/neovim/neovim/issues/8450#issuecomment-407063983
 : ${CLIPBOARD_REQUESTOR_TTY:=`(tty || readlink /proc/$CLIPBOARD_REQUESTOR_PID/fd/0) 2>/dev/null | grep /dev/`}
-# FIXME: doing `echo foobar | clipboard-provider--osc52` in a shell doesn't work,
-#   because `echo foobar | tty` says `not a tty`
-#   => How to fix that ?!
-#   NOTE: I asked on Wezterm Matrix channel, and based on the issue mentioned above, @wez replied
-#   basically the same thing as what I aliready have here.
+
+# --- End of find TTY
+
 
 function do_copy
 {
