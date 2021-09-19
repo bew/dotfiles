@@ -150,7 +150,7 @@ syntax enable " Not 'syntax on' which overrides colorscheme
 " directory.
 set undofile
 set swapfile
-let swap_undo_dir = $HOME . "/.nvim/swap_undo"
+let swap_undo_dir = $HOME . "/.cache/nvim/swap_undo"
 let &directory = swap_undo_dir . "/swapfiles//"
 let &undodir = swap_undo_dir . "/undofiles//"
 " Ensures the directofies exists!
