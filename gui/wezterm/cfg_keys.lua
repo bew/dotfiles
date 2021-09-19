@@ -14,6 +14,14 @@ local function act_callback(event_id, callback)
   end
 end
 
+-- IDEA: A better action syntax, see: https://github.com/wez/wezterm/issues/1150
+
+-- IDEA: helper for keybind definition
+local function keybind(mods, key, action)
+  return {mods = mods, key = key, action = action}
+end
+local ctrl_shift = "CTRL|SHIFT"
+
 local cfg = {}
 
 cfg.disable_default_key_bindings = true
@@ -25,41 +33,41 @@ cfg.disable_default_key_bindings = true
 --   and key should be the shifted key that is going to reach the terminal.
 --   (based on the keyboard-layout)
 cfg.keys = {
-  {mods = "SHIFT", key = "PageUp", action = act{ScrollByPage = -1}},
-  {mods = "SHIFT", key = "PageDown", action = act{ScrollByPage = 1}},
+  keybind("SHIFT", "PageUp", act{ScrollByPage = -1}),
+  keybind("SHIFT", "PageDown", act{ScrollByPage = 1}),
 
   -- Wezterm features
-  {mods = "CTRL|SHIFT", key = "r", action = "ReloadConfiguration"},
-  {mods = "CTRL|SHIFT", key = "l", action = act{ClearScrollback = "ScrollbackAndViewport"}},
-  {mods = "CTRL|SHIFT", key = "f", action = act{Search = {CaseInSensitiveString = ""}}},
-  {mods = "CTRL|SHIFT", key = " ", action = "QuickSelect"},
-  {mods = "CTRL|ALT",   key = " ", action = "QuickSelect"}, -- note: eats a valid terminal keybind
-  {mods = "CTRL|SHIFT", key = "d", action = "ShowDebugOverlay"}, -- note: it's not a full Lua interpreter
+  keybind(ctrl_shift, "r", "ReloadConfiguration"),
+  keybind(ctrl_shift, "l", act{ClearScrollback = "ScrollbackAndViewport"}),
+  keybind(ctrl_shift, "f", act{Search = {CaseInSensitiveString = ""}}),
+  keybind(ctrl_shift, " ", "QuickSelect"),
+  keybind("CTRL|ALT", " ", "QuickSelect"), -- note: eats a valid terminal keybind
+  keybind(ctrl_shift, "d", "ShowDebugOverlay"), -- note: it's not a full Lua interpreter
 
   -- Copy/Paste to/from Clipboard
-  {mods = "CTRL|SHIFT", key = "c", action = act{CopyTo = "Clipboard"}},
-  {mods = "CTRL|SHIFT", key = "v", action = act{PasteFrom = "Clipboard"}},
+  keybind(ctrl_shift, "c", act{CopyTo = "Clipboard"}),
+  keybind(ctrl_shift, "v", act{PasteFrom = "Clipboard"}),
   -- Paste from PrimarySelection (Copy is done by selection)
-  {mods = "SHIFT",    key = "Insert", action = act{PasteFrom = "PrimarySelection"}},
-  {mods = "CTRL|ALT", key = "v",      action = act{PasteFrom = "PrimarySelection"}},
+  keybind("SHIFT",    "Insert", act{PasteFrom = "PrimarySelection"}),
+  keybind("CTRL|ALT", "v",      act{PasteFrom = "PrimarySelection"}),
   -- NOTE: the last one eats a valid terminal keybind
 
   -- Tabs
-  {mods = "CTRL|SHIFT", key = "t", action = act{SpawnTab="DefaultDomain"}},
-  {mods = "CTRL",       key = "Tab", action = act{ActivateTabRelative=1}},
-  {mods = "CTRL|SHIFT", key = "Tab", action = act{ActivateTabRelative=-1}},
-  {mods = "CTRL|SHIFT", key = "w", action = act{CloseCurrentTab={confirm=false}}},
+  keybind(ctrl_shift, "t", act{SpawnTab="DefaultDomain"}),
+  keybind("CTRL",     "Tab", act{ActivateTabRelative=1}),
+  keybind(ctrl_shift, "Tab", act{ActivateTabRelative=-1}),
+  keybind(ctrl_shift, "w", act{CloseCurrentTab={confirm=false}}),
 
-  {mods = "CTRL|SHIFT", key = "x", action = "ShowLauncher"},
+  keybind(ctrl_shift, "x", "ShowLauncher"),
 
   -- Font size
-  {mods = "CTRL", key = "0", action = "ResetFontSize"}, -- Ctrl-Shift-0
-  {mods = "CTRL", key = "6", action = "DecreaseFontSize"}, -- Ctrl-Shift-- (key with -)
-  {mods = "CTRL", key = "+", action = "IncreaseFontSize"}, -- Ctrl-Shift-+ (key with =)
+  keybind("CTRL", "0", "ResetFontSize"), -- Ctrl-Shift-0
+  keybind("CTRL", "+", "IncreaseFontSize"), -- Ctrl-Shift-+
+  keybind("CTRL", "6", "DecreaseFontSize"), -- Ctrl-Shift-- (key with -)
 
   ---- custom events
 
-  {mods = "CTRL|SHIFT", key = "g", action = act_callback("toggle-ligatures", function(win, _)
+  keybind(ctrl_shift, "g", act_callback("toggle-ligatures", function(win, _)
     local overrides = win:get_config_overrides() or {}
     if not overrides.harfbuzz_features then
       -- If we haven't overriden it yet, then override with ligatures disabled
@@ -69,7 +77,7 @@ cfg.keys = {
       overrides.harfbuzz_features = nil
     end
     win:set_config_overrides(overrides)
-  end)},
+  end)),
 }
 
 
