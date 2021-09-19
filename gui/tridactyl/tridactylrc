@@ -31,9 +31,9 @@ command reload_my_config composite \
     fillcmdline_tmp 5000 Starting config reload...... (takes ~15s seconds) \
     | source \
     | fillcmdline_tmp 1000 Config reloaded!
-bind <CA-r> reload_my_config
-bind --mode=ignore <CA-r> reload_my_config
-bind --mode=insert <CA-r> reload_my_config
+bind <C-R> reload_my_config
+bind --mode=ignore <C-R> reload_my_config
+bind --mode=insert <C-R> reload_my_config
 
 # Get back C-a to select all text!
 unbind <C-a>
