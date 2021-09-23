@@ -80,6 +80,10 @@ alias ipy="ipython --no-confirm-exit"
 alias com=command
 alias j=jobs
 
+# Always use tmux in 256 colors and force UTF-8
+alias tmux="tmux -2 -u"
+alias tx="tmux"
+
 alias hc=herbstclient
 
 # Big-one letter aliases
