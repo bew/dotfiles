@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# NOTE: DOES NOT WORK :(
+# NOTE: CANNOT WORK :(
+#   SNIIF...
+
+# The goal of this script is to control the scrollback's scroll by hiding more or showing more the
+# scrollback.
+# This is similar to the common Ctrl-L keybind for clear, which effectively hides the whole
+# scrollback, but this time in a more flexible way by allowing you to revert the action, or only
+# re-hide/show the scrollback partially.
+#
+# Example:
+# : Run `tree` in a medium-sized folder
+# => It takes wayy too much space, I don't like when the prompt is at the bottom..
+# : Clear everything with Ctrl-L
+# => But I wanted to see the end of the command!
+#    Ok I could rerun with `tree | tail`... but why re-execute a command that takes some time??..
+#    or, I can just scroll up with the mouse or with a keybind!
+# => BUT as soon as I start typing, I'm back to the cleared screen
+#    and can't see the end of the `tree` output..
+# => What if I could revert the Ctrl-L action.. or only show again the last few lines, and still be
+#    able to type my next command while looking at those lines?
+#
+# This script is the answer! (OR NOT :/...)
+#
+# -------------------------------------------------------------------------
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# It actually DOES NOT WORK :( :(
+# When I try to scroll down to reveal the scrollback
+# --> Well... the scrollback is not revealed, and blank lines are used instead :(
+#
+
+
+# https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_(Control_Sequence_Introducer)_sequences
+CSI=$'\e['
+
+if [[ $# == 0 ]] || ! [[ -e $1 ]]; then
+  >&2 echo "Usage: $(basename $0) </path/to/tty>"
+  exit 1
+fi
+
+TTY=$1
+
+function scroll_up
+{
+  local by_lines="${1:-1}"
+  printf "%s" "${CSI}${by_lines}S" >$TTY # scroll scrollback up
+  printf "%s" "${CSI}${by_lines}A" >$TTY # move cursor up
+}
+
+function scroll_down
+{
+  local by_lines="${1:-1}"
+  printf "%s" "${CSI}${by_lines}T" >$TTY # scroll scrollback down
+  printf "%s" "${CSI}${by_lines}B" >$TTY # move cursor down
+}
+
+function report_cursor_position
+{
+  # Ask the terminal to report cursor position:
+  printf "%s" "${CSI}6n" >$TTY
+
+  # The terminal replies with: `ESC[r;cR`
+  # => where r is the row and c is the column
+  local row col
+  # IFS='[;'    - config separators for read splitting
+  # -d R        - Read until `R` (inclusive)
+  # -rs         - raw input, silent mode
+  # _ row col   - Store the result (with IFS splitting) to
+  #               variables `_` (discard initial ESC), `row`, and `col`.
+  # Simplified from: https://stackoverflow.com/a/52944692
+  IFS='[;' read -d R -rs _ row col <$TTY
+  INITIAL_CURSOR_ROW="$row"
+  INITIAL_CURSOR_COL="$col"
+}
+
+report_cursor_position
+
+if (( INITIAL_CURSOR_ROW <= 4 )); then
+  TERMINAL_ROWS=$(tput lines <$TTY)
+  scroll_down $(( TERMINAL_ROWS - 5 ))
+else
+  scroll_up 5
+fi
