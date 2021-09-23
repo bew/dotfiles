@@ -338,6 +338,11 @@ alias fr:def='trans fr: -d'
 
 alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
 
+# Media cool stuff
+# NOTE: chafa without custom options is really great on its own!
+alias chafa::braille="chafa -c 256 --fg-only --symbols braille"
+alias chafa::braille::small="chafa::braille --size 70x70"
+
 # Hacks
 
 # 'pezop' is a firefox profile, where the browser language is in french, to
