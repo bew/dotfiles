@@ -92,8 +92,8 @@ function zwidget::force-scroll-window
   # Don't attempt to scroll in a tty
   [ "$TERM" = "linux" ] && return
 
-  echo -n $'\e[4S' # Scroll the terminal
-  echo -n $'\e[4A' # Move the cursor back up
+  printf "%s" $'\e[7S' >/dev/tty # Scroll the terminal up
+  printf "%s" $'\e[7A' >/dev/tty # Move the cursor up
 
   zle redisplay
 }
