@@ -34,6 +34,10 @@ final: prev:
       p.watchexec
 
       p.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
+      p.gron # to have grep-able json <3
+
+      p.chafa # crazy cool img/gif terminal viewer
+      # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
 
       # Nix tools
       p.nix-tree # TUI to browse the dependencies of a derivation
