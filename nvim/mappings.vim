@@ -133,6 +133,12 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+" Also bind with Alt, so I have a way to _always_ move to windows, even when tmux's repeat is active
+" (when repeat-mode is active, <C-{h,j,k,l}> keybinds are eaten and used by tmux).
+nnoremap <C-M-h> <C-w>h
+nnoremap <C-M-j> <C-w>j
+nnoremap <C-M-k> <C-w>k
+nnoremap <C-M-l> <C-w>l
 
 " When mapping <C-j> has no effect
 " nmap <cr> <C-j>
@@ -245,9 +251,11 @@ nnoremap <M-$> g$
 nnoremap <M-^> g^
 " I: Move cursor to begin/end of line
 inoremap <M-$> <C-g>U<End>
-" FIXME: <M-^> is waiting on https://github.com/wez/wezterm/issues/877 to work...
+" FIXME: <M-^> is waiting on https://github.com/wez/wezterm/issues/877 to work instantly...
+" FIXME: <Home> moves like 0 not like ^
 inoremap <M-^> <C-g>U<Home>
 " TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
+" TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line!
 
 " Insert a new line below using <cr>, useful in comments when `formatoptions`
 " has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
