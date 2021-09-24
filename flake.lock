@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1630076227,
-        "narHash": "sha256-p3YdtqSPLnMudWsLMgd6XMEhQKB2oz1hvDkHtOlz5/Q=",
+        "lastModified": 1631573611,
+        "narHash": "sha256-u2E/wstadWNcn6vOIoK1xY86QPOzzBZQfT1FbePfdaI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f5adb9be829f487f99bcc0f1884f74ddb85f70c8",
+        "rev": "7d9ba15214004c979d2c8733f8be12ce6502cf8a",
         "type": "github"
       },
       "original": {
@@ -23,11 +23,11 @@
     },
     "nixpkgsBackbone": {
       "locked": {
-        "lastModified": 1630845541,
-        "narHash": "sha256-DKj/0V+NNJe3sgRAZFb4yYFZFH0gXD1qNU8xiI87+GA=",
+        "lastModified": 1632418649,
+        "narHash": "sha256-4rZspkiQU7zbsuciRRMgoEPkAF/+FSv2jx/VIPxPVx4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "1e5c35dfbc8e0ad8c35aa1a6446f442ca1ec5234",
+        "rev": "056a3c1fae30d06d14b171b9023743c21a23ec1a",
         "type": "github"
       },
       "original": {
@@ -39,11 +39,11 @@
     },
     "nixpkgsStable": {
       "locked": {
-        "lastModified": 1630845541,
-        "narHash": "sha256-DKj/0V+NNJe3sgRAZFb4yYFZFH0gXD1qNU8xiI87+GA=",
+        "lastModified": 1632418649,
+        "narHash": "sha256-4rZspkiQU7zbsuciRRMgoEPkAF/+FSv2jx/VIPxPVx4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "1e5c35dfbc8e0ad8c35aa1a6446f442ca1ec5234",
+        "rev": "056a3c1fae30d06d14b171b9023743c21a23ec1a",
         "type": "github"
       },
       "original": {
@@ -55,11 +55,11 @@
     },
     "nixpkgsUnstable": {
       "locked": {
-        "lastModified": 1630140382,
-        "narHash": "sha256-ntXepAHFlAEtaYIU5EzckRUODeeMgpu1u2Yug+4LFNc=",
+        "lastModified": 1632146492,
+        "narHash": "sha256-+5LSb1alIWujWwFUZ2Juv1U9owBidLDONsz/T7ydDIY=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "08ef0f28e3a41424b92ba1d203de64257a9fca6a",
+        "rev": "1a56d76d718afb6c47dd96602c915b6d23f7c45d",
         "type": "github"
       },
       "original": {
