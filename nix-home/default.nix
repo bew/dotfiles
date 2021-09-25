@@ -1,6 +1,12 @@
 { lib, ... }:
 
 {
+  imports = [
+    # NOTE: I'l need to split more! (editor, shell, desktop, ....)
+    ./cli.nix
+    ./gui.nix
+  ];
+
   # FIXME: uncomment when I'm in a release/channel!
   # meta.maintainers = [lib.maintainers.bew];
 
