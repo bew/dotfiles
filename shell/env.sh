@@ -46,6 +46,7 @@ path_maybe_add_entry "/usr/local/bin" fallback
 # -R : Output raw ANSI "color" escape sequences directly
 # -+X (Disables the `-X` option) : Send alt-screen term init sequence if necessary
 export LESS="-R -+X"
+export LESSKEYIN=~/.dot/lesskey-bew
 
 export PAGER="most"
 export MANPAGER='nvim -R +Man!' # man in vim!

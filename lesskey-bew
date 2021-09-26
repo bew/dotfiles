@@ -1,0 +1,44 @@
+# Configuration file for keys for the `less` program.
+# It must be compiled with `lesskey -o ./some-output.bin -- ./this-file`
+# And used like `less --lesskey ./some-output.bin ...`
+# See `man lesskey` for more details.
+# vim:set ft=conf:
+
+# NOTE on how to use `noaction` to give argument to command.
+# For example: There is no command that scrolls one character left or right.
+# In less program, typing 1 then a key that does {left,right}-scroll would scroll by 1.
+# But we can't directly set a binding for a command with an argument in lesskey file.
+# To bypass this, we can set a binding to run a no-op command, then parse more keys.
+# So run the `noaction` command, then parse a key sequence that runs the scroll
+# command with the desired arguments.
+# Ref: https://unix.stackexchange.com/a/59194/159811
+
+# --- Define new command keys under the following line:
+#command
+
+# Use HJKL to move around by half-a-page
+J forw-screen
+K back-screen
+H left-scroll
+L right-scroll
+
+# Use hjkl to move around 1-by-1
+j forw-line
+k back-line
+# See note on how to use `noaction` like this at the top
+h noaction 1H
+l noaction 1L
+
+# Disable search highlight
+§ undo-hilite
+
+# Restore help binding
+\eh help
+:h  help
+
+
+# --- Defines new line-editing keys under the following line:
+#line-edit
+
+# Escape to abort line editing
+\e abort
