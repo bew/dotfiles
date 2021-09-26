@@ -507,6 +507,22 @@ let g:which_key_map.c.c.i = "invert"
 " Currently my main usage is with jedi-vim, which I configure manually
 " when a python buffer opens.
 " NOTE: I don't know how to set a which_key_map for a single buffer
+nmap <leader>c²   <Plug>(lcn-menu)
+nmap <leader>cd   <Plug>(lcn-definition)
+nmap <leader>ct   <Plug>(lcn-type-definition)
+nmap <leader>cu   <Plug>(lcn-references)
+nmap <leader>cr   <Plug>(lcn-rename)
+nmap <leader>ca   <Plug>(lcn-code-action)
+nmap <leader>ci   <Plug>(lcn-implementation)
+nmap <leader>ch   <Plug>(lcn-hover)
+let g:which_key_map.c["²"] = "lang menu"
+let g:which_key_map.c.d = "lang goto def"
+let g:which_key_map.c.t = "lang goto type"
+let g:which_key_map.c.u = "lang references"
+let g:which_key_map.c.r = "lang rename"
+let g:which_key_map.c.a = "lang code actions"
+let g:which_key_map.c.i = "lang implementation"
+let g:which_key_map.c.h = "lang hover info"
 
 " TODO: Setup virtual keys for language tools/actions (with default msg),
 "   and enable for python (jedi) and when the language client is active
