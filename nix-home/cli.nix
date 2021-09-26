@@ -20,7 +20,7 @@ in {
 
     # When these are enabled, they can't find the terminfo of my arch terminal (urxvt) :/
     # stable.htop
-    # stable.less
+    bleedingedge.less # NOTE: need at least v283 to support LESSKEYIN env var
     # stable.tmux
     # stable.ncdu
 
