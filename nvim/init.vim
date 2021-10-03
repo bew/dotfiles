@@ -554,6 +554,9 @@ Plug 'tbastos/vim-lua'
 "       the option at all to keep it disabled.
 let g:lua_syntax_nofold = 1  " Disable auto code folding
 
+"# Toml
+Plug 'cespare/vim-toml'
+
 " tmux panes completion for deoplete <3 <3 <3
 " see deoplete config!
 Plug 'wellle/tmux-complete.vim'
