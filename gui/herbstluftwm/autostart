@@ -241,6 +241,13 @@ hc keybind $M-Tab      cycle_all +1   # FIXME: I want to select the LAST window.
 hc keybind $M-$S-Tab   cycle_all -1
 hc keybind $M-c   cycle
 hc keybind $M-u   jumpto urgent
+# Cycle through floating clients only.
+# -> Setting tags.focus.floating_focused to true switches to the floating layer and selects the first client.
+# -> `cycle` cycles through the floating layer if it is focused.
+hc keybind $M-$C-f                                        \
+  or , and . compare tags.focus.floating_focused = false  \
+           . attr tags.focus.floating_focused true        \
+     , cycle
 
 # theme
 
