@@ -43,17 +43,18 @@ ROFI_OPTS_LIST=()
 ROFI_OPTS_LIST+=(-theme Paper)
 ROFI_OPTS_LIST+=(-matching fuzzy)
 ROFI_OPTS_LIST+=(-scroll-method '1') # 0: Per page, 1: continuous.
-ROFI_OPTS_LIST+=(-kb-row-down 'Alt+j')
-ROFI_OPTS_LIST+=(-kb-row-up 'Alt+k')
+ROFI_OPTS_LIST+=(-kb-row-down 'Alt+j,Down')
+ROFI_OPTS_LIST+=(-kb-row-up 'Alt+k,Up')
 ROFI_OPTS_LIST+=(-kb-move-word-forward 'Alt+w')
 ROFI_OPTS_LIST+=(-kb-clear-line 'Control+c')
 ROFI_OPTS_LIST+=(-kb-remove-word-back 'Control+w')
 ROFI_OPTS_LIST+=(-kb-mode-next 'Alt+Tab')
 # for these 2, the keybinding is already used, so we must disable it to use it for another action
-ROFI_OPTS_LIST+=(-kb-move-end 'Alt+dollar' -kb-custom-14 '')
+ROFI_OPTS_LIST+=(-kb-move-end 'Alt+dollar,Alt+End' -kb-custom-14 '')
 # FIXME: The keybind Alt+^ (dead_circumflex) doesn't work
 #        See https://github.com/davatorium/rofi/issues/1394
 # ROFI_OPTS_LIST+=(-kb-move-front 'Alt+dead_circumflex' -kb-custom-16 '')
+ROFI_OPTS_LIST+=(-kb-move-front 'Alt+Home' -kb-custom-16 '')
 
 # FIXME: {w} is desktop name, {c} is class. => There's no vertical alignment, even when forcing it..
 #        See unresolved discussion at:
