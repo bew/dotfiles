@@ -12,6 +12,10 @@
 # So run the `noaction` command, then parse a key sequence that runs the scroll
 # command with the desired arguments.
 # Ref: https://unix.stackexchange.com/a/59194/159811
+#
+# NOTE: A number then an action (like scroll-left) changes the action-count for the rest of the program execution.
+# So to have a key that moves by 1 and a key that moves by 40, I need to change the action-count each time.
+# Ref: https://github.com/gwsw/less/issues/205
 
 # --- Define new command keys under the following line:
 #command
@@ -19,15 +23,15 @@
 # Use HJKL to move around by half-a-page
 J forw-screen
 K back-screen
-H left-scroll
-L right-scroll
+H noaction 40\e(
+L noaction 40\e)
 
 # Use hjkl to move around 1-by-1
 j forw-line
 k back-line
 # See note on how to use `noaction` like this at the top
-h noaction 1H
-l noaction 1L
+h noaction 1\e(
+l noaction 1\e)
 
 # Disable search highlight
 § undo-hilite
@@ -41,4 +45,6 @@ l noaction 1L
 #line-edit
 
 # Escape to abort line editing
-\e abort
+# \e abort
+# FIXME: Does not work, and breaks the hlHL bindings above for some reason
+# Ref: https://github.com/gwsw/less/issues/205#issuecomment-935613979
