@@ -18,7 +18,7 @@ in {
       type = types.bool;
       default = cfg.linkToHome.directory != null;
       description = ''
-        When enabled, store symlinks to all inputs in `flakeInputs.toHomeDirectory` directory.
+        When enabled, store symlinks to all inputs in `flakeInputs.linkToHome.directory` folder.
       '';
     };
     flakeInputs.linkToHome.directory = mkOption {
