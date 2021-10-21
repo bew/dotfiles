@@ -527,6 +527,10 @@ let g:which_key_map.c.h = "lang hover info"
 " TODO: Setup virtual keys for language tools/actions (with default msg),
 "   and enable for python (jedi) and when the language client is active
 
+" code/content context (using context.vim plugin)
+nmap <Leader>cx   <cmd>ContextPeek<cr>
+let g:which_key_map.c.x = "context peek (until move)"
+
 " -- Quickfix / Location lists
 let g:which_key_map["!"] = {"name": "+qf-loc-list"}
 nmap <leader>!c   <cmd>lclose \| copen<cr>
