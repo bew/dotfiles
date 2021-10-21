@@ -223,11 +223,11 @@ endsnippet
 # other 'rtype' snippet, used for reveal_type when the cursor is NOT at BOL
 priority 10
 snippet rtype "reveal_type" b
-reveal_type(${1:${VISUAL:expr}})  # noqa
+reveal_type(${0:${VISUAL:expr}})  # noqa
 endsnippet
 priority 0
 snippet rtype "reveal_type (in expr)" w
-reveal_type(${1:${VISUAL:expr}})
+reveal_type(${0:${VISUAL:expr}})
 endsnippet
 
 # vim:ft=snippets:
