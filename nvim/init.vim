@@ -93,6 +93,10 @@ let g:sandwich#recipes += [
     \   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['(']},
     \ ]
 
+" Indent-based text object <3
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'   " textobj: ii ai iI aI
+
 " Diagnostic provider agnostic signs config
 let s:code_diagnostic_cfg = {}
 let s:code_diagnostic_cfg.virt_text_prefix = "  <<  "
