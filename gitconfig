@@ -46,11 +46,17 @@
   s = status --ignore-submodules=all
   suf = status --untracked-files
 
-  # log
-  pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d%C(reset)%n          %C(white)%s%C(reset)   %C(dim magenta)by %an%C(reset)%n'
+  # log (minimal)
+  pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=tformat:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n'
   ll = pretty-log
   la = pretty-log --all
   lo = pretty-log --oneline
+
+  # log (verbose)
+  # (basically same as: pretty-log + the commit body & notes if available)
+  pretty-log-verbose = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n%+b%+N'
+  llv = pretty-log-verbose
+  lav = pretty-log-verbose --all
 
   # diff
   d = diff
