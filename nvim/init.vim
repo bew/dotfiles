@@ -299,6 +299,11 @@ augroup my_git_signs_hi
   au ColorScheme * hi link GitGutterDelete SignVcsDelete
 augroup END
 
+Plug 'wellle/context.vim'              " show the context of the currently visible buffer contents
+let g:context_enabled = v:false " we enable it only when needed
+" Do not use hard redraws (See: https://github.com/wellle/context.vim/issues/23)
+let g:context_nvim_no_redraw = v:true " necessary when g:context_presenter is 'nvim-float'
+
 " -- Insert mode helpers
 
 Plug 'Raimondi/delimitMate'      " auto insert of second ()''{}[]\"\" etc...
