@@ -51,6 +51,32 @@ def ${10:function_name}(self) -> ${20:Any}:
 	${30:${VISUAL:pass}}
 endsnippet
 
+snippet deft "test function" b
+def test_${10:something_is_working}($20):
+	${30:${VISUAL:pass}}
+endsnippet
+
+snippet deftu "pytest unit test function" b
+@pytest.mark.unit
+def test_${10:something_is_working}($20):
+	${30:${VISUAL:pass}}
+endsnippet
+
+snippet deftx "pytest fixture function" b
+@pytest.fixture${1:(scope="${2:function}"${3:, autouse=True})}
+def ${10:some_prefilled_obj}($20) -> ${30:Any}:
+	${40:${VISUAL:pass}}
+endsnippet
+
+snippet pytp "pytest parametrize test decorator" b
+@pytest.mark.parametrize(
+	"${10:param1,param2}",
+	[
+		(${20:value1, value2}),$0
+	]
+)
+endsnippet
+
 # decorators
 
 snippet @data "@dataclass" b
@@ -144,8 +170,12 @@ snippet p "print(...)" b
 print(${1:${VISUAL}})
 endsnippet
 
+snippet pf "print(f-string...)" b
+print(f"${1:${VISUAL}}"$2)
+endsnippet
+
 snippet pp "pprint(...)" b
-from pprint import pprint; pprint(${1:${VISUAL}})  # noqa: E702
+from pprint import pprint; pprint(${1:${VISUAL}})  # noqa: E702 E402 E501
 endsnippet
 
 snippet f "f format str" w
@@ -162,6 +192,10 @@ endsnippet
 
 snippet opt "Optional[...]"
 Optional[${1:${VISUAL:SomeType}}]
+endsnippet
+
+snippet optn "Optional[...] = None"
+Optional[${1:${VISUAL:SomeType}}] = None
 endsnippet
 
 snippet ld "lambda"
