@@ -748,6 +748,7 @@ bindkey -M vicmd 'l' zwidget::go-right_or_git-log::vicmd # fix git log in norma
 
 vibindkey 'b' zwidget::jump-previous-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
+vibindkey '^' beginning-of-line
 vibindkey '$' end-of-line
 
 # Alt- to undo (from anywhere)
