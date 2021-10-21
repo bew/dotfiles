@@ -30,6 +30,7 @@ in {
 
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
     stable.gron # to have grep-able json <3
+    stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
 
     bleedingedge.chafa # crazy cool img/gif terminal viewer
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
