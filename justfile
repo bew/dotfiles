@@ -3,8 +3,8 @@ _default:
 
 _build-only *ARGS:
   #!/usr/bin/env bash
-  set -euo pipefail
-  cd "{{justfile_directory()}}"
+  set -e
+  cd "{{ justfile_directory() }}"
   nix build .#homeConfig.activationPackage {{ ARGS }}
   echo
   echo "Home config successfully build!"
@@ -14,24 +14,23 @@ _build-only *ARGS:
 build-and-diff *ARGS: (_build-only ARGS)
   #!/usr/bin/env bash
   set -euo pipefail
-  cd "{{justfile_directory()}}"
 
-  DIFF_FILE="{{justfile_directory()}}/.nix-lastBuild-homeDiff.txt"
-  # NOTE: `nix-env -q --out-path home-manager-path`
-  # looks like `home-manager-path /nix/store/...`
-  CURRENT_HOME_MANAGER_PATH="$(nix-env -q --out-path home-manager-path | awk '{ print $2 }')"
+  cd "{{ justfile_directory() }}"
+
+  # NOTE: `nix-env -q --out-path home-manager-path`'s output
+  #       looks like `home-manager-path /nix/store/...`
+  CURRENT_HOME_MANAGER_PATH=$(nix-env -q --out-path home-manager-path | awk '{ print $2 }')
   BUILT_HOME_MANAGER_PATH="./result/home-path"
+  DIFF_FILE="./.nix-lastBuild-homeDiff.txt"
 
-  echo "Changed packages between current ('$CURRENT_HOME_MANAGER_PATH') and build:"
-  nix store diff-closures $CURRENT_HOME_MANAGER_PATH $BUILT_HOME_MANAGER_PATH > $DIFF_FILE
-  cat $DIFF_FILE
-  echo "--- NOTE: saved diff to '$DIFF_FILE'"
-  echo
-  # echo "Run 'just build' to apply the changes :)"
-  echo
+  # Helper script to nicely show:
+  # * `nix store diff-closures`'s output
+  # * the closure sizes (and +/- diff)
+  ./bin/nix-diff-closures.sh $CURRENT_HOME_MANAGER_PATH $BUILT_HOME_MANAGER_PATH -o $DIFF_FILE
 
 # Build the current home config AND switch to it
 switch *ARGS: (_build-only ARGS)
   #!/usr/bin/env bash
-  cd "{{justfile_directory()}}"
+  set -e
+  cd "{{ justfile_directory() }}"
   ./result/activate
