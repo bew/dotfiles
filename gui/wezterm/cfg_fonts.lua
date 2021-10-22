@@ -12,11 +12,8 @@ cfg.font_size = 12.0
 -- Makes FontAwesome's double-width glyphs display properly!
 cfg.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
 
--- default font config comes from fontconfig and manages to find a lot of fonts,
--- but to have a more all-included config I'll list everything myself.
-
-cfg.font_dirs = {"fonts"} -- relative to this config file
-cfg.font_locator = "ConfigDirsOnly" -- for a pure config, but might break if fonts can't be found
+-- Additional font directory (necessary to find FontAwesome font!)
+cfg.font_dirs = {"fonts"} -- relative to main config file
 
 local function font_with_fallback(font_family)
   -- family names, not file names
