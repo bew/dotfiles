@@ -12,9 +12,7 @@
 #
 # NOTE: must be done early (not sure why)
 if command -v dircolors >/dev/null; then
-  DIRCOLORS_FILE=~/.dircolors
-  ! [[ -f $DIRCOLORS_FILE ]] && dircolors -p > $DIRCOLORS_FILE
-  [[ -f $DIRCOLORS_FILE ]] && eval `dircolors $DIRCOLORS_FILE`
+  eval `dircolors --sh`
 fi
 
 #-------------------------------------------------------------
