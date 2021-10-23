@@ -79,16 +79,18 @@ zstyle ':completion:*:options'        list-colors "=^(-- *)=$color[green]"
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
 
 # Ignore some files when completing a text editor command (TODO: add more)
-zstyle ":completion:*:*:${EDITOR}:*:*files" ignored-patterns '*.pdf|*.o'
+zstyle ":completion:*:*:${EDITOR}:*:*files" ignored-patterns '*.pdf|*.o|*.lock'
+
+
+# -- Specialized completers
 
 # Provide a fallback completer which always completes files. Useful when Zsh's
 # completion is too "smart". Thanks to Frank Terbeck <ft@bewatermyfriend.org>
 # (http://www.zsh.org/mla/users/2009/msg01038.html).
 zle -C complete-files complete-word _generic
 zstyle ':completion:complete-files:*' completer _files
-bindkey '^x^f' complete-files # Force complete file names
-bindkey '^F' complete-files
+bindkey '^F' complete-files # Force complete file names
 
 zle -C complete-history complete-word _generic
 zstyle ':completion:complete-history:*' completer _history
-bindkey '^x^h' complete-history # Force complete words from history
+bindkey '^H' complete-history # Force complete words from history
