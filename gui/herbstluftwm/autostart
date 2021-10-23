@@ -237,9 +237,9 @@ hc mousebind $M-$S-Button3   zoom
 # focus
 hc keybind $M-BackSpace   cycle_monitor
 
-hc keybind $M-Tab      cycle_all +1   # FIXME: I want to select the LAST window.. not possible builtin..
-hc keybind $M-$S-Tab   cycle_all -1
-hc keybind $M-c   cycle
+# FIXME: Add $M-Escape to select the LAST window.. not possible builtin..
+hc keybind $M-Tab cycle # in a frame
+hc keybind $M-c   cycle_all +1
 hc keybind $M-u   jumpto urgent
 # Cycle through floating clients only.
 # -> Setting tags.focus.floating_focused to true switches to the floating layer and selects the first client.
