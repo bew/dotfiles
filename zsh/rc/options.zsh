@@ -1,26 +1,26 @@
 # do not beep !!!!
-unsetopt BEEP
+setopt NO_beep
 
 # do not remove slash on directory completion
-unsetopt AUTO_REMOVE_SLASH
+setopt NO_auto_remove_slash
 
 # enable Completion in the middle of a word
-setopt COMPLETE_IN_WORD
+setopt complete_in_word
 
 # after a middle word completion, move cursor at end of word
-setopt ALWAYS_TO_END
+setopt always_to_end
 
 # Allow comment (with '#') in zsh interactive mode
-setopt INTERACTIVE_COMMENTS
+setopt interactive_comments
 
 # Allow substitution in the prompt
-setopt PROMPT_SUBST
+setopt prompt_subst
 
 # Accept args with ? or * in them and leave them unchanged, without erroring
 # (because filename generation returns no match).
 # This also applies to file expansion of an initial ‘~’ or ‘=’.
 # E.g: `echo foo?bar` prints `foo?bar` or `echo ~foobar` prints `~foobar`.
-unsetopt NOMATCH
+setopt NO_nomatch
 
 # History options
 #-------------------------------------------------------------
@@ -34,37 +34,37 @@ HISTSIZE=10000
 SAVEHIST=1000000
 
 # ignore history duplications
-setopt HIST_IGNORE_DUPS
+setopt hist_ignore_dups
 
 # Even if there are commands inbetween commands that are the same, still only save the last one
-setopt HIST_IGNORE_ALL_DUPS
+setopt hist_ignore_all_dups
 
 # Ignore commands with a space before
-setopt HIST_IGNORE_SPACE
+setopt hist_ignore_space
 
 # When searching history don't display results already cycled through twice
-setopt HIST_FIND_NO_DUPS
+setopt hist_find_no_dups
 
 # Remove extra blanks from each command line being added to history
-setopt HIST_REDUCE_BLANKS
+setopt hist_reduce_blanks
 
 # Remove duplicated history entries on history save (usually at end of shell session)
-setopt HIST_SAVE_NO_DUPS
+setopt hist_save_no_dups
 
 # OTHERS
 #-------------------------------------------------------------
 
 # Report the status of background jobs immediately, rather than waiting until just before printing a prompt
-setopt NOTIFY
+setopt notify
 
 # List jobs in the long format
-setopt LONG_LIST_JOBS
+setopt long_list_jobs
 
 # Don't kill background jobs on logout
 #setopt NOHUP
 
 # Allow functions to have local options
-setopt LOCAL_OPTIONS
+setopt local_options
 
 # Allow functions to have local traps
-setopt LOCAL_TRAPS
+setopt local_traps
