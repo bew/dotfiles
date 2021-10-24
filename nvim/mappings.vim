@@ -404,6 +404,64 @@ function! ExecuteMacroOverVisualRange()
   execute ":'<,'>normal! " . column_code . "@" . register
 endfunction
 
+" V: Record a macro on first line, and repeat it on all other selected lines
+" This is the poor-man multiselection... (not even interactive)
+" NOTE: Maybe I'll never use it as I can also record macro then apply with @reg..
+"       I don't know, but it was interesting to do!
+vnoremap qq :<C-u>call <SID>StartRecordMacroForVisualRange()<cr>
+function! <SID>StartRecordMacroForVisualRange()
+  " Save visual selection, in case the macro makes use of visual selection
+  " return format is [_bufnum, lnum, col, _off]
+  let b:macro_visual_start = getpos("'<")
+  let b:macro_visual_end = getpos("'>")
+  let b:macro_visual_is_vblock = visualmode() == ""  " this is the ^V char
+  call setpos(".", b:macro_visual_start)
+  " TODO: Highlight saved visual selection (in IncSearch hi for example?)
+  "       while recording the macro.
+  nnoremap <buffer> q  <cmd>call <SID>ExecutePendingMacroOverSavedVisualRange()<cr>
+  " Start recording...
+  normal! qq
+endf
+function! <SID>ExecutePendingMacroOverSavedVisualRange()
+  " Unmap q, was <buffer> mapped in StartRecordMacroForVisualRange
+  nunmap <buffer> q
+  " End recording, started in StartRecordMacroForVisualRange
+  normal! q
+
+  if getreg("q") == ""
+    return
+  endif
+
+  let start_next_line = b:macro_visual_start[1] + 1
+  let end_line = b:macro_visual_end[1]
+  if b:macro_visual_is_vblock
+    let column_code = b:macro_visual_start[2] . "|"
+  else
+    let column_code = ""
+  endif
+
+  " Format as `:START,END normal! COL|@q`
+  let cmd = ":" . start_next_line . "," . end_line . "normal! " . column_code . "@q"
+  " echom cmd
+  execute cmd
+
+  let save_final_pos = getpos(".")
+
+  " Restore visual selection to be same as before batch action (including vblock)
+  call setpos("'<", b:macro_visual_start)
+  call setpos("'>", b:macro_visual_end)
+  if b:macro_visual_is_vblock
+    " Re-enter visual block temporarily to mark this visual selection as block..
+    " FIXME: is there a better way?
+    execute "normal! gv"
+  endif
+  call setpos(".", save_final_pos)
+
+  unlet b:macro_visual_start
+  unlet b:macro_visual_end
+  unlet b:macro_visual_is_vblock
+endf
+
 " Fold ranged open/close
 " NOTE: this does not change the 'foldlevel'.
 " FIXME: these mappings must be typed fast, otherwise you get normal behavior.
