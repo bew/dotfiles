@@ -52,6 +52,10 @@ zinit light zdharma/fast-syntax-highlighting
 # cd with 'frecency' (recent + frequence)
 zinit light rupa/z
 
+# autopair all the things!
+AUTOPAIR_INHIBIT_INIT=1 # don't auto-init, init at the end (with 'autopair-init')
+zinit light hlissner/zsh-autopair
+
 # Git branch in prompt (using fast gitstatusd daemon)
 zinit load romkatv/gitstatus
 gitstatus_start MY
@@ -195,6 +199,11 @@ alias zmv::dry-run='zmv -n'
 alias zcp::dry-run='zcp -n'
 alias zln::dry-run='zln -n'
 
+
+#-------------------------------------------------------------
+# LATE INIT - initialize things that should be init last
+
+autopair-init
 
 #-------------------------------------------------------------
 # Load local per-machine zsh config
