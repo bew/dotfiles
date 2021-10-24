@@ -110,6 +110,8 @@ set formatoptions+=r
 set formatoptions+=j
 """
 
+set textwidth=100
+
 " Do not insert 2 spaces after a '.', '?' and '!' with a join command. Use a single space.
 set nojoinspaces
 
