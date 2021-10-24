@@ -24,12 +24,13 @@ FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-
 # preview nav
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-p:toggle-preview')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'pgup:preview-page-up' --bind 'pgdn:preview-page-down')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-p:preview-page-up' --bind 'ctrl-n:preview-page-down')
 
 # selection
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-j:accept')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-a:toggle+down')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-space:toggle+down')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:select-all')
+FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:toggle-all')
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'change:top') # select best result on input change
 FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-^:beginning-of-line' --bind 'alt-$:end-of-line')
 
@@ -46,3 +47,5 @@ alias fzf-bew="fzf $FZF_BEW_KEYBINDINGS $FZF_BEW_LAYOUT"
 # ------------------ load local per-machine config
 
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
+
+true # The config should always finish well!
