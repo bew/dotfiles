@@ -7,6 +7,10 @@ setopt NO_auto_remove_slash
 # enable Completion in the middle of a word
 setopt complete_in_word
 
+# On ambiguous completion, immediately show the menu and select first entry
+setopt menu_complete
+# NOTE: can continue filtering with interactive mode \o/
+
 # after a middle word completion, move cursor at end of word
 setopt always_to_end
 
@@ -21,6 +25,10 @@ setopt prompt_subst
 # This also applies to file expansion of an initial ‘~’ or ‘=’.
 # E.g: `echo foo?bar` prints `foo?bar` or `echo ~foobar` prints `~foobar`.
 setopt NO_nomatch
+
+# Make ** an abbreviation of **/* and *** an abbreviation of ***/*
+# (note: the *** variant follows symlinks)
+setopt glob_star_short
 
 # History options
 #-------------------------------------------------------------
@@ -60,8 +68,10 @@ setopt notify
 # List jobs in the long format
 setopt long_list_jobs
 
-# Don't kill background jobs on logout
-#setopt NOHUP
+# Don't kill background jobs on shell exit
+setopt check_jobs
+setopt check_running_jobs
+setopt hup # Send SIGHUP to signal if we force exit
 
 # Allow functions to have local options
 setopt local_options
