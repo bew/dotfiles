@@ -133,12 +133,33 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-" Also bind with Alt, so I have a way to _always_ move to windows, even when tmux's repeat is active
-" (when repeat-mode is active, <C-{h,j,k,l}> keybinds are eaten and used by tmux).
-nnoremap <C-M-h> <C-w>h
-nnoremap <C-M-j> <C-w>j
-nnoremap <C-M-k> <C-w>k
-nnoremap <C-M-l> <C-w>l
+
+" Window splits
+" FIXME: now I need repeat mode supports, like in tmux!!
+"        similar to Hydra plugin in emacs: https://github.com/abo-abo/hydra
+nnoremap <C-w><C-h>   <cmd>set nosplitright <bar> vsplit                       <cr>
+nnoremap <C-w><C-j>   <cmd>set   splitbelow <bar>  split <bar> set nosplitbelow<cr>
+nnoremap <C-w><C-k>   <cmd>set nosplitbelow <bar>  split                       <cr>
+nnoremap <C-w><C-l>   <cmd>set   splitright <bar> vsplit <bar> set nosplitright<cr>
+" Full-width/height window splits
+" FIXME: Do I need this? Would I use this?
+" FIXME: Since I use noequalalways, the created splits takes way too much space...
+"   => Maybe get current screen size and make the new one third of that?
+nnoremap <C-M-w><C-M-h>   <cmd> split<cr><C-w>H
+nnoremap <C-M-w><C-M-j>   <cmd>vsplit<cr><C-w>J
+nnoremap <C-M-w><C-M-k>   <cmd>vsplit<cr><C-w>K
+nnoremap <C-M-w><C-M-l>   <cmd> split<cr><C-w>L
+" Keep a mapping for original <C-w> behavior
+nnoremap <C-w><C-w>  <cmd>echo "Original ^W behavior..."<cr><C-w>
+
+" NOTE: Keys still available (not used often / ever)
+" * <C-M-hjkl>
+" * <C-w><C-HJKL>
+" * <C-w><C-M-hjkl>
+"
+" TODO: window actions ideas:
+" -> Keys to move current buffer around in the visible (non-float, non-special) windows
+" -> (??) Keys to create a full-width/height BUT do not switch to it
 
 " When mapping <C-j> has no effect
 " nmap <cr> <C-j>
