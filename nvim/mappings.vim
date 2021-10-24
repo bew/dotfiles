@@ -389,11 +389,19 @@ function! VisualPaste()
 endfunction
 
 
-" Taken from visual-at.vim from Practical Vim 2nd Edition
-xnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
+" Inspired from visual-at.vim from Practical Vim 2nd Edition
+vnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
 function! ExecuteMacroOverVisualRange()
-  echo "@".getcmdline()
-  execute ":'<,'>normal! @".nr2char(getchar())
+  let register = nr2char(getchar())
+  if register == "" " this is the ^[ (esc) char
+    return
+  endif
+  if visualmode() == ""  " this is the ^V char
+    let column_code = getpos("'<")[2] . "|"
+  else
+    let column_code = ""
+  endif
+  execute ":'<,'>normal! " . column_code . "@" . register
 endfunction
 
 " Fold ranged open/close
