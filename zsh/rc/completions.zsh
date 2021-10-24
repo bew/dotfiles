@@ -5,7 +5,10 @@
 autoload -U colors && colors
 
 fpath=(~/.zsh/completions/ $fpath)
-fpath+=(~/.zsh/completions/nix-completions)
+# Add system completions if available
+# (allows to have 'pacman' completions in nix's zsh for example)
+[[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*)
+[[ -d /usr/share/zsh/site-functions ]] && fpath+=(/usr/share/zsh/site-functions)
 
 # Initialize the completion system
 autoload -U compinit && compinit
