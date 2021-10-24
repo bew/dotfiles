@@ -147,13 +147,15 @@ nnoremap <C-M-l> <C-w>l
 " nmap <BS> <C-h>
 
 
+" CrazyIDEA: Map Alt-MouseClick to resize a window by finding nearest edge??
+
 " Goto tabs Alt-a/z
 nnoremap <M-a> gT
 nnoremap <M-z> gt
 inoremap <M-a> <esc>gT
 inoremap <M-z> <esc>gt
 
-" Move tabs Alt-A/Z
+" Move tabs (with Shift + goto keys)
 nnoremap <silent> <M-A> :tabmove -1<cr>
 nnoremap <silent> <M-Z> :tabmove +1<cr>
 inoremap <silent> <M-A> <esc>:tabmove -1<cr>
@@ -349,14 +351,20 @@ vnoremap <Plug>(my-EvalAndReplaceVimExpr-visual) c<C-r>=<C-r><C-r>"<cr><esc>
 " Vim eval-as-ex:
 " Run the current line/selection as an EX command
 " NOTE: changes the unnamed register
-function! s:EvalAsExFromUnnamed()
+function! ExecuteAsExFromUnnamed(what)
   let l:splitted_reg = split(@", "\n")
-  echom "Sourcing " . len(l:splitted_reg) . " lines..."
   execute @"
-  echom "Done sourcing " . len(l:splitted_reg) . " lines!"
+  let num_lines = len(l:splitted_reg)
+  if num_lines <= 1
+    let lines_text = num_lines . " line"
+  else
+    let lines_text = num_lines . " lines"
+  endif
+  echom "Sourced " . a:what . "! (" . lines_text . ")"
 endf
-nnoremap <Plug>(my-EvalAsVimEx-normal) yy:call <SID>EvalAsExFromUnnamed()<cr>
-vnoremap <Plug>(my-EvalAsVimEx-visual) y:call <SID>EvalAsExFromUnnamed()<cr>
+nnoremap <Plug>(my-ExecuteAsVimEx-normal) yy:call ExecuteAsExFromUnnamed("current line")<cr>
+vnoremap <Plug>(my-ExecuteAsVimEx-visual) y:call ExecuteAsExFromUnnamed("visual selection")<cr>
+nnoremap <Plug>(my-ExecuteAsVimEx-full-file) <cmd>source % <bar> echo "Sourced current file! (" . line("$") . " lines)"<cr>
 
 " Search with{,out} word boundaries
 " V: search selection with word boundaries
@@ -471,13 +479,17 @@ vnoremap <silent> <leader> <cmd>WhichKeyVisual '<VisualBindings>'<cr>
 " leader indicator, AND use the g:which_key_vmap to search for descriptions
 
 " -- Vim
-nmap <leader>vx <Plug>(my-EvalAsVimEx-normal)
-vmap <leader>vx <Plug>(my-EvalAsVimEx-visual)
+nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
+nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
+vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
+let g:which_key_map.v = {"name": "+vim"}
+let g:which_key_map.v.s = "source current file"
+let g:which_key_map.v.x = "exec current line/selection as VimEx"
 " let g:which_key_nmap.v = {"name": "+vim"}
-" let g:which_key_vmap.v = deepcopy(g:which_key_nmap.v)
 " let g:which_key_nmap.v.x = "eval current line/sel as EX"
+" let g:which_key_vmap.v = deepcopy(g:which_key_nmap.v)
 " let g:which_key_vmap.v.x = g:which_key_nmap.v.x
-vmap <leader>ve <Plug>(my-EvalAndReplaceVimExpr-visual)
+vmap <leader>ve <Plug>(my-ExecuteAndReplaceVimExpr-visual)
 " let g:which_key_vmap.v.e = "eval sel as vim expression"
 
 " -- Code
