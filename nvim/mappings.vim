@@ -576,8 +576,9 @@ let g:which_key_map.v.x = "exec current line/selection as VimEx"
 " let g:which_key_nmap.v.x = "eval current line/sel as EX"
 " let g:which_key_vmap.v = deepcopy(g:which_key_nmap.v)
 " let g:which_key_vmap.v.x = g:which_key_nmap.v.x
-vmap <leader>ve <Plug>(my-ExecuteAndReplaceVimExpr-visual)
-" let g:which_key_vmap.v.e = "eval sel as vim expression"
+nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
+vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
+let g:which_key_map.v.e = "substitute/eval sel as vim expr"
 
 " -- Code
 let g:which_key_map.c = {"name": "+code"}
