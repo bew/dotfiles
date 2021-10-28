@@ -152,8 +152,11 @@ bind_frame_focus $M-$C-k   up
 bind_frame_focus $M-$C-l   right
 
 
-# Close current window
-hc keybind $M-$S-c   close
+# Close current window if any or remove frame if empty
+hc keybind $M-$S-c \
+  or , close \
+     , and . compare tags.focus.curframe_wcount = 0 \
+           . remove
 
 # tags
 
