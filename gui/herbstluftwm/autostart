@@ -151,7 +151,6 @@ bind_frame_focus $M-$C-j   down
 bind_frame_focus $M-$C-k   up
 bind_frame_focus $M-$C-l   right
 
-
 # Close current window if any or remove frame if empty
 hc keybind $M-$S-c \
   or , close \
@@ -177,15 +176,34 @@ hc keybind $M-Right  use_index +1 --skip-visible
 hc keybind $M-$C-a  attr tags.focus.index -=1
 hc keybind $M-$C-z  attr tags.focus.index +=1
 
+# Delete current tag if empty
+# (only if there are at least 2 tags && current tag contains a single empty frame)
+# NOTE: floating windows are not blocking, they will be merged in previous tag
+hc keybind $M-$C-d \
+  and \
+    , compare tags.count ge 2 \
+    , compare tags.focus.frame_count = 1 \
+    , compare tags.focus.curframe_wcount = 0 \
+    , chain \
+        : lock \
+        : substitute TAG_TO_DEL tags.focus.name \
+            chain + use_index -1 \
+                  + merge_tag TAG_TO_DEL \
+        : unlock
+
 # Move window to prev/next tag and make it floating (so I can place it where I want)
 hc keybind $M-$S-a \
-  chain , attr clients.focus.floating true \
-        , move_index -1 --skip-visible \
-        , use_index -1 --skip-visible
+  chain : lock \
+        : attr clients.focus.floating true \
+        : move_index -1 --skip-visible \
+        : use_index -1 --skip-visible \
+        : unlock
 hc keybind $M-$S-z \
-  chain , attr clients.focus.floating true \
-        , move_index +1 --skip-visible \
-        , use_index +1 --skip-visible
+  chain : lock \
+        : attr clients.focus.floating true \
+        : move_index +1 --skip-visible \
+        : use_index +1 --skip-visible \
+        : unlock
 
 hc keybind $M-$A-r   spawn ~/.config/herbstluftwm/scripts/hlwm_rename_current_tag.py
 hc keybind $M-$A-a   spawn ~/.config/herbstluftwm/scripts/hlwm_add_tag.py
