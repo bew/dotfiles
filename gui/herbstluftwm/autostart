@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-# this is a simple config for herbstluftwm
-
 function hc {
-    herbstclient "$@"
+  herbstclient "$@"
 }
+
+# TODO?: I could make dynamic keys (in bash / any language (Rust? :P)) by binding a key to
+# 'emit_hook myaction-do-something' and then using a watcher daemon to listen to key-sent hooks :)
 
 hc emit_hook reload
 
