@@ -9,7 +9,8 @@ autocmd BufReadPost *
     \ endif
 
 " Close the auto-completion preview window when leaving insert mode
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+" (disabled in the cmdline-window which does not have a preview window)
+autocmd InsertLeave * if pumvisible() == 0 && getcmdwintype() == "" | pclose | endif
 
 " vim -b : edit binary using xxd-format!
 augroup binary_file_handling
