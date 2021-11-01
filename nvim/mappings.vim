@@ -1,4 +1,6 @@
 " VIM - mappings
+"
+" "I speek vim" - bew, 2021
 
 " TODO: improve organization!
 
@@ -61,7 +63,7 @@ function! ToggleSignsAndLineNumbers()
 
   echo "Signs and line numbers: " . l:status
 endf
-nnoremap <expr> <M-R>  ToggleSignsAndLineNumbers()
+nnoremap <M-R>  <cmd>call ToggleSignsAndLineNumbers()<cr>
 
 " Start interactive EasyAlign in visual mode (e.g. vipgea)
 xmap gea <Plug>(EasyAlign)
@@ -384,7 +386,7 @@ function! ExecuteAsExFromUnnamed(what)
   echom "Sourced " . a:what . "! (" . lines_text . ")"
 endf
 nnoremap <Plug>(my-ExecuteAsVimEx-normal) yy:call ExecuteAsExFromUnnamed("current line")<cr>
-vnoremap <Plug>(my-ExecuteAsVimEx-visual) y:call ExecuteAsExFromUnnamed("visual selection")<cr>
+vnoremap <Plug>(my-ExecuteAsVimEx-visual) y:call ExecuteAsExFromUnnamed("visual selection")<cr>gv
 nnoremap <Plug>(my-ExecuteAsVimEx-full-file) <cmd>source % <bar> echo "Sourced current file! (" . line("$") . " lines)"<cr>
 
 " Search with{,out} word boundaries
@@ -551,7 +553,7 @@ cnoremap <M-K> <S-Up>
 cnoremap <M-J> <S-Down>
 
 " Expand %% to dir of current file
-cnoremap <expr> %% expand("%:h") . "/"
+cnoremap <expr> %%  expand("%:h") . "/"
 
 
 " ---- Various Leader key mappings ----

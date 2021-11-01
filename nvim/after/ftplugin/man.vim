@@ -20,6 +20,10 @@ nnoremap <buffer><silent> <M-o> <cmd>split <bar> Man<cr>
 noremap <buffer> j <C-e>
 noremap <buffer> k <C-y>
 
+" Backup for cursor up/down (can help with manual selections)
+noremap <buffer> <M-j> j
+noremap <buffer> <M-k> k
+
 " Scroll half-screen
 noremap <buffer> J <C-d>
 noremap <buffer> K <C-u>
