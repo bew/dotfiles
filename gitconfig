@@ -37,10 +37,15 @@
   context = 10
   # TODO (bug report?): does not seems to work on diffs visible in `git add -p`.
 
-  # Moved lines of code are colored differently.
+  # Moved lines of code are colored differently
   colorMoved = default
-  # Ignore whitespace changes for indentation only.
+  # Ignore whitespace changes for indentation only
   colorMovedWS = allow-indentation-change
+
+  # Limit the size of --stat graph (++++----)
+  # Important for `git show --patch-with-stat` to avoid line wrapping
+  # (which is not automatically detected for some reasons..)
+  statGraphWidth = 30
 
   tool = nvim_diff # NOTE: I _never_ use this....
 
@@ -110,7 +115,26 @@
   dd  = diff -w
   ddc = diff -w --staged
 
+  # Diff side-by-side with delta (instead of unified diff)
+  dds = !git -c delta.features=split-layout dd
+  ds  = !git -c delta.features=split-layout d
+
+  # Helper to find the base-commit between a base branch (usually master/main) and
+  # a head ref (usually HEAD).
+  # (we want to find the commit before the first commit on the branch)
+  z--base-branch-helper = !git merge-base --octopus ${BASE_BRANCH:-main@\\{u\\}} ${HEAD_REF:-HEAD}
+
+  # --unified is for the up/down diff context around hunks
+  review-branch          = !git diff --unified=30   $(git z--base-branch-helper)
+  review-branch-full-ctx = !git diff --unified=9999 $(git z--base-branch-helper)
+  # (now with side-by-side delta diff layout)
+  review-branch-s          = !git dds --unified=30   $(git z--base-branch-helper)
+  review-branch-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
+
   stat = !git --no-pager diff --stat --summary
+  stat-branch = !git stat $(git z--base-branch-helper)..
+
+  show-with-stat = !git show --patch-with-stat --summary
 
   # last merge stats
   stat-last-merge = stat ORIG_HEAD..
@@ -136,10 +160,18 @@
   diffFilter = delta --color-only
 
 [delta]
-  features = line-numbers decorations
-  ; whitespace-error-style = 22 reverse
+  features = unified-layout
   syntax-theme = DarkNeon
-  paging = always
+
+  paging = always ; always use a pager
+  ; Note that diffs in `git add -p` will never use the pager.
+
+  line-numbers = true
+
+  relative-paths = true
+  file-modified-label = "changed:"
+  file-removed-label = "nuked:"
+  hunk-label = "§"
 
   # Removed lines
   minus-style = normal 52
@@ -149,9 +181,6 @@
   plus-style = syntax 22
   plus-emph-style = normal bold 28
 
-  file-modified-label = changed:
-
-[delta "decorations"]
   file-style = bold 166
   file-decoration-style = none
   # NOTE: the decoration styles ul/ol/box uses unicode chars AFAIK
@@ -161,12 +190,30 @@
   hunk-header-style = 243 236 # light grey on dark grey
   hunk-header-decoration-style = bold
 
-  ; >> Using ASCII separator
-  ; line-numbers-left-format = {nm:^4}|
-  ; line-numbers-right-format = {np:^4}|
-  ; >> Using Unicode separator
-  line-numbers-left-format = {nm:^4}|
-  line-numbers-right-format = {np:^4}│
+[delta "unified-layout"]
+  features = navigate
+
+  ; >> Unicode separators:
+  line-numbers-left-format = {nm:^5}¦
+  line-numbers-right-format = {np:^5}│
+  ; >> ASCII separators:
+  ; line-numbers-left-format = {nm:^5}:
+  ; line-numbers-right-format = {np:^5}|
+
+[delta "split-layout"]
+  # NOTE: This group of delta settings is enabled for some of my git aliases
+  #       using `git -c delta.features=split-layout ...`
+
+  features = navigate side-by-side
+
+  ; >> Unicode separators:
+  line-numbers-left-format = ┃{nm:^5}│
+  line-numbers-right-format = ┃{np:^5}│
+  ; >> ASCII separators:
+  ; line-numbers-left-format = |{nm:^5}|
+  ; line-numbers-right-format = |{np:^5}|
+  line-numbers-left-style = red
+  line-numbers-right-style = green
 
 # -- END delta config
 
