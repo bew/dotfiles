@@ -1,18 +1,63 @@
+[core]
+  excludesfile = ~/.gitignore
+
 [user]
   email = benoit.dechezelles@gmail.com
   name = Benoit de Chezelles
 
 [github]
+  # some tools uses this
   user = bew
 
 [push]
+  # When 'push' subcmd is called without a remote branch,
+  # use the current local branch name as the remote branch name.
   default = current
 
 [pull]
-  ff = only # fast-forward only on pull, merges will be done manually if needed
+  # Only allow fast-forward merge when using 'pull'.
+  # => Non-ff merge is not attempted automatically and will need to be done manually.
+  ff = only
 
-[core]
-  excludesfile = ~/.gitignore
+[merge]
+  # When 'merge' subcmd is called without any ref, merge the upstream branch in.
+  defaultToUpstream = true
+
+[help]
+  autocorrect = -1 # without prompt
+
+[color]
+  interactive = true
+
+[color "status"]
+  untracked = "cyan"
+
+[diff]
+  # Give a little bit more context in diffs (defaut is 3)
+  context = 10
+  # TODO (bug report?): does not seems to work on diffs visible in `git add -p`.
+
+  # Moved lines of code are colored differently.
+  colorMoved = default
+  # Ignore whitespace changes for indentation only.
+  colorMovedWS = allow-indentation-change
+
+  tool = nvim_diff # NOTE: I _never_ use this....
+
+[color "diff"]
+  # color settings for 'colorMoved' option
+  oldMoved = cyan 17
+  newMoved = cyan 17
+
+[difftool "nvim_diff"]
+  cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
+
+# Useful when I can't use SSH to communicate with github and I don't want to
+# type my password/personal-token everytime.
+#
+# [credential "https://github.com"]
+#   username = bew
+#   helper = github-bew-password-from-env
 
 [alias]
 
@@ -41,9 +86,10 @@
   # info only
   #----------------------------
 
-  br = branch
+  br  = branch
   brv = "!git --no-pager branch -vv"
-  s = status --ignore-submodules=all
+
+  s   = status --ignore-submodules=all
   suf = status --untracked-files
 
   # log (minimal)
@@ -59,39 +105,27 @@
   lav = pretty-log-verbose --all
 
   # diff
-  d = diff
+  d  = diff
   dc = diff --staged
-  dd = diff -w
+  dd  = diff -w
   ddc = diff -w --staged
 
-  # last merge stats (This is a complex alias, I won't get auto-completion on this one..)
-  stat-last-merge = "!f() { \
-    sha_orig_head=$(git rev-parse --short ORIG_HEAD); \
-    sha_head=$(git rev-parse --short HEAD); \
-    echo 'Last merge (' ${sha_orig_head}..${sha_head} '):'; \
-    git --no-pager diff --stat ORIG_HEAD $@ && git --no-pager diff --summary ORIG_HEAD $@; \
-    }; f"
+  stat = !git --no-pager diff --stat --summary
+
+  # last merge stats
+  stat-last-merge = stat ORIG_HEAD..
   slm = stat-last-merge
 
-  # last merge diff (move as simple alias?)
-  diff-last-merge = "diff ORIG_HEAD..HEAD"
+  # last merge diff
+  diff-last-merge = diff ORIG_HEAD..
   dlm = diff-last-merge
 
   # last merge logs
   log-last-merge = pretty-log ORIG_HEAD..
   llm = log-last-merge
 
-  remove-old-commits = reflog expire --all --expire=now
-  compress-repo = gc --aggressive --prune=now
-
-[help]
-  autocorrect = -1
-
-[color]
-  interactive = true
-
-[color "status"]
-  untracked = "cyan"
+  gc-remove-old-commits = reflog expire --all --expire=now
+  gc-compress-repo = gc --aggressive --prune=now
 
 # -- BEGIN delta config
 
@@ -135,28 +169,5 @@
   line-numbers-right-format = {np:^4}│
 
 # -- END delta config
-
-[diff]
-  tool = nvim_diff # NOTE: I _never_ use this....
-
-  # Moved lines of code are colored differently.
-  colorMoved = default
-  # Ignore whitespace changes for indentation only.
-  colorMovedWS = allow-indentation-change
-
-[color "diff"]
-  # color settings for 'colorMoved' option
-  oldMoved = cyan 17
-  newMoved = cyan 17
-
-[difftool "nvim_diff"]
-  cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
-
-# Useful when I can't use SSH to communicate with github and I don't want to
-# type my password/personal token everyting
-#
-# [credential "https://github.com"]
-#   username = bew
-#   helper = github-bew-password-from-env
 
 # vim:set ft=gitconfig:
