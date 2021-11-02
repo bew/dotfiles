@@ -53,7 +53,7 @@ export LESS="-R --ignore-case --incsearch --LONG-PROMPT --tabs=4 --window=-4"
 export LESSKEYIN=~/.dot/lesskey-bew
 
 export PAGER="most"
-export MANPAGER='nvim -R +Man!' # man in vim!
+export MANPAGER='nvim +Man!' # man in vim!
 export BAT_PAGER="less" # `most` does not work with `bat`
 
 export EDITOR="nvim"
