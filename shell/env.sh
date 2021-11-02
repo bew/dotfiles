@@ -43,9 +43,13 @@ path_maybe_add_entry "$HOME/.local/bin"
 path_maybe_add_entry "/usr/local/bin" fallback
 
 
-# -R : Output raw ANSI "color" escape sequences directly
-# -+X (Disables the `-X` option) : Send alt-screen term init sequence if necessary
-export LESS="-R -+X"
+# -R : Output raw ANSI "color" & "hyperlink" escape sequences directly
+# --ignore-case : smart case search
+# --incsearch : incremental search
+# --LONG-PROMPT : show scroll information at the bottom
+# --tabs : Sets length of tabs
+# --window=-n : Changes the scrolling window size, -n means VISIBLE_LINES -N
+export LESS="-R --ignore-case --incsearch --LONG-PROMPT --tabs=4 --window=-4"
 export LESSKEYIN=~/.dot/lesskey-bew
 
 export PAGER="most"
