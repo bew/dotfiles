@@ -95,4 +95,7 @@ if (( size_diff != 0 )); then
     echo_info "Diff: \e[1;31m+$(human_size $size_diff)B\e[0m" # red
   fi
   echo
+else
+  echo_info "Closure size is exactly the same"
+  echo
 fi
