@@ -7,24 +7,21 @@ autoload -U colors && colors
 # Segment git branch
 function segmt::git_branch_slow
 {
-  [ -n "$NO_SEGMT_GIT_BRANCH" ] && return
+  [ -n "$SEGMT_DISABLE_GIT_BRANCH" ] && return
 
   local branchName=$(__git_ps1 "%s")
   if [ -z "${branchName}" ]; then
     return
   fi
-  local branchNameStyle="%{$fg[red]%}${branchName}"
+  local branchNameStyle="%F{red}${branchName}%f"
 
-  local gitInfo=" On ${branchNameStyle} "
-  local gitInfoStyle="%{$bg[black]%}${gitInfo}%{$reset_color%}"
-
-  echo -n ${gitInfoStyle}
+  echo -n "%K{black} On ${branchNameStyle} %k"
 }
 
-# Segment git branch (fast!)
+# Segment git branch (fast! complete! responsive!)
 function segmt::git_branch_fast
 {
-  [ -n "$NO_SEGMT_GIT_BRANCH" ] && return
+  [ -n "$SEGMT_DISABLE_GIT_BRANCH" ] && return
 
   emulate -L zsh
   typeset -g GITSTATUS_PROMPT=""
@@ -34,49 +31,80 @@ function segmt::git_branch_fast
   gitstatus_query MY                  || return 1  # error
   [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
 
-  local       clean='%F{076}'  # green foreground
-  local c_untracked='%F{014}'  # teal foreground
-  local  c_modified='%F{011}'  # yellow foreground
+  # colors used below
+  local    col_background="black"
+  local   col_is_all_good="076"  # green
+  local col_has_untracked="068"  # blue/purple (slight)
+  local  col_has_modified="178"  # yellow
+  local   col_has_stashes="038"  # blue (medium)
+  local     col_is_behind="196"  # red
+  local      col_is_ahead="202"  # orange
+  local col_has_modified_staged="202"  # orange
 
-  local p
+  # note: when not on a branch, show commit id (but shorter than usual 40-chars)
+  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}}"
+  local current_ref_short="${VCS_STATUS_LOCAL_BRANCH[0,10]:-@${VCS_STATUS_COMMIT[0,10]}}"
+  [[ -n $VCS_STATUS_TAG ]] && {
+    current_ref+="#${VCS_STATUS_TAG}"
+    current_ref_short+="#.."
+  }
+  local col_current_ref
   if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
-    p+=$c_modified
+    col_current_ref+="$col_has_modified"
   elif (( VCS_STATUS_HAS_UNTRACKED )); then
-    p+=$c_untracked
+    col_current_ref+="$col_has_untracked"
   else
-    p+=$clean
+    col_current_ref+="$col_is_all_good"
   fi
-  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT}}"
-  [[ -n $VCS_STATUS_TAG ]] && current_ref+="#${VCS_STATUS_TAG}"
+  # make sure to escape any '%' in current_ref{,_short}
+  local current_ref_info="%F{$col_current_ref}${current_ref//\%/%%}%f"
+  local current_ref_info_short="%F{$col_current_ref}${current_ref_short//\%/%%}%f"
 
-  p+=${current_ref//\%/%%}  # escape %
-
-  local repo_status
-  [[ $VCS_STATUS_HAS_STAGED      == 1 ]] && repo_status+="${c_modified}+"
-  [[ $VCS_STATUS_HAS_UNSTAGED    == 1 ]] && repo_status+="${c_modified}!"
-  [[ $VCS_STATUS_HAS_UNTRACKED   == 1 ]] && repo_status+="${c_untracked}?"
-  [[ -n "$repo_status" ]] && p+=" ${repo_status}${clean}"
+  local worktree_info
+  (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_modified_staged}%B+%b%f"
+  (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_modified}%B!%b%f"
+  (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B?%b%f"
 
   local arrow_up
   local arrow_down
   if [[ -z "$ASCII_ONLY" ]]; then
     # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
     #      character width will be output.
-    #
-    #      Needed sometimes because that unicode char can be considered 2 chars by mistake.
-    #      (NOTE 2020-12-13: don't remember in which cases..)
+    #      Can be needed when a unicode char is considered as 2 chars by mistake.
     arrow_up="%{↑%G%}"
     arrow_down="%{↓%G%}"
   else
-    arrow_up="+"
-    arrow_down="-"
+    arrow_up="^"
+    arrow_down="v"
   fi
 
-  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && p+=" ${arrow_up}${VCS_STATUS_COMMITS_AHEAD}"
-  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && p+=" ${arrow_down}${VCS_STATUS_COMMITS_BEHIND}"
-  [[ $VCS_STATUS_STASHES        -gt 0 ]] && p+=" *${VCS_STATUS_STASHES}"
+  local commits_info commits_info_short
+  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && {
+    commits_info+="%F{$col_is_ahead}${arrow_up}${VCS_STATUS_COMMITS_AHEAD}%f"
+    commits_info_short+="%F{$col_is_ahead}${arrow_up}%f"
+  }
+  [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && {
+    [[ -n "$commits_info" ]] && commits_info+=" "
+    commits_info+="%F{$col_is_behind}${arrow_down}${VCS_STATUS_COMMITS_BEHIND}%f"
+    commits_info_short+="%F{$col_is_behind}${arrow_down}%f"
+  }
+  [[ $VCS_STATUS_STASHES -gt 0 ]] && {
+    [[ -n "$commits_info" ]] && commits_info+=" "
+    commits_info+="%F{$col_has_stashes}*${VCS_STATUS_STASHES}%f"
+    commits_info_short+="%F{$col_has_stashes}*%f"
+  }
 
-  echo -n "%K{black} On ${p} %k"
+  local repo_info_long="On $current_ref_info"
+  [[ -n "$worktree_info" ]] && repo_info_long+=" $worktree_info"
+  [[ -n "$commits_info" ]] && repo_info_long+=" $commits_info"
+  local repo_info_short="$current_ref_info_short"
+  [[ -n "${worktree_info}${commits_info_short}" ]] && \
+    repo_info_short+=" ${worktree_info}${commits_info_short}"
+
+  local repo_info
+  (( COLUMNS > 70 )) && repo_info=$repo_info_long || repo_info=$repo_info_short
+
+  echo -n "%K{$col_background} $repo_info %k"
 }
 
 # Segment last exit code
