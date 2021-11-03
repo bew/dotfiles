@@ -35,7 +35,7 @@
       system = "x86_64-linux";
     in import "${homeManager}/modules" {
       pkgs = nixpkgsStable.legacyPackages.${system};
-      configuration = { config, ... }: {
+      configuration = { config, lib, ... }: {
         imports = [
           ./nix-home/modules/flake-inputs.nix
           ./nix-home/modules/nix-registry.nix
@@ -73,7 +73,32 @@
         #   => NOTE: using a switch with an env var like
         #     `NIX_HOME_DEV_OVERRIDE` doesn't seem to trigger a rebuild..
         home.homeDirectory = "/home/${config.home.username}";
+
+        # ---
+        # Proof of concept of a dynamic/editable symlink-to-a-dot-file, managed by Nix, using
+        # the `config.lib.file.mkOutOfStoreSymlink` helper function exposed by homeManager.
+        home.file.".test-out-of-store-gitconfig".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dot/gitconfig";
+        # NOTE: (for when I finally commit and have my home dot-files managed by Nix)
+        # * https://github.com/nix-community/home-manager/issues/2085
+        # * https://www.reddit.com/r/NixOS/comments/qlhifw/comment/hj32l2b/ (my own comment on the subject)
+        home.file.".test-out-of-store-gitconfig--automatic".source = let
+          # Allows to give a ./relative/path/value and have it automatically converted
+          # to a path in my dotfiles directory. (Instead of being a path in the
+          # nix-stored flake source: /nix/store/...-source)
+          linkToDots = pathRaw: let
+            pathStr = toString pathRaw;
+            flakeSourceDir = toString self; # same as `toString ./.` # Could be computed elsewhere
+            actualDotsDir = "${config.home.homeDirectory}/.dot"; # Could be set in a custom module?
+
+            pathRelativeToDots = lib.removePrefix (flakeSourceDir + "/") pathStr;
+            pathAbsoluteToDots = "${actualDotsDir}/${pathRelativeToDots}";
+          in config.lib.file.mkOutOfStoreSymlink pathAbsoluteToDots;
+        in linkToDots ./gitconfig;
       };
     };
+
+    # TODO(idea): expose packages (& apps?) of my tools pre-configured,
+    # like tmux-bew (easiest), fzf-bew (easy?), nvim-bew (hard), zsh-bew (hard), ...
+    # and finally cli-bew (with all previous packages)
   };
 }
