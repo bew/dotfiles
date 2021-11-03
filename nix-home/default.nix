@@ -2,7 +2,7 @@
 
 {
   imports = [
-    # NOTE: I'l need to split more! (editor, shell, desktop, ....)
+    # NOTE: I'll need to split more! (editor, shell, desktop, ....)
     ./cli.nix
     ./gui.nix
   ];
