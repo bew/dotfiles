@@ -33,7 +33,7 @@ function segmt::git_branch_fast
 
   # colors used below
   local    col_background="black"
-  local   col_is_all_good="076"  # green
+  local   col_is_all_good="034"  # green
   local col_has_untracked="068"  # blue/purple (slight)
   local  col_has_modified="178"  # yellow
   local   col_has_stashes="038"  # blue (medium)
@@ -108,17 +108,9 @@ function segmt::git_branch_fast
 }
 
 # Segment last exit code
-function segmt::exit_code_long_on_error
-{
-  local content="Last Exit: %?"
-  local on_error="%B%K{black}%F{red} $content %f%k%b"
-  echo -n "%(?||$on_error)"
-}
-
-# Segment last exit code
 function segmt::exit_code_on_error
 {
-  local on_error="%K{back}%F{red} %? %f%k"
+  local on_error="%K{232}%F{red} %? %f%k"
   echo -n "%(?||$on_error)"
 }
 
@@ -129,7 +121,7 @@ function segmt::in_sudo
 
   if [[ "$result" == "bla" ]]; then
     local content="In sudo"
-    local with_style="%K{red}%F{white}%B $content %b%f%k"
+    local with_style="%K{88}%F{white}%B $content %b%f%k"
     echo -n "$with_style"
   fi
 }
@@ -139,9 +131,9 @@ function segmt::short_vim_mode
 {
   zle::utils::get-vim-mode
   case "$REPLY" in
-    insert) echo -n "%B%K{green}%F{white} I %f%k%b";;
-    normal) echo -n "%B%K{blue}%F{white} N %f%k%b";;
-    replace) echo -n "%B%K{red}%F{white} R %f%k%b";;
+    insert)  echo -n "%B%K{28}%F{white} I %f%k%b";; # bg: dark green
+    normal)  echo -n "%B%K{26}%F{white} N %f%k%b";; # bg: dark blue
+    replace) echo -n "%B%K{88}%F{white} R %f%k%b";; # bg: dark red
     # NOTE: does not work, we're NOT notified on normal<=>visual mode change
     # visualchar) echo -n "%B%K{133}%F{white} V %f%k%b";; # bg: light violet
     # visualline) echo -n "%B%K{133}%F{white} VL %f%k%b";; # bg: light violet
@@ -220,21 +212,6 @@ function segmt::shlvl
 function segmt::debug
 {
   echo -n "%K{blue} DEBUG: $* %k"
-}
-
-# NOTE: A more flexible alternative is to use ad-hoc dir alias with: `hash -d foo=$PWD`
-#   and the prompt will show `~foo`. It is more flexible because `cd ./bla` works
-#   as expected (shows `~foo/bla`).
-# TODO?: make helper function to ease manipulation of the directory hash table,
-#   and creation of an entry for $PWD
-PROMPT_OVERRIDE_PWD=
-function segmt::short_pwd_no_color
-{
-  if [[ -n "$PROMPT_OVERRIDE_PWD" ]]; then
-    echo -n "$PROMPT_OVERRIDE_PWD"
-  else
-    echo -n "%2~"
-  fi
 }
 
 # Build a string from an array of parts.
@@ -366,22 +343,22 @@ PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%B%F{166} "
-  func: segmt::short_pwd_no_color
-  text: " %f%b" # current dir
+
+  text: "%B%F{166} %2~ %f%b" # current dir
+
   func: segmt::short_vim_mode
   text: " "
-  text: "%(!.#.>)"
+  text: "%(!.#.>)" # normal (>) or sudo (#) cmd separator
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
   func: segmt::python_venv
   func: segmt::exit_code_on_error
-  text: "%K{black}%B%F{cyan} "
-  func: segmt::short_pwd_no_color
-  text: " %f%b%k" # current dir
+
+  text: "%K{235}%B%F{30} %2~ %f%b%k" # current dir
+
   text: " "
-  text: "%B%F{black}%%%f%b" # cmd separator
+  text: "%B%F{black}%%%f%b" # cmd '%' separator
 )
 
 PROMPT_CURRENT="$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
@@ -394,23 +371,18 @@ PROMPT_PAST+=" "
 # -- Right prompt
 
 RPROMPT_CURRENT_PARTS=(
-  func_reset: "%k%f%b%u%{$reset_color%}"
-
   func: segmt::in_sudo
   func: segmt::git_branch_fast
-  func: segmt::short_vim_mode
 )
 
 RPROMPT_PAST_PARTS=(
-  func_reset: "%k%f%b%u%{$reset_color%}"
-
   func: segmt::in_sudo
   func: segmt::git_branch_fast
 )
 
 RPROMPT_CURRENT="$(make_prompt_str_from_parts "${RPROMPT_CURRENT_PARTS[@]}")"
 RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
-# RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)''$(segmt::short_vim_mode)'
+# RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 # RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 
 # -- Setup prompts hooks
