@@ -188,9 +188,11 @@ function mkcd
   cd "$1"
 }
 
-# tree
-
-alias tree="tree -C --dirsfirst -F"
+# -C : Enable colors
+# -F : Show type of files (like ls -F)
+# -A : use ANSI line graphics hack when printing indentation lines (seems necessary in tmux)
+# --dirsfirst : Dirs then files
+alias tree="tree -C --dirsfirst -F -A"
 
 # cd
 
