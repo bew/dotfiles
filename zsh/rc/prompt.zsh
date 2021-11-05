@@ -462,3 +462,4 @@ function prompt::utils::apply-cursor-shape
 hooks-add-hook zle_keymap_select_hook prompt::utils::apply-cursor-shape
 hooks-add-hook zle_line_init_hook prompt::utils::set-cursor-beam
 hooks-add-hook zle_line_finish_hook prompt::utils::set-cursor-block
+# FIXME: we're not notified when going normal<=>visual mode :/
