@@ -217,6 +217,12 @@ hc keybind $M-$A-x   spawn ~/.config/herbstluftwm/scripts/hlwm_execute_hc.py
 hc keybind $M-f   attr clients.focus.floating toggle
 # FIXME: would it make sense to have a way to remember the parent frame?
 
+# Center current floating window
+# hc keybind $M-$S-f \
+#   and , compare tags.focus.floating_focused = true \
+#       , apply_tmp_rule "" floating=on floatplacement=center
+# FIXME: broken, see https://github.com/herbstluftwm/herbstluftwm/issues/1375
+
 hc keybind $M-$C-m   fullscreen toggle # fullscreen current client
 # hc keybind $M-$C-f floating toggle # all clients of current tag become floating (and stacked..)
 
@@ -256,8 +262,10 @@ hc mousebind $M-Button3   resize
 # window constant (at the same place).
 hc mousebind $M-$S-Button3   zoom
 
-# focus
-hc keybind $M-BackSpace   cycle_monitor
+# screen/monitor focus
+# (for left-hand only, so the right hand can stay on the mouse/touchpad)
+# NOTE: can also use $M-hjkl (directional focus, crossing frame and monitor boundaries)
+hc keybind $M-$S-s   cycle_monitor
 
 # FIXME: Add $M-Escape to select the LAST window.. not possible builtin..
 hc keybind $M-Tab cycle # in a frame
