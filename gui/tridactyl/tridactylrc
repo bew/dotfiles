@@ -92,10 +92,14 @@ bind <A-a> tabprev
 bind <A-z> tabnext
 bind --mode=insert <A-a> tabprev
 bind --mode=insert <A-z> tabnext
-bind --mode=ex <A-a> tabprev
-bind --mode=ex <A-z> tabnext
+bind --mode=ex     <A-a> tabprev
+bind --mode=ex     <A-z> tabnext
 bind <A-A> tabmove -1
 bind <A-Z> tabmove +1
+bind --mode=insert <A-A> tabmove -1
+bind --mode=insert <A-Z> tabmove +1
+bind --mode=ex     <A-A> tabmove -1
+bind --mode=ex     <A-Z> tabmove +1
 
 # tab operations
 bind <CA-t> tabduplicate
