@@ -1,19 +1,6 @@
 # do not beep !!!!
 setopt NO_beep
 
-# do not remove slash on directory completion
-setopt NO_auto_remove_slash
-
-# enable Completion in the middle of a word
-setopt complete_in_word
-
-# On ambiguous completion, immediately show the menu and select first entry
-setopt menu_complete
-# NOTE: can continue filtering with interactive mode \o/
-
-# after a middle word completion, move cursor at end of word
-setopt always_to_end
-
 # Allow comment (with '#') in zsh interactive mode
 setopt interactive_comments
 
