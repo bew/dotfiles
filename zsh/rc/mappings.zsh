@@ -554,6 +554,12 @@ compdef _bindkey vibindkey
 
 # TODO: better binds organization
 
+bindkey -M viins "${keysyms[Tab]}" menu-complete
+bindkey -M viins "${keysyms[S-Tab]}" reverse-menu-complete
+bindkey -M viins "^n" menu-complete
+
+bindkey -M viins ":" execute-named-cmd
+
 vibindkey 's' zwidget::toggle-sudo-nosudo
 
 vibindkey 'q' zwidget::cycle-quoting
@@ -777,82 +783,131 @@ vibindkey '$' end-of-line
 vibindkey 'u' undo
 vibindkey 'U' redo
 
+# Ctrl-a to increment number under the cursor
+autoload -Uz incarg
+zle -N incarg
+bindkey -M vicmd '^a' incarg
+
 # Use Up/Down to get history with current cmd prefix..
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
 bindkey "${keysyms[Up]}" up-line-or-beginning-search
 bindkey "${keysyms[Down]}" down-line-or-beginning-search
 
+
 # menuselect keybindings
 #-------------------------------------------------------------
 
-# Ensure Backspace is really mapped to 'backward-delete-char',
-# necessary for the interactive mode
+# Ensure Backspace is mapped to 'backward-delete-char',
+# necessary for the interactive & search modes.
 bindkey -M menuselect "${keysyms[Backspace]}" backward-delete-char
-
-# Additional vim-like Ctrl-N/P/Y bindings for completion
-bindkey -M viins "^n" expand-or-complete
-bindkey -M menuselect "^n" down-line-or-history
-bindkey -M menuselect "^p" up-line-or-history
-bindkey -M menuselect "^y" accept-line
+bindkey -M menuselect "^h" backward-delete-char # to avoid mistakes..
 
 # Cancel the whole current completion
-bindkey -M menuselect '' send-break
-bindkey -M menuselect "^u" send-break
+bindkey -M menuselect "" send-break
 
-# Go back in completion list
-bindkey -M menuselect "${keysyms[S-Tab]}" reverse-menu-complete
-# NOTE: I never use it... (do I?)
+# TODO: I want to quit while keeping current inserted completions, WITHOUT
+#       inserting highlighted entry. (hitting 'space' does insert it)
+#
+# => Alternative is to do 'accept-line && undo' (accept entry then remove last accepted match)
+#    (which cannot be mapped to a user-defined widget, they seems to be disabled in the menu..)
+# TODO (feature req): accept user-defined zle widget in the menu
+
+# Alt-Space => cancel current selection
+# NOTE: Text entered in interactive mode is retained
+# => It's the only sensible way to complete single dash options (like -XY), because otherwise
+#    doing - then TAB, then entering the option I want in interactive menu make it disappear
+#    from the menu and ressing Space would insert the currently highlighted option, in
+#    addition to the one I wanted ><..
+bindkey -M menuselect " " send-break # (note: would be nice to add Space after exiting the menu..)
+vibindkey -s " " " " # Alt-Space => send Space (makes it easy to use Alt-Space to exit menu, then again to add space)
+
+# FIXME: When menuselect is in interactive mode and has filtering text,
+#        it should remove everything in that mode, else, send-break
+# TODO (feature req): Add ability to use 'backward-kill-line' when interactive/search mode enabled
+#   (and an alternative like 'backward-kill-line-or-break' to 'send-break' in normal menu?)
+bindkey -M menuselect "^u" send-break
 
 # Undo last accepted completion
 bindkey -M menuselect "^w" undo
 bindkey -M menuselect "u" undo
 
-# Alt-hjkl to move in complete menu
-bindkey -M menuselect 'h' backward-char
-bindkey -M menuselect 'j' down-line-or-history
-bindkey -M menuselect 'k' up-line-or-history
-bindkey -M menuselect 'l' forward-char
-
-# Alt-$ & Alt-0 => go to first & last results on current line
-bindkey -M menuselect '0' beginning-of-line
-bindkey -M menuselect '$' end-of-line
-
-# Alt-J/K (or (Alt-){/}) => go to next/previous match group
-bindkey -M menuselect 'K' vi-backward-blank-word
-bindkey -M menuselect 'J' vi-forward-blank-word
-bindkey -M menuselect '{' vi-backward-blank-word
-bindkey -M menuselect '}' vi-forward-blank-word
-# Also with {/}, should not conflict with a use-case as adding { } during
-# a completion is very unlikely to happen.
-bindkey -M menuselect '{' vi-backward-blank-word
-bindkey -M menuselect '}' vi-forward-blank-word
-
-# Alt-g & Alt-G => go to first/last line (of all lines of matches)
-bindkey -M menuselect 'g' beginning-of-history
-bindkey -M menuselect 'G' end-of-history
-
 # Accept the current entry, and continue to show the completion list
-bindkey -M menuselect '^a' accept-and-hold
-bindkey -M menuselect 'a' accept-and-hold
-bindkey -M menuselect ' ' accept-and-hold
+bindkey -M menuselect "^a" accept-and-hold
+bindkey -M menuselect "a" accept-and-hold
 
 # Alt-Enter => Accepts the current match and immediately start a new menu completion.
-# >> This allows to select a directory and immediately attempt to complete files in it!
+# >> This allows to select (e.g) a directory and immediately attempt to complete files in it!
 #
-# If there are no matches, a message is shown.
-# ==> NOTE that in this case, we're not in menu selection anymore.
-#     The only way to go back to the completion menu we were in is to call the `undo`
-#     action.
+# NOTE: When in interactive menu mode, this action needs to be executed twice:
+#       first to exit interactive mode, second to do the action.
+# TODO (feature req): Ability to do the action in interactive menu mode, and keep it enabled!
+#   => So I don't have to manually re-enable interactive mode (with vi-insert action) to
+#      continue filtering in interactive menu mode.
 bindkey -M menuselect "${keysyms[Enter]}" accept-and-infer-next-history
 
 # Toggles between usual and interactive mode <3
 # In interactive mode, keys filter the selection without stopping menu completion
 bindkey -M menuselect "i" vi-insert
+# TODO (bug report): run 'echo 111', then do '!!:' then enter interactive menu mode
+#   and type 's:1:2'
+#   => the history substitution should NOT happen in interactive mode (??)
 
-# Enables incremental filtering (not fuzzy) by an arbitrary search <3
-# => NOTE that in this case, ONLY >> 'accept-line' << can be used to quit the
+# Enables incremental search (not fuzzy) by an arbitrary text <3
+# -> Matches anywhere in the menu completions
+#    (even in the description of some matches, like commit messages <3)
+# FIXME(?): I want to enable smart case matching (lowercase -> uppercase)
+#
+# => NOTE: In this mode, ONLY >> 'accept-line' << can be used to quit the
 #    incremental mode.
 #    Usual action keys do not work and will stop/cancel the menu completion.
-bindkey -M menuselect "/"  history-incremental-search-forward
-bindkey -M menuselect "^f" history-incremental-search-forward # find
+bindkey -M menuselect "s"  history-incremental-search-forward
+bindkey -M menuselect "^f"   history-incremental-search-forward
+
+# -- Movement keys in the completion menu
+
+# TODO (bug report): When interactive mode is on, the action
+#   'menu-complete' (TAB by default) does NOT move to the next match...
+#   => This is annoying when interactive mode is enabled by default (via zstyle)
+#
+#   MAYBE RELATED: When interactive mode is on, 'accept-and-infer-next-history'
+#   is not immediate, I need to do it twice: first will exit interactive mode,
+#   and second will do the action.
+bindkey -M menuselect "${keysyms[Tab]}" forward-char # alternative, but does not cycle well
+bindkey -M menuselect "${keysyms[S-Tab]}" reverse-menu-complete
+bindkey -M menuselect "^n" down-line-or-history
+bindkey -M menuselect "^p" up-line-or-history
+# TODO (feature req): Have an action to cycle in the current completion group only.
+#   (and bind TAB to it)
+
+# Alt-hjkl to move in complete menu
+bindkey -M menuselect "h" backward-char
+bindkey -M menuselect "j" down-line-or-history
+bindkey -M menuselect "k" up-line-or-history
+bindkey -M menuselect "l" forward-char
+
+# Alt-$/0 => go to first/last results on current line
+bindkey -M menuselect "0" beginning-of-line
+bindkey -M menuselect "$" end-of-line
+
+# Ctrl-Alt-j/k (or (Alt-){/}) => Go to next/previous match group
+bindkey -M menuselect "^k" vi-backward-blank-word
+bindkey -M menuselect "^j" vi-forward-blank-word
+bindkey -M menuselect "{" vi-backward-blank-word
+bindkey -M menuselect "}" vi-forward-blank-word
+# Also with {/}, should not conflict with a use-case as adding { } during
+# a completion is very unlikely to happen.
+bindkey -M menuselect "{" vi-backward-blank-word
+bindkey -M menuselect "}" vi-forward-blank-word
+
+# Alt-J/K or PageDown/PageUp => Move page by page (wrapping at top/bottom.. :/)
+bindkey -M menuselect "K" backward-word
+bindkey -M menuselect "J" forward-word
+bindkey -M menuselect "${keysyms[PageUp]}"   backward-word
+bindkey -M menuselect "${keysyms[PageDown]}" forward-word
+
+# Alt-g/G or Home/End => Go to first/last line (of all lines of matches)
+bindkey -M menuselect "g" beginning-of-history
+bindkey -M menuselect "G" end-of-history
+bindkey -M menuselect "${keysyms[Home]}" beginning-of-history
+bindkey -M menuselect "${keysyms[End]}"  end-of-history
