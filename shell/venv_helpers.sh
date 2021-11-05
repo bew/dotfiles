@@ -107,7 +107,7 @@ function _venv__deactivate_with_fallback
   fi
 }
 
-VENV_DEFAULT_PYTHON_BIN="${VENV_DEFAULT_PYTHON_BIN:-python3.7}"
+VENV_DEFAULT_PYTHON_BIN="${VENV_DEFAULT_PYTHON_BIN:-python3}"
 
 function _venv__find_python_bin_path
 {
