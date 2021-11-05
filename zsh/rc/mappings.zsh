@@ -99,8 +99,8 @@ function zwidget::force-scroll-window
 }
 zle -N zwidget::force-scroll-window
 
-# When set, git mappings will show status/log/diff for the current directory
-# instead of the whole repo.
+# When set, git-related key mappings will show status/log/diff for the current
+# directory instead of the whole repo.
 GIT_MAPPINGS_ARE_FOR_CWD="${GIT_MAPPINGS_ARE_FOR_CWD:-}"
 
 # Git status (for repo or cwd)
@@ -181,7 +181,7 @@ zle -N zwidget::git-diff-cached
 # fg %+
 function zwidget::fg
 {
-  [ -z "$(jobs)" ] && zle -M "No running jobs" && return
+  [[ $#jobstates == 0 ]] && zle -M "No running jobs" && return
 
   zle::utils::no-history-run "fg %+"
 }
@@ -191,8 +191,7 @@ zle -N zwidget::fg
 # fg %-
 function zwidget::fg2
 {
-  [ -z "$(jobs)" ] && zle -M "No running jobs" && return
-  [ "$(jobs | wc -l)" -lt 2 ] && zle -M "Not enough running jobs" && return
+  [[ $#jobstates < 2 ]] && zle -M "Not enough running jobs" && return
 
   zle::utils::no-history-run "fg %-"
 }
@@ -459,7 +458,7 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   function zle::utils::disable-app-mode {
     echoti rmkx
   }
-  hooks-add-hook zle_line_init_hook zle::utils::enable-app-mode
+  hooks-add-hook zle_line_init_hook   zle::utils::enable-app-mode
   hooks-add-hook zle_line_finish_hook zle::utils::disable-app-mode
 fi
 
@@ -541,7 +540,7 @@ function zle::utils::setup_keytimeout_per_keymap
     *) KEYTIMEOUT=100;; # 1000ms | 1s
   esac
 
-  # zle -M "KEYTIMEOUT = $KEYTIMEOUT"
+  # zle -M "KEYTIMEOUT = $KEYTIMEOUT" # debug..
 }
 hooks-add-hook zle_keymap_select_hook zle::utils::setup_keytimeout_per_keymap
 hooks-add-hook zle_line_init_hook zle::utils::setup_keytimeout_per_keymap
@@ -587,6 +586,7 @@ bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
 vibindkey 'a' zwidget::fzf::git_changed_files_in_cwd
 vibindkey 'A' zwidget::fzf::git_changed_files # all
+# IDEA: use ^f as a key prefix for more fuzzy search actions? (^x^f is used for builtin file search)
 
 # Ctrl-Z => fg %+
 vibindkey '^z' zwidget::fg
@@ -595,7 +595,29 @@ vibindkey '^z' zwidget::fg2
 
 
 # Fix keybinds when returning from command mode
+# FIXME: WHY DID THIS STOPPED WORKING????
+# => I've found the problem.... ^? (Backspace) is bound to autopair-delete...
+#    which might not work correctly w.r.t zsh's vim mode and the back-to-insert behavior..
+# Digging more...:
+# * When zsh starts, it sets keybind's vi mode if it finds 'vi' in $VISUAL or $EDITOR
+# * The autopair plugin saves the current Backspace widget when the plugin is
+#   initially sourced (and before my own keybinds are set)
+#   (See: https://github.com/hlissner/zsh-autopair/blob/9876030c97ee2c292e409030049c6c6d444eb185/autopair.zsh#L6)
+#   => The saved keybind is vi-backward-delete-char, which does NOT work after
+#      insert-normal-insert dance.
+# * And found an old open issue (tagged 'help wanted') on autopair-zsh:
+#    https://github.com/hlissner/zsh-autopair/issues/14 (-> MAYBE I CAN FIX IT?)
+#
+# Few solutions:
+# 1. Fix the vi-* widgets (alias them to what I want) instead of fixing the keys
+#    individually.
+# 2. Fix autopair-zsh plugin, by (I think?) saving the keys on autopair-init call,
+#    not when sourcing the plugin.
+# 3. Set AUTOPAIR_BKSPC_WIDGET="backward-delete-char" before sourcing the plugin.
+# 4. Move plugin loading AFTER my config (options, mappings, prompt, ...)
 bindkey "${keysyms[Backspace]}" backward-delete-char # Backspace
+AUTOPAIR_BKSPC_WIDGET="backward-delete-char" # tmp, see big comment above
+
 bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
