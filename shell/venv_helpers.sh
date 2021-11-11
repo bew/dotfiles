@@ -279,7 +279,7 @@ VENV_VOLATILE_BASE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/volatile-venvs"
 function venv_with_do
 {
   if [[ $# == 0 ]] || [[ $1 =~ "^-h|--help$" ]]; then
-    _venv__echo2 usage "Usage: venv_with_do [--new|--upgrade] PKGS... [-- [CMD...]]"
+    _venv__echo2 usage "Usage: venv_with_do [--new|--upgrade|--quiet|-q] PKGS... [-- [CMD...]]"
     _venv__echo2 usage
     _venv__echo2 usage "Creates a volatile python virtual env, installs the given PKGS in it."
     _venv__echo2 usage "Subsequent calls with the same python version and PKGS will reuse the env."
@@ -311,6 +311,7 @@ function venv_with_do
     local cmd=()
     local force_new=false
     local force_upgrade=false
+    local quiet_install=false
     local dashdash_found=false
     while [[ -n "${1:-}" ]]; do
       case "$1" in
@@ -318,6 +319,8 @@ function venv_with_do
           force_new=true;;
         --upgrade)
           force_upgrade=true;;
+        --quiet|-q)
+          quiet_install=true;;
         --)
           dashdash_found=true;;
         *)
@@ -356,12 +359,15 @@ function venv_with_do
     fi
 
     if [[ "${#pkgs[@]}" != 0 ]]; then
-      local upgrade_msg=""
-      $force_upgrade && upgrade_msg=" (with upgrade)"
-      _venv__echo2 section "Installing packages${upgrade_msg}: ${pkgs[@]}"
-      $force_upgrade && pkgs+=("--upgrade")
-      pip install "${pkgs[@]}" || return $?
-      echo "pip install ${pkgs[*]}" > "$venv_path/volatile-venv-pip-invocation"
+      local opts_msg=""
+      $force_upgrade && opts_msg+=" (with upgrade)"
+      $quiet_install && opts_msg+=" (quiet)"
+      _venv__echo2 section "Installing packages${opts_msg}: ${pkgs[@]}"
+      local opts=()
+      $force_upgrade && opts+=("--upgrade")
+      $quiet_install && opts+=("--quiet" "--quiet") # show errors only (hides usual + warnings logs)
+      pip install "${opts[@]}" "${pkgs[@]}" || return $?
+      echo "pip install ${opts[*]} ${pkgs[*]}" > "$venv_path/volatile-venv-pip-invocation"
     else
       _venv__echo2 section "No package to install"
       echo > "$venv_path/volatile-venv-pip-invocation"
