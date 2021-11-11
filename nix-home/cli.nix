@@ -8,6 +8,7 @@ in {
     bleedingedge.rust-analyzer
     stable.sumneko-lua-language-server
 
+    bleedingedge.bat # use bleedingedge version, same as 'less' below (to have new 'less' with the options I want!)
     stable.fd
     bleedingedge.fzf
     stable.git
