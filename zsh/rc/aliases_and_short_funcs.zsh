@@ -160,10 +160,9 @@ function cheatsh
 # --forest : Show a processes hierarchy
 alias pss="ps -f --forest"
 
-# Colorful diffs (https://www.colordiff.org/)
-if _cmd_available colordiff; then
-  alias diff="colordiff"
-fi
+# git-diff based diff (with delta <3)
+alias gdiff="git dd --no-index"
+alias gdiff::split="git dds --no-index"
 
 # ping
 if _cmd_available prettyping; then
