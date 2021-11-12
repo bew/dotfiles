@@ -587,6 +587,7 @@ runtime! config.rc/plugins/*.rc.vim
 " Source some files
 runtime! mappings.vim
 runtime! autocmd.vim
+runtime! statusline.vim
 
 
 " --- START of deoplete config
