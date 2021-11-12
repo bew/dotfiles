@@ -109,7 +109,7 @@ function! StatuslineSpecialName()
   endif
 
   if filename == "__Mundo__"
-    return "Mundo"
+    return "Undo Tree"
   elseif filename == "__Mundo_Preview__"
     return "Preview"
   elseif filename =~ "NERD_tree"

@@ -24,15 +24,17 @@ Plug 'junegunn/vim-plug', {
     \ 'do': 'ln -sf ../plugged/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
     \ }
 
-Plug 'embear/vim-localvimrc'      " Load local .lvimrc files
-
 " -- Vim feature enhancer
 
 Plug 'wellle/targets.vim'        " Moar & improved text objects
 Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
+let g:mundo_width = 42
+let g:mundo_preview_height = 20
+let g:mundo_prefer_python3 = v:true
+
 Plug 'szw/vim-ctrlspace'        " Control your space (buffers/tags/workspaces/etc..)
-let g:CtrlSpaceUseTabline = 1
-let g:CtrlSpaceLoadLastWorkspaceOnStart = 0
+let g:CtrlSpaceUseTabline = v:true
+let g:CtrlSpaceLoadLastWorkspaceOnStart = v:false
 
 " Use ascii for most symbols
 " (note: some are still on their plugin' default)
@@ -50,6 +52,8 @@ let g:CtrlSpaceSymbols.IM = "(+)"  " Item Modified
 
 Plug 'tpope/vim-abolish'        " Helpers for abbreviation, cased substitution & coercion
 Plug 'thinca/vim-visualstar'      " * for visualy selected text
+let g:visualstar_no_default_key_mappings = v:true
+
 Plug 'itchyny/lightline.vim'      " statusline builder
 
 Plug 'liuchengxu/vim-which-key'
@@ -138,6 +142,12 @@ augroup my_code_diagnostic_hi
 augroup END
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
+let g:neomake_cpp_enabled_makers=['clang']
+let g:neomake_cpp_clang_args = ["-std=c++11"]
+" Run makers on file open/read & write
+autocmd User PluginsLoaded call neomake#configure#automake('rw')
+
+" Config signs & virtual text
 let diag = s:code_diagnostic_cfg
 let g:neomake_virtualtext_prefix = diag.virt_text_prefix
 let s:nm_diag_gen = {cfg -> {"text": cfg.sign, "texthl": cfg.sign_hl}}
@@ -243,6 +253,10 @@ let g:NERDCustomDelimiters.python = {"left": "#"}
 " --
 
 Plug 'preservim/nerdtree'    " Tree based file explorer
+let NERDTreeNaturalSort = v:true
+let NERDTreeWinSize = 45
+let NERDTreeRespectWildIgnore = 1
+let NERDTreeMouseMode = 2 " Single click opens directory nodes, double clicks opens file nodes
 
 Plug 'dyng/ctrlsf.vim'            " Project search like Sublime Text
 let g:ctrlsf_confirm_save = 1
@@ -315,6 +329,12 @@ let delimitMate_expand_space = 1
 let delimitMate_expand_cr = 1
 
 Plug 'SirVer/ultisnips'         " Advanced snippets
+" Trigger configuration.
+let g:UltiSnipsExpandTrigger="²"
+let g:UltiSnipsJumpForwardTrigger="<M-j>"
+let g:UltiSnipsJumpBackwardTrigger="<M-k>"
+" Edit snippets, split/vsplit based on current window size
+let g:UltiSnipsEditSplit="context"
 
 " -- Text refactor / formater
 
@@ -401,10 +421,6 @@ augroup my_startify
   " buffer.
   autocmd User Startified setlocal buflisted
 augroup END
-
-Plug 'junegunn/vim-peekaboo'    " Show registers on usage
-let g:peekaboo_delay = 1000 " in ms (don't show it when I'm fast)
-let g:peekaboo_compact = v:false " always show section names
 
 Plug 'owickstrom/vim-colors-paramount' " Very simple colorscheme
 
@@ -582,8 +598,6 @@ doautocmd User PluginsLoaded
 
 """""""""""""""""""""""""""""""""
 
-runtime! config.rc/plugins/*.rc.vim
-
 " Source some files
 runtime! mappings.vim
 runtime! autocmd.vim
@@ -598,7 +612,7 @@ call deoplete#custom#option("auto_complete_delay", v:false)
 "   Ex: "foB" is matched with "FooBar" but not with "foobar".
 call deoplete#custom#option("camel_case", v:true)
 
-" Allow the use of Ctrl-N for 'complete' based completion
+" Allows to use Ctrl-N for normal vim completion
 call deoplete#custom#option("on_insert_enter", v:false)
 
 " Ensure file paths are ranked higher than words from around, to be able to write file paths without
