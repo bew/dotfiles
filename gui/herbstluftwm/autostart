@@ -29,14 +29,14 @@ hc keybind $M-$C-r   reload
 # WM agnostic keys
 
 # lock (& sleep)
-hc keybind Pause   spawn ~/.bin/i3colocker
-hc keybind $C-Pause   spawn ~/.bin/desktop--lock-and-sleep ~/.bin/i3colocker
+hc keybind Pause   spawn ~/.bin-gui/i3colocker
+hc keybind $C-Pause   spawn ~/.bin-gui/desktop--lock-and-sleep ~/.bin-gui/i3colocker
 # FIXME? (but how to fix?) the screen flashes with the 'theme.background_color' just
 # before i3lock is displayed with a blurry screenshot.
 # --> Seems to be related with the bash script starting i3lock. Starting i3lock
 #     without script does not flicker.
 
-hc keybind $M-space   spawn ~/.bin/wezterm
+hc keybind $M-space   spawn ~/.bin-gui/wezterm
 hc keybind $M-$S-space spawn urxvt
 
 # TODO: move these 'common' options to a script, to be usable anywhere!
