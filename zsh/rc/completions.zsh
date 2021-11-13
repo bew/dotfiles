@@ -64,6 +64,7 @@ function zcompl::extract_options_completion_from_cmd_help
   #  for all option completions gathered from '_gnu_generic' :shrug:)
 }
 zcompl::extract_options_completion_from_cmd_help "fzf"
+zcompl::extract_options_completion_from_cmd_help "exa"
 # TODO (how??): use this to add options completion for 'just' (the task runner)
 #   => The issue is that I have my own '_just' completion function for the tasks. I want to use
 #      '_gnu_generic' only for the options..

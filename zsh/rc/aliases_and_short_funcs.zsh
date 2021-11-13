@@ -105,8 +105,24 @@ alias mkdir="mkdir -v"
 
 # ls
 
-alias ls="ls --color=auto --group-directories-first"
-alias ll="ls -lh"
+alias ls="ls --color=auto --group-directories-first -h"
+
+alias exa="exa --group-directories-first"
+# Config exa colors to shades of grey instead of a distractful bright colors
+EXA_COLORS=""
+EXA_COLORS+="da=38;5;243:" # darker
+EXA_COLORS+="uu=38;5;239:gu=38;5;239:" # darker username & group
+EXA_COLORS+="sn=38;5;29:sb=38;5;100:" # darker and better contrast for file size
+# Darker permissions (shades of grey)
+EXA_COLORS+="ur=38;5;240:uw=38;5;244:ux=38;5;248:ue=38;5;248:" # user permissions
+EXA_COLORS+="gr=38;5;240:gw=38;5;244:gx=38;5;248:" # group permissions
+EXA_COLORS+="tr=38;5;240:tw=38;5;244:tx=38;5;248:" # other permissions
+EXA_COLORS+="xa=38;5;24:" # xattr marker ('@')
+EXA_COLORS+="xx=38;5;240:" # punctuation ('-')
+export EXA_COLORS
+
+alias ls-backend=exa
+alias ll="ls-backend -l"
 alias la="ll -a"
 alias l="la"
 alias l1="ls -1"
