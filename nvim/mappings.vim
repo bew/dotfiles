@@ -1,6 +1,6 @@
 " VIM - mappings
-"
-" "I speek vim" - bew, 2021
+" --------------------------------------------------------------------
+" 'I speek vim' - bew, 2021
 
 " TODO: improve organization!
 
@@ -564,33 +564,29 @@ cnoremap <expr> %%  expand("%:h") . "/"
 " (NOTE: some mappings are in init.vim)
 "
 " Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
-
-" Helper guide on <Leader>
-nnoremap <silent> <leader> <cmd>WhichKey '<Space>'<cr>
-vnoremap <silent> <leader> <cmd>WhichKeyVisual '<VisualBindings>'<cr>
-" NOTE: I'm trying to understand how to tell WhichKey to use '<Space>' as
-" leader indicator, AND use the g:which_key_vmap to search for descriptions
+let g:wk_leader_n_maps = {}
+let g:wk_leader_v_maps = {}
 
 " -- Vim
 nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
 nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
 vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
-let g:which_key_map.v = {"name": "+vim"}
-let g:which_key_map.v.s = "source current file"
-let g:which_key_map.v.x = "exec current line/selection as VimEx"
-" let g:which_key_nmap.v = {"name": "+vim"}
-" let g:which_key_nmap.v.x = "eval current line/sel as EX"
-" let g:which_key_vmap.v = deepcopy(g:which_key_nmap.v)
-" let g:which_key_vmap.v.x = g:which_key_nmap.v.x
+let g:wk_leader_n_maps.v = {"name": "+vim"} " Normal
+let g:wk_leader_v_maps.v = {"name": "+vim"} " Visual
+let g:wk_leader_n_maps.v.s = "source current file"
+let g:wk_leader_n_maps.v.x = "exec current line as VimEx"
+let g:wk_leader_v_maps.v.x = "exec selection as VimEx"
 nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
 vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
-let g:which_key_map.v.e = "substitute/eval sel as vim expr"
+let g:wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
+let g:wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
 
 " -- Code
-let g:which_key_map.c = {"name": "+code"}
+let g:wk_leader_n_maps.c = {"name": "+code"}
+let g:wk_leader_v_maps.c = {"name": "+code"}
 
 " code comment
-let g:which_key_map.c.c = {"name": "+comment"}
+let g:wk_leader_n_maps.c.c = {"name": "+comment"}
 nmap <Leader>cc<space> <plug>NERDCommenterToggle
 vmap <Leader>cc<space> <plug>NERDCommenterToggle
 nmap <Leader>ccc       <plug>NERDCommenterComment
@@ -599,20 +595,14 @@ nmap <Leader>ccu       <plug>NERDCommenterUncomment
 vmap <Leader>ccu       <plug>NERDCommenterUncomment
 nmap <Leader>cci       <plug>NERDCommenterInvert
 vmap <Leader>cci       <plug>NERDCommenterInvert
-let g:which_key_map.c.c["<space>"] = "toggle"
-let g:which_key_map.c.c.c = "force"
-let g:which_key_map.c.c.u = "remove"
-let g:which_key_map.c.c.i = "invert"
+let g:wk_leader_n_maps.c.c["<space>"] = "toggle"
+let g:wk_leader_n_maps.c.c.c = "force"
+let g:wk_leader_n_maps.c.c.u = "remove"
+let g:wk_leader_n_maps.c.c.i = "invert"
+let g:wk_leader_v_maps.c.c = deepcopy(g:wk_leader_n_maps.c.c)
 
-" code language tools (not done globally.. LSP would solve this..)
-" cr   rename
-" cu   show usages
-" cd   goto definition
-" ca   code actions (from LSP + custom?)
-"
-" Currently my main usage is with jedi-vim, which I configure manually
-" when a python buffer opens.
-" NOTE: I don't know how to set a which_key_map for a single buffer
+" code language tools
+" FIXME: These should be buffer-local maps
 nmap <leader>c²   <Plug>(lcn-menu)
 nmap <leader>cd   <Plug>(lcn-definition)
 nmap <leader>ct   <Plug>(lcn-type-definition)
@@ -621,28 +611,36 @@ nmap <leader>cr   <Plug>(lcn-rename)
 nmap <leader>ca   <Plug>(lcn-code-action)
 nmap <leader>ci   <Plug>(lcn-implementation)
 nmap <leader>ch   <Plug>(lcn-hover)
-let g:which_key_map.c["²"] = "lang menu"
-let g:which_key_map.c.d = "lang goto def"
-let g:which_key_map.c.t = "lang goto type"
-let g:which_key_map.c.u = "lang references"
-let g:which_key_map.c.r = "lang rename"
-let g:which_key_map.c.a = "lang code actions"
-let g:which_key_map.c.i = "lang implementation"
-let g:which_key_map.c.h = "lang hover info"
+nmap <leader>c<space>   <Plug>(lcn-hover)
+let g:wk_leader_n_maps.c["²"] = "lang menu"
+let g:wk_leader_n_maps.c.d = "lang goto def"
+let g:wk_leader_n_maps.c.t = "lang goto type"
+let g:wk_leader_n_maps.c.u = "lang usages/references"
+let g:wk_leader_n_maps.c.r = "lang rename"
+let g:wk_leader_n_maps.c.a = "lang code actions"
+let g:wk_leader_n_maps.c.i = "lang implementation"
+let g:wk_leader_n_maps.c.h = "lang hover info"
+let g:wk_leader_n_maps.c["<space>"] = "lang hover info"
+" Additional keys, which should be better defined..
+" TODO: Use virtual keys!
+nmap ²   <Plug>(lcn-hover)
+" TODO: nmap K   <please always give documentation in an upper split>
 
 " TODO: Setup virtual keys for language tools/actions (with default msg),
 "   and enable for python (jedi) and when the language client is active
 
 " code/content context (using context.vim plugin)
 nmap <Leader>cx   <cmd>ContextPeek<cr>
-let g:which_key_map.c.x = "context peek (until move)"
+let g:wk_leader_n_maps.c.x = "context peek (until move)"
 
 " -- Quickfix / Location lists
-let g:which_key_map["!"] = {"name": "+qf-loc-list"}
+let g:wk_leader_n_maps["!"] = {"name": "+qf-loc-list"}
 nmap <leader>!c   <cmd>lclose \| copen<cr>
 nmap <leader>!l   <cmd>cclose \| lopen<cr>
-let g:which_key_map["!"].c = "open qf list (global)"
-let g:which_key_map["!"].l = "open loc list (local)"
+nmap <leader>!!   <cmd>call <SID>OnLastQfLocListDoTryNextOrFirst()<cr>
+let g:wk_leader_n_maps["!"].c = "open qf list (global)"
+let g:wk_leader_n_maps["!"].l = "open loc list (local)"
+let g:wk_leader_n_maps["!"]["!"] = "jump to next/first in last list"
 
 " Try to detect the qf or loc list, and save which one is the last one
 function! s:TryRegisterLastUsedQfOrLocList()
@@ -689,38 +687,42 @@ function! s:OnLastQfLocListDoTryNextOrFirst()
     endtry
   endtry
 endf
-nmap <leader>!! <cmd>call <SID>OnLastQfLocListDoTryNextOrFirst()<cr>
-let g:which_key_map["!"]["!"] = "jump to next/first in last list"
 
 " -- Edit
-let g:which_key_map.e = {"name": "+edit"}
+let g:wk_leader_n_maps.e = {"name": "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
 nmap <leader>ee  :e %%
 nmap <leader>es  :spl %%
 nmap <leader>ev  :vsp %%
 nmap <leader>et  :tabe %%
-let g:which_key_map.e.e = "relative here"
-let g:which_key_map.e.s = "relative in split"
-let g:which_key_map.e.v = "relative in vertical split"
-let g:which_key_map.e.t = "relative in tab"
+let g:wk_leader_n_maps.e.e = "relative here"
+let g:wk_leader_n_maps.e.s = "relative in split"
+let g:wk_leader_n_maps.e.v = "relative in vertical split"
+let g:wk_leader_n_maps.e.t = "relative in tab"
 
 " -- Git
-" FIXME (not just here): Why not use nnoremap for these? Oo
 nmap <leader>hp <Plug>(GitGutterPreviewHunk)
 nmap <leader>hu <Plug>(GitGutterUndoHunk)
 nmap <leader>hf <cmd>GitGutterFold<cr>
 nmap <leader>hn <cmd>GitGutterNextHunk<cr>
 nmap <leader>hN <cmd>GitGutterPrevHunk<cr>
 nmap <leader>hb <Plug>(git-messenger)
-let g:which_key_map.h = {"name": "+git-hunks"}
-let g:which_key_map.h.p = "preview"
-let g:which_key_map.h.u = "undo"
-let g:which_key_map.h.f = "fold non-hunk"
-let g:which_key_map.h.n = "next hunk"
-let g:which_key_map.h.N = "prev hunk"
-let g:which_key_map.h.b = "blame"
+let g:wk_leader_n_maps.h = {"name": "+git-hunks"}
+let g:wk_leader_n_maps.h.p = "preview"
+let g:wk_leader_n_maps.h.u = "undo"
+let g:wk_leader_n_maps.h.f = "fold non-hunk"
+let g:wk_leader_n_maps.h.n = "next hunk"
+let g:wk_leader_n_maps.h.N = "prev hunk"
+let g:wk_leader_n_maps.h.b = "blame"
 
+
+
+lua << LUA
+-- Register nmap/vmap keys descriptions
+require("which-key").register(vim.g.wk_leader_n_maps, { mode = "n", prefix = "<leader>" })
+require("which-key").register(vim.g.wk_leader_v_maps, { mode = "v", prefix = "<leader>" })
+LUA
 
 
 " -----------------

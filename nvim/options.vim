@@ -1,6 +1,5 @@
-"
-" OPTIONS
-"
+" Options
+" --------------------------------------------------------------------
 
 filetype plugin indent on
 " Enable omni completion
