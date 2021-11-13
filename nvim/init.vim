@@ -56,14 +56,51 @@ let g:visualstar_no_default_key_mappings = v:true
 
 Plug 'itchyny/lightline.vim'      " statusline builder
 
-Plug 'liuchengxu/vim-which-key'
-let g:which_key_use_floating_win = 0
-" let g:which_key_timeout = 0  " Does not seem to work, it still takes &timeoutlen to open.
-let g:which_key_sep = '->'
-autocmd! FileType which_key
-autocmd FileType which_key hi WhichKeySeperator ctermbg=none ctermfg=37
-let g:which_key_map = {}  " Fill this map for which-key helper!
-autocmd User PluginsLoaded call which_key#register("<space>", "g:which_key_map")
+Plug 'folke/which-key.nvim'
+" NOTE: It's a remake of the vimscript-based 'liuchengxu/vim-which-key' plugin,
+"   that handles WAY BETTER keys in various modes.
+"   However it comes with a lot of things re-enabled, and I have to opt-out of these..
+"   I'd have prefered to have opt-in features rather than opt-out, to potentially give better
+"   extensibility for users.
+lua << LUA
+function my_which_key_setup()
+  local wk = require("which-key")
+  wk.setup {
+    layout = {
+      align = "center",
+      spacing = 15,
+    },
+    icons = { separator = "->" },
+    key_labels = {
+      -- Override the label used to display some keys
+      ["<space>"] = "SPC",
+      ["<tab>"] = "TAB",
+      ["<cr>"] = "Enter",
+      ["<NL>"] = "<C-J>",
+    },
+    plugins = {
+      -- Enable spelling popup on 'z='
+      spelling = { enabled = true },
+      -- Disable most presets (auto-doc for builtin keys) which assume the default keys
+      -- are used. It is distractful, and doesn't detect everything right.
+      presets = {
+        operators = false,
+        motions = false,
+        text_objects = false,
+        windows = false,
+        nav = false,
+      },
+    },
+    -- Ensure the which-key popup is auto-triggered ONLY for a very limitted set of keys,
+    -- because the popup is mostly annoying/distractful for other keys.
+    -- (help for 'z' can be useful)
+    triggers = {"<leader>", "z"},
+  }
+  -- note: nmap/vmap descriptions are registered in ./mappings.vim
+end
+LUA
+autocmd User PluginsLoaded lua my_which_key_setup()
+
 " Create a per-buffer map, to avoid crashing WhichKey when the variable
 " does not exist, we must create a buffer dict, empty for most files,
 " which will be filled for some file types
