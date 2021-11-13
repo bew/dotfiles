@@ -27,6 +27,22 @@ Plug 'junegunn/vim-plug', {
 " -- Vim feature enhancer
 
 Plug 'wellle/targets.vim'        " Moar & improved text objects
+" Configure how targets are found based on cursor, current line, and lines around:
+let g:targets_seekRanges = ""
+" * Consider targets that start, end or include the cursor:
+"   (for current line and lines around)
+let g:targets_seekRanges .= " cc cr cb cB lc ac Ac lr lb ar ab lB Ar aB Ab AB"
+" * Consider targets that start on the right (->) of cursor on current line:
+let g:targets_seekRanges .= " rr rb rB"
+" * Consider targets that start and end on the left (<-) of cursor, only on current line:
+let g:targets_seekRanges .= " ll"
+" NOTE: It would be nice to be able to configure this for ' or " quotes only, to limit to start/end on
+"       current line only.
+" NOTE2: Still not perfect, because a quote `'` that start in (e.g) a comment
+"   (like when writing `I'm groot`) will be considered as open for the next lines
+"   until the next quote `'` which can be many lines after. Now `ci'` between them is unreliable,
+"   and can delete a lot of text that shouldn't be deleted.
+
 Plug 'simnalamburt/vim-mundo'     " undo tree (fork of gundo)
 let g:mundo_width = 42
 let g:mundo_preview_height = 20
