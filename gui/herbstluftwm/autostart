@@ -267,6 +267,9 @@ hc mousebind $M-$S-Button3   zoom
 # NOTE: can also use $M-hjkl (directional focus, crossing frame and monitor boundaries)
 hc keybind $M-$S-s   cycle_monitor
 
+# Screenshot (with intereactive gui)
+hc keybind $M-$C-s   spawn flameshot gui
+
 # FIXME: Add $M-Escape to select the LAST window.. not possible builtin..
 hc keybind $M-Tab cycle # in a frame
 hc keybind $M-c   cycle_all +1
@@ -331,6 +334,7 @@ hc rule --windowtype="_NET_WM_WINDOW_TYPE_DIALOG" focus=on
 hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)" manage=off
 
 hc rule --instance="pavucontrol" floating=true floatplacement=center
+hc rule --instance="flameshot" floating=true floatplacement=center
 
 hc rule --instance="yad" floating=true
 
