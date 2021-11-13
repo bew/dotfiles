@@ -5,7 +5,7 @@ if &buftype != "help"
 endif
 
 " Fast quit
-nnoremap <buffer> q  :q<cr>
+nnoremap <buffer><silent> q  :q<cr>
 
 " Fast more-help
 " NOTE: I use <right> to not have a trailing space in the config
@@ -39,4 +39,4 @@ nnoremap <buffer><silent> <C-n>  :call <SID>SearchHelpLink(v:false)<cr>
 nnoremap <buffer><silent> <C-p>  :call <SID>SearchHelpLink(v:true)<cr>
 
 " Set statusline comment for this buffer
-let b:bew_statusline_comment = "o: open | C-n/p: find link | M-n/p: n/p jump | M-h: :h"
+let b:bew_statusline_comment = "o: open | C-n/p: find link | M-n/p: history | M-h: :h"

@@ -39,7 +39,7 @@ let g:lightline.inactive = {
     \   'left':  [
     \     ['mode'],
     \     ['readonly', 'relativepath', 'linter_err_warn', 'modified'],
-    \     ['git_branch']
+    \     ['git_branch', 'realpath']
     \   ],
     \   'right': [
     \     ['progress'],
@@ -62,7 +62,8 @@ let g:lightline.component_visible_condition = {
     \ }
 let g:lightline.component_function = {
     \   'filename': 'StatuslineTwoPartsFilename',
-    \   'relativepath': 'StatuslineRelativeFilename',
+    \   'relativepath': 'StatuslineTryRelativeFilename',
+    \   'realpath': 'StatuslineRealpathIfDiff',
     \   'filetype': 'StatuslineFiletype',
     \   'mode': 'StatuslineMode',
     \   'git_branch': 'StatuslineGitBranch',
@@ -89,7 +90,7 @@ function! StatuslineGitBranch()
   return ''
 endfunction
 
-function! StatuslineSpecialName()
+function! s:special_buffer_name()
   let wininfo = getwininfo(win_getid())[0]
   " let r = getwininfo(win_getid())[0] | echo "qf: " . r.quickfix . " loc: " . r.loclist
   let is_qf_list = (wininfo.quickfix && !wininfo.loclist)  " qf: 1 && loc: 0
@@ -121,35 +122,61 @@ function! StatuslineSpecialName()
   return "__not_special__"
 endf
 
-function! StatuslineRelativeFilename()
-  " Path relative to (tab/process) cwd or absolute
-  let path = fnamemodify(expand('%:p'), ':.')
-  if path !~? '^/'
-    " path is not absolute, it's relative, add './' to be explicit
-    let formatted_path = './' . path
+function! StatuslineRealpathIfDiff()
+  let buffer_name = expand('%')
+  let fullpath = fnamemodify(buffer_name, ':p')
+  let resolved_fullpath = resolve(fullpath)
+  if filereadable(buffer_name) && fullpath != resolved_fullpath
+    let formatted_realpath = fnamemodify(resolved_fullpath, ':~')
+    return 'Realpath: ' . formatted_realpath
   else
+    return ''
+  endif
+endf
+
+function! s:path_try_to_relative(valid_path)
+  " Transform to relative path to (tab/process's) cwd or absolute path
+  let path = fnamemodify(a:valid_path, ':p:.')
+  if path =~? '^/'
     " path is absolute, at least try to apply '~' home substitution
-    let formatted_path = fnamemodify(path, ':~')
+    return fnamemodify(path, ':~')
+  else
+    " path is not absolute, it's relative, add './' to be explicit
+    return './' . path
+  endif
+endf
+
+function! s:path_to_2_parts(valid_path)
+  " Transform to 2-parts file path: ~/foo or foo/bar
+  let raw_fname = fnamemodify(a:valid_path, ':t')
+  if filereadable(expand("~/" . raw_fname))
+    return "~/" . raw_fname " ~/filename
+  else
+    let parent_dir = expand("%:h:t")
+    return parent_dir . "/" . raw_fname " parent_dir/filename
+  endif
+endf
+
+function! s:buffer_name_with_transformation(path_transformer)
+  let buffer_name = expand('%')
+  if filereadable(buffer_name)
+    " It's a file path, transform it!
+    let formatted_path = a:path_transformer(buffer_name)
+  else
+    " It's not a file path, just put its name (e.g: '__XtermColorTable__')
+    let formatted_path = (buffer_name != "" ? buffer_name : "[No Name]")
   endif
 
-  let special_name = StatuslineSpecialName()
+  let special_name = s:special_buffer_name()
   return special_name != "__not_special__" ? special_name : formatted_path
 endf
 
-function! StatuslineTwoPartsFilename()
-  let raw_fname = expand('%:t')
-  if raw_fname != ""
-    if filereadable(expand("~/" . raw_fname))
-      let formatted_fname = "~/" . raw_fname " ~ & filename
-    else
-      let formatted_fname = expand("%:h:t") . "/" . raw_fname " parent dir & filename
-    endif
-  else
-    let formatted_fname = "[No Name]"
-  endif
+function! StatuslineTryRelativeFilename()
+  return s:buffer_name_with_transformation(funcref('s:path_try_to_relative'))
+endf
 
-  let special_name = StatuslineSpecialName()
-  return special_name != "__not_special__" ? special_name : formatted_fname
+function! StatuslineTwoPartsFilename()
+  return s:buffer_name_with_transformation(funcref('s:path_to_2_parts'))
 endfunction
 
 function! StatuslineFiletype()
