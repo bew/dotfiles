@@ -139,10 +139,29 @@ nnoremap <C-l> <C-w>l
 " Window splits
 " FIXME: now I need repeat mode supports, like in tmux!!
 "        similar to Hydra plugin in emacs: https://github.com/abo-abo/hydra
-nnoremap <C-w><C-h>   <cmd>set nosplitright <bar> vsplit                       <cr>
-nnoremap <C-w><C-j>   <cmd>set   splitbelow <bar>  split <bar> set nosplitbelow<cr>
-nnoremap <C-w><C-k>   <cmd>set nosplitbelow <bar>  split                       <cr>
-nnoremap <C-w><C-l>   <cmd>set   splitright <bar> vsplit <bar> set nosplitright<cr>
+nnoremap <C-w><C-h>   <cmd>call DirectionalSplit("left")<cr>
+nnoremap <C-w><C-j>   <cmd>call DirectionalSplit("down")<cr>
+nnoremap <C-w><C-k>   <cmd>call DirectionalSplit("up")<cr>
+nnoremap <C-w><C-l>   <cmd>call DirectionalSplit("right")<cr>
+function! DirectionalSplit(dir)
+  let save_split_options = [&splitright, &splitbelow]
+  if a:dir == "left"
+    set nosplitright
+    vsplit
+  elseif a:dir == "down"
+    set splitbelow
+    split
+  elseif a:dir == "up"
+    set nosplitbelow
+    split
+  elseif a:dir == "right"
+    set splitright
+    vsplit
+  endif
+  let &splitright = save_split_options[0]
+  let &splitbelow = save_split_options[1]
+endf
+
 " Full-width/height window splits
 " FIXME: Do I need this? Would I use this?
 " FIXME: Since I use noequalalways, the created splits takes way too much space...
@@ -151,6 +170,18 @@ nnoremap <C-M-w><C-M-h>   <cmd> split<cr><C-w>H
 nnoremap <C-M-w><C-M-j>   <cmd>vsplit<cr><C-w>J
 nnoremap <C-M-w><C-M-k>   <cmd>vsplit<cr><C-w>K
 nnoremap <C-M-w><C-M-l>   <cmd> split<cr><C-w>L
+
+" Smart window split (based on current window size)
+nnoremap <C-w><C-s>  <cmd>call SmartSplit()<cr>
+function! SmartSplit()
+  " ((win_width / 3) > win_height) ? vsplit : split
+  if (winwidth(0) / 3) > winheight(0)
+    call DirectionalSplit("left")
+  else
+    call DirectionalSplit("up")
+  endif
+endf
+
 " Keep a mapping for original <C-w> behavior
 nnoremap <C-w><C-w>  <cmd>echo "Original ^W behavior..."<cr><C-w>
 
