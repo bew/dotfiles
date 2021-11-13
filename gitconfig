@@ -23,6 +23,15 @@
   # When 'merge' subcmd is called without any ref, merge the upstream branch in.
   defaultToUpstream = true
 
+[rebase]
+  # Automatically create a temporary stash entry before the operation begins, and apply it after the
+  # operation ends.
+  autoStash = true
+
+  # Print a warning when deleting commit lines in interactive rebase.
+  # (use an explicit 'drop' action to avoid the warning)
+  missingCommitsCheck = "warn"
+
 [help]
   autocorrect = -1 # without prompt
 
