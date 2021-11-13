@@ -8,6 +8,7 @@ in {
     bleedingedge.rust-analyzer
     stable.sumneko-lua-language-server
 
+    stable.exa # alternative ls, more colors!
     bleedingedge.bat # use bleedingedge version, same as 'less' below (to have new 'less' with the options I want!)
     stable.fd
     bleedingedge.fzf
@@ -40,5 +41,6 @@ in {
     stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)
     stable.nix-diff # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
     stable.nixfmt # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
+    # stable.nix-update # Swiss-knife for updating nix packages
   ];
 }
