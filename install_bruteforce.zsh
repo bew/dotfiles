@@ -31,7 +31,8 @@ make-link .config/dotfiles ~/.dot
 make-link dotfiles         ~/.config/.dot
 
 label "bin link"
-make-link .dot/bin ~/.bin
+make-link .dot/bin     ~/.bin
+make-link .dot/gui/bin ~/.bin-gui
 
 label "zsh links"
 make-link .dot/zsh     ~/.zsh
