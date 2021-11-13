@@ -630,7 +630,7 @@ nmap ²   <Plug>(lcn-hover)
 "   and enable for python (jedi) and when the language client is active
 
 " code/content context (using context.vim plugin)
-nmap <Leader>cx   <cmd>ContextPeek<cr>
+nmap <Leader>cx   <cmd>MyContextPeek<cr>
 let g:wk_leader_n_maps.c.x = "context peek (until move)"
 
 " -- Quickfix / Location lists

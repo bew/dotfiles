@@ -355,9 +355,18 @@ augroup my_git_signs_hi
 augroup END
 
 Plug 'wellle/context.vim'              " show the context of the currently visible buffer contents
-let g:context_enabled = v:false " we enable it only when needed
 " Do not use hard redraws (See: https://github.com/wellle/context.vim/issues/23)
 let g:context_nvim_no_redraw = v:true " necessary when g:context_presenter is 'nvim-float'
+" Disable every defaults. We enable it only when needed, and register autocmd ourself to avoid
+" unnecessary slowdowns (CursorMoved was always hooked by default, and seemed slow in big files..)
+let g:context_enabled = v:false " we enable it only when needed
+let g:context_add_mappings = v:false
+let g:context_add_autocmds = v:false
+" Replicate the wanted peek-and-discard behavior, without permanent callbacks :)
+command! MyContextPeek silent ContextPeek | autocmd CursorMoved <buffer> ++once ContextUpdate
+augroup my_context_vim
+  autocmd VimEnter * ContextActivate " Necessary.. cf plugin's help about disabled autocmds.
+augroup END
 
 " -- Insert mode helpers
 
