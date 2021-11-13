@@ -141,6 +141,9 @@ function segmt::short_vim_mode
   esac
 }
 
+# Set to anything to show a short venv segment
+PROMPT_SEGMT_VENV_SHORT="${PROMPT_SEGMT_VENV_SHORT:-}"
+
 # Segment with the current active venv directory if any
 function segmt::python_venv
 {
@@ -155,7 +158,13 @@ function segmt::python_venv
   else
     # Add venv name if not 'venv'
     if [[ "$venv_dir" != "venv" ]]; then
-      venv_display+=" '$venv_dir'"
+      if [[ -n "$PROMPT_SEGMT_VENV_SHORT" ]]; then
+        # For $venv_dir == `Py3.9.7-231c4f5db9de5be7df4255ec41a3139b`
+        # -> prints `'Py3.9.7-231c~'`
+        venv_display+=" '${venv_dir[0,12]}~'"
+      else
+        venv_display+=" '$venv_dir'"
+      fi
     fi
 
     local venv_parent_dir_path=$(dirname "$VIRTUAL_ENV")
@@ -164,12 +173,16 @@ function segmt::python_venv
       venv_display+=" here"
     else
       # venv is not in $PWD, show the venv parent dir name to avoid ambiguity.
-      if [[ "${(D)venv_parent_dir_path}" != "$venv_parent_dir_path" ]]; then
-        # Use existing directory alias (usualy shorter than the real dirname)
-        venv_display+=" in ${(D)venv_parent_dir_path}"
+      if [[ -n "$PROMPT_SEGMT_VENV_SHORT" ]]; then
+        venv_display+=" not here"
       else
-        local venv_parent_dir=$(basename "$venv_parent_dir_path")
-        venv_display+=" in $venv_parent_dir"
+        if [[ "${(D)venv_parent_dir_path}" != "$venv_parent_dir_path" ]]; then
+          # Use existing directory alias (usualy shorter than the real dirname)
+          venv_display+=" in ${(D)venv_parent_dir_path}"
+        else
+          local venv_parent_dir=$(basename "$venv_parent_dir_path")
+          venv_display+=" in $venv_parent_dir"
+        fi
       fi
     fi
   fi

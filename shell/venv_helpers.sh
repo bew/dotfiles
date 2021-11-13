@@ -344,8 +344,10 @@ function venv_with_do
     # E.g: /home/me/.cache/volatile-venvs/d3b07384d113edec49eaa6238ad5ff00
     local venv_dir_hash=$(echo "${pkgs[@]}" | md5sum | awk '{ print $1 }')
     local python_bin_path="$(_venv__find_python_bin_path)"
-    # note: `python --version` looks like `Python 3.7.10 (optional stuff here)`
-    local python_version="$("$python_bin_path" --version | awk '{ print $1$2 }')"
+    # `python --version` looks like `Python 3.7.10 (optional stuff here)`
+    # => Transform it to: `Py3.7.10
+    local python_version=$("$python_bin_path" --version \
+      | awk '{ sub(/Python/, "Py", $1); print $1$2 }')
     local venv_path="${VENV_VOLATILE_BASE_DIR}/${python_version}-${venv_dir_hash}"
 
     local created_or_reused_msg="created"
