@@ -4,8 +4,8 @@ let
   inherit (config.pkgsChannels) stable bleedingedge;
 in {
   home.packages = [
-    bleedingedge.neovim
-    bleedingedge.rust-analyzer
+    stable.neovim
+    stable.rust-analyzer
     stable.sumneko-lua-language-server
 
     stable.exa # alternative ls, more colors!
@@ -34,8 +34,11 @@ in {
     stable.gron # to have grep-able json <3
     stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
 
-    bleedingedge.chafa # crazy cool img/gif terminal viewer
+    stable.chafa # crazy cool img/gif terminal viewer
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
+
+    # Languages
+    stable.python3
 
     # Nix tools
     stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)

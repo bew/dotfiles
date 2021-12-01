@@ -72,7 +72,7 @@ nix store diff-closures $CLOSURE_BEFORE $CLOSURE_AFTER > $DIFF_FILE
 
 if [[ -s $DIFF_FILE ]]; then
   # file is not empty
-  echo_section "Significant (>8KB) packages changes or new packages"
+  echo_section "Significant (>8KB) packages changes or new/removed packages"
   cat $DIFF_FILE
   echo_info "NOTE: diff available in '$(realpath --relative-base=. $DIFF_FILE)'"
 else
