@@ -19,13 +19,13 @@
   # We use specific branches to get most/all packages from the official cache.
 
   # This is the backbone package set, DO NOT REMOVE/CHANGE unless you know what you're doing
-  inputs.nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-21.05";
+  inputs.nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-21.11";
 
-  inputs.nixpkgsStable.url = "github:nixos/nixpkgs/nixos-21.05";
+  inputs.nixpkgsStable.url = "github:nixos/nixpkgs/nixos-21.11";
   inputs.nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
   inputs.homeManager = {
-    url = "github:nix-community/home-manager/release-21.05";
+    url = "github:nix-community/home-manager/release-21.11";
     inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
@@ -60,7 +60,9 @@
           };
         };
 
-        pkgsChannels = let pkgsFromNixpkgs = nixpkgs: nixpkgs.legacyPackages.${system}; in {
+        pkgsChannels = let
+          pkgsFromNixpkgs = nixpkgs: nixpkgs.legacyPackages.${system};
+        in {
           backbone = pkgsFromNixpkgs inputs.nixpkgsBackbone;
           stable = pkgsFromNixpkgs inputs.nixpkgsStable;
           bleedingedge = pkgsFromNixpkgs inputs.nixpkgsUnstable;
