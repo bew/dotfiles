@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Dependencies:
+# pkg nix (for nix commands)
+# pkg moreutils (for sponge)
+# pkg ansifilter
+
 # Safer shell script with these options
 # -e          : exit if a command exits with non-zero status
 # -u          : exit if an expanded variable does not exist
@@ -80,6 +85,10 @@ else
   echo_info "No significant (>8KB) package changes"
 fi
 echo
+
+# Strip ANSI sequences from $DIFF_FILE
+# NOTE: 'sponge' read all its input before opening its arg and writing to it, allows self-overwrite
+( ansifilter "$DIFF_FILE" || cat "$DIFF_FILE" ) | sponge "$DIFF_FILE"
 
 size_before=$(get_closure_size $CLOSURE_BEFORE)
 size_after=$(get_closure_size $CLOSURE_AFTER)
