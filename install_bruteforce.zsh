@@ -47,6 +47,7 @@ make-link .dot/nvim  ~/.nvim # shortcut
 label "git links"
 make-link .dot/gitconfig ~/.gitconfig
 make-link .dot/gitignore ~/.gitignore
+make-link ~/.dot/gh      ~/.config/gh
 
 label "Nix stuff"
 make-link .dot/nix        ~/.config/nix

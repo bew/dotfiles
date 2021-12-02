@@ -68,7 +68,6 @@ alias -g NOOUTPUT="NOOUT NOERR"
 # Shorters
 
 alias g=git
-alias gh=hub
 alias m=make
 alias dk=docker
 alias dkc=docker-compose
