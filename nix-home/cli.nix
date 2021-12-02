@@ -14,6 +14,7 @@ in {
     bleedingedge.fzf
     stable.git
     stable.git-lfs
+    stable.gh  # github cli for view & operations
     bleedingedge.delta # for nice git diffs
     stable.jq
     bleedingedge.ripgrep
