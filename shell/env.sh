@@ -53,9 +53,8 @@ path_maybe_add_entry "/usr/local/bin" fallback
 export LESS="-R --ignore-case --incsearch --LONG-PROMPT --tabs=4 --window=-4"
 export LESSKEYIN=~/.dot/lesskey-bew
 
-export PAGER="most"
+export PAGER="less"
 export MANPAGER='nvim +Man!' # man in vim!
-export BAT_PAGER="less" # `most` does not work with `bat`
 
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
