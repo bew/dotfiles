@@ -248,6 +248,10 @@ zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*='"${colo
 
 zstyle ':completion:*:*:git*:*:commits*' list-colors "=(#b)(*) -- *=0=${color[cyan]}"
 
+# for just's receipe (color args & description)
+# format is `the-receipe -- Args: FOO # Receipe description`
+zstyle ':completion:*:*:just:*:argument-1'  list-colors "=(#b)* (-- *) (\#*)=0=${color[blue]}=${color[green]}"
+
 
 # Custom color for the menu completion (let's try!)
 #
