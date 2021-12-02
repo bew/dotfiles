@@ -118,6 +118,9 @@
   llv = pretty-log-verbose
   lav = pretty-log-verbose --all
 
+  # NOTE: using the verbose version, because it does not add a blank line at the end
+  last-log = !git --no-pager pretty-log-verbose -n1
+
   # diff
   d  = diff
   dc = diff --staged
@@ -139,6 +142,8 @@
   # (now with side-by-side delta diff layout)
   review-branch-s          = !git dds --unified=30   $(git z--base-branch-helper)
   review-branch-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
+
+  review-logs = !git pretty-log $(git z--base-branch-helper)..
 
   stat = !git --no-pager diff --stat --summary
   stat-branch = !git stat $(git z--base-branch-helper)..
