@@ -543,13 +543,48 @@ Plug 'peterhoeg/vim-qml'        " QML syntax
 "# Markdown
 Plug 'plasticboy/vim-markdown'  " Markdown vim mode
 
-let g:vim_markdown_folding_disabled = 1
-let g:vim_markdown_conceal = 0
-let g:vim_markdown_conceal_code_blocks = 0
+let g:vim_markdown_folding_disabled = v:true
+let g:vim_markdown_conceal = v:false
+let g:vim_markdown_conceal_code_blocks = v:false
+let g:vim_markdown_fenced_languages = ["hcl=terraform"] " Additional code hi config
+let g:vim_markdown_frontmatter = v:true
+let g:vim_markdown_new_list_item_indent = 2
 
-" Highlight YAML at start of file, useful to add metadata to a
-" markdown file.
-let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_auto_insert_bullets = 0 " Because I don't want <Enter> to make a new bullet!
+" Note: auto bullet works by setting '*', '+', '-' as a comment leader, and configuring vim to
+" auto insert comment leader on <Enter> (with 'formatoptions').
+" TODO: Ideally I want <Enter> to make a new line in the same bullet, and <o> to make a new bullet.
+"   The problem is that I also want <Enter> in a quote to auto-add '>' (also set as a comment
+"   leader) and <o> to make a new line _without_ the quote char '>'. So the *exact* opposite of the
+"   bullet behavior.
+"   I don't think it's possible to configure vim to have multiple <Enter>/<o> behavior based
+"   on the comment leader ('-' vs '>').
+" FIXME need to investigate: For some reason, auto-insert and indents of numbered lists
+"   DO NOT WORK with this plugin. (vim options: 'formatoptions' flag 'n', and 'formatlistpat')
+
+Plug 'dhruvasagar/vim-table-mode'
+" NOTE: By default, mappings are under <leader>t (once <leader>tm enabled the table mode)
+let g:table_mode_motion_up_map = ""
+let g:table_mode_motion_down_map = ""
+let g:table_mode_realign_map = "<leader>ta"
+let g:table_mode_insert_column_before_map = "<leader>tiC"
+let g:table_mode_insert_column_after_map = "<leader>taC"
+let g:table_mode_delete_column_map = "<leader>tdC"
+let g:table_mode_cell_text_object_a_map = "ac"
+let g:table_mode_cell_text_object_i_map = "ic"
+" TODO: textobj iC & aC to select a column (in visual block)
+"   => Is this even possible? (can I change the type of visual mode from a textobj?)
+
+" Ensure existing syntax rules are not overriden (inline code, bold, italics, ...)
+" Ref: https://github.com/dhruvasagar/vim-table-mode/issues/180
+let g:table_mode_syntax = v:false
+
+" Disable auto align in insert mode, configure it myself on BufWritePre:
+let g:table_mode_auto_align = v:false
+autocmd BufWritePre *.md if tablemode#IsActive() | exe "TableModeRealign" | endif
+" Disable auto align on '|'
+" (also disables '||' behavior to fill a separator line, enter '|-|' and realign to get it)
+let g:table_mode_separator_map = ""
 
 "# Python
 " Add colors to 'arg=' in 'func_call(arg=1)'
@@ -752,13 +787,13 @@ augroup my_custom_language_hi
   "
   " Tracking issue: https://github.com/plasticboy/vim-markdown/issues/521
   "
-  " In the meantime, we need to set both html & mkd groups, because the mkd
-  " groups are used for the delimiters, and html groups are used for the
-  " content.
-  au ColorScheme * hi mkdItalic cterm=italic ctermfg=253 ctermbg=235
-  au ColorScheme * hi mkdBold cterm=bold ctermfg=253 ctermbg=235
-  au ColorScheme * hi link htmlItalic mkdItalic
-  au ColorScheme * hi link htmlBold mkdBold
+  " In the meantime, we need to set both html & mkd groups:
+  " * mkd groups are used for the delimiters
+  au ColorScheme * hi mkdItalic ctermfg=243 ctermbg=235
+  au ColorScheme * hi mkdBold ctermfg=243 ctermbg=235
+  " * html groups are used for the content
+  au ColorScheme * hi htmlItalic cterm=italic ctermfg=251 ctermbg=235
+  au ColorScheme * hi htmlBold cterm=bold ctermfg=255 ctermbg=235
 
   " Ruby Colors
   au ColorScheme * hi clear rubyInstanceVariable
