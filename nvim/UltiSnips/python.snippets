@@ -68,15 +68,26 @@ def ${10:some_prefilled_obj}($20) -> ${30:Any}:
 	${40:${VISUAL:pass}}
 endsnippet
 
+snippet pytu "pytest unit test decorator" b
+@pytest.mark.unit
+endsnippet
+
+snippet pyts "pytest skip test decorator" b
+@pytest.mark.skip  # TODO: remove this!
+endsnippet
+
 snippet pytp "pytest parametrize test decorator" b
 @pytest.mark.parametrize(
 	"${10:param1,param2}",
 	[
-		(${20:value1, value2}),$0
+		(${20:value1,value2}),$0
 	],
 )
 endsnippet
 
+snippet pytpi "pytest parametrize test decorator (inline)" b
+@pytest.mark.parametrize("${10:param1,param2}", [$2])
+endsnippet
 # decorators
 
 snippet @data "@dataclass" b

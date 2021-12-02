@@ -414,8 +414,8 @@ fi
 
 alias pytest::no-warn="pytest --disable-warnings"
 alias pytest::no-cov-no-warn="pytest --no-cov --disable-warnings"
-alias pyt::fail-fast-verbose="pytest::no-cov-no-warn --exitfirst -vv --showlocals"
-alias pyt::last-failed-verbose="pytest::no-cov-no-warn --last-failed -vv --showlocals"
-alias pyt::failed-first="pytest::no-cov-no-warn --failed-first"
+alias pytest::fail-fast-verbose="pytest::no-cov-no-warn --exitfirst -vv --showlocals"
+alias pytest::last-failed-verbose="pytest::no-cov-no-warn --last-failed -vv --showlocals"
+alias pytest::failed-first="pytest::no-cov-no-warn --failed-first"
 
 # vim:set sw=2:
