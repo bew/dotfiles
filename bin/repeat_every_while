@@ -30,10 +30,16 @@ function repeat_every_impl
   local ctrl_mode="$1"; shift # The internal mode (while or until)
 
   if [[ $# == 0 ]]; then
-    usage "$ctrl_mode" && return 1
+    usage "$ctrl_mode"; return 1
   fi
 
+  # TODO: add '--rand 5-15' interval option (random between 5 and 15 seconds)
   local interval="$1"; shift
+
+  # TODO: add --bell support when script ends
+  # TODO: allow `--` before command for clarity
+
+  # FIXME(not here): Add support to shell aliases (must be done in shell config)
 
   local use_separator=false
   local use_compact_separator=false
@@ -63,11 +69,13 @@ function repeat_every_impl
   fi
 
   local run_count=0
+  local now
   while "${cmd[@]}"; do
     run_count=$(( run_count + 1 ))
     if $use_separator; then
       $use_compact_separator || echo
-      echo "--- [repeat_every_$ctrl_mode] Last run (n°$run_count) $run_comment, re-running in ${interval}s ---"
+      now=$(date +%T) # hour:min:sec
+      echo "--- [repeat_every_$ctrl_mode $now] Last run (n°$run_count) $run_comment, re-running in ${interval}s ---"
       $use_compact_separator || echo
     fi
     sleep $interval
