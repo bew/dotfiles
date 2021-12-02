@@ -335,6 +335,7 @@ hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)" manage=of
 
 hc rule --instance="pavucontrol" floating=true floatplacement=center
 hc rule --instance="flameshot" floating=true floatplacement=center
+hc rule --instance="Xephyr" floating=true floatplacement=center
 
 hc rule --instance="yad" floating=true
 

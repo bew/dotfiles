@@ -298,6 +298,7 @@ function make_prompt_str_from_parts
 
     case "$type" in
       # Config parts handling
+      # TODO: remove, I don't use these.... (the whole function can be trashed?)
       func_reset:) func_reset="$value" ;;
       part_separator:) part_separator="$value" ;;
 

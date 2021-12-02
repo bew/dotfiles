@@ -1,6 +1,8 @@
 # Restore default config first!
 sanitize tridactyllocal
 
+# Explore current config with: `:viewconfig`
+
 # --------------------------------------------------------
 # Options & Setup
 
