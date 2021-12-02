@@ -26,6 +26,7 @@ in {
     stable.tmux
     stable.ncdu
 
+    stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
     stable.cloc
     stable.httpie
     stable.strace
