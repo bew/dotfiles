@@ -762,3 +762,7 @@ LUA
 " M-S-Up/Down -> Copy current line Up/Down
 " M-S-Left/Right -> Shrink/Expand (char-)selection (can be simulated in vim?
 "     even without proper language support/detection?)
+"
+" IDEA: Add mapping (<leader>vr ? or <M-C-R> ?) to reload file HUD info like the diagnostics,
+" the git signs, python's semantic highlights
+" (if possible, without reloading buffer from disk with :e)

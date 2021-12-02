@@ -195,10 +195,13 @@ augroup my_code_diagnostic_hi
 augroup END
 
 Plug 'neomake/neomake'          " Asynchronous linting and make framework
-let g:neomake_cpp_enabled_makers=['clang']
-let g:neomake_cpp_clang_args = ["-std=c++11"]
+" Store tmp files in a hidden folder, linting tools (e.g: flake8) shouldn't pick them up there
+let g:neomake_tempfile_dir = expand("%:p:h") . "/.neomake-tmp"
 " Run makers on file open/read & write
 autocmd User PluginsLoaded call neomake#configure#automake('rw')
+
+let g:neomake_cpp_enabled_makers=['clang']
+let g:neomake_cpp_clang_args = ["-std=c++11"]
 
 " Config signs & virtual text
 let diag = s:code_diagnostic_cfg
