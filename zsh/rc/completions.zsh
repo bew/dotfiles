@@ -16,6 +16,8 @@ fpath=(~/.zsh/completions/ $fpath)
 # (allows to have 'pacman' completions in nix's zsh for example)
 [[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*)
 [[ -d /usr/share/zsh/site-functions ]] && fpath+=(/usr/share/zsh/site-functions)
+# Add completions from Nix is available
+[[ -d ~/.nix-profile/share/zsh/site-functions ]] && fpath+=(~/.nix-profile/share/zsh/site-functions)
 
 setopt NO_auto_remove_slash # Don't remove slash for accepted directory compl
 setopt complete_in_word # Enable compl in the middle of a word
@@ -64,12 +66,6 @@ function zcompl::extract_options_completion_from_cmd_help
   #  for all option completions gathered from '_gnu_generic' :shrug:)
 }
 zcompl::extract_options_completion_from_cmd_help "fzf"
-zcompl::extract_options_completion_from_cmd_help "exa"
-# TODO (how??): use this to add options completion for 'just' (the task runner)
-#   => The issue is that I have my own '_just' completion function for the tasks. I want to use
-#      '_gnu_generic' only for the options..
-#   Alternative solution is to write a proper '_just' completion function, that includes all
-#   options + can complete task names. (=> I don't need '_gnu_generic' anymore)
 
 # Activate menu completion (in interactive mode!!)
 zstyle ':completion:*' menu select interactive
