@@ -88,6 +88,10 @@ set wildmenu          " show list instead of just completing
 set wildmode=longest:full,full  " commandline <Tab> completion, list matches, then longest common part, then all.
 set wildignorecase    " ignore case when completing filenames
 
+" Use 'best' algo, works best for english words, also finds chnges for algo 'fast' (typing mistzkes)
+" Show at most N suggegstions (instead of a whole page)
+set spellsuggest=best,10
+
 " setup default fold
 "set foldmethod=syntax
 "set foldcolumn=2
