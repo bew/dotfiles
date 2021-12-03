@@ -9,6 +9,9 @@
   # some tools uses this
   user = bew
 
+[init]
+  defaultBranch = main
+
 [push]
   # When 'push' subcmd is called without a remote branch,
   # use the current local branch name as the remote branch name.
