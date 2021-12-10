@@ -110,8 +110,7 @@ function segmt::git_branch_fast
 # Segment last exit code
 function segmt::exit_code_on_error
 {
-  local on_error="%K{232}%F{red} %? %f%k"
-  echo -n "%(?||$on_error)"
+  echo -n "%(?||%K{232}%F{red} %? %f%k )"
 }
 
 # Segment is shell in sudo session
@@ -121,8 +120,7 @@ function segmt::in_sudo
 
   if [[ "$result" == "bla" ]]; then
     local content="In sudo"
-    local with_style="%K{88}%F{white}%B $content %b%f%k"
-    echo -n "$with_style"
+    echo -n "%K{88}%F{white}%B $content %b%f%k"
   fi
 }
 
@@ -218,7 +216,7 @@ function segmt::shlvl
   [[ $SHLVL == 1 ]] && return
 
   # e.g: "L3"
-  echo -n "%BL%L%b"
+  echo -n "%BL%L%b "
 }
 
 # Segment variable debug
@@ -358,7 +356,7 @@ PROMPT_CURRENT_PARTS=(
   func: segmt::python_venv
   func: segmt::exit_code_on_error
 
-  text: "%B%F{166} %2~ %f%b" # current dir
+  text: "%B%F{166}%2~%f%b " # current dir
 
   func: segmt::short_vim_mode
   text: " "
@@ -372,7 +370,7 @@ PROMPT_PAST_PARTS=(
   text: "%K{235}%B%F{30} %2~ %f%b%k" # current dir
 
   text: " "
-  text: "%B%F{black}%%%f%b" # cmd '%' separator
+  text: "%(!.#.%B%F{243}%%%f%b)" # normal (%) or sudo (#) cmd separator
 )
 
 PROMPT_CURRENT="$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
@@ -439,7 +437,7 @@ hooks-add-hook zle_keymap_select_hook prompt::utils::regen-prompt
 # Set to disable cursor shape changes.
 # It is NOT set based on the current terminal and support for cursor change feature,
 # maybe this can come one day..
-CURSOR_SHAPE_CHANGE_DISABLED=
+CURSOR_SHAPE_CHANGE_DISABLED="${CURSOR_SHAPE_CHANGE_DISABLED:-}"
 
 # Set cursor style (DECSCUSR), VT520.
 # 0 => blinking block.
