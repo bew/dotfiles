@@ -37,6 +37,9 @@ bind <C-R> reload_my_config
 bind --mode=ignore <C-R> reload_my_config
 bind --mode=insert <C-R> reload_my_config
 
+bind --mode=normal <F9> mode ignore
+bind --mode=ignore <F9> mode normal
+
 # Get back C-a to select all text!
 unbind <C-a>
 unbind <C-x> # unbind it as well for coherence (since C-a & C-x go in pair)
