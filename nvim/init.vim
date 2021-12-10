@@ -84,7 +84,8 @@ function my_which_key_setup()
   wk.setup {
     layout = {
       align = "center",
-      spacing = 15,
+      spacing = 5,
+      height = { min = 1 }, -- Ref: https://github.com/folke/which-key.nvim/issues/195
     },
     icons = { separator = "->" },
     key_labels = {
@@ -116,6 +117,12 @@ function my_which_key_setup()
 end
 LUA
 autocmd User PluginsLoaded lua my_which_key_setup()
+augroup my_hi_which_key
+  au!
+  au ColorScheme * hi WhichKey      ctermfg=33 cterm=bold
+  au ColorScheme * hi WhichKeyDesc  ctermfg=172
+  au ColorScheme * hi WhichKeyGroup ctermfg=70
+augroup END
 
 " Create a per-buffer map, to avoid crashing WhichKey when the variable
 " does not exist, we must create a buffer dict, empty for most files,
