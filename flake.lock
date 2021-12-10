@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "flakeTemplates": {
+      "locked": {
+        "lastModified": 1637957362,
+        "narHash": "sha256-OfhmLR4Bkaz9CFh/p9Mom6BS0lnFDRJ6F4KofVX6JCU=",
+        "owner": "nixos",
+        "repo": "templates",
+        "rev": "16cd57c9c3f037eddddb57f87b65350ec59ed4f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "templates",
+        "type": "github"
+      }
+    },
     "homeManager": {
       "inputs": {
         "nixpkgs": [
@@ -71,6 +86,7 @@
     },
     "root": {
       "inputs": {
+        "flakeTemplates": "flakeTemplates",
         "homeManager": "homeManager",
         "nixpkgsBackbone": "nixpkgsBackbone",
         "nixpkgsStable": "nixpkgsStable",

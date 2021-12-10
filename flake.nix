@@ -24,17 +24,19 @@
   inputs.nixpkgsStable.url = "github:nixos/nixpkgs/nixos-21.11";
   inputs.nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
+  inputs.flakeTemplates.url = "github:nixos/templates";
+
   inputs.homeManager = {
     url = "github:nix-community/home-manager/release-21.11";
     inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
-  outputs = { self, nixpkgsStable, homeManager, ... }@inputs: {
+  outputs = { self, ... }@inputs: {
     homeConfig = let
       # I only care about ONE system for now...
       system = "x86_64-linux";
-    in import "${homeManager}/modules" {
-      pkgs = nixpkgsStable.legacyPackages.${system};
+    in import "${inputs.homeManager}/modules" {
+      pkgs = inputs.nixpkgsStable.legacyPackages.${system};
       configuration = { config, lib, ... }: {
         imports = [
           ./nix-home/modules/flake-inputs.nix
@@ -58,6 +60,8 @@
             repo = "nixpkgs";
             ref = "nixpkgs-unstable";
           };
+          # -> flake ref: "path:${flakeTemplates.outPath}"
+          templates = { type = "path"; path = inputs.flakeTemplates.outPath; };
         };
 
         pkgsChannels = let
