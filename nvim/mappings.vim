@@ -313,8 +313,8 @@ inoremap <silent><expr> <C-b>  (pumvisible() ?
 
 
 " Exit the terminal grabber
-tnoremap <M-q> <C-\><C-n>
-tmap  <M-q>
+tnoremap <M-Esc> <C-\><C-n>
+tmap  <M-Esc>
 
 " Shortcut
 nnoremap <silent> Q :q<cr>
