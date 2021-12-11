@@ -73,6 +73,11 @@ echo_header "Nix closure diff"
 echo "'$CLOSURE_BEFORE' -> '$CLOSURE_AFTER'"
 echo
 
+if [[ `realpath $CLOSURE_BEFORE` == `realpath $CLOSURE_AFTER` ]]; then
+  echo_info "No package change (same output)"
+  exit
+fi
+
 nix store diff-closures $CLOSURE_BEFORE $CLOSURE_AFTER > $DIFF_FILE
 
 if [[ -s $DIFF_FILE ]]; then
