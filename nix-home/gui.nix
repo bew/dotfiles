@@ -1,7 +1,7 @@
-{ config, ... }:
+{ config, pkgsChannels, ... }:
 
 let
-  inherit (config.pkgsChannels) stable bleedingedge;
+  inherit (pkgsChannels) stable bleedingedge;
 in {
   home.packages = [
     # desktop/wm related (TODO? nixify config)

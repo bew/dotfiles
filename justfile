@@ -27,9 +27,7 @@ build-and-diff *ARGS: (_build-only ARGS)
 
 # Build the current home config AND switch to it
 switch *ARGS: (_build-only ARGS)
-  #!/usr/bin/env bash
-  set -e
-  ./result/activate
+  @./result/activate
 
 upgrade-multiuser-nix:
   @# Ref: https://nixos.org/manual/nix/stable/installation/upgrading.html
