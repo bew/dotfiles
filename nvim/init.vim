@@ -277,19 +277,25 @@ Plug 'tommcdo/vim-exchange'
 " FIXME: I get a vim error message when triggering it with
 Plug 'voldikss/vim-floaterm'    " Nice floating terminal with super powers
 if $ASCII_ONLY == "1"
-  let g:floaterm_borderchars = ['-', '|', '-', '|', '+', '+', '+', '+']
+  let g:floaterm_borderchars = "-|-|++++"
+else
+  let g:floaterm_borderchars = "━┃━┃┏┓┛┗"
 endif
 " Command used for opening a file from within :terminal, using the binary `floaterm <some-file>`
 let g:floaterm_open_command = 'split'  " So I can move it where I want without overwriting my current window
+let g:floaterm_autoclose = 2  " Always auto close
+let g:floaterm_wintype = "float"
+let g:floaterm_position = "bottom"
+let g:floaterm_width = 0.9
 
 function! s:InstallFloatermBorderColorChange()
-  au TermLeave <buffer> hi FloatermBorder cterm=bold ctermfg=124
-  au TermEnter <buffer> hi FloatermBorder cterm=NONE ctermfg=28
+  au TermLeave <buffer> hi FloatermBorder cterm=bold ctermfg=124 ctermbg=234
+  au TermEnter <buffer> hi FloatermBorder cterm=NONE ctermfg=28  ctermbg=234
 endf
 
 augroup my_floaterm
   au!
-  au ColorScheme * hi Floaterm ctermbg=235
+  au ColorScheme * hi Floaterm ctermbg=234
   au ColorScheme * hi FloatermBorder ctermfg=130
 
   au FileType floaterm call <SID>InstallFloatermBorderColorChange()
