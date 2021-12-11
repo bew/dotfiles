@@ -1,36 +1,31 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, flakeInputs, ... }:
 
 with lib;
 
 let
-  cfg = config.flakeInputs;
+  cfg = config.linkFlakeInputs;
 
-  inputsToRemove = if !cfg.linkToHome.includeSelf then ["self"] else [];
-  consideredInputs = builtins.removeAttrs cfg.inputs inputsToRemove;
+  inputsToRemove = if !cfg.includeSelf then ["self"] else [];
+  consideredInputs = builtins.removeAttrs flakeInputs inputsToRemove;
 
   # note: entries for linkFarm must be a list of { name = "foo"; path = "/path"; }
   inputsFarm = pkgs.linkFarm "flake-inputs"
     (mapAttrsToList (name: drv: {inherit name; path = drv;}) consideredInputs);
 in {
   options = {
-    flakeInputs.inputs = mkOption {
-      type = types.attrs;
-      default = {};
-      description = "The inputs";
-    };
-    flakeInputs.linkToHome.enable = mkOption {
+    linkFlakeInputs.enable = mkOption {
       type = types.bool;
-      default = cfg.linkToHome.directory != null;
+      default = cfg.directory != null;
       description = ''
-        When enabled, store symlinks to all inputs in `flakeInputs.linkToHome.directory` folder.
+        When enabled, store symlinks to all inputs in `linkFlakeInputs.directory` folder.
       '';
     };
-    flakeInputs.linkToHome.directory = mkOption {
+    linkFlakeInputs.directory = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = "Directory where the input links will be stored, relative to home";
     };
-    flakeInputs.linkToHome.includeSelf = mkOption {
+    linkFlakeInputs.includeSelf = mkOption {
       type = types.bool;
       default = false;
       description = ''
@@ -41,7 +36,7 @@ in {
     };
   };
 
-  config = mkIf cfg.linkToHome.enable {
-    home.file.${cfg.linkToHome.directory}.source = inputsFarm;
+  config = mkIf cfg.enable {
+    home.file.${cfg.directory}.source = inputsFarm;
   };
 }
