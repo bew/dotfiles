@@ -50,7 +50,21 @@ cfg.keys = {
   -- Paste from PrimarySelection (Copy is done by selection)
   keybind("SHIFT",    "Insert", act{PasteFrom = "PrimarySelection"}),
   keybind("CTRL|ALT", "v",      act{PasteFrom = "PrimarySelection"}),
-  -- NOTE: the last one eats a valid terminal keybind
+  -- NOTE: that last one eats a valid terminal keybind
+
+  -- Smart copy with Alt-c:
+  -- - If active selection, will copy it to Clipboard & Primary
+  -- - If NO selection, sends Alt-c to the running program
+  keybind("ALT", "c", act_callback("smart-copy", function(win, pane)
+    local has_selection = win:get_selection_text_for_pane(pane) ~= ""
+    if has_selection then
+      win:perform_action(act{CopyTo="ClipboardAndPrimarySelection"}, pane)
+    else
+      -- FIXME: for some reason, adding 'act' (wezterm.action) for 'SendKey' breaks the call..
+      --   WHY?? It's not consistent with all other actions..
+      win:perform_action({SendKey={mods="ALT", key="c"}}, pane)
+    end
+  end)),
 
   -- Tabs
   keybind(ctrl_shift, "t", act{SpawnTab="DefaultDomain"}),
