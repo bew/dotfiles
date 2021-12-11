@@ -39,15 +39,18 @@
       pkgs = inputs.nixpkgsStable.legacyPackages.${system};
       configuration = { config, lib, ... }: {
         imports = [
-          ./nix-home/modules/flake-inputs.nix
+          ./nix-home/modules/link-flake-inputs.nix
           ./nix-home/modules/nix-registry.nix
           ./nix-home/modules/pkgs-channels.nix
           ./nix-home # my actual home package!
         ];
 
-        # Save inputs for use in other modules, and link to home for personal reading
-        flakeInputs.inputs = inputs;
-        flakeInputs.linkToHome.directory = ".nix-home-current";
+        # Extra module args
+        _module.args.flakeInputs = inputs;
+
+        # Link flake inputs to home
+        # => Easy way to search/read/navigate in any of them
+        linkFlakeInputs.directory = ".nix-home-current";
 
         # Restrict user nix/registry.json to the following indirect flakes:
         nixRegistry.indirectFlakes = {
