@@ -79,31 +79,17 @@ nnoremap <silent> <C-Space> :CtrlSpace<cr>
 nnoremap <silent> <M-f> :FuzzyFilesSmart<cr>
 nnoremap <silent> <M-F> :FuzzyFiles<cr>
 
-" Focus or create a Floaterm with the given name.
-" Hides the current Floaterm if any.
-function! s:FloatermFocusOrNew(name, cmd)
-  let target_bufnr = floaterm#terminal#get_bufnr(a:name)
-  let curr_bufnr = bufnr()
-
-  if getwininfo(win_getid())[0].terminal == 1
-    " Hide the floaterm if the current terminal is a floaterm
-    call floaterm#window#hide_floaterm(l:curr_bufnr)
-    if l:curr_bufnr == l:target_bufnr
-      return
-    endif
-  endif
-
-  if l:target_bufnr != -1
-    call floaterm#terminal#open_existing(l:target_bufnr)
-  else
-    call floaterm#new(a:cmd, {"name": a:name}, {}, v:false)
-  endif
-endf
-nnoremap <silent> <M-y> :call <SID>FloatermFocusOrNew("scratch", "zsh")<cr>
-tnoremap <silent> <M-y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch", "zsh")<cr>
-
-nnoremap <silent> <M-Y> :call <SID>FloatermFocusOrNew("scratch-alt", "zsh")<cr>
-tnoremap <silent> <M-Y> <C-\><C-n>:call <SID>FloatermFocusOrNew("scratch-alt", "zsh")<cr>
+" Toggle terminal
+nnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
+tnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
+" New/next/prev terminal
+" NOTE: I don't plan to use these much, tmux is prefered if I need 2+ terminals
+nnoremap <silent> <C-M-t><C-M-t> <cmd>FloatermNew<cr>
+tnoremap <silent> <C-M-t><C-M-t> <cmd>FloatermNew<cr>
+nnoremap <silent> <C-M-t><C-M-n> <cmd>FloatermNext<cr>
+tnoremap <silent> <C-M-t><C-M-n> <cmd>FloatermNext<cr>
+nnoremap <silent> <C-M-t><C-M-p> <cmd>FloatermPrev<cr>
+tnoremap <silent> <C-M-t><C-M-p> <cmd>FloatermPrev<cr>
 
 "-- Navigation
 "------------------------------------------------------------------
