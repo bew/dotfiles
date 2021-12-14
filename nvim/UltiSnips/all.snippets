@@ -139,4 +139,8 @@ snippet modeline "Vim modeline"
 vim`!v ':set '. (&expandtab ? printf('et sw=%i ts=%i', &sw, &ts) : printf('noet sts=%i sw=%i ts=%i', &sts, &sw, &ts)) . (&tw ? ' tw='. &tw : '') . ':'`
 endsnippet
 
+snippet #! "Default Shebang" b
+#!/usr/bin/env ${1:bash}
+endsnippet
+
 # vim:ft=snippets:
