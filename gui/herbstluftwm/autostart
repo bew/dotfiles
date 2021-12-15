@@ -29,7 +29,7 @@ hc keybind $M-$C-r   reload
 # WM agnostic keys
 
 # lock (& sleep)
-hc keybind Pause   spawn ~/.bin-gui/i3colocker
+hc keybind Pause      spawn ~/.bin-gui/i3colocker
 hc keybind $C-Pause   spawn ~/.bin-gui/desktop--lock-and-sleep ~/.bin-gui/i3colocker
 # FIXME? (but how to fix?) the screen flashes with the 'theme.background_color' just
 # before i3lock is displayed with a blurry screenshot.
@@ -39,7 +39,7 @@ hc keybind $C-Pause   spawn ~/.bin-gui/desktop--lock-and-sleep ~/.bin-gui/i3colo
 # Type in a brain2 ID
 hc keybind $M-$C-i     spawn sh -c 'xdotool type --clearmodifiers "$(~/.bin/mkid-now)"'
 
-hc keybind $M-space   spawn ~/.bin-gui/wezterm
+hc keybind $M-space    spawn ~/.bin-gui/wezterm
 hc keybind $M-$S-space spawn urxvt
 
 # TODO: move these 'common' options to a script, to be usable anywhere!
@@ -229,20 +229,21 @@ hc keybind $M-f   attr clients.focus.floating toggle
 hc keybind $M-$C-m   fullscreen toggle # fullscreen current client
 # hc keybind $M-$C-f floating toggle # all clients of current tag become floating (and stacked..)
 
-# if frame layout is not max
-#   remember current frame layout (in the frame attr system?)
-#   switch to max
-# else
-#   switch back to saved frame layout
-# end
-# FIXME: how to do this???
-# hc keybind $M-m \
-#   or , and . compare frames.focus.layout   # !! frames object does not exist...
-
-# NOTE: for now we only cycle between max & vertical. So if the layout was horizontal
-# I'll have to re-do select horizontal after going maximized
-# It seems that if it's horizontal it'll first select vertical, them max >< oh well..
-hc keybind $M-m   cycle_layout +1 max horizontal
+# Toggle max layout on current frame, save/restore old layout as needed
+# if current frame layout is max:
+#     set_layout OLD_LAYOUT (from a custom attr)
+# else:
+#     try to create the frame custom attr (fails if already exist)
+#     set frame custom attr to current layout algorithm
+#     set_layout max
+hc keybind $M-m   \
+  or , and . compare tags.focus.focused_client.parent_frame.algorithm = max                             \
+           . substitute OLD_LAYOUT tags.focus.focused_client.parent_frame.my_frame_layout_before_max    \
+               set_layout OLD_LAYOUT                                                                    \
+     , chain : try new_attr string tags.focus.focused_client.parent_frame.my_frame_layout_before_max    \
+             : substitute CUR_LAYOUT tags.focus.focused_client.parent_frame.algorithm                   \
+                 set_attr tags.focus.focused_client.parent_frame.my_frame_layout_before_max CUR_LAYOUT  \
+             : set_layout max
 
 # Cycle through frame layouts, skipping 'max' layout (which is toggled by another key).
 #   - layouts for 2 clients: vertical, horizontal
