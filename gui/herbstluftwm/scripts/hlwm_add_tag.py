@@ -19,7 +19,7 @@ def main():
     tags = Hlwm.get_tags(monitor="")
     tag_names = [tag.name for tag in tags]
 
-    new_tag_name = f"blank{randint(0, 99)}"
+    new_tag_name = f"new{randint(0, 99)}"
     big_text = "<big>Add tag</big>"
     error_msg = None
     while True:

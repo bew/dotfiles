@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Dependencies:
+EXT_BIN_autorandr=${EXT_BIN_fzf:-autorandr}
+EXT_BIN_fzf=${EXT_BIN_fzf:-fzf}
+
+# TODO(later): Detect screen connect/disconnect, and send an event to my desktop system to ask which
+# screen layout to use.
+# -> with a udev rule? (But user udev rules doesn't seems to exist)
+#
+# Relevant posts:
+# - https://frdmtoplay.com/i3-udev-xrandr-hotplugging-output-switching/
+# - https://ruedigergad.com/2012/01/28/hotplug-an-external-screen-to-your-laptop-on-linux/
+
+function get_autorandr_profile
+{
+  # TODO: Use rofi to select the profile!
+  #       So I can bind this to a desktop action (no terminal needed).
+  local fzf_cmd=($EXT_BIN_fzf $FZF_BEW_KEYBINDINGS $FZF_BEW_LAYOUT)
+  fzf_cmd+=(--height=10)
+  fzf_cmd+=(--query="detected ") # match detected profiles by default
+  fzf_cmd+=(--prompt="Select autorandr profile: ")
+  local match=$($EXT_BIN_autorandr | "${fzf_cmd[@]}")
+  echo "${match%% *}" # remove text after profile name (like ' (detected) (current)')
+}
+
+selected_profile=$(get_autorandr_profile)
+if [[ -z "$selected_profile" ]]; then
+  >&2 echo "No selected autorandr profile, aborting.."
+  exit 1
+fi
+
+>&2 echo ">>> Loading selected profile '$selected_profile'"
+$EXT_BIN_autorandr --load "$selected_profile"
+# NOTE:
+# We don't use '--change' (with a default) as it would auto-detect and always select the matching
+# profile, even if there are more than one.
