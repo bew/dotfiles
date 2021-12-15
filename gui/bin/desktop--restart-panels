@@ -4,14 +4,30 @@
 # - polybar
 # - pkill
 
-echo script: Starting bars
+# Safer shell script with these options
+# -e          : exit if a command exits with non-zero status
+# -u          : exit if an expanded variable does not exist
+# -o pipefail : if a command in a pipeline fail, fail the pipeline
+#               (e.g this now fails: false | true)
+set -euo pipefail
+
+if pgrep polybar >/dev/null; then
+  echo script: Killing existing panels
+  pkill polybar
+  sleep 2 # wait for all instances to end
+fi
+
+echo script: Starting panels
 
 monitors=($(xrandr --query | awk '/ connected/ { print $1 }'))
 primary_monitor="${monitors[0]}" # xrandr puts the primary first
 unset monitors[0] # remove the primary monitor
 
-echo "primary_monitor: $primary_monitor"
-echo "other monitors: ${monitors[@]}"
+echo
+echo ">>> Monitor detection:"
+echo "primary: $primary_monitor"
+echo "other:   ${monitors[@]}"
+echo
 
 function run_bars
 {
@@ -34,7 +50,4 @@ done
 
 wait
 
-echo script: Stopping bars
-
-# Make sure to stop all bars if we've been Ctrl-C'ed
-pkill polybar
+echo script: all panels terminated
