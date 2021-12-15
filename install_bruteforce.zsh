@@ -67,6 +67,7 @@ make-link .dot/gui/Xresources    ~/.Xresources
 make-link .dot/gui/Xresources.d  ~/.Xresources.d
 make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
 make-link .dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg default apps
+make-link .dot/gui/autorandr     ~/.config/autorandr
 
 label "X apps configs"
 # terms

@@ -10,6 +10,11 @@ in {
     # FIXME: herbstluftwm is missing here (can't get it to compile last version)
     stable.stalonetray # TODO: use it!
 
+    # FIXME: `arandr` disabled because it can't load menu icons :/
+    #        and installing hicolor-icon-theme doesn't solve it..
+    # stable.arandr
+    stable.autorandr
+
     # screen/video capture
     stable.kazam
     stable.screenkey
