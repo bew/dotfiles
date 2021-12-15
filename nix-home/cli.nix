@@ -19,6 +19,7 @@ in {
     stable.jq
     bleedingedge.ripgrep
     stable.tree
+    stable.just
     bleedingedge.zsh
 
     stable.htop
@@ -38,6 +39,7 @@ in {
 
     stable.chafa # crazy cool img/gif terminal viewer
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
+    stable.translate-shell
 
     # Languages
     stable.python3

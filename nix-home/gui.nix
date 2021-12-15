@@ -14,5 +14,6 @@ in {
     stable.kazam
     stable.screenkey
     stable.slop
+    # stable.peek ? (for gifs iirc)
   ];
 }
