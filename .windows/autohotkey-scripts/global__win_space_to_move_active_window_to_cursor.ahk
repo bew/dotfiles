@@ -4,9 +4,10 @@
 
 ; #: Window key
 
-#Include lib/_win_helpers.ahk ; For MoveWinToCursor
+#Include lib/_win_helpers.ahk
 
 #Space::
   ; 'A' as a window selector is the active window
-  MoveWinToCursor("A")
+  win_selector := "A"
+  MoveWinCenteredOn(win_selector, GetMousePos())
   return
