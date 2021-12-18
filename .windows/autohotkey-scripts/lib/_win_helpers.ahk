@@ -1,33 +1,40 @@
-; Move the window to the mouse cursor.
-; It will be exactly at the center of the window.
-MoveWinToCursor(window_selector)
+; Move the window to be centered on the given (absolute) position.
+MoveWinCenteredOn(window_selector, pos)
 {
   WinGetPos,,, win_width, win_height, %window_selector%
-  CoordMode, Mouse, Screen ; Required to get mouse pos relative to the screen
-  MouseGetPos, xpos, ypos
-  WinMove, %window_selector%,, xpos-(win_width/2), ypos-(win_height/2)
+  WinMove, %window_selector%,, pos.x - (win_width//2), pos.y - (win_height//2)
 }
 
-; Raise the window if it exists, or launch it,
-; then place it under mouse cursor.
-RaiseWinToCursorOrLaunch(window_selector, window_launch)
+; Find and toggle matching window, or launch one if it doesn't exist.
+; Returns true if window is now visible, false otherwise.
+ToggleWinVisibilityOrLaunch(window_selector, window_launch)
 {
   If WinExist(window_selector)
   {
     If WinActive(window_selector)
     {
       WinMinimize
+      return false
     }
     Else
     {
       WinActivate
-      MoveWinToCursor(window_selector)
+      return true
     }
   }
   Else
   {
     Run, %window_launch%
     WinWaitActive, %window_selector%
-    MoveWinToCursor(window_selector)
+    return true
   }
+}
+
+; Returns absolute position of mouse cursor.
+GetMousePos()
+{
+  ; Required to get absolute mouse pos (across all visible monitors)
+  CoordMode, Mouse, Screen
+  MouseGetPos, mouse_x, mouse_y
+  return {x: mouse_x, y: mouse_y}
 }
