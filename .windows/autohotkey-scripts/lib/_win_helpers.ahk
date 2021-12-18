@@ -51,3 +51,34 @@ GetWinCenterPos(window_selector)
   abs_center_y := win_y + rel_center_y
   return {x: abs_center_x, y: abs_center_y, win_relative_x: rel_center_x, win_relative_y: rel_center_y}
 }
+
+; Returns monitor info of the monitor including the given absolute position,
+; or false if position is offscreen.
+GetMonitorIncludingPos(pos)
+{
+  SysGet, monitor_count, 80 ; count only visible display monitors (not exactly same as MonitorCount)
+  Loop, %monitor_count% ; NOTE: indices always start at 1
+  {
+    ; Get the total desktop space of the monitor, including taskbar
+    SysGet, monitor, Monitor, %A_Index%
+
+    if (monitorLeft <= pos.x) && (pos.x < monitorRight) && (monitorTop <= pos.y) && (pos.y < monitorBottom) {
+      return GetMonitorInfo(A_Index)
+    }
+  }
+  return false ; can happen if pos is offscreen (e.g: partially visible window)
+}
+
+; Returns monitor info of the given monitor index (used by GetMonitorIncludingPos).
+; NOTE: workarea coords are absolute to the screen (across all visible monitors)
+GetMonitorInfo(monitor_index)
+{
+  SysGet, name, MonitorName, %monitor_index%
+  SysGet, workarea, MonitorWorkArea, %monitor_index%
+  workarea_center_x := workareaLeft + (workareaRight - workareaLeft) // 2
+  workarea_center_y := workareaTop + (workareaBottom - workareaTop) // 2
+  ; NOTE on associative arrays: https://www.autohotkey.com/docs/Objects.htm#Usage_Associative_Arrays
+  workarea := {left: workareaLeft, right: workareaRight, top: workareaTop, bottom: workareaBottom}
+  workarea_center_pos := {x: workarea_center_x, y: workarea_center_y}
+  return {index: monitor_index, name: name, workarea: workarea, center_pos: workarea_center_pos}
+}
