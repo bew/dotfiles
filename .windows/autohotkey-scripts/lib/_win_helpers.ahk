@@ -38,3 +38,16 @@ GetMousePos()
   MouseGetPos, mouse_x, mouse_y
   return {x: mouse_x, y: mouse_y}
 }
+
+; Returns absolute (and win relative) position of the center of the window.
+GetWinCenterPos(window_selector)
+{
+  WinGetPos, win_x, win_y, win_width, win_height, %window_selector%
+  ; rel: relative to the window
+  rel_center_x := (win_width//2)
+  rel_center_y := (win_height//2)
+  ; abs: absolute to the screen (across all visible monitors)
+  abs_center_x := win_x + rel_center_x
+  abs_center_y := win_y + rel_center_y
+  return {x: abs_center_x, y: abs_center_y, win_relative_x: rel_center_x, win_relative_y: rel_center_y}
+}
