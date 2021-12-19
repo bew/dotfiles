@@ -161,6 +161,9 @@ let g:sandwich#recipes += [
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'   " textobj: ii ai iI aI
 
+" Comment text object <3
+Plug 'glts/vim-textobj-comment'  " textobj: ic ac
+
 " Diagnostic provider agnostic signs config
 let s:code_diagnostic_cfg = {}
 let s:code_diagnostic_cfg.virt_text_prefix = "  <<  "
