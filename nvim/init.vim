@@ -703,7 +703,7 @@ Plug 'cespare/vim-toml'
 Plug 'wellle/tmux-complete.vim'
 " Emoji completion (:foobar:)
 " It is auto enabled on gitcommit & markdown files
-Plug 'fszymanski/deoplete-emoji'
+Plug 'bew/deoplete-emoji-backup'
 
 " TODO: Add a configure properly a dictionary completion source for markdown
 " https://github.com/deoplete-plugins/deoplete-dictionary
