@@ -28,16 +28,9 @@ function ffmpeg::extract-audio
 
 function ffmpeg::extract-audio::rm_source
 {
-  if [[ $# == 0 ]]; then
-    echo "Usage: ffmpeg::extract-audio <filename> [<format>]"
-    echo "  <format> defaults to m4a"
-    return 1
-  fi
-
   local filename="$1"
-  local format="${2:-m4a}"
 
-  ffmpeg::extract-audio "$filename" "$format"
+  ffmpeg::extract-audio "${@}"
   local ret=$?
   if [[ $? == 0 ]]; then
     echo ">>> Deleting source '$filename'..."
@@ -48,6 +41,126 @@ function ffmpeg::extract-audio::rm_source
   command rm "$filename"
   ret=$?
   [[ $ret == 0 ]] && echo " >> Done!"
+  return $ret
+}
+
+function ffmpeg::transcode-movie::single-file
+{
+  local input_path="$1"
+  local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
+  local input_filename_no_ext="${input_filename%.*}" # remove extension
+
+  # default (low) video resolution: nhd <=> 640x360
+  local video_size="${FFMPEG_VIDEO_SIZE:-nhd}"
+
+  local output_path="${input_filename_no_ext}.transcoded-${video_size}.mkv"
+
+  echo
+  echo "--- Transcoding file -> '$output_path'"
+  echo
+
+  local cmd=(ffmpeg -hide_banner)
+  # input
+  cmd+=(-i "$input_path")
+  # output config
+  cmd+=(-map 0:V) # video first
+  cmd+=(-map 0:a) # then all audios
+  cmd+=(-map "0:s?") # then all subtitles (if any)
+  cmd+=(-framerate 30) # just enough fps
+  cmd+=(-preset slow) # good compression
+  cmd+=(-s "$video_size")
+  cmd+=(-c:a aac -b:a 512k) # best quality & widely supported format
+  # output
+  cmd+=("$output_path")
+
+  "${cmd[@]}"
+  local ret=$?
+  if [[ $? == 0 ]]; then
+    echo
+    echo "--- File transcoded -> '$output_path'"
+    echo
+  fi
+  return $ret
+}
+
+function ffmpeg::transcode-movie--low-qual
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: ffmpeg::transcode-movie--low-qual <files>..."
+    return 1
+  fi
+
+  for filename in "${@}"; do
+    # low resolution (nhd <=> 640x360), enough for usual tv shows
+    if ! FFMPEG_VIDEO_SIZE=nhd ffmpeg::transcode-movie::single-file "$filename"; then
+      echo
+      echo "... Movie transcode failed/cancelled ..."
+      echo
+      return 1
+    fi
+  done
+}
+
+function ffmpeg::transcode-movie--med-qual
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: ffmpeg::transcode-movie--med-qual <files>..."
+    return 1
+  fi
+
+  for filename in "${@}"; do
+    # medium resolution (qhd <=> 960x540), good for movies or high qual tv shows
+    if ! FFMPEG_VIDEO_SIZE=qhd ffmpeg::transcode-movie::single-file "$filename"; then
+      echo
+      echo "... Movie transcode failed/cancelled ..."
+      echo
+      return 1
+    fi
+  done
+}
+
+function ffmpeg::take-sample
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: ffmpeg::take-sample <file> [<duration=60>]"
+    echo "       ffmpeg::take-sample <file> <start> <end>"
+    echo "  <duration> & <start> & <end> are in seconds or [HH:]MM:SS"
+    echo "  Not giving <start> is like taking a sample of the <file>."
+    return 1
+  fi
+
+  local input_path="$1"
+  local start _end
+  if [[ -z "$2" ]]; then
+    start=0
+    _end=60 # 1min
+  elif [[ -z "$3" ]]; then
+    start=0
+    _end="$2"
+  else
+    start="$2"
+    _end="$3"
+  fi
+
+  local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
+  local input_filename_no_ext="${input_filename%.*}" # remove extension
+  local input_ext="${input_filename##*.}" # remove everything until last '.'
+  local output_path="${input_filename_no_ext}.sample-${start}-${_end}.${input_ext}"
+
+  local cmd=(ffmpeg -hide_banner)
+  cmd+=(-ss "$start")
+  cmd+=(-to "$_end")
+  cmd+=(-i "$input_path")
+  cmd+=(-map 0 -c copy) # copy every input streams
+  cmd+=("$output_path")
+
+  "${cmd[@]}"
+  local ret=$?
+  if [[ $? == 0 ]]; then
+    echo
+    echo "--- File sample cut -> '$output_path'"
+    echo
+  fi
   return $ret
 }
 
