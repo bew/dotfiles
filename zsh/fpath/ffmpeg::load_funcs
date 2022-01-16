@@ -90,9 +90,9 @@ function ffmpeg::transcode-movie--low-qual
     return 1
   fi
 
-  for filename in "${@}"; do
+  for input_path in "${@}"; do
     # low resolution (nhd <=> 640x360), enough for usual tv shows
-    if ! FFMPEG_VIDEO_SIZE=nhd ffmpeg::transcode-movie::single-file "$filename"; then
+    if ! FFMPEG_VIDEO_SIZE=nhd ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
       echo
@@ -108,9 +108,9 @@ function ffmpeg::transcode-movie--med-qual
     return 1
   fi
 
-  for filename in "${@}"; do
+  for input_path in "${@}"; do
     # medium resolution (qhd <=> 960x540), good for movies or high qual tv shows
-    if ! FFMPEG_VIDEO_SIZE=qhd ffmpeg::transcode-movie::single-file "$filename"; then
+    if ! FFMPEG_VIDEO_SIZE=qhd ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
       echo
@@ -162,6 +162,22 @@ function ffmpeg::take-sample
     echo
   fi
   return $ret
+}
+
+function ffprobe::show-top-level
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: ffprobe::show-top-level <files>..."
+    echo "  Show top-level informations (streams, duration, ..) for the given files"
+    return 1
+  fi
+
+  for input_path in "$@"; do
+    echo "Main media info for '$input_path'"
+    ffprobe -hide_banner "$input_path" 2>&1 | grep '^  \w'
+    # Top level lines are prefixed by 2 spaces.
+    echo
+  done
 }
 
 # This function only needs to exist, when I call it, this file
