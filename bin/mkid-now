@@ -5,4 +5,7 @@
 
 # Format: {full-year}{0-month}{0-day}T{0-hours}{0-minutes}
 # NOTE: 0-xyz means 01 for 1 and 12 for 12
-date +%Y%m%dT%H%M
+ID=$(date +%Y%m%dT%H%M)
+echo -n "$ID"
+# NOTE: The variable indirection is necessary to eat
+#       the extra new line from `date`.
