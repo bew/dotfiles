@@ -37,7 +37,7 @@ hc keybind $C-Pause   spawn ~/.bin-gui/desktop--lock-and-sleep ~/.bin-gui/i3colo
 #     without script does not flicker.
 
 # Type in a brain2 ID
-hc keybind $M-$C-i     spawn sh -c 'xdotool type --clearmodifiers "$(~/.bin/mkid-now)"'
+hc keybind $M-$C-i     spawn sh -c '~/.bin/mkid-now | ~/.bin/clipboard-provider--xclip copy && notify-send "Brain ID copied to clipboard"'
 
 hc keybind $M-space    spawn ~/.bin-gui/wezterm
 hc keybind $M-$S-space spawn urxvt
