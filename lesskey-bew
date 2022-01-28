@@ -40,6 +40,9 @@ l noaction 1\e)
 \eh help
 :h  help
 
+# Use Alt-q to exit and print what was currently visible
+# Ref: https://github.com/gwsw/less/issues/36
+\eq toggle-option -!^Predraw-on-quit\nq
 
 # --- Defines new line-editing keys under the following line:
 #line-edit

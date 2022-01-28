@@ -21,7 +21,7 @@ in {
     stable.sumneko-lua-language-server
 
     stable.exa # alternative ls, more colors!
-    bleedingedge.bat # use bleedingedge version, same as 'less' below (to have new 'less' with the options I want!)
+    bleedingedge.bat # 'bleedingedge to have latest 'less' version I need
     stable.fd
     bleedingedge.fzf
     stable.git
@@ -35,7 +35,7 @@ in {
     bleedingedge.zsh
 
     stable.htop
-    bleedingedge.less # NOTE: need at least v283 to support LESSKEYIN env var
+    bleedingedge.less # very-recent 'less' version I need for my key bindings
     stable.tmux
     stable.ncdu
 
