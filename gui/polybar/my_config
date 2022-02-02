@@ -309,8 +309,4 @@ label-warn-foreground = ${colors.alert}
 screenchange-reload = true
 pseudo-transparency = false
 
-[global/wm]
-margin-top = 5
-margin-bottom = 5
-
 ; vim:ft=dosini:
