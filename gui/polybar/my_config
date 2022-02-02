@@ -72,7 +72,9 @@ modules-center = xwindow
 modules-right = xkeyboard date
 
 tray-position = right
-tray-padding = 2
+; Left/Right padding around the tray
+tray-padding = 5
+tray-background = #050505
 
 [bar/sys-bar]
 monitor = ${env:MONITOR_NAME}
