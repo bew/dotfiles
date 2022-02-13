@@ -55,7 +55,7 @@ background_run dunst # notification daemon
 background_run flameshot # screenshot tool
 background_run copyq # clipboard manager
 
-background_run ~/.dot/bin/desktop--start-status-bars
+background_run ~/.bin-gui/desktop--restart-panels
 
 run libinput-gestures-setup start
 # NOTE: to reload config, use: libinput-gestures-setup restart
