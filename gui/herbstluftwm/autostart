@@ -341,6 +341,11 @@ hc rule --instance="pavucontrol" floating=true floatplacement=center
 hc rule --instance="flameshot" floating=true floatplacement=center
 hc rule --instance="Xephyr" floating=true floatplacement=center
 
+hc rule --instance="copyq" floating=true floatplacement=center
+# TODO(?): detect main win reliably, and make it appear centered under mouse cursor
+#   (but always fully on screen)
+#   => Ask for 'floatplacement=mouse,on_screen'
+
 hc rule --instance="yad" floating=true
 
 hc rule --instance~".*kazam.*" floating=true
