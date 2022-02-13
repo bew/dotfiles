@@ -77,6 +77,7 @@ make-link .dot/gui/alacritty ~/.config/alacritty
 make-link .dot/gui/kitty     ~/.config/kitty
 make-link .dot/gui/dunst     ~/.config/dunst
 make-link .dot/gui/flameshot ~/.config/flameshot
+make-link .dot/gui/copyq     ~/.config/copyq
 
 # Desktop env
 make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm

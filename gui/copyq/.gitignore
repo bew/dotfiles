@@ -1,0 +1,16 @@
+# backups
+*.bak
+*bak*
+
+# not worth tracking (change often)
+*.dat
+copyq-filter.ini
+copyq_geometry.ini
+copyq_tabs.ini
+copyq.lock
+
+# security (to encrypt entries if needed)
+copyq.pub
+
+# socket
+.copyq_s

@@ -53,6 +53,7 @@ background_run redshift-gtk -l 48.8:2.3
 background_run nm-applet # network selector
 background_run dunst # notification daemon
 background_run flameshot # screenshot tool
+background_run copyq # clipboard manager
 
 background_run ~/.dot/bin/desktop--start-status-bars
 
