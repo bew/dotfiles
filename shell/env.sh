@@ -33,10 +33,6 @@ function path_maybe_add_entry
 path_maybe_add_entry "$HOME/.dot/bin"
 path_maybe_add_entry "$HOME/.dot/gui/bin"
 
-# adb & fastboot PATH, installed using install.sh script at
-# https://github.com/corbindavenport/nexus-tools
-path_maybe_add_entry "$HOME/.nexustools"
-
 # User-local bins
 path_maybe_add_entry "$HOME/.local/bin"
 

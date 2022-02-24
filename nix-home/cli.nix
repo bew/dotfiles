@@ -54,6 +54,12 @@ in {
       };
     in mybuilders.linkSingleBin "${ipython-minimal}/bin/ipython")
 
+    (let androidPkgs = stable.androidenv.androidPkgs_9_0;
+    in mybuilders.linkBins "android-tools-bins" [
+      "${androidPkgs.platform-tools}/bin/adb"
+      "${androidPkgs.platform-tools}/bin/fastboot"
+    ])
+
     # Nix tools
     stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)
     stable.nix-diff # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
