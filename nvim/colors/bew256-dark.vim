@@ -188,10 +188,14 @@ exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
 
-" 237 (light grey)
-" 17 (dark blue) is pretty nice (maybe too subtle)
+" 236 (grey)
+" 17 (dark blue) is nice BUT a bit too subtle
 " 52 (dark red) is VERY visible (too much? needs to have a toggle)
-exe "HiResetTo Visual cterm=none ctermbg=17"
+exe "HiResetTo VisualNormal ctermbg=236"
+exe "HiResetTo VisualHighContrast ctermbg=52"
+" ^^^ HighContrast variant can be helpful when sharing screen, to better show what I have selected
+" NOTE: Would be nice to have a visual binding to toggle between the 2 :)
+hi! link Visual VisualNormal
 hi! link VisualNOS Visual
 
 exe "HiResetTo Title"          .s:fmt_bold   .s:fg_orange
