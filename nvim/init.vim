@@ -852,6 +852,11 @@ augroup my_custom_language_hi
   " Javascript Colors
   au ColorScheme * hi javaScriptDocParam ctermfg=25
   au ColorScheme * hi javaScriptDocTags ctermfg=88
+
+  " Nix Colors
+  " * highlight lambda arguments differently from attribute names
+  au ColorScheme * hi nixSimpleFunctionArgument ctermfg=136 cterm=italic
+  au ColorScheme * hi nixArgumentDefinition ctermfg=136 cterm=italic
 augroup END
 
 " Set a colorScheme based on current 'background'.
