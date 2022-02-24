@@ -32,4 +32,20 @@ ${VISUAL}$0
 \`\`\`
 endsnippet
 
+snippet details "Github <details> block" b
+<details>
+<summary>${1:interesting summary}</summary>
+
+<!-- blank line above is necessary for formatting on github -->
+$2
+
+</details>
+<!-- blank line below is necessary for formatting on github -->
+
+endsnippet
+
+snippet com "HTML comment"
+<!-- ${1:${VISUAL}} -->
+endsnippet
+
 # vim:ft=snippets:
