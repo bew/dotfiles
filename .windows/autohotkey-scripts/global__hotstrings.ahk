@@ -26,3 +26,16 @@
 ::!nohi::https://nohello.net/
 
 ::!askwithtext::I don't have much time right now, but if you can ask your question in tchat I'll try to answer you or redirect you
+
+
+; <details> block for github
+; Multiline is documented at https://www.autohotkey.com/docs/Hotstrings.htm#continuation
+::!ghdetails::
+(
+<details>
+<summary>FILL_ME</summary>
+
+DETAILS_HERE
+
+</details>
+)
