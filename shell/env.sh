@@ -40,6 +40,23 @@ path_maybe_add_entry "$HOME/.nexustools"
 # User-local bins
 path_maybe_add_entry "$HOME/.local/bin"
 
+# Automatically make available project-local helper binaries.
+# MUST BE LAST (to take precedence)
+#
+# The idea is to use an esoteric dirname for $PATH, and make a symlink with
+# that name to the bin/ of a given project, when I need this
+# auto-bins behavior.
+path_maybe_add_entry "__auto_bins__"
+if [[ -n "$ZSH_VERSION" ]] && [[ $- == *i* ]]; then # when in interactive zsh
+  # For some reason, using a non-absolute path in $path does not make auto-completion work when that
+  # path exists in cwd.
+  # To work around that, we tell the completion system to add an absolute path in it's command
+  # search path every time a command is looked for.
+  # (-e flag tells zstyle to eval the given string every the completion system requests the value of command-path)
+  # ref: https://superuser.com/a/1564543/536847
+  zstyle -e ':completion:*' command-path 'reply=( "$PWD/__auto_bins__" "${(@)path}" )'
+fi
+
 # OSX bins
 path_maybe_add_entry "/usr/local/bin" fallback
 

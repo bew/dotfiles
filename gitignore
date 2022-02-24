@@ -20,6 +20,8 @@ result-*
 # Put any dir link you want to a __vcs_ignore__ directory!
 __vcs_ignore__/
 
+__auto_bins__/
+
 # Python
 __pycache__/
 *.egg
