@@ -1,5 +1,14 @@
 #!/usr/bin/env zsh
 
+function _ffmpeg::display_and_run
+{
+  echo "--> Going to run:"
+  echo "$*"
+  echo "--> Now running..."
+  echo
+  "$@"
+}
+
 function ffmpeg::extract-audio
 {
   if [[ $# == 0 ]]; then
@@ -73,7 +82,7 @@ function ffmpeg::transcode-movie::single-file
   # output
   cmd+=("$output_path")
 
-  "${cmd[@]}"
+  _ffmpeg::display_and_run "${cmd[@]}"
   local ret=$?
   if [[ $? == 0 ]]; then
     echo
@@ -154,7 +163,7 @@ function ffmpeg::take-sample
   cmd+=(-map 0 -c copy) # copy every input streams
   cmd+=("$output_path")
 
-  "${cmd[@]}"
+  _ffmpeg::display_and_run "${cmd[@]}"
   local ret=$?
   if [[ $? == 0 ]]; then
     echo
