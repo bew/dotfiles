@@ -108,6 +108,15 @@ zstyle ':completion:*' matcher-list \
 # NOTE: Read 'matcher-list' doc in man 'zshcompsys' for details (not trivial).
 # NOTE: Syntax of matcher specifications is documented in man 'zshcompwid', in the
 #       section named 'COMPLETION MATCHING CONTROL'.
+#
+# FIXME: I have a problem, when in a subdir and ../README.md is modified,
+#   doing 'git checkout ../rea' then TAB gives 'no match for...'  GRRR
+#
+# FIXME: I have a problem (that existed before my completion config changes),
+#   for modified files (on `git checkout ...`) the matcher is tried AFTER normal compl,
+#   instead of at the same time...
+#   => If I have modified files 'config' and 'CONTRIBUTE', doing 'con' then  trigger completion
+#      should show both! Instead it auto-completes 'config' only.. :/ :/ :/ :/ :/ :/
 
 # Make completion stops at the first ambiguous component
 zstyle ':completion:*' ambiguous true

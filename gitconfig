@@ -36,7 +36,7 @@
   missingCommitsCheck = "warn"
 
 [help]
-  autocorrect = -1 # without prompt
+  autocorrect = immediate
 
 [color]
   interactive = true
