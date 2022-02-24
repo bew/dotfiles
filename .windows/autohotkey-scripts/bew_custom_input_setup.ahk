@@ -15,6 +15,13 @@ GroupAdd, bew_input, ahk_exe Outlook.exe
 GroupAdd, bew_input, ahk_exe Mattermost.exe
 GroupAdd, bew_input, Firefox
 
+; Windows Explorer and parts of the Windows's Shell (the desktop environment)
+; NOTE: I can't get arrows to work on the clipboard manager to move up/down because when
+;       pressing Alt for Alt+{j,k}, the popup disappears. I also tried to map Win+{j,k}
+;       so I can do Win+v then Win+j to go down, but 'Down' isn't passed to the clipboard
+;       manager's window but the window behind it :/
+GroupAdd, bew_input, ahk_exe Explorer.exe
+
 #IfWinActive ahk_group bew_input
 
 ; --- Word movement
