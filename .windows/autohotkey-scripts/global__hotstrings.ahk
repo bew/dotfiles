@@ -14,8 +14,17 @@
 ; (╯°□°)╯︵┻━┻
 ::!flip::({U+256f}{U+00B0}{U+25A1}{U+00B0}){U+256f}{U+FE35}{U+253B}{U+2501}{U+253B}
 
+; ᕕ( ᐛ )ᕗ
+::!lalala::{U+1555}( {U+141B} ){U+1557}
+
+; (҂-_･) ︻デ═一▸
+::!blam::({U+0482}-_{U+FF65}) {U+FE3B}{U+30C7}{U+2550}{U+4E00}{U+25B8}
+
 ; 👍
 ::!+1::{U+1F44D}
+
+; 👀
+::!eyes::{U+1F440}
 
 ; ™ (trademark)
 ::!tm::{U+2122}
@@ -26,7 +35,6 @@
 ::!nohi::https://nohello.net/
 
 ::!askwithtext::I don't have much time right now, but if you can ask your question in tchat I'll try to answer you or redirect you
-
 
 ; <details> block for github
 ; Multiline is documented at https://www.autohotkey.com/docs/Hotstrings.htm#continuation
