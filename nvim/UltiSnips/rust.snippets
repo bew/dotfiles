@@ -25,15 +25,26 @@ snippet fn "Closure, anonymous function (inline)" w
 endsnippet
 
 snippet p "println!(..) with endline" w
-println!("$1"$2)
+println!("$1"$2);
+endsnippet
+
+snippet ep "eprintln!(..) with endline" w
+eprintln!("$1"$2);
 endsnippet
 
 snippet pi "print!(..) inline" w
-print!("$1"$2)
+print!("$1"$2);
 endsnippet
 
+snippet wi "write!(..) inline" w
+write!(${1:writer}, "$2"$3)
+endsnippet
+
+# Using $VISUAL then $1 allows to start to write a string, then need to
+# interpolate something, select the string, expand `fmt` snip, and continue
+# writing the string with interpolations.
 snippet fmt "format!(..)" w
-format!("$1"$2)
+format!("${VISUAL/"//g}$1"$2)
 endsnippet
 
 snippet dbg "Debug expression" w
@@ -41,24 +52,31 @@ dbg!(${1:${VISUAL}})
 endsnippet
 
 snippet ma "match .. { .. }" w
-match ${1:expr} {$2}
+match ${1:${VISUAL:expr}} {$2}
 endsnippet
 
-# snippet b "{ .. } block" w
-# {${1:${VISUAL}}}
-# endsnippet
+# Useful when I have a few lines selected in visual mode.
+snippet blk "{ .. } block" w
+{
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet blki "{ .. } inline block" w
+{ ${1:${VISUAL}} }
+endsnippet
 
 snippet macro "macro_rules!" b
 macro_rules! ${1:name} (
 	(${2:matcher}) => (
-		${3}
+		$0
 	)
 )
 endsnippet
 
 snippet for "for .. in .." b
 for ${1:i} in ${2:iter_expr} {
-	${10:${VISUAL}}$0
+	${0:${VISUAL}}
 }
 endsnippet
 
@@ -70,16 +88,24 @@ snippet doc "Doc comment" b
 /// $0
 endsnippet
 
-snippet todo "A Todo comment"
+snippet todo "A TODO comment"
 // TODO: $0
+endsnippet
+
+snippet !fixm(e)?! "A FIXME comment" r
+// FIXME: $0
 endsnippet
 
 snippet note "A Note comment"
 // NOTE: $0
 endsnippet
 
-snippet st "Struct" b
-struct ${1:Name} {$2}
+snippet st "Struct type" b
+${1:pub }struct ${2:Name} {$3}
+endsnippet
+
+snippet sf "Struct field" b
+${1:pub }${2:field_name}: ${3:()},
 endsnippet
 
 snippet ann "#[...] annotation" b
@@ -102,8 +128,56 @@ impl<${1:T}> ${2:TypeOrTrait}<${3:T}>${4: for ${5:Type}<${6:T}>} {
 }
 endsnippet
 
+snippet implfmt "impl fmt Display for Type" b
+impl std::fmt::Display for ${1:Type} {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		$0
+	}
+}
+endsnippet
+
 snippet tr "Trait declaration" b
-trait ${1:Type} {$2}
+${1:pub }trait ${2:Type}${3:: ${4:RequiredTypeBound}} {$10}
+endsnippet
+
+# Types helpers
+
+snippet res "Result<>"
+Result<${1:${VISUAL:()}}, ${2:ErrorType}>
+endsnippet
+
+snippet ares "anyhow::Result<>"
+anyhow::Result<${1:${VISUAL:()}}>
+endsnippet
+
+snippet ok "Ok(...)" w
+Ok(${1:${VISUAL:()}})
+endsnippet
+
+snippet opt "Option<Type>" w
+Option<${1:${VISUAL:Type}}>
+endsnippet
+
+# Tests helpers
+
+snippet tests_section "EOF test section" b
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	${0:// TODO: write test functions here...}
+}
+endsnippet
+
+snippet fnt "A test function" b
+#[test]
+fn ${1:test_${2:something}}() {
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet assq "assert_eq!(...);" b
+assert_eq!(${1:${VISUAL}}, $2);
 endsnippet
 
 # vim:ft=snippets:
