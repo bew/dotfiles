@@ -11,6 +11,10 @@ class ${20:MyClass}:
 	${30:${VISUAL:pass}}
 endsnippet
 
+snippet fromdata "import for @dataclass" b
+from dataclasses import dataclass
+endsnippet
+
 snippet def "function" b
 def ${10:function_name}(${20:self${21:, ${22:arg}}})${30: -> ${31:Any}}:
 	${40:${VISUAL:pass}}
@@ -209,7 +213,7 @@ snippet optn "Optional[...] = None"
 Optional[${1:${VISUAL:SomeType}}] = None
 endsnippet
 
-snippet ld "lambda"
+snippet ld "lambda" w
 lambda
 endsnippet
 
