@@ -68,7 +68,7 @@ function zcompl::extract_options_completion_from_cmd_help
 zcompl::extract_options_completion_from_cmd_help "fzf"
 
 # Activate menu completion (in interactive mode!!)
-zstyle ':completion:*' menu select interactive
+zstyle ':completion:*' menu select #interactive
 # NOTE: the menu is immediately shown because Tab is mapped to 'menu-complete' in ./mappings.zsh
 
 # Force a reload of completion system if nothing matched; this fixes installing
