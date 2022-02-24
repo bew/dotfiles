@@ -565,9 +565,15 @@ Plug 'plasticboy/vim-markdown'  " Markdown vim mode
 let g:vim_markdown_folding_disabled = v:true
 let g:vim_markdown_conceal = v:false
 let g:vim_markdown_conceal_code_blocks = v:false
-let g:vim_markdown_fenced_languages = ["hcl=terraform"] " Additional code hi config
 let g:vim_markdown_frontmatter = v:true
 let g:vim_markdown_new_list_item_indent = 2
+
+" Recognize additional fenced language shortcuts
+" (in addition to all filetypes)
+let g:vim_markdown_fenced_languages = [
+    \   "hcl=terraform",
+    \   "py=python",
+    \ ]
 
 let g:vim_markdown_auto_insert_bullets = 0 " Because I don't want <Enter> to make a new bullet!
 " Note: auto bullet works by setting '*', '+', '-' as a comment leader, and configuring vim to
@@ -606,9 +612,8 @@ autocmd BufWritePre *.md if tablemode#IsActive() | exe "TableModeRealign" | endi
 let g:table_mode_separator_map = ""
 
 "# Python
-" Add colors to 'arg=' in 'func_call(arg=1)'
-autocmd FileType python syn match pythonFunctionCallKwargs '\h\w\+='
-autocmd FileType python hi pythonFunctionCallKwargs ctermfg=137
+" NOTE: new syntax elements are now in ./after/syntax/python.vim
+" FIXME: how to properly set my chosen highlights? move them in ./colors/bew256-dark.vim ?
 
 " NOTE: specifying `'for': 'python'` for this Plug breaks something when opening
 " multiple files from cli, resulting in 'Not an editor command: Semshi enable'
@@ -620,6 +625,7 @@ let g:semshi#mark_selected_nodes = 2 " Also highlight the word under cursor
 autocmd FileType python hi semshiSelected ctermfg=NONE ctermbg=NONE cterm=underline
 autocmd FileType python hi semshiBuiltin ctermfg=131
 autocmd FileType python hi semshiParameterUnused ctermfg=240
+autocmd FileType python hi semshiSelf ctermfg=253 cterm=italic
 
 Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
