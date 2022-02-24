@@ -814,6 +814,12 @@ augroup my_custom_language_hi
   au ColorScheme * hi htmlItalic cterm=italic ctermfg=251 ctermbg=235
   au ColorScheme * hi htmlBold cterm=bold ctermfg=255 ctermbg=235
 
+  " Give a basic progression/difference between H1, H2, H3.. titles
+  au ColorScheme * hi htmlH1 cterm=bold ctermfg=255 ctermbg=130
+  au ColorScheme * hi htmlH2 cterm=bold ctermfg=232 ctermbg=252
+  au ColorScheme * hi! link htmlH3 Title
+  " NOTE: htmlH4 is linked to htmlH3, htmlH5 is linked to htmlH4, ..
+
   " Ruby Colors
   au ColorScheme * hi clear rubyInstanceVariable
   au ColorScheme * hi rubyInstanceVariable ctermfg=33
