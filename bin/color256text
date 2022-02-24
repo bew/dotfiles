@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+
+PROGRAM_NAME=$(basename "$0")
+
+function usage
+{
+  echo "Usage: $PROGRAM_NAME [-h|--help] [<FG-BG-COLOR>...] [<TEXT-STYLE>...]"
+  echo
+  echo "<FG-BG-COLOR> can be any number of:"
+  echo "  fg:<COLOR-ID> - foreground text color (COLOR-ID in 1 -> 256)"
+  echo "  bg:<COLOR-ID> - background color (COLOR-ID in 1 -> 256)"
+  echo
+  echo "<TEXT-STYLE> can be any number of:"
+  echo "  bold     - bold text"
+  echo "  dim      - dim text, thinner font"
+  echo "  italic   - italic text"
+  echo "  under*   - underlined text"
+  echo "  blink    - blinking text"
+  echo "  strike*  - striked-through text"
+  echo
+  echo "Examples:"
+  echo "  $PROGRAM_NAME bg:33 fg:254 bold italic"
+  echo "  $PROGRAM_NAME fg:107 under"
+  echo
+}
+
+RESET="\e[0m"
+
+# defaults to the terminal default colors & style
+TEXT_COLOR=""
+TEXT_STYLE=""
+
+while [[ -n "${1:-}" ]]; do
+  case "$1" in
+    fg:*)
+      TEXT_COLOR+="\e[38;5;${1:3}m" # support 256 colors
+      shift
+      ;;
+    bg:*)
+      TEXT_COLOR+="\e[48;5;${1:3}m" # support 256 colors
+      shift
+      ;;
+    bold)    TEXT_STYLE+="\e[1m"; shift;;
+    dim)     TEXT_STYLE+="\e[2m"; shift;;
+    italic)  TEXT_STYLE+="\e[3m"; shift;;
+    under*)  TEXT_STYLE+="\e[4m"; shift;;
+    blink)   TEXT_STYLE+="\e[5m"; shift;;
+    strike*) TEXT_STYLE+="\e[9m"; shift;;
+    -h|--help) usage; exit;;
+    *)
+      >&2 echo "ERROR: unknown argument '$1'"
+      >&2 usage
+      exit 1
+      ;;
+  esac
+done
+
+function colored_echo
+{
+  echo -en "${TEXT_COLOR}"
+  echo -en "$*"
+  echo -en "${RESET}"
+  echo # the only new line
+}
+
+echo         "---------------------------------"
+colored_echo "                                 "
+colored_echo "    ${TEXT_STYLE}This is an (example[TXT])${RESET}${TEXT_COLOR}    "
+colored_echo "                                 "
+echo         "---------------------------------"
