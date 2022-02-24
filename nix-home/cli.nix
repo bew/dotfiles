@@ -20,6 +20,7 @@ in {
     stable.rust-analyzer
     stable.sumneko-lua-language-server
 
+    bleedingedge.zsh
     stable.exa # alternative ls, more colors!
     bleedingedge.bat # 'bleedingedge to have latest 'less' version I need
     stable.fd
@@ -32,7 +33,7 @@ in {
     bleedingedge.ripgrep
     stable.tree
     stable.just
-    bleedingedge.zsh
+    (stable.ranger.override { imagePreviewSupport = false; less = bleedingedge.less; })
 
     stable.htop
     bleedingedge.less # very-recent 'less' version I need for my key bindings
