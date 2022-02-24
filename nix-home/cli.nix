@@ -1,19 +1,7 @@
-{ config, pkgsChannels, lib, ... }:
+{ config, pkgsChannels, lib, mybuilders, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge;
-
-  # Builds a derivation that only has a link to a binary in another derivation.
-  # Can be used to rename a binary and allow multiple version of the same software
-  # in the same environment.
-  linkSingleBin = binName: binPath:
-    stable.runCommandLocal "${binName}-bin-link" { } ''
-      link_path=$out/bin/${lib.escapeShellArg binName}
-      mkdir -p $out/bin
-      ln -s ${lib.escapeShellArg binPath} "$link_path"
-      # NOTE: a symlink to an executable is automatically executable
-    '';
-
 in {
   home.packages = [
     stable.neovim
@@ -64,7 +52,7 @@ in {
           propagatedBuildInputs = (lib.remove pyPkg.pkgs.matplotlib oldAttrs.propagatedBuildInputs);
         });
       };
-    in linkSingleBin "ipython" "${ipython-minimal}/bin/ipython")
+    in mybuilders.linkSingleBin "${ipython-minimal}/bin/ipython")
 
     # Nix tools
     stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)

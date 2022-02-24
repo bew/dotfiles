@@ -4,7 +4,7 @@
 }:
 
 # -------- Start of main home config module --------
-{ config, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -17,6 +17,8 @@
   ];
 
   # -------- Push custom args for any of my modules --------
+
+  _module.args.mybuilders = pkgs.callPackage ./mybuilders.nix {};
 
   # Flake inputs
   _module.args.flakeInputs = inputs;
