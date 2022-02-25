@@ -236,6 +236,14 @@ Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh
 let g:LanguageClient_rootMarkers = [".manual_root_marker"]
 let g:LanguageClient_useVirtualText = "Diagnostics"
 let g:LanguageClient_virtualTextPrefix = s:code_diagnostic_cfg.virt_text_prefix
+function! s:lc_restart()
+  LanguageClientStop
+  sleep 2 " NOTE: this blocks the UI thread
+  LanguageClientStart
+  redraw!
+endf
+" Can be needed to reset the lang server, when adding project dependencies
+command! LanguageClientRestart silent call <SID>lc_restart()<cr>
 
 let s:lc_diag_gen = {name, cfg -> {
     \   "name": name,
