@@ -290,10 +290,18 @@ let g:floaterm_autoclose = 2  " Always auto close
 let g:floaterm_wintype = "float"
 let g:floaterm_position = "bottom"
 let g:floaterm_width = 0.9
+" NOTE: the floaterm window doesn't react to VimResized events, probably for simplicity. Easy
+" workaround is to toggle the terminal twice to re-show it.
 
 function! s:InstallFloatermBorderColorChange()
   au TermLeave <buffer> hi FloatermBorder cterm=bold ctermfg=124 ctermbg=234
   au TermEnter <buffer> hi FloatermBorder cterm=NONE ctermfg=28  ctermbg=234
+endf
+
+function! s:DarkenBackgroundUntilOutOfFloatermWin()
+  let g:save_normal_bg = synIDattr(hlID("Normal"), "bg")
+  hi Normal ctermbg=232
+  au WinLeave term://* ++once exe "hi Normal ctermbg=" . g:save_normal_bg
 endf
 
 augroup my_floaterm
@@ -302,6 +310,7 @@ augroup my_floaterm
   au ColorScheme * hi FloatermBorder ctermfg=130
 
   au FileType floaterm call <SID>InstallFloatermBorderColorChange()
+  au User FloatermOpen call <SID>DarkenBackgroundUntilOutOfFloatermWin()
 augroup END
 
 
