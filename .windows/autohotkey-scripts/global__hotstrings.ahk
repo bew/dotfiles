@@ -19,6 +19,10 @@
 
 ; (҂-_･) ︻デ═一▸
 ::!blam::({U+0482}-_{U+FF65}) {U+FE3B}{U+30C7}{U+2550}{U+4E00}{U+25B8}
+; (҂-_･) ︻デ═一⠀⠀⠀· · ▸⠀⠀⠀⠀⠀⠀⠀⠀(XYZ)
+; attacking something, with a few non-breakable spaces
+; (to ensure they will stay as spaces in Teams for example)
+::!blamfor::({U+0482}-_{U+FF65}) {U+FE3B}{U+30C7}{U+2550}{U+4E00}{U+2800}{U+2800}{U+2800}{U+00B7} {U+00B7} {U+25B8}{U+2800}{U+2800}{U+2800}{U+2800}{U+2800}{U+2800}{U+2800}{U+2800}(
 
 ; 👍
 ::!+1::{U+1F44D}
