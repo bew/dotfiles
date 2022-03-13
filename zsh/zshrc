@@ -41,23 +41,24 @@ add-zsh-hook chpwd chpwd-wrapper
 #-------------------------------------------------------------
 # Load Plugins
 
-# zinit
-source ~/.zsh/third-party/zinit/zinit.zsh
+# zi (old project names: zinit, zplugin)
+# WARNING: needs folder ~/.zi to exist, it will auto download/setup plugins on first launch
+source ~/.zsh/third-party/zi/zi.zsh
 
 # Syntax highlighting
-zinit light zdharma/fast-syntax-highlighting
+zi light zdharma/fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme ~/.zsh/fast-theme--bew.ini
 
 # cd with 'frecency' (recent + frequence)
-zinit light rupa/z
+zi light rupa/z
 
 # autopair all the things!
 AUTOPAIR_INHIBIT_INIT=1 # don't auto-init, init at the end (with 'autopair-init')
-zinit light hlissner/zsh-autopair
+zi light hlissner/zsh-autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
-zinit load romkatv/gitstatus
+zi load romkatv/gitstatus
 gitstatus_start MY
 
 
