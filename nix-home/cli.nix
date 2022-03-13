@@ -18,6 +18,7 @@ in {
     stable.gh  # github cli for view & operations
     bleedingedge.delta # for nice git diffs
     stable.jq
+    stable.yq
     bleedingedge.ripgrep
     stable.tree
     stable.just
