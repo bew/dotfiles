@@ -74,6 +74,11 @@ function _venv__ensure_exists
     _venv__echo2 err "ERROR: '$venv_dir' directory does NOT exist"
     return 1
   fi
+
+  if ! [[ -f "$venv_dir/bin/python" ]]; then
+    _venv__echo2 err "ERROR: Interpreter '$venv_dir/bin/python' does NOT exist"
+    return 1
+  fi
 }
 
 function _venv__ensure_inside
@@ -152,7 +157,8 @@ function venv_on
     return 1
   fi
 
-  _venv__echo2 info "+++ Enabling virtual env.."
+  local used_python_version="$("$venv_dir/bin/python" --version)"
+  _venv__echo2 info "+++ Enabling virtual env.. ($used_python_version)"
   source "$venv_dir/bin/activate"
 }
 
@@ -162,12 +168,6 @@ function venv_off
 
   _venv__echo2 info "--- Disabling virtual env.."
   _venv__deactivate_with_fallback
-}
-
-function venv_off_manual
-{
-  _venv__ensure_inside || return 1
-
 }
 
 function venv_do
