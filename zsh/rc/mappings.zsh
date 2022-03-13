@@ -23,6 +23,11 @@ function zle::utils::no-history-run
   zle .accept-line
 }
 
+function zle::utils::is-insert-mode
+{
+  [[ "$KEYMAP" =~ "(main|viins)" ]]
+}
+
 # Set $REPLY with the current vim mode (insert, normal, visual*, replace)
 function zle::utils::get-vim-mode
 {
@@ -284,7 +289,7 @@ function zwidget::insert_one_arg
 }
 zle -N zwidget::insert_one_arg
 
-# Jump to beginning of current or previous shell argument
+# Jump to start of current/previous shell argument
 #
 # [z] means the CURSOR is on letter z
 # [] means the CURSOR at the end of the BUFFER
@@ -305,10 +310,11 @@ function zwidget::jump-previous-shell-arg
   split-shell-arguments
   local word_idx=$REPLY char_idx_in_word=$REPLY2
   local sh_args=("${reply[@]}") # copy $reply array, keeping blank and empty elements
+  (( char_idx0_in_word = char_idx_in_word - 1 )) # start idx at 0 instead of 1
 
   if (( word_idx == 1 )); then
     # CURSOR is on space before first argument
-    # move CURSOR before the beginning of space
+    # move CURSOR to start of everything
     (( CURSOR = 0 ))
     return
   fi
@@ -325,48 +331,98 @@ function zwidget::jump-previous-shell-arg
     # - word_idx = idx of last space
     # - char_idx_in_word = 1 (<- not reliable)
 
-    # move CURSOR to beginning of last space
+    # move CURSOR to start of last space
     (( CURSOR = CURSOR - ${#sh_args[word_idx]} ))
-    # move CURSOR to beginning of previous argument
+    # move CURSOR to start of previous argument
     (( CURSOR = CURSOR - ${#sh_args[word_idx - 1]} ))
     return
   fi
 
   if (( word_idx % 2 != 0 )); then
     # CURSOR is on a space
-    # move CURSOR to beginning of space
-    (( CURSOR = CURSOR - char_idx_in_word + 1))
-    # move CURSOR to beginning of previous argument
+    # move CURSOR to start of space
+    (( CURSOR = CURSOR - char_idx0_in_word ))
+    # move CURSOR to start of previous argument
     (( CURSOR = CURSOR - ${#sh_args[word_idx - 1]} ))
     return
   fi
 
   # Now CURSOR is on an argument
 
-  if (( char_idx_in_word > 1 )); then
-    # CURSOR is somewhere on an argument, jump to beginning of it
-    (( CURSOR = CURSOR - char_idx_in_word + 1 ))
+  if (( 0 < char_idx0_in_word )); then
+    # CURSOR is somewhere on an argument, jump to start of it
+    (( CURSOR = CURSOR - char_idx0_in_word ))
     return
   fi
 
-  # Now CURSOR is at beginning of an argument
+  # Now CURSOR is at start of an argument
 
   if (( word_idx == 2 )); then
-    # CURSOR is at beginning of first argument (the command), jump before first space
+    # CURSOR is at start of first argument (the command), jump before first space
     (( CURSOR = 0 ))
     return
   fi
 
-  # CURSOR is at beginning of an argument, jump to beginning of previous argument
+  # CURSOR is at start of an argument, jump to start of previous argument
 
-  # move CURSOR to beginning of space before current argument
+  # move CURSOR to start of space before current argument
   (( CURSOR = CURSOR - ${#sh_args[word_idx - 1]}))
-  # move CURSOR to beginning of previous argument
+  # move CURSOR to start of previous argument
   (( CURSOR = CURSOR - ${#sh_args[word_idx - 2]}))
 }
 zle -N zwidget::jump-previous-shell-arg
 
-# Jump to the end of current or next shell argument
+# Jump to the next shell argument.
+#
+# [z] means the CURSOR is on letter z
+# [] means the CURSOR at the end of the BUFFER
+# The BUFFER is between | and |
+#
+# |[a]bc   def|  =>  |abc   [d]ef|
+# |abc [ ] def|  =>  |abc   [d]ef|
+# |abc   d[e]f|  =>  |abc   def[]|
+#
+# |[ ]  abc   def   |  =>  |   [a]bc   def   |
+# |   abc   def [ ] |  =>  |   abc   def   []|
+# |   abc   de[f]   |  =>  |   abc   def   []|
+function zwidget::jump-next-shell-arg
+{
+  autoload -U split-shell-arguments
+
+  local reply REPLY REPLY2
+  split-shell-arguments
+  local word_idx=$REPLY char_idx_in_word=$REPLY2
+  local sh_args=("${reply[@]}") # copy $reply array, keeping blank and empty elements
+  (( char_idx0_in_word = char_idx_in_word - 1 )) # start idx at 0 instead of 1
+
+  if (( word_idx == ${#sh_args})); then
+    # CURSOR is on space after last argument
+    # move CURSOR after the end of the buffer
+    (( CURSOR = ${#BUFFER} ))
+    return
+  fi
+
+  if (( word_idx % 2 != 0 )); then
+    # CURSOR is on a space
+    # move CURSOR to start of next arg
+    (( CURSOR = CURSOR - char_idx0_in_word + ${#sh_args[word_idx]} ))
+    return
+  fi
+
+  # Now CURSOR is on an argument
+
+  if (( char_idx_in_word <= ${#sh_args[word_idx]} )); then
+    # CURSOR is on an argument, jump to next space
+    (( CURSOR = CURSOR - char_idx0_in_word + ${#sh_args[word_idx]} ))
+    # and skip next space
+    (( CURSOR = CURSOR + ${#sh_args[word_idx + 1]} ))
+    return
+  fi
+}
+zle -N zwidget::jump-next-shell-arg
+
+# Jump to the end of current/next shell argument.
+# If we're in insert mode, put the cursor just after the end, to write AT the end.
 #
 # [z] means the CURSOR is on letter z
 # [] means the CURSOR at the end of the BUFFER
@@ -379,7 +435,7 @@ zle -N zwidget::jump-previous-shell-arg
 # |[ ]  abc   def   |  =>  |   ab[c]   def   |
 # |   abc   def [ ] |  =>  |   abc   def   []|
 # |   abc   de[f]   |  =>  |   abc   def   []|
-function zwidget::jump-next-shell-arg
+function zwidget::jump-end-shell-arg
 {
   autoload -U split-shell-arguments
 
@@ -387,6 +443,7 @@ function zwidget::jump-next-shell-arg
   split-shell-arguments
   local word_idx=$REPLY char_idx_in_word=$REPLY2
   local sh_args=("${reply[@]}") # copy $reply array, keeping blank and empty elements
+  (( char_idx0_in_word = char_idx_in_word - 1 )) # start idx at 0 instead of 1
 
   if (( word_idx == ${#sh_args})); then
     # CURSOR is on space after last argument
@@ -398,36 +455,43 @@ function zwidget::jump-next-shell-arg
   if (( word_idx % 2 != 0 )); then
     # CURSOR is on a space
     # move CURSOR to the end of space
-    (( CURSOR = CURSOR + (${#sh_args[word_idx]} - char_idx_in_word) ))
+    (( CURSOR = CURSOR - char_idx_in_word + ${#sh_args[word_idx]} ))
     # move CURSOR to the end of next argument
     (( CURSOR = CURSOR + ${#sh_args[word_idx + 1]} ))
+    # if in insert mode, ensure cursor is after the end (to write at the end)
+    zle::utils::is-insert-mode && (( CURSOR = CURSOR + 1 ))
     return
   fi
 
   # Now CURSOR is on an argument
 
   if (( char_idx_in_word < ${#sh_args[word_idx]} )); then
-    # CURSOR is somewhere on an argument, jump to the end of it
-    (( CURSOR = CURSOR + (${#sh_args[word_idx]} - char_idx_in_word) ))
+    # CURSOR is somewhere on an argument (but not the end), jump to the end of it
+    (( CURSOR = CURSOR - char_idx_in_word + ${#sh_args[word_idx]} ))
+    # if in insert mode, ensure cursor is after the end (to write at the end)
+    zle::utils::is-insert-mode && (( CURSOR = CURSOR + 1 ))
     return
   fi
 
   # Now CURSOR is at the end of an argument
 
   if (( word_idx == (${#sh_args} - 1) )); then
-    # CURSOR is at the end of last argument, jump after last space (can be empty)
+    # CURSOR is at the end of last argument, jump to the end of everything
     (( CURSOR = ${#BUFFER} ))
     return
   fi
 
-  # CURSOR is at the end of an argument, jump to the end of the next argument
+  # CURSOR is at the end of an argument (not the last one), jump to the end of the next argument
 
   # move CURSOR to the end of space after current argument
   (( CURSOR = CURSOR + ${#sh_args[word_idx + 1]}))
   # move CURSOR to the end of next argument
   (( CURSOR = CURSOR + ${#sh_args[word_idx + 2]}))
+  # if in insert mode, ensure cursor is after the end (to write at the end)
+  zle::utils::is-insert-mode && (( CURSOR = CURSOR + 1 ))
+  return
 }
-zle -N zwidget::jump-next-shell-arg
+zle -N zwidget::jump-end-shell-arg
 
 function zwidget::noop
 {
@@ -775,6 +839,7 @@ bindkey -M vicmd 'l' zwidget::go-right_or_git-log::vicmd # fix git log in norma
 # Why: it's almost never useful to go up/down, while staying in insert mode
 
 vibindkey 'b' zwidget::jump-previous-shell-arg
+vibindkey 'e' zwidget::jump-end-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
 vibindkey '^' beginning-of-line
 vibindkey '$' end-of-line
