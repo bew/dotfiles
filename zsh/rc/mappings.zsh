@@ -882,7 +882,7 @@ bindkey -M menuselect "" send-break
 # NOTE: Text entered in interactive mode is retained
 # => It's the only sensible way to complete single dash options (like -XY), because otherwise
 #    doing - then TAB, then entering the option I want in interactive menu make it disappear
-#    from the menu and ressing Space would insert the currently highlighted option, in
+#    from the menu and pressing Space would insert the currently highlighted option, in
 #    addition to the one I wanted ><..
 bindkey -M menuselect " " send-break # (note: would be nice to add Space after exiting the menu..)
 vibindkey -s " " " " # Alt-Space => send Space (makes it easy to use Alt-Space to exit menu, then again to add space)
@@ -927,6 +927,7 @@ bindkey -M menuselect "i" vi-insert
 #    incremental mode.
 #    Usual action keys do not work and will stop/cancel the menu completion.
 bindkey -M menuselect "s"  history-incremental-search-forward
+bindkey -M menuselect "f"  history-incremental-search-forward
 bindkey -M menuselect "^f"   history-incremental-search-forward
 
 # -- Movement keys in the completion menu
