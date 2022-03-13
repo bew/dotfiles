@@ -556,7 +556,7 @@ nnoremap <silent> <F3> :call <SID>syntax_query(v:true)<cr>
 " ---- Command mode
 
 " Save the file as sudo
-cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin/zenity_passwd.sh sudo tee % >/dev/null
+cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin-gui/zenity_passwd.sh sudo tee % >/dev/null
 
 " Cursor movement
 cnoremap <M-h> <Left>
