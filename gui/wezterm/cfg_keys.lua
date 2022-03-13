@@ -1,18 +1,6 @@
 local wezterm = require "wezterm"
 local act = wezterm.action
-
--- NOTE: always use wezterm.action_callback when it's in a release version!!
--- PR (by me!): https://github.com/wez/wezterm/pull/1151
-local function act_callback(event_id, callback)
-  if wezterm.action_callback then
-    wezterm.log_info(">> wezterm.action_callback is available for this version, use it!")
-    return wezterm.action_callback(callback)
-  else
-    wezterm.log_info(">> wezterm.action_callback is NOT available for this version, fallback to manual setup..")
-    wezterm.on(event_id, callback)
-    return wezterm.action{EmitEvent=event_id}
-  end
-end
+local act_callback = wezterm.action_callback
 
 -- IDEA: A better action syntax, see: https://github.com/wez/wezterm/issues/1150
 
@@ -55,7 +43,7 @@ cfg.keys = {
   -- Smart copy with Alt-c:
   -- - If active selection, will copy it to Clipboard & Primary
   -- - If NO selection, sends Alt-c to the running program
-  keybind("ALT", "c", act_callback("smart-copy", function(win, pane)
+  keybind("ALT", "c", act_callback(function(win, pane)
     local has_selection = win:get_selection_text_for_pane(pane) ~= ""
     if has_selection then
       win:perform_action(act{CopyTo="ClipboardAndPrimarySelection"}, pane)
@@ -81,7 +69,7 @@ cfg.keys = {
 
   ---- custom events
 
-  keybind(ctrl_shift, "g", act_callback("toggle-ligatures", function(win, _)
+  keybind(ctrl_shift, "g", act_callback(function(win, _)
     local overrides = win:get_config_overrides() or {}
     if not overrides.harfbuzz_features then
       -- If we haven't overriden it yet, then override with ligatures disabled
