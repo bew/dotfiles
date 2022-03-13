@@ -61,6 +61,10 @@ zi light hlissner/zsh-autopair
 zi load romkatv/gitstatus
 gitstatus_start MY
 
+# Ability to send command between shells :)
+zi ice wait"0" silent # load plugin async & silently
+zi light z-shell/zconvey
+zstyle ":plugin:zconvey" greeting "none"
 
 #-------------------------------------------------------------
 # remember recent directories (use with 'cdr')
