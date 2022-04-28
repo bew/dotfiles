@@ -231,6 +231,7 @@ function pac::show_useless_deps
 }
 
 alias pac::remove_useless_deps="command sudo pacman -Rsv \$(pac::list_useless_deps)"
+alias pac::safe-remove-pkg="pacman -Rsv"
 
 # yay
 
