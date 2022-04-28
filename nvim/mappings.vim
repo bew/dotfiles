@@ -108,11 +108,18 @@ imap <M-l> <Right>
 inoremap <M-b> <C-g>U<S-Left>
 inoremap <M-w> <C-g>U<S-Right>
 
-" I: Disable up/down
+" Insert helper, useful for most languages so I make it global!
 "
-" This is required when running under tmux with scrolling emulation mouse bindings
-" for the alternate screen, because it would move Up/Down N times based on the
-" scrolling emulation config.
+" I: Alt-, to insert a comma after cursor.
+" * When the cursor is at EOL, inserts only ','
+" * When the cursor is in text, inserts ', '
+inoremap <expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')
+
+" I: Disable up/down keys
+"
+" This is required to disable scrolling in insert mode when running under tmux with scrolling
+" emulation mouse bindings for the alternate screen, because it would move Up/Down N times based on
+" the scrolling emulation config.
 inoremap <Up> <nop>
 inoremap <Down> <nop>
 
