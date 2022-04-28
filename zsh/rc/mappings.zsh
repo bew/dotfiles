@@ -52,6 +52,47 @@ function zle::utils::get-vim-mode
   fi
 }
 
+# Get the row (0-indexed) the cursor is on (in a multi-lines buffer)
+function zle::utils::get-cursor-row0-in-buffer
+{
+  local cursor_row0_in_buffer=0
+  for (( i=1; i<=$#LBUFFER; i++ )); do
+    [[ ${LBUFFER[$i]} == $'\n' ]] && (( cursor_row0_in_buffer += 1 ))
+  done
+  REPLY_cursor_row0_in_buffer=$cursor_row0_in_buffer
+}
+
+function zle::term-utils::get-cursor-pos
+{
+  # Inspired from: https://www.zsh.org/mla/users/2015/msg00866.html
+  # It seems to work well :) (unlike my own old impl from a long time ago)
+  local pos="" char
+  print -n $'\e[6n' # Ask terminal for cursor position
+  # Then read char by char until we get a 'R'
+  # (terminal reply looks like: `\e[57;12R`)
+  while read -r -s -k1 char; do
+    [[ $char == R ]] && break
+    pos+=$char
+  done
+  pos=${pos#*\[} # remove '\e['
+
+  # pos has format 'row;col'
+  REPLY_cursor_row_in_term=${pos%;*} # remove ';col'
+  REPLY_cursor_col_in_term=${pos#*;} # remove 'row;'
+}
+
+# NOTE: when implemented in terminals, we can have '...reveal-scrollback-by' !
+function zle::term-utils::hide-scrollback-by
+{
+  local by_rows="${1:-1}" # default to 1 line
+  [[ "$by_rows" == 0 ]] && return
+
+  echo -n $'\e['"${by_rows}S" >/dev/tty # Scroll the terminal
+  echo -n $'\e['"${by_rows}A" >/dev/tty # Move the cursor back up
+}
+
+# --------
+
 # Toggle between "nosudo "/"sudo "/"" at <bol>
 function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
 {
@@ -97,8 +138,7 @@ function zwidget::force-scroll-window
   # Don't attempt to scroll in a tty
   [ "$TERM" = "linux" ] && return
 
-  printf "%s" $'\e[7S' >/dev/tty # Scroll the terminal up
-  printf "%s" $'\e[7A' >/dev/tty # Move the cursor up
+  zle::term-utils::hide-scrollback-by 10
 
   zle redisplay
 }
@@ -499,6 +539,25 @@ function zwidget::noop
 }
 zle -N zwidget::noop
 
+# NOTE: Not perfect..
+#   When completion menu is visible, it quits completion mode
+#   (accepting current entry for some reason..)
+function zwidget::clear-but-keep-scrollback
+{
+  local REPLY_cursor_row_in_term REPLY_cursor_col_in_term
+  zle::term-utils::get-cursor-pos
+
+  local REPLY_cursor_row0_in_buffer
+  zle::utils::get-cursor-row0-in-buffer
+
+  local prompt_row=$(( REPLY_cursor_row_in_term - REPLY_cursor_row0_in_buffer ))
+  zle::term-utils::hide-scrollback-by "$(( prompt_row - 1 ))"
+
+  zle redisplay
+  # zle -M "prompt row was: $prompt_row"
+}
+zle -N zwidget::clear-but-keep-scrollback
+
 #-------------------------------------------------------------
 # Mappings
 
@@ -623,6 +682,8 @@ bindkey -M viins "${keysyms[S-Tab]}" reverse-menu-complete
 bindkey -M viins "^n" menu-complete
 
 bindkey -M viins ":" execute-named-cmd
+
+vibindkey '^l' zwidget::clear-but-keep-scrollback
 
 vibindkey 's' zwidget::toggle-sudo-nosudo
 
