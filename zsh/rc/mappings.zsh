@@ -17,9 +17,10 @@ function zle::utils::no-history-run
 {
   local cmd="$1"
 
+  # Push current buffer, will be auto restored after $cmd
   zle push-input
-  BUFFER=" " # note: skip history with a leading space
-  BUFFER+="$cmd"
+
+  BUFFER=" $cmd" # skip history with a leading space
   zle .accept-line
 }
 
