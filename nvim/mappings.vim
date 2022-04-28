@@ -1,6 +1,6 @@
 " VIM - mappings
 " --------------------------------------------------------------------
-" 'I speek vim' - bew, 2021
+" 'I speak vim' - bew, 2021
 
 " TODO: improve organization!
 
