@@ -371,10 +371,6 @@ let g:ctrlsf_auto_close = {
 
 Plug 'airblade/vim-gitgutter'     " Git diff in the gutter
 let g:gitgutter_map_keys = v:false
-" FIXME: doesn't work well: with no preview visible, esc is still bound to a
-" function, and doing 42<esc> (to cancel a started action), the cursor moves
-" unexpectedly..
-" Tracking issue: https://github.com/airblade/vim-gitgutter/issues/784
 let g:gitgutter_close_preview_on_escape = v:false
 
 " Set a high sign priority, to avoid mixing signs based on order of appearance
