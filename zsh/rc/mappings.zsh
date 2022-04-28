@@ -860,6 +860,28 @@ bindkey "${keysyms[Up]}" up-line-or-beginning-search
 bindkey "${keysyms[Down]}" down-line-or-beginning-search
 
 
+# Vi OPerator Pending keybindings (text objects)
+#-------------------------------------------------------------
+
+# Add many text objects like: a' i' a) i( a} i_ a/ i`
+# From https://thevaluable.dev/zsh-line-editor-configuration-mouseless/
+autoload -Uz select-bracketed select-quoted
+zle -N select-quoted; zle -N select-bracketed
+
+for keymap in viopp visual; do
+  # NOTE: {a,i}${(s..)^:-hjkl} would generate the list: ah ih aj ij ak ik al il
+  # (I don't understand everything, like what '^:-' is for.. but it's necessary syntax)
+  for c in {a,i}${(s..)^:-\'\"\`\|\\,./:;=+@&'!'§%_~}; do
+    bindkey -M $keymap -- $c select-quoted
+  done
+  for c in {a,i}${(s..)^:-'()[]{}<>'}; do
+    bindkey -M $keymap -- $c select-bracketed
+  done
+done
+
+# TODO? A text object to select the entire current command
+
+
 # menuselect keybindings
 #-------------------------------------------------------------
 
