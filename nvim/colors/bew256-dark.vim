@@ -202,7 +202,7 @@ exe "HiResetTo Title"          .s:fmt_bold   .s:fg_orange
 exe "HiResetTo WarningMsg"     .s:fmt_bold   .s:fg_red
 exe "HiResetTo WildMenu"   .s:fg_base2  .s:bg_base02 .s:fmt_revr
 exe "HiResetTo Folded"   .s:fg_base0  ." ctermbg=236"
-exe "HiResetTo FoldColumn"   .s:fg_base0  .s:bg_base02
+HiResetTo FoldColumn ctermfg=240 ctermbg=233
 
 " Diff Colors
 exe "HiResetTo DiffAdd"          .s:fmt_bold   .s:bg_base03_g
