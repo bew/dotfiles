@@ -1,9 +1,7 @@
 let g:neomake_python_enabled_makers = ["python", "flake8", "mypy"]
 
-" I: Alt-, to insert a comma after cursor.
-" * When the cursor is at EOL, inserts only ','
-" * When the cursor is in text, inserts ', '
-inoremap <buffer><expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')
+" I: Alt-: to insert a colon after cursor.
+inoremap <buffer> <M-:>  : <C-g>U<Left><C-g>U<Left>
 
 " I: Alt-f to toggle between `f"..."` and `"..."`
 " NOTE that it is pretty dumb, and searches the first '"' on left of cursor.
