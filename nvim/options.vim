@@ -64,6 +64,9 @@ set shiftround
 " Completion popup
 set pumheight=20
 
+set foldmethod=manual   " the default, but make it explicit
+set foldcolumn=auto:2   " Auto show fold column, use at most 2 columns
+
 " Show non visible chars (tabs/trailing spaces/too long lines/etc..)
 set list
 set listchars=
