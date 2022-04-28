@@ -164,6 +164,11 @@ Plug 'kana/vim-textobj-indent'   " textobj: ii ai iI aI
 " Comment text object <3
 Plug 'glts/vim-textobj-comment'  " textobj: ic ac
 
+" Whitespace text object <3
+Plug 'vim-utils/vim-space'       " textobj: i<Space> a<Space>
+" a<Space> is all whitespace
+" i<Space> is same as a<Space> except it leaves a single space or newline
+
 " Diagnostic provider agnostic signs config
 let s:code_diagnostic_cfg = {}
 let s:code_diagnostic_cfg.virt_text_prefix = "  <<  "
