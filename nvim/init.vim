@@ -874,6 +874,11 @@ augroup my_custom_language_hi
   " * highlight lambda arguments differently from attribute names
   au ColorScheme * hi nixSimpleFunctionArgument ctermfg=136 cterm=italic
   au ColorScheme * hi nixArgumentDefinition ctermfg=136 cterm=italic
+
+  " Terraform colors
+  au ColorScheme * hi hclBlockType ctermfg=220 cterm=italic
+  au ColorScheme * hi hclValueDec ctermfg=99
+  au ColorScheme * hi hclValueBool ctermfg=202
 augroup END
 
 " Set a colorScheme based on current 'background'.
