@@ -339,7 +339,13 @@ nnoremap <M-C-f> gg=G``
 " V: a count then J on a single visual line does not make sense and is a probably a mistake
 " (like when I 'V4j' but fail to release Shift rapidly enough after typing 4 (on azerty layout)),
 " sends j instead.
-vnoremap <expr> J  (v:count && line(".") == line("v")) ? "j" : "J"
+" NOTE: _not_ using a noremap to get the J to gJ mapping below
+vmap <expr> J  (v:count && line(".") == line("v")) ? "j" : "gJ"
+" NV: Swap J & gJ, to not insert any spaces by default, use gJ to join with a space
+nnoremap J gJ
+vnoremap J gJ
+nnoremap gJ J
+vnoremap gJ J
 
 " N: un-join (split) the current line at the cursor position
 nnoremap <M-J> i<c-j><esc>k$
