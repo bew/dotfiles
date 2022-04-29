@@ -389,6 +389,13 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
+" V: logical visual eol
+" For some reason in visual mode '$' goes beyond end of line and include the newline,
+" making 'v$d' (or other actions) delete the end of line + the newline, joining them without being smart about it..
+"   => Totally not what I wanted... Let's fix this!
+" NOTE: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
+vnoremap $ $h
+
 " I: Select last inserted region
 nnoremap gV `[v`]
 " O: Operate on last inserted region
