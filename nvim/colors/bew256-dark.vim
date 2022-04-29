@@ -207,7 +207,7 @@ HiResetTo FoldColumn ctermfg=240 ctermbg=233
 " Diff Colors
 exe "HiResetTo DiffAdd"          .s:fmt_bold   .s:bg_base03_g
 exe "HiResetTo DiffChange cterm=none"
-exe "HiResetTo DiffDelete"       .s:bg_base03_r
+HiResetTo DiffDelete ctermfg=240 ctermbg=52
 exe "HiResetTo DiffText"         .s:fmt_bold   .s:bg_base03_b
 
 " Signs

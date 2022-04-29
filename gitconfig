@@ -26,6 +26,12 @@
   # When 'merge' subcmd is called without any ref, merge the upstream branch in.
   defaultToUpstream = true
 
+  tool = nvim_diffconflicts
+
+[mergetool "nvim_diffconflicts"]
+  # Using vim helper plugin: https://github.com/whiteinge/diffconflicts
+  cmd = nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
+
 [rebase]
   # Automatically create a temporary stash entry before the operation begins, and apply it after the
   # operation ends.
