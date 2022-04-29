@@ -65,15 +65,10 @@
   # (which is not automatically detected for some reasons..)
   statGraphWidth = 30
 
-  tool = nvim_diff # NOTE: I _never_ use this....
-
 [color "diff"]
   # color settings for 'colorMoved' option
   oldMoved = cyan 17
   newMoved = cyan 17
-
-[difftool "nvim_diff"]
-  cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE"
 
 # Useful when I can't use SSH to communicate with github and I don't want to
 # type my password/personal-token everytime.

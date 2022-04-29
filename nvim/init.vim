@@ -407,6 +407,17 @@ augroup my_git_signs_hi
   au ColorScheme * hi link GitGutterDelete SignVcsDelete
 augroup END
 
+Plug 'nvim-lua/plenary.nvim' " lua contrib stdlib for plugins, used by diffview
+Plug 'sindrets/diffview.nvim'
+lua << LUA
+function my_diffview_setup()
+  require'diffview'.setup {
+    use_icons = false, -- for files languages
+  }
+end
+LUA
+autocmd User PluginsLoaded lua my_diffview_setup()
+
 Plug 'whiteinge/diffconflicts'     " Helper plugin for git merges
 " Use this cmd as mergetool:
 "   nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
