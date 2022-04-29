@@ -78,7 +78,7 @@ set listchars+=extends:>,   " Last char when line too long for display
 " Set the char to use to fill some blanks
 set fillchars=
 set fillchars+=fold:╶,   " right side of a closed fold (default: '·')
-set fillchars+=diff:\ ,  " deleted lines of the 'diff' option (default: '-')
+set fillchars+=diff:╱, " (fully diagonal line) - deleted lines of the 'diff' option (default: '-')
 set fillchars+=eob:\ ,   " empty lines at the end of a buffer (default: '~')
 set fillchars+=vert:\ ,  " separator between vertical splits
 
