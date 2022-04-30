@@ -7,7 +7,7 @@ from hlwm.tag import Tag
 
 class Hlwm:
     @staticmethod
-    def hc(*args):
+    def hc(*args, default=...):
         args = [str(arg) for arg in args]
         cmd = ["herbstclient", "--no-newline"] + args
         # print(f"<-> HC: {cmd}")
@@ -16,7 +16,11 @@ class Hlwm:
             capture_output=True,
             encoding="utf-8",
         )
-        proc.check_returncode()  # Raise in case of error
+        if proc.returncode and default is not ...:
+            # There was an error, but we have a default value
+            return default
+        else:
+            proc.check_returncode()  # Raise in case of error
         # TODO: errors should be handled somewhere or at least wrapped here?
         return proc.stdout
 
