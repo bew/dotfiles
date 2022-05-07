@@ -396,9 +396,9 @@ nnoremap U <C-r>
 " NOTE: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
 vnoremap $ $h
 
-" I: Select last inserted region
+" N: Select last inserted region
 nnoremap gV `[v`]
-" O: Operate on last inserted region
+" O: Textobj for the last inserted region
 onoremap gV <cmd>normal! `[v`]<cr>
 
 " mark position before search
