@@ -169,6 +169,11 @@ Plug 'vim-utils/vim-space'       " textobj: i<Space> a<Space>
 " a<Space> is all whitespace
 " i<Space> is same as a<Space> except it leaves a single space or newline
 
+" Entire-buffer-content text object
+Plug 'kana/vim-textobj-entire'   " textobj: ie ae
+" ae is the entire buffer content
+" ie is like ae without leading/trailing blank lines
+
 " Diagnostic provider agnostic signs config
 let s:code_diagnostic_cfg = {}
 let s:code_diagnostic_cfg.virt_text_prefix = "  <<  "
