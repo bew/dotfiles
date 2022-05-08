@@ -23,6 +23,13 @@ function debug
     echo $* >> /tmp/xinitrc_debug
 }
 
+if [[ -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ]]; then
+  # Make sure to load session vars like XDG_DATA_DIRS, needed to have icons working properly for some Nix-based gui apps.
+  #
+  # NOTE: the file is guarded against reloads, unset __HM_SESS_VARS_SOURCED to be able to re-source it.
+  source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+fi
+
 # -----------------------------------------------
 
 # Setup mouse options (see `man 4 libinput)

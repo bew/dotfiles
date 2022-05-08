@@ -3,6 +3,10 @@
 let
   inherit (pkgsChannels) stable bleedingedge;
 in {
+  imports = [
+    ./gui-fix-default-icons.nix
+  ];
+
   home.packages = [
     # desktop/wm related (TODO? nixify config)
     stable.polybar
