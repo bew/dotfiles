@@ -58,7 +58,7 @@ AUTOPAIR_INHIBIT_INIT=1 # don't auto-init, init at the end (with 'autopair-init'
 zi light hlissner/zsh-autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
-zi load romkatv/gitstatus
+zi light romkatv/gitstatus
 gitstatus_start MY
 
 # Ability to send command between shells :)
