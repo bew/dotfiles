@@ -35,7 +35,7 @@ xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Tapping Button Mapping En
 setxkbmap -config ~/.dot/gui/xkbmap.config
 
 # Setup X resources
-~/.bin/load_xresources
+~/.bin-gui/load_xresources
 
 # no beep
 xset -b
