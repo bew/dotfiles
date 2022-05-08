@@ -78,3 +78,8 @@ if [[ -d /nix ]] && [[ -z "${NIX_PROFILE_SOURCED:-}" ]]; then
   source ~/.nix-profile/etc/profile.d/nix.sh
   export NIX_PROFILE_SOURCED=yes
 fi
+
+if [[ -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ]]; then
+  # NOTE: the file is guarded against reloads, unset __HM_SESS_VARS_SOURCED to be able to re-source it.
+  source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+fi
