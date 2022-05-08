@@ -635,8 +635,8 @@ key_bindings:
 
   # Font
   - { key: Key0,      mods: Control|Shift,       action: ResetFontSize }
-  - { key: Add,       mods: Control|Shift,       action: IncreaseFontSize }
-  - { key: Subtract,  mods: Control|Shift,       action: DecreaseFontSize }
+  - { key: Plus,      mods: Control|Shift,       action: IncreaseFontSize }
+  - { key: Minus,     mods: Control|Shift,       action: DecreaseFontSize }
   - { key: Key6,      mods: Control|Shift,       action: DecreaseFontSize }
 
   # Scroll

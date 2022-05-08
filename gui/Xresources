@@ -1,25 +1,8 @@
-/* URxvt */
-
-! FIXME: can be removed once I switch to non-Xresource-based terminal
-
-#include ".Xresources.d/urxvt"
-
-! Background color
-URxvt*background: #202020
-
-! Font color
-URxvt*foreground: #eeeeee
-
-URxvt*scrollBar: false
-
-!URxvt*font:					xft:Liberation Mono:size=11
-
-
 /* --------------------------------------------------------------------------- */
 /* ------ XTERM CONFIG ------------------------------------------------------- */
 /* --------------------------------------------------------------------------- */
 
-XTerm*background:				#424242
+XTerm*background:				#202020
 XTerm*foreground:				#eeeeee
 
 !XTerm*utf8:						true
