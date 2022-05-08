@@ -55,7 +55,7 @@ ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 # Locations: (<lat>:<long>)
 # - San Marcos: 29.9:-97.9
 # - Paris: 48.8:2.3
-background_run redshift-gtk -l 48.8:2.3
+background_run ~/.nix-profile/bin/redshift-gtk -l 48.8:2.3
 
 background_run nm-applet # network selector
 background_run dunst # notification daemon
