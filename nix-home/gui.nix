@@ -8,7 +8,6 @@ in {
     stable.polybar
     stable.dunst
     # FIXME: herbstluftwm is missing here (can't get it to compile last version)
-    stable.stalonetray # TODO: use it!
     stable.copyq # powerful clipboard manager
 
     # FIXME: `arandr` disabled because it can't load menu icons :/
@@ -17,7 +16,7 @@ in {
     stable.autorandr
 
     # screen/video capture
-    stable.kazam
+    stable.simplescreenrecorder # simple (to use) yet powerful Screen Recorder
     stable.screenkey
     stable.slop
     # stable.peek ? (for gifs iirc)
