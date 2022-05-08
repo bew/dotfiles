@@ -78,7 +78,14 @@ function ffmpeg::transcode-movie::single-file
   cmd+=(-framerate 30) # just enough fps
   cmd+=(-preset slow) # good compression
   cmd+=(-s "$video_size")
-  cmd+=(-c:a aac -b:a 512k) # best quality & widely supported format
+  if [[ -n "${FFMPEG_VIDEO_AVG_BITRATE:-}" ]]; then
+    # Set average bitrate & maxrate allowed
+    # NOTE: '-maxrate' needs '-bufsize' to be set.
+    #   We don't set it explicitely because I have no idea what to put, and the h264 encoder
+    #   (the default video encoding for mkv files) does seems to set it by itself.
+    cmd+=(-b:v "$FFMPEG_VIDEO_AVG_BITRATE" -maxrate:v "$FFMPEG_VIDEO_AVG_BITRATE")
+  fi
+  cmd+=(-c:a aac -maxrate:a 512k) # best quality & widely supported format
   # output
   cmd+=("$output_path")
 
@@ -101,7 +108,7 @@ function ffmpeg::transcode-movie--low-qual
 
   for input_path in "${@}"; do
     # low resolution (nhd <=> 640x360), enough for usual tv shows
-    if ! FFMPEG_VIDEO_SIZE=nhd ffmpeg::transcode-movie::single-file "$input_path"; then
+    if ! FFMPEG_VIDEO_SIZE=nhd FFMPEG_VIDEO_AVG_BITRATE=400k ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
       echo
@@ -119,7 +126,7 @@ function ffmpeg::transcode-movie--med-qual
 
   for input_path in "${@}"; do
     # medium resolution (qhd <=> 960x540), good for movies or high qual tv shows
-    if ! FFMPEG_VIDEO_SIZE=qhd ffmpeg::transcode-movie::single-file "$input_path"; then
+    if ! FFMPEG_VIDEO_SIZE=qhd FFMPEG_VIDEO_AVG_BITRATE=700k ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
       echo
