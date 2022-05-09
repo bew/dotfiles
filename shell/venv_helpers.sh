@@ -315,7 +315,7 @@ function venv_with_do
     local dashdash_found=false
     while [[ -n "${1:-}" ]]; do
       case "$1" in
-        --new)
+        --new|--reset)
           force_new=true;;
         --upgrade)
           force_upgrade=true;;
@@ -354,7 +354,7 @@ function venv_with_do
     [[ -d "$venv_path" ]] && created_or_reused_msg="reused"
     _venv__echo2 section "venv will be $created_or_reused_msg in '$venv_path'"
     if $force_new; then
-      _venv__echo2 section "--new passed, force create new venv.."
+      _venv__echo2 section "--new/--reset passed, force create new venv.."
       venv_reset "$venv_path" || return $?
     else
       venv_here "$venv_path" || return $?
