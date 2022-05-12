@@ -46,7 +46,11 @@ add-zsh-hook chpwd chpwd-wrapper
 source ~/.zsh/third-party/zi/zi.zsh
 
 # Syntax highlighting
-zi light zdharma/fast-syntax-highlighting
+FAST_WORK_DIR=~/.long_term_cache/zsh--fast-syntax-highlighting
+mkdir -vp "$FAST_WORK_DIR" # necessary to exist, other it falls back to ~/.cache :/
+# | => to avoid the selected theme to be saved in ~/.cache tmpfs (empty on boot)
+# \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
+zi light z-shell/F-Sy-H # updated repo for fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme ~/.zsh/fast-theme--bew.ini
 
@@ -58,6 +62,8 @@ AUTOPAIR_INHIBIT_INIT=1 # don't auto-init, init at the end (with 'autopair-init'
 zi light hlissner/zsh-autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
+GITSTATUS_CACHE_DIR=~/.long_term_cache/zsh--gitstatus
+# \__ to avoid binary auto install in ~/.cache tmpfs (empty on boot)
 zi light romkatv/gitstatus
 gitstatus_start MY
 
@@ -146,10 +152,6 @@ source ~/.zsh/rc/aliases_and_short_funcs.zsh
 
 #-------------------------------------------------------------
 # Prompt
-
-# disable the status line (in the prompt) when run in neovim, as the terminal implementation
-# of neovim does not handle cursor save/restore terminal capabilities.
-[[ -n "$NVIM_LISTEN_ADDRESS" ]] && ZSH_DISABLE_STATUS_LINE=1
 
 source ~/.zsh/rc/prompt.zsh
 
