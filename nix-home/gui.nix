@@ -4,7 +4,7 @@ let
   inherit (pkgsChannels) stable bleedingedge;
 in {
   imports = [
-    ./gui-fix-default-icons.nix
+    ./gui-fix-xdg-data-dirs.nix
   ];
 
   home.packages = [

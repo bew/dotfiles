@@ -17,12 +17,18 @@ in {
     stable.breeze-icons
   ];
 
-  # Tell home-manager to fill XDG_DATA_DIRS var with the user's nix profile /share
-  # directory, where all icons & icon themes are.
+  # Tell home-manager to set XDG_DATA_DIRS var with the user's nix profile /share
+  # directory, where e.g: all icons & icon themes are. (in addition to standard-Linux system/user dirs)
   #
   # NOTE: the X session should source `<profile>/etc/profile.d/hm-session-vars.sh`
   # on start to get this variable
-  #
-  # NOTE: 'config.home.profileDirectory' <=> '~/.nix-profile'
-  xdg.systemDirs.data = [ "${config.home.profileDirectory}/share" ];
+  xdg.systemDirs.data = [
+    # NOTE: 'config.home.profileDirectory' <=> '~/.nix-profile'
+    "${config.home.profileDirectory}/share"
+
+    # Also load standard-Linux system/user xdg data directories
+    "/usr/share"
+    "/usr/local/share"
+    "${config.home.homeDirectory}/.local/share"
+  ];
 }
