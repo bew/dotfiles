@@ -272,8 +272,9 @@ hc keybind $M-$S-s   cycle_monitor
 hc keybind $M-$C-s   spawn flameshot gui
 
 # FIXME: Add $M-Escape to select the LAST window.. not possible builtin..
-hc keybind $M-Tab cycle # in a frame
-hc keybind $M-c   cycle_all +1
+hc keybind $M-Tab    cycle +1 # in a frame
+hc keybind $M-$S-Tab cycle -1 # in a frame
+hc keybind $M-c      cycle_all +1
 hc keybind $M-u   jumpto urgent
 # Cycle through floating clients only.
 # -> Setting tags.focus.floating_focused to true switches to the floating layer and selects the first client.
@@ -295,22 +296,34 @@ hc set frame_border_normal_color "#00f"
 # If unset, only frames with focus or with windows in them are displayed.
 # NOTE: the frame in question is the frame's border, which is the only visible
 # thing when the frame is empty.
-hc set always_show_frame 1
+hc set always_show_frame true
 
 hc set frame_bg_normal_color "#565656"
 hc set frame_bg_active_color "#aaaaaa"
-hc set frame_bg_transparent 1
+hc set frame_bg_transparent true
 hc set frame_transparent_width 3
 hc set frame_gap 0
 hc set frame_padding 5
 
 # FIXME: why are there xyz_border_width options and theme.xyz.border_width attributes ????
 # also I don't get the usage for sooo many borders (inner -> border -> outer)
-hc attr theme.active.color "#33B5E5"
+# NOTE: 'color' is the bg color of the border
+hc attr theme.active.color "#1E6C89"
 hc attr theme.normal.color "#171717"
 hc attr theme.urgent.color orange
 hc attr theme.border_width 5
 hc attr theme.background_color "#FFFFFF"
+
+# max layout tabs
+hc attr settings.tabbed_max true # show tabs when frame in 'max' layout
+hc attr theme.title_when multiple_tabs
+hc attr theme.title_height 15
+hc attr theme.title_depth 4 # space below the title
+hc attr theme.title_align center
+
+hc attr theme.title_color "#777777"
+hc attr theme.tab_color "#222222"
+hc attr theme.active.title_color "#EEEEEE"
 
 hc set window_gap 5
 hc set smart_window_surroundings 0
