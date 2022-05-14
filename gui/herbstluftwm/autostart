@@ -305,8 +305,6 @@ hc set frame_transparent_width 3
 hc set frame_gap 0
 hc set frame_padding 5
 
-# FIXME: why are there xyz_border_width options and theme.xyz.border_width attributes ????
-# also I don't get the usage for sooo many borders (inner -> border -> outer)
 # NOTE: 'color' is the bg color of the border
 hc attr theme.active.color "#1E6C89"
 hc attr theme.normal.color "#171717"
@@ -346,6 +344,8 @@ hc rule focus=on # normally focus new clients
 hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)" floating=on
 hc rule --windowtype="_NET_WM_WINDOW_TYPE_DIALOG" focus=on
 hc rule --windowtype~"_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)" manage=off
+
+hc rule --fixedsize floating=on # matches windows that cannot be resized (min size == max size)
 
 hc rule --instance="pavucontrol" floating=true floatplacement=center
 hc rule --instance="flameshot" floating=true floatplacement=center
