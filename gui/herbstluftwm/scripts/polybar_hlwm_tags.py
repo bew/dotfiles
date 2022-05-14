@@ -52,6 +52,10 @@ def try_get_client_count(tag: hlwm.Tag) -> Optional[int]:
 
 
 def regen_polybar_tags_list():
+    # FIXME: get the monitor where the bar is displayed
+    # Asked on IRC how I can match xrandr's monitors with hlwm's monitors. Because the the polybars
+    # are aware of the xrandr monitor name, and here I need hlwm's monitor...
+    # https://matrix.to/#/!fZBUOpdqzSNJzCHHQV:libera.chat/$tmjfhofgHHUALQDXY9DgS1ff5zJzvL0U37IjhDEt97A
     tags = Hlwm.get_tags(monitor="")
 
     tags_with_client_count: Tuple[hlwm.Tag, Optional[int]] = [
