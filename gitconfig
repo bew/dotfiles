@@ -26,6 +26,10 @@
   # When 'merge' subcmd is called without any ref, merge the upstream branch in.
   defaultToUpstream = true
 
+  # Do not keep '.orig' files around after a merge conflict for that file,
+  # I can always find it back with git!
+  keepBackup = false
+
   tool = nvim_diffconflicts
 
 [mergetool "nvim_diffconflicts"]
