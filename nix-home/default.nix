@@ -30,6 +30,7 @@
   in {
     backbone = pkgsForSystem inputs.nixpkgsBackbone;
     stable = pkgsForSystem inputs.nixpkgsStable;
+    lastStable = pkgsForSystem inputs.nixpkgsLastStable;
     bleedingedge = pkgsForSystem inputs.nixpkgsUnstable;
   };
 
