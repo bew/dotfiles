@@ -1,5 +1,11 @@
+; User overrides of MIME file associations to an application.
+; More info at https://wiki.archlinux.org/title/XDG_MIME_Applications#mimeapps.list
+
 [Default Applications]
-application/pdf=evince.desktop
+; This section is used to to set the default association
+; (also adds the association if not already present)
+application/json=nvim.desktop;
+application/pdf=okularApplication_pdf.desktop
 application/x-extension-htm=firefox.desktop
 application/x-extension-html=firefox.desktop
 application/x-extension-shtml=firefox.desktop
@@ -11,24 +17,18 @@ image/png=nomacs.desktop
 text/html=firefox.desktop
 text/markdown=nvim.desktop
 text/plain=nvim.desktop
+text/x-log=nvim.desktop;
 x-scheme-handler/chrome=firefox.desktop
 x-scheme-handler/ftp=firefox.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
 
 [Added Associations]
-application/json=gvim.desktop;
+; This section is used to add 1+ associations that will be tried in order
 application/octet-stream=mpv.desktop;nvim.desktop;transmission-gtk.desktop;firefox.desktop;wps-office-wps.desktop;calibre-ebook-viewer.desktop;
-application/octetstream=gvim.desktop;
-application/pdf=evince.desktop;kde4-okularApplication_pdf.desktop;firefox.desktop;
-application/x-bittorrent=transmission-gtk.desktop;webtorrent-desktop.desktop;
-image/jpeg=nomacs.desktop;
-image/png=nomacs.desktop;
-text/html=firefox.desktop;
-text/markdown=nvim.desktop;
-text/plain=nvim.desktop;
-text/x-log=gvim.desktop;
-x-scheme-handler/chrome=firefox.desktop;
-x-scheme-handler/ftp=firefox.desktop;
-x-scheme-handler/http=firefox.desktop;
-x-scheme-handler/https=firefox.desktop;
+application/octetstream=nvim.desktop;
+application/x-bittorrent=transmission-gtk.desktop;
+
+[Removed Associations]
+; This section is used to remove 1+ associations set in other mimeapps.list files
+; (like distrib defaults or system overrides)
