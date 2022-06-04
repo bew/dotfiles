@@ -27,62 +27,54 @@ if ! [[ -d ~/.config/dotfiles ]]; then
 fi
 
 label "Bootstraping .dot symlinks"
-make-link .config/dotfiles ~/.dot
-make-link dotfiles         ~/.config/.dot
+make-link .config/dotfiles  ~/.dot
+make-link dotfiles          ~/.config/.dot
 
-label "bin link"
+label "bin links"
 make-link .dot/bin     ~/.bin
 make-link .dot/gui/bin ~/.bin-gui
 
 label "zsh links"
-make-link .dot/zsh     ~/.zsh
-make-link .zsh/zshrc   ~/.zshrc
-make-link .zsh/zshenv  ~/.zshenv
-make-link .zsh/zlogin  ~/.zlogin
+make-link .dot/zsh/zshrc   ~/.zshrc
+make-link .dot/zsh/zshenv  ~/.zshenv
+make-link .dot/zsh/zlogin  ~/.zlogin
 
-label "nvim links"
+label "nvim link"
 make-link .dot/nvim  ~/.config/nvim
-make-link .dot/nvim  ~/.nvim # shortcut
 
 label "git links"
-make-link .dot/gitconfig ~/.gitconfig
-make-link .dot/gitignore ~/.gitignore
-make-link ~/.dot/gh      ~/.config/gh
+make-link .dot/git  ~/.config/git
+make-link .dot/gh   ~/.config/gh
 
 label "Nix stuff"
-make-link .dot/nix        ~/.config/nix
-# TODO: remove nixpkgs's overlays, use the flake!
-make-link .dot/nixpkgs    ~/.config/nixpkgs
+make-link .dot/nix  ~/.config/nix
 
 label "other cli tools"
-make-link .dot/gdbinit   ~/.gdbinit
-make-link .dot/htop      ~/.config/htop
-make-link .dot/tmux/tmux.conf ~/.tmux.conf
+make-link .dot/htop            ~/.config/htop
+make-link .dot/tmux/tmux.conf  ~/.tmux.conf
+make-link .dot/gdb/gdbinit     ~/.config/gdb/gdbinit
 
 label "X configs"
 make-link .dot/gui/xinitrc       ~/.xinitrc
 make-link .dot/gui/xprofile      ~/.xprofile
-make-link .dot/gui/xkbmap.config ~/.config/
-make-link .dot/gui/Xresources    ~/.Xresources
-make-link .dot/gui/Xresources.d  ~/.Xresources.d
-make-link .dot/gui/picom.config  ~/.config/picom.config # compositor, old compton
-make-link .dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg default apps
+make-link .dot/gui/xkbmap.config ~/.config/xkbmap.config
+make-link .dot/gui/Xresources    ~/.Xresources # FIXME: remove?
+make-link .dot/gui/picom.config  ~/.config/picom.config # compositor
+make-link .dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg MIME type to apps associations
 make-link .dot/gui/autorandr     ~/.config/autorandr
 
 label "X apps configs"
 # terms
-make-link .dot/gui/urxvt     ~/.urxvt
 make-link .dot/gui/wezterm   ~/.config/wezterm
 make-link .dot/gui/alacritty ~/.config/alacritty
-make-link .dot/gui/kitty     ~/.config/kitty
-make-link .dot/gui/dunst     ~/.config/dunst
-make-link .dot/gui/flameshot ~/.config/flameshot
-make-link .dot/gui/copyq     ~/.config/copyq
 
 # Desktop env
-make-link .dot/gui/herbstluftwm ~/.config/herbstluftwm
-make-link .dot/gui/libinput-gestures.conf ~/.config/libinput-gestures.conf
-make-link .dot/gui/polybar ~/.config/polybar
+make-link .dot/gui/herbstluftwm  ~/.config/herbstluftwm
+make-link .dot/gui/polybar       ~/.config/polybar
+make-link .dot/gui/dunst         ~/.config/dunst
+make-link .dot/gui/flameshot     ~/.config/flameshot
+make-link .dot/gui/copyq         ~/.config/copyq
+make-link .dot/gui/libinput-gestures.conf  ~/.config/libinput-gestures.conf
 
 # tools
 make-link .dot/gui/mpv       ~/.config/mpv
