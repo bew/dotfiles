@@ -17,11 +17,12 @@ let g:mapleader = " "
 " And the CtrlSpace plugin would be <leader><space> or <leader><leader>
 " Also give a new leader possibility with <Alt-space> (:
 
-call plug#begin('~/.nvim/plugged')
+let $NVIM_MANAGED_PLUGINS_DIR = $NVIM_DATA_HOME . "/managed-plugins"
+call plug#begin($NVIM_MANAGED_PLUGINS_DIR)
 
 " Manage vim-plug itself! (to auto update & handle its doc)
 Plug 'junegunn/vim-plug', {
-    \ 'do': 'ln -sf ../plugged/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
+    \ 'do': 'ln -sf ' . $NVIM_MANAGED_PLUGINS_DIR . '/vim-plug/plug.vim ~/.nvim/autoload/plug.vim',
     \ }
 
 " -- Vim feature enhancer
@@ -139,7 +140,7 @@ Plug 'machakann/vim-sandwich'   " Advanced operators & textobjects to manipulate
 
 " Load vim-surround compatible mappings
 " Ref: https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings
-source ~/.nvim/plugged/vim-sandwich/macros/sandwich/keymap/surround.vim
+source $NVIM_MANAGED_PLUGINS_DIR/vim-sandwich/macros/sandwich/keymap/surround.vim
 " Textobjects to select a text surrounded by bracket or same characters user input
 xmap is <Plug>(textobj-sandwich-query-i)
 xmap as <Plug>(textobj-sandwich-query-a)
