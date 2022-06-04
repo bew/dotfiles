@@ -378,6 +378,9 @@ inoremap <C-u> <C-g>u<C-u>
 " logical undo
 nnoremap U <C-r>
 
+" N: Y to copy whole line
+nnoremap Y yy
+
 " V: logical visual eol
 " For some reason in visual mode '$' goes beyond end of line and include the newline,
 " making 'v$d' (or other actions) delete the end of line + the newline, joining them without being smart about it..

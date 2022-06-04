@@ -83,7 +83,7 @@ function! StatuslineGitBranch()
 
   try
     let mark = 'On '
-    let branch = fugitive#head()
+    let branch = fugitive#Head()
     return branch !=# '' ? mark . branch : ''
   catch
   endtry

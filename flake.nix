@@ -22,6 +22,7 @@
     nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-21.11";
 
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-21.11";
+    nixpkgsLastStable.url = "github:nixos/nixpkgs/nixos-22.05"; # latest release, only used for neovim for now
     nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     flakeTemplates.url = "github:nixos/templates";
