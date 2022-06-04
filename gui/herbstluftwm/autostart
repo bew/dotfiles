@@ -217,6 +217,16 @@ hc keybind $M-$A-x   spawn ~/.config/herbstluftwm/scripts/hlwm_execute_hc.py
 hc keybind $M-f   attr clients.focus.floating toggle
 # FIXME: would it make sense to have a way to remember the parent frame?
 
+# Make next window to open to be floating
+# exclude rofi from rule matching, so I can do:
+#    1. trigger this action
+#    2. open rofi, type 'firefox', confirm
+#    3. firefox is opened floating, centered :)
+# (without the exclusion, the rule would have been applied on rofi launcher, which is useless)
+hc keybind $M-$S-f   rule once not --instance=rofi floating=on floatplacement=center
+# FIXME: I'd prefer to use '--once' to show it's a special arg, but in hc 0.9.4 it's broken.
+#        ref: https://github.com/herbstluftwm/herbstluftwm/issues/1487
+
 # Center current floating window
 # hc keybind $M-$S-f \
 #   and , compare tags.focus.floating_focused = true \
