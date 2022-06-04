@@ -361,7 +361,8 @@ hc rule --instance="pavucontrol" floating=true floatplacement=center
 hc rule --instance="flameshot" floating=true floatplacement=center
 hc rule --instance="Xephyr" floating=true floatplacement=center
 
-hc rule --instance="copyq" floating=true floatplacement=center
+hc rule --instance="copyq" floating=true #floatplacement=center
+# @2022-06 floatplacement breaks it :/ I really need a way to force copyq to not place itself..
 # TODO(?): detect main win reliably, and make it appear centered under mouse cursor
 #   (but always fully on screen)
 #   => Ask for 'floatplacement=mouse,on_screen'
