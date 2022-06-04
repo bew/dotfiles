@@ -1,4 +1,4 @@
-plug.vim is a symlink to ../plugged/vim-plug/plug.vim which is managed by vim-plug itself.
+plug.vim is a symlink to where the vim-plug plugin is installed ($PLUGINS_DIR/vim-plug/plug.vim) which is managed by vim-plug itself.
 :brainfuck:
 
 To be able to bootstrap vim-plug, symlink plug.vim to `./plug--bootstrap.vim`.
