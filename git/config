@@ -1,5 +1,5 @@
 [core]
-  excludesfile = ~/.gitignore
+  excludesfile = ~/.dot/git/global_gitignore
 
 [user]
   email = benoit.dechezelles@gmail.com
