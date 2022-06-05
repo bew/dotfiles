@@ -274,6 +274,23 @@ nnoremap <silent> <M-f><M-g> <cmd>lua require"fzf-lua".git_files()<cr>
 
 Plug 'vim-scripts/xterm-color-table.vim'  " Provide some commands to display all cterm colors
 
+Plug 'nvim-lua/plenary.nvim' " lua contrib stdlib for plugins, used by many plugins
+
+Plug 'kyazdani42/nvim-web-devicons' " corresponding icon for a given filetype (required for alpha-nvim)
+Plug 'goolord/alpha-nvim'     " a lua powered greeter like vim-startify / dashboard-nvim
+lua << LUA
+function my_startupscreen_setup()
+  -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
+  -- simple theme, until I want to make my own...
+  local theme = require"alpha.themes.startify"
+  -- FIXME: fortune broken, ref: https://github.com/goolord/alpha-nvim/issues/112
+  -- theme.section.footer.val = require"alpha.fortune"()
+  -- TODO(later): format with cowsay!
+  require"alpha".setup(theme.config)
+end
+LUA
+autocmd User PluginsLoaded lua my_startupscreen_setup()
+
 Plug 'tpope/vim-fugitive'       " A Git wrapper so awesome, it should be illegal
 Plug 'junegunn/gv.vim'             " Simple (<3) git commit browser, based on vim-fugitive
 Plug 'whiteinge/diffconflicts'     " Helper plugin for git merges
