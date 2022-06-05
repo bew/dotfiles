@@ -423,6 +423,9 @@ runtime! statusline.vim   " Until it's re-written in Lua :)
 
 colorscheme bew256-dark
 
+" FIXME: I don't know where to put this...
+au TextYankPost * silent! lua vim.highlight.on_yank({ timeout = 300 })
+
 " When editing a file, always jump to the last known cursor position.
 " Don't do it when the position is invalid or when inside an event handler
 " (happens when dropping a file on gvim).
