@@ -27,13 +27,13 @@ endsnippet
 
 snippet defa "abstract method" b
 @abstractmethod
-def ${10:function_name}(self${20:, ${21:arg}})${30: -> ${31:Any}}:  # pragma: no cover
+def ${10:function_name}(self${20:, ${21:arg}})${30: -> ${31:Any}}:${40:  # pragma: no cover}
 	pass
 endsnippet
 
 snippet defap "abstract property" b
 @abstractproperty
-def ${10:function_name}(self) -> ${20:Any}:  # pragma: no cover
+def ${10:function_name}(self) -> ${20:Any}:${40:  # pragma: no cover}
 	pass
 endsnippet
 
@@ -114,30 +114,6 @@ snippet @prop "@property" b
 @property
 endsnippet
 
-# if / elif / else
-
-snippet if "If" b
-if ${1:condition}:
-	${2:${VISUAL:pass}}
-endsnippet
-
-snippet ife "If / Else" b
-if ${1:condition}:
-	${2:${VISUAL:pass}}
-else:
-	${3:pass}
-endsnippet
-
-snippet elif "elif ..." b
-elif ${1:condition}:
-	${2:pass}
-endsnippet
-
-snippet el "else" b
-else:
-	${1:pass}
-endsnippet
-
 snippet ifmain "ifmain" b
 if __name__ == "__main__":
 	${1:${VISUAL:main()}}
@@ -177,6 +153,7 @@ endsnippet
 
 snippet mdoc "Multi line doc" b
 """${1:TODO: oneline doc}
+
 ${2:${VISUAL:TODO: doc}}
 """
 endsnippet
@@ -213,6 +190,10 @@ snippet optn "Optional[...] = None"
 Optional[${1:${VISUAL:SomeType}}] = None
 endsnippet
 
+snippet uni "Union[...]"
+Union[${1:${VISUAL:SomeType}}, ${2:OtherType}]
+endsnippet
+
 snippet ld "lambda" w
 lambda
 endsnippet
@@ -229,9 +210,6 @@ endsnippet
 # __import__("sys").stdin = open('/dev/tty')
 snippet bp "Add pdb breakpoint"
 breakpoint()  # FIXME: remove this debug probe
-endsnippet
-snippet bpforce "Force add pdb breakpoint" b
-__import__("sys").stdin = open('/dev/tty'); breakpoint()  # FIXME: remove this debug probe
 endsnippet
 
 # Increase priority of this 'rtype' snippet, to avoid conflict with the
