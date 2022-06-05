@@ -23,6 +23,55 @@ let g:mapleader = " "
 
 " ------ PLUGINS
 
+" Mapping helpers, to be moved, probably
+lua << LUA
+-- Create initial leader maps (to be used in init of some plugins)
+wk_leader_n_maps = {}
+wk_leader_v_maps = {}
+
+--- Get the which_key's leader map for the given mode
+function get_wk_leader_maps_for_mode(mode)
+  local wk_leader_maps_for_mode = {
+    n = wk_leader_n_maps,
+    v = wk_leader_v_maps,
+  }
+  return wk_leader_maps_for_mode[mode]
+end
+
+--- Define leader map group for which_key plugin
+function leader_map_define_group(spec)
+  assert(spec.mode, "mode is required")
+  for _, m in ipairs(spec.mode) do
+    wk_leader_maps = get_wk_leader_maps_for_mode(m)
+    if wk_leader_maps then
+      wk_leader_maps[spec.prefix_key] = { name = spec.name }
+    end
+  end
+end
+
+--- Create top level map
+function toplevel_map(spec)
+  assert(spec.mode, "mode is required")
+  assert(spec.key, "key is required")
+  assert(spec.action, "action is required")
+  vim.keymap.set(spec.mode, spec.key, spec.action, spec.opts)
+end
+
+--- Create leader map & register it on which_key plugin
+function leader_map(spec)
+  toplevel_map(vim.tbl_extend("force", spec, { key = "<leader>"..spec.key }))
+  -- when desc is set, put the key&desc in appropriate whichkey maps
+  if spec.desc then
+    for _, m in ipairs(spec.mode) do
+      wk_leader_maps = get_wk_leader_maps_for_mode(m)
+      if wk_leader_maps then
+        wk_leader_maps[spec.key] = spec.desc
+      end
+    end
+  end
+end
+LUA
+
 let $NVIM_MANAGED_PLUGINS_DIR = $NVIM_DATA_HOME . "/managed-plugins"
 call plug#begin($NVIM_MANAGED_PLUGINS_DIR)
 
@@ -107,7 +156,7 @@ end
 LUA
 autocmd User PluginsLoaded lua my_cmp_setup()
 
-" ---------- UI
+" ---------- Code-centric UI
 
 Plug 'lukas-reineke/indent-blankline.nvim'
 lua << LUA
@@ -200,7 +249,9 @@ function my_which_key_setup()
       "<M-f>", -- fuzzy stuff
     },
   }
-  -- note: nmap/vmap descriptions are registered in ./mappings.vim
+  -- Register nmap/vmap keys descriptions
+  require("which-key").register(wk_leader_n_maps, { mode = "n", prefix = "<leader>" })
+  require("which-key").register(wk_leader_v_maps, { mode = "v", prefix = "<leader>" })
 end
 LUA
 autocmd User PluginsLoaded lua my_which_key_setup()
