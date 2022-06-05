@@ -109,6 +109,20 @@ autocmd User PluginsLoaded lua my_cmp_setup()
 
 " ---------- UI
 
+Plug 'lukas-reineke/indent-blankline.nvim'
+lua << LUA
+function my_indentguides_setup()
+  require("indent_blankline").setup {
+    char_list = {"¦", "│"},
+    show_first_indent_level = false,
+    -- show the current indent level on empty lines
+    -- (setting it to false would only show the previous indent, not current one)
+    show_trailing_blankline_indent = true,
+  }
+end
+LUA
+autocmd User PluginsLoaded lua my_indentguides_setup()
+
 Plug 'kyazdani42/nvim-tree.lua'
 lua << LUA
 function my_tree_setup()
