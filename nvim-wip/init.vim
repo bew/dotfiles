@@ -172,6 +172,58 @@ end
 LUA
 autocmd User PluginsLoaded lua my_indentguides_setup()
 
+" %% Git
+
+Plug 'rhysd/git-messenger.vim'  " Popup the commit message of the line under cursor
+let g:git_messenger_no_default_mappings = v:true
+Plug 'lewis6991/gitsigns.nvim'
+lua << LUA
+function my_gitsigns_setup()
+  require"gitsigns".setup{
+    signs = {
+      add          = {hl = 'SignVcsAdd'   , text = '┃'},
+      change       = {hl = 'SignVcsChange', text = '┃'},
+      delete       = {hl = 'SignVcsDelete', text = '▁'},
+      changedelete = {hl = 'SignVcsChange', text = '▁'}, -- diff is done with different highlight
+      topdelete    = {hl = 'SignVcsDelete', text = '▔'},
+    },
+    attach_to_untracked = false,
+    preview_config = { border = "none" },
+
+    -- FIXME: use 'on_attach' ? or configure keybinds outside?
+    -- (there's no autocmd on attach (yet))
+  }
+
+  -- define these globally for now.. (until good solution for per-buffer which_key helper)
+  leader_map_define_group{mode={"n"}, prefix_key="h", name="+git-hunks"}
+  local gs = require"gitsigns"
+  leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="preview hunk"}
+  leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="undo (reset) hunk"}
+  leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="diff file"}
+  -- FIXME: there is no action to toggle fold of everything that didn't change
+  -- leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
+  leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
+
+  -- next/prev hunk that also work in vim's diff mode
+  leader_map{mode={"n"}, key="hn", desc="next hunk", opts={expr=true}, action=function()
+    if vim.wo.diff then return "]c" end
+    vim.schedule(gs.next_hunk) -- need to schedule, cannot run it in an expr mapping
+    return "<Ignore>"
+  end}
+  leader_map{mode={"n"}, key="hN", desc="prev hunk", opts={expr=true}, action=function()
+    if vim.wo.diff then return "[c" end
+    vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
+    return "<Ignore>"
+  end}
+
+  -- define hunk text object & visual selector
+  toplevel_map{mode={"o", "x"}, key="ih", action=gs.select_hunk, desc="select hunk"}
+end
+LUA
+autocmd User PluginsLoaded lua my_gitsigns_setup()
+
+" ---------- Editor-wide UI
+
 Plug 'kyazdani42/nvim-tree.lua'
 lua << LUA
 function my_tree_setup()
