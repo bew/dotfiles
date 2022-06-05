@@ -69,9 +69,6 @@ nnoremap <silent> § :noh \| echo "Search cleared"<cr>
 
 nnoremap <silent> <C-Space> :CtrlSpace<cr>
 
-nnoremap <silent> <M-f> :FuzzyFilesSmart<cr>
-nnoremap <silent> <M-F> :FuzzyFiles<cr>
-
 " Toggle terminal
 nnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
 tnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
