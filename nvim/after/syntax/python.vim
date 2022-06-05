@@ -40,3 +40,6 @@ syn keyword pythonBuiltinType bytes bytearray memoryview
 syn keyword pythonBuiltinType set frozenset
 syn keyword pythonBuiltinType dict
 hi def pythonBuiltinType ctermfg=131
+
+" FIXME: No idea where to define all python highlights in a single place... Let's add more here...
+hi pythonFunction ctermfg=33 cterm=bold

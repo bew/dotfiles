@@ -665,6 +665,9 @@ autocmd FileType python hi semshiSelected ctermfg=NONE ctermbg=NONE cterm=underl
 autocmd FileType python hi semshiBuiltin ctermfg=131
 autocmd FileType python hi semshiParameterUnused ctermfg=240
 autocmd FileType python hi semshiSelf ctermfg=253 cterm=italic
+" FIXME: Need to make distinction between _global_ type & global variable, I want all type in a
+" certain color, and global variables in another color/style.
+autocmd FileType python hi semshiGlobal ctermfg=214 cterm=italic
 
 Plug 'hynek/vim-python-pep8-indent'   " PEP8 indentation
 Plug 'zchee/deoplete-jedi'
