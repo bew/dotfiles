@@ -281,6 +281,15 @@ inoremap <M-o> <C-o>o
 inoremap <M-O> <C-o>O
 nnoremap <M-o> o<esc>
 nnoremap <M-O> O<esc>
+" IDEA: change the semantic a little, to say: 'insert empty line with same context as cursor'
+" * This could be used to insert a line when inside inline func params, and automatically convert
+"   the func params to multiline and start a new line.
+" * This would also make possible to change 'o' to 'insert blank line, no care for context', and
+"   'M-o' to 'insert line but take care of context' (e.g: stay in comment if currently in comment)
+"   normal mode 'M-o' would no longer stay in normal mode, but it's still repeatable since 'M-o' in
+"   insert mode do the same.
+"   And I can already save from insert mode.. BUT if I just want to add few lines and then move
+"   around, i'll have to go back to normal mode myself before.. (acceptable?)
 
 " I: M-Space <-- [] --> Space
 "
