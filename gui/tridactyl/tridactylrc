@@ -17,6 +17,17 @@ set incsearch true
 #       a firefox restart to be applied.
 composite jsb browser.runtime.getURL("static/newtab.html") | setpref browser.startup.homepage
 
+# Disable `input` mode, make `gi` always enter `insert` mode.
+#
+# About typing modes, there are `insert` & `input` modes:
+# `input` mode is conceptually the same as `insert` mode with extra keybindings to use
+# tab/shift-tab to cycle text inputs.
+# Due to some complexity, author of Tridactyl didn't implement custom bindings inheritence, so
+# custom keys defined in `insert` mode are NOT available in `input` mode.
+# By default `gi` (from normal mode) enters `input` mode.
+# Ref: https://matrix.to/#/!xmubtggllUtLrQiGyn:matrix.org/$1646690509227197OySpW:matrix.org
+set gimode firefox
+
 # --------------------------------------------------------
 # Key bindings
 
