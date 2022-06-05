@@ -178,10 +178,13 @@ function my_which_key_setup()
         nav = false,
       },
     },
-    -- Ensure the which-key popup is auto-triggered ONLY for a very limitted set of keys,
+    -- Ensure the which-key popup is auto-triggered ONLY for a very limited set of keys,
     -- because the popup is mostly annoying/distractful for other keys.
-    -- (help for 'z' can be useful)
-    triggers = {"<leader>", "z"},
+    triggers = {
+      "<leader>",
+      "z", -- (help for 'z' can be useful)
+      "<M-f>", -- fuzzy stuff
+    },
   }
   -- note: nmap/vmap descriptions are registered in ./mappings.vim
 end
@@ -200,6 +203,72 @@ augroup END
 "        dicts of multiple register('same-prefix', different-dict).
 " autocmd BufRead * let b:which_key_map = {}
 " autocmd User PluginsLoaded call which_key#register("<space>", "b:which_key_map")
+
+Plug 'vijaymarupudi/nvim-fzf'   " A powerful Lua API for using fzf in neovim
+let $FZF_DEFAULT_OPTS = $FZF_BEW_KEYBINDINGS . " " . $FZF_BEW_LAYOUT
+lua << LUA
+function my_fzf_setup()
+  require"fzf".default_options = {
+    relative = "editor", -- open a centered floating win
+    width = 90, -- FIXME: not a percentage!!!! Ask to allow function here?
+    height = 40, -- FIXME: not a percentage!!!! Ask to allow function here?
+    border = "single",
+  }
+end
+LUA
+autocmd User PluginsLoaded lua my_fzf_setup()
+Plug 'ibhagwan/fzf-lua'         " Few pre-configured thing selectors (buffers, files, ...)
+lua << LUA
+function my_fuzzy_selectors_setup()
+  -- command! FuzzyFilesSmart call fzf#run(fzf#wrap({
+  --     \   "source": "fd --type f --type l --follow",
+  --     \   "options": ["--multi", "--prompt", "FilesSmart-> "]
+  --     \ }))
+  -- " Using the default source to find ALL files
+  -- command! FuzzyFiles call fzf#run(fzf#wrap({
+  --     \   "options": ["--multi", "--prompt", "Files-> "]
+  --     \ }))
+  -- " TODO: in FuzzyOldFiles, remove files that do not exist anymore (or are not
+  -- " really files, like `man://foobar`.
+  -- command! FuzzyOldFiles call fzf#run(fzf#wrap({
+  --     \   "source": v:oldfiles,
+  --     \   "options": ["--multi", "--prompt", "OldFiles-> "]
+  --     \ }))
+  -- " FIXME: oldfiles are NOT recent files (files recently opened in current
+  -- " session are not in v:oldfiles. Need a FuzzyRecentFiles !!
+  -- " (same dir? or general? or configurable (in fzf?) ?)
+  local act = require"fzf-lua.actions"
+  require"fzf-lua".setup{
+    winopts = {
+      border = "single",
+      preview = {
+        default = "bat", -- instead of builtin one, using nvim buffers
+      },
+    },
+    fzf_opts = {}, -- don't let them overwrite my own config!
+    keymap = {
+      -- don't let them overwrite my own config! (e.g: their alt-a means select all :/)
+      fzf = {},
+    },
+    actions = {
+      files = {
+        -- keys for all providers that act on files
+        ["default"] = act.file_edit,
+        ["alt-s"]   = act.file_split,
+        ["alt-v"]   = act.file_vsplit,
+        ["alt-t"]   = act.file_tabedit,
+        ["alt-q"]   = act.file_sel_to_qf, -- this is interesting! (TODO: similar to arglist?)
+      },
+    },
+  }
+  require"fzf-lua".register_ui_select()
+end
+LUA
+autocmd User PluginsLoaded lua my_fuzzy_selectors_setup()
+
+nnoremap <silent> <M-f><M-f> <cmd>lua require"fzf-lua".files()<cr>
+nnoremap <silent> <M-f><M-a> <cmd>lua require"fzf-lua".files()<cr>
+nnoremap <silent> <M-f><M-g> <cmd>lua require"fzf-lua".git_files()<cr>
 
 " ---------- utils plugins
 
