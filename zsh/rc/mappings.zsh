@@ -171,13 +171,12 @@ function zwidget::git-log
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
     "${cmd[@]}"
+    zle reset-prompt
   else
-    echo # to ensure we're on a new blank line
-    echo "!! WARNING: Showing git logs of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
     "${cmd[@]}" .
+    zle reset-prompt
+    zle -M "!! WARNING: Shown git logs are for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
   fi
-
-  zle reset-prompt
 }
 zle -N zwidget::git-log
 
@@ -196,13 +195,12 @@ function zwidget::git-diff
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
     git d
+    zle reset-prompt
   else
-    echo # to ensure we're on a new blank line
-    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
     git d .
+    zle reset-prompt
+    zle -M "!! WARNING: Shown git diff is for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
   fi
-
-  zle reset-prompt
 }
 zle -N zwidget::git-diff
 
@@ -213,13 +211,12 @@ function zwidget::git-diff-cached
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
     git dc
+    zle reset-prompt
   else
-    echo # to ensure we're on a new blank line
-    echo "!! WARNING: Showing git diff of cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
     git dc .
+    zle reset-prompt
+    zle -M "!! WARNING: Shown git diff (cached) is for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
   fi
-
-  zle reset-prompt
 }
 zle -N zwidget::git-diff-cached
 
