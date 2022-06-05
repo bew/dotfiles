@@ -593,29 +593,27 @@ cnoremap <expr> %%  expand("%:h") . "/"
 " (NOTE: some mappings are in init.vim)
 "
 " Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
-let g:wk_leader_n_maps = {}
-let g:wk_leader_v_maps = {}
 
 " -- Vim
 nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
 nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
 vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
-let g:wk_leader_n_maps.v = {"name": "+vim"} " Normal
-let g:wk_leader_v_maps.v = {"name": "+vim"} " Visual
-let g:wk_leader_n_maps.v.s = "source current file"
-let g:wk_leader_n_maps.v.x = "exec current line as VimEx"
-let g:wk_leader_v_maps.v.x = "exec selection as VimEx"
+lua wk_leader_n_maps.v = {name = "+vim"}
+lua wk_leader_v_maps.v = {name = "+vim"}
+lua wk_leader_n_maps.v.s = "source current file"
+lua wk_leader_n_maps.v.x = "exec current line as VimEx"
+lua wk_leader_v_maps.v.x = "exec selection as VimEx"
 nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
 vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
-let g:wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
-let g:wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
+lua wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
+lua wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
 
 " -- Code
-let g:wk_leader_n_maps.c = {"name": "+code"}
-let g:wk_leader_v_maps.c = {"name": "+code"}
+lua wk_leader_n_maps.c = {name = "+code"}
+lua wk_leader_v_maps.c = {name = "+code"}
 
 " code comment
-let g:wk_leader_n_maps.c.c = {"name": "+comment"}
+lua wk_leader_n_maps.c.c = {name = "+comment"}
 nmap <Leader>cc<space> <plug>NERDCommenterToggle
 vmap <Leader>cc<space> <plug>NERDCommenterToggle
 nmap <Leader>ccc       <plug>NERDCommenterComment
@@ -624,11 +622,11 @@ nmap <Leader>ccu       <plug>NERDCommenterUncomment
 vmap <Leader>ccu       <plug>NERDCommenterUncomment
 nmap <Leader>cci       <plug>NERDCommenterInvert
 vmap <Leader>cci       <plug>NERDCommenterInvert
-let g:wk_leader_n_maps.c.c["<space>"] = "toggle"
-let g:wk_leader_n_maps.c.c.c = "force"
-let g:wk_leader_n_maps.c.c.u = "remove"
-let g:wk_leader_n_maps.c.c.i = "invert"
-let g:wk_leader_v_maps.c.c = deepcopy(g:wk_leader_n_maps.c.c)
+lua wk_leader_n_maps.c.c["<space>"] = "toggle"
+lua wk_leader_n_maps.c.c.c = "force"
+lua wk_leader_n_maps.c.c.u = "remove"
+lua wk_leader_n_maps.c.c.i = "invert"
+lua wk_leader_v_maps.c.c = wk_leader_n_maps.c.c
 
 " code language tools
 " FIXME: These should be buffer-local maps
@@ -641,15 +639,15 @@ nmap <leader>ca   <Plug>(lcn-code-action)
 nmap <leader>ci   <Plug>(lcn-implementation)
 nmap <leader>ch   <Plug>(lcn-hover)
 nmap <leader>c<space>   <Plug>(lcn-hover)
-let g:wk_leader_n_maps.c["²"] = "lang menu"
-let g:wk_leader_n_maps.c.d = "lang goto def"
-let g:wk_leader_n_maps.c.t = "lang goto type"
-let g:wk_leader_n_maps.c.u = "lang usages/references"
-let g:wk_leader_n_maps.c.r = "lang rename"
-let g:wk_leader_n_maps.c.a = "lang code actions"
-let g:wk_leader_n_maps.c.i = "lang implementation"
-let g:wk_leader_n_maps.c.h = "lang hover info"
-let g:wk_leader_n_maps.c["<space>"] = "lang hover info"
+lua wk_leader_n_maps.c["²"] = "lang menu"
+lua wk_leader_n_maps.c.d = "lang goto def"
+lua wk_leader_n_maps.c.t = "lang goto type"
+lua wk_leader_n_maps.c.u = "lang usages/references"
+lua wk_leader_n_maps.c.r = "lang rename"
+lua wk_leader_n_maps.c.a = "lang code actions"
+lua wk_leader_n_maps.c.i = "lang implementation"
+lua wk_leader_n_maps.c.h = "lang hover info"
+lua wk_leader_n_maps.c["<space>"] = "lang hover info"
 " Additional keys, which should be better defined..
 " TODO: Use virtual keys!
 nmap ²   <Plug>(lcn-hover)
@@ -660,16 +658,16 @@ nmap ²   <Plug>(lcn-hover)
 
 " code/content context (using context.vim plugin)
 nmap <Leader>cx   <cmd>MyContextPeek<cr>
-let g:wk_leader_n_maps.c.x = "context peek (until move)"
+lua wk_leader_n_maps.c.x = "context peek (until move)"
 
 " -- Quickfix / Location lists
-let g:wk_leader_n_maps["!"] = {"name": "+qf-loc-list"}
+lua wk_leader_n_maps["!"] = {name = "+qf-loc-list"}
 nmap <leader>!c   <cmd>lclose \| copen<cr>
 nmap <leader>!l   <cmd>cclose \| lopen<cr>
 nmap <leader>!!   <cmd>call <SID>OnLastQfLocListDoTryNextOrFirst()<cr>
-let g:wk_leader_n_maps["!"].c = "open qf list (global)"
-let g:wk_leader_n_maps["!"].l = "open loc list (local)"
-let g:wk_leader_n_maps["!"]["!"] = "jump to next/first in last list"
+lua wk_leader_n_maps["!"].c = "open qf list (global)"
+lua wk_leader_n_maps["!"].l = "open loc list (local)"
+lua wk_leader_n_maps["!"]["!"] = "jump to next/first in last list"
 
 " Try to detect the qf or loc list, and save which one is the last one
 function! s:TryRegisterLastUsedQfOrLocList()
@@ -718,41 +716,17 @@ function! s:OnLastQfLocListDoTryNextOrFirst()
 endf
 
 " -- Edit
-let g:wk_leader_n_maps.e = {"name": "+edit"}
+lua wk_leader_n_maps.e = {name = "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
 nmap <leader>ee  :e %%
 nmap <leader>es  :spl %%
 nmap <leader>ev  :vsp %%
 nmap <leader>et  :tabe %%
-let g:wk_leader_n_maps.e.e = "relative here"
-let g:wk_leader_n_maps.e.s = "relative in split"
-let g:wk_leader_n_maps.e.v = "relative in vertical split"
-let g:wk_leader_n_maps.e.t = "relative in tab"
-
-" -- Git
-nmap <leader>hp <Plug>(GitGutterPreviewHunk)
-nmap <leader>hu <Plug>(GitGutterUndoHunk)
-nmap <leader>hf <cmd>GitGutterFold<cr>
-nmap <leader>hn <cmd>GitGutterNextHunk<cr>
-nmap <leader>hN <cmd>GitGutterPrevHunk<cr>
-nmap <leader>hb <Plug>(git-messenger)
-let g:wk_leader_n_maps.h = {"name": "+git-hunks"}
-let g:wk_leader_n_maps.h.p = "preview"
-let g:wk_leader_n_maps.h.u = "undo"
-let g:wk_leader_n_maps.h.f = "fold non-hunk"
-let g:wk_leader_n_maps.h.n = "next hunk"
-let g:wk_leader_n_maps.h.N = "prev hunk"
-let g:wk_leader_n_maps.h.b = "blame"
-
-
-
-" lua << LUA
-" -- Register nmap/vmap keys descriptions
-" require("which-key").register(vim.g.wk_leader_n_maps, { mode = "n", prefix = "<leader>" })
-" require("which-key").register(vim.g.wk_leader_v_maps, { mode = "v", prefix = "<leader>" })
-" LUA
-
+lua wk_leader_n_maps.e.e = "relative here"
+lua wk_leader_n_maps.e.s = "relative in split"
+lua wk_leader_n_maps.e.v = "relative in vertical split"
+lua wk_leader_n_maps.e.t = "relative in tab"
 
 " -----------------
 " IDEAS: (from vscode)
