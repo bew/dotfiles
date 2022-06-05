@@ -385,8 +385,9 @@ nnoremap Y yy
 " For some reason in visual mode '$' goes beyond end of line and include the newline,
 " making 'v$d' (or other actions) delete the end of line + the newline, joining them without being smart about it..
 "   => Totally not what I wanted... Let's fix this!
-" NOTE: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
-vnoremap $ $h
+" NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
+" NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
+vnoremap <expr> $ (mode() == "v" ? "$h" : "$")
 
 " N: Select last inserted region
 nnoremap gV `[v`]
