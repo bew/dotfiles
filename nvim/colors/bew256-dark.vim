@@ -191,7 +191,7 @@ exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
 " 236 (grey)
 " 17 (dark blue) is nice BUT a bit too subtle
 " 52 (dark red) is VERY visible (too much? needs to have a toggle)
-exe "HiResetTo VisualNormal ctermbg=236"
+exe "HiResetTo VisualNormal ctermbg=236 cterm=bold"
 exe "HiResetTo VisualHighContrast ctermbg=52"
 " ^^^ HighContrast variant can be helpful when sharing screen, to better show what I have selected
 " NOTE: Would be nice to have a visual binding to toggle between the 2 :)
