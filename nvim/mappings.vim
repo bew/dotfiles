@@ -345,6 +345,11 @@ nnoremap <C-f> mi==`i
 " N: Format the entire file
 nnoremap <M-C-f> gg=G``
 
+" V: a count then J on a single visual line does not make sense and is a probably a mistake
+" (like when I 'V4j' but fail to release Shift rapidly enough after typing 4 (on azerty layout)),
+" sends j instead.
+vnoremap <expr> J  (v:count && line(".") == line("v")) ? "j" : "J"
+
 " N: un-join (split) the current line at the cursor position
 nnoremap <M-J> i<c-j><esc>k$
 
