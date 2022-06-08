@@ -84,11 +84,12 @@
 [alias]
 
   # add & commit
-  a = add
+  a  = add
   ap = add -p
   an = add -N
+
   com = commit --verbose
-  comp = com -p
+  comp  = com -p
   comam = com --amend
 
   # index manipulation
@@ -116,23 +117,24 @@
 
   # log (minimal: with metadata + subject)
   pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=tformat:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n'
-  l = pretty-log
+  l  = pretty-log
   la = pretty-log --all
   lo = pretty-log --oneline
 
   # log (verbose: with metadata + subject + body + notes)
   # (~same as: pretty-log + the commit body & notes if available)
   pretty-log-verbose = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n%+b%-N%n'
-  lv = pretty-log-verbose
+  lv  = pretty-log-verbose
   lva = pretty-log-verbose --all
 
-  # NOTE: using the verbose version, because it does not add a blank line at the end
+  # NOTE: using the verbose version, because it's more complete,
+  # and does not add a blank line at the end.
   last-log = !git --no-pager pretty-log-verbose -n1
   ll = last-log
 
   # diff
-  d  = diff
-  dc = diff --staged
+  d   = diff
+  dc  = diff --staged
   dd  = diff -w
   ddc = diff -w --staged
 
@@ -152,7 +154,8 @@
   review-branch-s          = !git dds --unified=30   $(git z--base-branch-helper)
   review-branch-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
 
-  review-logs = !git pretty-log $(git z--base-branch-helper)..
+  review-logs         = !git pretty-log         $(git z--base-branch-helper)..
+  review-logs-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
 
   stat = !git --no-pager diff --stat --summary
   stat-branch = !git stat $(git z--base-branch-helper)..
@@ -168,9 +171,9 @@
   dlm = diff-last-merge
 
   # last merge logs
-  log-last-merge = pretty-log ORIG_HEAD..
-  llm = log-last-merge
+  log-last-merge         = pretty-log         ORIG_HEAD..
   log-verbose-last-merge = pretty-log-verbose ORIG_HEAD..
+  llm  = log-last-merge
   lvlm = log-verbose-last-merge
 
   gc-remove-old-commits = reflog expire --all --expire=now
