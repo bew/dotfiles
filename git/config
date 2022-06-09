@@ -1,6 +1,3 @@
-[core]
-  excludesfile = ~/.dot/git/global_gitignore
-
 [user]
   email = benoit.dechezelles@gmail.com
   name = Benoit de Chezelles
@@ -8,6 +5,14 @@
 [github]
   # some tools uses this
   user = bew
+
+# ------
+
+[core]
+  excludesfile = ~/.dot/git/global_gitignore
+
+[help]
+  autocorrect = immediate
 
 [init]
   defaultBranch = main
@@ -27,7 +32,7 @@
   defaultToUpstream = true
 
   # Do not keep '.orig' files around after a merge conflict for that file,
-  # I can always find it back with git!
+  # (I can always find the original files with git!)
   keepBackup = false
 
   tool = nvim_diffconflicts
@@ -45,15 +50,6 @@
   # (use an explicit 'drop' action to avoid the warning)
   missingCommitsCheck = "warn"
 
-[help]
-  autocorrect = immediate
-
-[color]
-  interactive = true
-
-[color "status"]
-  untracked = "cyan"
-
 [diff]
   # Give a little bit more context in diffs (defaut is 3)
   context = 10
@@ -69,6 +65,12 @@
   # (which is not automatically detected for some reasons..)
   statGraphWidth = 30
 
+[color]
+  interactive = true
+
+[color "status"]
+  untracked = "cyan"
+
 [color "diff"]
   # color settings for 'colorMoved' option
   oldMoved = cyan 17
@@ -82,8 +84,11 @@
 #   helper = github-bew-password-from-env
 
 [alias]
+  br = branch
+  brv = "!git --no-pager branch -vv"
 
-  # add & commit
+  # index manipulation (staging area)
+
   a  = add
   ap = add -p
   an = add -N
@@ -92,25 +97,34 @@
   comp  = com -p
   comam = com --amend
 
-  # index manipulation
+  # Inverts a previous `git add file`
+  # (same as new command `git restore --staged file` except
+  # that it also works without `file` and unstages all files)
+  # NOTE: changes the index only (the staging area)
+  unstage = reset HEAD
+
+  # Stage the deletion of a file
+  # NOTE: changes the index only (the staging area),
+  #   the working tree isn't touched at all
+  #   (the file isn't actually deleted)
+  untrack = rm --cached
+
+  # repo manipulation
   f = fetch
   m = merge
   ch = checkout
   sth = stash
-  untrack = rm --cached
-
-  unstage = reset HEAD
 
   # remote interaction
   ph = push
   pl = pull
   rem = remote -v
 
-  # info only
-  #----------------------------
+  # repo size helpers
+  gc-remove-old-commits = reflog expire --all --expire=now
+  gc-compress-repo = gc --aggressive --prune=now
 
-  br  = branch
-  brv = "!git --no-pager branch -vv"
+  # --- Info aliases
 
   s   = status --ignore-submodules=all
   suf = status --untracked-files
@@ -142,10 +156,15 @@
   dds = !git -c delta.features=split-layout dd
   ds  = !git -c delta.features=split-layout d
 
+  stat = !git --no-pager diff --stat --summary
+  show-with-stat = !git show --patch-with-stat --summary
+
   # Helper to find the base-commit between a base branch (usually master/main) and
   # a head ref (usually HEAD).
   # (we want to find the commit before the first commit on the branch)
   z--base-branch-helper = !git merge-base --octopus ${BASE_BRANCH:-main@\\{u\\}} ${HEAD_REF:-HEAD}
+
+  # --- Info aliases on current branch
 
   # --unified is for the up/down diff context around hunks
   review-branch          = !git diff --unified=30   $(git z--base-branch-helper)
@@ -154,32 +173,27 @@
   review-branch-s          = !git dds --unified=30   $(git z--base-branch-helper)
   review-branch-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
 
-  review-logs         = !git pretty-log         $(git z--base-branch-helper)..
-  review-logs-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
+  log-branch         = !git pretty-log         $(git z--base-branch-helper)..
+  log-branch-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
+  lb  = log-branch
+  lvb = log-branch-verbose
 
-  stat = !git --no-pager diff --stat --summary
   stat-branch = !git stat $(git z--base-branch-helper)..
 
-  show-with-stat = !git show --patch-with-stat --summary
+  # --- Info aliases on last merge
 
-  # last merge stats
-  stat-last-merge = stat ORIG_HEAD..
-  slm = stat-last-merge
-
-  # last merge diff
   diff-last-merge = diff ORIG_HEAD..
   dlm = diff-last-merge
 
-  # last merge logs
   log-last-merge         = pretty-log         ORIG_HEAD..
   log-verbose-last-merge = pretty-log-verbose ORIG_HEAD..
   llm  = log-last-merge
   lvlm = log-verbose-last-merge
 
-  gc-remove-old-commits = reflog expire --all --expire=now
-  gc-compress-repo = gc --aggressive --prune=now
+  stat-last-merge = stat ORIG_HEAD..
+  slm = stat-last-merge
 
-# -- BEGIN delta config
+# --- BEGIN delta config
 
 [core]
   pager = delta
@@ -228,10 +242,9 @@
   ; line-numbers-left-format = {nm:^5}:
   ; line-numbers-right-format = {np:^5}|
 
+# NOTE: This group of delta settings is enabled for some of my git aliases
+#       using `git -c delta.features=split-layout ...`
 [delta "split-layout"]
-  # NOTE: This group of delta settings is enabled for some of my git aliases
-  #       using `git -c delta.features=split-layout ...`
-
   features = navigate side-by-side
 
   ; >> Unicode separators:
@@ -243,6 +256,6 @@
   line-numbers-left-style = red
   line-numbers-right-style = green
 
-# -- END delta config
+# --- END delta config
 
 # vim:set ft=gitconfig:
