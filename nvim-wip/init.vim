@@ -400,9 +400,15 @@ function my_startupscreen_setup()
   -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
   -- simple theme, until I want to make my own...
   local theme = require"alpha.themes.startify"
-  -- FIXME: fortune broken, ref: https://github.com/goolord/alpha-nvim/issues/112
-  -- theme.section.footer.val = require"alpha.fortune"()
-  -- TODO(later): format with cowsay!
+  -- (NOTE: 'theme.section.footer' is a block of type 'group')
+  theme.section.footer.val = {
+    { type = "padding", val = 1 },
+    { type = "text", val = {" ----------------------------------------------------"} },
+    {
+      type = "text",
+      val = require"alpha.fortune"() -- TODO(later): format with cowsay!
+    },
+  }
   require"alpha".setup(theme.config)
 end
 LUA
