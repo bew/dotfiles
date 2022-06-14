@@ -202,7 +202,6 @@ function my_gitsigns_setup()
   leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="diff file"}
   -- FIXME: there is no action to toggle fold of everything that didn't change
   -- leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
-  leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
 
   -- next/prev hunk that also work in vim's diff mode
   leader_map{mode={"n"}, key="hn", desc="next hunk", opts={expr=true}, action=function()
@@ -215,6 +214,14 @@ function my_gitsigns_setup()
     vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
     return "<Ignore>"
   end}
+
+  leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
+
+  -- toggles
+  leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
+  leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
+  leader_map{mode={"n"}, key="htd", action=gs.toggle_deleted,            desc="toggle deleted lines"}
+  leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
   -- define hunk text object & visual selector
   toplevel_map{mode={"o", "x"}, key="ih", action=gs.select_hunk, desc="select hunk"}
@@ -235,6 +242,7 @@ function my_tree_setup()
     renderer = {
       add_trailing = true, -- add '/' to folders
       group_empty = true,
+      full_name = true, -- for long names, show full name in float win on hover <3
       indent_markers = { enable = true },
       icons = {
         symlink_arrow = "->",
