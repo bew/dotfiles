@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import sys
+from textwrap import dedent
+
+
+def copy_stat_timestamp(from_: str, to: str):
+    """
+    Set access time & modified time of 'to_file', copied from 'from_file'
+    """
+    from_file, to_file = from_, to
+    stat_info = os.stat(from_file)
+    os.utime(to_file, ns=(stat_info.st_atime_ns, stat_info.st_mtime_ns))
+
+
+def parse_args(args) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=dedent("""
+        Copy stat timestamps from 'SRC' to 'TARGET'
+
+        It can be usuful when editing media files, but want the final file to
+        keep the original timestamps.
+    """))
+    parser.add_argument("SRC", help="Source file to copy timestamps from")
+    parser.add_argument("TARGET", help="Target file that will have updated timestamps")
+    if not args:
+        parser.print_help()
+        sys.exit(1)
+    return parser.parse_args(args)
+
+
+def main(args):
+    opts = parse_args(args)
+    try:
+        copy_stat_timestamp(from_=opts.SRC, to=opts.TARGET)
+        print(f"Copied stat timestamps from {opts.SRC!r} to {opts.TARGET!r}")
+    except OSError as e:
+        print(f"ERROR: {e}")
+        return False
+    return True
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]) and 0 or 1)
