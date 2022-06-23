@@ -84,6 +84,10 @@ tnoremap <silent> <C-M-t><C-M-p> <cmd>FloatermPrev<cr>
 "-- Navigation
 "------------------------------------------------------------------
 
+" N: Side-scroll using Alt+ScrollWheel
+nmap <M-ScrollWheelUp> zhzhzh
+nmap <M-ScrollWheelDown> zlzlzl
+
 " I: Short navigation on the line in insert mode
 "
 " This makes it possible to use the cursor keys in Insert mode, without breaking
