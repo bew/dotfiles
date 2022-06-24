@@ -47,7 +47,7 @@ l noaction 1\e)
 # --- Defines new line-editing keys under the following line:
 #line-edit
 
-# Escape to abort line editing
-# \e abort
-# FIXME: Does not work, and breaks the hlHL bindings above for some reason
-# Ref: https://github.com/gwsw/less/issues/205#issuecomment-935613979
+# Escape-Escape to abort line editing
+\e\e abort
+# NOTE: a single \e would not work, as it would break every other keybinds using \e
+# (there is no `nnoremap` a-la-vim, there's only `nmap`)
