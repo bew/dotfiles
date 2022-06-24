@@ -55,6 +55,12 @@ def ${10:function_name}(self) -> ${20:Any}:
 	${30:${VISUAL:pass}}
 endsnippet
 
+snippet defpr "property method (getter for _prop)" b
+@property
+def ${10:function_name}(self) -> ${20:Any}:
+	return self._${30:$10}
+endsnippet
+
 snippet deft "test function" b
 def test_${10:something_is_working}($20):
 	${30:${VISUAL:pass}}
@@ -114,9 +120,45 @@ snippet @prop "@property" b
 @property
 endsnippet
 
-snippet ifmain "ifmain" b
+snippet ifmain "if module is main" b
 if __name__ == "__main__":
 	${1:${VISUAL:main()}}
+endsnippet
+
+snippet mainsimple "simple main() then if main" b
+def main():
+	${1:${VISUAL:pass}}
+
+
+if __name__ == "__main__":
+	main()
+endsnippet
+
+snippet maincli "minimal setup for main(args) & cli parsing" b
+import argparse  # TODO: move to top
+import sys  # TODO: move to top
+
+
+class ScriptError(Exception):  # TODO: move to top
+	pass
+
+
+def parse_args(args) -> argparse.Namespace:
+	parser = argparse.ArgumentParser()
+	return parser.parse_args(args)
+
+
+def main(args):
+	opts = parse_args(args)
+	${1:${VISUAL:# do something useful!}}
+
+
+if __name__ == "__main__":
+	try:
+		main(sys.argv[1:])
+	except ScriptError as err:
+		print(f"ERROR: {err}", file=sys.stderr)
+		sys.exit(1)
 endsnippet
 
 # for
@@ -156,6 +198,10 @@ snippet mdoc "Multi line doc" b
 
 ${2:${VISUAL:TODO: doc}}
 """
+endsnippet
+
+snippet :p ":param ..: dor line" b
+:param ${1:name}: $0
 endsnippet
 
 snippet p "print(...)" b
