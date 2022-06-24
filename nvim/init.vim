@@ -748,7 +748,9 @@ Plug 'cespare/vim-toml'
 
 " tmux panes completion for deoplete <3 <3 <3
 " see deoplete config!
-Plug 'wellle/tmux-complete.vim'
+" Disabled, see: https://github.com/bew/dotfiles/issues/85
+"Plug 'wellle/tmux-complete.vim'
+
 " Emoji completion (:foobar:)
 " It is auto enabled on gitcommit & markdown files
 Plug 'bew/deoplete-emoji-backup'
