@@ -44,6 +44,10 @@ l noaction 1\e)
 # Ref: https://github.com/gwsw/less/issues/36
 \eq toggle-option -!^Predraw-on-quit\nq
 
+# Use Alt-w to toggle long lines wrapping
+# Ref: https://github.com/gwsw/less/issues/272
+\ew toggle-option ^P-chop-long-lines\n
+
 # --- Defines new line-editing keys under the following line:
 #line-edit
 
