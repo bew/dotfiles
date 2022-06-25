@@ -41,8 +41,8 @@ cfg.keys = {
   keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
   keybind(mods.S, "PageDown", act.ScrollByPage(1)),
 
-  keybind(ctrl_shift, "r", act.ReloadConfiguration),
-  -- keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
+  -- keybind(mods.CS, "r", act.ReloadConfiguration),
+  keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
 
   keybind(mods.CS, "l", act.ClearScrollback("ScrollbackAndViewport")),
   keybind(mods.CS, " ", act.QuickSelect),
@@ -137,6 +137,20 @@ cfg.keys = {
 -- cfg.key_tables.copy_mode = {
 --   {key="i", mods="NONE", action=act.CopyMode("Close")},
 -- }
+
+-- Events related to config reloading
+wezterm.on("my-reload-config-with-notif", function(win, pane)
+    wezterm.GLOBAL.want_reload_notification = true
+    win:perform_action(act.ReloadConfiguration, pane)
+    -- Will trigger the builtin `window-config-reloaded` event, the notification is wired on
+    -- that event, to make sure only a _valid_ config reload will display it.
+end)
+wezterm.on("window-config-reloaded", function(win, _)
+  if wezterm.GLOBAL.want_reload_notification then
+    win:toast_notification("wezterm", "Config successfully reloaded!", nil, 1000)
+    wezterm.GLOBAL.want_reload_notification = false
+  end
+end)
 
 -- To simplify config composability, `cfg.keys` is (initially) a
 -- nested list of (bind or list of (bind or ...)), so we must
