@@ -31,4 +31,8 @@ col.brights = {
   "#fafafa", -- white
 }
 
+-- Slightly red & transparent (blended in bg)
+-- (fg color is preserved)
+col.selection_bg = "rgba(100% 50% 50% 20%)"
+
 return col

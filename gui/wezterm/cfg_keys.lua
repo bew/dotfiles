@@ -1,18 +1,35 @@
 local wezterm = require "wezterm"
+local mytable = require "lib/mystdlib".mytable
+local mods = require "cfg_utils".mods
+
 local act = wezterm.action
 local act_callback = wezterm.action_callback
 
--- IDEA: A better action syntax, see: https://github.com/wez/wezterm/issues/1150
-
--- IDEA: helper for keybind definition
-local function keybind(mods, key, action)
-  return {mods = mods, key = key, action = action}
-end
-local ctrl_shift = "CTRL|SHIFT"
-
 local cfg = {}
 
+-- Helper for keybind definition
+local function keybind(mods, keys, action)
+  local keys = (type(keys) == "table") and keys or {keys}
+  local mods = tostring(mods)
+  local binds = {}
+  for _, key in ipairs(keys) do
+    table.insert(binds, {mods = mods, key = key, action = action})
+  end
+  return binds
+end
+
 cfg.disable_default_key_bindings = true
+
+cfg.key_tables = {}
+local function define_and_activate_keytable(spec)
+  -- Flatten keys, and define the Key Table
+  cfg.key_tables[spec.name] = mytable.flatten_list(spec.keys)
+
+  -- Setup & return activation key bind
+  local activation_opts = spec.activation or {}
+  activation_opts.name = spec.name
+  return act.ActivateKeyTable(activation_opts)
+end
 
 -- NOTE: About SHIFT and the keybind definition:
 -- * For bindings with SHIFT and a letter, the `key` field (the letter)
@@ -21,55 +38,54 @@ cfg.disable_default_key_bindings = true
 --   and key should be the shifted key that is going to reach the terminal.
 --   (based on the keyboard-layout)
 cfg.keys = {
-  keybind("SHIFT", "PageUp", act{ScrollByPage = -1}),
-  keybind("SHIFT", "PageDown", act{ScrollByPage = 1}),
+  keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
+  keybind(mods.S, "PageDown", act.ScrollByPage(1)),
 
-  -- Wezterm features
-  keybind(ctrl_shift, "r", "ReloadConfiguration"),
-  keybind(ctrl_shift, "l", act{ClearScrollback = "ScrollbackAndViewport"}),
-  keybind(ctrl_shift, "f", act{Search = {CaseInSensitiveString = ""}}),
-  keybind(ctrl_shift, " ", "QuickSelect"),
-  keybind("CTRL|ALT", " ", "QuickSelect"), -- note: eats a valid terminal keybind
-  keybind(ctrl_shift, "d", "ShowDebugOverlay"), -- note: it's not a full Lua interpreter
+  keybind(ctrl_shift, "r", act.ReloadConfiguration),
+  -- keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
+
+  keybind(mods.CS, "l", act.ClearScrollback("ScrollbackAndViewport")),
+  keybind(mods.CS, " ", act.QuickSelect),
+  keybind(mods.CA, " ", act.QuickSelect), -- note: eats a valid term input
+  keybind(mods.CS, "d", act.ShowDebugOverlay),
+  keybind(mods.CS, "y", act.ActivateCopyMode),
+  -- note: last search is now prefilled, may need to clear it first with Ctrl-u
+  keybind(mods.CS, "f", act.Search{CaseInSensitiveString = ""}),
 
   -- Copy/Paste to/from Clipboard
-  keybind(ctrl_shift, "c", act{CopyTo = "Clipboard"}),
-  keybind(ctrl_shift, "v", act{PasteFrom = "Clipboard"}),
+  keybind(mods.CS, "c", act.CopyTo("Clipboard")),
+  keybind(mods.CS, "v", act.PasteFrom("Clipboard")),
   -- Paste from PrimarySelection (Copy is done by selection)
-  keybind("SHIFT",    "Insert", act{PasteFrom = "PrimarySelection"}),
-  keybind("CTRL|ALT", "v",      act{PasteFrom = "PrimarySelection"}),
-  -- NOTE: that last one eats a valid terminal keybind
+  keybind(mods.S,  "Insert", act.PasteFrom("PrimarySelection")),
+  keybind(mods.CA, "v",      act.PasteFrom("PrimarySelection")), -- note: eats a valid term input
 
   -- Smart copy with Alt-c:
   -- - If active selection, will copy it to Clipboard & Primary
   -- - If NO selection, sends Alt-c to the running program
-  keybind("ALT", "c", act_callback(function(win, pane)
+  keybind(mods.A, "c", act_callback(function(win, pane)
     local has_selection = win:get_selection_text_for_pane(pane) ~= ""
     if has_selection then
-      win:perform_action(act{CopyTo="ClipboardAndPrimarySelection"}, pane)
+      win:perform_action(act.CopyTo("ClipboardAndPrimarySelection"), pane)
     else
-      -- FIXME: for some reason, adding 'act' (wezterm.action) for 'SendKey' breaks the call..
-      --   WHY?? It's not consistent with all other actions..
-      win:perform_action({SendKey={mods="ALT", key="c"}}, pane)
+      win:perform_action(act.SendKey{mods=mods.A, key="c"}, pane)
     end
   end)),
 
   -- Tabs
-  keybind(ctrl_shift, "t", act{SpawnTab="DefaultDomain"}),
-  keybind("CTRL",     "Tab", act{ActivateTabRelative=1}),
-  keybind(ctrl_shift, "Tab", act{ActivateTabRelative=-1}),
-  keybind(ctrl_shift, "w", act{CloseCurrentTab={confirm=false}}),
+  keybind(mods.CS, "t", act.SpawnTab("DefaultDomain")),
+  keybind(mods.C,  "Tab", act.ActivateTabRelative(1)),
+  keybind(mods.CS, "Tab", act.ActivateTabRelative(-1)),
+  keybind(mods.CS, "w", act.CloseCurrentTab{confirm=false}),
 
-  keybind(ctrl_shift, "x", "ShowLauncher"),
+  keybind(mods.CS, "x", act.ShowLauncher),
 
   -- Font size
-  keybind("CTRL", "0", "ResetFontSize"), -- Ctrl-Shift-0
-  keybind("CTRL", "+", "IncreaseFontSize"), -- Ctrl-Shift-+
-  keybind("CTRL", "6", "DecreaseFontSize"), -- Ctrl-Shift-- (key with -)
+  keybind(mods.C, "0", act.ResetFontSize),    -- Ctrl-Shift-0
+  keybind(mods.C, "+", act.IncreaseFontSize), -- Ctrl-Shift-+ (key with +)
+  keybind(mods.C, "6", act.DecreaseFontSize), -- Ctrl-Shift-- (key with -)
 
-  ---- custom events
-
-  keybind(ctrl_shift, "g", act_callback(function(win, _)
+  -- Toggle font ligatures
+  keybind(mods.CS, "g", act_callback(function(win, _)
     local overrides = win:get_config_overrides() or {}
     if not overrides.harfbuzz_features then
       -- If we haven't overriden it yet, then override with ligatures disabled
@@ -80,7 +96,51 @@ cfg.keys = {
     end
     win:set_config_overrides(overrides)
   end)),
-}
 
+
+  -- Key Table: Panes Management
+  keybind(mods.CS, "p", define_and_activate_keytable{
+    name = "my-panes-management",
+    activation = {one_shot=false, replace_current=false},
+    keys = {
+      keybind(mods._, "Escape", act.PopKeyTable),
+      keybind(mods.CS, "p", act.PopKeyTable),
+
+
+      -- Create
+      keybind(mods.CSA, {"h", "LeftArrow"},  act.SplitPane{direction="Left"}),
+      keybind(mods.CSA, {"j", "DownArrow"},  act.SplitPane{direction="Down"}),
+      keybind(mods.CSA, {"k", "UpArrow"},    act.SplitPane{direction="Up"}),
+      keybind(mods.CSA, {"l", "RightArrow"}, act.SplitPane{direction="Right"}),
+      -- Destroy
+      keybind(mods.CS, "d", act.CloseCurrentPane{confirm=true}),
+
+      -- Navigation
+      keybind(mods.CS, {"h", "LeftArrow"},  act.ActivatePaneDirection("Left")),
+      keybind(mods.CS, {"j", "DownArrow"},  act.ActivatePaneDirection("Down")),
+      keybind(mods.CS, {"k", "UpArrow"},    act.ActivatePaneDirection("Up")),
+      keybind(mods.CS, {"l", "RightArrow"}, act.ActivatePaneDirection("Right")),
+      keybind(mods.CS, "Space", act.PaneSelect{mode="Activate"}),
+
+      -- Manipulation
+      keybind(mods.CS, "s", act.PaneSelect{mode="SwapWithActive"}),
+      keybind(mods.CS, "z", act.TogglePaneZoomState),
+    },
+  }),
+}
+-- FIXME: redefining the 'copy_mode' key_table will remove default 'copy_mode' keys.
+--        (probably due to disable_default_key_bindings=true)
+-- TODO(IDEA): suggest `wezterm.default_config.key_tables.copy_mode` on which I could add my own 'i' key!
+--             (maybe as a getter, to make it explicit we're getting a fresh list of keys?)
+-- TODO(IDEA): suggest adding a 'wezterm' or 'builtin' prefix to existing tables,
+--             to 'reserve' a set of tables for potential future uses
+-- cfg.key_tables.copy_mode = {
+--   {key="i", mods="NONE", action=act.CopyMode("Close")},
+-- }
+
+-- To simplify config composability, `cfg.keys` is (initially) a
+-- nested list of (bind or list of (bind or ...)), so we must
+-- flatten the list to have a list of bind.
+cfg.keys = mytable.flatten_list(cfg.keys)
 
 return cfg
