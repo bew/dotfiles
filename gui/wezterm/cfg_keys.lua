@@ -10,7 +10,7 @@ local cfg = {}
 -- Helper for keybind definition
 local function keybind(mods, keys, action)
   local keys = (type(keys) == "table") and keys or {keys}
-  local mods = tostring(mods)
+  local mods = mods
   local binds = {}
   for _, key in ipairs(keys) do
     table.insert(binds, {mods = mods, key = key, action = action})
