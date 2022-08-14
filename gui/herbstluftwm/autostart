@@ -324,7 +324,7 @@ hc attr theme.background_color "#FFFFFF"
 
 # max layout tabs
 hc attr settings.tabbed_max true # show tabs when frame in 'max' layout
-hc attr theme.title_when multiple_tabs
+hc attr theme.title_when one_tab # whenever we are in max layout (with 1+ clients)
 hc attr theme.title_height 15
 hc attr theme.title_depth 4 # space below the title
 hc attr theme.title_align center
