@@ -540,6 +540,18 @@ zle -N zwidget::noop
 # NOTE: Not perfect..
 #   When completion menu is visible, it quits completion mode
 #   (accepting current entry for some reason..)
+#   --
+#   Another idea to try could be to:
+#   1. change the beginning of $PROMPT to call some binary to clear terminal with
+#      content-preserving behavior
+#   2. redisplay prompt
+#   3. revert $PROMPT to what it was
+#
+# Nice writeup I made on how it works and why:
+# https://github.com/wez/wezterm/issues/2405#issuecomment-1214418211
+#
+# TODO(?): Make a proper helper binary (in Rust?) or a zsh plugin to allow other
+#          people to have this (generally wanted) behavior?
 function zwidget::clear-but-keep-scrollback
 {
   local REPLY_cursor_row_in_term REPLY_cursor_col_in_term
