@@ -93,7 +93,6 @@ table.insert(mouse_bindings, {
 table.insert(mouse_bindings, {
   -- Middle click pastes from the primary selection (for any other mods).
   wezterm.permute_any_or_no_mods({
-    mods=mods._,
     event={Down={streak=1, button="Middle"}},
     action=act.PasteFrom("PrimarySelection"),
   }),
