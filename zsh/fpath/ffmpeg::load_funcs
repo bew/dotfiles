@@ -59,10 +59,11 @@ function ffmpeg::transcode-movie::single-file
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
 
-  # default (low) video resolution: nhd <=> 640x360
-  local video_size="${FFMPEG_VIDEO_SIZE:-nhd}"
-
-  local output_path="${input_filename_no_ext}.transcoded-${video_size}.mkv"
+  if [[ -n "${FFMPEG_VIDEO_SIZE:-}" ]]; then
+    local output_path="${input_filename_no_ext}.transcoded-${FFMPEG_VIDEO_SIZE}.mkv"
+  else
+    local output_path="${input_filename_no_ext}.transcoded.mkv"
+  fi
 
   echo
   echo "--- Transcoding file -> '$output_path'"
@@ -77,7 +78,7 @@ function ffmpeg::transcode-movie::single-file
   cmd+=(-map "0:s?") # then all subtitles (if any)
   cmd+=(-framerate 30) # just enough fps
   cmd+=(-preset slow) # good compression
-  cmd+=(-s "$video_size")
+  [[ -n "${FFMPEG_VIDEO_SIZE:-}" ]] && cmd+=(-s "$FFMPEG_VIDEO_SIZE")
   if [[ -n "${FFMPEG_VIDEO_AVG_BITRATE:-}" ]]; then
     # Set average bitrate & maxrate allowed
     # NOTE: '-maxrate' needs '-bufsize' to be set.
@@ -125,7 +126,7 @@ function ffmpeg::transcode-movie--med-qual
   fi
 
   for input_path in "${@}"; do
-    # medium resolution (qhd <=> 960x540), good for movies or high qual tv shows
+    # medium resolution (qhd <=> 960x540), enough for movies or high qual tv shows
     if ! FFMPEG_VIDEO_SIZE=qhd FFMPEG_VIDEO_AVG_BITRATE=700k ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
