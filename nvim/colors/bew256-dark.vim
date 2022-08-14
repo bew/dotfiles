@@ -104,7 +104,6 @@ exe "let s:fmt_undr     = ' cterm=underline'"
 exe "let s:fmt_undb     = ' cterm=underline,bold'"
 exe "let s:fmt_curl     = ' cterm=none'"
 exe "let s:fmt_ital     = ' cterm=italic'"
-exe "let s:fmt_revr     = ' cterm=reverse'"
 
 "}}}
 " Basic highlighting"{{{
@@ -177,16 +176,16 @@ exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_yellow_bright
 " ---------------------------------------------------------------------
 exe "HiResetTo SpecialKey" .s:fmt_bold   .s:fg_base00 .s:bg_base02
 exe "HiResetTo NonText ctermfg=237"
-exe "HiResetTo StatusLine"   .s:fg_base0  .s:bg_base02 .s:fmt_revr
-exe "HiResetTo StatusLineNC"   .s:fg_base00 .s:bg_base02 .s:fmt_revr
+exe "HiResetTo StatusLine"   .s:fg_base02  .s:bg_base0
+exe "HiResetTo StatusLineNC"   .s:fg_base02 .s:bg_base00
 exe "HiResetTo Directory"   .s:fg_blue
-exe "HiResetTo ErrorMsg"       .s:fmt_revr   .s:fg_red
+exe "HiResetTo ErrorMsg"       .s:bg_red
 exe "HiResetTo IncSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
 exe "HiResetTo Search"         .s:fmt_bold   .s:fg_base03 .s:bg_yellow
 exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
-exe "HiResetTo VertSplit"  .s:fmt_revr  .s:fg_base00 .s:bg_base02
+exe "HiResetTo VertSplit"  .s:fg_base02 .s:bg_base00
 
 " 236 (grey)
 " 17 (dark blue) is nice BUT a bit too subtle
@@ -200,7 +199,7 @@ hi! link VisualNOS Visual
 
 exe "HiResetTo Title"          .s:fmt_bold   .s:fg_orange
 exe "HiResetTo WarningMsg"     .s:fmt_bold   .s:fg_red
-exe "HiResetTo WildMenu"   .s:fg_base2  .s:bg_base02 .s:fmt_revr
+exe "HiResetTo WildMenu"   .s:fg_base02  .s:bg_base2
 exe "HiResetTo Folded"   .s:fg_base0  ." ctermbg=236"
 HiResetTo FoldColumn ctermfg=240 ctermbg=233
 
@@ -221,12 +220,12 @@ exe "HiResetTo SpellBad"       .s:fmt_undr
 exe "HiResetTo SpellCap"       .s:fmt_undr
 exe "HiResetTo SpellRare"      .s:fmt_undr
 exe "HiResetTo SpellLocal"     .s:fmt_undr
-exe "HiResetTo Pmenu"   .s:fg_base0  .s:bg_base02  .s:fmt_revr
-exe "HiResetTo PmenuSel"       .s:fmt_bold   .s:fg_orange .s:bg_base2   .s:fmt_revr
+exe "HiResetTo Pmenu"   .s:fg_base02  .s:bg_base0
+exe "HiResetTo PmenuSel"       .s:fmt_bold   .s:fg_base2 .s:bg_orange
 
 " TODO: review the popup-menu' scrollbar highlight!
-exe "HiResetTo PmenuSbar"   .s:fg_base2  .s:bg_base0   .s:fmt_revr
-exe "HiResetTo PmenuThumb"   .s:fg_base0  .s:bg_base03  .s:fmt_revr
+exe "HiResetTo PmenuSbar"   .s:fg_base0  .s:bg_base2
+exe "HiResetTo PmenuThumb"   .s:fg_base03  .s:bg_base0
 
 " Tab Colors
 exe "HiResetTo TabLineSel  cterm=bold  ctermfg=".s:tab_contrast ." ctermbg=".s:tab_current
