@@ -2,8 +2,6 @@
 " --------------------------------------------------------------------
 
 filetype plugin indent on
-" Enable omni completion
-set omnifunc=syntaxcomplete#Complete
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -121,8 +119,8 @@ set textwidth=100
 " Do not insert 2 spaces after a '.', '?' and '!' with a join command. Use a single space.
 set nojoinspaces
 
-" Remove builtin preview window on completion
-set completeopt-=preview
+" Use a completion menu, always show the menu (even if only one match)
+set completeopt=menu,menuone
 
 """ search ignore
 
