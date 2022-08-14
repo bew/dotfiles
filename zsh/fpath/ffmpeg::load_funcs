@@ -136,6 +136,24 @@ function ffmpeg::transcode-movie--med-qual
   done
 }
 
+function ffmpeg::transcode-movie--high720-qual
+{
+  if [[ $# == 0 ]]; then
+    echo "Usage: ffmpeg::transcode-movie--high720-qual <files>..."
+    return 1
+  fi
+
+  for input_path in "${@}"; do
+    # high (720p) resolution (hd720 <=> 1280x720), better qual for movies
+    if ! FFMPEG_VIDEO_SIZE=hd720 FFMPEG_VIDEO_AVG_BITRATE=1M ffmpeg::transcode-movie::single-file "$input_path"; then
+      echo
+      echo "... Movie transcode failed/cancelled ..."
+      echo
+      return 1
+    fi
+  done
+}
+
 function ffmpeg::take-sample
 {
   if [[ $# == 0 ]]; then
