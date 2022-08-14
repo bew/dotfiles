@@ -11,6 +11,8 @@ CS_SESSION
 # Nix result
 result
 result-*
+# Nix profiles (manual)
+*.nix-gc-root*
 
 
 # C/C++ compilation

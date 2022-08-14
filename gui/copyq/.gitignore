@@ -8,6 +8,7 @@ copyq-filter.ini
 copyq_geometry.ini
 copyq_tabs.ini
 copyq.lock
+*.lock
 
 # security (to encrypt entries if needed)
 copyq.pub
