@@ -48,12 +48,52 @@ bind <C-R> reload_my_config
 bind --mode=ignore <C-R> reload_my_config
 bind --mode=insert <C-R> reload_my_config
 
-bind --mode=normal <F9> mode ignore
-bind --mode=ignore <F9> mode normal
+bind --mode=normal <C-F12> mode ignore
+bind --mode=insert <C-F12> mode ignore
+bind --mode=ignore <C-F12> mode normal
 
-# Get back C-a to select all text!
+# unbind many builtins...
+
+# vim' increment (here, for the url)
 unbind <C-a>
-unbind <C-x> # unbind it as well for coherence (since C-a & C-x go in pair)
+unbind <C-x>
+# vim' up/down (by line & by page)
+unbind <C-u>
+unbind <C-d>
+unbind <C-f>
+unbind <C-b>
+# visual search
+unbind --mode=visual S
+unbind --mode=visual s
+# others...
+unbind A
+unbind B
+unbind D
+unbind F
+unbind H
+unbind J
+unbind K
+unbind L
+unbind M
+unbind O
+unbind R
+unbind S
+unbind T
+unbind U
+unbind W
+# dangerous! I can do :qall manually if needed!
+unbind ZZ
+unbind a
+unbind b
+unbind d
+unbind f
+unbind o
+unbind r
+unbind s
+unbind t
+unbind u
+unbind w
+unbind x
 
 # Open Tridactyl' cmdline from any mode
 bind --mode=insert <A-:> fillcmdline_notrail
@@ -64,22 +104,18 @@ bind --mode=visual <A-:> fillcmdline_notrail
 # --- Open bindings
 
 # open in new tab
-unbind t
+# Opened issue for more positioning: https://github.com/tridactyl/tridactyl/issues/4257
 bind <A-t> fillcmdline tabopen
 bind --mode=insert <A-t> fillcmdline tabopen
 
 # open
-unbind o
 bind <A-o> fillcmdline open
 bind --mode=insert <A-o> fillcmdline open
 
 # open with search engine
-unbind s
 bind <A-s> fillcmdline open search
 
 # open by hint on the page
-unbind f
-unbind F
 bind <A-f> hint
 # Open target in background
 bind <A-F> hint -b
@@ -100,8 +136,6 @@ bind --mode=hint <A-Space> hint.selectFocusedHint
 # --- Tab bindings
 
 # tab goto & movement
-unbind J
-unbind K
 # TODO: Try with --mode=browser to set it everywhere at once
 #       ==> Does not seems to work :/
 bind <A-a> tabprev
@@ -133,8 +167,6 @@ command tabclose_safe \
       } \
     })()
 
-unbind d
-unbind D
 bind <A-d> tabclose_safe
 bind --mode=insert <A-d> tabclose_safe
 bind --mode=visual <A-d> tabclose_safe
@@ -145,12 +177,9 @@ bind <A-c> pin
 bind --mode=insert <A-c> pin
 
 # undo tab close
-unbind u
 bind <A-u> undo
 
 # history
-unbind H
-unbind L
 bind <CA-a> back
 bind <CA-z> forward
 bind --mode=insert <CA-a> back
@@ -166,15 +195,12 @@ bind j scrollline 5
 bind k scrollline -5
 
 # page reload
-unbind r
-unbind R
 bind <A-r> reload
 bind <A-R> reloadhard
 bind --mode=insert <A-r> reload
 bind --mode=insert <A-R> reloadhard
 
 # rudimentary page search mode
-unbind <C-f>
 bind <A-/> fillcmdline find
 bind <A-?> fillcmdline find -?
 bind <A-n> findnext 1
