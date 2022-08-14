@@ -35,3 +35,12 @@ augroup ${1:my_${2:group_name}}
 	$10
 augroup END
 endsnippet
+
+snippet luasetup "Lua plugin setup block" b
+lua << LUA
+function my_${1:thing}_setup()
+  $2
+end
+LUA
+autocmd User PluginsLoaded lua my_$1_setup()
+endsnippet
