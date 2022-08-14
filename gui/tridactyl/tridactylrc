@@ -176,8 +176,13 @@ bind --mode=hint <A-d> tabclose_safe
 bind <A-c> pin
 bind --mode=insert <A-c> pin
 
-# undo tab close
-bind <A-u> undo
+# undo tab close (in current window only)
+bind <A-u> undo tab_strict
+# undo window close
+bind <A-U> undo window
+# note: other kind possible:
+# - 'recent' (can be tab or window)
+# - 'tab' (tab in any window)
 
 # history
 bind <CA-a> back
