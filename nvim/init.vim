@@ -281,7 +281,6 @@ augroup END
 
 let g:LanguageClient_serverCommands = {}
 let g:LanguageClient_serverCommands.rust = ["rust-analyzer"]
-let g:LanguageClient_serverCommands.lua = ["lua-language-server", "--logpath=/t/lua-lsp-logs-dir"]
 
 Plug 'Shougo/echodoc'  " shows (in a smart way) the signature of completed items
 let g:echodoc#enable_at_startup = v:true
