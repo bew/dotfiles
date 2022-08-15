@@ -18,7 +18,7 @@
 
   # -------- Push custom args for any of my modules --------
 
-  _module.args.mybuilders = pkgs.callPackage ./mybuilders.nix {};
+  _module.args.mybuilders = pkgs.callPackage ./mylib/mybuilders.nix {};
 
   # Flake inputs
   _module.args.flakeInputs = inputs;
@@ -62,7 +62,7 @@
   # --------
   # Proof of concept of a dynamic/editable symlink-to-a-dot-file, managed by Nix, using
   # the `config.lib.file.mkOutOfStoreSymlink` helper function exposed by homeManager.
-  home.file.".test-out-of-store-gitconfig".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dot/gitconfig";
+  home.file.".test-out-of-store-gitconfig".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dot/git/config";
   # NOTE: (for when I finally commit and have my home dot-files managed by Nix)
   # * https://github.com/nix-community/home-manager/issues/2085
   # * https://www.reddit.com/r/NixOS/comments/qlhifw/comment/hj32l2b/ (my own comment on the subject)
@@ -79,7 +79,7 @@
       pathRelativeToDots = lib.removePrefix (flakeSourceDir + "/") pathStr;
       pathAbsoluteToDots = "${actualDotsDir}/${pathRelativeToDots}";
     in config.lib.file.mkOutOfStoreSymlink pathAbsoluteToDots;
-  in linkToDots ./gitconfig;
+  in linkToDots ../../git/config;
 
   # Do not build home-manager's manual, it brings a number of useless dependencies and I don't need
   # them often anyway.
