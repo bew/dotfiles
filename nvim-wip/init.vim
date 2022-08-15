@@ -232,100 +232,10 @@ autocmd User PluginsLoaded lua my_gitsigns_setup()
 " ---------- Editor-wide UI
 
 Plug 'rebelot/heirline.nvim'    " Heirline.nvim is a no-nonsense Neovim Statusline plugin
-" Very flexible, modular, dynamic & nicely customizable !!!
+" Very flexible, modular, declarative ❤️, dynamic & nicely customizable !!!
 " Full doc is available at: https://github.com/rebelot/heirline.nvim/blob/master/cookbook.md
 " (no vim doc for now)
-lua << LUA
-function my_statusline_setup()
-  -- Let's start with something simple!!
-  -- NOTE: doesn't behave well when no space to show whole statuline..
-  -- want these sections:
-  -- - file name (+ parent?)
-  -- - file modified / readonly
-  -- - filetype
-  -- - simple mode
-  -- - cursor position (ruler)
-  local conditions = require"heirline.conditions"
-  local _ = { provider = " " }
-  local __WideSpacing__ = { provider = "%=" }
-
-  local BasicMode = {
-    provider = function(self)
-      function simple_mode()
-      end
-      return " " .. vim.fn.mode():upper() .. " "
-    end,
-    hl = function()
-      if conditions.is_active() then
-        return { ctermbg = 27, ctermfg = 255, cterm = {bold = true} }
-      else
-        return { ctermbg = 235, ctermfg = 242 }
-      end
-    end,
-  }
-
-  local ReadOnly = {
-    provider = function(self)
-      if vim.bo.readonly then
-        return "[RO]"
-      end
-    end,
-  }
-
-  local File = {
-    provider = " %f ",
-  }
-  local FileType = {
-    provider = function(self)
-      return vim.bo.filetype or "no ft"
-    end,
-  }
-  local Changed = { provider = "%m" }
-  local Ruler = { provider = "%P %l:%02v" }
-
-  local statusline = {
-    BasicMode,
-    { -- File quick info block
-      File,
-      Changed,
-      ReadOnly,
-      hl = function()
-        if conditions.is_active() then
-          return { ctermfg = 253, ctermbg = 240 }
-        else
-          return { ctermfg = 250, ctermbg = 238 }
-        end
-      end,
-    },
-    { provider = " [basic-line]" }, -- to quickely differenciate the statuslines!
-    __WideSpacing__,
-    FileType,
-    _,
-    {
-      _, Ruler, _,
-      hl = function()
-        if conditions.is_active() then
-          return { ctermfg = 236, ctermbg = 244 }
-        else
-          return { ctermfg = 236, ctermbg = 242 }
-        end
-      end
-    },
-  }
-  require"heirline".setup({
-    hl = function()
-      if conditions.is_active() then
-        return { ctermfg = 244, ctermbg = 236 }
-      else
-        return { ctermfg = 241, ctermbg = 235 }
-      end
-    end,
-    statusline,
-  })
-  -- TODO: I want to setup the statusline option myself, and only call heirline for initialization.
-end
-LUA
-autocmd User PluginsLoaded lua my_statusline_setup()
+autocmd User PluginsLoaded lua require("mycfg.heirline_statusline_setup").setup()
 
 Plug 'kyazdani42/nvim-tree.lua'
 lua << LUA
