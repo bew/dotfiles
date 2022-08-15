@@ -1,12 +1,11 @@
 { config, pkgsChannels, lib, mybuilders, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge lastStable;
+  inherit (pkgsChannels) stable bleedingedge;
 in {
   home.packages = [
-    lastStable.neovim
+    stable.neovim
     stable.rust-analyzer
-    stable.sumneko-lua-language-server
 
     bleedingedge.zsh
     stable.exa # alternative ls, more colors!
