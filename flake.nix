@@ -18,8 +18,12 @@
 
   # We use specific branches to get most/all packages from the official cache.
   inputs = {
-    # This is the backbone package set, DO NOT REMOVE/CHANGE unless you know what you're doing
-    nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-21.11";
+    # This is the backbone package set, used for tools that should not change too much like tmux
+    # (if I have active tmux sessions, I might not want to restart the server if new version is not
+    # compatible).
+    # Update this channel only if you're not using backbone packages at the moment, or you know
+    # they're safe to upgrade.
+    nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-22.05";
 
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";

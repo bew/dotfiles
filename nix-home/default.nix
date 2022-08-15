@@ -81,6 +81,10 @@
     in config.lib.file.mkOutOfStoreSymlink pathAbsoluteToDots;
   in linkToDots ./gitconfig;
 
+  # Do not build home-manager's manual, it brings a number of useless dependencies and I don't need
+  # them often anyway.
+  manual.manpages.enable = false;
+
   # -------- Kind of 'meta' configs --------
   meta.maintainers = [lib.maintainers.bew];
   # This determines the home-manager release the config is compatible with.

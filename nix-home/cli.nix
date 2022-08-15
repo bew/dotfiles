@@ -1,15 +1,18 @@
 { config, pkgsChannels, lib, mybuilders, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge;
+  inherit (pkgsChannels) backbone stable bleedingedge;
 in {
   home.packages = [
+    # packages on backbone channel, upgrades less often
+    backbone.tmux
+
     stable.neovim
     stable.rust-analyzer
 
     bleedingedge.zsh
     stable.exa # alternative ls, more colors!
-    bleedingedge.bat # 'bleedingedge to have latest 'less' version I need
+    stable.bat
     stable.fd
     bleedingedge.fzf
     stable.git
@@ -21,11 +24,10 @@ in {
     bleedingedge.ripgrep
     stable.tree
     stable.just
-    (stable.ranger.override { imagePreviewSupport = false; less = bleedingedge.less; })
+    (stable.ranger.override { imagePreviewSupport = false; })
 
     stable.htop
-    bleedingedge.less # very-recent 'less' version I need for my key bindings
-    stable.tmux
+    stable.less
     stable.ncdu
 
     stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
