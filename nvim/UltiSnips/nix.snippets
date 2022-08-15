@@ -8,6 +8,10 @@ snippet ''i "Inline '' string"
 ''${1:${VISUAL}}''$99
 endsnippet
 
-snippet sha "sha256 dummy entry"
-sha256 = "0000000000000000000000000000000000000000000000000000";
+snippet hash "sha256 dummy entry (SRI format)"
+hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+endsnippet
+
+snippet af "attrset field"
+${1:attrName} = ${0:value};
 endsnippet
