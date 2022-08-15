@@ -47,7 +47,7 @@ make-link .dot/git  ~/.config/git
 make-link .dot/gh   ~/.config/gh
 
 label "Nix stuff"
-make-link .dot/nix  ~/.config/nix
+make-link .dot/nix/nix-self-config  ~/.config/nix
 
 label "other cli tools"
 make-link .dot/htop            ~/.config/htop

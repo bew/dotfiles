@@ -41,7 +41,7 @@
       system = "x86_64-linux";
     in import "${inputs.homeManager}/modules" {
       pkgs = inputs.nixpkgsStable.legacyPackages.${system};
-      configuration = import ./nix-home { inherit inputs system username; };
+      configuration = import ./nix/homes/main.nix { inherit inputs system username; };
     };
 
     # TODO(idea): expose packages (& apps?) of my tools pre-configured,
