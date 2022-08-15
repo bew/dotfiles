@@ -21,8 +21,7 @@
     # This is the backbone package set, DO NOT REMOVE/CHANGE unless you know what you're doing
     nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-21.11";
 
-    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-21.11";
-    nixpkgsLastStable.url = "github:nixos/nixpkgs/nixos-22.05"; # latest release, only used for neovim for now
+    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     flakeTemplates.url = "github:nixos/templates";
