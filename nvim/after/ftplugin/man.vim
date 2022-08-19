@@ -13,8 +13,6 @@ setlocal incsearch
 " Follow man page link
 nnoremap <buffer><silent> o <cmd>Man<cr>
 nnoremap <buffer><silent> <2-LeftMouse> <cmd>Man<cr>
-" Open man page link in split (easy to move afterward)
-nnoremap <buffer><silent> <M-o> <cmd>split <bar> Man<cr>
 
 " Scroll one line
 noremap <buffer> j <C-e>
@@ -28,10 +26,6 @@ noremap <buffer> <M-k> k
 noremap <buffer> J <C-d>
 noremap <buffer> K <C-u>
 
-" Scroll screen
-noremap <buffer> <Space> <C-d><C-d>
-noremap <buffer> <S-Space> <C-u><C-u>
-
 " Quit
 " Always quit a man buffer with q (and its loc list if opened).
 " This is necessary to work in all cases
@@ -40,4 +34,21 @@ noremap <buffer> <S-Space> <C-u><C-u>
 nnoremap <buffer><silent> q <cmd>lclose <bar> q<cr>
 nnoremap <buffer><silent> <M-q> q
 
-let b:bew_statusline_comment = "o/2-clicks: open | M-o: split-open"
+nnoremap <buffer>  <M-o>  :Man <Right>
+
+" Move cursor on next/previous help link
+function! s:SearchManLink(backward)
+  let flags = "wz" " w: wrap at eof | z: from cursor column not 0
+  if a:backward
+    let flags .= "b" " b: search backward
+  endif
+  " The help links format is: |some_stuff|
+  " So we search for a | then some chars that are not spaces then |
+  let pos = searchpos('\C[a-z][a-z0-9-]\+(\d)', flags)
+  call cursor(pos)
+endf
+nnoremap <buffer><silent> <C-n>  :call <SID>SearchManLink(v:false)<cr>
+nnoremap <buffer><silent> <C-p>  :call <SID>SearchManLink(v:true)<cr>
+
+
+let b:bew_statusline_comment = "2-clicks/o: open at cursor | M-o: open new | C-n/p: find link"
