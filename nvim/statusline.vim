@@ -149,7 +149,7 @@ endf
 function! s:path_to_2_parts(valid_path)
   " Transform to 2-parts file path: ~/foo or foo/bar
   let raw_fname = fnamemodify(a:valid_path, ':t')
-  if filereadable(expand("~/" . raw_fname))
+  if fnamemodify(a:valid_path, ":h") == expand("~")
     return "~/" . raw_fname " ~/filename
   else
     let parent_dir = expand("%:h:t")
