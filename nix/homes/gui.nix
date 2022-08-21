@@ -2,6 +2,16 @@
 
 let
   inherit (pkgsChannels) stable bleedingedge;
+
+  copyq-latest = stable.copyq.overrideAttrs (oldAttrs: rec {
+    version = "6.2.0";
+    src = stable.fetchFromGitHub {
+      owner = "hluk";
+      repo = "CopyQ";
+      rev = "v${version}";
+      hash = "sha256-0XCqSF1oc2B3FD5OmOxqgt9sqCIrzK0KjkntVFXlRWI=";
+    };
+  });
 in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix
@@ -12,7 +22,7 @@ in {
     stable.polybar
     stable.dunst
     # FIXME: herbstluftwm is missing here (can't get it to compile last version)
-    stable.copyq # powerful clipboard manager
+    copyq-latest # powerful clipboard manager
 
     stable.arandr
     stable.autorandr
