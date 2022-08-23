@@ -100,7 +100,7 @@ function my_cmp_setup()
     snippet = {
       expand = function(args)
         -- TODO: enable when luasnip configured!
-        -- require'loasnip'.lsp_expand(args.body)
+        -- require'luasnip'.lsp_expand(args.body)
       end
     },
     -- TODO? try the configurable popup menu (value: "custom")

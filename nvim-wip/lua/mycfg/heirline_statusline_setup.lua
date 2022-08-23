@@ -50,7 +50,6 @@ local Mode = {
     self.matching_mode_spec = self.mode_specs[vim.fn.mode()] or {}
   end,
   provider = function(self)
-    -- TODO: when in command mode, display the cmd type (using `getcmdtype()`)
     local mode_text = some_text_or(self.matching_mode_spec.text, "?!")
     return " " .. mode_text .. " "
   end,
