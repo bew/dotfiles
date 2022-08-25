@@ -103,8 +103,11 @@ local CmdwinTypeDescription = {
 local function transform_path_to_2_parts(buf_name)
   -- Transform to 2-parts file path: ~/foo or foo/bar
   local basename = vim.fn.fnamemodify(buf_name, ":t")
-  if vim.startswith(buf_name, vim.env.HOME) then
+  local parent_path = vim.fn.fnamemodify(buf_name, ":h")
+  if parent_path == vim.env.HOME then
     return "~/" .. basename
+  elseif parent_path == vim.fn.getcwd() then
+    return "./" .. basename
   else
     local parent_name = vim.fn.fnamemodify(buf_name, ":h:t")
     return parent_name .. "/" .. basename
