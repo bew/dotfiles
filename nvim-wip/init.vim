@@ -308,6 +308,26 @@ end
 LUA
 autocmd User PluginsLoaded lua my_comment_setup()
 
+" %% Text objects (mostly vimscript based..)
+
+Plug 'kana/vim-textobj-user'
+
+" Indent-based text object <3
+Plug 'kana/vim-textobj-indent'   " textobj: ii ai iI aI
+
+" Comment text object <3
+Plug 'glts/vim-textobj-comment'  " textobj: ic ac
+
+" Whitespace text object <3
+Plug 'vim-utils/vim-space'       " textobj: i<Space> a<Space>
+" a<Space> is all whitespace
+" i<Space> is same as a<Space> except it leaves a single space or newline
+
+" Entire-buffer-content text object
+Plug 'kana/vim-textobj-entire'   " textobj: ie ae
+" ae is the entire buffer content
+" ie is like ae without leading/trailing blank lines
+
 " ---------- Global UI
 
 Plug 'rebelot/heirline.nvim'    " Heirline.nvim is a no-nonsense Neovim Statusline plugin
