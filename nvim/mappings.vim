@@ -605,7 +605,7 @@ cnoremap <M-K> <S-Up>
 cnoremap <M-J> <S-Down>
 
 " Expand %% to dir of current file
-cnoremap <expr> %%  expand("%:h") . "/"
+cnoremap <expr> %%  expand("%:.:h") . "/"
 
 
 " ---- Various Leader key mappings ----
