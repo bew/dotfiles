@@ -170,7 +170,17 @@ local SpecialFileDescription = {
     provider = function()
       return "  Do something cool !  "
     end,
-  }
+  },
+  { -- when in a man page
+    condition = function()
+      local buf_name = vim.api.nvim_buf_get_name(0)
+      return vim.startswith(buf_name, "man://")
+    end,
+    provider = function()
+      local buf_name = vim.api.nvim_buf_get_name(0)
+      return buf_name:gsub("man://", "Man: ")
+    end,
+  },
 }
 
 -- few simple blocks (simple.. for now)
