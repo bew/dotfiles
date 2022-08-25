@@ -114,6 +114,15 @@ local function transform_path_to_2_parts(buf_name)
   end
 end
 
+local FileOutOfCwd = {
+  provider = function(self)
+    local buf_name = vim.api.nvim_buf_get_name(0)
+    if not vim.startswith(buf_name, vim.fn.getcwd()) then
+      return "[EXT] "
+    end
+  end,
+}
+
 local FilenameTwoParts = {
   -- IDEA: It is possible with heirline to dynamically generate blocks (see the 'Navic' example),
   --       do a similar thing to have the path separators highlighted ?
@@ -127,6 +136,7 @@ local FilenameTwoParts = {
     end
   end,
 }
+
 local SpecialFileDescription = {
   -- NOTE: We need a condition function to be properly skipped when pick_child_on_condition is
   --       used on the block that calls us.
@@ -189,7 +199,7 @@ local statusline = {
       {
         init = hline_utils.pick_child_on_condition,
         SpecialFileDescription,
-        FilenameTwoParts, -- fallback to this if not a special file
+        { FileOutOfCwd, FilenameTwoParts }, -- fallback to this if not a special file
       },
       _,
       hl = function()
