@@ -70,6 +70,15 @@ function leader_map(spec)
     end
   end
 end
+
+--- Helper to create remap-enabled leader map, see `leader_map` for details
+function leader_remap(spec)
+  if not spec.opts then
+    spec.opts = {}
+  end
+  spec.opts.remap = true
+  leader_map(spec)
+end
 LUA
 
 let $NVIM_MANAGED_PLUGINS_DIR = $NVIM_DATA_HOME . "/managed-plugins"
