@@ -292,9 +292,9 @@ function my_comment_setup()
   --leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
 
   local comment_api = require"Comment.api"
-  leader_map{mode={"n"}, key="cco", action=comment_api.locked("insert.linewise.below"), desc="insert (linewise) below"}
-  leader_map{mode={"n"}, key="ccO", action=comment_api.locked("insert.linewise.above"), desc="insert (linewise) above"}
-  leader_map{mode={"n"}, key="cca", action=comment_api.locked("insert.linewise.eol"),   desc="insert (linewise) at end of line"}
+  leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
+  leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
+  leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
 
   -- force comment/uncomment line
   -- (normal)
