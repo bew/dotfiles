@@ -229,7 +229,86 @@ end
 LUA
 autocmd User PluginsLoaded lua my_gitsigns_setup()
 
-" ---------- Editor-wide UI
+Plug 'numToStr/Comment.nvim'
+lua << LUA
+function my_comment_setup()
+  require('Comment').setup {
+    mappings = false,
+  }
+
+  -- NOTE: smart uncomment on inline comments (like `foo /* bar */ baz`) doesn't work automatically by default
+  -- => There is a way, when triggering a 'linewise' un/comment/toggle on a region
+  --    (via motion / visual selection) that is inside current line, it does an inline block comment
+  --    around that region when possible.
+  -- Tracking issue: https://github.com/numToStr/Comment.nvim/issues/39
+
+  leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
+
+  leader_map{
+    mode={"n"},
+    key="cc<Space>",
+    action=function()
+      if vim.v.count == 0 then
+        return "<Plug>(comment_toggle_linewise_current)"
+      else
+        return "<Plug>(comment_toggle_linewise_count)"
+      end
+    end,
+    desc="toggle current (linewise)",
+    opts={expr=true},
+  }
+  leader_map{
+    mode={"n"},
+    key="ccb<Space>",
+    action=function()
+      if vim.v.count == 0 then
+        return "<Plug>(comment_toggle_blockwise_current)"
+      else
+        return "<Plug>(comment_toggle_blockwise_count)"
+      end
+    end,
+    desc="toggle current (blockwise)",
+    opts={expr=true},
+  }
+  leader_map{mode={"v"}, key="cc<Space>", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle selection"}
+
+  -- These mappings work as a prefix for an operator-pending-like mode
+  -- (e.g: '<leader> cct 3j' to toggle comment on 4 lines (linewise))
+  -- (e.g: '<leader> cct ip' to toggle comment in-paragraph (linewise))
+  -- (e.g: '<leader> cct e' to toggle comment next word (blockwise (it's a little smart!))
+  leader_map_define_group{mode={"n", "v"}, prefix_key="ccm", name="+for-motion"}
+  leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
+  leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
+  --leader_map{mode={"n"}, key="ccmb", action="<Plug>(comment_toggle_blockwise)",        desc="toggle for motion (blockwise)"}
+  --leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
+
+  local comment_api = require"Comment.api"
+  leader_map{mode={"n"}, key="cco", action=comment_api.locked("insert.linewise.below"), desc="insert (linewise) below"}
+  leader_map{mode={"n"}, key="ccO", action=comment_api.locked("insert.linewise.above"), desc="insert (linewise) above"}
+  leader_map{mode={"n"}, key="cca", action=comment_api.locked("insert.linewise.eol"),   desc="insert (linewise) at end of line"}
+
+  -- force comment/uncomment line
+  -- (normal)
+  leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
+  leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
+  -- (visual)
+  leader_map{
+    mode={"v"},
+    key="ccc",
+    action="<ESC><CMD>lua require('Comment.api').locked('comment.linewise')(vim.fn.visualmode())<CR>",
+    desc="force (linewise)",
+  }
+  leader_map{
+    mode={"v"},
+    key="ccu",
+    action="<ESC><CMD>lua require('Comment.api').locked('uncomment.linewise')(vim.fn.visualmode())<CR>",
+    desc="remove (linewise)"
+  }
+end
+LUA
+autocmd User PluginsLoaded lua my_comment_setup()
+
+" ---------- Global UI
 
 Plug 'rebelot/heirline.nvim'    " Heirline.nvim is a no-nonsense Neovim Statusline plugin
 " Very flexible, modular, declarative ❤️, dynamic & nicely customizable !!!
