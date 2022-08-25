@@ -616,22 +616,6 @@ lua wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
 lua wk_leader_n_maps.c = {name = "+code"}
 lua wk_leader_v_maps.c = {name = "+code"}
 
-" code comment
-lua wk_leader_n_maps.c.c = {name = "+comment"}
-nmap <Leader>cc<space> <plug>NERDCommenterToggle
-vmap <Leader>cc<space> <plug>NERDCommenterToggle
-nmap <Leader>ccc       <plug>NERDCommenterComment
-vmap <Leader>ccc       <plug>NERDCommenterComment
-nmap <Leader>ccu       <plug>NERDCommenterUncomment
-vmap <Leader>ccu       <plug>NERDCommenterUncomment
-nmap <Leader>cci       <plug>NERDCommenterInvert
-vmap <Leader>cci       <plug>NERDCommenterInvert
-lua wk_leader_n_maps.c.c["<space>"] = "toggle"
-lua wk_leader_n_maps.c.c.c = "force"
-lua wk_leader_n_maps.c.c.u = "remove"
-lua wk_leader_n_maps.c.c.i = "invert"
-lua wk_leader_v_maps.c.c = wk_leader_n_maps.c.c
-
 " code language tools
 " FIXME: These should be buffer-local maps
 nmap <leader>c²   <Plug>(lcn-menu)
