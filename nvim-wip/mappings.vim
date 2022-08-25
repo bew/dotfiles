@@ -590,7 +590,7 @@ cnoremap <M-K> <S-Up>
 cnoremap <M-J> <S-Down>
 
 " Expand %% to dir of current file
-cnoremap <expr> %%  expand("%:h") . "/"
+cnoremap <expr> %%  expand("%:.:h") . "/"
 
 
 " ---- Various Leader key mappings ----
@@ -704,17 +704,16 @@ function! s:OnLastQfLocListDoTryNextOrFirst()
 endf
 
 " -- Edit
-lua wk_leader_n_maps.e = {name = "+edit"}
 " Use this to make a few nice mappings
 " Taken from: http://vimcasts.org/episodes/the-edit-command/
-nmap <leader>ee  :e %%
-nmap <leader>es  :spl %%
-nmap <leader>ev  :vsp %%
-nmap <leader>et  :tabe %%
-lua wk_leader_n_maps.e.e = "relative here"
-lua wk_leader_n_maps.e.s = "relative in split"
-lua wk_leader_n_maps.e.v = "relative in vertical split"
-lua wk_leader_n_maps.e.t = "relative in tab"
+lua <<LUA
+leader_map_define_group{mode={"n"}, prefix_key="e", name="+relative-edit"}
+-- note: remap needed for '%%' to trigger!
+leader_remap{mode={"n"}, key="ee", action=":e %%",      desc="here"}
+leader_remap{mode={"n"}, key="es", action=":split %%",  desc="in split"}
+leader_remap{mode={"n"}, key="ev", action=":vsplit %%", desc="in v' split"}
+leader_remap{mode={"n"}, key="et", action=":tabe %%",   desc="in tab"}
+LUA
 
 " -----------------
 " IDEAS: (from vscode)
