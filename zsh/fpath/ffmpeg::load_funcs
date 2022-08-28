@@ -158,6 +158,7 @@ function ffmpeg::take-sample
 {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::take-sample <file> [<duration=60>]"
+    echo "       ffmpeg::take-sample <file> <end>"
     echo "       ffmpeg::take-sample <file> <start> <end>"
     echo "  <duration> & <start> & <end> are in seconds or [HH:]MM:SS"
     echo "  Not giving <start> is like taking a sample of the <file>."
@@ -194,6 +195,49 @@ function ffmpeg::take-sample
   if [[ $? == 0 ]]; then
     echo
     echo "--- File sample cut -> '$output_path'"
+    echo
+  fi
+  return $ret
+}
+
+function ffmpeg::keep-only-subs
+{
+  if [[ $# == 0 || $# == 1 ]]; then
+    echo "Usage: ffmpeg::keep-only-subs <file> <lang1> [<lang2>...]"
+    echo "  Keep only the subtitles with the given language codes."
+    return 1
+  fi
+
+  local input_path="$1"; shift
+  local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
+  local input_filename_no_ext="${input_filename%.*}" # remove extension
+  local langs=() langs_str
+  for lang in "$@"; do
+    langs+="$lang"
+    langs_str+="$lang,"
+  done
+  langs_str="${langs_str[1,-2]}" # remove last ','
+  local output_path="${input_filename_no_ext}.only-subs(${langs_str}).mkv"
+
+  local cmd=(ffmpeg -hide_banner)
+  cmd+=(-i "$input_path") # input
+  cmd+=(-c copy)
+  cmd+=(-map 0:V -map 0:a) # video, then all audios
+  # add subtitles of the wanted languages
+  for lang in "${langs[@]}"; do
+    # '0:s' for subtitles streams
+    # and with additional specifier 'm:language:<lang>'
+    # to only match subtitles with metadata of <lang>
+    cmd+=(-map 0:s:m:language:$lang)
+  done
+  # output
+  cmd+=("$output_path")
+
+  _ffmpeg::display_and_run "${cmd[@]}"
+  local ret=$?
+  if [[ $? == 0 ]]; then
+    echo
+    echo "--- File with only subs (${langs_str}) -> '$output_path'"
     echo
   fi
   return $ret
