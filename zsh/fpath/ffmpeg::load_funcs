@@ -1,12 +1,35 @@
 #!/usr/bin/env zsh
 
+FFMPEG_DRY_RUN=${FFMPEG_DRY_RUN:-}
+
+function _ffmpeg::quote_arg_if_needed
+{
+  local tmp_quotes=$(printf "%q" "$1")
+  if [[ "$tmp_quotes" =~ '\\' ]] || [[ "$tmp_quotes" =~ "'" ]]; then
+    # Ref: https://unix.stackexchange.com/a/445477/159811
+    printf "%s" "$1" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/'/"
+  else
+    printf "%s" "$1"
+  fi
+}
+
 function _ffmpeg::display_and_run
 {
   echo "--> Going to run:"
-  echo "$*"
-  echo "--> Now running..."
+  # Print command and args, with quotes if needed
+  for arg in "$@"; do
+    _ffmpeg::quote_arg_if_needed "$arg"
+    printf " "
+  done
   echo
-  "$@"
+
+  if [[ -n "${FFMPEG_DRY_RUN:-}" ]]; then
+    echo "--> \$FFMPEG_DRY_RUN is set, nothing to run"
+  else
+    echo "--> Now running..."
+    echo
+    "$@"
+  fi
 }
 
 function ffmpeg::extract-audio
