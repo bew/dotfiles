@@ -161,7 +161,9 @@ source ~/.zsh/rc/mappings.zsh
 
 #-------------------------------------------------------------
 # Terminal title
-source ~/.zsh/rc/terminal_title.zsh
+# source ~/.zsh/rc/terminal_title.zsh
+# Disabled for now, It kinda breaks when SHLVL > 1, and I'm not even sure it works :eyes:
+# (and I don't really miss it)
 
 #-------------------------------------------------------------
 # SSH Agent handling
