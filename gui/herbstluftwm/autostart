@@ -106,10 +106,10 @@ hc keybind $M-$S-l   shift right
 
 # splitting frames
 # create an empty frame in the specified direction and focus it
-hc keybind $M-$C-Left    chain , split left    0.5 , focus -e left
-hc keybind $M-$C-Right   chain , split right   0.5 , focus -e right
-hc keybind $M-$C-Down    chain , split bottom  0.5 , focus -e down
-hc keybind $M-$C-Up      chain , split top     0.5 , focus -e up
+hc keybind $M-$A-Left    chain , split left    0.5 , focus -e left
+hc keybind $M-$A-Right   chain , split right   0.5 , focus -e right
+hc keybind $M-$A-Down    chain , split bottom  0.5 , focus -e down
+hc keybind $M-$A-Up      chain , split top     0.5 , focus -e up
 
 # Splits the frame in such a way that the window sizes and positions are kept
 # as much as possible.
@@ -149,23 +149,20 @@ function bind_frame_focus
                       : unlock \
         , focus -e "$dir"
 }
-bind_frame_focus $M-$C-h   left
-bind_frame_focus $M-$C-j   down
-bind_frame_focus $M-$C-k   up
-bind_frame_focus $M-$C-l   right
+bind_frame_focus $M-$C-Left    left
+bind_frame_focus $M-$C-Down    down
+bind_frame_focus $M-$C-Up      up
+bind_frame_focus $M-$C-Right   right
 
 # Close current window if any or remove frame if empty
 hc keybind $M-$S-c close_or_remove
 
 # tags
 
-# FIXME: how to implement dynamic tags (with traversing)
-#   What about tag groups? (would need a special keymap to navigate groups..
-#   not enough keys otherwise)
+# FIXME: How to implement tag groups?
+# (would need a special keymap to navigate groups.. not enough keys otherwise)
 
 # cycle through tags (skip already visible tags on another monitor)
-# NOTE: would need to change if I want to insert tags anywhere, since hlwm
-#       does not support insertion (yet) I can't use the 'linear' use_index +1 -1.
 hc keybind $M-a   use_index -1 --skip-visible
 hc keybind $M-z   use_index +1 --skip-visible
 # Also bind Mod-{Left,Right}, because the touchpad gestures are bound to that.
