@@ -206,6 +206,20 @@ hc keybind $M-$S-z \
         : use_index +1 --skip-visible \
         : unlock
 
+function bind_monitor_tag_swap
+{
+  local keybind="$1"
+  local dir_flag="$2"
+  hc keybind "$keybind" \
+    substitute LAST_MONITOR_TAG tags.focus.name \
+      chain + focus_monitor "$dir_flag" \
+            + use LAST_MONITOR_TAG
+}
+bind_monitor_tag_swap $M-$C-h '-l'
+bind_monitor_tag_swap $M-$C-j '-d'
+bind_monitor_tag_swap $M-$C-k '-u'
+bind_monitor_tag_swap $M-$C-l '-r'
+
 hc keybind $M-$A-r   spawn ~/.config/herbstluftwm/scripts/hlwm_rename_current_tag.py
 hc keybind $M-$A-a   spawn ~/.config/herbstluftwm/scripts/hlwm_add_tag.py
 hc keybind $M-$A-x   spawn ~/.config/herbstluftwm/scripts/hlwm_execute_hc.py
