@@ -47,7 +47,8 @@ local Mode = {
   -- NOTE: This function is called whenever a component is evaluated
   -- (right after condition but before hl and provider).
   init = function(self)
-    self.matching_mode_spec = self.mode_specs[vim.fn.mode()] or {}
+    local mode = hline_conditions.is_active() and vim.fn.mode() or "n"
+    self.matching_mode_spec = self.mode_specs[mode] or {}
   end,
   provider = function(self)
     local mode_text = some_text_or(self.matching_mode_spec.text, "?!")
