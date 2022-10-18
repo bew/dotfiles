@@ -22,7 +22,10 @@ in {
     stable.polybar
     stable.dunst
     # FIXME: herbstluftwm is missing here (can't get it to compile last version)
+
+    # X tools
     copyq-latest # powerful clipboard manager
+    stable.xclip
 
     stable.arandr
     stable.autorandr
