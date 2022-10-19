@@ -1,6 +1,11 @@
 # A set of fzf-based zsh widgets, for key bindings
 # TODO: add a LICENSE for these!
 
+# NOTE: These lines may be rewritten by config manager.
+_BIN_fzf=fzf
+_BIN_fd=fd
+_BIN_bat=bat
+
 if [[ $- != *i* ]]; then
   # -> This is not an interactive shell, bail out!
   return
@@ -35,7 +40,7 @@ function zwidget::utils::results_to_args
 }
 
 # Those layout & keybindings vars come from ~/.zshenv
-FZF_BASE_CMD=(fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
+FZF_BASE_CMD=($_BIN_fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
 
 function zwidget::utils::__fzf_generic_impl_for_paths
 {
@@ -126,11 +131,11 @@ function zwidget::utils::__fzf_generic_impl_for_paths
   zle reset-prompt
 }
 
-FZF_PREVIEW_CMD_FOR_FILE="bat --color=always --style=numbers,header -- {}"
+FZF_PREVIEW_CMD_FOR_FILE="$_BIN_bat --color=always --style=numbers,header -- {}"
 
 function zwidget::fzf::smart_find_file
 {
-  FZF_FINDER_CMD=(fd --type f --type l --follow) # follow symlinks
+  FZF_FINDER_CMD=($_BIN_fd --type f --type l --follow) # follow symlinks
   FZF_PROMPT="Smart files: "
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
 
@@ -162,7 +167,7 @@ FZF_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-
 function zwidget::fzf::find_directory
 {
   FZF_PROMPT="Smart dirs: "
-  FZF_FINDER_CMD=(fd --type d --type l --follow) # follow symlinks
+  FZF_FINDER_CMD=($_BIN_fd --type d --type l --follow) # follow symlinks
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_DIR"
   FZF_PREVIEW_WINDOW="down:10"
 
@@ -228,9 +233,19 @@ function zwidget::fzf::z
 }
 zle -N zwidget::fzf::z
 
+# Checks if we are in a git repository, displays a ZLE message otherwize.
+# Copied from zle::utils::check_git here to have a mostly self-contained file
+function zwidget::utils::check_git
+{
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    zle -M "Error: Not a git repository"
+    return 1
+  fi
+}
+
 function zwidget::fzf::git_changed_files
 {
-  zle::utils::check_git || return
+  zwidget::utils::check_git || return
 
   if [[ -n "$FZF_GIT_CHANGED_FROM_CWD" ]]; then
     # files from cwd

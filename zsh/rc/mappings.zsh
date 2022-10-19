@@ -2,6 +2,13 @@
 # ZLE Widgets
 #----------------------------------------------------------------------------------
 
+# TODO: find a way (kinda profiles?) to split utils/mappings between:
+# * shell-specific (like zle::utils::no-history-run, zwidget::force-scroll-window or zwidget::fg)
+# * common-cli-specific (like zwidget::git-diff, zwidget::fzf::z or zwidget::toggle-sudo-nosudo)
+#
+# => Where to put clipboard stuff? in a seperate plugin? (mostly specific to my setup then)
+
+
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 function zle::utils::check_git
 {
@@ -718,7 +725,7 @@ autoload -U edit-command-line
 zle -N edit-command-line
 vibindkey '^e' edit-command-line
 
-source ~/.zsh/rc/fzf-mappings.zsh
+source $ZSH_MY_CONF_DIR/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
 vibindkey 'F' zwidget::fzf::find_file
 vibindkey 'c' zwidget::fzf::find_directory

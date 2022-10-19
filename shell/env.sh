@@ -37,7 +37,7 @@ path_maybe_add_entry "$HOME/.dot/gui/bin"
 path_maybe_add_entry "$HOME/.local/bin"
 
 # Automatically make available project-local helper binaries.
-# MUST BE LAST (to take precedence)
+# MUST BE ADDED LAST (to take precedence)
 #
 # The idea is to use an esoteric dirname for $PATH, and make a symlink with
 # that name to the bin/ of a given project, when I need this
@@ -56,6 +56,8 @@ fi
 # OSX bins
 path_maybe_add_entry "/usr/local/bin" fallback
 
+# -----------------------
+# FIXME: These env vars are specific to my cli env!!! They should be moved to another file (which will eventually be sourced by bash/zsh)
 
 # -R : Output raw ANSI "color" & "hyperlink" escape sequences directly
 # --ignore-case : smart case search
@@ -74,7 +76,7 @@ export VISUAL="$EDITOR"
 export GIT_EDITOR="$EDITOR"
 
 # Setup Nix env (ONCE!) when /nix is available <3 <3
-if [[ -d /nix ]] && [[ -z "${NIX_PROFILE_SOURCED:-}" ]]; then
+if [[ -d /nix ]] && [[ -f ~/.nix-profile/etc/profile.d/nix.sh ]] && [[ -z "${NIX_PROFILE_SOURCED:-}" ]]; then
   source ~/.nix-profile/etc/profile.d/nix.sh
   export NIX_PROFILE_SOURCED=yes
 fi

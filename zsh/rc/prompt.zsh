@@ -1,6 +1,12 @@
 #-------------------------------------------------------------
 # Prompt setup
 
+# TODO: find a way (kinda profiles?) to split prompt segments between:
+# * shell-specific (segmt::shlvl or segmt::short_vim_mode)
+# * common-cli-specific (like segmt::git_branch_fast or segmt::in-nix-shell)
+# * code-tech-specific (like segmt::python_venv)
+
+
 # Import color helpers
 autoload -U colors && colors
 

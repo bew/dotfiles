@@ -1,9 +1,23 @@
 ORIGINAL_PATH=$PATH
 
+# ------------------ shell config
+
 source ~/.dot/shell/env.sh
+
+ZSH_MY_CONF_DIR=~/.zsh
+
+# ID of the config, used to seperate cache/data dirs for different zsh configs
+ZSH_CONFIG_ID=main
+
+ZSH_CACHE_DIR=${ZSH_CACHE_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}/zsh-${ZSH_CONFIG_ID}}
+ZSH_DATA_DIR_SHARED=${ZSH_DATA_DIR:-${XDG_DATA_DIR:-$HOME/.local/share}/zsh-shared}
+ZSH_DATA_DIR=${ZSH_DATA_DIR:-${XDG_DATA_DIR:-$HOME/.local/share}/zsh-${ZSH_CONFIG_ID}}
+mkdir -p $ZSH_CACHE_DIR
+mkdir -p $ZSH_DATA_DIR $ZSH_DATA_DIR_SHARED
 
 # ------------------ default directory aliases
 
+# FIXME: these named folders are specific to my config! Move somewhere else!
 hash -d dot=~/.dot
 hash -d cfg=~/.config
 hash -d nixpkgs=~/.nix-home-current/nixpkgsStable
@@ -11,6 +25,7 @@ hash -d nixpkgs=~/.nix-home-current/nixpkgsStable
 # NOTE: more can be defined in zshrc.local for machine-specific dirs.
 
 # ------------------ fzf config
+# TODO: move this to 'fzf-bew' package!
 
 FZF_BEW_KEYBINDINGS_ARRAY=()
 

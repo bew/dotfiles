@@ -1,9 +1,0 @@
-[submodule "bin/repos/crun"]
-  path = bin/repos/crun
-  url = git@github.com:Val/crun.git
-[submodule "zsh/third-party/zsh-hooks"]
-  path = zsh/third-party/zsh-hooks
-  url = git@github.com:willghatch/zsh-hooks.git
-[submodule "zsh/third-party/zi"]
-	path = zsh/third-party/zi
-	url = https://github.com/z-shell/zi.git
