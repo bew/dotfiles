@@ -11,12 +11,12 @@
 #
 # NOTE: The docs for the completion system is in man zshcompsys.
 
-fpath=(~/.zsh/completions/ $fpath)
+fpath=($ZSH_MY_CONF_DIR/completions/ $fpath)
 # Add system completions if available
 # (allows to have 'pacman' completions in nix's zsh for example)
 [[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*)
 [[ -d /usr/share/zsh/site-functions ]] && fpath+=(/usr/share/zsh/site-functions)
-# Add completions from Nix is available
+# Add completions from Nix if available
 [[ -d ~/.nix-profile/share/zsh/site-functions ]] && fpath+=(~/.nix-profile/share/zsh/site-functions)
 
 setopt NO_auto_remove_slash # Don't remove slash for accepted directory compl

@@ -1,5 +1,26 @@
 #-------------------------------------------------------------
+#
+# TODO: cleanup old, unused funcs/aliases!
 # 
+# TODO: find a way (kinda profiles?) to split funcs/aliases between:
+# * helpers-for-shell funcs/aliases (for core cli experience)
+#   Specific to the shell
+#   (like j, zsh::safe_reload or NOOUT)
+#
+# * helpers-for-cli-tools funcs/aliases (for common cli tools, dev-lang-agnostic, distro-agnostic)
+#   Specific to my cli env
+#   (like mkcd, ncdu, gclonecd, dl_file or ssh-password-only)
+#
+# * helpers-for-code-tools funcs/aliases (for tech/dev tools, distro-agnostic)
+#   Specific to my projects
+#   (like venv* or dk)
+#
+# * helpers-for-distro-tools funcs/aliases
+#   Specific to my distro
+#   (like pac::list_useless_deps or nix-prefetch-url-tarball)
+#
+# * helpers-for-gui-tools funcs/aliases
+#   (like mpv-audio)
 
 function _cmd_available
 {
