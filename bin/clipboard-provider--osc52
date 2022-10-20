@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Clipboard provider using OSC 52 (needs terminal support).
 

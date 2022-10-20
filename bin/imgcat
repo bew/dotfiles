@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Inspired from https://iterm2.com/utilities/imgcat
 # Protocol documentation, from: https://iterm2.com/documentation-images.html
 #
