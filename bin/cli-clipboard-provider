@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # clipboard provider for neovim, zsh and other cli apps
 # (:help provider-clipboard)

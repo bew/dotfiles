@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Some links can DL very fast (~3Mo/s) for a few seconds,
 # then go very slow for the rest of the time (~300ko/s)
