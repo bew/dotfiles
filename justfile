@@ -16,7 +16,7 @@ build-and-diff *ARGS: (_build-only ARGS)
 
   # NOTE: `nix-env -q --out-path home-manager-path`'s output
   #       looks like `home-manager-path /nix/store/...`
-  CURRENT_HOME_MANAGER_PATH=$(nix-env -q --out-path home-manager-path | awk '{ print $2 }')
+  CURRENT_HOME_MANAGER_PATH=$(nix profile list | grep home-manager-path | awk '{ print $4 }')
   BUILT_HOME_MANAGER_PATH="./result/home-path"
   DIFF_FILE="./.nix-lastBuild-homeDiff.txt"
 

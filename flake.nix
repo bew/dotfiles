@@ -30,7 +30,7 @@
 
     flakeTemplates.url = "github:nixos/templates";
 
-    homeManager.url = "github:nix-community/home-manager/release-21.11";
+    homeManager.url = "github:nix-community/home-manager/release-22.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 

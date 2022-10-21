@@ -10,6 +10,8 @@
   imports = [
     ./modules/link-flake-inputs.nix
     ./modules/nix-registry.nix
+    # Make (force) this home config install using `nix profile`, not `nix-env`
+    ./modules/force-homemanager-to-use-nix-profiles.nix
   ] ++ [
     # NOTE: I'll need to split more! (editor, shell, desktop, ....)
     ./cli.nix
