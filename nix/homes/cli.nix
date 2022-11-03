@@ -2,13 +2,56 @@
 
 let
   inherit (pkgsChannels) backbone stable bleedingedge;
+
+  neovim-minimal = let pkgs = stable; in pkgs.neovim.override {
+    configure = {
+      # TODO: make this a proper nvim plugin dir 'myMinimalNvimConfig'
+      customRC = /* vim */ ''
+        set shiftwidth=2 expandtab
+        set mouse=nv
+        set iskeyword+=-
+        set ignorecase smartcase
+        set smartindent
+        set number relativenumber
+        set cursorline
+
+        nnoremap Y yy
+        nnoremap <M-s> :w<cr>
+        inoremap <M-s> <esc>:w<cr>
+        nnoremap § :nohl<cr>
+        nnoremap <M-a> gT
+        nnoremap <M-z> gt
+        nnoremap Q :q<cr>
+
+        nnoremap U <C-r>
+
+        nnoremap <C-h> <C-w>h
+        nnoremap <C-j> <C-w>j
+        nnoremap <C-k> <C-w>k
+        nnoremap <C-l> <C-w>l
+
+        cnoremap <M-k> <Up>
+        cnoremap <M-j> <Down>
+
+        source ${./../../nvim/colors/bew256-dark.vim}
+      '';
+      packages.myVimPackage = with pkgs.vimPlugins; {
+        start = [
+          vim-nix
+        ];
+      };
+    };
+  };
+
 in {
   home.packages = [
     # packages on backbone channel, upgrades less often
     backbone.tmux
 
-    stable.neovim
-    stable.rust-analyzer
+    #stable.neovim
+    #stable.rust-analyzer
+    neovim-minimal
+
 
     bleedingedge.zsh
     stable.exa # alternative ls, more colors!
@@ -67,5 +110,6 @@ in {
     stable.nix-diff # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
     stable.nixfmt # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
     # stable.nix-update # Swiss-knife for updating nix packages
+    # TODO: add nix-index!
   ];
 }
