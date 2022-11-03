@@ -34,11 +34,12 @@
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
-  outputs = { self, ... }@inputs: {
+  outputs = { self, ... }@inputs: let
+    # I only care about ONE system for now...
+    system = "x86_64-linux";
+  in {
     homeConfig = let
       username = "lesell_b";
-      # I only care about ONE system for now...
-      system = "x86_64-linux";
     in import "${inputs.homeManager}/modules" {
       pkgs = inputs.nixpkgsStable.legacyPackages.${system};
       configuration = import ./nix/homes/main.nix { inherit inputs system username; };
@@ -47,5 +48,38 @@
     # TODO(idea): expose packages (& apps?) of my tools pre-configured,
     # like tmux-bew (easiest), fzf-bew (easy?), nvim-bew (hard), zsh-bew (hard), ...
     # and finally cli-bew (with all previous packages)
+
+    # --- Stuff I want to be able to do with binaries & packages:
+    # In my packages:
+    # - a `zsh-bew` pkg with a `zsh` binary, configured with my config (using fzf-bew)
+    # - a `fzf-bew` pkg with a `fzf` binary, configured with my config
+    # - ...
+    # In my CLI env:
+    # - a `fzf` bin, for normal zsh without config
+    # - a `fzf-bew` bin, for zsh with my config (only?)
+    # - a way to override my `zsh-bew` drv (with my config) to use `fzf-bew` instead of `fzf`
+    #
+    # IDEA: Instead of `fzf-bew` having a `fzf` bin, make it a `fzf-bew` bin,
+    # and provide a nested drv (`asFzfBin`? or `asUsualBin`?) with normal `fzf` bin.
+    # (for re-usability in other drvs, e.g for: `zsh-bew`)
+    packages.${system} = let
+      selfPkgs = self.packages.${system};
+      stablePkgs = inputs.nixpkgsStable.legacyPackages.${system};
+      mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
+    in {
+      zsh-bew = stablePkgs.callPackage ./zsh/pkg-zsh-bew.nix {
+        fzf = selfPkgs.fzf-bew;
+      };
+
+      fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {};
+
+      #tmux-bew = ...
+    };
+    apps.${system} = let
+      selfPkgs = self.packages.${system};
+    in {
+      zsh-bew = { type = "app"; program = "${selfPkgs.zsh-bew}/bin/zsh"; };
+      fzf-bew = { type = "app"; program = "${selfPkgs.fzf-bew}/bin/fzf"; };
+    };
   };
 }
