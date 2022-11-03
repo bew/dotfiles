@@ -24,42 +24,6 @@ hash -d nixpkgs=~/.nix-home-current/nixpkgsStable
 
 # NOTE: more can be defined in zshrc.local for machine-specific dirs.
 
-# ------------------ fzf config
-# TODO: move this to 'fzf-bew' package!
-
-FZF_BEW_KEYBINDINGS_ARRAY=()
-
-# input nav
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-h:backward-char' --bind 'alt-l:forward-char')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-b:backward-word' --bind 'alt-w:forward-word')
-
-# suggestions nav
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-j:down' --bind 'alt-k:up')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'tab:down' --bind 'shift-tab:up' --bind 'alt-g:jump')
-
-# preview nav
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-p:toggle-preview')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'pgup:preview-page-up' --bind 'pgdn:preview-page-down')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-p:preview-page-up' --bind 'ctrl-n:preview-page-down')
-
-# selection
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-j:accept')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-a:toggle+down')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-space:toggle+down')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'ctrl-a:toggle-all')
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'change:top') # select best result on input change
-FZF_BEW_KEYBINDINGS_ARRAY+=(--bind 'alt-^:beginning-of-line' --bind 'alt-$:end-of-line')
-
-FZF_BEW_LAYOUT_ARRAY=()
-FZF_BEW_LAYOUT_ARRAY+=(--height=40% --reverse --inline-info)
-
-# Better highlights (current line, substring matches, multiline markers)
-FZF_BEW_LAYOUT_ARRAY+=(--color='bg+:237,hl+:202,hl:166,gutter:-1,marker:220:bold')
-
-export FZF_BEW_KEYBINDINGS="${(j: :)FZF_BEW_KEYBINDINGS_ARRAY}"
-export FZF_BEW_LAYOUT="${(j: :)FZF_BEW_LAYOUT_ARRAY}"
-alias fzf-bew="fzf $FZF_BEW_KEYBINDINGS $FZF_BEW_LAYOUT"
-
 # ------------------ load local per-machine config
 
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local

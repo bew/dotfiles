@@ -41,6 +41,8 @@ let
       rev = "v1.66";
       hash = "sha256-by5x/FTGhypk98w31WQrSUxJTStM39Z21DmMV7P4yVA=";
     };
+    # FIXME: zconvey is broken, because it needs a tiny binary, usually compiled on first use of the plugin
+    # => TODO: Make a drv to build that binary!
     zconvey = fetchFromGitHub {
       owner = "z-shell";
       repo = "zconvey";
@@ -88,20 +90,22 @@ let
 
     # FIXME: this should be part of a sort of activation?
     # Or can I detect it's not set and suggest to run the activation command for that if it's not?
-    cp    ${./.}/fast-theme--bew.ini $out/
+    cp ${./.}/fast-theme--bew.ini $out/
 
-    cp    ${cfg_files.zshrc} $out/.zshrc
-    cp    ${./.}/zshenv $out/.zshenv
+    cp ${cfg_files.zshrc} $out/.zshrc
+    cp ${./.}/zshenv $out/.zshenv
 
     substituteInPlace $out/.zshenv \
       --replace "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
       --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=bew-nixified #"
   '';
-in {
-  packages.zsh-bew = runCommand "zsh-bew" { nativeBuildInputs = [ makeWrapper ]; } /* sh */ ''
-    mkdir -p $out/bin
-    cp ${zsh}/bin/zsh $out/bin/zsh-bew
-    wrapProgram $out/bin/zsh-bew --set ZDOTDIR ${bew-config-zdotdir}
-  '';
-}
-# vim:set ft=conf sw=2:
+in
+
+# NOTE: the binary is still named 'zsh' and not 'zsh-bew', to be able to pass
+# this derivation to something expecting `${some-zsh}/bin/zsh` to exist.
+# My CLI env will have an additional 'linkBins` drv to rename it to 'zsh-bew' if needed.
+runCommand "zsh-with-bew-cfg" { nativeBuildInputs = [ makeWrapper ]; } /* sh */ ''
+  mkdir -p $out/bin
+  cp ${zsh}/bin/zsh $out/bin/zsh
+  wrapProgram $out/bin/zsh --set ZDOTDIR ${bew-config-zdotdir}
+''

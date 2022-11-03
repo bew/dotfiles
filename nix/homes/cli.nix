@@ -1,7 +1,7 @@
 { config, pkgsChannels, lib, mybuilders, ... }:
 
 let
-  inherit (pkgsChannels) backbone stable bleedingedge;
+  inherit (pkgsChannels) backbone stable bleedingedge myPkgs;
 
   neovim-minimal = let pkgs = stable; in pkgs.neovim.override {
     configure = {
@@ -43,6 +43,29 @@ let
     };
   };
 
+  groups.editor-bins = {
+    nvim-minimal = neovim-minimal;
+  };
+
+  groups.zsh-bins = let zsh = bleedingedge.zsh; in {
+    inherit zsh; # for normal bin + man
+    zsh-bew = myPkgs.zsh-bew.override {
+      inherit zsh;
+      fzf = groups.fzf-bins.fzf-bew; # make sure to use fzf-bew with specific fzf version
+    };
+  };
+
+  groups.fzf-bins = let fzf = bleedingedge.fzf; in {
+    inherit fzf; # for normal bin + man
+    fzf-bew = myPkgs.fzf-bew.override { inherit fzf; };
+  };
+
+  linkBinsForGroup = binsGroup: targetBinName:
+    mybuilders.linkBins "${targetBinName}-bins"
+      (lib.mapAttrsToList
+        (binName: pkg: { name = binName; path = "${pkg}/bin/${targetBinName}"; })
+        binsGroup);
+
 in {
   home.packages = [
     # packages on backbone channel, upgrades less often
@@ -52,12 +75,13 @@ in {
     #stable.rust-analyzer
     neovim-minimal
 
+    (linkBinsForGroup groups.zsh-bins "zsh")
 
-    bleedingedge.zsh
+    (linkBinsForGroup groups.fzf-bins "fzf")
+
     stable.exa # alternative ls, more colors!
     stable.bat
     stable.fd
-    bleedingedge.fzf
     stable.git
     stable.git-lfs
     stable.gh  # github cli for view & operations

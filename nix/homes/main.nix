@@ -28,12 +28,14 @@
   # Pkgs channels from inputs
   # => Allows to have a stable sharing point for multiple pkgs sets
   _module.args.pkgsChannels = let
-    pkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
+    legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
+    pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
   in {
-    backbone = pkgsForSystem inputs.nixpkgsBackbone;
-    stable = pkgsForSystem inputs.nixpkgsStable;
-    lastStable = pkgsForSystem inputs.nixpkgsLastStable;
-    bleedingedge = pkgsForSystem inputs.nixpkgsUnstable;
+    backbone = legacyPkgsForSystem inputs.nixpkgsBackbone;
+    stable = legacyPkgsForSystem inputs.nixpkgsStable;
+    lastStable = legacyPkgsForSystem inputs.nixpkgsLastStable;
+    bleedingedge = legacyPkgsForSystem inputs.nixpkgsUnstable;
+    myPkgs = pkgsForSystem inputs.self;
   };
 
   # -------- Global home setup --------
