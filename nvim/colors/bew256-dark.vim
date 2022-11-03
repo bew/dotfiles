@@ -242,7 +242,7 @@ exe "HiResetTo CursorColumn"   .s:bg_base02
 exe "HiResetTo CursorLine"   .s:bg_base02
 
 exe "HiResetTo LineNr"   .s:fg_base01 .s:bg_base02
-exe "HiResetTo CursorLineNr"   .s:fg_cyan   .s:bg_base02
+exe "HiResetTo CursorLineNr"   .s:fg_cyan   ." ctermbg=237 cterm=bold"
 hi! link ColorColumn CursorColumn
 exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
 
