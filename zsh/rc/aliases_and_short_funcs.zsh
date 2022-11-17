@@ -43,16 +43,18 @@ function zsh::utils::check_can_reload_or_exit
 
 function zsh::safe_reload
 {
-  zsh::utils::check_can_reload_or_exit "reload" || return
+  zsh::utils::check_can_reload_or_exit "reload" || return 1
 
   [[ -n "$ORIGINAL_PATH" ]] && export PATH="$ORIGINAL_PATH"
+  >&2 echo "--- Reloading 'zsh' safely"
   exec zsh
 }
 
 function zsh::safe_exit
 {
-  zsh::utils::check_can_reload_or_exit "quit" || return
+  zsh::utils::check_can_reload_or_exit "quit" || return 1
 
+  >&2 echo "--- Exiting safely, bye!"
   exit
 }
 
