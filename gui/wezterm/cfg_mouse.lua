@@ -105,6 +105,23 @@ table.insert(mouse_bindings, {
   },
 })
 
+-- Scrolling!
+-- Since 20220807-113146-c2fee766 the WheelUp/WheelDown events can be bound to
+-- custom actions. When using `disable_default_mouse_bindings=true`, scrolling
+-- is completely disabled and we need to enable it again.
+table.insert(mouse_bindings, {
+  {
+    mods=mods._,
+    event={Down={streak=1, button={WheelUp=1}}},
+    action=act.ScrollByCurrentEventWheelDelta,
+  },
+  {
+    mods=mods._,
+    event={Down={streak=1, button={WheelDown=1}}},
+    action=act.ScrollByCurrentEventWheelDelta,
+  },
+})
+
 -- To simplify config composability, `mouse_bindings` is a
 -- nested list of (bind or list of (bind or ...)), so we must
 -- flatten the list first.
