@@ -67,9 +67,19 @@
       stablePkgs = inputs.nixpkgsStable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
-      zsh-bew = stablePkgs.callPackage ./zsh/pkg-zsh-bew.nix {
+      zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {
         fzf = selfPkgs.fzf-bew;
       };
+      zsh-bew = let
+        # Thin zsh wrapper, using my zsh-bew-zdotdir as configuration
+        pkg = { runCommand, makeWrapper, zsh, ...}: runCommand "zsh-with-bew-cfg" {
+          nativeBuildInputs = [ makeWrapper ];
+        } /* sh */ ''
+          mkdir -p $out/bin
+          cp ${zsh}/bin/zsh $out/bin/zsh
+          wrapProgram $out/bin/zsh --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
+        '';
+      in stablePkgs.callPackage pkg {};
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {};
 
@@ -77,7 +87,9 @@
     };
     apps.${system} = let
       selfPkgs = self.packages.${system};
+      selfApps = self.apps.${system};
     in {
+      default = selfApps.zsh-bew; # FIXME: should be a full env with all cli tools
       zsh-bew = { type = "app"; program = "${selfPkgs.zsh-bew}/bin/zsh"; };
       fzf-bew = { type = "app"; program = "${selfPkgs.fzf-bew}/bin/fzf"; };
     };
