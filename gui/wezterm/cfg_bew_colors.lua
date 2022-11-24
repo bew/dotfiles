@@ -31,6 +31,11 @@ col.brights = {
   "#fafafa", -- white
 }
 
+col.indexed = {
+  [22] = "#003a0b", -- darker dark green
+  [52] = "#490101", -- darker dark red
+}
+
 -- Slightly red & transparent (blended in bg)
 -- (fg color is preserved)
 col.selection_bg = "rgba(100% 50% 50% 20%)"
