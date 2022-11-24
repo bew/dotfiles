@@ -98,6 +98,12 @@ endsnippet
 snippet pytpi "pytest parametrize test decorator (inline)" b
 @pytest.mark.parametrize("${10:param1,param2}", [$2])
 endsnippet
+
+snippet pytr "pytest exception check block" b
+with pytest.raises(${1:MyException}${2:, match=r"${3:matching text}"):
+	${10:pass}
+endsnippet
+
 # decorators
 
 snippet @data "@dataclass" b
@@ -262,7 +268,7 @@ endsnippet
 # other 'rtype' snippet, used for reveal_type when the cursor is NOT at BOL
 priority 10
 snippet rtype "reveal_type" b
-reveal_type(${0:${VISUAL:expr}})  # noqa
+reveal_type(${0:${VISUAL:expr}})  # noqa: F821 # TODO: remove probe
 endsnippet
 priority 0
 snippet rtype "reveal_type (in expr)" w
