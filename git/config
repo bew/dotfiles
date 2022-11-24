@@ -84,9 +84,6 @@
 #   helper = github-bew-password-from-env
 
 [alias]
-  br = branch
-  brv = "!git --no-pager branch -vv"
-
   # index manipulation (staging area)
 
   a  = add
@@ -113,7 +110,20 @@
   f = fetch
   m = merge
   ch = checkout
+  sw = switch
   sth = stash
+
+  # branch manipulations
+
+  chb = checkout -b
+  swc = switch -c
+
+  br = branch
+  brv = "!git --no-pager branch -vv"
+
+  br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
+  brg = br-gone
+
 
   # remote interaction
   ph = push
