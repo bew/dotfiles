@@ -236,6 +236,11 @@
   plus-style = syntax 22
   plus-emph-style = normal bold 28
 
+  # Line number style to match added/removed line
+  # Not working in a useful way for now, see: https://github.com/dandavison/delta/issues/247
+  ; line-numbers-minus-style = normal 52
+  ; line-numbers-plus-style = normal 22
+
   file-style = bold 166
   file-decoration-style = none
   # NOTE: the decoration styles ul/ol/box uses unicode chars AFAIK
