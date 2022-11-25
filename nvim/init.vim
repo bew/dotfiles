@@ -611,6 +611,8 @@ let g:vim_markdown_new_list_item_indent = 2
 let g:vim_markdown_fenced_languages = [
     \   "hcl=terraform",
     \   "py=python",
+    \   "shell=sh",
+    \   "ini=dosini",
     \ ]
 
 let g:vim_markdown_auto_insert_bullets = 0 " Because I don't want <Enter> to make a new bullet!
