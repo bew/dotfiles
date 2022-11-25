@@ -401,15 +401,15 @@ RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
 
 function set-current-prompts
 {
-  PROMPT="%{$reset_color%}"$PROMPT_CURRENT
-  RPROMPT="%{$reset_color%}"$RPROMPT_CURRENT
+  PROMPT=$PROMPT_CURRENT
+  RPROMPT=$RPROMPT_CURRENT
 }
 hooks-add-hook precmd_hook set-current-prompts
 
 function set-past-prompts
 {
-  PROMPT="%{$reset_color%}"$PROMPT_PAST
-  RPROMPT="%{$reset_color%}"$RPROMPT_PAST
+  PROMPT=$PROMPT_PAST
+  RPROMPT=$RPROMPT_PAST
 
   zle reset-prompt
 }
