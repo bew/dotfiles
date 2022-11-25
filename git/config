@@ -17,6 +17,11 @@
 [init]
   defaultBranch = main
 
+[commit]
+  # Always enable `--verbose` on commit/squash/...
+  # (shows diff of what is being commited <3)
+  verbose = true
+
 [push]
   # When 'push' subcmd is called without a remote branch,
   # use the current local branch name as the remote branch name.
@@ -73,8 +78,11 @@
 
 [color "diff"]
   # color settings for 'colorMoved' option
-  oldMoved = cyan 17
-  newMoved = cyan 17
+  oldMoved = italic 31 52
+  newMoved = italic 31 22
+  # (alternative color, used when 2 different block of moved lines are next to each other)
+  oldMovedAlternative = italic 97 52
+  newMovedAlternative = italic 97 22
 
 # Useful when I can't use SSH to communicate with github and I don't want to
 # type my password/personal-token everytime.
@@ -84,18 +92,15 @@
 #   helper = github-bew-password-from-env
 
 [alias]
-  br = branch
-  brv = "!git --no-pager branch -vv"
-
   # index manipulation (staging area)
 
   a  = add
   ap = add -p
   an = add -N
 
-  com = commit --verbose
-  comp  = com -p
-  comam = com --amend
+  com   = commit
+  comp  = commit -p
+  comam = commit --amend
 
   # Inverts a previous `git add file`
   # (same as new command `git restore --staged file` except
@@ -113,7 +118,20 @@
   f = fetch
   m = merge
   ch = checkout
+  sw = switch
   sth = stash
+
+  # branch manipulations
+
+  chb = checkout -b
+  swc = switch -c
+
+  br = branch
+  brv = "!git --no-pager branch -vv"
+
+  br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
+  brg = br-gone
+
 
   # remote interaction
   ph = push
@@ -130,14 +148,14 @@
   suf = status --untracked-files
 
   # log (minimal: with metadata + subject)
-  pretty-log = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=tformat:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n'
+  pretty-log = log --graph --decorate --pretty='%C(bold red)%h%C(auto)%d %C(237)[%C(italic green)%ar%C(reset 237)]   %C(italic 238)by %an%C(reset)%n%s%n'
   l  = pretty-log
   la = pretty-log --all
   lo = pretty-log --oneline
 
   # log (verbose: with metadata + subject + body + notes)
   # (~same as: pretty-log + the commit body & notes if available)
-  pretty-log-verbose = log --graph --decorate --date=format:'%a %e %b %Y [%H:%M]' --pretty=format:'%C(bold red)%h%C(reset) - %C(bold cyan)%ad%C(reset) | %C(green)%ar%C(reset)%C(auto)%d   %C(dim magenta)by %an%C(reset)%n%s%n%+b%-N%n'
+  pretty-log-verbose = log --graph --decorate --pretty=format:'%C(bold red)%h%C(auto)%d - %C(237)[%C(italic green)%ar%C(reset 237)]   %C(italic 239)by %an%C(reset)%n%s%n%+b%-N%n'
   lv  = pretty-log-verbose
   lva = pretty-log-verbose --all
 
@@ -216,12 +234,17 @@
   hunk-label = "§"
 
   # Removed lines
-  minus-style = normal 52
+  minus-style = syntax 52
   minus-emph-style = normal bold 88
 
   # Added lines
   plus-style = syntax 22
   plus-emph-style = normal bold 28
+
+  # Line number style to match added/removed line
+  # Not working in a useful way for now, see: https://github.com/dandavison/delta/issues/247
+  ; line-numbers-minus-style = normal 52
+  ; line-numbers-plus-style = normal 22
 
   file-style = bold 166
   file-decoration-style = none
