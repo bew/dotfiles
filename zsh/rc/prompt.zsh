@@ -41,12 +41,29 @@ function segmt::git_branch_fast
   local      col_is_ahead="202"  # orange
   local col_has_modified_staged="202"  # orange
 
+  local arrow_up
+  local arrow_down
+  local dots
+  if [[ -z "$ASCII_ONLY" ]]; then
+    # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
+    #      character width will be output.
+    #      Can be needed when a unicode char is considered as 2 chars by mistake.
+    arrow_up="%{↑%G%}"
+    arrow_down="%{↓%G%}"
+    dots="%{…%G%}"
+  else
+    arrow_up="^"
+    arrow_down="v"
+    dots=".."
+  fi
+
   # note: when not on a branch, show commit id (but shorter than usual 40-chars)
   local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}}"
   local current_ref_short="${VCS_STATUS_LOCAL_BRANCH[0,10]:-@${VCS_STATUS_COMMIT[0,10]}}"
+  [[ ${#current_ref_short} -lt ${#current_ref} ]] && current_ref_short+="$dots"
   [[ -n $VCS_STATUS_TAG ]] && {
     current_ref+="#${VCS_STATUS_TAG}"
-    current_ref_short+="#.."
+    current_ref_short+="#${dots}"
   }
   local col_current_ref
   if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
@@ -56,27 +73,13 @@ function segmt::git_branch_fast
   else
     col_current_ref+="$col_is_all_good"
   fi
-  # make sure to escape any '%' in current_ref{,_short}
-  local current_ref_info="%F{$col_current_ref}${current_ref//\%/%%}%f"
-  local current_ref_info_short="%F{$col_current_ref}${current_ref_short//\%/%%}%f"
+  local current_ref_info="%F{$col_current_ref}${current_ref}%f"
+  local current_ref_info_short="%F{$col_current_ref}${current_ref_short}%f"
 
   local worktree_info
   (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_modified_staged}%B+%b%f"
   (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_modified}%B!%b%f"
   (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B?%b%f"
-
-  local arrow_up
-  local arrow_down
-  if [[ -z "$ASCII_ONLY" ]]; then
-    # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
-    #      character width will be output.
-    #      Can be needed when a unicode char is considered as 2 chars by mistake.
-    arrow_up="%{↑%G%}"
-    arrow_down="%{↓%G%}"
-  else
-    arrow_up="^"
-    arrow_down="v"
-  fi
 
   local commits_info commits_info_short
   [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && {
