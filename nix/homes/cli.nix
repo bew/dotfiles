@@ -28,6 +28,7 @@ in {
 
     stable.htop
     stable.less
+    stable.jless # less for JSON
     stable.ncdu
 
     stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
