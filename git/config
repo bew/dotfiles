@@ -17,6 +17,11 @@
 [init]
   defaultBranch = main
 
+[commit]
+  # Always enable `--verbose` on commit/squash/...
+  # (shows diff of what is being commited <3)
+  verbose = true
+
 [push]
   # When 'push' subcmd is called without a remote branch,
   # use the current local branch name as the remote branch name.
@@ -93,9 +98,9 @@
   ap = add -p
   an = add -N
 
-  com = commit --verbose
-  comp  = com -p
-  comam = com --amend
+  com   = commit
+  comp  = commit -p
+  comam = commit --amend
 
   # Inverts a previous `git add file`
   # (same as new command `git restore --staged file` except
