@@ -38,6 +38,8 @@
     myPkgs = pkgsForSystem inputs.self;
   };
 
+  _module.args.system = system;
+
   # -------- Global home setup --------
 
   home.username = username;

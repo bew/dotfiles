@@ -1,4 +1,4 @@
-{ config, pkgsChannels, lib, mybuilders, ... }:
+{ config, pkgsChannels, lib, mybuilders, flakeInputs, system, ... }:
 
 let
   inherit (pkgsChannels) backbone stable bleedingedge myPkgs;
@@ -97,6 +97,7 @@ lib.mkMerge [
       bleedingedge.delta # for nice git diffs
       stable.jq
       stable.yq
+      flakeInputs.binHtmlq.packages.${system}.htmlq
       bleedingedge.ripgrep
       stable.tree
       stable.just
