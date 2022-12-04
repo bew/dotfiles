@@ -1,0 +1,9 @@
+# Minimal config to be somewhat usable
+
+alias e="nvim -u NORC"
+alias g=git
+alias ls="ls --group-directories-first -F --color=auto"
+
+EDITOR=vim
+
+# vim:set ft=bash:

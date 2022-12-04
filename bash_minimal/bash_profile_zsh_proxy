@@ -1,0 +1,17 @@
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+_WANTED_SHELL=zsh
+if [[ "${SHLVL:-1}" == "1" ]] && command -v $_WANTED_SHELL >/dev/null; then
+  # Wanted shell is available, replace current shell with it :)
+  export SHLVL=
+  exec $_WANTED_SHELL
+else
+  >&2 echo
+  >&2 echo "We are in a nested shell (SHLVL: $SHLVL) OR '$_WANTED_SHELL' command not available"
+  >&2 echo
+fi
+
+[[ -f ~/.bashrc ]] && source ~/.bashrc
+
+# vim:set ft=bash:

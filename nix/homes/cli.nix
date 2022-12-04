@@ -63,6 +63,10 @@ let
       fzf = groups.fzf-bins.fzf-bew; # make sure to use fzf-bew with specific fzf version
     });
   in {
+    imports = [
+      # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
+      ../../bash_minimal/proxy_to_zsh.home-module.nix
+    ];
     home.packages = [ bleedingedge.zsh ];
     home.file.".zshrc".text = ''
       ZDOTDIR=${zdotdir}
