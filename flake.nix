@@ -32,6 +32,9 @@
 
     homeManager.url = "github:nix-community/home-manager/release-22.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
+
+    binHtmlq.url = "github:mgdm/htmlq";
+    binHtmlq.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
   outputs = { self, ... }@inputs: let
