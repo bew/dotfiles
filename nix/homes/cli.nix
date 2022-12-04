@@ -116,7 +116,7 @@ in {
     stable.cloc
     stable.httpie
     stable.strace
-    stable.watchexec
+    stable.entr
 
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
     stable.gron # to have grep-able json <3
