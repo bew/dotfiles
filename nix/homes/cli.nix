@@ -58,11 +58,7 @@ let
         (binName: pkg: { name = binName; path = "${pkg}/bin/${targetBinName}"; })
         binsGroup);
 
-in
-
-lib.mkMerge [
-  # Zsh mini module
-  (let
+  zshHomeModule = let
     zdotdir = (myPkgs.zsh-bew-zdotdir.override {
       fzf = groups.fzf-bins.fzf-bew; # make sure to use fzf-bew with specific fzf version
     });
@@ -75,77 +71,80 @@ lib.mkMerge [
     home.file.".zshenv".text = ''
       source ${zdotdir}/.zshenv
     '';
-  })
+  };
 
-  {
-    home.packages = [
-      # packages on backbone channel, upgrades less often
-      backbone.tmux
+in {
+  imports = [
+    zshHomeModule
+  ];
 
-      #stable.neovim
-      #stable.rust-analyzer
-      neovim-minimal
+  home.packages = [
+    # packages on backbone channel, upgrades less often
+    backbone.tmux
 
-      (linkBinsForGroup groups.fzf-bins "fzf")
+    #stable.neovim
+    #stable.rust-analyzer
+    neovim-minimal
 
-      stable.exa # alternative ls, more colors!
-      stable.bat
-      stable.fd
-      stable.git
-      stable.git-lfs
-      stable.gh  # github cli for view & operations
-      bleedingedge.delta # for nice git diffs
-      stable.jq
-      stable.yq
-      flakeInputs.binHtmlq.packages.${system}.htmlq
-      bleedingedge.ripgrep
-      stable.tree
-      stable.just
-      (stable.ranger.override { imagePreviewSupport = false; })
+    (linkBinsForGroup groups.fzf-bins "fzf")
 
-      stable.htop
-      stable.less
-      stable.jless # less for JSON
-      stable.ncdu
+    stable.exa # alternative ls, more colors!
+    stable.bat
+    stable.fd
+    stable.git
+    stable.git-lfs
+    stable.gh  # github cli for view & operations
+    bleedingedge.delta # for nice git diffs
+    stable.jq
+    stable.yq
+    flakeInputs.binHtmlq.packages.${system}.htmlq
+    bleedingedge.ripgrep
+    stable.tree
+    stable.just
+    (stable.ranger.override { imagePreviewSupport = false; })
 
-      stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
-      stable.cloc
-      stable.httpie
-      stable.strace
-      stable.watchexec
+    stable.htop
+    stable.less
+    stable.jless # less for JSON
+    stable.ncdu
 
-      stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
-      stable.gron # to have grep-able json <3
-      stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
+    stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
+    stable.cloc
+    stable.httpie
+    stable.strace
+    stable.watchexec
 
-      stable.chafa # crazy cool img/gif terminal viewer
-      # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
-      stable.translate-shell
+    stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
+    stable.gron # to have grep-able json <3
+    stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
 
-      # Languages
-      stable.python3
-      (let
-        # Ref: https://github.com/NixOS/nixpkgs/pull/151253 (my PR to reduce ipython closure size)
-        pyPkg = stable.python3;
-        ipython-minimal = pyPkg.pkgs.ipython.override {
-          matplotlib-inline = pyPkg.pkgs.matplotlib-inline.overrideAttrs (oldAttrs: {
-            propagatedBuildInputs = (lib.remove pyPkg.pkgs.matplotlib oldAttrs.propagatedBuildInputs);
-          });
-        };
-      in mybuilders.linkSingleBin "${ipython-minimal}/bin/ipython")
+    stable.chafa # crazy cool img/gif terminal viewer
+    # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
+    stable.translate-shell
 
-      (let androidPkgs = stable.androidenv.androidPkgs_9_0;
-      in mybuilders.linkBins "android-tools-bins" [
-        "${androidPkgs.platform-tools}/bin/adb"
-        "${androidPkgs.platform-tools}/bin/fastboot"
-      ])
+    # Languages
+    stable.python3
+    (let
+      # Ref: https://github.com/NixOS/nixpkgs/pull/151253 (my PR to reduce ipython closure size)
+      pyPkg = stable.python3;
+      ipython-minimal = pyPkg.pkgs.ipython.override {
+        matplotlib-inline = pyPkg.pkgs.matplotlib-inline.overrideAttrs (oldAttrs: {
+          propagatedBuildInputs = (lib.remove pyPkg.pkgs.matplotlib oldAttrs.propagatedBuildInputs);
+        });
+      };
+    in mybuilders.linkSingleBin "${ipython-minimal}/bin/ipython")
 
-      # Nix tools
-      stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)
-      stable.nix-diff # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
-      stable.nixfmt # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
-      # stable.nix-update # Swiss-knife for updating nix packages
-      # TODO: add nix-index!
-    ];
-  }
-]
+    (let androidPkgs = stable.androidenv.androidPkgs_9_0;
+    in mybuilders.linkBins "android-tools-bins" [
+      "${androidPkgs.platform-tools}/bin/adb"
+      "${androidPkgs.platform-tools}/bin/fastboot"
+    ])
+
+    # Nix tools
+    stable.nix-tree # TUI to browse the dependencies of a derivation (https://github.com/utdemir/nix-tree)
+    stable.nix-diff # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
+    stable.nixfmt # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
+    # stable.nix-update # Swiss-knife for updating nix packages
+    # TODO: add nix-index!
+  ];
+}
