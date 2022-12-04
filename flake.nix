@@ -37,12 +37,16 @@
     binHtmlq.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
+  # TO-EXPERIMENT: flake-parts (https://github.com/hercules-ci/flake-parts) to
+  # define my toplevel flake in multiples files, like:
+  # * ./nix/homes.flake-module.nix
+  # * ./nix/exposed-pkgs.flake-module.nix
   outputs = { self, ... }@inputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
   in {
     homeConfig = let
-      username = "lesell_b";
+      username = "lesell_b";  # FIXME: ?? Why does it work on my /home/bew system ?? Is this even used ??
     in import "${inputs.homeManager}/modules" {
       pkgs = inputs.nixpkgsStable.legacyPackages.${system};
       configuration = import ./nix/homes/main.nix { inherit inputs system username; };

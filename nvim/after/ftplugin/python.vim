@@ -43,3 +43,5 @@ function! s:PyFStringToggle()
   call cursor(saved_cursor)
 endf
 inoremap <buffer> <M-f> <cmd>call <SID>PyFStringToggle()<cr>
+
+" TODO: Add bindings to reformat entire file & order imports
