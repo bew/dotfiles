@@ -18,6 +18,7 @@ fpath=(~/.zsh/completions/ $fpath)
 [[ -d /usr/share/zsh/site-functions ]] && fpath+=(/usr/share/zsh/site-functions)
 # Add completions from Nix is available
 [[ -d ~/.nix-profile/share/zsh/site-functions ]] && fpath+=(~/.nix-profile/share/zsh/site-functions)
+[[ -d /run/current-system/sw/share/zsh/site-functions ]] && fpath+=(/run/current-system/sw/share/zsh/site-functions)
 
 setopt NO_auto_remove_slash # Don't remove slash for accepted directory compl
 setopt complete_in_word # Enable compl in the middle of a word
