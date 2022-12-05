@@ -148,14 +148,14 @@
   suf = status --untracked-files
 
   # log (minimal: with metadata + subject)
-  pretty-log = log --graph --decorate --pretty='%C(bold red)%h%C(auto)%d %C(237)[%C(italic green)%ar%C(reset 237)]   %C(italic 238)by %an%C(reset)%n%s%n'
+  pretty-log = log --graph --decorate --pretty='%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n'
   l  = pretty-log
   la = pretty-log --all
   lo = pretty-log --oneline
 
   # log (verbose: with metadata + subject + body + notes)
   # (~same as: pretty-log + the commit body & notes if available)
-  pretty-log-verbose = log --graph --decorate --pretty=format:'%C(bold red)%h%C(auto)%d - %C(237)[%C(italic green)%ar%C(reset 237)]   %C(italic 239)by %an%C(reset)%n%s%n%+b%-N%n'
+  pretty-log-verbose = log --graph --decorate --pretty=format:'%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n'
   lv  = pretty-log-verbose
   lva = pretty-log-verbose --all
 
