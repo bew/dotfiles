@@ -134,6 +134,13 @@ in {
     stable.translate-shell
 
     # Languages
+    # NOTE: Compilers, interpreter shouldn't really be made available in a global way..
+    #       Goes a bit against Nix-motto to have well defined dependencies, per-projects.
+    # => Could still be nice-to-have for one-of tests/experiments...
+    #    * Could make these available through a custom shell I need to launch?
+    #      (or a kind of shell module to enable)
+    #      With an explicit name like `shell-with-languages-for-ad-hoc-experimenting`
+    #      (FIXME: need a shorter name...)
     stable.python3
     (let
       # Ref: https://github.com/NixOS/nixpkgs/pull/151253 (my PR to reduce ipython closure size)
