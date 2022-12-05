@@ -27,6 +27,15 @@ in {
     copyq-latest # powerful clipboard manager
     stable.xclip
 
+    #bleedingedge.ripdrag # drag/drop files from/to terminal :)
+    # Not adding right now, individual testing shows using it as target doesn't
+    # really work....
+    # `ripdrag --target --print-path --and-exit` doesn't react when I drag a
+    # file onto the window :/
+    #
+    # And it adds 800M to the closure size :/
+    # => Really want to have a standalone HM profile for gui apps...
+
     stable.arandr
     stable.autorandr
 
