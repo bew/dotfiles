@@ -20,7 +20,7 @@ mkdir -p $ZSH_DATA_DIR $ZSH_DATA_DIR_SHARED
 # FIXME: these named folders are specific to my config! Move somewhere else!
 hash -d dot=~/.dot
 hash -d cfg=~/.config
-hash -d nixpkgs=~/.nix-home-current/nixpkgsStable
+hash -d pkgs=~/.nix-home-current/nixpkgsStable
 
 # NOTE: more can be defined in zshrc.local for machine-specific dirs.
 
