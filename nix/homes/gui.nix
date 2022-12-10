@@ -15,7 +15,13 @@ let
 in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix
+    ./gui-firefox-tridactyl-native-extension.nix
   ];
+
+  # Check needed native pkg version at:
+  # https://github.com/tridactyl/tridactyl/blob/master/native/current_native_version
+  # URL found in: https://github.com/tridactyl/native_messenger/blob/62f19dba573b92/installers/install.sh#L53
+  my.firefox-tridactyl-native.package = pkgsChannels.bleedingedge.tridactyl-native;
 
   home.packages = [
     # desktop/wm related (TODO? nixify config)
