@@ -33,6 +33,7 @@ in {
     # X tools
     copyq-latest # powerful clipboard manager
     stable.xclip
+    stable.xdotool
 
     #bleedingedge.ripdrag # drag/drop files from/to terminal :)
     # Not adding right now, individual testing shows using it as target doesn't
