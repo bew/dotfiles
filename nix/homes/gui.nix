@@ -15,6 +15,7 @@ let
 in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix
+    ./gui-force-system-locales.nix
     ./gui-firefox-tridactyl-native-extension.nix
   ];
 
