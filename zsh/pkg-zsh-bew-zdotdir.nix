@@ -14,6 +14,7 @@
   fzf,
   fd,
   bat,
+  git,
   ...
 }:
 
@@ -50,6 +51,15 @@ let
     };
   };
 
+  bins = {
+    # NOTE: one day all these will be Nix Flake Apps, so we can auto find the main bin :)
+    fzf = "${fzf}/bin/fzf";
+    fd = "${fd}/bin/fd";
+    bat = "${bat}/bin/bat";
+    git = "${git}/bin/git";
+    dircolors = "${coreutils}/bin/dircolors";
+  };
+
 in
 
 runCommand "zsh-bew-zdotdir" {} /* sh */ ''
@@ -72,9 +82,10 @@ runCommand "zsh-bew-zdotdir" {} /* sh */ ''
   >&2 echo "Patching binaries in rc/mappings.zsh"
   cp ${./.}/rc/mappings.zsh $out/rc/
   substitute ${./rc/fzf-mappings.zsh} $out/rc/fzf-mappings.zsh \
-    --replace "_BIN_fzf=" "_BIN_fzf=${fzf}/bin/fzf #" \
-    --replace "_BIN_fd="  "_BIN_fd=${fd}/bin/fd #" \
-    --replace "_BIN_bat=" "_BIN_bat=${bat}/bin/bat #"
+    --replace "_BIN_fzf=" "_BIN_fzf=${bins.fzf} #" \
+    --replace "_BIN_fd="  "_BIN_fd=${bins.fd} #" \
+    --replace "_BIN_bat=" "_BIN_bat=${bins.bat} #" \
+    --replace "_BIN_git=" "_BIN_git=${bins.git} #"
 
   >&2 echo "Patching config-specific env vars .zshenv"
   substitute ${./zshenv} $out/.zshenv \
@@ -83,7 +94,7 @@ runCommand "zsh-bew-zdotdir" {} /* sh */ ''
 
   >&2 echo "Patching binaries and plugins in .zshrc"
   substitute ${./zshrc} $out/.zshrc \
-    --replace "_BIN_dircolors=" "_BIN_dircolors=${coreutils}/bin/dircolors #" \
+    --replace "_BIN_dircolors=" "_BIN_dircolors=${bins.dircolors} #" \
     \
     --replace "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
     --replace "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
