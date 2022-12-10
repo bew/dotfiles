@@ -103,10 +103,10 @@ bind --mode=visual <A-:> fillcmdline_notrail
 
 # --- Open bindings
 
-# open in new tab
+# open new tab (right after to current tab)
 # Opened issue for more positioning: https://github.com/tridactyl/tridactyl/issues/4257
-bind <A-t> fillcmdline tabopen
-bind --mode=insert <A-t> fillcmdline tabopen
+bind <A-t> tabopen --focus-address-bar
+bind --mode=insert <A-t> tabopen --focus-address-bar
 
 # open
 bind <A-o> fillcmdline open
