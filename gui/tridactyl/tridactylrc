@@ -1,6 +1,8 @@
 # Restore default config first!
 sanitize tridactyllocal
 
+fillcmdline_tmp 5000 Starting config reload...... (takes ~15s seconds)
+
 # Explore current config with: `:viewconfig`
 
 # --------------------------------------------------------
@@ -35,18 +37,16 @@ set gimode firefox
 # CA : Ctrl-Alt
 
 # Reload config file
-# NOTE: The config takes some time to load completely (~10s), because of a bug
+# NOTE: The config takes some time to load completely (~15s), because of a bug
 #       somewhere in Tridactyl that was loading only some parts of config file.
 #       Each line of the config is loaded with a delay to workaround that issue.
 #       Ref: https://matrix.to/#/!xmubtggllUtLrQiGyn:matrix.org/$1607877211548340BLAuN:matrix.org
 #            https://github.com/tridactyl/tridactyl/issues/1409
-command reload_my_config composite \
-    fillcmdline_tmp 5000 Starting config reload...... (takes ~15s seconds) \
-    | source \
-    | fillcmdline_tmp 1000 Config reloaded!
-bind <C-R> reload_my_config
-bind --mode=ignore <C-R> reload_my_config
-bind --mode=insert <C-R> reload_my_config
+#
+# NOTE: Tridactyl's native messenger is REQUIRED to be able to load the config from a file
+bind <C-R> source
+bind --mode=ignore <C-R> source
+bind --mode=insert <C-R> source
 
 bind --mode=normal <C-F12> mode ignore
 bind --mode=insert <C-F12> mode ignore
@@ -259,5 +259,7 @@ bindurl reddit.com <A-Escape> composite mode normal | hide cmdline
 # FIXME: <Escape> should not be set per site, but should be a generic key binding, that switch to
 # Tridactyl's "ignore" mode, inject the "Escape" key and go back to "normal" mode.. (and maybe
 # also hide the cmdline to get the normal <Escape> behavior of Tridactyl)
+
+fillcmdline_tmp 1000 Config reloaded!
 
 # vim:set ft=conf:
