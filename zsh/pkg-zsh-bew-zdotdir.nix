@@ -54,28 +54,34 @@ in
 
 runCommand "zsh-bew-zdotdir" {} /* sh */ ''
   mkdir -p $out $out/rc
+
+  >&2 echo "Copying no-deps files"
+
   cp ${./.}/rc/aliases_and_short_funcs.zsh $out/rc/
   cp ${./.}/rc/completions.zsh $out/rc/
   cp ${./.}/rc/options.zsh $out/rc/
   cp ${./.}/rc/prompt.zsh $out/rc/
 
+  # FIXME: this should be part of a sort of activation?
+  # Or can I detect it's not set and suggest to run the activation command for that if it's not?
+  cp ${./.}/fast-theme--bew.ini $out/
+
+  ###cp -R ${./.}/completions $out/  # nothing important there
+  ###cp -R ${./.}/fpath $out/        # nothing important there
+
+  >&2 echo "Patching binaries in rc/mappings.zsh"
   cp ${./.}/rc/mappings.zsh $out/rc/
   substitute ${./rc/fzf-mappings.zsh} $out/rc/fzf-mappings.zsh \
     --replace "_BIN_fzf=" "_BIN_fzf=${fzf}/bin/fzf #" \
     --replace "_BIN_fd="  "_BIN_fd=${fd}/bin/fd #" \
     --replace "_BIN_bat=" "_BIN_bat=${bat}/bin/bat #"
 
-  ###cp -R ${./.}/completions $out/  # nothing important there
-  ###cp -R ${./.}/fpath $out/        # nothing important there
-
-  # FIXME: this should be part of a sort of activation?
-  # Or can I detect it's not set and suggest to run the activation command for that if it's not?
-  cp ${./.}/fast-theme--bew.ini $out/
-
+  >&2 echo "Patching config-specific env vars .zshenv"
   substitute ${./zshenv} $out/.zshenv \
     --replace "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
     --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=bew-nixified #"
 
+  >&2 echo "Patching binaries and plugins in .zshrc"
   substitute ${./zshrc} $out/.zshrc \
     --replace "_BIN_dircolors=" "_BIN_dircolors=${coreutils}/bin/dircolors #" \
     \
