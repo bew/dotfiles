@@ -5,6 +5,7 @@
 _BIN_fzf=fzf
 _BIN_fd=fd
 _BIN_bat=bat
+_BIN_git=git
 
 if [[ $- != *i* ]]; then
   # -> This is not an interactive shell, bail out!
@@ -237,7 +238,7 @@ zle -N zwidget::fzf::z
 # Copied from zle::utils::check_git here to have a mostly self-contained file
 function zwidget::utils::check_git
 {
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if ! $_BIN_git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     zle -M "Error: Not a git repository"
     return 1
   fi
@@ -250,20 +251,20 @@ function zwidget::fzf::git_changed_files
   if [[ -n "$FZF_GIT_CHANGED_FROM_CWD" ]]; then
     # files from cwd
     local prompt_note="in cwd"
-    local finder_cmd="git diff --name-only --relative"
-    local preview_cmd="git diff --color=always -- {}"
+    local finder_cmd="$_BIN_git diff --name-only --relative"
+    local preview_cmd="$_BIN_git diff --color=always -- {}"
     FZF_ROOT_PATH="."
   else
     # files from root of the repo
     local prompt_note="in repo"
-    local finder_cmd="git diff --name-only"
-    local preview_cmd="git diff --color=always -- :/{}"
+    local finder_cmd="$_BIN_git diff --name-only"
+    local preview_cmd="$_BIN_git diff --color=always -- :/{}"
 
     # The finder_cmd gives paths absolute to the root of the repo
     # (without a leading '/' though). When inserting the results in the
     # cmdline, each path will be made relative to cwd. We need to give it
     # the git root to be able to compute correct relative paths:
-    FZF_ROOT_PATH="$(git rev-parse --show-toplevel)"
+    FZF_ROOT_PATH="$($_BIN_git rev-parse --show-toplevel)"
   fi
 
   FZF_PROMPT="Changed files ($prompt_note): "
