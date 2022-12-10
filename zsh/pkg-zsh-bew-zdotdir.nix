@@ -1,4 +1,5 @@
 {
+  lib,
   fetchFromGitHub,
   runCommand,
   makeWrapper,
@@ -51,14 +52,24 @@ let
     };
   };
 
-  bins = {
+  bins = let
+    binFromDrv = binName: drv: {
+      outPath = "${drv}/bin/${binName}";
+      manOutput = drv ? man;
+    };
+  in {
     # NOTE: one day all these will be Nix Flake Apps, so we can auto find the main bin :)
-    fzf = "${fzf}/bin/fzf";
-    fd = "${fd}/bin/fd";
-    bat = "${bat}/bin/bat";
-    git = "${git}/bin/git";
-    dircolors = "${coreutils}/bin/dircolors";
+    fzf = binFromDrv "fzf" fzf;
+    fd = binFromDrv "fd" fd;
+    bat = binFromDrv "bat" bat;
+    git = binFromDrv "git" git;
+    dircolors = binFromDrv "dircolors" coreutils;
   };
+  # NOTE: all bins from this list should also have their 'man' output installed!
+  # not tested/used..
+  binsManPages = lib.mapAttrsToList (_: binInfo: binInfo.manOutput) bins;
+  # FIXME: How to propagate the 'man' outputs?
+  # this looks like a job for the cliPkgModule system
 
 in
 
