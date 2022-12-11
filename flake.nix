@@ -46,7 +46,7 @@
     system = "x86_64-linux";
   in {
     homeConfig = let
-      username = "lesell_b";  # FIXME: ?? Why does it work on my /home/bew system ?? Is this even used ??
+      username = "bew";
     in import "${inputs.homeManager}/modules" {
       pkgs = inputs.nixpkgsStable.legacyPackages.${system};
       configuration = import ./nix/homes/main.nix { inherit inputs system username; };
