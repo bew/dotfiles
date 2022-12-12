@@ -1,23 +1,34 @@
-# Restore default config first!
-sanitize tridactyllocal
+#   _____     _     _            _         _ 
+#  |_   _| __(_) __| | __ _  ___| |_ _   _| |
+#    | || '__| |/ _` |/ _` |/ __| __| | | | |
+#    | || |  | | (_| | (_| | (__| |_| |_| | |
+#    |_||_|  |_|\__,_|\__,_|\___|\__|\__, |_|
+#                                    |___/   
+#
 
-fillcmdline_tmp 5000 Starting config reload...... (takes ~15s seconds)
+
+
+# Theme 'shydactyl' puts the command promp in the middle of the window, like
+# fuzzy launchers in some editors. It allows to _always_ see the mode
+# indicator, even when a fillcmdline_tmp 'toast' is visible. With the 'dark'
+# theme, the mode indicator is hidden behind the command prompt..
+colors shydactyl
+
+fillcmdline_tmp 1000 Reloading Tridactyl config...... (takes ~15s seconds)
+
+# Restore default config
+# => Disabled on config reload, there is no correct way to reset config reliably. 'sanitize' is
+#    actually async and we don't know when the local storage will be erased..
+command set_defaults sanitize tridactyllocal
 
 # Explore current config with: `:viewconfig`
 
 # --------------------------------------------------------
 # Options & Setup
 
-set theme dark
-
 set smoothscroll true
 
 set incsearch true
-
-# Set the browser's homepage to the newtab page of the plugin
-# NOTE: This works by changing the user.js file in my profile, and needs
-#       a firefox restart to be applied.
-composite jsb browser.runtime.getURL("static/newtab.html") | setpref browser.startup.homepage
 
 # Disable `input` mode, make `gi` always enter `insert` mode.
 #
@@ -35,6 +46,9 @@ set gimode firefox
 
 # A : Alt
 # CA : Ctrl-Alt
+#
+# A-d is Alt-d
+# A-D is Alt-Shift-d
 
 # Reload config file
 # NOTE: The config takes some time to load completely (~15s), because of a bug
@@ -48,11 +62,12 @@ bind <C-R> source
 bind --mode=ignore <C-R> source
 bind --mode=insert <C-R> source
 
-bind --mode=normal <C-F12> mode ignore
-bind --mode=insert <C-F12> mode ignore
-bind --mode=ignore <C-F12> mode normal
+# Toggle ignore mode
+bind --mode=normal <F9> mode ignore
+bind --mode=insert <F9> mode ignore
+bind --mode=ignore <F9> mode normal
 
-# unbind many builtins...
+# --- Unbind many builtins I don't want...
 
 # vim' increment (here, for the url)
 unbind <C-a>
@@ -62,10 +77,7 @@ unbind <C-u>
 unbind <C-d>
 unbind <C-f>
 unbind <C-b>
-# visual search
-unbind --mode=visual S
-unbind --mode=visual s
-# others...
+# All letters (except a selected few, like j/k)
 unbind A
 unbind B
 unbind D
@@ -76,8 +88,10 @@ unbind K
 unbind L
 unbind M
 unbind O
+unbind P
 unbind R
 unbind S
+unbind --mode=visual S
 unbind T
 unbind U
 unbind W
@@ -87,9 +101,12 @@ unbind a
 unbind b
 unbind d
 unbind f
+unbind m
 unbind o
+unbind p
 unbind r
 unbind s
+unbind --mode=visual s
 unbind t
 unbind u
 unbind w
@@ -103,25 +120,24 @@ bind --mode=visual <A-:> fillcmdline_notrail
 
 # --- Open bindings
 
-# open new tab (right after to current tab)
-# Opened issue for more positioning: https://github.com/tridactyl/tridactyl/issues/4257
+# open new tab (right after current tab)
+#
+# Opened issue for more positioning:
+# https://github.com/tridactyl/tridactyl/issues/4257
 bind <A-t> tabopen --focus-address-bar
 bind --mode=insert <A-t> tabopen --focus-address-bar
 
-# open
-bind <A-o> fillcmdline open
-bind --mode=insert <A-o> fillcmdline open
+# PREFIX <A-f>: Do actions via hints on the page
 
-# open with search engine
-bind <A-s> fillcmdline open search
-
-# open by hint on the page
+# Open target in current tab
 bind <A-f> hint
-# Open target in background
+bind --mode=insert <A-f> hint
+# Open target in new tab, in background
 bind <A-F> hint -b
+bind --mode=insert <A-F> hint -b
 # NOTE: There are MANY options for `hint`, see `:h hint` :)
 
-# --- hint mode bindings
+# --- hint mode bindings (to help selection / navigation)
 
 # Same as backspace, to remove a key in case of mistake
 bind --mode=hint <C-h> hint.popKey
@@ -191,13 +207,22 @@ bind --mode=insert <CA-a> back
 bind --mode=insert <CA-z> forward
 bind --mode=ex <CA-a> back
 bind --mode=ex <CA-z> forward
+# For some reason <CA-a> stopped working for now... (currently on FF 105)
+bind <CA-h> back
+bind <CA-l> forward
 
 # --- Page bindings
+
+# Find a likely next/previous link and follow it (in current tab)
+bind ]] followpage next
+bind [[ followpage prev
 
 # page movement
 # The default jump of 10 is a bit much.
 bind j scrollline 5
 bind k scrollline -5
+bind J scrollline 15
+bind K scrollline -15
 
 # page reload
 bind <A-r> reload
@@ -212,15 +237,54 @@ bind <A-n> findnext 1
 bind <A-N> findnext -1
 bind § nohlsearch
 
-# Send Escape to the page itself
-# NOTE: (on windows) couldn't map <A-Escape> for some reason, maybe related to my autohotkey setup w.r.t caps>>ctrl/escape
-bind <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
-bind --mode=insert <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
-bind --mode=visual <A-e> js window.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"}))
+# NORMAL: Send Escape to the page itself
+# From insert/visual mode: `Escape-Escape` to go back to normal mode, then sends actual `Escape` to the page
+#
+# Make sure <Escape> isn't bound, so it is directly sent to the page when in normal mode.
+unbind <Escape>
 
 # --- insert mode bindings
+
+# INSERT: Send Escape to the page itself (from insert mode)
+# (necessary for some popups like the Ctrl-k popup of Element (Matrix Web UI))
+#
+#   !!! NOTE !!!
+#   This keybind uses Alt-something, but xdotool will clear & re-apply Alt to properly
+#   send Escape to the window.
+#   If I do Alt+something-triggering-xdotool but release it after 1s (without other action),
+#   the browser will see a Alt press-release (the press comes from xdotool re-applying Alt after
+#   clearing it, the release it me), which by default opens the menubar (with File, View...).
+#
+#   % How to disable Alt press-release opening the menubar
+#   Open about:config and set `ui.key.menuAccessKeyFocuses` to `false`.
+#   Ref: https://support.mozilla.org/en-US/questions/1278533
+#   |
+#   ALTERNATIVE:
+#   Prepend `xdotool keyup Alt` and remove `--clearmodifiers` for the next xdotool. This will
+#   ensure Alt is not disabled then re-enabled. The main downside is that it's not possible to
+#   chain Alt-something keybinds because Alt is not pressed anymore after xdotool was called.
+bind --mode=insert <A-Escape> composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Escape ; mode insert
+bind --mode=insert <A-q>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Escape ; mode insert
+# Also bind A-q in case A-Escape can't be mapped (like on Windows it seems)
+
+# Ref: moz-extension://d4be4c81-b633-439c-8d53-744227c38bed/static/docs/modules/_src_excmds_.html#editor
+alias editor_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
+bind --mode=insert <C-e> editor_rm
+
+# Try to remap some insert keys to help navigation
 # FIXME: Can I remap keys à-la-AHK, like A-b/w to Ctrl-Left/Right?
-#   => if yes, remap all insert movements! (hjkl, w, b, ^, $, g, G)
+#   => yes, BUT
+# % Move cursor
+bind --mode=insert <A-h>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Left ; mode insert
+bind --mode=insert <A-j>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Down ; mode insert
+bind --mode=insert <A-k>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Up   ; mode insert
+bind --mode=insert <A-l>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Right; mode insert
+# % Move by word
+bind --mode=insert <A-b>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Left  ; mode insert
+bind --mode=insert <A-w>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Right ; mode insert
+# % Move to begin/end
+bind --mode=insert <A-$>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers End  ; mode insert
+bind --mode=insert <A-^>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Right ; mode insert
 
 # --- ex mode bindings
 
@@ -251,14 +315,6 @@ bind --mode=ex <Up> ex.prev_completion
 
 # Quick go to notifications!
 bindurl github.com nn js tri.dom.simulateClick(document.querySelector("a.notification-indicator"))
-
-# reddit.com, simulate clicking on the Close button of an opened post
-bindurl reddit.com <Escape> js tri.dom.simulateClick(document.querySelector("*[aria-label=Close]"))
-bindurl reddit.com <A-Escape> composite mode normal | hide cmdline
-
-# FIXME: <Escape> should not be set per site, but should be a generic key binding, that switch to
-# Tridactyl's "ignore" mode, inject the "Escape" key and go back to "normal" mode.. (and maybe
-# also hide the cmdline to get the normal <Escape> behavior of Tridactyl)
 
 fillcmdline_tmp 1000 Config reloaded!
 
