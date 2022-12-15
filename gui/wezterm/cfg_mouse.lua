@@ -45,7 +45,7 @@ local function initial_selection_mouse_actions(selection_mode)
     -- Extend on Drag event
     drag_action = act.ExtendSelectionToMouseCursor(selection_mode),
     -- Complete & Copy on Up event
-    up_action   = act.CompleteSelection("PrimarySelection"),
+    up_action   = act.CompleteSelection("ClipboardAndPrimarySelection"),
   }
 end
 -- Left click always starts a new selection.
@@ -64,7 +64,7 @@ local function extend_selection_mouse_actions(selection_mode)
     down_action = act.ExtendSelectionToMouseCursor(selection_mode),
     drag_action = act.ExtendSelectionToMouseCursor(selection_mode),
     -- Complete & Copy on Up event
-    up_action   = act.CompleteSelection("PrimarySelection"),
+    up_action   = act.CompleteSelection("ClipboardAndPrimarySelection"),
   }
 end
 -- Right click always extends the selection.
@@ -89,20 +89,13 @@ table.insert(mouse_bindings, {
 --        Currently I have to press Ctrl-Shift-click to make this binding work.
 -- Opened issue: https://github.com/wez/wezterm/issues/581
 
--- Clipboard / PrimarySelection paste
+-- Clipboard
 table.insert(mouse_bindings, {
-  -- Middle click pastes from the primary selection (for any other mods).
+  -- Middle click pastes
   wezterm.permute_any_or_no_mods({
     event={Down={streak=1, button="Middle"}},
-    action=act.PasteFrom("PrimarySelection"),
-  }),
-  -- Alt-Middle click pastes from the clipboard selection
-  -- NOTE: Must be last to overwrite the existing Alt-Middle binding done by permute_any_or_no_mods.
-  {
-    mods=mods.A,
-    event={Down={streak=1, button="Middle"}},
     action=act.PasteFrom("Clipboard"),
-  },
+  }),
 })
 
 -- Scrolling!

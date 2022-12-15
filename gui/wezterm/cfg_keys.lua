@@ -53,11 +53,11 @@ cfg.keys = {
   keybind(mods.CS, "f", act.Search{CaseInSensitiveString = ""}),
 
   -- Copy/Paste to/from Clipboard
-  keybind(mods.CS, "c", act.CopyTo("Clipboard")),
+  keybind(mods.CS, "c", act.CopyTo("ClipboardAndPrimarySelection")),
   keybind(mods.CS, "v", act.PasteFrom("Clipboard")),
-  -- Paste from PrimarySelection (Copy is done by selection)
+  keybind(mods.CA, "v", act.PasteFrom("Clipboard")), -- note: eats a valid term input
+  -- Paste from PrimarySelection
   keybind(mods.S,  "Insert", act.PasteFrom("PrimarySelection")),
-  keybind(mods.CA, "v",      act.PasteFrom("PrimarySelection")), -- note: eats a valid term input
 
   -- Smart copy with Alt-c:
   -- - If active selection, will copy it to Clipboard & Primary
