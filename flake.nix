@@ -58,17 +58,18 @@
 
     # --- Stuff I want to be able to do with binaries & packages:
     # In my packages:
-    # - a `zsh-bew` pkg with a `zsh` binary, configured with my config (using fzf-bew)
-    # - a `fzf-bew` pkg with a `fzf` binary, configured with my config
+    # - a `zsh-bew` full pkg with the full `zsh` pkg + `zsh` binary wrapped to use my config (using fzf-bew)
+    # - a `fzf-bew` full pkg with the full `fzf` pkg + `fzf` binary wrapped to use my config
+    # - a `zsh-bew-bin` pkg with only `${zsh-bew}/bin/zsh`
+    # - a `fzf-bew-bin` pkg with only `${fzf-bew}/bin/fzf`
     # - ...
-    # In my CLI env:
-    # - a `fzf` bin, for normal zsh without config
-    # - a `fzf-bew` bin, for zsh with my config (only?)
-    # - a way to override my `zsh-bew` drv (with my config) to use `fzf-bew` instead of `fzf`
+    # => Installing `zsh-bew` or `fzf-bew` should also make `man zsh` & `man fzf` available!
+    #    (`man` will auto discover man pages based on binary in `$PATH`, see `man 5 manpath`!)
     #
-    # IDEA: Instead of `fzf-bew` having a `fzf` bin, make it a `fzf-bew` bin,
-    # and provide a nested drv (`asFzfBin`? or `asUsualBin`?) with normal `fzf` bin.
-    # (for re-usability in other drvs, e.g for: `zsh-bew`)
+    # In my CLI env:
+    # - a `zsh` bin, with my config (may be editable?)
+    # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
+    # - a `fzf` bin, for fzf with my config
     packages.${system} = let
       selfPkgs = self.packages.${system};
       stablePkgs = inputs.nixpkgsStable.legacyPackages.${system};
@@ -78,17 +79,23 @@
         fzf = selfPkgs.fzf-bew;
       };
       zsh-bew = let
-        # Thin zsh wrapper, using my zsh-bew-zdotdir as configuration
-        pkg = { runCommand, makeWrapper, zsh, ...}: runCommand "zsh-with-bew-cfg" {
-          nativeBuildInputs = [ makeWrapper ];
-        } /* sh */ ''
-          mkdir -p $out/bin
-          cp ${zsh}/bin/zsh $out/bin/zsh
-          wrapProgram $out/bin/zsh --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
-        '';
-      in stablePkgs.callPackage pkg {};
+        # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration
+        pkg = { buildEnv, makeWrapper, zsh, zdotdir }:
+          mybuilders.replaceBinsInPkg {
+            name = "zsh-bew";
+            copyFromPkg = zsh;
+            nativeBuildInputs = [ makeWrapper ];
+            postBuild = /* sh */ ''
+              makeWrapper ${zsh}/bin/zsh $out/bin/zsh --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
+            '';
+          };
+      in stablePkgs.callPackage pkg { zdotdir = selfPkgs.zsh-bew-zdotdir; };
+      zsh-bew-bin = mybuilders.linkSingleBin "${selfPkgs.zsh-bew}/bin/zsh";
 
-      fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {};
+      fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
+        replaceBinsInPkg = mybuilders.replaceBinsInPkg;
+      };
+      fzf-bew-bin = mybuilders.linkSingleBin "${selfPkgs.fzf-bew}/bin/fzf";
 
       #tmux-bew = ...
     };
@@ -96,7 +103,7 @@
       selfPkgs = self.packages.${system};
       selfApps = self.apps.${system};
     in {
-      default = selfApps.zsh-bew; # FIXME: should be a full env with all cli tools
+      default = selfApps.zsh-bew; # FIXME: should be an env with all 'core' cli tools
       zsh-bew = { type = "app"; program = "${selfPkgs.zsh-bew}/bin/zsh"; };
       fzf-bew = { type = "app"; program = "${selfPkgs.fzf-bew}/bin/fzf"; };
     };
