@@ -43,24 +43,14 @@ let
     };
   };
 
-  groups.editor-bins = {
-    nvim-minimal = neovim-minimal;
+  # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
+  cliPkgs = {
+    fzf = myPkgs.fzf-bew.override { fzf = bleedingedge.fzf; };
   };
-
-  groups.fzf-bins = let fzf = bleedingedge.fzf; in {
-    inherit fzf; # for normal bin + man
-    fzf-bew = myPkgs.fzf-bew.override { inherit fzf; };
-  };
-
-  linkBinsForGroup = binsGroup: targetBinName:
-    mybuilders.linkBins "${targetBinName}-bins"
-      (lib.mapAttrsToList
-        (binName: pkg: { name = binName; path = "${pkg}/bin/${targetBinName}"; })
-        binsGroup);
 
   zshHomeModule = let
     zdotdir = (myPkgs.zsh-bew-zdotdir.override {
-      fzf = groups.fzf-bins.fzf-bew; # make sure to use fzf-bew with specific fzf version
+      inherit (cliPkgs) fzf; # make sure to use my fzf config with specific fzf version
     });
   in {
     imports = [
@@ -90,7 +80,7 @@ in {
     #stable.rust-analyzer
     neovim-minimal
 
-    (linkBinsForGroup groups.fzf-bins "fzf")
+    cliPkgs.fzf
 
     stable.exa # alternative ls, more colors!
     stable.bat

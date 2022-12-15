@@ -1,7 +1,7 @@
 {
-  writeShellScriptBin,
-  stdenv,
+  writeShellScript,
   lib,
+  replaceBinsInPkg,
 
   fzf,
 }:
@@ -57,9 +57,12 @@ let
   );
 in
 
-# NOTE: the binary is still named 'fzf' and not 'fzf-bew', to be able to pass
-# this derivation to something expecting `${some-fzf}/bin/fzf` to exist.
-# My CLI env will have an additional 'linkBins` drv to rename it to 'fzf-bew' if needed.
-(writeShellScriptBin "fzf" ''
-  ${fzf}/bin/fzf ${toString keybindingsArgs} ${toString layoutArgs} "$@"
-'').overrideAttrs (_: { name = "fzf-bew"; }) # rename derivation to mention it's specific to me
+replaceBinsInPkg {
+  name = "fzf-bew";
+  copyFromPkg = fzf;
+  bins = {
+    fzf = writeShellScript "fzf" ''
+      exec ${fzf}/bin/fzf ${toString keybindingsArgs} ${toString layoutArgs} "$@"
+    '';
+  };
+}
