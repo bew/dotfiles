@@ -101,7 +101,7 @@ cfg.keys = {
   -- Key Table: Panes Management
   keybind(mods.CS, "p", define_and_activate_keytable{
     name = "my-panes-management",
-    activation = {one_shot=false, replace_current=false},
+    activation = {one_shot=false},
     keys = {
       keybind(mods._, "Escape", act.PopKeyTable),
       keybind(mods.CS, "p", act.PopKeyTable),
@@ -125,6 +125,26 @@ cfg.keys = {
       -- Manipulation
       keybind(mods.CS, "s", act.PaneSelect{mode="SwapWithActive"}),
       keybind(mods.CS, "z", act.TogglePaneZoomState),
+    },
+  }),
+   
+  keybind(mods.CS, "Space", define_and_activate_keytable{
+    name = "Leader",
+    -- Make this layer volatile, easily dismissed
+    activation = {one_shot=true, until_unknown=true},
+    keys = {
+      keybind(mods.C, "v", act.Paste),
+
+      keybind(mods._, "f", define_and_activate_keytable{
+        name = "font size",
+        activation = {one_shot=false},
+        keys = {
+          keybind(mods._, "Escape", act.PopKeyTable),
+          keybind(mods._, "j", act.DecreaseFontSize),
+          keybind(mods._, "k", act.IncreaseFontSize),
+          keybind(mods._, "r", act.ResetFontSize),
+        },
+      }),
     },
   }),
 }
