@@ -412,8 +412,9 @@ if command -v pip 2>&1 >/dev/null; then
   alias pip-for-global-env="pip::disabled-for-global-env --allow-for-global-env"
 fi
 
-alias pytest::no-warn="pytest --disable-warnings"
-alias pytest::no-cov-no-warn="pytest --no-cov --disable-warnings"
+alias pytest::no-cov="pytest --no-cov"
+alias pytest::no-warn="echo '!!!! Warnings are disabled !!!!'; pytest --disable-warnings"
+alias pytest::no-cov-no-warn="echo '!!!! Warnings are disabled !!!!'; pytest --no-cov --disable-warnings"
 alias pytest::fail-fast-verbose="pytest::no-cov-no-warn --exitfirst -vv --showlocals"
 alias pytest::last-failed-verbose="pytest::no-cov-no-warn --last-failed -vv --showlocals"
 alias pytest::failed-first="pytest::no-cov-no-warn --failed-first"
