@@ -258,6 +258,10 @@ snippet ass "assert ..." b
 assert $0
 endsnippet
 
+snippet ca "create_autospec(spec=...)" w
+create_autospec(spec=${1:MyClass})
+endsnippet
+
 # NOTE: this can be necessary sometimes when the running process closes stdio
 # __import__("sys").stdin = open('/dev/tty')
 snippet bp "Add pdb breakpoint"

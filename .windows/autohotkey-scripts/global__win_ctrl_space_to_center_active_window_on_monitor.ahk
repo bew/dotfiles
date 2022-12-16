@@ -9,6 +9,6 @@
 
 #^Space::
   win_selector := "A"
-  mouse_monitor := GetMonitorIncludingPos(GetMousePos())
-  MoveWinCenteredOn(win_selector, mouse_monitor.center_pos)
+  win_monitor := GetMonitorIncludingPos(GetWinCenterPos(win_selector))
+  MoveWinCenteredOn(win_selector, win_monitor.center_pos)
   return

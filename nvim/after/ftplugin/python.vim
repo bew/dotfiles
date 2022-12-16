@@ -44,4 +44,25 @@ function! s:PyFStringToggle()
 endf
 inoremap <buffer> <M-f> <cmd>call <SID>PyFStringToggle()<cr>
 
-" TODO: Add bindings to reformat entire file & order imports
+" N: Reformat entire file with `black` if it's available
+function! PyTryReformatWithBlack()
+  if executable("black")
+    exe "!black %"
+  else
+    echohl Error | echo "'black' binary not available, aborting full file reformat :(" | echohl None
+  endif
+endf
+noremap <buffer> <Plug>(my-ReformatEntireFile) <cmd>call PyTryReformatWithBlack()<cr>
+
+" N: Order imports with `isort` if it's available
+function! PyTryOrderImports()
+  if executable("isort")
+    exe "!isort % --profile black"
+  else
+    echohl Error | "'isort' binary not available, aborting ordering of imports :(" | echohl None
+  endif
+endf
+nnoremap <buffer> <Plug>(my-OrderImports)  <cmd>call PyTryOrderImports()<cr>
+nnoremap <buffer> <C-A-i>  <Plug>(my-OrderImports)
+nnoremap <buffer> <A-Tab>  <Plug>(my-OrderImports)
+" NOTE: A-Tab is same as A-C-i for terminals that don't distinguish between Tab & C-i
