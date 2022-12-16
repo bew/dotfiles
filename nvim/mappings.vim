@@ -347,7 +347,10 @@ vnoremap <C-f> =
 " N: Indent current line
 nnoremap <C-f> mi==`i
 " N: Format the entire file
-nnoremap <M-C-f> gg=G``
+nnoremap <M-C-f> <Plug>(my-ReformatEntireFile)
+
+" Default file reformat impl
+nnoremap <Plug>(my-ReformatEntireFile)  gg=G``
 
 " V: a count then J on a single visual line does not make sense and is a probably a mistake
 " (like when I 'V4j' but fail to release Shift rapidly enough after typing 4 (on azerty layout)),
