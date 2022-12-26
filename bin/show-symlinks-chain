@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+
+import os
+import shutil
+import sys
+from pathlib import Path
+from typing import List
+
+
+def print_err(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+def exit_with_usage():
+    print_err("USAGE: show-symlinks-chain <BIN|PATH>")
+    print_err("  Shows the chain of symlinks to the given argument,")
+    print_err("  very useful on systems using many symlinks like Nix/NixOS.")
+    print_err()
+    print_err("  To distinguish the argument between a binary name and a path,")
+    print_err("  the path needs to be ./relative or /absolute.")
+    print_err()
+    print_err("Example of binary resolution:")
+    print_err("  show-symlinks-chain zsh")
+    print_err("  show-symlinks-chain ls")
+    print_err("  show-symlinks-chain show-symlinks-chain")
+    print_err()
+    print_err("Example of path resolution:")
+    print_err("  show-symlinks-chain ./zsh")
+    print_err("  show-symlinks-chain ./result-symlink")
+    print_err("  show-symlinks-chain /run/current-system")
+    print_err()
+    sys.exit()
+
+
+def find_bin_in_PATH_or_exit(bin_name: str) -> Path:
+    bin_immediate_path = shutil.which(bin_name)
+    if bin_immediate_path is None:
+        print_err(f"ERROR: '{bin_name}' is not in path :/")
+        if Path(bin_name).exists():
+            print_err(f"  Use './{bin_name}' to resolve a local path")
+        sys.exit(1)
+    return Path(bin_immediate_path)
+
+
+def find_and_resolve_symlinks(path: Path) -> List[Path]:
+    paths = [path]
+    while path.is_symlink():
+        link_target = path.readlink()
+        if link_target.is_absolute():
+            target_path = link_target
+        else:
+            target_path = path.parent / link_target
+        paths.append(target_path)
+        path = target_path
+    return paths
+
+
+def path_to_str_with_info(path: Path) -> str:
+    metainfo = []
+    if path.is_symlink():
+        metainfo.append("link")
+    elif path.is_dir():
+        metainfo.append("dir")
+    elif os.access(path, os.X_OK):
+        metainfo.append("exe")
+
+    if not path.exists():
+        metainfo.append("MISSING")
+
+    cwd_relative_prefix = ""
+    if not path.is_absolute() and path.parts[0] != "..":
+        # ensure relative paths are shown as ./foo ../bar
+        cwd_relative_prefix = "./"
+    metainfo_str = ", ".join(metainfo)
+    return f"{cwd_relative_prefix}{path} ({metainfo_str})"
+
+
+def main(args: List[str]):
+    if len(args) == 0 or args[0] in ["-h", "--help"]:
+        exit_with_usage()
+    bin_or_path = args[0]
+
+    path_to_resolve: Path
+    if any((bin_or_path.startswith(path_prefix) for path_prefix in ["/", "./", "../"])):
+        path_to_resolve = Path(bin_or_path)
+    else:
+        bin_name = bin_or_path
+        path_to_resolve = find_bin_in_PATH_or_exit(bin_or_path)
+        print(f"For executable '{bin_name}'")
+
+    paths = find_and_resolve_symlinks(path_to_resolve)
+    initpath = paths[0]
+    symlinks_chain = paths[1:]
+
+    print(f"Path: {path_to_str_with_info(initpath)}")
+
+    for link in symlinks_chain:
+        print(f" -->  {path_to_str_with_info(link)}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+
+
+# TODO: write tests... (need pytest, generate dummy symlinks in tmpdir)
