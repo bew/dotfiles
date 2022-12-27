@@ -18,7 +18,7 @@ mkdir -p $ZSH_DATA_DIR $ZSH_DATA_DIR_SHARED
 # ------------------ default directory aliases
 
 # FIXME: these named folders are specific to my config! Move somewhere else!
-hash -d dot=~/.dot
+hash -d dot=$(realpath ~/.dot)
 hash -d cfg=~/.config
 hash -d pkgs=~/.nix-home-current/nixpkgsStable
 
