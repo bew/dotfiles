@@ -3,7 +3,22 @@
 let
   inherit (pkgsChannels) backbone stable bleedingedge myPkgs;
 
-  neovim-minimal = let pkgs = stable; in pkgs.neovim.override {
+  # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
+  cliPkgs = {
+    fzf = myPkgs.fzf-bew.override { fzf = bleedingedge.fzf; };
+    neovim = stable.neovim.override {
+      # NOTE: stable.neovim is a drv using 'legacyWrapper' function:
+      # defined in: nixpkgs-repo/pkgs/applications/editors/neovim/utils.nix
+      # used in: nixpkgs-repo/pkgs/top-level/all-packages.nix for 'wrapNeovim' function
+      # ---
+      # python3 & ruby providers are enabled by default..
+      # => I think I won't need them, I want to have vimscript or Lua based plugins ONLY
+      withPython3 = false;
+      withRuby = false;
+    };
+  };
+
+  neovim-minimal = cliPkgs.neovim.override {
     configure = {
       # TODO: make this a proper nvim plugin dir 'myMinimalNvimConfig'
       customRC = /* vim */ ''
@@ -35,17 +50,12 @@ let
 
         source ${./../../nvim/colors/bew256-dark.vim}
       '';
-      packages.myVimPackage = with pkgs.vimPlugins; {
+      packages.myVimPackage = with stable.vimPlugins; {
         start = [
           vim-nix
         ];
       };
     };
-  };
-
-  # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
-  cliPkgs = {
-    fzf = myPkgs.fzf-bew.override { fzf = bleedingedge.fzf; };
   };
 
   zshHomeModule = let
@@ -79,6 +89,10 @@ in {
     #stable.neovim
     #stable.rust-analyzer
     neovim-minimal
+    (mybuilders.linkBins "nvim-original" {
+      nvim-original = "${cliPkgs.neovim}/bin/nvim";
+    })
+
 
     cliPkgs.fzf
 
