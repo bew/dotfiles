@@ -119,6 +119,7 @@ local FileOutOfCwd = {
   provider = function(self)
     local buf_name = vim.api.nvim_buf_get_name(0)
     if not vim.startswith(buf_name, vim.fn.getcwd()) then
+      -- FIXME: use a unicode symbol instead?
       return "[EXT] "
     end
   end,
@@ -139,18 +140,17 @@ local FilenameTwoParts = {
 }
 
 local SpecialFileDescription = {
-  -- NOTE: We need a condition function to be properly skipped when pick_child_on_condition is
+  -- NOTE: We need a condition function to be properly skipped when fallthrough is
   --       used on the block that calls us.
+  -- See: https://github.com/rebelot/heirline.nvim/issues/54
   condition = function(self)
-    hline_utils.pick_child_on_condition(self)
-    -- NOTE: pick_child_on_condition fills the `self.pick_child` table when one of the condition
-    -- is truthy, when that table is empty, no children matched and the entire block should be
-    -- skipped.
-    return not vim.tbl_isempty(self.pick_child)
+    for _, child in ipairs(self) do
+      if not child.condition or child:condition() then
+        return true
+      end
+    end
   end,
 
-  -- first block with successful condition wins!
-  init = hline_utils.pick_child_on_condition,
   { -- when in a help file
     condition = function()
       return vim.bo.filetype == "help" and not vim.bo.modifiable
@@ -208,7 +208,6 @@ local statusline = {
     {
       _,
       {
-        init = hline_utils.pick_child_on_condition,
         SpecialFileDescription,
         { FileOutOfCwd, FilenameTwoParts }, -- fallback to this if not a special file
       },

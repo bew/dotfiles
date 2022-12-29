@@ -3,11 +3,36 @@
 " => Remove the ones from these folders that don't actually exist?
 
 " Force rtp to use the new ~/.dot/nvim-wip dir, not the std ~/.config/nvim one (with my old config)
-let &rtp = '/home/lesell_b/.config/nvim-wip,/etc/xdg/nvim,/home/lesell_b/.local/share/nvim/site,/home/lesell_b/.nix-profile/share/nvim/site,/usr/share/nvim/site,/usr/local/share/nvim/site,/home/lesell_b/.local/share/nvim/site,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/share/nvim/runtime,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/share/nvim/runtime/pack/dist/opt/matchit,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/lib/nvim,/home/lesell_b/.local/share/nvim/site/after,/usr/local/share/nvim/site/after,/usr/share/nvim/site/after,/home/lesell_b/.nix-profile/share/nvim/site/after,/home/lesell_b/.local/share/nvim/site/after,/etc/xdg/nvim/after,/home/lesell_b/.config/nvim-wip/after'
+" NOTE: Here is how lazy.nvim resets these:
+" https://github.com/folke/lazy.nvim/blob/c7122d64cdf16766433588486adcee67571de6d0/lua/lazy/core/config.lua#L183
+lua <<LUA
+local nvim_cfg_path = "/home/bew/.dot/nvim-wip"
+vim.opt.runtimepath = {
+  nvim_cfg_path,
+  --"/etc/xdg/nvim",
+  "/home/bew/.local/share/nvim/site",
+  "/home/bew/.nix-profile/share/nvim/site",
+  --"/usr/share/nvim/site",
+  --"/usr/local/share/nvim/site",
+
+  vim.env.VIMRUNTIME,
+
+  "/home/bew/.nix-profile/share/nvim/site/after",
+  "/home/bew/.local/share/nvim/site/after",
+  --"/etc/xdg/nvim/after",
+  nvim_cfg_path .. "/after",
+}
+vim.opt.packpath = {
+  nvim_cfg_path,
+  vim.env.VIMRUNTIME,
+}
+LUA
 
 " Load options early in case the initialization of some plugin requires them.
 " (e.g: for filetype on)
 runtime! options.vim
+
+colorscheme bew256-dark
 
 " Specify the python binary to use for the plugins, this is necessary to be
 " able to use them while inside a project' venv (which does not have pynvim)
@@ -84,6 +109,13 @@ function leader_remap(spec)
   leader_map(spec)
 end
 LUA
+
+" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+" Early exit until plugin loading is setup
+" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+finish
+
+
 
 let $NVIM_MANAGED_PLUGINS_DIR = $NVIM_DATA_HOME . "/managed-plugins"
 call plug#begin($NVIM_MANAGED_PLUGINS_DIR)
