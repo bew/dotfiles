@@ -1,3 +1,7 @@
+" FIXME: &rtp and &pp defaults to loaaads of stuff on NixOS, using the
+" maannyyyy dirs from XDG_CONFIG_DIRS & XDG_DATA_DIRS...
+" => Remove the ones from these folders that don't actually exist?
+
 " Force rtp to use the new ~/.dot/nvim-wip dir, not the std ~/.config/nvim one (with my old config)
 let &rtp = '/home/lesell_b/.config/nvim-wip,/etc/xdg/nvim,/home/lesell_b/.local/share/nvim/site,/home/lesell_b/.nix-profile/share/nvim/site,/usr/share/nvim/site,/usr/local/share/nvim/site,/home/lesell_b/.local/share/nvim/site,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/share/nvim/runtime,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/share/nvim/runtime/pack/dist/opt/matchit,/nix/store/0vjynr1jdnvqpy9rcc2kh0agsdgdbzn0-neovim-unwrapped-0.7.0/lib/nvim,/home/lesell_b/.local/share/nvim/site/after,/usr/local/share/nvim/site/after,/usr/share/nvim/site/after,/home/lesell_b/.nix-profile/share/nvim/site/after,/home/lesell_b/.local/share/nvim/site/after,/etc/xdg/nvim/after,/home/lesell_b/.config/nvim-wip/after'
 
