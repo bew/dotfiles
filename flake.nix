@@ -25,7 +25,7 @@
     # they're safe to upgrade.
     nixpkgsBackbone.url = "github:nixos/nixpkgs/nixos-22.05";
 
-    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-22.11";
     nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     flakeTemplates.url = "github:nixos/templates";

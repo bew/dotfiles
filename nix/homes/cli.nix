@@ -5,7 +5,7 @@ let
 
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   cliPkgs = {
-    fzf = myPkgs.fzf-bew.override { fzf = bleedingedge.fzf; };
+    fzf = myPkgs.fzf-bew.override { fzf = stable.fzf; };
     neovim = stable.neovim.override {
       # NOTE: stable.neovim is a drv using 'legacyWrapper' function:
       # defined in: nixpkgs-repo/pkgs/applications/editors/neovim/utils.nix
@@ -67,7 +67,7 @@ let
       # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
       ../../bash_minimal/proxy_to_zsh.home-module.nix
     ];
-    home.packages = [ bleedingedge.zsh ];
+    home.packages = [ stable.zsh ];
     home.file.".zshrc".text = ''
       ZDOTDIR=${zdotdir}
       source ${zdotdir}/.zshrc
@@ -102,11 +102,11 @@ in {
     stable.git
     stable.git-lfs
     stable.gh  # github cli for view & operations
-    bleedingedge.delta # for nice git diffs
+    stable.delta # for nice git diffs
     stable.jq
     stable.yq
-    flakeInputs.binHtmlq.packages.${system}.htmlq
-    bleedingedge.ripgrep
+    #flakeInputs.binHtmlq.packages.${system}.htmlq # fails to build, & generates LOTS of intermediate drvs...
+    stable.ripgrep
     stable.tree
     stable.just
     (stable.ranger.override { imagePreviewSupport = false; })
