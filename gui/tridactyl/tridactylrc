@@ -14,7 +14,7 @@
 # theme, the mode indicator is hidden behind the command prompt..
 colors shydactyl
 
-fillcmdline_tmp 1000 Reloading Tridactyl config...... (takes ~15s seconds)
+fillcmdline_tmp 3000 Reloading Tridactyl config...... (takes ~15s seconds)
 
 # Restore default config
 # => Disabled on config reload, there is no correct way to reset config reliably. 'sanitize' is
@@ -77,6 +77,9 @@ unbind <C-u>
 unbind <C-d>
 unbind <C-f>
 unbind <C-b>
+# Edit textbox in favorite editor
+# (<C-i> is usually used in rich-textboxes to toggle italic styling)
+unbind --mode=insert <C-i>
 # All letters (except a selected few, like j/k)
 unbind A
 unbind B
@@ -267,9 +270,12 @@ bind --mode=insert <A-Escape> composite mode ignore ; exclaim_quiet xdotool key 
 bind --mode=insert <A-q>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Escape ; mode insert
 # Also bind A-q in case A-Escape can't be mapped (like on Windows it seems)
 
+# Edit textboxes in favorite editor <3
+# (will open file %f at line %l and column %c, centering the view if needed)
+set editorcmd flatpak run org.wezfurlong.wezterm start --always-new-process nvim %f -c 'normal! %lG%c|zz'
 # Ref: moz-extension://d4be4c81-b633-439c-8d53-744227c38bed/static/docs/modules/_src_excmds_.html#editor
 alias editor_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
-bind --mode=insert <C-e> editor_rm
+bind --mode=insert <A-i> editor_rm
 
 # Try to remap some insert keys to help navigation
 # FIXME: Can I remap keys à-la-AHK, like A-b/w to Ctrl-Left/Right?
