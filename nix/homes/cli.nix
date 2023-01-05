@@ -6,8 +6,8 @@ let
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   cliPkgs = {
     fzf = myPkgs.fzf-bew.override { fzf = stable.fzf; };
-    neovim = stable.neovim.override {
-      # NOTE: stable.neovim is a drv using 'legacyWrapper' function:
+    neovim = bleedingedge.neovim.override {
+      # NOTE: somePkgs.neovim is a drv using 'legacyWrapper' function:
       # defined in: nixpkgs-repo/pkgs/applications/editors/neovim/utils.nix
       # used in: nixpkgs-repo/pkgs/top-level/all-packages.nix for 'wrapNeovim' function
       # ---
@@ -86,12 +86,11 @@ in {
     # packages on backbone channel, upgrades less often
     backbone.tmux
 
-    #stable.neovim
-    #stable.rust-analyzer
     neovim-minimal
     (mybuilders.linkBins "nvim-original" {
       nvim-original = "${cliPkgs.neovim}/bin/nvim";
     })
+    #stable.rust-analyzer
 
 
     cliPkgs.fzf
@@ -102,7 +101,7 @@ in {
     stable.git
     stable.git-lfs
     stable.gh  # github cli for view & operations
-    stable.delta # for nice git diffs
+    bleedingedge.delta # for nice git diffs
     stable.jq
     stable.yq
     #flakeInputs.binHtmlq.packages.${system}.htmlq # fails to build, & generates LOTS of intermediate drvs...
