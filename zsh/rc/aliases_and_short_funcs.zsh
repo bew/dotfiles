@@ -318,7 +318,7 @@ alias e="nvim"
 alias v="nvim -R"
 # e: edit | v: view
 
-alias ewip="nvim-original -u ~/.dot/nvim-wip/init.vim"
+alias ewip="nvim-original -u ~/.dot/nvim-wip/init.lua"
 
 alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
 
