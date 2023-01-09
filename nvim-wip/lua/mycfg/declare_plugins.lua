@@ -618,7 +618,7 @@ Plug {
 NamedPlug.pkg_manager {
   source = gh"folke/lazy.nvim",
   desc = "A modern plugin manager for Neovim",
-  tags = {"boot"},
+  tags = {"boot", t.careful_update},
   on_boot = function()
     local lazy_installed = pcall(require, "lazy")
     if not lazy_installed then return false end

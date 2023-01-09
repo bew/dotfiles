@@ -8,6 +8,13 @@
 
 print("Starting config load", vim.fn.strftime"%c")
 
+-- TODO: re-enable, and contribute fixes to all plugins with undefined global vars..
+--_G = setmetatable(_G, {
+--  __index = function(_, key)
+--    error("Unknown global variable '" .. key .. "'")
+--  end,
+--})
+
 local nvim_cfg_path = "/home/bew/.dot/nvim-wip"
 -- Override stdpaths
 --
