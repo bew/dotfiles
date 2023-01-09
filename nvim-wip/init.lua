@@ -51,11 +51,9 @@ vim.opt.packpath = {
 
 -- Load options early in case the initialization of some plugin requires them.
 -- (e.g: for filetype on)
-vim.cmd[[
-runtime! options.vim
+require"mycfg.options"
 
-colorscheme bew256-dark
-]]
+vim.cmd[[colorscheme bew256-dark]]
 
 -- Specify the python binary to use for the plugins, this is necessary to be
 -- able to use them while inside a project' venv (which does not have pynvim)

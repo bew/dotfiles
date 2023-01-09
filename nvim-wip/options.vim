@@ -1,1 +1,0 @@
-../nvim/options.vim
