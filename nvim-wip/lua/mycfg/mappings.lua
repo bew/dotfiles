@@ -107,6 +107,35 @@ vim.cmd[[cnoremap <expr> %%  expand("%:.:h") . "/"]]
 vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
 
 
+-- Copy/Paste with system clipboard (using nvim's clipboard provider)
+-- Register '+' is session clipboard (e.g: tmux)
+-- Register '*' is OS/system clipboard
+vim.g.clipboard = {
+  name = "my-cli-clipboard-provider",
+  copy = {
+     ["+"] = "cli-clipboard-provider copy-to smart-session",
+     ["*"] = "cli-clipboard-provider copy-to system",
+   },
+  paste = {
+     ["+"] = "cli-clipboard-provider paste-from smart-session",
+     ["*"] = "cli-clipboard-provider paste-from system",
+  },
+}
+
+-- Copy
+vim.cmd[[xnoremap <silent> <M-c> "+y :echo "Copied to session clipboard!"<cr>]]
+vim.cmd[[xnoremap <silent> <M-C> "*y :echo "Copied to system clipboard!"<cr>]]
+
+-- Paste
+vim.cmd[[nnoremap <M-v> "+p]]
+vim.cmd[[nnoremap <M-V> o<esc>"+p]]
+vim.cmd[[xnoremap <M-v> "+p]]
+vim.cmd[[cnoremap <M-v> <C-r><C-o>+]]
+-- Paste in insert mode inserts an undo breakpoint
+-- C-r C-o {reg}    -- inserts the reg content literaly
+vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
+
+
 --------------------------------
 
 -- toggle relativenumber
@@ -333,35 +362,6 @@ vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
 
 -- N: un-join (split) the current line at the cursor position
 --nnoremap <M-J> i<c-j><esc>k$
-
--- Copy/Paste with system clipboard (using nvim's clipboard provider)
--- Register '+' is session clipboard (e.g: tmux)
--- Register '*' is OS/system clipboard
---let g:clipboard = {
---    \   'name': 'myClipboard',
---    \   'copy': {
---    \      '+': 'cli-clipboard-provider copy-to smart-session',
---    \      '*': 'cli-clipboard-provider copy-to system',
---    \    },
---    \   'paste': {
---    \      '+': 'cli-clipboard-provider paste-from smart-session',
---    \      '*': 'cli-clipboard-provider paste-from system',
---    \   },
---    \ }
-
--- Copy
---xnoremap <silent> <M-c> "+y :echo "Copied to session clipboard!"<cr>
---xnoremap <silent> <M-C> "*y :echo "Copied to system clipboard!"<cr>
-
--- Paste
---nnoremap <M-v> "+p
---nnoremap <M-V> o<esc>"+p
---xnoremap <M-v> "+p
---cnoremap <M-v> <C-r><C-o>+
--- Paste in insert mode inserts an undo breakpoint
--- C-r C-o {reg}    -- inserts the reg content literaly
---inoremap <silent> <M-v> <C-g>u<C-r><C-o>+
--- TODO?: Add system paste bindings
 
 -- Copy absolute filepath
 --nnoremap <silent> y%% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
