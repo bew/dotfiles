@@ -141,7 +141,7 @@ end
 local declared_plugins = require"mycfg.declare_plugins"
 require"mylib.do_simple_plugin_boot"(declared_plugins.all_plugin_specs)
 
---require"mycfg.mappings"
+require"mycfg.mappings"
 
 
 -- " FIXME: I don't know where to put this...
