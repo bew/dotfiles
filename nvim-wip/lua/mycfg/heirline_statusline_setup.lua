@@ -205,6 +205,8 @@ local Ruler = { provider = "%P %l:%02v" }
 local statusline = {
   Mode,
   { -- File info block
+    -- FIXME: `:h` looks like this: `help.txt[EXT] doc/help.txt`
+    -- => Make dedicated left-side of statusline for help pages?
     {
       _,
       {
