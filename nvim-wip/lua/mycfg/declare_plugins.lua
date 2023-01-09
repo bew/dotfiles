@@ -646,6 +646,9 @@ NamedPlug.pkg_manager {
       change_detection = { enabled = false }, -- MAYBE: try it?
       cache = { enabled = false },
       performance = { reset_packpath = false },
+      -- Works in the Update UI, but not in the Logs UI
+      -- See: https://github.com/folke/lazy.nvim/discussions/353
+      --git = { log = {"ORIG_HEAD.."} },
     })
   end,
 }
