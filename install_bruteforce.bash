@@ -5,6 +5,15 @@ function make-link
   local link_to="$1"
   local link_destination="$2"
 
+  # When linking `src/bar` to `foo/`
+  # $link_destination should be `foo/bar`
+  #
+  # NOTE: in bash, ${foo:(-N)} takes last N chars
+  # Ref: https://stackoverflow.com/a/19858692
+  if [[ "${link_destination:(-1)}" == "/" ]]; then
+    link_destination="${link_destination}$(basename "$link_to")"
+  fi
+
   local old_link_to="$(readlink "$link_destination" || true)"
   if [[ "$link_to" == "$old_link_to" ]]; then
     echo "nothing to do, '$link_destination' already points to '$link_to'"
@@ -69,6 +78,9 @@ label "other cli tools"
 make-link ~/.dot/htop            ~/.config/htop
 make-link ~/.dot/tmux/tmux.conf  ~/.tmux.conf
 make-link ~/.dot/gdb             ~/.config/gdb
+
+mkdir -vp ~/.ipython/profile_default/startup
+make-link ~/.dot/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
 
 label "X configs"
 make-link ~/.dot/gui/xinitrc       ~/.xinitrc
