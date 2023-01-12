@@ -2,27 +2,27 @@
 
 function make-link
 {
-  local to="$1"
-  local from="$2"
+  local link_to="$1"
+  local link_destination="$2"
 
-  local old_to="$(readlink "$from" || true)"
-  if [[ "$to" == "$old_to" ]]; then
-    echo "nothing to do, '$from' already points to '$to'"
+  local old_link_to="$(readlink "$link_destination" || true)"
+  if [[ "$link_to" == "$old_link_to" ]]; then
+    echo "nothing to do, '$link_destination' already points to '$link_to'"
     return
   fi
 
   if [[ "$DRYRUN_ONLY" == "true" ]]; then
     local before before_short
-    if [[ -n "$old_to" ]]; then
+    if [[ -n "$old_link_to" ]]; then
       before_short=R
-      before="was '$old_to'"
+      before="was '$old_link_to'"
     else
       before_short=N
       before="to create"
     fi
-    echo "DRYRUN[$before_short]: '$from' -> '$to' ($before)"
+    echo "DRYRUN[$before_short]: '$link_destination' -> '$link_to' ($before)"
   else
-    ln -vsf --no-dereference "$to" "$from"
+    ln -vsf --no-dereference "$link_to" "$link_destination"
   fi
 }
 
