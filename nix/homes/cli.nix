@@ -146,14 +146,13 @@ in {
     #      (FIXME: need a shorter name...)
     stable.python3
     (let
-      # Ref: https://github.com/NixOS/nixpkgs/pull/151253 (my PR to reduce ipython closure size)
-      pyPkg = stable.python3;
-      ipython-minimal = pyPkg.pkgs.ipython.override {
-        matplotlib-inline = pyPkg.pkgs.matplotlib-inline.overrideAttrs (oldAttrs: {
-          propagatedBuildInputs = (lib.remove pyPkg.pkgs.matplotlib oldAttrs.propagatedBuildInputs);
-        });
-      };
-    in mybuilders.linkSingleBin "${ipython-minimal}/bin/ipython")
+      ipythonEnv = pyPkg: pyPkg.withPackages (pypkgs: [
+        pypkgs.ipython
+        # Rich extension is used for nicer UI elements
+        # See: https://rich.readthedocs.io/en/stable/introduction.html#ipython-extension
+        pypkgs.rich
+      ]);
+    in mybuilders.linkSingleBin "${ipythonEnv stable.python3}/bin/ipython")
 
     (let androidPkgs = stable.androidenv.androidPkgs_9_0;
     in mybuilders.linkBins "android-tools-bins" [

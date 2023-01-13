@@ -106,6 +106,15 @@ def setup_config(shell: TerminalInteractiveShell) -> Any:
     # Require magic commands to be prefixed with %.
     shell.automagic = False
 
+    try:
+        # Rich has an ipython extension for nicer UI elements :)
+        # See: https://rich.readthedocs.io/en/stable/introduction.html#ipython-extension
+        import rich
+        shell.extension_manager.load_extension("rich")
+        print("note: 'rich' extension loaded \\o/")
+    except ImportError:
+        print("note: Unable to `import rich`, 'rich' extension not loaded")
+
     prompt_toolkit_app = cast(PromptSession, shell.pt_app)
     setup_my_keys(prompt_toolkit_app.key_bindings)
 
