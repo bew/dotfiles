@@ -5,7 +5,10 @@
 -- TODO: Add tags! Define layers!
 
 -- Disable keybindings
--- FIXME: missing?
+
+-- <C-LeftMouse> default to <C-]>, which just give errors in most files..
+-- I'll re-enable it in a smart way whenever I really want it!
+vim.cmd[[nnoremap <C-LeftMouse> <nop>]]
 
 ----- Survival keybindings..
 
@@ -47,7 +50,8 @@ vim.cmd[[nnoremap <C-l> <C-w>l]]
 --vim.cmd[[nmap <BS> <C-h>]]
 
 -- I: CTRL-U with undo point to avoid loosing text by mistake
-vim.cmd[[inoremap <C-u> <C-g>u<C-u>]]
+--vim.cmd[[inoremap <C-u> <C-g>u<C-u>]]
+-- NOTE: now a nvim default
 
 -- Goto tabs Alt-a/z
 vim.cmd[[nnoremap <M-a> gT]]
@@ -81,6 +85,20 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --   insert mode do the same.
 --   And I can already save from insert mode.. BUT if I just want to add few lines and then move
 --   around, i'll have to go back to normal mode myself before.. (acceptable?)
+
+
+-- I: Short navigation on the line in insert mode
+--
+-- This makes it possible to use the cursor keys in Insert mode, without breaking
+-- the undo sequence, therefore using `.` (redo) will work as expected.
+vim.cmd[[inoremap <Left>  <C-g>U<Left>]]
+vim.cmd[[inoremap <Right> <C-g>U<Right>]]
+vim.cmd[[inoremap <M-h>   <C-g>U<Left>]]
+vim.cmd[[inoremap <M-l>   <C-g>U<Right>]]
+-- Move back/forward by word, I'm too used to it in the shell and nvim's
+-- cmdline!
+vim.cmd[[inoremap <M-b> <C-g>U<S-Left>]]
+vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
 
 
 -- Survival keybindings - Command mode
@@ -167,20 +185,6 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 -- N: Side-scroll using Alt+ScrollWheel
 --nmap <M-ScrollWheelUp> zhzhzh
 --nmap <M-ScrollWheelDown> zlzlzl
-
--- I: Short navigation on the line in insert mode
---
--- This makes it possible to use the cursor keys in Insert mode, without breaking
--- the undo sequence, therefore using `.` (redo) will work as expected.
---inoremap <Left>  <C-g>U<Left>
---inoremap <Right> <C-g>U<Right>
--- We use imap to use the above left/right mapping
---imap <M-h> <Left>
---imap <M-l> <Right>
--- Move back/forward by word, I'm too used to it in the shell and nvim's
--- cmdline!
---inoremap <M-b> <C-g>U<S-Left>
---inoremap <M-w> <C-g>U<S-Right>
 
 -- Insert helper, useful for most languages so I make it global!
 --
