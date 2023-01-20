@@ -436,6 +436,18 @@ Plug {
   tags = {t.vimscript, t.textobj},
 }
 
+Plug {
+  source = gh"kylechui/nvim-surround",
+  desc = "Add/change/delete surrounding delimiter pairs with ease",
+  -- Nice showcases at: https://github.com/kylechui/nvim-surround/discussions/53
+  tags = {t.editing, t.extensible},
+  on_load = function()
+    -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red) highlights to the
+    -- modified surrounds?
+    -- (like with vim-sandwich)
+    require"nvim-surround".setup {}
+  end,
+}
 
 Plug {
   source = gh"tpope/vim-fugitive",
