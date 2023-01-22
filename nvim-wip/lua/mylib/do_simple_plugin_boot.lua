@@ -1,5 +1,5 @@
 local U = require"mylib.utils"
-local _f = U.str_concat
+local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 
 local function boot_plugins(given_plugin_specs)
