@@ -857,6 +857,13 @@ Plug {
 }
 
 Plug {
+  source = gh"tommcdo/vim-exchange",
+  desc = "Arbitrarily exchange(swap) blocks of code!",
+  tags = {t.vimscript},
+  -- TODO(later): Explicit keybinds, so I can better control which normal keybinds are active.
+}
+
+Plug {
   source = gh"vim-scripts/xterm-color-table.vim",
   desc = "Provide some commands to display all cterm colors",
   tags = {"utils", t.ui, t.vimscript},
