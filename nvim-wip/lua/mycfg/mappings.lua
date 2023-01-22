@@ -108,6 +108,21 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --
 -- And then it should be repeatable!
 -- (in another location with same (similar?) context around the cursor)
+--
+-- ------
+-- IDEA: A bit in the same vein as context-add stuff,
+-- I'd like to have a way to split a line UP, so:
+-- ```
+-- some text |-- some comment
+-- ```
+-- Then `<M-Enter>`, should give:
+-- ```
+-- |-- some comment
+-- some text
+-- ```
+--
+-- Could it be a special case of visual mode `<M-O>` ?
+-- That would be a `move selection to same context above/below` (can be repeated)
 
 
 -- I: Short navigation on the line in insert mode
