@@ -84,9 +84,11 @@ predefined_tags.vimscript = { desc = "Plugins in vimscript" }
 predefined_tags.global_ui = { desc = "Plugins for the global UI" }
 predefined_tags.code_ui = { desc = "Plugins for code UI" }
 predefined_tags.editing = { desc = "Plugins about code/content editing" }
+predefined_tags.insert = { desc = "Plugins adding stuff in insert mode" }
 predefined_tags.git = { desc = "Plugins around git VCS" }
 predefined_tags.textobj = { desc = "Plugins to add textobjects" }
 predefined_tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
+predefined_tags.extensible = { desc = "Plugins that can be extended" } -- TODO: apply on all relavant!
 predefined_tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
 -- Add name for each tag spec
 for k, v in pairs(predefined_tags) do v.name = k end
@@ -465,6 +467,115 @@ Plug {
   end,
   on_load = function()
     toplevel_map{mode={"n"}, key="<F5>", action=[[:UndotreeToggle<cr>]], desc="Toggle undo tree"}
+  end,
+}
+
+Plug {
+  source = gh"windwp/nvim-autopairs",
+  desc = "auto insert of second ()''{}[]\"\" etc...",
+  tags = {t.editing, t.extensible, t.insert},
+  on_load = function()
+    -- The plugin is _very_ configurable!
+    -- See Rules API at: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
+    local npairs = require"nvim-autopairs"
+    npairs.setup {
+      -- Cool way to interactively close last opened 'pair',
+      -- press the map and type one of the hint!
+      -- TODO: See if it's compatible with Luasnip? (w.r.t. extmarks, ..)
+      fast_wrap = { map = "<C-l>" },
+      -- FIXME: Don't auto-wrap if I don't ask for it!!
+      -- E.g: (While writing some doc)
+      -- `foo |"foo"` (`|` is the cursor)
+      -- Doing `{` currently does:
+      -- `foo {"foo"}`
+      -- But I simply want:
+      -- `foo {"foo"`
+      -- Opened issue: https://github.com/windwp/nvim-autopairs/issues/317
+    }
+
+    -- NOTE: The Rule API is a bit weird, and and doesn't make the config directly
+    --   readable without knowing about how the API works..
+    -- See: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
+    local Rule = require"nvim-autopairs.rule"
+    local cond = require"nvim-autopairs.conds"
+    -- Rename some functions to have a more readable config (has many more!)
+    -- NOTE: Not possible by default, made a PR for it (& changed locally)
+    --   https://github.com/windwp/nvim-autopairs/pull/316
+    Rule.insert_pair_when = Rule.with_pair
+    Rule.cr_expands_pair_when = Rule.with_cr
+    Rule.bs_deletes_pair_when = Rule.with_del
+    Rule.just_move_right_when = Rule.with_move
+    cond.never = cond.none()
+    cond.always = cond.done()
+
+    -- FIXME(?): It's not possible to make a SaneRule default without knowing the
+    -- internals of Rule:
+    -- * Default behavior is 'true' when no condition return either true or false.
+    -- * Adding new conditions always adds them at the end of the list
+    --   (=> I can't add a fallback behavior at the end)
+    --
+    -- One nice thing though is that only if the condition function returns nil,
+    -- the next condition is checked, so each condition has control
+    -- (could completely block / allow the action).
+
+    -- FIXME: Trying to write this in a shell script:
+    -- `some_var="foo $(basename "$to") bar"`
+    -- The nested `"` before `$to` was NOT doubled, and trying to write the
+    -- second one after writing `$to` doubled it :/
+    -- With `|` the cursor:
+    -- * From: `some_var="foo $(basename |) bar"`      (Type `"`)
+    -- *  Get: `some_var="foo $(basename "|) bar"`     (Type `"`)
+    -- *  Get: `some_var="foo $(basename ""|") bar"`
+    -- Expected:
+    -- * From: `some_var="foo $(basename |) bar"`      (Type `"`)
+    -- *  Get: `some_var="foo $(basename "|") bar"`
+    --
+    -- FIXME: Similar to last FIXME, spliting a quoted string in two isn't easy:
+    -- `" abc | def "`     I want: `" abc "|" def "`
+    -- But when I input `"`, I get:
+    -- `" abc "| def "`
+    -- And repeating `"` gives:
+    -- `" abc ""|" def "`
+    -- Which is not helpful :/
+    -- => I think I want `"` to always make a `"|"`
+    --    (and I'll bind `<M-">` for when I want a simple `"`)
+
+    -- FIXME: I want <bs> at bol to join multiline empty brackets!
+    -- text: `(\n|\n)` ; press `<backspace>` ; text: `(|)`
+
+    -- FIXME: In non-markup lang like in Lua comments, pressing ``` gives ```` (one too much)
+    -- It should be considered as a 'triplet' (like in smart-pairs) in _all_ cases.
+    -- -> See how it's done for markdown
+
+    -- text: `(|)` ; press `<space>` ; get: `( | )`
+    -- text: `( | )` ; press `<backspace>` ; get: `(|)`
+    -- From: https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#alternative-version
+    local brackets = { { '(', ')' }, { '[', ']' }, { '{', '}' } }
+    npairs.add_rules {
+      (
+        Rule({start_pair = " ", end_pair = " "})
+          :insert_pair_when(function(ctx)
+            -- get last char & next char, check if it's a known 'expandable' pair
+            local pair = ctx.line:sub(ctx.col -1, ctx.col)
+            return vim.tbl_contains({
+              brackets[1][1]..brackets[1][2],
+              brackets[2][1]..brackets[2][2],
+              brackets[3][1]..brackets[3][2]
+            }, pair)
+          end)
+          :just_move_right_when(cond.never) -- is this the default? (why not?)
+          :cr_expands_pair_when(cond.never) -- is this the default? (why not?)
+          :bs_deletes_pair_when(function(ctx)
+            local col = vim.api.nvim_win_get_cursor(0)[2]
+            local context = ctx.line:sub(col - 1, col + 2)
+            return vim.tbl_contains({
+              brackets[1][1]..'  '..brackets[1][2],
+              brackets[2][1]..'  '..brackets[2][2],
+              brackets[3][1]..'  '..brackets[3][2]
+            }, context)
+          end)
+      ),
+    }
   end,
 }
 
