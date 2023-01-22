@@ -479,10 +479,13 @@ Plug {
     -- See Rules API at: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
     local npairs = require"nvim-autopairs"
     npairs.setup {
-      -- Cool way to interactively close last opened 'pair',
-      -- press the map and type one of the hint!
+      -- VERY COOL way to interactively close last opened 'pair',
+      -- press the map and type one of the hint to place a/the closing pair there!
+      -- Workflow:
+      -- `(|foo`            -> fast_wrap.map -> press `$` -> `(|foo)`
+      -- `(|)bla (foo) bla` -> fast_wrap.map -> press `$` -> `(|bla (foo) bla)`
       -- TODO: See if it's compatible with Luasnip? (w.r.t. extmarks, ..)
-      fast_wrap = { map = "<C-l>" },
+      --
       -- FIXME: Don't auto-wrap if I don't ask for it!!
       -- E.g: (While writing some doc)
       -- `foo |"foo"` (`|` is the cursor)
@@ -491,6 +494,40 @@ Plug {
       -- But I simply want:
       -- `foo {"foo"`
       -- Opened issue: https://github.com/windwp/nvim-autopairs/issues/317
+      --
+      -- IDEA: I think that a more generic plugin to fast-insert a key via hints
+      -- would be REALLY handy!
+      -- => For example  `<M-,>$` could add a `,` at EOL without moving cursor,
+      --    while keeping flexibility, because `$` is _not_ the only hint position!
+      fast_wrap = {
+        map = "<C-l>",
+
+        -- Add '`' char as a potential wrap position
+        -- Default pattern: [=[[%'%"%)%>%]%)%}%,]]=]
+        -- NOTE: That regex only has a charset, it matches only 1 char
+        pattern = U.str_concat(
+          "[",
+          "%'", [[%"]], "%`",
+          "%)", "%>", "%]", "%}",
+          "%,",
+          "]"
+        ),
+        -- FIXME: I can't wrap _before_ a '`', only _after_ :/
+        -- Would need a way to target the char before it and give it as a position..
+        --
+        -- IDEA: Since pattern is a charset that match a single char,
+        -- and Lua patterns don't support logical OR, the plugin could receive a
+        -- list of lua patterns, and logical OR them!
+        -- => Would allow patterns that only match a char if it's preceded by X..
+        --    (with a single match group allowed?)
+        --
+        -- Could be even more powerful with a function that return
+        -- (cursor-relative?) positions on the line!
+        -- (with a helper function for simple pattern(s) matching)
+        -- => Would allow to have positions only at end of tree-sitter nodes..
+        -- => Would allow to have positions only in a string if we're in a string..
+        -- => Would allow to add some positions only if none matched so far..
+      },
     }
 
     -- NOTE: The Rule API is a bit weird, and and doesn't make the config directly
