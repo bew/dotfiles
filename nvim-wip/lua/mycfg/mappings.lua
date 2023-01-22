@@ -85,6 +85,29 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --   insert mode do the same.
 --   And I can already save from insert mode.. BUT if I just want to add few lines and then move
 --   around, i'll have to go back to normal mode myself before.. (acceptable?)
+--
+-- And we could extend this further, o/O are for entire lines, what about inside a line?
+-- * M-i/a could add in same context (container?) before/after current node
+--   Like for a function call: foo(1, 2|, 3)
+--        `<M-i>new` could be: foo(1, new|, 2, 3)
+--        `<M-a>new` could be: foo(1, 2, new|, 3)
+--   But could also work for a multiline Lua table!
+--
+-- * M-I/A could add in same context (container?) at the beginning/end ?
+--   Like for a function call: foo(1, 2|, 3)
+--        `<M-i>new` could be: foo(new|, 1, 2, 3)
+--        `<M-a>new` could be: foo(1, 2, 3, new|)
+--   But could also work for a multiline Lua table!
+--
+-- * M-n/p (?) could move to (begin? of) next/prev sibling nodes
+--
+-- And then there could be subtle highlights, or statusline segment
+-- to show the current inline/line contexts?
+-- There could be a interactive mode (a 'submode' of visual mode?) to choose context
+-- precisely, where only context-aware keys work?
+--
+-- And then it should be repeatable!
+-- (in another location with same (similar?) context around the cursor)
 
 
 -- I: Short navigation on the line in insert mode
