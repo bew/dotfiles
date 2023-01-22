@@ -128,61 +128,62 @@ NamedPlug.cmp {
   on_load = function()
     local cmp = require"cmp"
     -- NOTE: default config is at: https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/default.lua
-    cmp.setup.global({
-      snippet = {
-        expand = function(args)
-          -- TODO: enable when luasnip configured!
-          -- require'luasnip'.lsp_expand(args.body)
-        end
-      },
-      -- TODO? try the configurable popup menu (value: "custom")
-      -- view = {
-      --   entries = {name = 'custom', selection_order = 'near_cursor' }
-      -- }
-      view = { entries = "native" }, -- the builtin completion menu
-      confirmation = {
-        -- disable auto-confirmations!
-        get_commit_characters = function() return {} end,
-      },
-      -- NOTE: mapping presets are in https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/mapping.lua
-      mapping = cmp.mapping.preset.insert({
-        ["<C-c>"] = cmp.mapping.abort(), -- in addition to <C-e>
-        ["<M-C-n>"] = cmp.mapping.scroll_docs(4),
-        ["<M-C-p>"] = cmp.mapping.scroll_docs(-4),
-      }),
-      -- NOTE: default config has lots of sorting functions (cmp.config.compare.*),
-      --       and a locality system, try using that first before trying to override it!
-      --sorting = {
-      --  comparators = {
-      --    require'cmp_buffer'.compare_locality, -- sort words by distance to cursor (for buffer & lsp* sources)
-      --  }
-      --},
-      -- NOTE: 'cmp.config.sources' helper allows to specify multiple source arrays.
-      -- (internally it generates a single source list, where each source has 'group_index' field set to make groups)
-      -- The sources are grouped in the given order, and the groups are displayed as a fallback,
-      -- like chain completion.
-      sources = cmp.config.sources({
-        -- By default, 'buffer' source searches words in current buffer only
-        -- TODO: config to search in all opened (or visible?) buffers
-        -- IDEA?: make a separate source to search in buffer of same filetype
-        --        (its priority should be higher than the 'buffer' source's priority)
-        { name = "buffer" },
-        { name = "path" }, -- By default, '.' is relative to the buffer
-      }, {
-        {
-          name = "tmux",
-          option = { all_panes = true, trigger_characters = {} --[[ all ]], keyword_length = 5 },
-        },
-      }),
+    local global_cfg = {}
+    global_cfg.snippet = {
+      expand = function(args)
+        -- TODO: enable when luasnip configured!
+        -- require'luasnip'.lsp_expand(args.body)
+      end
+    }
+    -- TODO? try the configurable popup menu (value: "custom")
+    -- view = {
+    --   entries = {name = 'custom', selection_order = 'near_cursor' }
+    -- }
+    global_cfg.view = { entries = "native" } -- the builtin completion menu
+    global_cfg.confirmation = {
+      -- disable auto-confirmations!
+      get_commit_characters = function() return {} end,
+    }
+    -- NOTE: mapping presets are in https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/mapping.lua
+    global_cfg.mapping = cmp.mapping.preset.insert({
+      ["<C-c>"] = cmp.mapping.abort(), -- in addition to <C-e>
+      ["<M-C-n>"] = cmp.mapping.scroll_docs(4),
+      ["<M-C-p>"] = cmp.mapping.scroll_docs(-4),
     })
+    -- NOTE: default config has lots of sorting functions (cmp.config.compare.*),
+    --       and a locality system, try using that first before trying to override it!
+    --sorting = {
+    --  comparators = {
+    --    require'cmp_buffer'.compare_locality, -- sort words by distance to cursor (for buffer & lsp* sources)
+    --  }
+    --},
+    local common_sources = {
+      -- By default, 'buffer' source searches words in current buffer only
+      -- TODO: config to search in all opened (or visible?) buffers
+      -- IDEA?: make a separate source to search in buffer of same filetype
+      --        (its priority should be higher than the 'buffer' source's priority)
+      { name = "buffer" },
+      { name = "path" }, -- By default, '.' is relative to the buffer
+      {
+        name = "tmux",
+        option = { all_panes = true, trigger_characters = {} --[[ all ]], keyword_length = 5 },
+      },
+    }
+
+    global_cfg.sources = common_sources
+
+    cmp.setup.global(global_cfg)
     cmp.setup.filetype({"markdown", "git", "gitcommit"}, {
-      -- FIXME: does it replace the global sources? (I hope not)
-      sources = {
+      -- NOTE: This list of sources does NOT inherit from the global list of sources
+      sources = vim.list_extend(
         {
-          name = "emoji",
-          option = { insert = true, keyword_length = 4 },
+          {
+            name = "emoji",
+            option = { insert = true, keyword_length = 4 },
+          },
         },
-      }
+        common_sources
+      ),
     })
     -- IDEA of source for gitcommit:
     -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
