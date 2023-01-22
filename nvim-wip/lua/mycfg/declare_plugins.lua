@@ -445,10 +445,54 @@ Plug {
   -- Nice showcases at: https://github.com/kylechui/nvim-surround/discussions/53
   tags = {t.editing, t.extensible},
   on_load = function()
-    -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red) highlights to the
-    -- modified surrounds?
-    -- (like with vim-sandwich)
-    require"nvim-surround".setup {}
+    -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red)
+    -- highlights to the modified surrounds? (like with vim-sandwich)
+
+    -- NOTE: Doc on Lua patterns: https://www.lua.org/pil/20.2.html
+    --   gotcha: `%s` in patterns includes `\n`!
+    local surround_utils = require"nvim-surround.config"
+    local my_surrounds = {}
+
+    -- Override opening brace&co surrounds: They should represent the braces and
+    -- any spaces between them and actual content.
+    -- Like this:
+    -- `{   foo    }` -> `ds{` -> `foo`
+    -- `{ \n foo \n }` -> `ds{` -> `foo`
+    local openers = {
+      { open = "(", close = ")", open_rx = "%(", close_rx = "%)" },
+      { open = "[", close = "]", open_rx = "%[", close_rx = "%]" },
+      { open = "{", close = "}" },
+    }
+    for _, opener in ipairs(openers) do
+      my_surrounds[opener.open] = {
+        add = { opener.open .. " ", " " .. opener.close },
+        find = function()
+          return surround_utils.get_selection({ motion = "a" .. opener.open })
+        end,
+        -- For `(`: "^(%(%s*)().-(%s*%))()$",
+        -- For `[`: "^(%[%s*)().-(%s*%])()$",
+        -- For `{`: "^({%s*)().-(%s*})()$",
+        -- NOTE: the delete pattern will be applied on text returned by `find` above
+        -- NOTE: the plugin requires `()` after each opener/closer to remove
+        delete = U.str_concat(
+          "^",
+          "(", (opener.open_rx or opener.open), "%s*)()",
+          ".-",
+          "(%s*", (opener.close_rx or opener.close), ")()",
+          "$"
+        ),
+      }
+    end
+    require"nvim-surround".setup {
+      surrounds = my_surrounds,
+      -- Do not try to re-indent if the change was on a single line
+      -- See: https://github.com/kylechui/nvim-surround/issues/201
+      indent_lines = function(start_row, end_row)
+        if start_row ~= end_row then
+          surround_utils.default_opts.indent_lines(start_row, end_row)
+        end
+      end,
+    }
   end,
 }
 
