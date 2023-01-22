@@ -24,9 +24,9 @@ end
 --   so I can have trailing comma for the last item to concat!
 function M.str_space_concat(...)
   local final_str = ""
-  for idx, str_part in ipairs({...}) do
+  for idx, item in ipairs({...}) do
     if idx ~= 1 then final_str = final_str .. " " end
-    final_str = final_str .. str_part
+    final_str = final_str .. tostring(item)
   end
   return final_str
 end
@@ -45,8 +45,8 @@ end
 --   so I can have trailing comma for the last item to concat!
 function M.str_concat(...)
   local final_str = ""
-  for idx, str_part in ipairs({...}) do
-    final_str = final_str .. str_part
+  for idx, item in ipairs({...}) do
+    final_str = final_str .. tostring(item)
   end
   return final_str
 end

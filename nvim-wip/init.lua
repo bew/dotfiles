@@ -15,6 +15,11 @@ print("Starting config load", vim.fn.strftime"%c")
 --  end,
 --})
 
+-- Setup this nvim instance to work with a completely different nvim folder,
+-- because I want to have multiple configs, potentially available at the same time.
+--
+-- See this issue for future better way to solve this:
+-- https://github.com/neovim/neovim/issues/21691
 local nvim_cfg_path = "/home/bew/.dot/nvim-wip"
 -- Override stdpaths
 --
@@ -106,9 +111,11 @@ end
 
 --- Create top level map
 function toplevel_map(spec)
-  assert(spec.mode, "mode is required")
-  assert(spec.key, "key is required")
-  assert(spec.action, "action is required")
+  vim.validate{
+    mode={spec.mode, {"string", "table"}},
+    key={spec.key, "string"},
+    action={spec.action, {"function", "string"}}
+  }
   vim.keymap.set(spec.mode, spec.key, spec.action, spec.opts)
 end
 
