@@ -86,11 +86,26 @@ in {
     # packages on backbone channel, upgrades less often
     backbone.tmux
 
-    neovim-minimal
-    (mybuilders.linkBins "nvim-original" {
-      nvim-original = "${cliPkgs.neovim}/bin/nvim";
+    # The original nvim Nix package, with another bin name
+    (mybuilders.replaceBinsInPkg {
+      name = "nvim-original";
+      copyFromPkg = cliPkgs.neovim;
+      bins = { nvim-original = "${cliPkgs.neovim}/bin/nvim"; };
     })
-    #stable.rust-analyzer
+    (mybuilders.linkBins "nvim-bins" (
+      let
+        nvim-wip = stable.writeShellScript "nvim-wip" ''
+          exec ${cliPkgs.neovim}/bin/nvim -u ~/.dot/nvim-wip/init.lua "$@"
+        '';
+        nvim-minimal = "${neovim-minimal}/bin/nvim";
+      in {
+        inherit nvim-minimal nvim-wip;
+
+        # My WIP config, directly accessible as `nvim` (may be broken!)
+        # Change drv to `nvim-minimal` if all is broken! So `nvim` always points to ~working config
+        nvim = nvim-wip;
+      }
+    ))
 
 
     cliPkgs.fzf
