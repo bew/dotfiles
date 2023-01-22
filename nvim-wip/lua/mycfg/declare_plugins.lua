@@ -87,6 +87,7 @@ predefined_tags.editing = { desc = "Plugins about code/content editing" }
 predefined_tags.git = { desc = "Plugins around git VCS" }
 predefined_tags.textobj = { desc = "Plugins to add textobjects" }
 predefined_tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
+predefined_tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
 -- Add name for each tag spec
 for k, v in pairs(predefined_tags) do v.name = k end
 -- Shorter var for easy/non-bloat use in pkg spec!
@@ -446,6 +447,24 @@ Plug {
     -- modified surrounds?
     -- (like with vim-sandwich)
     require"nvim-surround".setup {}
+  end,
+}
+
+-- FIXME: 'mbbill/undotree' does NOT have diff preview when going up/down :/
+-- Best would be 'simnalamburt/vim-mundo' BUT it requires python...
+-- See: https://github.com/nvim-lua/wishlist/issues/21
+Plug {
+  source = gh"mbbill/undotree",
+  desc = "Vim undo tree visualizer",
+  tags = {t.vimscript, "ui", t.need_better_plugin},
+  -- pre_load because it must be set before `plugin/` files are loaded!
+  on_pre_load = function()
+    -- (e.g) Use 'd' instead of 'days' to save some space.
+    vim.g.undotree_ShortIndicators = 1
+    vim.g.undotree_SplitWidth = 42
+  end,
+  on_load = function()
+    toplevel_map{mode={"n"}, key="<F5>", action=[[:UndotreeToggle<cr>]], desc="Toggle undo tree"}
   end,
 }
 
