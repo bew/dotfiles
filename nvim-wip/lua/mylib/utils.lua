@@ -14,15 +14,38 @@ function M.filter_list(tbl, filter_fn)
   return ret
 end
 
--- Helper function to concat and return strings like print
+-- Helper function to concat/join strings together with spaces like print
 -- ```
--- local _f = U.str_concat
+-- -- Useful to format string without having to add spaces everywhere before/after variables
+-- local _f = U.str_space_concat
 -- error(_f("foo", some_var, "baz"))
 -- ```
-function M.str_concat(...)
+-- TODO(?): Might be nice to allow a table as single param,
+--   so I can have trailing comma for the last item to concat!
+function M.str_space_concat(...)
   local final_str = ""
   for idx, str_part in ipairs({...}) do
     if idx ~= 1 then final_str = final_str .. " " end
+    final_str = final_str .. str_part
+  end
+  return final_str
+end
+
+-- Helper function to concat/join strings together (without spaces)
+-- ```
+-- -- Useful to write complex regexes on multiple lines
+-- U.str_concat(
+--   "^"
+--   "(",
+--   foo,
+--   ")$"
+-- )
+-- ```
+-- TODO(?): Might be nice to allow a table as single param,
+--   so I can have trailing comma for the last item to concat!
+function M.str_concat(...)
+  local final_str = ""
+  for idx, str_part in ipairs({...}) do
     final_str = final_str .. str_part
   end
   return final_str

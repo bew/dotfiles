@@ -1,5 +1,5 @@
 local U = require"mylib.utils"
-local _f = U.str_concat
+local _f = U.str_space_concat
 local _s = U.str_surround
 local _q = U.str_simple_quote_surround
 
