@@ -81,7 +81,7 @@ local gh = from_github
 local predefined_tags = setmetatable({}, KeyRefMustExist_mt)
 predefined_tags.careful_update = { desc = "Plugins I want to update carefully" }
 predefined_tags.vimscript = { desc = "Plugins in vimscript" }
-predefined_tags.global_ui = { desc = "Plugins for the global UI" }
+predefined_tags.ui = { desc = "Plugins for the global UI" }
 predefined_tags.code_ui = { desc = "Plugins for code UI" }
 predefined_tags.editing = { desc = "Plugins about code/content editing" }
 predefined_tags.insert = { desc = "Plugins adding stuff in insert mode" }
@@ -95,6 +95,11 @@ for k, v in pairs(predefined_tags) do v.name = k end
 -- Shorter var for easy/non-bloat use in pkg spec!
 local t = predefined_tags
 
+local function is_module_available(module_name)
+  local module_available = pcall(require, module_name)
+  return module_available -- bool
+end
+
 --------------------
 
 NamedPlug.statusline {
@@ -103,7 +108,7 @@ NamedPlug.statusline {
   -- Very flexible, modular, declarative, dynamic & nicely customizable !!!
   -- Full doc is available at: https://github.com/rebelot/heirline.nvim/blob/master/cookbook.md
   -- (no vim doc for now)
-  tags = {t.global_ui, t.careful_update},
+  tags = {t.ui, t.careful_update, t.extensible},
   on_load = function()
     require("mycfg.heirline_statusline_setup").setup()
   end,
@@ -113,7 +118,7 @@ NamedPlug.cmp {
   source = gh"hrsh7th/nvim-cmp",
   desc = "Auto-completion framework",
   -- IDEA: could enable plugins based on roles?
-  tags = {"insert", t.editing, t.careful_update},
+  tags = {t.insert, t.editing, t.careful_update, t.extensible},
   config_depends_on = {
     Plug { source = gh"hrsh7th/cmp-buffer", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
@@ -179,13 +184,17 @@ NamedPlug.cmp {
         },
       }
     })
+    -- IDEA of source for gitcommit:
+    -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
+    --    (only if it's lowercase, to not match ticket numbers like JIRA-456)
+    -- 2. for last 100(?) git log summaries (for touched files / for all)
   end,
 }
 
 Plug {
   source = gh"folke/which-key.nvim",
   desc = "Display a popup with possible keybindings of the command you started typing",
-  tags = {"keys", t.global_ui},
+  tags = {"keys", t.ui},
   on_load = function()
     local wk = require"which-key"
     wk.setup {
@@ -318,7 +327,7 @@ Plug {
 Plug {
   source = gh"kyazdani42/nvim-tree.lua",
   desc = "file explorer tree",
-  tags = {t.global_ui, "filesystem"},
+  tags = {t.ui, "filesystem"},
   on_load = function()
     require"nvim-tree".setup {
       view = {
@@ -366,6 +375,13 @@ Plug {
       -- show the current indent level on empty lines
       -- (setting it to false would only show the previous indent, not current one)
       show_trailing_blankline_indent = true,
+      -- The maximum indent level increase from line to line
+      -- => Make sudden big indent not add more indent lines than necessary
+      max_indent_increase = 1,
+
+      -- TODO: TEST THIS!
+      use_treesitter = is_module_available("treesitter"),
+      show_current_context = is_module_available("treesitter"),
     }
   end,
 }
@@ -373,12 +389,13 @@ Plug {
 NamedPlug.web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
-  tags = {"ui", t.lib_only},
+  tags = {t.ui, t.lib_only},
 }
 
 NamedPlug.startup_screen {
   source = gh"goolord/alpha-nvim",
   desc = "a lua powered greeter like vim-startify / dashboard-nvim",
+  tags = {t.ui, t.extensible},
   depends_on = {NamedPlug.web_devicons},
   on_load = function()
     -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
@@ -418,6 +435,18 @@ Plug {
   desc = "Comment text object",
   tags = {t.vimscript, t.textobj},
   depends_on = { NamedPlug.lib_textobj_user },
+  -- IDEA: when the comment is the last thing of the line,
+  -- `ac` could also take the spaces before it!
+  -- Meaning that when I have:
+  -- `foobar  -- |some comment`
+  -- Doing `dac` currently does:
+  -- `foobar  ` (trailing spaces left!)
+  -- I'd like to have:
+  -- `foobar`
+  --
+  -- BUT I usually don't want it when I do `vac` or `cac`...
+  -- Maybe a better solution could be that when `ac` binding is enabled,
+  -- add a `dac` binding that implements this behavior?
 }
 
 -- textobj: ie ae
@@ -739,6 +768,7 @@ Plug {
 
     -- define hunk text object & visual selector
     toplevel_map{mode={"o", "x"}, key="ih", action=gs.select_hunk, desc="select hunk"}
+    toplevel_map{mode={"o", "x"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
 }
 
@@ -750,6 +780,9 @@ Plug {
     require('Comment').setup {
       mappings = false,
     }
+    -- FIXME: Allow `gcA` to be dot-repeated
+    -- Opened issue: https://github.com/numToStr/Comment.nvim/issues/222
+    -- (closed as wontfix :/ TODO: make a PR that does it!)
 
     -- NOTE: smart uncomment on inline comments (like `foo /* bar */ baz`) doesn't work automatically by default
     -- => There is a way, when triggering a 'linewise' un/comment/toggle on a region
@@ -825,7 +858,7 @@ Plug {
 Plug {
   source = gh"vim-scripts/xterm-color-table.vim",
   desc = "Provide some commands to display all cterm colors",
-  tags = {"utils", "ui", t.vimscript},
+  tags = {"utils", t.ui, t.vimscript},
 }
 
 -- Disabled for now, to find all plugins that require it!
@@ -837,24 +870,26 @@ Plug {
 
 -- NOTE: I don't want all the lazyness and perf stuff of 'lazy'
 -- I want a simple plugin loader (using neovim packages), with nice recap UI,
--- update system (?) with lockfile (usable from Nix).
+-- interactive update system, with a lockfile (usable from Nix).
+--
+-- I want a way to ask what plugins has updates, see git log, and update plugins individually on
+-- demand (or by tags inclusion/exclusion).
+-- => It's actually already possible (except filtering on tags) with `Lazy check` then `Lazy logs`
+--
+-- TODO: Ask a way to disable the 'update' tab, which is potentially too dangerous,
+-- I want to review plugins updates before I actuall update them!
 NamedPlug.pkg_manager {
   source = gh"folke/lazy.nvim",
   desc = "A modern plugin manager for Neovim",
   tags = {"boot", t.careful_update},
   on_boot = function()
-    local lazy_installed = pcall(require, "lazy")
-    if not lazy_installed then return false end
+    if not is_module_available("lazy") then return false end
 
     local lazy_plugin_specs = {}
     for _, plug in pairs(U.filter_list(all_plugin_specs, function(p) return not p.on_boot end)) do
       local lazy_single_spec = { plug.source.owner_repo }
-      if plug.on_load then
-        --lazy_single_spec.config = plug.on_load
-        lazy_single_spec.config = function()
-          plug.on_load()
-        end
-      end
+      lazy_single_spec.init = plug.on_pre_load
+      lazy_single_spec.config = plug.on_load
       table.insert(lazy_plugin_specs, lazy_single_spec)
     end
     local plug_names = {}
@@ -869,9 +904,13 @@ NamedPlug.pkg_manager {
       change_detection = { enabled = false }, -- MAYBE: try it?
       cache = { enabled = false },
       performance = { reset_packpath = false },
-      -- Works in the Update UI, but not in the Logs UI
-      -- See: https://github.com/folke/lazy.nvim/discussions/353
-      --git = { log = {"ORIG_HEAD.."} },
+      git = {
+        -- In the Logs UI, show commits that are 'pending'
+        -- (for plugins not yet updated to their latest fetched commit)
+        -- => Will show nothing for plugins that are up-to-date, but I can always go
+        --    where the plugin is (can copy path from plugin details) and `git log`!
+        log = {"..origin/HEAD"}
+      },
     })
   end,
 }

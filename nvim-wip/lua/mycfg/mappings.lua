@@ -142,22 +142,25 @@ vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
 -- Survival keybindings - Command mode
 
 -- C: Cursor movement
-vim.cmd[[cnoremap <M-h> <Left>]]
-vim.cmd[[cnoremap <M-l> <Right>]]
-vim.cmd[[cnoremap <M-w> <S-Right>]]
-vim.cmd[[cnoremap <M-b> <S-Left>]]
-vim.cmd[[cnoremap <M-$> <End>]]
-vim.cmd[[cnoremap <M-^> <Home>]]
+toplevel_map{mode="c", key="<M-h>", action="<Left>",    desc="move left"}
+toplevel_map{mode="c", key="<M-l>", action="<Right>",   desc="move right"}
+toplevel_map{mode="c", key="<M-w>", action="<S-Right>", desc="move to next word"}
+toplevel_map{mode="c", key="<M-b>", action="<S-Left>",  desc="move to prev word"}
+toplevel_map{mode="c", key="<M-$>", action="<End>",     desc="move to end"}
+toplevel_map{mode="c", key="<M-^>", action="<Home>",    desc="move to start"}
 
 -- C: Command history by prefix
-vim.cmd[[cnoremap <M-k> <Up>]]
-vim.cmd[[cnoremap <M-j> <Down>]]
+toplevel_map{mode="c", key="<M-k>", action="<Up>",      desc="prev history byprefix"}
+toplevel_map{mode="c", key="<M-j>", action="<Down>",    desc="next history byprefix"}
 -- Command history
-vim.cmd[[cnoremap <M-K> <S-Up>]]
-vim.cmd[[cnoremap <M-J> <S-Down>]]
+toplevel_map{mode="c", key="<M-K>", action="<S-Up>",    desc="prev history"}
+toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 
 -- C: Expand %% to dir of current file
-vim.cmd[[cnoremap <expr> %%  expand("%:.:h") . "/"]]
+-- vim.cmd[[cnoremap <expr> %%  expand("%:.:h") . "/"]]
+toplevel_map{mode="c", key="%%", opts={expr=true}, desc="current file's dir", action=function()
+  return vim.fn.expand("%:.:h") .. "/"
+end}
 
 -- N: toggle wrap
 vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
