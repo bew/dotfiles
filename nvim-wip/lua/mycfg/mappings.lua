@@ -13,9 +13,11 @@ vim.cmd[[nnoremap <C-LeftMouse> <nop>]]
 ----- Survival keybindings..
 
 -- N,I,V: Save buffer
-vim.cmd[[nnoremap <silent> <M-s> :w<cr>]]
-vim.cmd[[inoremap <silent> <M-s> <Esc>:w<cr>]]
-vim.cmd[[vnoremap <silent> <M-s> <Esc>:w<cr>]]
+-- NOTE: using lockmarks to avoid overwriting '[ & '] marks by the 'write'
+--   See: https://neovim.discourse.group/t/using-after-w/3608
+vim.cmd[[nnoremap <silent> <M-s> :lockmarks w<cr>]]
+vim.cmd[[inoremap <silent> <M-s> <Esc>:lockmarks w<cr>]]
+vim.cmd[[vnoremap <silent> <M-s> <Esc>:lockmarks w<cr>]]
 
 -- N: Quit window
 vim.cmd[[nnoremap <silent> Q :q<cr>]]
