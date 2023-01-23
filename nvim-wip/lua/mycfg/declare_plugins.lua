@@ -904,7 +904,7 @@ NamedPlug.pkg_manager {
     for _, plug in pairs(lazy_plugin_specs) do
       table.insert(plug_names, plug[1])
     end
-    print("Loading lazy plugins:", vim.inspect(plug_names))
+    --print("Loading lazy plugins:", vim.inspect(plug_names))
     require("lazy").setup(lazy_plugin_specs, {
       root = "/home/bew/.dot/nvim-wip/pack/lazy-managed-plugins/start",
       install = { missing = false },
