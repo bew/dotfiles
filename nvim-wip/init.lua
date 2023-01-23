@@ -149,8 +149,11 @@ require"mylib.do_simple_plugin_boot"(declared_plugins.all_plugin_specs)
 require"mycfg.mappings"
 
 
--- " FIXME: I don't know where to put this...
--- au TextYankPost * silent! lua vim.highlight.on_yank({ timeout = 300 })
+-- FIXME: I don't know where to put this...
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "Briefly highlight yanked text",
+  callback = function() vim.highlight.on_yank{ timeout = 300 } end,
+})
 
 -- " When editing a file, always jump to the last known cursor position.
 -- " Don't do it when the position is invalid or when inside an event handler
