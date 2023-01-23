@@ -38,5 +38,11 @@ endf
 nnoremap <buffer><silent> <C-n>  :call <SID>SearchHelpLink(v:false)<cr>
 nnoremap <buffer><silent> <C-p>  :call <SID>SearchHelpLink(v:true)<cr>
 
+" Vertical movement (fast & slow)
+nnoremap <buffer> <M-j> <C-d>
+nnoremap <buffer> <M-k> <C-u>
+nnoremap <buffer> <M-K> 5<C-y>
+nnoremap <buffer> <M-J> 5<C-e>
+
 " Set statusline comment for this buffer
 let b:bew_statusline_comment = "o: open | C-n/p: find link | M-n/p: history | M-h: :h"
