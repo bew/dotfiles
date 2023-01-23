@@ -124,6 +124,36 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- Could it be a special case of visual mode `<M-O>` ?
 -- That would be a `move selection to same context above/below` (can be repeated)
 
+-- Duplicate visual selection (preserving its mode, can be 'spammed' for repeat)
+toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=function()
+  -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
+  -- however Visual selection is a pain to get reliably while handling all cases.
+  -- See this PR that attempts to add a vim.get_visual_selection() function:
+  --   https://github.com/neovim/neovim/pull/13896
+  --
+  -- So until we have better APIs to manipulate visual mode, let's just implement it
+  -- in a way similar to my old vimscript implementation :shrug:
+
+  local save_reg = vim.fn.getreginfo([["]])
+
+  local visual_mode = vim.fn.mode()
+  if visual_mode == "v" or visual_mode == "V" then
+    --- Char or Line selection mode:
+    -- Copy, go to the end of the selection, paste
+    -- then re-enter visual (for easy repeat)
+    vim.fn.execute [[noautocmd normal! y`>pgv]]
+  else
+    --- Block selection mode:
+    -- Copy (cursor moves to top left of block), paste before
+    -- then re-enter visual (for easy repeat)
+    --
+    -- NOTE: for some reason paste before in block mode does _not_ move
+    -- last visual marks.. (they do move when using this in the other visual modes)
+    vim.fn.execute [[noautocmd normal! yPgv]]
+  end
+
+  vim.fn.setreg([["]], save_reg.regcontents, save_reg.regtype)
+end}
 
 -- I: Short navigation on the line in insert mode
 --
@@ -594,20 +624,6 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 --vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>
 -- close all manually opened folds in range
 --vnoremap <silent> zc  zx
-
--- Duplicate the visual selection
---vnoremap <C-d> <cmd>call <sid>DuplicateVisualSelection()<cr>
---function! s:DuplicateVisualSelection()
---  " Save unnamed register (will be overwritten when copying current visual selection)
---  let save_reg = getreg('"', 1, v:true)
---  let save_regtype = getregtype('"')
-
---  " Copy, go to the end of the selection, paste
---  exe 'normal! y`>p'
-
---  " Restore unnamed register
---  call setreg('"', save_reg, save_regtype)
---endf
 
 -- Toggle Mundo tree
 --nnoremap <silent> <F5> :MundoToggle<cr>
