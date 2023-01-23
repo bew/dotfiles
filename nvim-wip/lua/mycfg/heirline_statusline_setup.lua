@@ -2,7 +2,6 @@
 
 
 local hline_conditions = require"heirline.conditions"
-local hline_utils = require"heirline.utils"
 local _ = { provider = " " }
 local __WideSpacing__ = { provider = "%=" }
 
@@ -202,7 +201,7 @@ local FileType = {
 }
 local Ruler = { provider = "%P %l:%02v" }
 
-local statusline = {
+local StatuslineInner = {
   Mode,
   { -- File info block
     -- FIXME: `:h` looks like this: `help.txt[EXT] doc/help.txt`
@@ -249,19 +248,25 @@ local statusline = {
   },
 }
 
+local Statusline = {
+  hl = function()
+    if hline_conditions.is_active() then
+      return { ctermfg = 244, ctermbg = 236 }
+    else
+      return { ctermfg = 241, ctermbg = 235 }
+    end
+  end,
+  StatuslineInner,
+}
+
 local function setup()
   -- FIXME: doesn't behave well when no space to show whole statuline..
   require"heirline".setup({
-    hl = function()
-      if hline_conditions.is_active() then
-        return { ctermfg = 244, ctermbg = 236 }
-      else
-        return { ctermfg = 241, ctermbg = 235 }
-      end
-    end,
-    statusline,
+    statusline = Statusline,
   })
-  -- TODO: I want to setup the statusline option myself, and only call heirline for initialization.
+  -- TODO: I want to setup the 'statusline' option myself, and only call heirline for initialization.
+  -- This would allow to setup local statuslines in some file / for some window, without putting
+  -- that config in the global statusline.
 end
 
 return {

@@ -724,18 +724,24 @@ Plug {
   on_load = function()
     require"gitsigns".setup{
       signs = {
-        add          = {hl = "SignVcsAdd"   , text = "┃"},
-        change       = {hl = "SignVcsChange", text = "┃"},
-        delete       = {hl = "SignVcsDelete", text = "▁"},
-        changedelete = {hl = "SignVcsChange", text = "▁"}, -- diff is done with different highlight
-        topdelete    = {hl = "SignVcsDelete", text = "▔"},
+        add          = { text = "┃" },
+        change       = { text = "┃" },
+        delete       = { text = "▁" },
+        changedelete = { text = "▁" }, -- like delete, but with different highlight
+        topdelete    = { text = "▔" },
+        untracked    = { text = '┆' },
       },
-      attach_to_untracked = false,
+      attach_to_untracked = true,
       preview_config = { border = "none" },
-
-      -- FIXME: use 'on_attach' ? or configure keybinds outside?
-      -- (there's no autocmd on attach (yet))
     }
+    vim.api.nvim_set_hl(0, "GitSignsAdd",          { link = "SignVcsAdd" })
+    vim.api.nvim_set_hl(0, "GitSignsChange",       { link = "SignVcsChange" })
+    vim.api.nvim_set_hl(0, "GitSignsDelete",       { link = "SignVcsDelete" })
+    vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = "SignVcsChange" })
+    vim.api.nvim_set_hl(0, "GitSignsTopdelete",    { link = "SignVcsDelete" })
+    vim.api.nvim_set_hl(0, "GitSignsUntracked",    { link = "SignVcsUntracked" })
+
+    -- FIXME: use 'on_attach' to config keybinds?
 
     -- define these globally for now.. (until good solution for per-buffer which_key helper)
     leader_map_define_group{mode={"n"}, prefix_key="h", name="+git-hunks"}
