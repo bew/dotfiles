@@ -214,6 +214,7 @@ exe "HiResetTo SignColumn ctermbg=233"
 exe "HiResetTo SignVcsAdd"      .s:fg_green
 exe "HiResetTo SignVcsChange"   .s:fg_yellow
 exe "HiResetTo SignVcsDelete"   .s:fg_red
+exe "HiResetTo SignVcsUntracked".s:fg_cyan
 
 exe "HiResetTo Conceal"   .s:fg_blue
 exe "HiResetTo SpellBad"       .s:fmt_undr
