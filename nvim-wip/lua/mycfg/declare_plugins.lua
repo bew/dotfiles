@@ -875,6 +875,21 @@ Plug {
   tags = {"utils", t.ui, t.vimscript},
 }
 
+Plug {
+  source = gh"ethanholz/nvim-lastplace",
+  desc = "Intelligently reopen files at your last edit position",
+  -- It handles more edge cases (and is actually configurable) than the autocmd that
+  -- is documented at `:h restore-cursor`.
+  tags = {"utils"},
+  on_load = function()
+    require'nvim-lastplace'.setup {
+      lastplace_ignore_buftype = {"quickfix", "nofile", "help"},
+      lastplace_ignore_filetype = {"gitcommit", "gitrebase"},
+      lastplace_open_folds = true,
+    }
+  end,
+}
+
 -- Disabled for now, to find all plugins that require it!
 --Plug.plenary {
 --  source = gh"nvim-lua/plenary.nvim",
