@@ -6,8 +6,6 @@
 -- NOTE: Here is how lazy.nvim resets these:
 -- https://github.com/folke/lazy.nvim/blob/c7122d64cdf16766433588486adcee67571de6d0/lua/lazy/core/config.lua#L183
 
-print("Starting config load", vim.fn.strftime"%c")
-
 -- TODO: re-enable, and contribute fixes to all plugins with undefined global vars..
 --_G = setmetatable(_G, {
 --  __index = function(_, key)
