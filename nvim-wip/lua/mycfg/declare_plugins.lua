@@ -763,6 +763,12 @@ Plug {
 }
 
 Plug {
+  source = gh"rhysd/committia.vim",
+  desc = "More pleasant editing on commit messages with dedicated msg/status/diff windows",
+  tags = {t.vimscript, t.git},
+}
+
+Plug {
   source = gh"lewis6991/gitsigns.nvim",
   desc = "Git integration for buffers",
   tags = {t.code_ui, t.git},
