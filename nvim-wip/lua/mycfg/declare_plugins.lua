@@ -136,7 +136,9 @@ NamedPlug.cmp {
       end
     }
     -- TODO? try the configurable popup menu (value: "custom")
-    -- view = {
+    -- => Need to set all CmpItem* hl groups!
+    --    (they only have gui* styles by default, no cterm*)
+    -- global_cfg.view = {
     --   entries = {name = 'custom', selection_order = 'near_cursor' }
     -- }
     global_cfg.view = { entries = "native" } -- the builtin completion menu
@@ -157,16 +159,55 @@ NamedPlug.cmp {
     --    require'cmp_buffer'.compare_locality, -- sort words by distance to cursor (for buffer & lsp* sources)
     --  }
     --},
+    -- FIXME: writing `thina` does NOT match `thisisnotaword` :/ why not??
     local common_sources = {
-      -- By default, 'buffer' source searches words in current buffer only
-      -- TODO: config to search in all opened (or visible?) buffers
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
-      { name = "buffer" },
+      -- FIXME: There doesn't seem to be a way to change the associated label we see in compl menu
+      --        for a given source block..
+      --        Only `tmux` source allow configurating the source name in compl menu.
+      --        => it should really be a config on source config level, not source definition
+      --        level. (or can a single source provide multiple labels???)
+      --        NOTE: looking at cmp_tmux's source, it seems to be set per completion item, in
+      --        `item.labelDetails.detail`.
+      {
+        name = "buffer",
+        option = {
+          -- Collect buffer words, following 'iskeyword' option
+          -- See: https://github.com/hrsh7th/nvim-cmp/issues/453
+          keyword_pattern = [[\k\+]],
+          -- By default, 'buffer' source searches words in current buffer only,
+          -- I want instead to look into:
+          -- * visible bufs (on all tabs)
+          -- * loaded bufs with same filetype
+          -- FIXME: Any way to have special compl entry display for visible / same tab / same ft ?
+          get_bufnrs = function()
+            local bufs = {}
+            -- get visible buffers (across all tabs)
+            for _, win in ipairs(vim.api.nvim_list_wins()) do
+              bufs[vim.api.nvim_win_get_buf(win)] = true
+            end
+            -- get loaded buffers of same filetype
+            local current_ft = vim.api.nvim_buf_get_option(0, "filetype")
+            for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+              local is_loaded = vim.api.nvim_buf_is_loaded(bufnr)
+              local buf_ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+              if is_loaded and buf_ft == current_ft then
+                bufs[bufnr] = true
+              end
+            end
+            return vim.tbl_keys(bufs)
+          end,
+        },
+      },
       { name = "path" }, -- By default, '.' is relative to the buffer
       {
         name = "tmux",
-        option = { all_panes = true, trigger_characters = {} --[[ all ]], keyword_length = 5 },
+        keyword_length = 4,
+        option = {
+          all_panes = true,
+          trigger_characters = {}, -- all
+        },
       },
     }
 
@@ -179,7 +220,11 @@ NamedPlug.cmp {
         {
           {
             name = "emoji",
-            option = { insert = true, keyword_length = 4 },
+            keyword_length = 3,
+            option = {
+              -- insert the emoji char, not the `:txt:`
+              insert = true,
+            },
           },
         },
         common_sources
