@@ -119,17 +119,30 @@ local FilenameTwoParts = {
       return some_text_or(buf_name, "[No Name]")
     end
   end,
+  hl = function()
+    return vim.bo.modified and { cterm = { bold = true } }
+  end,
 }
 
 -- few simple blocks (simple.. for now)
 local Changed = {
   provider = function()
-    return vim.bo.modified and "[+]"
+    return vim.bo.modified and unicode_or(" ", "[+]")
   end,
+  hl = function()
+    return { ctermfg = 208 }
+  end,
+  on_click = {
+    callback = function()
+      vim.cmd[[lockmarks write]]
+    end,
+    -- Should be unique(?). Not 100% sure what it's used for, and how..
+    name = "statusline_buffer_write_action",
+  },
 }
 local ReadOnly = {
   provider = function(self)
-    return vim.bo.readonly and "[RO]"
+    return vim.bo.readonly and unicode_or(" ", "[RO]")
   end,
 }
 local FileType = {
@@ -280,7 +293,12 @@ SpecialStatuslines.SplashStartup = {
 
   __WideSpacing__,
   {
-    provider = function() return "  Do something cool !  " end,
+    provider = "          Do something cool !          ",
+    hl = {
+      ctermbg = 26,
+      ctermfg = 254,
+      cterm = { bold = true },
+    },
   },
   __WideSpacing__,
 }
@@ -292,7 +310,7 @@ SpecialStatuslines.for_plugin.XtermColorTable = {
 
   __WideSpacing__,
   {
-    provider = function() return " XTerm color table " end,
+    provider = " XTerm color table ",
     hl = function()
       return white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
     end,
@@ -303,19 +321,9 @@ SpecialStatuslines.for_plugin.XtermColorTable = {
 local GeneralPurposeStatusline = {
   Mode,
   { -- File info block
-    {
-      _,
-      { FileOutOfCwd, FilenameTwoParts },
-      _,
-      hl = function()
-        if not vim.bo.modifiable then
-          -- FIXME: not working?
-          --   (Maybe there's some `cterm` override down-the-tree that prevent
-          --   this one to work?)
-          return { cterm = { italic = true } }
-        end
-      end,
-    },
+    _,
+    { FileOutOfCwd, FilenameTwoParts },
+    _,
     Changed,
     ReadOnly,
     hl = function()
