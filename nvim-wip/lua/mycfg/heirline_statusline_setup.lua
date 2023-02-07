@@ -2,15 +2,36 @@
 
 
 local hline_conditions = require"heirline.conditions"
+local hline_utils = require"heirline.utils"
 local _ = { provider = " " }
 local __WideSpacing__ = { provider = "%=" }
 
+local function is_and_has_text(value)
+  return type(value) == "string" and value ~= ""
+end
+
+local function unicode_or(unicode_variant, ascii_variant)
+  if not is_and_has_text(vim.env.ASCII_ONLY) then
+    return unicode_variant
+  else
+    return ascii_variant
+  end
+end
+
 local function some_text_or(maybe_txt, default)
   -- small helper to avoid checking nil or empty string
-  if maybe_txt ~= nil and maybe_txt ~= "" then
+  if is_and_has_text(maybe_txt) then
     return maybe_txt
   else
     return default
+  end
+end
+
+local function white_with_bg(spec)
+  if hline_conditions.is_active() then
+    return { ctermbg = spec.active_ctermbg, ctermfg = 255, cterm = {bold = true} }
+  else
+    return { ctermbg = spec.inactive_ctermbg, ctermfg = 252, cterm = {bold = true} }
   end
 end
 
@@ -63,43 +84,6 @@ local Mode = {
   end,
 }
 
-local CmdwinType = {
-  provider = function()
-    return vim.fn.getcmdwintype()
-  end,
-  hl = { ctermfg = "red", cterm = { bold = true } },
-}
--- Looks like this: `/ Search history /`
-local CmdwinTypeDescription = {
-  condition = function()
-    -- NOTE: using `nvim_buf_get_name` gives the same BUT preceded by CWD
-    --       `expand` always gives only that name.
-    return vim.fn.expand("%") == "[Command Line]"
-  end,
-  CmdwinType,
-  _,
-  {
-    provider = function()
-      local cmdwin_type = vim.fn.getcmdwintype()
-      if cmdwin_type == ":" then
-        return "Command history"
-      elseif cmdwin_type == ">" then
-        return "Debug mode history"
-      elseif cmdwin_type == "/" or cmdwin_type == "?" then
-        return "Search history"
-      elseif cmdwin_type == "@" then
-        return "Input history"
-      elseif cmdwin_type == "-" then
-        return "Old Ex :insert :append history"
-      elseif cmdwin_type == "=" then
-        return "Expression history"
-      end
-    end,
-  },
-  _,
-  CmdwinType,
-}
-
 local function transform_path_to_2_parts(buf_name)
   -- Transform to 2-parts file path: ~/foo or foo/bar
   local basename = vim.fn.fnamemodify(buf_name, ":t")
@@ -118,8 +102,7 @@ local FileOutOfCwd = {
   provider = function(self)
     local buf_name = vim.api.nvim_buf_get_name(0)
     if not vim.startswith(buf_name, vim.fn.getcwd()) then
-      -- FIXME: use a unicode symbol instead?
-      return "[EXT] "
+      return unicode_or(" ", "[EXT]")
     end
   end,
 }
@@ -138,51 +121,6 @@ local FilenameTwoParts = {
   end,
 }
 
-local SpecialFileDescription = {
-  -- NOTE: We need a condition function to be properly skipped when fallthrough is
-  --       used on the block that calls us.
-  -- See: https://github.com/rebelot/heirline.nvim/issues/54
-  condition = function(self)
-    for _, child in ipairs(self) do
-      if not child.condition or child:condition() then
-        return true
-      end
-    end
-  end,
-
-  { -- when in a help file
-    condition = function()
-      return vim.bo.filetype == "help" and not vim.bo.modifiable
-    end,
-    -- TODO: also replace/remove 'mode' block and say it's a help file?
-    -- (or make a completely separate statusline for help windows?)
-    provider = function()
-      local buf_name = vim.api.nvim_buf_get_name(0)
-      return vim.fn.fnamemodify(buf_name, ":t") -- keep only base name
-    end,
-  },
-  CmdwinTypeDescription, -- when the commandline window is open
-  { -- when on the startup screen
-    condition = function()
-      return hline_conditions.buffer_matches{filetype = {"alpha"}}
-    end,
-    -- TODO(?): make a separate statusline for the startup screen?
-    provider = function()
-      return "  Do something cool !  "
-    end,
-  },
-  { -- when in a man page
-    condition = function()
-      local buf_name = vim.api.nvim_buf_get_name(0)
-      return vim.startswith(buf_name, "man://")
-    end,
-    provider = function()
-      local buf_name = vim.api.nvim_buf_get_name(0)
-      return buf_name:gsub("man://", "Man: ")
-    end,
-  },
-}
-
 -- few simple blocks (simple.. for now)
 local Changed = {
   provider = function()
@@ -199,22 +137,181 @@ local FileType = {
     return vim.bo.filetype or "no ft"
   end,
 }
-local Ruler = { provider = "%P %l:%02v" }
+local RulerAndCursorPos = {
+  {
+    _,
+    {
+      provider = function()
+        if hline_conditions.is_active() then
+          return "%P %l:%02v"
+        else
+          return "%P L%l"
+        end
+      end,
+    },
+    _,
+  },
+  hl = function()
+    if hline_conditions.is_active() then
+      return { ctermfg = 235, ctermbg = 244 }
+    else
+      return { ctermfg = 233, ctermbg = 242 }
+    end
+  end
+}
 
-local StatuslineInner = {
+local BufBasename = {
+  provider = function()
+    local buf_name = vim.api.nvim_buf_get_name(0)
+    return vim.fn.fnamemodify(buf_name, ":t") -- keep only base name
+  end,
+}
+
+
+--------------------------------------------------------------------------------
+-- Per-use statuslines
+--------------------------------------------------------------------------------
+
+local SpecialStatuslines = { for_plugin = {} }
+
+local CmdwinType = {
+  provider = function()
+    return vim.fn.getcmdwintype()
+  end,
+  hl = { ctermfg = "red", cterm = { bold = true } },
+}
+local CmdwinTypeDescription = {
+  provider = function()
+    local cmdwin_type = vim.fn.getcmdwintype()
+    if cmdwin_type == ":" then
+      return "Command history"
+    elseif cmdwin_type == ">" then
+      return "Debug mode history"
+    elseif cmdwin_type == "/" or cmdwin_type == "?" then
+      return "Search history"
+    elseif cmdwin_type == "@" then
+      return "Input history"
+    elseif cmdwin_type == "-" then
+      return "Ex :insert :append history"
+    elseif cmdwin_type == "=" then
+      return "Expression history"
+    end
+  end,
+}
+-- Looks like this: `/ Search history /`
+SpecialStatuslines.Cmdwin = {
+  condition = function()
+    -- NOTE: using `nvim_buf_get_name` gives the same BUT preceded by CWD.
+    --   `expand` always gives only that name.
+    --   Also, `expand` gives that name only for the statusline of cmdwin.
+    return vim.fn.expand("%") == "[Command Line]"
+  end,
+
+  Mode,
+  _,
+  {
+    CmdwinType,
+    _, CmdwinTypeDescription, _,
+    CmdwinType,
+  },
+  __WideSpacing__,
+  RulerAndCursorPos,
+}
+
+SpecialStatuslines.Help = {
+  condition = function()
+    return hline_conditions.buffer_matches{ buftype = { "help" } }
+  end,
+
+  Mode,
+  {
+    provider = " HELP ",
+    hl = function()
+      return white_with_bg{ active_ctermbg = 91, inactive_ctermbg = 54 }
+    end,
+  },
+  _,
+  BufBasename,
+  -- TODO: insert local keybinding help! (note: generate it?)
+  __WideSpacing__,
+  RulerAndCursorPos,
+}
+
+SpecialStatuslines.Man = {
+  condition = function()
+    local buf_name = vim.api.nvim_buf_get_name(0)
+    return vim.startswith(buf_name, "man://")
+  end,
+
+  Mode,
+  {
+    provider = " Man ",
+    hl = function()
+      return white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+    end,
+  },
+  {
+    _,
+    {
+      provider = function()
+        local buf_name = vim.api.nvim_buf_get_name(0)
+        return buf_name:gsub("man://", "")
+      end,
+    },
+    _,
+
+    -- NOTE: This is the same hl fn as for general purpose's file info component
+    hl = function()
+      if hline_conditions.is_active() then
+        return { ctermfg = 253, ctermbg = 240 }
+      else
+        return { ctermfg = 250, ctermbg = 238 }
+      end
+    end,
+  },
+  __WideSpacing__,
+  RulerAndCursorPos,
+}
+
+SpecialStatuslines.SplashStartup = {
+  condition = function()
+    return hline_conditions.buffer_matches{ filetype = {"alpha"} }
+  end,
+
+  __WideSpacing__,
+  {
+    provider = function() return "  Do something cool !  " end,
+  },
+  __WideSpacing__,
+}
+
+SpecialStatuslines.for_plugin.XtermColorTable = {
+  condition = function()
+    return hline_conditions.buffer_matches{ bufname = {"__XtermColorTable__"} }
+  end,
+
+  __WideSpacing__,
+  {
+    provider = function() return " XTerm color table " end,
+    hl = function()
+      return white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+    end,
+  },
+  __WideSpacing__,
+}
+
+local GeneralPurposeStatusline = {
   Mode,
   { -- File info block
-    -- FIXME: `:h` looks like this: `help.txt[EXT] doc/help.txt`
-    -- => Make dedicated left-side of statusline for help pages?
     {
       _,
-      {
-        SpecialFileDescription,
-        { FileOutOfCwd, FilenameTwoParts }, -- fallback to this if not a special file
-      },
+      { FileOutOfCwd, FilenameTwoParts },
       _,
       hl = function()
         if not vim.bo.modifiable then
+          -- FIXME: not working?
+          --   (Maybe there's some `cterm` override down-the-tree that prevent
+          --   this one to work?)
           return { cterm = { italic = true } }
         end
       end,
@@ -229,40 +326,37 @@ local StatuslineInner = {
       end
     end,
   },
-  { -- to quickely differenciate the statuslines!
-    __WideSpacing__,
-    { provider = " [go Lua, go!!]" },
-  },
   __WideSpacing__,
   FileType,
   _,
-  {
-    _, Ruler, _,
-    hl = function()
-      if hline_conditions.is_active() then
-        return { ctermfg = 236, ctermbg = 244 }
-      else
-        return { ctermfg = 236, ctermbg = 242 }
-      end
-    end
-  },
+  RulerAndCursorPos,
 }
 
-local Statusline = {
+local Statuslines = {
   hl = function()
     if hline_conditions.is_active() then
-      return { ctermfg = 244, ctermbg = 236 }
+      return { ctermfg = 246, ctermbg = 236 }
     else
-      return { ctermfg = 241, ctermbg = 235 }
+      return { ctermfg = 242, ctermbg = 235 }
     end
   end,
-  StatuslineInner,
+
+  -- Only the first child with `(not condition or condition()) == true` will
+  -- render!
+  fallthrough = false,
+
+  SpecialStatuslines.Cmdwin,
+  SpecialStatuslines.Help,
+  SpecialStatuslines.Man,
+  SpecialStatuslines.SplashStartup,
+  SpecialStatuslines.for_plugin.XtermColorTable,
+  GeneralPurposeStatusline, -- last fallback
 }
 
 local function setup()
   -- FIXME: doesn't behave well when no space to show whole statuline..
   require"heirline".setup({
-    statusline = Statusline,
+    statusline = Statuslines,
   })
   -- TODO: I want to setup the 'statusline' option myself, and only call heirline for initialization.
   -- This would allow to setup local statuslines in some file / for some window, without putting
