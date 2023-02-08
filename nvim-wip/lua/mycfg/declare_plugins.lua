@@ -605,15 +605,6 @@ Plug {
       -- `(|)bla (foo) bla` -> fast_wrap.map -> press `$` -> `(|bla (foo) bla)`
       -- TODO: See if it's compatible with Luasnip? (w.r.t. extmarks, ..)
       --
-      -- FIXME: Don't auto-wrap if I don't ask for it!!
-      -- E.g: (While writing some doc)
-      -- `foo |"foo"` (`|` is the cursor)
-      -- Doing `{` currently does:
-      -- `foo {"foo"}`
-      -- But I simply want:
-      -- `foo {"foo"`
-      -- Opened issue: https://github.com/windwp/nvim-autopairs/issues/317
-      --
       -- IDEA: I think that a more generic plugin to fast-insert a key via hints
       -- would be REALLY handy!
       -- => For example  `<M-,>$` could add a `,` at EOL without moving cursor,
@@ -647,6 +638,10 @@ Plug {
         -- => Would allow to have positions only in a string if we're in a string..
         -- => Would allow to add some positions only if none matched so far..
       },
+
+      -- Don't auto-wrap quoted text
+      -- `foo |"bar"` -> press `{` -> `foo {|"bar"` (not: `foo {|"bar"}`)
+      enable_afterquote = false,
     }
 
     -- NOTE: The Rule API is a bit weird, and and doesn't make the config directly
