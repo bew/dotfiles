@@ -13,11 +13,10 @@ _build-only *ARGS:
 build-and-diff *ARGS: (_build-only ARGS)
   #!/usr/bin/env bash
   set -euo pipefail
+  cd {{ justfile_directory() }}
 
-  # NOTE: `nix-env -q --out-path home-manager-path`'s output
-  #       looks like `home-manager-path /nix/store/...`
-  CURRENT_HOME_MANAGER_PATH=$(nix profile list | grep home-manager-path | awk '{ print $4 }')
-  BUILT_HOME_MANAGER_PATH="./result/home-path"
+  CURRENT_HOME_MANAGER_PATH="/nix/var/nix/profiles/per-user/$USER/home-manager"
+  BUILT_HOME_MANAGER_PATH="./result"
   DIFF_FILE="./.nix-lastBuild-homeDiff.txt"
 
   # Helper script to nicely show:
@@ -27,6 +26,7 @@ build-and-diff *ARGS: (_build-only ARGS)
 
 # Build the current home config AND switch to it
 switch *ARGS: (_build-only ARGS)
+  cd {{ justfile_directory() }}
   @./result/activate
 
 upgrade-multiuser-nix:
