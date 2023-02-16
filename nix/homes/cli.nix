@@ -51,9 +51,7 @@ let
         source ${./../../nvim/colors/bew256-dark.vim}
       '';
       packages.myVimPackage = with stable.vimPlugins; {
-        start = [
-          vim-nix
-        ];
+        start = [ vim-nix ];
       };
     };
   };
@@ -150,6 +148,7 @@ in {
     stable.chafa # crazy cool img/gif terminal viewer
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
     stable.translate-shell
+    stable.asciiquarium # nice ASCII aquarium 'screen saver'
 
     # Languages
     # NOTE: Compilers, interpreter shouldn't really be made available in a global way..
