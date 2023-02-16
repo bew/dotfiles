@@ -159,7 +159,13 @@ NamedPlug.cmp {
     --    require'cmp_buffer'.compare_locality, -- sort words by distance to cursor (for buffer & lsp* sources)
     --  }
     --},
-    -- FIXME: writing `thina` does NOT match `thisisnotaword` :/ why not??
+    -- FIXME: writing `thina` still does NOT match `thisisnotaword` :/ why not??
+    -- Opened issue: https://github.com/hrsh7th/nvim-cmp/issues/1443
+    global_cfg.matching = {
+      -- Not sure why this is not the default.. It's not really fuzzy matching otherwise!
+      -- See: https://github.com/hrsh7th/nvim-cmp/issues/1422
+      disallow_partial_fuzzy_matching = false,
+    }
     local common_sources = {
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
