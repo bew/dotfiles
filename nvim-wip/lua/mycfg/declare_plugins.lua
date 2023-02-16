@@ -730,13 +730,14 @@ Plug {
   end,
 }
 
-Plug {
+NamedPlug.fugitive {
   source = gh"tpope/vim-fugitive",
   desc = "A Git wrapper so awesome, it should be illegal",
   tags = {t.vimscript, t.git},
 }
 Plug {
   source = gh"junegunn/gv.vim",
+  depends_on = { NamedPlug.fugitive },
   desc = "Simple (<3) git commit browser, based on vim-fugitive",
   tags = {t.vimscript, t.git},
 }

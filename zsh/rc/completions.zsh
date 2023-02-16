@@ -299,7 +299,6 @@ zstyle ':completion:*' list-colors \
 zle -C complete-files menu-complete _generic
 zstyle ':completion:complete-files:*' completer _files _match
 bindkey '^x^f' complete-files # Force complete file names
-# bindkey '^f' complete-files # Force complete file names
 
 # Complete words from history
 zle -C complete-words-from-history menu-complete _generic
