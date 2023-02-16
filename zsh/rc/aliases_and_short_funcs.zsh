@@ -179,6 +179,9 @@ function curl_auth_json
 # misc
 
 alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
+# Add line numbers when output is not a tty,
+# allows to use output as input to `nvim -q <results-file>` for easy navigation \o/
+alias rg='rg -n'
 
 # Search the given bin name in PATH (ignores aliases/functions)
 # -p : always search in PATH
