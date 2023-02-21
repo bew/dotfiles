@@ -1,4 +1,5 @@
-
+local U = require"mylib.utils"
+local _f = U.str_space_concat
 
 
 local hline_conditions = require"heirline.conditions"
@@ -141,8 +142,17 @@ local Changed = {
   },
 }
 local ReadOnly = {
+  condition = function() return vim.bo.readonly end,
+
   provider = function(self)
-    return vim.bo.readonly and unicode_or(" ", "[RO]")
+    return unicode_or(" ", "[RO]")
+  end,
+  hl = function()
+    if hline_conditions.is_active() then
+      return { ctermfg = 203 } -- red
+    else
+      return { ctermfg = 232 } -- black
+    end
   end,
 }
 local FileType = {
@@ -226,6 +236,59 @@ SpecialStatuslines.Cmdwin = {
     CmdwinType,
     _, CmdwinTypeDescription, _,
     CmdwinType,
+  },
+  __WideSpacing__,
+  RulerAndCursorPos,
+}
+
+SpecialStatuslines.QuickfixOrLoc = {
+  condition = function()
+    return hline_conditions.buffer_matches{ buftype = { "quickfix" } }
+  end,
+
+  Mode,
+  _,
+  {
+    condition = function()
+      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
+      return wininfo.quickfix == 1 and wininfo.loclist == 0
+    end,
+
+    {
+      provider = "QUICKFIX LIST",
+      hl = { cterm = { bold = true } },
+    },
+    _,
+    { provider = "(global)" },
+    __WideSpacing__,
+    {
+      provider = function()
+        local current_entry_idx1 = vim.fn.getqflist{ idx = 0 }.idx
+        local nb_entries = vim.fn.getqflist{ size = true }.size
+        return _f("Entry", current_entry_idx1, "of", nb_entries)
+      end,
+    },
+  },
+  {
+    condition = function()
+      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
+      return wininfo.quickfix == 1 and wininfo.loclist == 1
+    end,
+
+    {
+      provider = "LOCATION LIST",
+      hl = { cterm = { bold = true } },
+    },
+    _,
+    { provider = "(local)" },
+    __WideSpacing__,
+    {
+      provider = function()
+        local current_entry_idx1 = vim.fn.getloclist{ idx = 0 }.idx
+        local nb_entries = vim.fn.getloclist{ size = true }.size
+        return _f("Entry", current_entry_idx1, "of", nb_entries)
+      end,
+    },
   },
   __WideSpacing__,
   RulerAndCursorPos,
@@ -354,6 +417,7 @@ local Statuslines = {
   fallthrough = false,
 
   SpecialStatuslines.Cmdwin,
+  SpecialStatuslines.QuickfixOrLoc,
   SpecialStatuslines.Help,
   SpecialStatuslines.Man,
   SpecialStatuslines.SplashStartup,
