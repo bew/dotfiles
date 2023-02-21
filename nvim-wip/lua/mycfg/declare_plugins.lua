@@ -438,6 +438,12 @@ Plug {
   end,
 }
 
+Plug {
+  source = gh"jremmen/vim-ripgrep",
+  desc = "Use RipGrep in Vim and display results in a quickfix list",
+  tags = {t.vimscript, "nav"},
+}
+
 NamedPlug.web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
