@@ -183,12 +183,19 @@ function segmt::python_venv
       if [[ -n "$PROMPT_SEGMT_VENV_SHORT" ]]; then
         venv_display+=" not here"
       else
-        if [[ "${(D)venv_parent_dir_path}" != "$venv_parent_dir_path" ]]; then
-          # Use existing directory alias (usualy shorter than the real dirname)
-          venv_display+=" in ${(D)venv_parent_dir_path}"
+        local venv_parent_dir_relative_path="$(realpath --relative-to="$PWD" "$venv_parent_dir_path")"
+        local venv_parent_dir_aliased_path="${(D)venv_parent_dir_path}" # try to shorten using dir aliases
+        if [[ "${#venv_parent_dir_relative_path}" -le "${#venv_parent_dir_aliased_path}" ]]; then
+          # Use relative path if it's shorter than the dir aliased path
+          venv_display+=" in ${venv_parent_dir_relative_path}"
+        elif [[ "${#venv_parent_dir_aliased_path}" -lt "${#venv_parent_dir_path}" ]]; then
+          # Use path with existing dir alias if it's shorter than the full dir path
+          venv_display+=" in ${venv_parent_dir_aliased_path}"
         else
+          # Use only the dir nam eof parent of venv
+          # (less precise, we don't really know _where_ it is, only its name)
           local venv_parent_dir=$(basename "$venv_parent_dir_path")
-          venv_display+=" in $venv_parent_dir"
+          venv_display+=" in […]/$venv_parent_dir"
         fi
       fi
     fi
