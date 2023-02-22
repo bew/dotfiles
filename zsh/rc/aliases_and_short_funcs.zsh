@@ -243,6 +243,20 @@ alias ....="cd ../../..;"
 alias cdt="cd /tmp;"
 alias cdl="cd -;"
 
+alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
+
+function cdvenv
+{
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    >&2 echo "Not in a virtual env :shrug: (\$VIRTUAL_ENV not set)"
+  fi
+
+  cd $(dirname "$VIRTUAL_ENV")
+
+  local venv_name=$(basename "$VIRTUAL_ENV")
+  >&2 echo "Welcome to parent of virtual env, named '$venv_name'"
+}
+
 # pacman
 
 alias pac::list_useless_deps="pacman -Qtdq"
@@ -268,7 +282,6 @@ alias yay="yay --builddir ~/.long_term_cache/yay_build_dir"
 alias gnp="git --no-pager"
 alias git::status_in_all_repos="find -name .git -prune -print -execdir git status \;"
 alias git_watch="watch --color -- git --no-pager -c color.ui=always"
-alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 # Clone git repository and cd to it
 #
