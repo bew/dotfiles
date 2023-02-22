@@ -11,6 +11,11 @@ vim.cmd[[filetype plugin indent on]]
 --set backspace=indent,eol,start
 -- NOTE: default in nvim
 
+-- Let's try! It's usually nice to have, and I don't often need identifiers without - if any..
+-- NOTE(side effect): word movements now move above dashes
+--   => I have to move/select with `t-` if I don't want this..
+vim.opt.iskeyword:append("-")
+
 -- always show the statusline
 vim.o.laststatus = 2
 
