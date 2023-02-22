@@ -191,6 +191,10 @@ function segmt::python_venv
         elif [[ "${#venv_parent_dir_aliased_path}" -lt "${#venv_parent_dir_path}" ]]; then
           # Use path with existing dir alias if it's shorter than the full dir path
           venv_display+=" in ${venv_parent_dir_aliased_path}"
+        elif [[ "${#venv_parent_dir_path}" -lt $(( COLUMNS / 5 )) ]]; then
+          # Use path when its length is less than 20% of available width
+          # (that percentage looks like a good compromise, leaving space for other prompt segments)
+          venv_display+=" in $venv_parent_dir_path"
         else
           # Use only the dir nam eof parent of venv
           # (less precise, we don't really know _where_ it is, only its name)
