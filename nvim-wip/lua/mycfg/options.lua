@@ -58,6 +58,8 @@ vim.o.cursorline = true
 vim.o.equalalways = false   -- Avoid windows auto-resizing on win opened/closed
 
 vim.o.mouse = "nv"   -- Enable mouse in normal & visual
+-- Disable new popup menu on left click, always extend visual selection!
+vim.o.mousemodel = "extend"
 
 -- Change the way text is displayed
 vim.opt.display = {
