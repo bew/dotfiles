@@ -239,6 +239,12 @@ function segmt::shlvl
   echo -n "%BL%L%b "
 }
 
+function segmt::jobs
+{
+  # e.g: "J3 "
+  echo -n "%(1j|%B%F{178}J%j%f%b |)"
+}
+
 # Segment variable debug
 function segmt::debug
 {
@@ -373,6 +379,7 @@ VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to chang
 
 PROMPT_CURRENT_PARTS=(
   func: segmt::shlvl
+  func: segmt::jobs
   func: segmt::python_venv
   func: segmt::exit_code_on_error
 
@@ -384,6 +391,7 @@ PROMPT_CURRENT_PARTS=(
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
+  func: segmt::jobs
   func: segmt::python_venv
   func: segmt::exit_code_on_error
 
