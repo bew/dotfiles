@@ -32,8 +32,9 @@ col.brights = {
 }
 
 col.indexed = {
-  [22] = "#003a0b", -- darker dark green
-  [52] = "#490101", -- darker dark red
+  [22] = "#003010", -- darker dark green
+  [28] = "#00641a", -- slightly less dark green (used for highlight over dark green)
+  [52] = "#420c0c", -- darker dark red
 }
 
 -- Slightly red & transparent (blended in bg)
