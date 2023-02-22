@@ -102,8 +102,9 @@ alias ipy="ipython --no-confirm-exit"
 alias com=command
 alias j=jobs
 
-# Always use tmux in 256 colors and force UTF-8
-alias tmux="tmux -2 -u"
+# Force tmux to be compatible UTF-8
+# (256 colors & RGB are enabled in tmux config, via `terminal-features`)
+alias tmux="tmux -u"
 alias tx="tmux"
 
 alias hc=herbstclient
