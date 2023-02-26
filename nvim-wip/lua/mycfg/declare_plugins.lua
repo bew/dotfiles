@@ -674,6 +674,7 @@ Plug {
     Rule.just_move_right_when = Rule.with_move
     cond.never = cond.none()
     cond.always = cond.done()
+    cond.has_regex_before = cond.before_regex
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -741,6 +742,14 @@ Plug {
               brackets[3][1]..'  '..brackets[3][2]
             }, context)
           end)
+      ),
+      (
+        -- Pair angle brackets when directly preceded by a word, useful in
+        -- languages using angle brackets generics, like Rust (`Foo<T>`)
+        -- Taken from https://github.com/windwp/nvim-autopairs/issues/330
+        Rule({start_pair = "<", end_pair = ">"})
+          :insert_pair_when(cond.has_regex_before("%a+"))
+          :just_move_right_when(cond.always)
       ),
     }
   end,
