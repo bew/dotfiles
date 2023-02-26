@@ -63,7 +63,8 @@ vim.opt.packpath = {
 -- (e.g: for filetype on)
 require"mycfg.options"
 
-vim.cmd[[colorscheme bew256-dark]]
+-- NOTE: If trying to move it AFTER plugin load, double check git signs are of correct color!
+vim.cmd[[ colorscheme bew256-dark ]]
 
 -- Specify the python binary to use for the plugins, this is necessary to be
 -- able to use them while inside a project' venv (which does not have pynvim)
