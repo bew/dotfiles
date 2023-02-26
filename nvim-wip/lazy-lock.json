@@ -23,6 +23,7 @@
   "undotree": { "branch": "master", "commit": "b6fdb95db53b7ceb23ddfe8a8211a3135d98eef0" },
   "vim-exchange": { "branch": "master", "commit": "784d63083ad7d613aa96f00021cd0dfb126a781a" },
   "vim-fugitive": { "branch": "master", "commit": "62f42f013d866139fa23068ac2651b3f7e05a56f" },
+  "vim-markdown": { "branch": "master", "commit": "df4be8626e2c5b2a42eb60e1f100fce469b81f7d" },
   "vim-ripgrep": { "branch": "master", "commit": "2bb2425387b449a0cd65a54ceb85e123d7a320b8" },
   "vim-space": { "branch": "master", "commit": "e6615bd3803b7b874fd9e08295400268739597a1" },
   "vim-textobj-comment": { "branch": "master", "commit": "58ae4571b76a5bf74850698f23d235eef991dd4b" },
