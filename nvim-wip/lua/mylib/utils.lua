@@ -60,7 +60,7 @@ end
 -- print("foo", _q(thing), "bar")
 -- ```
 function M.str_surround(before, str, after)
-  return before .. str .. after
+  return before .. tostring(str) .. after
 end
 function M.str_simple_quote_surround(str)
   return M.str_surround("'", str, "'")
