@@ -278,19 +278,23 @@ alias editor_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
 bind --mode=insert <A-i> editor_rm
 
 # Try to remap some insert keys to help navigation
-# FIXME: Can I remap keys à-la-AHK, like A-b/w to Ctrl-Left/Right?
-#   => yes, BUT
-# % Move cursor
+# % Move by char
+# (using 'xdotool' to inject arrows, to be able to control autocompletions popups, like Github's emoji popup)
 bind --mode=insert <A-h>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Left ; mode insert
 bind --mode=insert <A-j>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Down ; mode insert
 bind --mode=insert <A-k>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Up   ; mode insert
 bind --mode=insert <A-l>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Right; mode insert
 # % Move by word
-bind --mode=insert <A-b>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Left  ; mode insert
-bind --mode=insert <A-w>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Right ; mode insert
+bind --mode=insert <A-b>      text.backward_word
+bind --mode=insert <A-w>      text.forward_word
 # % Move to begin/end
-bind --mode=insert <A-$>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers End  ; mode insert
-bind --mode=insert <A-^>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Ctrl+Right ; mode insert
+bind --mode=insert <A-$>      text.end_of_line
+bind --mode=insert <A-^>      text.beginning_of_line
+# % Delete to BOL
+bind --mode=insert <C-u>      text.backward_kill_line
+# % Delete to BOW
+# => doesn't work, still closes current tab
+#bind --mode=insert <C-w>      text.backward_kill_word
 
 # --- ex mode bindings
 
