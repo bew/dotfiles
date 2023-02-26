@@ -696,28 +696,6 @@ Plug {
     -- the next condition is checked, so each condition has control
     -- (could completely block / allow the action).
 
-    -- FIXME: Trying to write this in a shell script:
-    -- `some_var="foo $(basename "$to") bar"`
-    -- The nested `"` before `$to` was NOT doubled, and trying to write the
-    -- second one after writing `$to` doubled it :/
-    -- With `|` the cursor:
-    -- * From: `some_var="foo $(basename |) bar"`      (Type `"`)
-    -- *  Get: `some_var="foo $(basename "|) bar"`     (Type `"`)
-    -- *  Get: `some_var="foo $(basename ""|") bar"`
-    -- Expected:
-    -- * From: `some_var="foo $(basename |) bar"`      (Type `"`)
-    -- *  Get: `some_var="foo $(basename "|") bar"`
-    --
-    -- FIXME: Similar to last FIXME, spliting a quoted string in two isn't easy:
-    -- `" abc | def "`     I want: `" abc "|" def "`
-    -- But when I input `"`, I get:
-    -- `" abc "| def "`
-    -- And repeating `"` gives:
-    -- `" abc ""|" def "`
-    -- Which is not helpful :/
-    -- => I think I want `"` to always make a `"|"`
-    --    (and I'll bind `<M-">` for when I want a simple `"`)
-
     -- FIXME: I want <bs> at bol to join multiline empty brackets!
     -- text: `(\n|\n)` ; press `<backspace>` ; text: `(|)`
 
@@ -763,6 +741,23 @@ Plug {
         :insert_pair_when(cond.preceded_by_regex("%a+"))
         :just_move_right_when(cond.always)
     )
+
+    -- Ensure dquotes are _always_ paired, even when inside quotes
+    -- (useful in shell interpolations, or to split a python str in two..)
+    -- `x="foo $(bla |) bar"` -> press `"` => `x="foo $(bla "|") bar"`
+    -- `" abc | def "`        -> press `"` => `" abc "|" def "`
+    -- (use `<M-">` for only one dquote, see below)
+    npairs.add_rule(
+      Rule({start_pair = [["]], end_pair = [["]]})
+        :insert_pair_when(cond.always)
+        -- Try to not be smart about dquote insertion, even if in quotes
+        -- `|"`
+        :just_move_right_when(cond.never)
+        -- normal behavior is:
+        -- :just_move_right_when(cond.smart_move_right())
+    )
+    -- I: Map `<M-">` to dquote, for when I want only one!
+    toplevel_map{mode={"i"}, key=[[<M-">]], action=[["]], desc="insert single dquote"}
   end,
 }
 
