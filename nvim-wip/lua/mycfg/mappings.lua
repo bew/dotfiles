@@ -194,7 +194,7 @@ toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 
 -- C: Expand %% to dir of current file
 -- vim.cmd[[cnoremap <expr> %%  expand("%:.:h") . "/"]]
-toplevel_map{mode="c", key="%%", opts={expr=true}, desc="current file's dir", action=function()
+toplevel_map{mode="c", key="%%", desc="current file's dir", opts={expr=true}, action=function()
   return vim.fn.expand("%:.:h") .. "/"
 end}
 
@@ -232,9 +232,52 @@ vim.cmd[[cnoremap <M-v> <C-r><C-o>+]]
 -- C-r C-o {reg}    -- inserts the reg content literaly
 vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 
+--------------------------------
+-- Better visual mode support
+
+-- V: logical visual eol
+-- For some reason in visual mode '$' goes beyond end of line and include the newline,
+-- making 'v$d' (or other actions) delete the end of line + the newline, joining them without being smart about it..
+--   => Totally not what I wanted... Let's fix this!
+-- NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
+-- NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
+-- vim.cmd[[ vnoremap <expr> $ (mode() == "v" ? "$h" : "$") ]]
+toplevel_map{mode="v", key="$", desc="smart eol", opts={expr=true}, action=function()
+  if vim.fn.mode() == "v" then
+    return "$h"
+  else
+    return "$"
+  end
+end}
+
+-- N: Select last inserted region
+vim.cmd[[ nnoremap gV `[v`] ]]
+-- O: Textobj for the last inserted region
+vim.cmd[[onoremap gV <cmd>normal! `[v`]<cr>]]
+
+-- Visual paste, preserving the content of the unnamed register
+function clean_visual_paste()
+  -- Save unnamed register (will be overwritten with the normal visual paste)
+  local saved_register = vim.fn.getreginfo([["]])
+  vim.cmd(U.str_concat([[norma! "]], vim.v.register, [[p]]))
+  -- Restore unnamed register
+  vim.fn.setreg([["]], saved_register)
+end
+toplevel_map{mode="v", key="<M-p>", desc="clean paste", action=clean_visual_paste}
+
+-- V: Ranged fold open/close
+-- NOTE1: this does not change the 'foldlevel'.
+-- NOTE2: these mappings must be typed fast, otherwise you get normal behavior.
+-- Make sure to read `:h fold-commands` for all the details.
+-- open all folds in range
+vim.cmd[[vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>]]
+-- close all manually opened folds in range
+vim.cmd[[vnoremap <silent> zc  zx]]
+
 
 --------------------------------
 -- Window splits
+
 -- LATER: This could be a good candidate for a keymap/layer
 --   It can be appended to <C-w> or activated on <C-w> ?
 -- LATER: would be nice to have 'repeat' mode supports, like in tmux!!
@@ -458,19 +501,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- Copy absolute filepath
 --nnoremap <silent> y%% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
 
--- V: logical visual eol
--- For some reason in visual mode '$' goes beyond end of line and include the newline,
--- making 'v$d' (or other actions) delete the end of line + the newline, joining them without being smart about it..
---   => Totally not what I wanted... Let's fix this!
--- NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
--- NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
---vnoremap <expr> $ (mode() == "v" ? "$h" : "$")
-
--- N: Select last inserted region
---nnoremap gV `[v`]
--- O: Textobj for the last inserted region
---onoremap gV <cmd>normal! `[v`]<cr>
-
 -- Vim eval-and-replace:
 -- Evaluate the current selection as a vimscript expression and replace
 -- the selection with the result
@@ -504,20 +534,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --vmap <M-*> <Plug>(visualstar-g*)
 -- N: search current word without word boundaries
 --nnoremap <M-*> g*
-
---vnoremap <M-p> <cmd>call VisualPaste()<cr>
--- Visual paste with the current register, preserving the content of
--- the unnamed register.
---function! VisualPaste()
---  " Save unnamed register (will be overwritten with the normal visual paste)
---  let save_reg = getreg('"', 1, v:true)
---  let save_regtype = getregtype('"')
---
---  exe 'normal! "' . v:register . 'p'
---
---  " Restore unnamed register
---  call setreg('"', save_reg, save_regtype)
---endfunction
 
 -- Inspired from visual-at.vim from Practical Vim 2nd Edition
 --vnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
@@ -632,15 +648,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --  echo "Signs and line numbers: " . l:status
 --endf
 --nnoremap <M-R>  <cmd>call ToggleSignsAndLineNumbers()<cr>
-
--- Fold ranged open/close
--- NOTE: this does not change the 'foldlevel'.
--- FIXME: these mappings must be typed fast, otherwise you get normal behavior.
--- Make sure to read `:h fold-commands` for all the details.
--- open all folds in range
---vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>
--- close all manually opened folds in range
---vnoremap <silent> zc  zx
 
 -- Toggle Mundo tree
 --nnoremap <silent> <F5> :MundoToggle<cr>
