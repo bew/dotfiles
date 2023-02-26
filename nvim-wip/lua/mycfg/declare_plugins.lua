@@ -547,8 +547,8 @@ Plug {
     -- Override opening brace&co surrounds: They should represent the braces and
     -- any spaces between them and actual content.
     -- Like this:
-    -- `{   foo    }` -> `ds{` -> `foo`
-    -- `{ \n foo \n }` -> `ds{` -> `foo`
+    -- `{   foo    }` -> `ds{` => `foo`
+    -- `{ \n foo \n }` -> `ds{` => `foo`
     local openers = {
       { open = "(", close = ")", open_rx = "%(", close_rx = "%)" },
       { open = "[", close = "]", open_rx = "%[", close_rx = "%]" },
@@ -617,8 +617,8 @@ Plug {
       -- VERY COOL way to interactively close last opened 'pair',
       -- press the map and type one of the hint to place a/the closing pair there!
       -- Workflow:
-      -- `(|foo`            -> fast_wrap.map -> press `$` -> `(|foo)`
-      -- `(|)bla (foo) bla` -> fast_wrap.map -> press `$` -> `(|bla (foo) bla)`
+      -- `(|foo`            -> fast_wrap.map -> press `$` => `(|foo)`
+      -- `(|)bla (foo) bla` -> fast_wrap.map -> press `$` => `(|bla (foo) bla)`
       -- TODO: See if it's compatible with Luasnip? (w.r.t. extmarks, ..)
       --
       -- IDEA: I think that a more generic plugin to fast-insert a key via hints
@@ -655,12 +655,20 @@ Plug {
         -- => Would allow to add some positions only if none matched so far..
       },
 
+      -- Do not break undo when pairing default rules
+      break_undo = false,
+
+      -- map <C-h> to delete a pair if possible
+      map_c_h = true,
+      -- map <C-w> to delete a pair if possible, like <C-h>
+      map_c_w = true,
+
       -- Don't auto-wrap quoted text
-      -- `foo |"bar"` -> press `{` -> `foo {|"bar"` (not: `foo {|"bar"}`)
+      -- `foo |"bar"` -> press `{` => `foo {|"bar"` (not: `foo {|"bar"}`)
       enable_afterquote = false,
     }
 
-    -- NOTE: The Rule API is a bit weird, and and doesn't make the config directly
+    -- NOTE: The Rule API is a bit weird, and doesn't make the config directly
     --   readable without knowing about how the API works..
     -- See: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
     local Rule = require"nvim-autopairs.rule"
@@ -674,7 +682,9 @@ Plug {
     Rule.just_move_right_when = Rule.with_move
     cond.never = cond.none()
     cond.always = cond.done()
-    cond.has_regex_before = cond.before_regex
+    cond.smart_move_right = cond.move_right
+    cond.not_preceded_by_char = cond.not_before_char
+    cond.preceded_by_regex = cond.before_regex
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -715,43 +725,44 @@ Plug {
     -- It should be considered as a 'triplet' (like in smart-pairs) in _all_ cases.
     -- -> See how it's done for markdown
 
-    -- text: `(|)` ; press `<space>` ; get: `( | )`
-    -- text: `( | )` ; press `<backspace>` ; get: `(|)`
+    -- Properly add 2-spaces or delete 2-spaces when inside brackets
+    -- `(|)`   -> press `<space>`     => get: `( | )`
+    -- `( | )` -> press `<backspace>` => get: `(|)`
     -- From: https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#alternative-version
-    local brackets = { { '(', ')' }, { '[', ']' }, { '{', '}' } }
-    npairs.add_rules {
-      (
-        Rule({start_pair = " ", end_pair = " "})
-          :insert_pair_when(function(ctx)
-            -- get last char & next char, check if it's a known 'expandable' pair
-            local pair = ctx.line:sub(ctx.col -1, ctx.col)
-            return vim.tbl_contains({
-              brackets[1][1]..brackets[1][2],
-              brackets[2][1]..brackets[2][2],
-              brackets[3][1]..brackets[3][2]
-            }, pair)
-          end)
-          :just_move_right_when(cond.never) -- is this the default? (why not?)
-          :cr_expands_pair_when(cond.never) -- is this the default? (why not?)
-          :bs_deletes_pair_when(function(ctx)
-            local col = vim.api.nvim_win_get_cursor(0)[2]
-            local context = ctx.line:sub(col - 1, col + 2)
-            return vim.tbl_contains({
-              brackets[1][1]..'  '..brackets[1][2],
-              brackets[2][1]..'  '..brackets[2][2],
-              brackets[3][1]..'  '..brackets[3][2]
-            }, context)
-          end)
-      ),
-      (
-        -- Pair angle brackets when directly preceded by a word, useful in
-        -- languages using angle brackets generics, like Rust (`Foo<T>`)
-        -- Taken from https://github.com/windwp/nvim-autopairs/issues/330
-        Rule({start_pair = "<", end_pair = ">"})
-          :insert_pair_when(cond.has_regex_before("%a+"))
-          :just_move_right_when(cond.always)
-      ),
-    }
+    local brackets = { {'(', ')'}, {'[', ']'}, {'{', '}'} }
+    npairs.add_rule(
+      Rule({start_pair = " ", end_pair = " "})
+      :insert_pair_when(function(ctx)
+        -- get last char & next char, check if it's a known 'expandable' pair
+        local pair = ctx.line:sub(ctx.col -1, ctx.col) -- inclusive indexing
+        return vim.tbl_contains({
+          brackets[1][1]..brackets[1][2],
+          brackets[2][1]..brackets[2][2],
+          brackets[3][1]..brackets[3][2],
+        }, pair)
+      end)
+      :just_move_right_when(cond.never) -- is this the default? (why not?)
+      :cr_expands_pair_when(cond.never) -- is this the default? (why not?)
+      :bs_deletes_pair_when(function(ctx)
+        local col = vim.api.nvim_win_get_cursor(0)[2]
+        -- (weird? `col` is one less than what I would have thought..)
+        local context = ctx.line:sub(col - 1, col + 2) -- inclusive indexing
+        return vim.tbl_contains({
+          brackets[1][1]..'  '..brackets[1][2],
+          brackets[2][1]..'  '..brackets[2][2],
+          brackets[3][1]..'  '..brackets[3][2],
+        }, context)
+      end)
+    )
+
+    -- Pair angle brackets when directly preceded by a word, useful in
+    -- languages using angle brackets generics, like Rust (`Foo<T>`)
+    -- Taken from https://github.com/windwp/nvim-autopairs/issues/330
+    npairs.add_rule(
+      Rule({start_pair = "<", end_pair = ">"})
+        :insert_pair_when(cond.preceded_by_regex("%a+"))
+        :just_move_right_when(cond.always)
+    )
   end,
 }
 
