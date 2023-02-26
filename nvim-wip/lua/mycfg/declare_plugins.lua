@@ -699,10 +699,6 @@ Plug {
     -- FIXME: I want <bs> at bol to join multiline empty brackets!
     -- text: `(\n|\n)` ; press `<backspace>` ; text: `(|)`
 
-    -- FIXME: In non-markup lang like in Lua comments, pressing ``` gives ```` (one too much)
-    -- It should be considered as a 'triplet' (like in smart-pairs) in _all_ cases.
-    -- -> See how it's done for markdown
-
     -- Properly add 2-spaces or delete 2-spaces when inside brackets
     -- `(|)`   -> press `<space>`     => get: `( | )`
     -- `( | )` -> press `<backspace>` => get: `(|)`
@@ -758,6 +754,22 @@ Plug {
     )
     -- I: Map `<M-">` to dquote, for when I want only one!
     toplevel_map{mode={"i"}, key=[[<M-">]], action=[["]], desc="insert single dquote"}
+
+    -- Uniformize bquotes handling, for all filetypes!
+    -- Makes it work like dquotes, always inserting pair (no smartness)
+    -- '|' -> press '`' => '`|`' (normal pairs)
+    -- '`|`' -> press '`' => '``|``' (instead of '``|')
+    -- Allows to do 3+ bquote blocks without special logic:
+    -- '```|```' -> press '`' => '````|````' (instead of weird '````|``````')
+    npairs.remove_rule("`")
+    npairs.remove_rule("```")
+    npairs.add_rule(
+      Rule({start_pair = "`", end_pair = "`"})
+        :insert_pair_when(cond.always)
+        :just_move_right_when(cond.never) -- ?
+    )
+    -- I: Map '<M-`>' to bquote, for when I want only one!
+    toplevel_map{mode={"i"}, key=[[<M-`>]], action=[[`]], desc="insert single bquote"}
   end,
 }
 
