@@ -31,6 +31,25 @@ local function define_and_activate_keytable(spec)
   return act.ActivateKeyTable(activation_opts)
 end
 
+-- Raw key codes are hardware & OS/WM dependent, so they're not really portable..
+-- https://wezfurlong.org/wezterm/config/keys.html#raw-key-assignments
+local known_raw_keys_by_os = {
+  ["^"] = { linux = "raw:34", win = nil },
+}
+local function get_raw_key(keysym)
+  local target_triple_to_os = {
+    ["x86_64-pc-windows-msvc"] = "windows",
+    ["x86_64-unknown-linux-gnu"] = "linux",
+  }
+  local os = target_triple_to_os[wezterm.target_triple]
+  assert(os, "Unknown os for getting raw key keysym:"..tostring(keysym) .." (target_triple:"..tostring(wezterm.target_triple)..")")
+  local key_by_os = known_raw_keys_by_os[keysym]
+  assert(key_by_os, "Unknown keysym:"..tostring(keysym))
+  local key_raw = key_by_os[os]
+  assert(key_raw, "Unknown raw key for keysym:"..tostring(keysym) .." os:"..tostring(os))
+  return key_raw
+end
+
 -- NOTE: About SHIFT and the keybind definition:
 -- * For bindings with SHIFT and a letter, the `key` field (the letter)
 --   can be lowercase and the mods should NOT contain 'SHIFT'.
@@ -97,6 +116,9 @@ cfg.keys = {
     win:set_config_overrides(overrides)
   end)),
 
+  -- Map `Alt-^`'s raw key code to bypass dead key handling (for ^e -> ê) when Alt is pressed,
+  -- and directly send `<M-^>` to terminal program (like neovim!).
+  keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
 
   -- Key Table: Panes Management
   keybind(mods.CS, "p", define_and_activate_keytable{
@@ -105,7 +127,6 @@ cfg.keys = {
     keys = {
       keybind(mods._, "Escape", act.PopKeyTable),
       keybind(mods.CS, "p", act.PopKeyTable),
-
 
       -- Create
       keybind(mods.CSA, {"h", "LeftArrow"},  act.SplitPane{direction="Left"}),
