@@ -2,6 +2,10 @@
 -- --------------------------------------------------------------------
 -- 'I speak vim' - bew, 2021
 
+local U = require"mylib.utils"
+local _f = U.str_space_concat
+local _q = U.str_simple_quote_surround
+
 -- TODO: Add tags! Define layers!
 
 -- Disable keybindings
@@ -196,9 +200,11 @@ end}
 
 -- N: toggle wrap
 vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
+-- N: toggle relativenumber
+vim.cmd[[nnoremap <silent> <M-r> :set relativenumber! relativenumber?<cr>]]
 
 
--- Copy/Paste with system clipboard (using nvim's clipboard provider)
+-- Copy/Paste with session/system clipboard
 -- Register '+' is session clipboard (e.g: tmux)
 -- Register '*' is OS/system clipboard
 vim.g.clipboard = {
@@ -228,9 +234,76 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 
 
 --------------------------------
+-- Window splits
+-- LATER: This could be a good candidate for a keymap/layer
+--   It can be appended to <C-w> or activated on <C-w> ?
+-- LATER: would be nice to have 'repeat' mode supports, like in tmux!!
+--   similar to Hydra plugin in emacs: https://github.com/abo-abo/hydra
+--   See hydra.nvim plugin?: https://github.com/anuvyklack/hydra.nvim
+-- NOTE: To get original behavior of `<C-w>` do it and simply wait for `timeoutlen`.
+local function directional_split(direction)
+  local saved_splitright = vim.o.splitright
+  local saved_splitbelow = vim.o.splitbelow
 
--- toggle relativenumber
---nnoremap <silent> <M-r> :set relativenumber! relativenumber?<cr>
+  if direction == "up" then
+    vim.o.splitbelow = false
+    vim.cmd[[  split ]]
+  elseif direction == "down" then
+    vim.o.splitbelow = true
+    vim.cmd[[  split ]]
+  elseif direction == "left" then
+    vim.o.splitright = false
+    vim.cmd[[ vsplit ]]
+  elseif direction == "right" then
+    vim.o.splitright = true
+    vim.cmd[[ vsplit ]]
+  else
+    vim.api.nvim_err_writeln(_f("Unknown split direction", _q(direction)))
+  end
+
+  vim.o.splitright = saved_splitright
+  vim.o.splitbelow = saved_splitbelow
+end
+vim.keymap.set("n", "<C-w><C-h>", function() directional_split("left") end)
+vim.keymap.set("n", "<C-w><C-j>", function() directional_split("down") end)
+vim.keymap.set("n", "<C-w><C-k>", function() directional_split("up") end)
+vim.keymap.set("n", "<C-w><C-l>", function() directional_split("right") end)
+
+-- Smart window split (based on current window size)
+local function smart_split()
+  local win_width = vim.fn.winwidth(0)
+  local win_height = vim.fn.winheight(0)
+  if (win_width / 3) > win_height then
+    directional_split("left")
+  else
+    directional_split("up")
+  end
+end
+vim.keymap.set("n", "<C-w><C-s>", smart_split)
+
+-- Full-width/height window splits
+-- FIXME: Do I need this? Would I use this?
+-- FIXME: Since I use noequalalways, the created splits takes way too much space...
+--   => Maybe get current screen size and make the new one third of that?
+--   I'd like to keep the ratios of existing windows
+--   (don't almost completely hide a single window if there's space around!)
+--   Instead of using <C-w>{H,J,K,L} to move the window,
+--   I could create the window myself with commands like:
+--     `botright 10split` to create a 10 lines full width window at the bottom
+--nnoremap <C-M-w><C-M-h>   <cmd> split<cr><C-w>H
+--nnoremap <C-M-w><C-M-j>   <cmd>vsplit<cr><C-w>J
+--nnoremap <C-M-w><C-M-k>   <cmd>vsplit<cr><C-w>K
+--nnoremap <C-M-w><C-M-l>   <cmd> split<cr><C-w>L
+
+-- NOTE: Keys still available (not used often / ever)
+-- * <C-w><C-HJKL>
+-- * <C-w><C-M-hjkl>
+--
+-- TODO: window actions ideas:
+-- -> Keys to move current buffer around in the visible (non-float, non-special) windows
+-- -> (??) Keys to create a full-width/height BUT do not switch to it
+
+--------------------------------
 
 -- Start interactive EasyAlign in visual mode (e.g. vipgea)
 --xmap gea <Plug>(EasyAlign)
@@ -265,64 +338,6 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 -- * When the cursor is at EOL, inserts only ','
 -- * When the cursor is in text, inserts ', '
 --inoremap <expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')
-
--- Window splits
--- FIXME: now I need repeat mode supports, like in tmux!!
---        similar to Hydra plugin in emacs: https://github.com/abo-abo/hydra
---nnoremap <C-w><C-h>   <cmd>call DirectionalSplit("left")<cr>
---nnoremap <C-w><C-j>   <cmd>call DirectionalSplit("down")<cr>
---nnoremap <C-w><C-k>   <cmd>call DirectionalSplit("up")<cr>
---nnoremap <C-w><C-l>   <cmd>call DirectionalSplit("right")<cr>
---function! DirectionalSplit(dir)
---  let save_split_options = [&splitright, &splitbelow]
---  if a:dir == "left"
---    set nosplitright
---    vsplit
---  elseif a:dir == "down"
---    set splitbelow
---    split
---  elseif a:dir == "up"
---    set nosplitbelow
---    split
---  elseif a:dir == "right"
---    set splitright
---    vsplit
---  endif
---  let &splitright = save_split_options[0]
---  let &splitbelow = save_split_options[1]
---endf
-
--- Full-width/height window splits
--- FIXME: Do I need this? Would I use this?
--- FIXME: Since I use noequalalways, the created splits takes way too much space...
---   => Maybe get current screen size and make the new one third of that?
---nnoremap <C-M-w><C-M-h>   <cmd> split<cr><C-w>H
---nnoremap <C-M-w><C-M-j>   <cmd>vsplit<cr><C-w>J
---nnoremap <C-M-w><C-M-k>   <cmd>vsplit<cr><C-w>K
---nnoremap <C-M-w><C-M-l>   <cmd> split<cr><C-w>L
-
--- Smart window split (based on current window size)
---nnoremap <C-w><C-s>  <cmd>call SmartSplit()<cr>
---function! SmartSplit()
---  " ((win_width / 3) > win_height) ? vsplit : split
---  if (winwidth(0) / 3) > winheight(0)
---    call DirectionalSplit("left")
---  else
---    call DirectionalSplit("up")
---  endif
---endf
-
--- Keep a mapping for original <C-w> behavior
---nnoremap <C-w><C-w>  <cmd>echo "Original ^W behavior..."<cr><C-w>
-
--- NOTE: Keys still available (not used often / ever)
--- * <C-M-hjkl>
--- * <C-w><C-HJKL>
--- * <C-w><C-M-hjkl>
---
--- TODO: window actions ideas:
--- -> Keys to move current buffer around in the visible (non-float, non-special) windows
--- -> (??) Keys to create a full-width/height BUT do not switch to it
 
 
 -- CrazyIDEA: Map Alt-MouseClick to resize a window by finding nearest edge??
