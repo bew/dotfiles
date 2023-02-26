@@ -321,11 +321,17 @@ bind --mode=ex <A-p> ex.prev_completion
 bind --mode=ex <Down> ex.next_completion
 bind --mode=ex <Up> ex.prev_completion
 
-# URL based binds
+# URL based config
 
 # Quick go to notifications!
 bindurl github.com nn js tri.dom.simulateClick(document.querySelector("a.notification-indicator"))
 
-fillcmdline_tmp 1000 Config reloaded!
+# Disable on OnShape's CAD which uses many bindings
+autocmd DocStart  cad.onshape.com  mode ignore
+
+
+# --------------------------------------------------------
+# (must be at the end, indicates config (re)load finished!)
+fillcmdline_tmp 1000 Config (re)loaded!
 
 # vim:set ft=conf:
