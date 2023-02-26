@@ -163,7 +163,7 @@ NamedPlug.cmp {
     -- FIXME: writing `thina` still does NOT match `thisisnotaword` :/ why not??
     -- Opened issue: https://github.com/hrsh7th/nvim-cmp/issues/1443
     global_cfg.matching = {
-      -- Not sure why this is not the default.. It's not really fuzzy matching otherwise!
+      -- Allow fuzzy matching to not match from the beginning
       -- See: https://github.com/hrsh7th/nvim-cmp/issues/1422
       disallow_partial_fuzzy_matching = false,
     }
@@ -179,8 +179,11 @@ NamedPlug.cmp {
       --        `item.labelDetails.detail`.
       {
         name = "buffer",
+        -- Mainly used for long words, leveraging fuzzy search!
+        -- => Helps with speed & responsiveness :)
+        keyword_length = 3,
         option = {
-          -- Collect buffer words, following 'iskeyword' option
+          -- Collect buffer words, following 'iskeyword' option of that buffer
           -- See: https://github.com/hrsh7th/nvim-cmp/issues/453
           keyword_pattern = [[\k\+]],
           -- By default, 'buffer' source searches words in current buffer only,
