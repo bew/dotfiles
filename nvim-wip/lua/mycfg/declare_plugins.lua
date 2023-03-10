@@ -3,11 +3,7 @@ local _f = U.str_space_concat
 local _s = U.str_surround
 local _q = U.str_simple_quote_surround
 
-local KeyRefMustExist_mt = {
-  __index = function(self, key)
-    error(_f("Unknown key", key))
-  end,
-}
+local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
 -----------------------------------------------------------------
 
@@ -67,15 +63,24 @@ local NamedPlug_mt = {
 }
 local NamedPlug = setmetatable({}, NamedPlug_mt)
 
-function from_github(owner_repo)
+local PlugSource = {}
+function PlugSource.github(owner_repo)
   return setmetatable({
     type = "github",
     owner_repo = owner_repo,
     resolved_name = owner_repo:gsub("^.*/", ""), -- remove 'owner/' in 'owner/repo'
   }, KeyRefMustExist_mt)
 end
--- Shorter var for easy/non-bloat use in pkg spec!
-local gh = from_github
+function PlugSource.myplug(name)
+  local normalized_path = vim.fs.normalize(MY_KNOWN_PATHS.myplugins .. "/" .. name)
+  return setmetatable({
+    type = "local",
+    name = name,
+    local_path = normalized_path,
+  }, KeyRefMustExist_mt)
+end
+-- Shorter var for easy/non-bloat use in pkg spec (almost all of them!)
+local gh = PlugSource.github
 
 -- IDEA: attach plugin behavior / load pattern based on tags?
 local predefined_tags = setmetatable({}, KeyRefMustExist_mt)
@@ -1073,7 +1078,14 @@ NamedPlug.pkg_manager {
 
     local lazy_plugin_specs = {}
     for _, plug in pairs(U.filter_list(all_plugin_specs, function(p) return not p.on_boot end)) do
-      local lazy_single_spec = { plug.source.owner_repo }
+      local lazy_single_spec = {}
+      if plug.source.type == "github" then
+        lazy_single_spec[1] = plug.source.owner_repo
+      elseif plug.source.type == "local" then
+        lazy_single_spec.dir = plug.source.local_path
+      else
+        error(_f("Unknown declared plugin type", _q(plug.source.type)))
+      end
       lazy_single_spec.init = plug.on_pre_load
       lazy_single_spec.config = plug.on_load
       table.insert(lazy_plugin_specs, lazy_single_spec)
