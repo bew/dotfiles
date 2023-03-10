@@ -108,6 +108,17 @@ end
 
 --------------------
 
+Plug {
+  source = PlugSource.myplug"restore-cursor.nvim",
+  desc = "Restore cursor when opening file for first time, customizable :)",
+  tags = {t.code_ui, "utils"},
+  on_load = function()
+    require("restore-cursor").setup()
+  end,
+}
+
+--------------------
+
 NamedPlug.statusline {
   source = gh"rebelot/heirline.nvim",
   desc = "Heirline.nvim is a no-nonsense Neovim Statusline plugin",
@@ -968,21 +979,6 @@ Plug {
   source = gh"vim-scripts/xterm-color-table.vim",
   desc = "Provide some commands to display all cterm colors",
   tags = {"utils", t.ui, t.vimscript},
-}
-
-Plug {
-  source = gh"ethanholz/nvim-lastplace",
-  desc = "Intelligently reopen files at your last edit position",
-  -- It handles more edge cases (and is actually configurable) than the autocmd that
-  -- is documented at `:h restore-cursor`.
-  tags = {"utils"},
-  on_load = function()
-    require'nvim-lastplace'.setup {
-      lastplace_ignore_buftype = {"quickfix", "nofile", "help"},
-      lastplace_ignore_filetype = {"gitcommit", "gitrebase"},
-      lastplace_open_folds = true,
-    }
-  end,
 }
 
 Plug {
