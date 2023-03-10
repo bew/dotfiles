@@ -56,6 +56,11 @@ vim.opt.packpath = {
   vim.env.VIMRUNTIME,
 }
 
+-- Setup known-paths for my own config:
+MY_KNOWN_PATHS = setmetatable({
+   myplugins = "/home/bew/.dot/nvim-myplugins",
+}, require"mylib.mt_utils".KeyRefMustExist_mt)
+
 -- NOTE: Read more about neovim's custom lua file loader at:
 -- https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
 
