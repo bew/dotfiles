@@ -263,7 +263,11 @@ function clean_visual_paste()
   -- Restore unnamed register
   vim.fn.setreg([["]], saved_register)
 end
-toplevel_map{mode="v", key="<M-p>", desc="clean paste", action=clean_visual_paste}
+-- V: Clean paste without scrubbing unnamed register using 'p',
+--    so I can paste over multiple visual selections using the same text
+toplevel_map{mode="v", key="p", desc="clean paste", action=clean_visual_paste}
+-- V: Vim's visual paste
+toplevel_map{mode="v", key="<M-p>", desc="vim's paste", action="p"}
 
 -- V: Ranged fold open/close
 -- NOTE1: this does not change the 'foldlevel'.
@@ -274,9 +278,42 @@ vim.cmd[[vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>]]
 -- close all manually opened folds in range
 vim.cmd[[vnoremap <silent> zc  zx]]
 
+--------------------------------
+-- Insert helpers
+
+-- I,C: Alt-Backspace to delete last word (like in most other programs)
+vim.cmd[[imap <M-BS> <C-w>]] -- using imap, for autopairs' auto-delete behavior of <C-w>
+vim.cmd[[cnoremap <M-BS> <C-w>]]
+
+-- N: Move cursor to begin/end of displayed line (useful when text wraps)
+vim.cmd[[nnoremap <M-$> g$]]
+vim.cmd[[nnoremap <M-^> g^]]
+-- I: Move cursor to begin/end of line
+vim.cmd[[inoremap <M-$> <C-g>U<End>]]
+-- TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
+-- TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line!
+
+-- I: Add space after cursor
+--
+-- The goal is to have: Space <- | -> M-Space
+-- <Space>   inserts space to the left of cursor:  `ab|cd` -> `ab |cd` (usual)
+-- <M-Space> inserts space to the right of cursor: `ab|cd` -> `ab| cd`
+vim.cmd[[inoremap <M-Space> <Space><C-g>U<Left>]]
+
+-- I: Insert a new line below using <cr> in same context, even when cursor not
+-- at eol, useful in comments!
+-- NOTE: `formatoptions` needs to have `r`
+--   (to auto-add comment start char on <cr>)
+vim.cmd[[inoremap <M-cr> <C-o>A<cr>]]
+-- N: Same in normal mode, ends in insert mode
+--   go in insert mode with a leading comment.
+vim.cmd[[nnoremap <M-cr> A<cr>]]
+
 
 --------------------------------
--- Window splits
+-- Window manipulation
+
+-- IDEA of plugin & mapping: Being able to use <C-w>u to undo last window/tab close !eyes
 
 -- LATER: This could be a good candidate for a keymap/layer
 --   It can be appended to <C-w> or activated on <C-w> ?
@@ -443,37 +480,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --vnoremap <silent> <Up>   :move '<-2<cr>gv
 --vnoremap <silent> <Down> :move '>+1<cr>gv
 
-
--- I: M-Space <-- [] --> Space
---
--- <Space>: add space to the left of cursor:    ab[c]d -> ab [c]d
--- <M-Space>: add space to the right of cursor: ab[c]d -> ab[ ]cd
--- Note: <C-G>U is used to avoid breaking the undo sequence on cursor movement
--- meaning that we can repeat (with .) a change that includes a cursor
--- movement.
---inoremap <expr> <M-Space> ' <C-G>U<Left>'
-
--- I: Alt-Backspace to delete last word (like in most other programs)
---inoremap <M-BS> <C-w>
---cnoremap <M-BS> <C-w>
-
--- N: Move cursor to begin/end of displayed line (useful when text wraps)
---nnoremap <M-$> g$
---nnoremap <M-^> g^
--- I: Move cursor to begin/end of line
---inoremap <M-$> <C-g>U<End>
--- FIXME: <M-^> is waiting on https://github.com/wez/wezterm/issues/877 to work instantly...
--- FIXME: <Home> moves like 0 not like ^
---inoremap <M-^> <C-g>U<Home>
--- TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
--- TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line!
-
--- Insert a new line below using <cr>, useful in comments when `formatoptions`
--- has `r` (to auto-add comment start char on <cr> but not o/O) and the cursor
--- is not at eol.
---inoremap <M-cr> <C-o>A<cr>
--- Also works in normal mode, goes in insert mode with a leading comment.
---nnoremap <M-cr> A<cr>
 
 -- Trigger completion manually
 --inoremap <silent><expr> <C-b>  (pumvisible() ?
