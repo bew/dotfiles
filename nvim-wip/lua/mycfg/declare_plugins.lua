@@ -874,7 +874,7 @@ Plug {
   desc = "Smart and powerful comment plugin for neovim",
   tags = {t.editing, t.textobj},
   on_load = function()
-    require('Comment').setup {
+    require("Comment").setup {
       mappings = false,
     }
     -- FIXME: Allow `gcA` to be dot-repeated
@@ -940,13 +940,13 @@ Plug {
     leader_map{
       mode={"v"},
       key="ccc",
-      action="<ESC><CMD>lua require('Comment.api').locked('comment.linewise')(vim.fn.visualmode())<CR>",
+      action=[[<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>]],
       desc="force (linewise)",
     }
     leader_map{
       mode={"v"},
       key="ccu",
-      action="<ESC><CMD>lua require('Comment.api').locked('uncomment.linewise')(vim.fn.visualmode())<CR>",
+      action=[[<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>]],
       desc="remove (linewise)"
     }
   end,
