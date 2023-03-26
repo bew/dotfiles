@@ -65,7 +65,7 @@ function segmt::git_branch_fast
   fi
 
   # note: when not on a branch, show commit id (but shorter than usual 40-chars)
-  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}}"
+  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}${dots}}"
   local current_ref_short="${VCS_STATUS_LOCAL_BRANCH[0,10]:-@${VCS_STATUS_COMMIT[0,10]}}"
   [[ ${#current_ref_short} -lt ${#current_ref} ]] && current_ref_short+="$dots"
   [[ -n $VCS_STATUS_TAG ]] && {
