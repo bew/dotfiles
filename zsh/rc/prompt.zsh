@@ -42,35 +42,38 @@ function segmt::git_branch_fast
   local     col_is_all_good="034"  # green
   local col_is_not_all_good="178"  # yellow
   local   col_has_untracked="cyan" # cyan
-  local    col_has_modified="196"  # red
+  local    col_has_unstaged="196"  # red
   local      col_has_staged="034"  # green
   local     col_has_stashes="038"  # blue (medium)
   local       col_is_behind="196"  # red
   local        col_is_ahead="202"  # orange
 
-  local arrow_up
-  local arrow_down
-  local dots
+  local sym_arrow_up
+  local sym_arrow_down
+  local sym_dots
+  local sym_staged="+"
+  local sym_unstaged="~"
+  local sym_untracked="?"
   if [[ -z "$ASCII_ONLY" ]]; then
     # %G : Within a %{...%} sequence, include a 'glitch': assume that a single
     #      character width will be output.
     #      Can be needed when a unicode char is considered as 2 chars by mistake.
-    arrow_up="%{↑%G%}"
-    arrow_down="%{↓%G%}"
-    dots="%{…%G%}"
+    sym_arrow_up="%{↑%G%}"
+    sym_arrow_down="%{↓%G%}"
+    sym_dots="%{…%G%}"
   else
-    arrow_up="^"
-    arrow_down="v"
-    dots=".."
+    sym_arrow_up="^"
+    sym_arrow_down="v"
+    sym_dots=".."
   fi
 
   # note: when not on a branch, show commit id (but shorter than usual 40-chars)
-  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}${dots}}"
+  local current_ref="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[0,20]}${sym_dots}}"
   local current_ref_short="${VCS_STATUS_LOCAL_BRANCH[0,10]:-@${VCS_STATUS_COMMIT[0,10]}}"
-  [[ ${#current_ref_short} -lt ${#current_ref} ]] && current_ref_short+="$dots"
+  [[ ${#current_ref_short} -lt ${#current_ref} ]] && current_ref_short+="$sym_dots"
   [[ -n $VCS_STATUS_TAG ]] && {
     current_ref+="#${VCS_STATUS_TAG}"
-    current_ref_short+="#${dots}"
+    current_ref_short+="#${sym_dots}"
   }
   local col_current_ref
   if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
@@ -84,19 +87,19 @@ function segmt::git_branch_fast
   local current_ref_info_short="%F{$col_current_ref}${current_ref_short}%f"
 
   local worktree_info
-  (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_staged}%B+%b%f"
-  (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_modified}%B~%b%f"
-  (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B?%b%f"
+  (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_staged}%B${sym_staged}%b%f"
+  (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_unstaged}%B${sym_unstaged}%b%f"
+  (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B${sym_untracked}%b%f"
 
   local commits_info commits_info_short
   [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && {
-    commits_info+="%F{$col_is_ahead}${arrow_up}${VCS_STATUS_COMMITS_AHEAD}%f"
-    commits_info_short+="%F{$col_is_ahead}${arrow_up}%f"
+    commits_info+="%F{$col_is_ahead}${sym_arrow_up}${VCS_STATUS_COMMITS_AHEAD}%f"
+    commits_info_short+="%F{$col_is_ahead}${sym_arrow_up}%f"
   }
   [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]] && {
     [[ -n "$commits_info" ]] && commits_info+=" "
-    commits_info+="%F{$col_is_behind}${arrow_down}${VCS_STATUS_COMMITS_BEHIND}%f"
-    commits_info_short+="%F{$col_is_behind}${arrow_down}%f"
+    commits_info+="%F{$col_is_behind}${sym_arrow_down}${VCS_STATUS_COMMITS_BEHIND}%f"
+    commits_info_short+="%F{$col_is_behind}${sym_arrow_down}%f"
   }
   [[ $VCS_STATUS_STASHES -gt 0 ]] && {
     [[ -n "$commits_info" ]] && commits_info+=" "
