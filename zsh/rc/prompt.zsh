@@ -38,14 +38,15 @@ function segmt::git_branch_fast
   [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
 
   # colors used below
-  local    col_background="black"
-  local   col_is_all_good="034"  # green
-  local col_has_untracked="068"  # blue/purple (slight)
-  local  col_has_modified="178"  # yellow
-  local   col_has_stashes="038"  # blue (medium)
-  local     col_is_behind="196"  # red
-  local      col_is_ahead="202"  # orange
-  local col_has_modified_staged="202"  # orange
+  local      col_background="black"
+  local     col_is_all_good="034"  # green
+  local col_is_not_all_good="178"  # yellow
+  local   col_has_untracked="cyan" # cyan
+  local    col_has_modified="196"  # red
+  local      col_has_staged="034"  # green
+  local     col_has_stashes="038"  # blue (medium)
+  local       col_is_behind="196"  # red
+  local        col_is_ahead="202"  # orange
 
   local arrow_up
   local arrow_down
@@ -73,7 +74,7 @@ function segmt::git_branch_fast
   }
   local col_current_ref
   if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
-    col_current_ref+="$col_has_modified"
+    col_current_ref+="$col_is_not_all_good"
   elif (( VCS_STATUS_HAS_UNTRACKED )); then
     col_current_ref+="$col_has_untracked"
   else
@@ -83,8 +84,8 @@ function segmt::git_branch_fast
   local current_ref_info_short="%F{$col_current_ref}${current_ref_short}%f"
 
   local worktree_info
-  (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_modified_staged}%B+%b%f"
-  (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_modified}%B!%b%f"
+  (( VCS_STATUS_HAS_STAGED    )) && worktree_info+="%F{$col_has_staged}%B+%b%f"
+  (( VCS_STATUS_HAS_UNSTAGED  )) && worktree_info+="%F{$col_has_modified}%B~%b%f"
   (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B?%b%f"
 
   local commits_info commits_info_short
