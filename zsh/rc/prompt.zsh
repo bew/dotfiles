@@ -78,8 +78,6 @@ function segmt::git_branch_fast
   local col_current_ref
   if (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED )); then
     col_current_ref+="$col_is_not_all_good"
-  elif (( VCS_STATUS_HAS_UNTRACKED )); then
-    col_current_ref+="$col_has_untracked"
   else
     col_current_ref+="$col_is_all_good"
   fi
