@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+# -- IDEAs:
+# Naming: `trace-which`, `trace-link`, `trace-bin`, `trace-path`
+# (from: https://gist.github.com/hellwolf/39feed6c494b4b93ebbd6e52aba2e8df)
+#
+# Completeness: Existing command `namei` from `linux-utils` gives more precise information about
+# each path parts, allowing to follow precise links, like `/foo/bar/baz` where `/foo/bar` is a link
+# to somwhere else. `namei`'s output is a bit hard to read, but I could do a nicer one?
+#
+# Output colors: To help distinguish links/dirs/exe files, I could colorize each path parts with its
+# corresponding dircolors color?
+
 import os
 import shutil
 import sys
@@ -17,7 +28,7 @@ def exit_with_usage():
     print_err("  very useful on systems using many symlinks like Nix/NixOS.")
     print_err()
     print_err("  To distinguish the argument between a binary name and a path,")
-    print_err("  the path needs to be ./relative or /absolute.")
+    print_err("  the path needs to be ./relative, relative/ or /absolute.")
     print_err()
     print_err("Example of binary resolution:")
     print_err("  show-symlinks-chain zsh")
@@ -81,7 +92,7 @@ def main(args: List[str]):
     bin_or_path = args[0]
 
     path_to_resolve: Path
-    if any((bin_or_path.startswith(path_prefix) for path_prefix in ["/", "./", "../"])):
+    if "/" in bin_or_path:
         path_to_resolve = Path(bin_or_path)
     else:
         bin_name = bin_or_path
