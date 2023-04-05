@@ -1059,6 +1059,12 @@ Plug {
   end,
 }
 
+Plug {
+  source = gh"LnL7/vim-nix",
+  desc = "Nix files support",
+  tags = {t.vimscript, t.ft_support},
+}
+
 -- Disabled for now, to find all plugins that require it!
 --Plug.plenary {
 --  source = gh"nvim-lua/plenary.nvim",
