@@ -111,9 +111,20 @@ end
 Plug {
   source = PlugSource.myplug"restore-cursor.nvim",
   desc = "Restore cursor when opening file for first time, customizable :)",
-  tags = {t.code_ui, "utils"},
+  tags = {t.code_ui},
   on_load = function()
     require("restore-cursor").setup()
+  end,
+}
+
+Plug {
+  source = PlugSource.myplug"debug-autocmds.nvim",
+  desc = "Tool to debug/understand autocmd flow while using neovim",
+  tags = {"utils", "debug"},
+  on_load = function()
+    require("debug-autocmds").setup{
+      global_tracking_on_start = false, -- switch to `true` to debug builtin events from start :)
+    }
   end,
 }
 
