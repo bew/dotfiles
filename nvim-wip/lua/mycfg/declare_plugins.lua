@@ -408,6 +408,71 @@ Plug {
 }
 
 Plug {
+  source = gh"nvim-neo-tree/neo-tree.nvim",
+  desc = "Neovim plugin to manage the file system and other tree like structures",
+  tags = {t.ui, "filesystem"},
+  version = { branch = "v2.x" }, -- v2.x is the default branch of that repo (@2023-04)
+  depends_on = {NamedPlug.lib_plenary, NamedPlug.lib_nui, NamedPlug.lib_web_devicons},
+  on_load = function()
+    require("neo-tree").setup {
+      sources = {
+        "filesystem", -- builtin
+        "buffers", -- builtin
+        "git_status", -- builtin
+      },
+      default_source = "filesystem",
+      use_popups_for_input = false, -- force use vim.input
+      sort_case_insensitive = true,
+      source_selector = {
+        winbar = true,
+        -- BROKEN: opened issue: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/848
+        -- tabs_layout = "start",
+        content_layout = "center",
+      },
+      -- Default window configs (can be specialized per source)
+      window = {
+        position = "right",
+        mappings = {
+          -- Action names are found in:
+          -- common actions: <plug>/lua/neo-tree/sources/common/commands.lua
+          -- per-source actions, e.g: <plug>/lua/neo-tree/sources/filesystem/commands.lua
+          -- FIXME: how to define custom ad-hoc actions here in the config?
+          -- FIXME: missing tree navigation actions to goto parent node, goto next/prev sibling node
+          ["o"] = "open",
+          ["<M-t>"] = "open_tabnew",
+          ["<M-s>"] = "open_split",
+          ["<M-v>"] = "open_vsplit",
+          ["zC"] = "close_all_nodes",
+          -- ["zA"] = "expand_all_nodes", -- BROKEN: crashes neovim :eyes:
+        },
+      },
+      -- event_handlers = {},
+      default_component_configs = {
+        name = {
+          trailing_slash = true,
+        }
+      },
+
+      -- Per source configs
+      filesystem = {
+        group_empty_dirs = true,
+        use_libuv_file_watcher = true,
+        follow_current_file = true, -- let's try!
+      }
+    }
+  end,
+  on_colorscheme_change = function()
+    -- Necessary as I don't have 'termguicolor' => ~all default colors are not available
+    vim.cmd[[hi NeoTreeModified cterm=bold]]
+    vim.cmd[[hi NeoTreeDimText ctermfg=239]]
+    vim.cmd[[hi NeoTreeTabActive cterm=bold]]
+    vim.cmd[[hi NeoTreeTabInactive ctermfg=239]]
+    vim.cmd[[hi NeoTreeTabSeparatorInactive ctermfg=239]]
+  end
+}
+
+Plug {
+  enable = false,
   source = gh"kyazdani42/nvim-tree.lua",
   desc = "file explorer tree",
   tags = {t.ui, "filesystem"},
@@ -1069,12 +1134,17 @@ Plug {
   tags = {t.vimscript, t.ft_support},
 }
 
--- Disabled for now, to find all plugins that require it!
---Plug.plenary {
---  source = gh"nvim-lua/plenary.nvim",
---  desc = "Lua contrib stdlib for plugins, used by many plugins",
---  tags = {t.lib_only}
---}
+NamedPlug.lib_plenary {
+ source = gh"nvim-lua/plenary.nvim",
+ desc = "Lua contrib stdlib for plugins, used by many plugins",
+ tags = {t.lib_only}
+}
+
+NamedPlug.lib_nui {
+ source = gh"MunifTanjim/nui.nvim",
+ desc = "UI Component Library for Neovim",
+ tags = {t.ui, t.lib_only}
+}
 
 -- NOTE: I don't want all the lazyness and perf stuff of 'lazy'
 -- I want a simple plugin loader (using neovim packages), with nice recap UI,
