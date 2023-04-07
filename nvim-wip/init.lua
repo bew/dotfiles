@@ -152,6 +152,11 @@ end
 local declared_plugins = require"mycfg.declare_plugins"
 require"mylib.do_simple_plugin_boot"(declared_plugins.all_plugin_specs)
 
+-- This is my config here!
+-- FIXME: I'd like to have a better place to put these,
+-- maybe even under a kind of 'plugin' in my declared_plugins tree!
+-- (see ~/.dot/nvim-myplugins/ & PlugSource.myplug ?)
+
 require"mycfg.mappings"
 
 
