@@ -100,7 +100,7 @@ local function transform_path_to_2_parts(buf_name)
 end
 
 local FileOutOfCwd = {
-  provider = function(self)
+  provider = function()
     local buf_name = vim.api.nvim_buf_get_name(0)
     if not vim.startswith(buf_name, vim.fn.getcwd()) then
       return unicode_or(" ", "[EXT]")
@@ -112,7 +112,7 @@ local FilenameTwoParts = {
   -- IDEA: It is possible with heirline to dynamically generate blocks (see the 'Navic' example),
   --       do a similar thing to have the path separators highlighted ?
   --       (and maybe try to cache it as much as possible if performance is too bad?)
-  provider = function(self)
+  provider = function()
     local buf_name = vim.api.nvim_buf_get_name(0)
     if vim.fn.filereadable(buf_name) == 1 then
       return transform_path_to_2_parts(buf_name)
@@ -144,7 +144,7 @@ local Changed = {
 local ReadOnly = {
   condition = function() return vim.bo.readonly end,
 
-  provider = function(self)
+  provider = function()
     return unicode_or(" ", "[RO]")
   end,
   hl = function()
@@ -156,7 +156,7 @@ local ReadOnly = {
   end,
 }
 local FileType = {
-  provider = function(self)
+  provider = function()
     return vim.bo.filetype or "no ft"
   end,
 }

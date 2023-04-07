@@ -192,9 +192,13 @@ toplevel_map{mode="c", key="<M-j>", action="<Down>",    desc="next history bypre
 toplevel_map{mode="c", key="<M-K>", action="<S-Up>",    desc="prev history"}
 toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 
--- C: Expand %% to dir of current file
--- vim.cmd[[cnoremap <expr> %%  expand("%:.:h") . "/"]]
+-- C: Expand %% to path of current file
 toplevel_map{mode="c", key="%%", desc="current file's dir", opts={expr=true}, action=function()
+  return vim.fn.expand("%:.")
+end}
+
+-- C: Expand %/ to dir of current file
+toplevel_map{mode="c", key="%/", desc="current file's path", opts={expr=true}, action=function()
   return vim.fn.expand("%:.:h") .. "/"
 end}
 
@@ -255,19 +259,11 @@ vim.cmd[[ nnoremap gV `[v`] ]]
 -- O: Textobj for the last inserted region
 vim.cmd[[onoremap gV <cmd>normal! `[v`]<cr>]]
 
--- Visual paste, preserving the content of the unnamed register
-function clean_visual_paste()
-  -- Save unnamed register (will be overwritten with the normal visual paste)
-  local saved_register = vim.fn.getreginfo([["]])
-  vim.cmd(U.str_concat([[norma! "]], vim.v.register, [[p]]))
-  -- Restore unnamed register
-  vim.fn.setreg([["]], saved_register)
-end
--- V: Clean paste without scrubbing unnamed register using 'p',
+-- V: Clean paste (preserving the content of the current/unnamed register),
 --    so I can paste over multiple visual selections using the same text
-toplevel_map{mode="v", key="p", desc="clean paste", action=clean_visual_paste}
--- V: Vim's visual paste
-toplevel_map{mode="v", key="<M-p>", desc="vim's paste", action="p"}
+toplevel_map{mode="v", key="p", desc="paste (preserves register)", action="P"}
+-- V: Vim's visual paste (replacing current/unnamed register)
+toplevel_map{mode="v", key="P", desc="paste (swaps register)", action="p"}
 
 -- V: Ranged fold open/close
 -- NOTE1: this does not change the 'foldlevel'.
@@ -800,11 +796,11 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- Taken from: http://vimcasts.org/episodes/the-edit-command/
 --lua <<LUA
 --leader_map_define_group{mode={"n"}, prefix_key="e", name="+relative-edit"}
----- note: remap needed for '%%' to trigger!
---leader_remap{mode={"n"}, key="ee", action=":e %%",      desc="here"}
---leader_remap{mode={"n"}, key="es", action=":split %%",  desc="in split"}
---leader_remap{mode={"n"}, key="ev", action=":vsplit %%", desc="in v' split"}
---leader_remap{mode={"n"}, key="et", action=":tabe %%",   desc="in tab"}
+---- note: remap needed for '%/' to trigger!
+--leader_remap{mode={"n"}, key="ee", action=":e %/",      desc="here"}
+--leader_remap{mode={"n"}, key="es", action=":split %/",  desc="in split"}
+--leader_remap{mode={"n"}, key="ev", action=":vsplit %/", desc="in v' split"}
+--leader_remap{mode={"n"}, key="et", action=":tabe %/",   desc="in tab"}
 --LUA
 
 -- -----------------
@@ -813,7 +809,3 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- M-S-Up/Down -> Copy current line Up/Down
 -- M-S-Left/Right -> Shrink/Expand (char-)selection (can be simulated in vim?
 --     even without proper language support/detection?)
---
--- IDEA: Add mapping (<leader>vr ? or <M-C-R> ?) to reload file HUD info like the diagnostics,
--- the git signs, python's semantic highlights
--- (if possible, without reloading buffer from disk with :e)

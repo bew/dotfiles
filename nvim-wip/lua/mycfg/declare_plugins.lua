@@ -193,6 +193,9 @@ NamedPlug.cmp {
       -- Allow fuzzy matching to not match from the beginning
       -- See: https://github.com/hrsh7th/nvim-cmp/issues/1422
       disallow_partial_fuzzy_matching = false,
+      -- Fuzzy matching is mostly ok but still broken in some cases (wontfix :/)
+      -- See my issue: https://github.com/hrsh7th/nvim-cmp/issues/1443
+      -- TODO(?): fork?
     }
     local common_sources = {
       -- IDEA?: make a separate source to search in buffer of same filetype
@@ -325,14 +328,11 @@ Plug {
     --        dicts of multiple register('same-prefix', different-dict).
     -- autocmd BufRead * let b:which_key_map = {}
     -- autocmd User PluginsLoaded call which_key#register("<space>", "b:which_key_map")
-    vim.cmd [[
-      augroup my_hi_which_key
-        au!
-        au ColorScheme * hi WhichKey      ctermfg=33 cterm=bold
-        au ColorScheme * hi WhichKeyDesc  ctermfg=172
-        au ColorScheme * hi WhichKeyGroup ctermfg=70
-      augroup END
-    ]]
+  end,
+  on_colorscheme_change = function()
+    vim.cmd[[hi WhichKey      ctermfg=33 cterm=bold]]
+    vim.cmd[[hi WhichKeyDesc  ctermfg=172]]
+    vim.cmd[[hi WhichKeyGroup ctermfg=70]]
   end,
 }
 
@@ -475,7 +475,7 @@ Plug {
   tags = {t.vimscript, "nav"},
 }
 
-NamedPlug.web_devicons {
+NamedPlug.lib_web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
   tags = {t.ui, t.lib_only},
@@ -485,7 +485,7 @@ NamedPlug.startup_screen {
   source = gh"goolord/alpha-nvim",
   desc = "a lua powered greeter like vim-startify / dashboard-nvim",
   tags = {t.ui, t.extensible},
-  depends_on = {NamedPlug.web_devicons},
+  depends_on = {NamedPlug.lib_web_devicons},
   on_load = function()
     -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
     -- simple theme, until I want to make my own...
@@ -620,7 +620,7 @@ Plug {
 Plug {
   source = gh"mbbill/undotree",
   desc = "Vim undo tree visualizer",
-  tags = {t.vimscript, "ui", t.need_better_plugin},
+  tags = {t.vimscript, t.ui, t.need_better_plugin},
   -- pre_load because it must be set before `plugin/` files are loaded!
   on_pre_load = function()
     -- (e.g) Use 'd' instead of 'days' to save some space.
@@ -1081,16 +1081,20 @@ Plug {
 -- => It's actually already possible (except filtering on tags) with `Lazy check` then `Lazy logs`
 --
 -- TODO: Ask a way to disable the 'update' tab, which is potentially too dangerous,
--- I want to review plugins updates before I actuall update them!
+-- I want to review plugins updates before I actually update them!
 NamedPlug.pkg_manager {
   source = gh"folke/lazy.nvim",
   desc = "A modern plugin manager for Neovim",
   tags = {"boot", t.careful_update},
   on_boot = function()
     if not is_module_available("lazy") then return false end
+    local function enabled_plugins_filter(plug)
+      if plug.on_boot then return false end -- not a regular plugin
+      return plug.enable ~= false
+    end
 
     local lazy_plugin_specs = {}
-    for _, plug in pairs(U.filter_list(all_plugin_specs, function(p) return not p.on_boot end)) do
+    for _, plug in pairs(U.filter_list(all_plugin_specs, enabled_plugins_filter)) do
       local lazy_single_spec = {}
       if plug.source.type == "github" then
         lazy_single_spec[1] = plug.source.owner_repo
@@ -1101,6 +1105,9 @@ NamedPlug.pkg_manager {
       end
       lazy_single_spec.init = plug.on_pre_load
       lazy_single_spec.config = plug.on_load
+      if plug.version and plug.version.branch then
+        lazy_single_spec.branch = plug.version.branch
+      end
       table.insert(lazy_plugin_specs, lazy_single_spec)
     end
     local plug_names = {}
