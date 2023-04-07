@@ -479,6 +479,10 @@ NamedPlug.lib_web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
   tags = {t.ui, t.lib_only},
+  on_load = function()
+    require'nvim-web-devicons'.set_default_icon("", "#cccccc", 244)
+    require'nvim-web-devicons'.setup { default = true } -- give a default icon when nothing matches
+  end,
 }
 
 NamedPlug.startup_screen {
