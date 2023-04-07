@@ -160,17 +160,35 @@ local FileType = {
     return vim.bo.filetype or "no ft"
   end,
 }
+local CursorPos = {
+  provider = function()
+    -- NOTE: %c is the byte-column of the cursor
+    -- IDEA: It would be nice to also have the unicode-aware column when different than %c,
+    --   to see the 'character' column.
+    if vim.tbl_contains({"", "NONE", "none"}, vim.o.virtualedit) then
+      return "%l:%02c"
+    else
+      -- Add virtual column (when different than %c), aka the screen-wise position of the cursor
+      -- Ref: https://stackoverflow.com/a/13544885
+      -- NOTE: It is not _always_ enabled, because it would appear too often,
+      --   e.g. when on a wrapped line with 'linebreak' set.
+      return "%l:%02c%V"
+    end
+  end,
+}
 local RulerAndCursorPos = {
   {
     _,
+    { provider = "%P" }, -- ruler
+    _,
     {
-      provider = function()
-        if hline_conditions.is_active() then
-          return "%P %l:%02v"
-        else
-          return "%P L%l"
-        end
-      end,
+      -- Only first child where `(not condition or condition()) == true` will render!
+      fallthrough = false,
+      {
+        condition = hline_conditions.is_active,
+        CursorPos,
+      },
+      { provider = "L%l" }, -- Defaults to only the line
     },
     _,
   },
@@ -412,8 +430,7 @@ local Statuslines = {
     end
   end,
 
-  -- Only the first child with `(not condition or condition()) == true` will
-  -- render!
+  -- Only first child where `(not condition or condition()) == true` will render!
   fallthrough = false,
 
   SpecialStatuslines.Cmdwin,
