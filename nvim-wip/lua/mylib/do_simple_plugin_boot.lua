@@ -1,6 +1,7 @@
 local U = require"mylib.utils"
 local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
+local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
 -- Return a filter function that checks the given field is present
 local function need_field(field_name)
@@ -11,12 +12,13 @@ end
 
 local function boot_plugins(plugin_specs)
   -- TODO(?): would be nice to find the named plugin 'pkg_manager' and boot it first?
-  -- and fallback to a manual boot if no pkg manage found.
+  -- and fallback to a manual boot if no pkg manager found.
   local can_boot_plugins = U.filter_list(plugin_specs, need_field"on_boot")
+  local ctx = setmetatable({ all_plugin_specs = plugin_specs }, KeyRefMustExist_mt)
   for _, plug in pairs(can_boot_plugins) do
-    local name = plug.source.resolved_name
+    local name = plug.source.name
     assert(type(plug.on_boot) == "function", _f("Field on_boot of plug spec", _q(name), "is not a function"))
-    if plug.on_boot() == false then
+    if plug.on_boot(ctx) == false then
       print("Plug", _q(name), "failed to boot, expect errors / lack of plugins / ..")
     end
   end

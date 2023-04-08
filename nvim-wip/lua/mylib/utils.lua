@@ -66,4 +66,12 @@ function M.str_simple_quote_surround(str)
   return M.str_surround("'", str, "'")
 end
 
+---Checks if the given module is available
+---@param module_name string The module to check
+---@return bool
+function M.is_module_available(module_name)
+  local module_available = pcall(require, module_name)
+  return module_available
+end
+
 return M
