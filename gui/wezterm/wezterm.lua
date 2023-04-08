@@ -12,7 +12,7 @@ local cfg_misc = {
   --
   -- Note that dot (.) & slash (/) are allowed though for
   -- easy selection of (partial) paths.
-  selection_word_boundary = " \t\n{}[]()\"'`,;:@│*",
+  selection_word_boundary = " \t\n{}[]()\"'`,;:@│┃*",
 
   -- Do not hold on exit by default.
   -- Because the default 'CloseOnCleanExit' can be annoying when exiting with
