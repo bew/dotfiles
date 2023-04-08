@@ -149,8 +149,8 @@ end
 ----------------------------
 
 -- ------ PLUGINS
-local declared_plugins = require"mycfg.declare_plugins"
-require"mylib.do_simple_plugin_boot"(declared_plugins.all_plugin_specs)
+local plugin_specs = require"mycfg.plugs"
+require"mylib.do_simple_plugin_boot"(plugin_specs)
 
 -- This is my config here!
 -- FIXME: I'd like to have a better place to put these,
