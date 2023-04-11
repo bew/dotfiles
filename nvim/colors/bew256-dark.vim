@@ -112,6 +112,8 @@ exe "let s:fmt_ital     = ' cterm=italic'"
 " exe compiled formats
 
 exe "HiResetTo Normal"   .s:fg_base0  .s:bg_back
+" Darker background for non-current windows
+exe "HiResetTo NormalNC ctermbg=232"
 
 exe "HiResetTo Comment cterm=italic ctermfg=241"
 "       *Comment         any comment
