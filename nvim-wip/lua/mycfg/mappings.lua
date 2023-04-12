@@ -8,6 +8,35 @@ local _q = U.str_simple_quote_surround
 
 -- TODO: Add tags! Define layers!
 
+-- Minimal action system
+
+---@class ActionSpecInput
+---@field for_mode string|string[] Compatible modes at the start of the action
+---@field fn fun(): any
+
+---@class ActionSpec: ActionSpecInput
+
+---@type {[string]: ActionSpec}
+local actions = {}
+---@param spec ActionSpecInput
+---@return ActionSpec
+local function mk_action(spec)
+  vim.validate{
+    spec={spec, "table"},
+    spec_fn={spec.fn, "function"},
+    spec_for_mode={spec.for_mode, "string"},
+  }
+  return setmetatable({
+    for_mode = spec.for_mode,
+    fn = spec.fn,
+  }, {
+    __call = function(self)
+      return self.fn()
+    end,
+  })
+end
+
+
 -- Disable keybindings
 
 -- <C-LeftMouse> default to <C-]>, which just give errors in most files..
