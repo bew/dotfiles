@@ -85,6 +85,30 @@ local Mode = {
   end,
 }
 
+local WinNr_only = {
+  -- mycfg-feature:direct-win-focus
+  provider = function()
+    return vim.fn.winnr()
+  end,
+}
+local WinNr = {
+  {
+    _,
+    WinNr_only,
+    _,
+  },
+  hl = { ctermfg = 242, cterm = { bold=true } },
+}
+local ModeOrWinNr = {
+  -- Only first child where `(not condition or condition()) == true` will render!
+  fallthrough = false,
+  {
+    condition = hline_conditions.is_active,
+    Mode,
+  },
+  WinNr,
+}
+
 local function transform_path_to_2_parts(buf_name)
   -- Transform to 2-parts file path: ~/foo or foo/bar
   local basename = vim.fn.fnamemodify(buf_name, ":t")
@@ -317,7 +341,7 @@ SpecialStatuslines.Help = {
     return hline_conditions.buffer_matches{ buftype = { "help" } }
   end,
 
-  Mode,
+  ModeOrWinNr,
   {
     provider = " HELP ",
     hl = function()
@@ -337,7 +361,7 @@ SpecialStatuslines.Man = {
     return vim.startswith(buf_name, "man://")
   end,
 
-  Mode,
+  ModeOrWinNr,
   {
     provider = " Man ",
     hl = function()
@@ -372,6 +396,7 @@ SpecialStatuslines.SplashStartup = {
     return hline_conditions.buffer_matches{ filetype = {"alpha"} }
   end,
 
+  WinNr,
   __WideSpacing__,
   {
     provider = "          Do something cool !          ",
@@ -426,6 +451,7 @@ SpecialStatuslines.for_plugin.XtermColorTable = {
     return hline_conditions.buffer_matches{ bufname = {"__XtermColorTable__"} }
   end,
 
+  WinNr,
   __WideSpacing__,
   {
     provider = " XTerm color table ",
@@ -437,7 +463,7 @@ SpecialStatuslines.for_plugin.XtermColorTable = {
 }
 
 local GeneralPurposeStatusline = {
-  Mode,
+  ModeOrWinNr,
   { -- File info block
     _,
     { FileOutOfCwd, FilenameTwoParts },
