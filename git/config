@@ -191,18 +191,18 @@
   # --- Info aliases on current branch
 
   # --unified is for the up/down diff context around hunks
-  review-branch          = !git diff --unified=30   $(git z--base-branch-helper)
-  review-branch-full-ctx = !git diff --unified=9999 $(git z--base-branch-helper)
+  review-diff          = !git diff --unified=30   $(git z--base-branch-helper)
+  review-diff-full-ctx = !git diff --unified=9999 $(git z--base-branch-helper)
   # (now with side-by-side delta diff layout)
-  review-branch-s          = !git dds --unified=30   $(git z--base-branch-helper)
-  review-branch-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
+  review-diff-s          = !git dds --unified=30   $(git z--base-branch-helper)
+  review-diff-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
 
-  log-branch         = !git pretty-log         $(git z--base-branch-helper)..
-  log-branch-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
-  lb  = log-branch
-  lvb = log-branch-verbose
+  review-log         = !git pretty-log         $(git z--base-branch-helper)..
+  review-log-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
+  rl  = review-log
+  rlv = review-log-verbose
 
-  stat-branch = !git stat $(git z--base-branch-helper)..
+  review-stat = !git stat $(git z--base-branch-helper)..
 
   # --- Info aliases on last merge
 
