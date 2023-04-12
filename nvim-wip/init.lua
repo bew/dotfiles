@@ -118,9 +118,24 @@ function toplevel_map(spec)
   vim.validate{
     mode={spec.mode, {"string", "table"}},
     key={spec.key, "string"},
-    action={spec.action, {"function", "string"}}
+    action={
+      spec.action,
+      function(a)
+        if vim.tbl_contains({"function", "string"}, type(a)) then
+          return true
+        end
+        return type(a) == "table" and getmetatable(a).__call ~= nil
+      end,
+    }
   }
-  vim.keymap.set(spec.mode, spec.key, spec.action, spec.opts)
+  local action_fn = spec.action
+  if type(spec.action) == "table" then
+    -- vim.keymap.set requires the action to be a string or a function,
+    -- so a pseudo function table must be wrapped
+    action_fn = function(...) return spec.action(...) end
+  else
+  end
+  vim.keymap.set(spec.mode, spec.key, action_fn, spec.opts)
 end
 
 --- Create leader map & register it on which_key plugin
