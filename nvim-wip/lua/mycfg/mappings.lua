@@ -345,6 +345,18 @@ vim.keymap.set("n", "<C-w><C-j>", function() directional_split("down") end)
 vim.keymap.set("n", "<C-w><C-k>", function() directional_split("up") end)
 vim.keymap.set("n", "<C-w><C-l>", function() directional_split("right") end)
 
+-- Focus windows by WinNr
+-- <C-w>N   -> N<C-w>w
+--
+-- mycfg-feature:direct-win-focus
+do
+  for i = 1, 9 do
+    vim.keymap.set("n", "<C-w>"..i, i.."<C-w>w")
+  end
+end
+-- TODO: 'jump-to-last' window
+--   (keep history of ~10-15 windows to handle window deletions gracefully)
+
 -- Smart window split (based on current window size)
 local function smart_split()
   local win_width = vim.fn.winwidth(0)
