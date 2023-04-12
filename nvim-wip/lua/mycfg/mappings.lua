@@ -159,35 +159,45 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- Could it be a special case of visual mode `<M-O>` ?
 -- That would be a `move selection to same context above/below` (can be repeated)
 
--- Duplicate visual selection (preserving its mode, can be 'spammed' for repeat)
-toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=function()
-  -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
-  -- however Visual selection is a pain to get reliably while handling all cases.
-  -- See this PR that attempts to add a vim.get_visual_selection() function:
-  --   https://github.com/neovim/neovim/pull/13896
-  --
-  -- So until we have better APIs to manipulate visual mode, let's just implement it
-  -- in a way similar to my old vimscript implementation :shrug:
-
-  local save_reg = vim.fn.getreginfo([["]])
-
-  local visual_mode = vim.fn.mode()
-  if visual_mode == "v" or visual_mode == "V" then
-    --- Char or Line selection mode:
-    -- Copy, go to the end of the selection, paste
-    -- then re-enter visual (for easy repeat)
-    vim.fn.execute [[noautocmd normal! y`>pgv]]
-  else
-    --- Block selection mode:
-    -- Copy (cursor moves to top left of block), paste before
-    -- then re-enter visual (for easy repeat)
+-- A: Duplicate visual selection
+actions.duplicate_selection = mk_action{
+  for_mode = "v",
+  fn = function()
+    -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
+    -- however Visual selection is a pain to get reliably while handling all cases.
+    -- See this PR that attempts to add a vim.get_visual_selection() function:
+    --   https://github.com/neovim/neovim/pull/13896
     --
-    -- NOTE: for some reason paste before in block mode does _not_ move
-    -- last visual marks.. (they do move when using this in the other visual modes)
-    vim.fn.execute [[noautocmd normal! yPgv]]
-  end
+    -- So until we have better APIs to manipulate visual mode, let's just implement it
+    -- in a way similar to my old vimscript implementation :shrug:
 
-  vim.fn.setreg([["]], save_reg.regcontents, save_reg.regtype)
+    local save_reg = vim.fn.getreginfo([["]])
+
+    local visual_mode = vim.fn.mode()
+    if visual_mode == "v" or visual_mode == "V" then
+      --- Char or Line selection mode:
+      -- Copy, go to the end of the selection, paste
+      -- then re-enter visual (for easy repeat)
+      vim.fn.execute [[noautocmd normal! y`>p]]
+    else
+      --- Block selection mode:
+      -- Copy (cursor moves to top left of block), paste before
+      -- then re-enter visual (for easy repeat)
+      --
+      -- NOTE: for some reason paste before in block mode does _not_ move
+      -- last visual marks.. (they do move when using this in the other visual modes)
+      vim.fn.execute [[noautocmd normal! yP]]
+    end
+
+    vim.fn.setreg([["]], save_reg.regcontents, save_reg.regtype)
+  end,
+}
+-- V: Duplicate visual selection
+toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=actions.duplicate_selection}
+-- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
+toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
+  actions.duplicate_selection()
+  vim.fn.execute [[noautocmd normal! gv]]
 end}
 
 -- I: Short navigation on the line in insert mode
