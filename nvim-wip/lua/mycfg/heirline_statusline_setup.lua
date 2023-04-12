@@ -40,6 +40,12 @@ local mode_default_hl = { ctermfg = 255, cterm = { bold = true } }
 local function tbl_merge(default, ...)
   return vim.tbl_extend("force", default, ...)
 end
+local ModeInnerText_only = {
+  provider = function(self)
+    -- MUST be under `Mode` to have the correct variable set!
+    return some_text_or(self.matching_mode_spec.text, "?!")
+  end,
+}
 local Mode = {
   static = {
     mode_palette = {
@@ -71,10 +77,21 @@ local Mode = {
     local mode = hline_conditions.is_active() and vim.fn.mode() or "n"
     self.matching_mode_spec = self.mode_specs[mode] or {}
   end,
-  provider = function(self)
-    local mode_text = some_text_or(self.matching_mode_spec.text, "?!")
-    return " " .. mode_text .. " "
-  end,
+  {
+    -- Flexible components, contract early but keep visible
+    -- If the N-th child doesn't have enough space, N+1-th child is tried.
+    flexible = 100,
+    {
+      _,
+      ModeInnerText_only,
+      _,
+    },
+    {
+      ModeInnerText_only,
+      _,
+    },
+    ModeInnerText_only, -- limited space fallback
+  },
   hl = function(self)
     -- NOTE: hl _could_ be done in a wrapper widget
     if hline_conditions.is_active() then
@@ -92,11 +109,21 @@ local WinNr_only = {
   end,
 }
 local WinNr = {
+  -- Flexible components, contract early but keep visible
+  -- If the N-th child doesn't have enough space, N+1-th child is tried.
+  -- Ref: https://github.com/rebelot/heirline.nvim/blob/master/cookbook.md#flexible-components
+  flexible = 100,
   {
     _,
     WinNr_only,
     _,
   },
+  {
+    WinNr_only,
+    _,
+  },
+  WinNr_only, -- limited space fallback
+
   hl = { ctermfg = 242, cterm = { bold=true } },
 }
 local ModeOrWinNr = {
@@ -179,12 +206,20 @@ local ReadOnly = {
     end
   end,
 }
-local FileType = {
+local FileType_only = {
   provider = function()
     return vim.bo.filetype or "no ft"
   end,
 }
-local CursorPos = {
+local FileType = {
+  flexible = 50,
+  {
+    FileType_only,
+    _
+  },
+  { provider = "" }, -- limited space fallback to nothing
+}
+local CursorPos_only = {
   provider = function()
     -- NOTE: %c is the byte-column of the cursor
     -- IDEA: It would be nice to also have the unicode-aware column when different than %c,
@@ -200,17 +235,25 @@ local CursorPos = {
     end
   end,
 }
+local Ruler_only = { provider = "%P" }
 local RulerAndCursorPos = {
   {
-    _,
-    { provider = "%P" }, -- ruler
+    {
+      flexible = 50,
+      {
+        _,
+        Ruler_only,
+      },
+      -- TODO: tiny ruler in one char (no spacer around, w/ braille?)
+      { provider = "" }, -- limited space fallback to nothing
+    },
     _,
     {
       -- Only first child where `(not condition or condition()) == true` will render!
       fallthrough = false,
       {
         condition = hline_conditions.is_active,
-        CursorPos,
+        CursorPos_only,
       },
       { provider = "L%l" }, -- Defaults to only the line
     },
@@ -480,7 +523,6 @@ local GeneralPurposeStatusline = {
   },
   __WideSpacing__,
   FileType,
-  _,
   RulerAndCursorPos,
 }
 
