@@ -35,6 +35,10 @@ col.indexed = {
   [22] = "#003010", -- darker dark green
   [28] = "#00641a", -- slightly less dark green (used for highlight over dark green)
   [52] = "#420c0c", -- darker dark red
+
+  -- darker blacks
+  [232] = "#000000", -- deep black
+  [233] = "#101010", -- darker slightly-not-black (default is #121212)
 }
 
 -- Slightly red & transparent (blended in bg)
