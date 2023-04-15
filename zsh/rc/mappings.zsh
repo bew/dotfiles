@@ -20,6 +20,9 @@ function zle::utils::check_git
 
 # Run the given command from a zle widget, as if it was written by the user
 # but without saving it to the history.
+#
+# Limitation: does not compose well, we can't easily run another command or
+#   display some arbitrary text after the command is run..
 function zle::utils::no-history-run
 {
   local cmd="$1"
@@ -164,6 +167,20 @@ function zwidget::git-status
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
     zle::utils::no-history-run "git status"
   else
+    # Start by checking if there are staged files OUTSIDE of cwd,
+    # If so, print _visible_ warning, to avoid committing stuff by mistakes while we're only looking
+    # at CWD git status.
+    local repo_nb_staged=$(git status --porcelain=v1 --untracked-files=no   |grep '^[^ ]' --count)
+    local  cwd_nb_staged=$(git status --porcelain=v1 --untracked-files=no . |grep '^[^ ]' --count)
+    if (( repo_nb_staged != cwd_nb_staged )); then
+      echo # newline to 'step out' of current prompt
+      echo
+      local diff_staged_files=$(( repo_nb_staged - cwd_nb_staged ))
+      local warn_msg="$diff_staged_files staged file(s) outside of CWD"
+      local col_reset=$'\e[0m' col_yellow_bold=$'\e[1;33m' col_red_bold=$'\e[1;31m'
+      echo -e "${col_red_bold}!!!${col_yellow_bold} WARNING: $warn_msg ${col_red_bold}!!!${col_reset}"
+      echo
+    fi
     zle::utils::no-history-run "git status .  # for cwd, unset GIT_MAPPINGS_ARE_FOR_CWD for repo"
   fi
 }
@@ -174,7 +191,8 @@ function zwidget::git-log
 {
   zle::utils::check_git || return
 
-  local cmd=(git pretty-log --all --max-count 42) # don't show too much commits to avoid waiting
+  local cmd=(git pretty-log --all)
+  cmd+=(--max-count 100) # don't show too many commits to avoid waiting
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
     "${cmd[@]}"
