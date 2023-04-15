@@ -24,11 +24,16 @@ local function restore_cursor(cfg, ctx)
     return
   elseif ctx.last_known.line1 > vim.api.nvim_buf_line_count(ctx.buf) then
     -- Last known line is out of bound
-    -- (can happen if the file was changed outside of nvim)
+    -- (can happen if the file was changed outside of nvim and is now shorter)
     ctx.out_of_bound = true
   else
     -- Last known line exists, let's move cursor to last known position!
-    vim.api.nvim_feedkeys([[g`"]], "x", false) -- ("x": for 'execute this now please')
+    -- vim.api.nvim_feedkeys([[g`"]], "x", false) -- ("x": for 'execute this now please')
+    vim.api.nvim_win_set_cursor(ctx.winid, {ctx.last_known.line1, ctx.last_known.col0})
+    -- print(
+    --   "restored cursor for winid:", ctx.winid,
+    --   "to position (L1, C0):", vim.inspect(last_known_pos)
+    -- )
     ctx.restored = true
   end
 
@@ -58,7 +63,7 @@ M.default_config = {
     if ctx.out_of_bound then
       -- Move cursor to last line (and try restore column)
       local buf_line_count = vim.api.nvim_buf_line_count(ctx.buf)
-      vim.api.nvim_win_set_cursor(vim.fn.win_getid(), {buf_line_count, ctx.last_known.col0})
+      vim.api.nvim_win_set_cursor(ctx.winid, {buf_line_count, ctx.last_known.col0})
       return
     end
     -- IDEA: Instead of simply centering on cursor, it could be smarter by looking at the
@@ -88,7 +93,10 @@ function M.setup(given_cfg)
         -- once = true, -- Ensure it's called ONCE (not everytime the buffer is displayed)
         buffer = event.buf,
         callback = function()
-          local ctx = { buf = event.buf }
+          local ctx = {
+            buf = event.buf,
+            winid = vim.fn.win_getid(vim.fn.winnr(), vim.fn.tabpagenr()),
+          }
           if not cfg.enable_when(ctx) then return end
           restore_cursor(cfg, ctx)
         end,
