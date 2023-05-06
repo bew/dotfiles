@@ -137,6 +137,7 @@ in {
     stable.httpie
     stable.strace
     stable.entr
+    stable.tokei
 
     stable.units # gnu's unit converter, has MANY units (https://www.gnu.org/software/units/)
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
