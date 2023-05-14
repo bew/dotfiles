@@ -90,27 +90,37 @@ vim.g.mapleader = " "
 -- Mapping helpers, to be moved, probably
 
 -- Create initial leader maps (to be used in init of some plugins)
-wk_leader_n_maps = {}
-wk_leader_v_maps = {}
+wk_toplevel_n_maps = {}
+wk_toplevel_v_maps = {}
 
---- Get the which_key's leader map for the given mode
-function get_wk_leader_maps_for_mode(mode)
-  local wk_leader_maps_for_mode = {
-    n = wk_leader_n_maps,
-    v = wk_leader_v_maps,
+--- Get the which_key's <group> map for the given mode
+function get_wk_maps_for_mode(mode)
+  local wk_toplevel_maps_for_mode = {
+    n = wk_toplevel_n_maps,
+    v = wk_toplevel_v_maps,
   }
-  return wk_leader_maps_for_mode[mode]
+  return wk_toplevel_maps_for_mode[mode]
 end
 
 --- Define leader map group for which_key plugin
-function leader_map_define_group(spec)
+function _map_define_group(spec)
   assert(spec.mode, "mode is required")
   for _, m in ipairs(spec.mode) do
-    wk_leader_maps = get_wk_leader_maps_for_mode(m)
-    if wk_leader_maps then
-      wk_leader_maps[spec.prefix_key] = { name = spec.name }
+    local wk_maps = get_wk_maps_for_mode(m)
+    if wk_maps then
+      wk_maps[spec.prefix_key] = { name = spec.name }
     end
   end
+end
+
+function leader_map_define_group(spec)
+  _map_define_group(vim.tbl_extend("force", spec, {
+    prefix_key = "<leader>"..spec.prefix_key,
+  }))
+end
+
+function toplevel_map_define_group(spec)
+  _map_define_group(spec)
 end
 
 --- Create top level map
@@ -133,23 +143,31 @@ function toplevel_map(spec)
     -- vim.keymap.set requires the action to be a string or a function,
     -- so a pseudo function table must be wrapped
     action_fn = function(...) return spec.action(...) end
-  else
   end
   vim.keymap.set(spec.mode, spec.key, action_fn, spec.opts)
+
+  -- when desc is set, put the key&desc in appropriate whichkey maps
+  if spec.desc then
+    local mode_tbl
+    if type(spec.mode) == "table" then
+      mode_tbl = spec.mode
+    else
+      mode_tbl = {spec.mode}
+    end
+    for _, m in ipairs(mode_tbl) do
+      local wk_maps = get_wk_maps_for_mode(m)
+      if wk_maps then
+        wk_maps[spec.key] = spec.desc
+      end
+    end
+  end
 end
 
 --- Create leader map & register it on which_key plugin
 function leader_map(spec)
-  toplevel_map(vim.tbl_extend("force", spec, { key = "<leader>"..spec.key }))
-  -- when desc is set, put the key&desc in appropriate whichkey maps
-  if spec.desc then
-    for _, m in ipairs(spec.mode) do
-      wk_leader_maps = get_wk_leader_maps_for_mode(m)
-      if wk_leader_maps then
-        wk_leader_maps[spec.key] = spec.desc
-      end
-    end
-  end
+  toplevel_map(vim.tbl_extend("force", spec, {
+    key = "<leader>"..spec.key,
+  }))
 end
 
 --- Helper to create remap-enabled leader map, see `leader_map` for details

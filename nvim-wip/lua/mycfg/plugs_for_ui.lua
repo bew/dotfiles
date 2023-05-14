@@ -77,8 +77,9 @@ Plug {
       },
     }
     -- Register nmap/vmap keys descriptions
-    require("which-key").register(wk_leader_n_maps, { mode = "n", prefix = "<leader>" })
-    require("which-key").register(wk_leader_v_maps, { mode = "v", prefix = "<leader>" })
+    wk.register(wk_toplevel_n_maps, { mode = "n" })
+    wk.register(wk_toplevel_v_maps, { mode = "v" })
+
     -- TODO: Create a per-buffer map, to avoid crashing WhichKey when the variable
     -- does not exist, we must create a buffer dict, empty for most files,
     -- which will be filled for some file types
