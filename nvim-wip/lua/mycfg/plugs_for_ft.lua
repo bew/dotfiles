@@ -93,3 +93,8 @@ Plug {
   tags = {t.vimscript, t.ft_support},
 }
 
+Plug {
+  source = gh"kaarmu/typst.vim",
+  desc = "Vim plugin for Typst language",
+  tags = {t.vimscript, t.ft_support},
+}
