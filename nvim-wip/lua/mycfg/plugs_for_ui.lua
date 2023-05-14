@@ -79,7 +79,9 @@ Plug {
     -- Register nmap/vmap keys descriptions
     wk.register(wk_toplevel_n_maps, { mode = "n" })
     wk.register(wk_toplevel_v_maps, { mode = "v" })
-
+    toplevel_map{mode={"n"}, key="cr", action=function()
+      wk.show("cr", {mode = "n", auto = true})
+    end, desc="+coerce"}
     -- TODO: Create a per-buffer map, to avoid crashing WhichKey when the variable
     -- does not exist, we must create a buffer dict, empty for most files,
     -- which will be filled for some file types
