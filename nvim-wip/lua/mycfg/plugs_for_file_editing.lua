@@ -538,3 +538,66 @@ Plug {
   -- TODO(later): Explicit keybinds, so I can better control which normal keybinds are active.
 }
 
+Plug {
+  source = gh"johmsalas/text-case.nvim",
+  desc = "Plugin for converting text case",
+  tags = {t.editing},
+  on_load = function()
+    -- ISSUE: cursor off-by-one after case conversion when line doesn't end with a space
+    -- with `x foo_bar`, coercing `foo_bar` to anything will move the cursor between `x` and `foo_bar`
+    -- with `x foo_bar `, coercing `foo_bar` to anything will move the cursor on `f`
+    -- => Cursor pos should end on `f` or (maybe) not move at all.
+
+    -- ISSUE(?):
+    -- With:  `Config.options.triggers`
+    -- .. converting to dash-case
+    -- Gives: `config-options-triggers` but doesn't keep the case of `Config`..
+    -- ---
+    -- With:  `ConfigBar.options.triggers`
+    -- .. converting to dash-case
+    -- Gives: `config-bar-options-triggers` changing all camel and dot-case at the same time..
+
+    local textcase = require"textcase"
+    local key_conversions = {
+      { key = "l", fn_id = "to_lower_case", desc = "to lower case" },
+      { key = "u", fn_id = "to_upper_case", desc = "to UPPER case" },
+      { key = "U", fn_id = "to_constant_case", desc = "TO_CONSTANT_CASE" },
+      { key = "c", fn_id = "to_camel_case", desc = "to lowerCamelCase" },
+      { key = "C", fn_id = "to_pascal_case", desc = "to UpperCamelCase" },
+      { key = "_", fn_id = "to_snake_case", desc = "to_snake_case" },
+      { key = "-", fn_id = "to_dash_case", desc = "to-dash-case" },
+      { key = ".", fn_id = "to_dot_case", desc = "to.dot.case" },
+      { key = "/", fn_id = "to_path_case", desc = "to /path/ case" },
+      { key = "s", fn_id = "to_lower_phrase_case", desc = "to lower sentence" },
+      { key = "S", fn_id = "to_upper_phrase_case", desc = "TO UPPER SENTENCE" },
+      { key = "t", fn_id = "to_title_case", desc = "To (Title) Sentence" },
+    }
+
+    toplevel_map_define_group{mode={"n"}, prefix_key="cr", name="+coerce"}
+    toplevel_map_define_group{mode={"n"}, prefix_key="crr", name="+via-lsp-rename"}
+    toplevel_map_define_group{mode={"n"}, prefix_key="cro", name="+with-operator"}
+
+    for _, conv in pairs(key_conversions) do
+      -- N: cr <action>  => coerce   current word
+      toplevel_map{mode={"n"}, key="cr"..conv.key, desc=conv.desc, action=function()
+        textcase.current_word(conv.fn_id)
+      end}
+      -- N: cr r  <action>  => coerce   via lsp_rename
+      toplevel_map{mode={"n"}, key="crr"..conv.key, desc=conv.desc, action=function()
+        textcase.lsp_rename(conv.fn_id)
+      end}
+      -- N: cr o  <action>  => coerce   with operator
+      toplevel_map{mode={"n"}, key="cro"..conv.key, desc=conv.desc, action=function()
+        textcase.operator(conv.fn_id)
+      end}
+    end
+
+    leader_map_define_group{mode={"v"}, prefix_key="cr", name="+coerce"}
+    for _, conv in pairs(key_conversions) do
+      -- V: <leader> cr <action>     => coerce   visual selection
+      leader_map{mode={"v"}, key="cr"..conv.key, desc=conv.desc, action=function()
+        textcase.operator(conv.fn_id)
+      end}
+    end
+  end,
+}
