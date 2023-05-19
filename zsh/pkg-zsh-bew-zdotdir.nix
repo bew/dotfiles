@@ -2,6 +2,7 @@
   lib,
   fetchFromGitHub,
   runCommand,
+  stdenv,
   makeWrapper,
   coreutils,
 
@@ -42,14 +43,33 @@ let
       rev = "v1.66";
       hash = "sha256-by5x/FTGhypk98w31WQrSUxJTStM39Z21DmMV7P4yVA=";
     };
-    # FIXME: zconvey is broken, because it needs a tiny binary, usually compiled on first use of the plugin
-    # => TODO: Make a drv to build that binary!
-    zconvey = fetchFromGitHub {
-      owner = "z-shell";
-      repo = "zconvey";
-      rev = "dd1060bf340cd0862ee8e158a6450c3196387096"; # latest master @2022-10
-      hash = "sha256-n65PQ7l7CdS3zl+BtLSjJlTsWmdnLVmlDyl7rOwDw24=";
-    };
+    zconvey = let
+      # NOTE: zconvey needs a tiny binary, the feeder, which is usually compiled in-place on
+      # first use of the plugin but that's not possible with Nix since 'in-place' is read-only.
+      zconvey-src = fetchFromGitHub {
+        owner = "z-shell";
+        repo = "zconvey";
+        rev = "dd1060bf340cd0862ee8e158a6450c3196387096"; # latest master @2022-10
+        hash = "sha256-n65PQ7l7CdS3zl+BtLSjJlTsWmdnLVmlDyl7rOwDw24=";
+      };
+      zconvey-feeder = stdenv.mkDerivation {
+        name = "zconvey-feeder";
+        src = "${zconvey-src}/feeder";
+        installPhase = /* sh */ ''
+          mkdir -p $out/bin
+          mv feeder $out/bin/feeder
+        '';
+      };
+    in runCommand "zconvey" {} /* sh */ ''
+      mkdir -p $out
+
+      echo "Copying plugin files"
+      cp -R ${zconvey-src}/* $out/
+      chmod +w $out/feeder
+
+      echo "Copying built feeder binary to plugin files"
+      cp -v ${zconvey-feeder}/bin/feeder $out/feeder/feeder
+    '';
   };
 
   bins = let
