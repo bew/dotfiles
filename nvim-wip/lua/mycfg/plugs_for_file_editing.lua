@@ -380,7 +380,7 @@ Plug {
     -- From: https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#alternative-version
     local brackets = { {'(', ')'}, {'[', ']'}, {'{', '}'} }
     npairs.add_rule(
-      Rule({start_pair = " ", end_pair = " "})
+      Rule{start_pair = " ", end_pair = " "}
       :insert_pair_when(function(ctx)
         -- get last char & next char, check if it's a known 'expandable' pair
         local pair = ctx.line:sub(ctx.col -1, ctx.col) -- inclusive indexing
@@ -393,9 +393,8 @@ Plug {
       :end_moves_right_when(cond.never) -- is this the default? (why not?)
       :cr_expands_pair_when(cond.never) -- is this the default? (why not?)
       :bs_deletes_pair_when(function(ctx)
-        local col = vim.api.nvim_win_get_cursor(0)[2]
-        -- (weird? `col` is one less than what I would have thought..)
-        local context = ctx.line:sub(col - 1, col + 2) -- inclusive indexing
+        local col0 = vim.api.nvim_win_get_cursor(0)[2]
+        local context = ctx.line:sub(col0 - 1, col0 + 2) -- inclusive indexing
         return vim.tbl_contains({
           brackets[1][1]..'  '..brackets[1][2],
           brackets[2][1]..'  '..brackets[2][2],
@@ -408,7 +407,7 @@ Plug {
     -- languages using angle brackets generics, like Rust (`Foo<T>`)
     -- Taken from https://github.com/windwp/nvim-autopairs/issues/330
     npairs.add_rule(
-      Rule({start_pair = "<", end_pair = ">"})
+      Rule{start_pair = "<", end_pair = ">"}
         :insert_pair_when(cond.preceded_by_regex("%a+"))
         :end_moves_right_when(cond.always)
     )
@@ -419,7 +418,7 @@ Plug {
     -- `" abc | def "`        -> press `"` => `" abc "|" def "`
     -- (use `<M-">` for only one dquote, see below)
     npairs.add_rule(
-      Rule({start_pair = [["]], end_pair = [["]]})
+      Rule{start_pair = [["]], end_pair = [["]]}
         :insert_pair_when(cond.always)
         -- Try to not be smart about dquote insertion, even if in quotes
         -- `|"`
@@ -436,10 +435,11 @@ Plug {
     -- '`|`' -> press '`' => '``|``' (instead of '``|')
     -- Allows to do 3+ bquote blocks without special logic:
     -- '```|```' -> press '`' => '````|````' (instead of weird '````|``````')
+    -- TODO(issue,impl?): `tabout.nvim`-like feature, see: https://github.com/abecodes/tabout.nvim
     npairs.remove_rule("`")
     npairs.remove_rule("```")
     npairs.add_rule(
-      Rule({start_pair = "`", end_pair = "`"})
+      Rule{start_pair = "`", end_pair = "`"}
         :insert_pair_when(cond.always)
         :end_moves_right_when(cond.never) -- ?
     )
