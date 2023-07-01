@@ -1,3 +1,5 @@
+local U = require"smart-bol.utils"
+
 local M = {}
 
 --- Get position of beginning of line after spaces
@@ -11,7 +13,7 @@ function M.get_pos_of_indented_bol(line)
     return text_first_pos
   else
     -- There is no <text>, give end of line
-    return #line +1
+    return U.eol_col_for_mode(line)
   end
 end
 
