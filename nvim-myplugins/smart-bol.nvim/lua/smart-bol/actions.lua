@@ -16,10 +16,15 @@ function M.move_to_indented_bol()
 end
 
 -- TODO: write unit tests for actions!
+-- => Need a way to init a test buffer with initial text and move cursor in it
 
--- TODO: support insert mode! (repeatable in a consistent way)
--- I can't find how to make an imap that when executed chooses between 2 movements and when repeated, does the same chosen movement, adapting to text (so no pre-defined number of builtin movements)
+-- IDEA: support repetition in insert mode
+-- I can't find how to make an imap that when executed chooses between 2 movements,
+-- and when repeated does the same chosen movement, adapting to text
+-- (=> no pre-defined number of builtin movements)
+--
 -- Maybe using Ctrl-o to switch back to normal mode temporarily would help?
+--   => NO that breaks undo, even with `<C-g>U` prepended
 
 function M.do_smart_bol()
   local start_pos = U.get_cursor()

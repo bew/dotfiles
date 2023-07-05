@@ -321,12 +321,15 @@ vim.cmd[[imap <M-BS> <C-w>]] -- using imap, for autopairs' auto-delete behavior 
 vim.cmd[[cnoremap <M-BS> <C-w>]]
 
 -- N: Move cursor to begin/end of displayed line (useful when text wraps)
-vim.cmd[[nnoremap <M-$> g$]]
-vim.cmd[[nnoremap <M-^> g^]]
+-- FIXME: conflicts with <M-^> used to smartly move to bol
+-- vim.cmd[[nnoremap <M-$> g$]]
+-- vim.cmd[[nnoremap <M-^> g^]]
+
 -- I: Move cursor to begin/end of line
-vim.cmd[[inoremap <M-$> <C-g>U<End>]]
--- TODO: for <M-^> mappings, support both ^ (first) & 0 (second) (like vscode)
--- TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line!
+-- NOTE: moved to "smart-bol.nvim" plug definition (would prefer to have all here?)
+-- Or define as virtual keys that are overriden in plugin definition?
+
+-- TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line! (or same treesitter 'logical line')
 
 -- I: Add space after cursor
 --

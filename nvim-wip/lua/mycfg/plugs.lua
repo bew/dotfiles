@@ -47,6 +47,26 @@ Plug {
   end,
 }
 
+Plug {
+  source = myplug"smart-bol.nvim",
+  desc = "Provide action to cycle movements ^ and 0 with a single key",
+  tags = {"movement", t.insert},
+  on_load = function()
+    -- I: Move cursor to begin/end of line
+    -- NOTE: BREAKS UNDO
+    --   I couldn't make the smart-bol plugin work in insert mode in a 'repeat'-able way nor without
+    --   breaking undo...
+    --   (moving to end could, but having begin/end have different behavior is a no-no)
+    --
+    -- NOTE: Direct mapping of <M-^> might need special terminal config to work instantly...
+    -- otherwise dead key might be triggered (like `^e` to make `ê`).
+    -- (wezterm implemented this after my issue: https://github.com/wez/wezterm/issues/877)
+    -- vim.cmd[[inoremap <M-^> <C-g>U<Home>]] -- BUT: <Home> moves like 0 not like ^
+    toplevel_map{mode={"n", "i"}, key=[[<M-^>]], desc="smart bol", action=require"smart-bol.actions".do_smart_bol}
+    toplevel_map{mode={"n", "i"}, key=[[<M-$>]], desc="eol", action=[[<End>]]}
+  end,
+}
+
 NamedPlug.lib_plenary {
  source = gh"nvim-lua/plenary.nvim",
  desc = "Lua contrib stdlib for plugins, used by many plugins",
