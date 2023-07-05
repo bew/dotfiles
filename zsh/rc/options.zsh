@@ -49,6 +49,9 @@ setopt hist_save_no_dups
 # OTHERS
 #-------------------------------------------------------------
 
+# Send a CONT signal to processes when they are explicitely `disown`ed from the shell
+setopt auto_continue
+
 # Report the status of background jobs immediately, rather than waiting until just before printing a prompt
 setopt notify
 
