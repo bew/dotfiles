@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     systems = {
@@ -30,7 +30,7 @@
         };
 
         # IDEA: make a flake-parts module to make plenary tests?
-        # ==> BUT... why a module and not just have a function?
+        # ==> BUT... why a module and not just have a builder function?
         mkPlenaryTest = {
           name,
           pluginToTest,
