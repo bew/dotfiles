@@ -186,7 +186,11 @@ local Changed = {
   end,
   on_click = {
     callback = function()
-      vim.cmd[[lockmarks write]]
+      local winid = vim.fn.getmousepos().winid
+      vim.api.nvim_win_call(winid, function()
+        -- Run 'write' in the context of the clicked window
+        vim.cmd[[lockmarks write]]
+      end)
     end,
     -- Should be unique(?). Not 100% sure what it's used for, and how..
     name = "statusline_buffer_write_action",
