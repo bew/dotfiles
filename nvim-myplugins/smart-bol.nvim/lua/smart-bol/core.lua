@@ -13,7 +13,7 @@ function M.get_pos_of_indented_bol(line)
     return text_first_pos
   else
     -- There is no <text>, give end of line
-    return U.eol_col_for_mode(line)
+    return U.eol_col1_for_mode(line)
   end
 end
 

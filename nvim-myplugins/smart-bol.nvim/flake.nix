@@ -67,7 +67,7 @@
           '';
         };
       in mkPlenaryTest {
-        name = "stable-plugin-test";
+        name = "smart-bol";
         pluginToTest = config.packages.default;
       };
     };

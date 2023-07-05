@@ -38,9 +38,11 @@ end
 --- Returns the EOL column based on the mode (handle difference between normal/insert)
 ---@param line string
 ---@return integer
-function M.eol_col_for_mode(line)
+function M.eol_col1_for_mode(line)
   local in_insert_mode = vim.api.nvim_get_mode().mode[1] == "i"
-  if in_insert_mode then
+  if #line == 0 then
+    return 1
+  elseif in_insert_mode then
     -- In insert mode, EOL col is after last char compared to normal mode
     return #line + 1
   else
