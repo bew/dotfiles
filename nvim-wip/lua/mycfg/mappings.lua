@@ -130,8 +130,8 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --
 -- * M-I/A could add in same context (container?) at the beginning/end ?
 --   Like for a function call: foo(1, 2|, 3)
---        `<M-i>new` could be: foo(new|, 1, 2, 3)
---        `<M-a>new` could be: foo(1, 2, 3, new|)
+--        `<M-I>new` could be: foo(new|, 1, 2, 3)
+--        `<M-A>new` could be: foo(1, 2, 3, new|)
 --   But could also work for a multiline Lua table!
 --
 -- * M-n/p (?) could move to (begin? of) next/prev sibling nodes
@@ -230,6 +230,9 @@ toplevel_map{mode="c", key="<M-j>", action="<Down>",    desc="next history bypre
 -- Command history
 toplevel_map{mode="c", key="<M-K>", action="<S-Up>",    desc="prev history"}
 toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
+
+-- TODO: Make <C-w> delete entire last arg (space separated?)
+--   and <M-BS> delete smaller parts (like builtin <C-w>)
 
 -- C: Expand %% to path of current file
 toplevel_map{mode="c", key="%%", desc="current file's dir", opts={expr=true}, action=function()
@@ -529,12 +532,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- TODO: make it work with v:count ?
 --vnoremap <silent> <Up>   :move '<-2<cr>gv
 --vnoremap <silent> <Down> :move '>+1<cr>gv
-
-
--- Trigger completion manually
---inoremap <silent><expr> <C-b>  (pumvisible() ?
---    \ deoplete#complete_common_string() :
---    \ deoplete#manual_complete())
 
 
 -- Exit the terminal grabber

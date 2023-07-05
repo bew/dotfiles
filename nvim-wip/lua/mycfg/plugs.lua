@@ -26,7 +26,7 @@ predefined_tags.git = { desc = "Plugins around git VCS" }
 predefined_tags.textobj = { desc = "Plugins to add textobjects" }
 predefined_tags.ft_support = { desc = "Plugins to support specific filetype(s)" }
 predefined_tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
-predefined_tags.extensible = { desc = "Plugins that can be extended" } -- TODO: apply on all relavant!
+predefined_tags.extensible = { desc = "Plugins that can be extended" } -- TODO: apply on all relevant!
 predefined_tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
