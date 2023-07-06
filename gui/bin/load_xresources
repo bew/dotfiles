@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-[[ -f ~/.Xresources ]] && xrdb ~/.Xresources
-[[ -f ~/.Xresources.local ]] && xrdb -merge ~/.Xresources.local
