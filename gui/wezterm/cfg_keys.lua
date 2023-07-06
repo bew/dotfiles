@@ -97,6 +97,10 @@ cfg.keys = {
   keybind(mods.CS, "w", act.CloseCurrentTab{confirm=false}),
 
   keybind(mods.CS, "x", act.ShowLauncher),
+  keybind(mods.CS, "p", act.ActivateCommandPalette),
+  keybind(mods.CS, "c", act.CharSelect),
+  -- note: overlays don't use OS-defined keyboard layout, fixed in nightly (@2023-07)
+  -- (fixed in https://github.com/wez/wezterm/issues/3470)
 
   -- Font size
   keybind(mods.C, "0", act.ResetFontSize),    -- Ctrl-Shift-0
@@ -120,41 +124,14 @@ cfg.keys = {
   -- and directly send `<M-^>` to terminal program (like neovim!).
   keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
 
-  -- Key Table: Panes Management
-  keybind(mods.CS, "p", define_and_activate_keytable{
-    name = "my-panes-management",
-    activation = {one_shot=false},
-    keys = {
-      keybind(mods._, "Escape", act.PopKeyTable),
-      keybind(mods.CS, "p", act.PopKeyTable),
-
-      -- Create
-      keybind(mods.CSA, {"h", "LeftArrow"},  act.SplitPane{direction="Left"}),
-      keybind(mods.CSA, {"j", "DownArrow"},  act.SplitPane{direction="Down"}),
-      keybind(mods.CSA, {"k", "UpArrow"},    act.SplitPane{direction="Up"}),
-      keybind(mods.CSA, {"l", "RightArrow"}, act.SplitPane{direction="Right"}),
-      -- Destroy
-      keybind(mods.CS, "d", act.CloseCurrentPane{confirm=true}),
-
-      -- Navigation
-      keybind(mods.CS, {"h", "LeftArrow"},  act.ActivatePaneDirection("Left")),
-      keybind(mods.CS, {"j", "DownArrow"},  act.ActivatePaneDirection("Down")),
-      keybind(mods.CS, {"k", "UpArrow"},    act.ActivatePaneDirection("Up")),
-      keybind(mods.CS, {"l", "RightArrow"}, act.ActivatePaneDirection("Right")),
-      keybind(mods.CS, "Space", act.PaneSelect{mode="Activate"}),
-
-      -- Manipulation
-      keybind(mods.CS, "s", act.PaneSelect{mode="SwapWithActive"}),
-      keybind(mods.CS, "z", act.TogglePaneZoomState),
-    },
-  }),
-   
   keybind(mods.CS, "Space", define_and_activate_keytable{
     name = "Leader",
     -- Make this layer volatile, easily dismissed
     activation = {one_shot=true, until_unknown=true},
     keys = {
-      keybind(mods.C, "v", act.Paste),
+      keybind(mods._, "Escape", act.PopKeyTable),
+
+      keybind(mods.C, "v", act.PasteFrom("Clipboard")),
 
       keybind(mods._, "f", define_and_activate_keytable{
         name = "font size",
@@ -166,18 +143,43 @@ cfg.keys = {
           keybind(mods._, "r", act.ResetFontSize),
         },
       }),
+
+      -- Key Table: Panes Management
+      keybind(mods.CS, "p", define_and_activate_keytable{
+        name = "my-panes-management",
+        activation = {one_shot=false},
+        keys = {
+          keybind(mods._, "Escape", act.PopKeyTable),
+          keybind(mods.CS, "p", act.PopKeyTable),
+
+          -- Create
+          keybind(mods.CSA, {"h", "LeftArrow"},  act.SplitPane{direction="Left"}),
+          keybind(mods.CSA, {"j", "DownArrow"},  act.SplitPane{direction="Down"}),
+          keybind(mods.CSA, {"k", "UpArrow"},    act.SplitPane{direction="Up"}),
+          keybind(mods.CSA, {"l", "RightArrow"}, act.SplitPane{direction="Right"}),
+          -- Destroy
+          keybind(mods.CS, "d", act.CloseCurrentPane{confirm=true}),
+
+          -- Navigation
+          keybind(mods.CS, {"h", "LeftArrow"},  act.ActivatePaneDirection("Left")),
+          keybind(mods.CS, {"j", "DownArrow"},  act.ActivatePaneDirection("Down")),
+          keybind(mods.CS, {"k", "UpArrow"},    act.ActivatePaneDirection("Up")),
+          keybind(mods.CS, {"l", "RightArrow"}, act.ActivatePaneDirection("Right")),
+          keybind(mods.CS, "Space", act.PaneSelect{mode="Activate"}),
+
+          -- Manipulation
+          keybind(mods.CS, "s", act.PaneSelect{mode="SwapWithActive"}),
+          keybind(mods.CS, "z", act.TogglePaneZoomState),
+        },
+      }),
     },
   }),
 }
--- FIXME: redefining the 'copy_mode' key_table will remove default 'copy_mode' keys.
---        (probably due to disable_default_key_bindings=true)
--- TODO(IDEA): suggest `wezterm.default_config.key_tables.copy_mode` on which I could add my own 'i' key!
---             (maybe as a getter, to make it explicit we're getting a fresh list of keys?)
--- TODO(IDEA): suggest adding a 'wezterm' or 'builtin' prefix to existing tables,
---             to 'reserve' a set of tables for potential future uses
--- cfg.key_tables.copy_mode = {
---   {key="i", mods="NONE", action=act.CopyMode("Close")},
--- }
+
+cfg.key_tables.copy_mode = mytable.flatten_list{
+  wezterm.gui.default_key_tables().copy_mode, -- extend default 'copy_mode' table
+  keybind(mods._, "i", act.CopyMode("Close")),
+}
 
 -- Events related to config reloading
 wezterm.on("my-reload-config-with-notif", function(win, pane)
