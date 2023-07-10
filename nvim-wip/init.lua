@@ -139,15 +139,19 @@ function toplevel_map(spec)
     }
   }
   local action_fn = spec.action
+  local description = spec.desc
   if type(spec.action) == "table" then
     -- vim.keymap.set requires the action to be a string or a function,
     -- so a pseudo function table must be wrapped
     action_fn = function(...) return spec.action(...) end
+    if not description then
+      description = spec.action.default_desc
+    end
   end
   vim.keymap.set(spec.mode, spec.key, action_fn, spec.opts)
 
-  -- when desc is set, put the key&desc in appropriate whichkey maps
-  if spec.desc then
+  -- when the description is set, put the key&desc in appropriate whichkey maps
+  if description then
     local mode_tbl
     if type(spec.mode) == "table" then
       mode_tbl = spec.mode
@@ -157,7 +161,7 @@ function toplevel_map(spec)
     for _, m in ipairs(mode_tbl) do
       local wk_maps = get_wk_maps_for_mode(m)
       if wk_maps then
-        wk_maps[spec.key] = spec.desc
+        wk_maps[spec.key] = description
       end
     end
   end

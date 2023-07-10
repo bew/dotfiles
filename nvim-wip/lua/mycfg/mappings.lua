@@ -25,8 +25,10 @@ local function mk_action(spec)
     spec={spec, "table"},
     spec_fn={spec.fn, "function"},
     spec_for_mode={spec.for_mode, "string"},
+    spec_desc={spec.default_desc, "string", true}, -- optional
   }
   return setmetatable({
+    default_desc = spec.default_desc,
     for_mode = spec.for_mode,
     fn = spec.fn,
   }, {
