@@ -11,9 +11,9 @@ cfg.disable_default_mouse_bindings = true
 
 local mouse_bindings = {}
 
-local function binds_for_mouse_actions(mods, button, streak, mouse_actions)
+local function binds_for_mouse_actions(mods, button, streak, mouse_actions, extra_opts)
   local function mouse_bind_for(event_kind, action)
-    return {
+    local bind = {
       mods=mods,
       event = {
         [event_kind] = {
@@ -23,6 +23,10 @@ local function binds_for_mouse_actions(mods, button, streak, mouse_actions)
       },
       action = action,
     }
+    for k, v in pairs(extra_opts or {}) do
+      bind[k] = v
+    end
+    return bind
   end
 
   local binds = {}
@@ -84,10 +88,12 @@ table.insert(mouse_bindings, {
     down_action = act.Nop,
     up_action   = act.OpenLinkAtMouseCursor,
   }),
+  -- Also enable this binding when mouse reporting is enabled.
+  binds_for_mouse_actions(mods.C, "Left", 1, {
+    down_action = act.Nop,
+    up_action   = act.OpenLinkAtMouseCursor,
+  }, {mouse_reporting=true}), -- note the extra binding options
 })
--- FIXME: I want this to work EVEN IF the current program enabled mouse-reporting.
---        Currently I have to press Ctrl-Shift-click to make this binding work.
--- Opened issue: https://github.com/wez/wezterm/issues/581
 
 -- Clipboard
 table.insert(mouse_bindings, {
@@ -95,6 +101,12 @@ table.insert(mouse_bindings, {
   wezterm.permute_any_or_no_mods({
     event={Down={streak=1, button="Middle"}},
     action=act.PasteFrom("Clipboard"),
+  }),
+  -- Also enable this binding when mouse reporting is enabled.
+  wezterm.permute_any_or_no_mods({
+    event={Down={streak=1, button="Middle"}},
+    action=act.PasteFrom("Clipboard"),
+    mouse_reporting=true,
   }),
 })
 
