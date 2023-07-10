@@ -65,7 +65,18 @@ vim.cmd[[nnoremap U <C-r>]]
 vim.cmd[[nnoremap Y yy]]
 
 -- N: Discard last search highlight
-vim.cmd[[nnoremap <silent> § :noh \| echo "Search cleared"<cr>]]
+actions.hide_search_hl = mk_action{
+  default_desc="Hide search highlight",
+  for_mode = "n",
+  fn = function()
+    vim.cmd[[nohlsearch]]
+    vim.cmd.echo([["Search cleared"]]) -- note the 'nested' quotes, required for vimscript..
+  end,
+}
+toplevel_map{mode="n", key="§",     action=actions.hide_search_hl}
+-- Outside of tmux, nvim recognizes '§' as '<S-§>'.. So let's bind both :shrug:
+-- FIXME: investigate why ?
+toplevel_map{mode="n", key="<S-§>", action=actions.hide_search_hl}
 
 -- I: Disable up/down keys
 --
