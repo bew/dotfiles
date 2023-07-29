@@ -6,15 +6,19 @@ in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix
     ./gui-force-system-locales.nix
-    ./gui-firefox-tridactyl-native-extension.nix
+    ./gui-firefox-native-extensions.nix
   ];
 
   # Check needed native pkg version at:
   # https://github.com/tridactyl/tridactyl/blob/master/native/current_native_version
   # URL found in: https://github.com/tridactyl/native_messenger/blob/62f19dba573b92/installers/install.sh#L53
-  my.firefox-tridactyl-native.package = pkgsChannels.stable.tridactyl-native;
+  my.firefox-native-extensions.tridactyl-native = stable.tridactyl-native;
+
+  my.firefox-native-extensions.uget-integrator = stable.uget-integrator;
 
   home.packages = [
+    stable.uget
+
     # desktop/wm related (TODO? nixify config)
     stable.polybar
     stable.dunst
