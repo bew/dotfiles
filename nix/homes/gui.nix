@@ -1,7 +1,7 @@
 { config, pkgsChannels, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge;
+  inherit (pkgsChannels) stable bleedingedge myPkgs;
 in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix
@@ -18,6 +18,8 @@ in {
 
   home.packages = [
     stable.uget
+
+    myPkgs.mpv-helpers # @mpv helpers
 
     # desktop/wm related (TODO? nixify config)
     stable.polybar
