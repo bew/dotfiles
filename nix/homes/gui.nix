@@ -19,6 +19,7 @@ in {
   home.packages = [
     stable.uget
 
+    myPkgs.mpv-bew # mpv with scripts
     myPkgs.mpv-helpers # @mpv helpers
 
     # desktop/wm related (TODO? nixify config)
