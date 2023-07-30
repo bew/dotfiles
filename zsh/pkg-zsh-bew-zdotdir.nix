@@ -1,7 +1,7 @@
 {
   lib,
   fetchFromGitHub,
-  runCommand,
+  runCommandLocal,
   stdenv,
   makeWrapper,
   coreutils,
@@ -60,7 +60,7 @@ let
           mv feeder $out/bin/feeder
         '';
       };
-    in runCommand "zconvey" {} /* sh */ ''
+    in runCommandLocal "zconvey" {} /* sh */ ''
       mkdir -p $out
 
       echo "Copying plugin files"
@@ -93,7 +93,7 @@ let
 
 in
 
-runCommand "zsh-bew-zdotdir" {} /* sh */ ''
+runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
   mkdir -p $out $out/rc
 
   >&2 echo "Copying no-deps files"
