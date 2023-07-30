@@ -75,6 +75,7 @@
       stablePkgs = inputs.nixpkgsStable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
+      mpv-bew = stablePkgs.callPackage ./nix/pkgs/mpv {};
       mpv-helpers = stablePkgs.callPackage ./nix/pkgs/mpv-helpers {};
 
       zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {

@@ -1,0 +1,36 @@
+diff --git a/copyTime.lua b/copyTime.lua
+index b412562..6786fa0 100644
+--- a/copyTime.lua
++++ b/copyTime.lua
+@@ -17,30 +17,21 @@ local function platform_type()
+ end
+ 
+ local function command_exists(cmd)
+     local pipe = io.popen("type " .. cmd .. " > /dev/null 2> /dev/null; printf \"$?\"", "r")
+     exists = pipe:read() == "0"
+     pipe:close()
+     return exists
+ end
+ 
+ local function get_clipboard_cmd()
+-    if command_exists("xclip") then
+-        return "xclip -silent -in -selection clipboard"
+-    elseif command_exists("wl-copy") then
+-        return "wl-copy"
+-    elseif command_exists("pbcopy") then
+-        return "pbcopy"
+-    else
+-        mp.msg.error("No supported clipboard command found")
+-        return false
+-    end
++    return "xclip -silent -in -selection clipboard"
+ end
+ 
+ local function divmod(a, b)
+     return a / b, a % b
+ end
+ 
+ local function set_clipboard(text) 
+     if platform == WINDOWS then
+         mp.commandv("run", "powershell", "set-clipboard", text)
+         return true
