@@ -20,7 +20,9 @@ in {
     stable.uget
 
     myPkgs.mpv-bew # mpv with scripts
-    myPkgs.mpv-helpers # @mpv helpers
+    (myPkgs.mpv-helpers.override { mpv = myPkgs.mpv-bew; }) # @mpv helpers
+    # note: need to pass mpv-bew in so that my mpv with config is used when starting
+    #   channel-controlled mpv using `@mpv daemon-start foo`
 
     # desktop/wm related (TODO? nixify config)
     stable.polybar
