@@ -44,4 +44,5 @@ in
         --set MPV_HOME ${mpv-config-dir}/share/mpv \
         --add-flags '--no-osc'
     '';
+    meta.mainProgram = "mpv";
   }

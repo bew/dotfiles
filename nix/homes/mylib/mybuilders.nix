@@ -155,9 +155,9 @@ rec {
   #     ├── lib -> /nix/store/dy11j8bd6a6gq0nsgx54zddg32qrcd7l-zsh-5.8.1/lib
   #     └── share -> /nix/store/dy11j8bd6a6gq0nsgx54zddg32qrcd7l-zsh-5.8.1/share
   #
-  replaceBinsInPkg = { name, copyFromPkg, bins ? {}, nativeBuildInputs ? [], postBuild ? "" }:
+  replaceBinsInPkg = { name, copyFromPkg, bins ? {}, nativeBuildInputs ? [], postBuild ? "", meta ? {} }:
     pkgs.buildEnv {
-      inherit name nativeBuildInputs;
+      inherit name nativeBuildInputs meta;
       paths = [ copyFromPkg ];
       postBuild = /* sh */ ''
         if [[ -e $out/bin ]]; then
