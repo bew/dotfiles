@@ -23,7 +23,13 @@ let
       (callPackage ./scripts/mpv-undoredo.nix {})
       (callPackage ./scripts/mpv-thumbfast.nix {})
       (callPackage ./scripts/mpv-copyTime.nix {})
-      (callPackage ./scripts/mpv-uosc.nix {})
+
+      # UI
+      (callPackage ./scripts/mpv-modernx.nix {})
+
+      # (callPackage ./scripts/mpv-uosc.nix {})
+      # note: uosc can do many things, but is a little bloated, and doesn't show actual playlist..
+      #   proximity and slight animations aren't my thing
     ];
   };
 
@@ -32,7 +38,10 @@ in
     name = "mpv-bew";
     copyFromPkg = mpv-unwrapped;
     nativeBuildInputs = [ makeWrapper ];
+    # Setup the binary to point to the config dir, and disable default OSC.
     postBuild = /* sh */ ''
-      makeWrapper ${mpv-unwrapped}/bin/mpv $out/bin/mpv --set MPV_HOME ${mpv-config-dir}/share/mpv
+      makeWrapper ${mpv-unwrapped}/bin/mpv $out/bin/mpv \
+        --set MPV_HOME ${mpv-config-dir}/share/mpv \
+        --add-flags '--no-osc'
     '';
   }
