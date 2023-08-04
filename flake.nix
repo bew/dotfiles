@@ -32,9 +32,6 @@
 
     homeManager.url = "github:nix-community/home-manager/release-22.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
-
-    binHtmlq.url = "github:mgdm/htmlq";
-    binHtmlq.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
   # TO-EXPERIMENT: flake-parts (https://github.com/hercules-ci/flake-parts) to
