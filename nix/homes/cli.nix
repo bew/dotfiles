@@ -149,6 +149,7 @@ in {
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
     stable.translate-shell
     stable.asciiquarium # nice ASCII aquarium 'screen saver'
+    bleedingedge.yt-dlp # youtube-dl FTW!!
 
     # Languages
     # NOTE: Compilers, interpreter shouldn't really be made available in a global way..
