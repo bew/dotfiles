@@ -355,7 +355,7 @@ alias venv::load_helpers="source ~/.dot/shell/venv_helpers.sh"
 
 # youtube-dl
 
-alias ytdl='youtube-dl'
+alias ytdl='yt-dlp'
 alias ytdl-m4a='ytdl --extract-audio -f m4a --ignore-errors'
 alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 
