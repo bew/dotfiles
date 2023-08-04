@@ -333,6 +333,9 @@ Plug {
       -- Do not break undo when pairing default rules
       break_undo = false,
 
+      -- Do not disable in macros (didn't see much trouble with having it enabled)
+      disable_in_macro = false,
+
       -- map <C-h> to delete a pair if possible
       map_c_h = true,
       -- map <C-w> to delete a pair if possible, like <C-h>

@@ -101,7 +101,7 @@ Plug {
   source = gh"nvim-neo-tree/neo-tree.nvim",
   desc = "Neovim plugin to manage the file system and other tree like structures",
   tags = {t.ui, "filesystem", "nav"},
-  version = { branch = "v2.x" }, -- v2.x is the default branch of that repo (@2023-04)
+  version = { branch = "v3.x" },
   depends_on = {NamedPlug.lib_plenary, NamedPlug.lib_nui, NamedPlug.lib_web_devicons},
   on_load = function()
     require("neo-tree").setup {
@@ -147,7 +147,10 @@ Plug {
       filesystem = {
         group_empty_dirs = true,
         use_libuv_file_watcher = true,
-        follow_current_file = true, -- let's try!
+        follow_current_file = {
+          enabled = true,
+          leave_dirs_open = false, -- AFAIU, 'false' -> dirs that were not manually opened will be auto-closed
+        }
       }
     }
   end,
