@@ -117,7 +117,6 @@ in {
     bleedingedge.delta # for nice git diffs
     stable.jq
     stable.yq
-    #flakeInputs.binHtmlq.packages.${system}.htmlq # fails to build, & generates LOTS of intermediate drvs...
     stable.ripgrep
     stable.tree
     stable.just
