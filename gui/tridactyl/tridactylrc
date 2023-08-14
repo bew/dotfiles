@@ -1,9 +1,9 @@
-#   _____     _     _            _         _ 
+#   _____     _     _            _         _
 #  |_   _| __(_) __| | __ _  ___| |_ _   _| |
 #    | || '__| |/ _` |/ _` |/ __| __| | | | |
 #    | || |  | | (_| | (_| | (__| |_| |_| | |
 #    |_||_|  |_|\__,_|\__,_|\___|\__|\__, |_|
-#                                    |___/   
+#                                    |___/
 #
 
 
@@ -240,23 +240,37 @@ bind <A-n> findnext 1
 bind <A-N> findnext -1
 bind § nohlsearch
 
-# NORMAL: Send Escape to the page itself
-# From insert/visual mode: `Escape-Escape` to go back to normal mode, then sends actual `Escape` to the page
+# Make sure <Escape> isn't bound, so it is directly sent to the page in most cases.
+# (necessary for some popups like the Ctrl-k search popups, reddit post preview, ...)
 #
-# Make sure <Escape> isn't bound, so it is directly sent to the page when in normal mode.
-unbind <Escape>
+# NOTE for insert mode: Since most websites that care about UX bind `Escape` only when an input is
+# focused, Tridactyl's default of going back to normal mode followed by me sending Escape to the
+# page itself would not invoke the website's handler to hide some UI/popups..
+# Use `<A-Escape>` in insert mode to go back to normal mode without sending `Escape` to the page.
+#
+# NOTE for visual mode: Tridactyl's default in visual mode is NOT disabled, use `Escape-Escape` to
+# go back to normal mode, then send actual `Escape` to the page.
+unbind               <Escape>
+unbind --mode=insert <Escape>
+
+# Go back to normal mode in tridactyl (page itself doesn't receive `Escape`)
+bind               <A-Escape> mode normal
+bind --mode=insert <A-Escape> composite unfocus ; mode normal
+bind --mode=insert <A-q> composite unfocus ; mode normal
+# Also bind A-q in case A-Escape can't be mapped (like on Windows it seems)
 
 # --- insert mode bindings
 
-# INSERT: Send Escape to the page itself (from insert mode)
-# (necessary for some popups like the Ctrl-k popup of Element (Matrix Web UI))
+# Try to remap some insert keys to help navigation
+# % Move by char
+# (using 'xdotool' to inject arrows, to be able to control autocompletions popups, like Github's emoji popup)
 #
 #   !!! NOTE !!!
 #   This keybind uses Alt-something, but xdotool will clear & re-apply Alt to properly
 #   send Escape to the window.
 #   If I do Alt+something-triggering-xdotool but release it after 1s (without other action),
 #   the browser will see a Alt press-release (the press comes from xdotool re-applying Alt after
-#   clearing it, the release it me), which by default opens the menubar (with File, View...).
+#   clearing it, the release is me), which by default opens the menubar (with File, View...).
 #
 #   % How to disable Alt press-release opening the menubar
 #   Open about:config and set `ui.key.menuAccessKeyFocuses` to `false`.
@@ -266,20 +280,6 @@ unbind <Escape>
 #   Prepend `xdotool keyup Alt` and remove `--clearmodifiers` for the next xdotool. This will
 #   ensure Alt is not disabled then re-enabled. The main downside is that it's not possible to
 #   chain Alt-something keybinds because Alt is not pressed anymore after xdotool was called.
-bind --mode=insert <A-Escape> composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Escape ; mode insert
-bind --mode=insert <A-q>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Escape ; mode insert
-# Also bind A-q in case A-Escape can't be mapped (like on Windows it seems)
-
-# Edit textboxes in favorite editor <3
-# (will open file %f at line %l and column %c, centering the view if needed)
-set editorcmd flatpak run org.wezfurlong.wezterm start --always-new-process nvim %f -c 'normal! %lG%c|zz'
-# Ref: moz-extension://d4be4c81-b633-439c-8d53-744227c38bed/static/docs/modules/_src_excmds_.html#editor
-alias editor_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
-bind --mode=insert <A-i> editor_rm
-
-# Try to remap some insert keys to help navigation
-# % Move by char
-# (using 'xdotool' to inject arrows, to be able to control autocompletions popups, like Github's emoji popup)
 bind --mode=insert <A-h>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Left ; mode insert
 bind --mode=insert <A-j>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Down ; mode insert
 bind --mode=insert <A-k>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Up   ; mode insert
@@ -295,6 +295,13 @@ bind --mode=insert <C-u>      text.backward_kill_line
 # % Delete to BOW
 # => doesn't work, still closes current tab
 #bind --mode=insert <C-w>      text.backward_kill_word
+
+# Edit textboxes in favorite editor <3
+# (will open file %f at line %l and column %c, centering the view if needed)
+set editorcmd flatpak run org.wezfurlong.wezterm start --always-new-process nvim %f -c 'normal! %lG%c|zz'
+# Ref: moz-extension://d4be4c81-b633-439c-8d53-744227c38bed/static/docs/modules/_src_excmds_.html#editor
+alias editor_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
+bind --mode=insert <A-i> editor_rm
 
 # --- ex mode bindings
 
