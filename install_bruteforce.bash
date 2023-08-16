@@ -46,9 +46,10 @@ function skip
   echo "SKIPPED: $*"
 }
 
-DRYRUN_ONLY="false"
-if [[ "$1" == "--dry-run" ]]; then
-  DRYRUN_ONLY="true"
+# opt-in apply
+DRYRUN_ONLY=true
+if [[ "$1" == "--apply" ]]; then
+  DRYRUN_ONLY=false
 fi
 DOTS_PATH=$(dirname $(realpath "$0"))
 
@@ -99,8 +100,8 @@ if [[ -d ~/.config/"Code - OSS" ]]; then
   make-link ~/.dot/gui/vscode-user-config ~/.config/"Code - OSS"/User
 fi
 
-if [[ "$DRYRUN_ONLY" == "true" ]]; then
+if $DRYRUN_ONLY; then
   echo
-  echo "### To apply the above config, re-run without --dry-run"
+  echo "### To apply the above config, re-run with '--apply"
   echo
 fi
