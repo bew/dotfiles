@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-xev -event keyboard | rg --passthru keysym

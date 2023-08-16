@@ -64,7 +64,7 @@ skip make-link ~/.dot/zsh/zshrc   ~/.zshrc
 skip make-link ~/.dot/zsh/zshenv  ~/.zshenv
 make-link ~/.dot/zsh/zlogin  ~/.zlogin
 
-label "nvim link"
+skip label "nvim link"
 skip make-link ~/.dot/nvim  ~/.config/nvim
 
 label "git links"
@@ -82,28 +82,16 @@ make-link ~/.dot/gdb             ~/.config/gdb
 mkdir -vp ~/.ipython/profile_default/startup
 make-link ~/.dot/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
 
-label "X configs"
-make-link ~/.dot/gui/xinitrc       ~/.xinitrc
-make-link ~/.dot/gui/xprofile      ~/.xprofile
-make-link ~/.dot/gui/xkbmap.config ~/.config/xkbmap.config
-make-link ~/.dot/gui/picom.config  ~/.config/picom.config # compositor
-make-link ~/.dot/gui/mimeapps.list ~/.config/mimeapps.list # xdg MIME type to apps associations
-make-link ~/.dot/gui/autorandr     ~/.config/autorandr
-
 label "X apps configs"
 # terms
 make-link ~/.dot/gui/wezterm   ~/.config/wezterm
 
 # Desktop env
-make-link ~/.dot/gui/herbstluftwm  ~/.config/herbstluftwm
-make-link ~/.dot/gui/polybar       ~/.config/polybar
 make-link ~/.dot/gui/dunst         ~/.config/dunst
 make-link ~/.dot/gui/flameshot     ~/.config/flameshot
 make-link ~/.dot/gui/copyq         ~/.config/copyq
-make-link ~/.dot/gui/libinput-gestures.conf  ~/.config/libinput-gestures.conf
 
 # tools
-make-link ~/.dot/gui/mpv       ~/.config/mpv
 make-link ~/.dot/gui/tridactyl ~/.config/tridactyl
 
 # vscode (if I ever want to have it..)
