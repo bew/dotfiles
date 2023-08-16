@@ -48,7 +48,7 @@ let
         cnoremap <M-k> <Up>
         cnoremap <M-j> <Down>
 
-        source ${./../../nvim/colors/bew256-dark.vim}
+        source ${./../../nvim-wip/colors/bew256-dark.vim}
       '';
       packages.myVimPackage = with stable.vimPlugins; {
         start = [ vim-nix ];
