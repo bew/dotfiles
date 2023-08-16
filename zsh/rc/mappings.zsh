@@ -318,6 +318,12 @@ function zwidget::cycle-quoting
     esac
   }
 
+  # FIXME: Keep cursor position on arg!
+  #        When cursor is at the start/end of the arg, put cursor inside the quotes!
+  # => 'modify-current-argument' is already supposed to put the cursor on right position,
+  #    doesn't work??
+  # TODO: talk to zsh's mailing list about my use case & behavior?
+
   modify-current-argument zwidget::cycle-quoting::inner
   zle redisplay
 }
