@@ -1,0 +1,45 @@
+# This file will be auto-loaded.
+
+matches:
+  - trigger: "!date"
+    replace: "{{mydate}}"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          format: "%Y-%m-%d"
+
+  - trigger: "!mkid"
+    replace: "{{brain2ID}}"
+    vars:
+      - name: brain2ID
+        type: date
+        params:
+          # Example: 20230816T1645
+          format: "%Y%m%dT%H%M"
+
+  - triggers:
+     - "!nohello"
+     - "!nohi"
+    replace: 'https://nohello.net/'
+
+  - trigger: "!ghdetails"
+    replace: |
+      <details>
+      <summary>FILL_ME</summary>
+
+      DETAILS_HERE
+
+      </details>
+
+  - trigger: "!lorem!" # ends with '!' to not trigger on 'm' if I want `!loremlong`
+    replace: |
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra et ultrices neque ornare aenean euismod elementum nisi quis. Pretium aenean pharetra magna ac placerat. Euismod quis viverra nibh cras pulvinar. Laoreet sit amet cursus sit amet dictum sit. Molestie at elementum eu facilisis sed odio morbi quis. Vulputate odio ut enim blandit volutpat maecenas. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit. In aliquam sem fringilla ut morbi tincidunt. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Dignissim sodales ut eu sem. Et leo duis ut diam quam nulla porttitor massa id.
+
+  - trigger: "!loremlong"
+    replace: |
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra et ultrices neque ornare aenean euismod elementum nisi quis. Pretium aenean pharetra magna ac placerat. Euismod quis viverra nibh cras pulvinar. Laoreet sit amet cursus sit amet dictum sit. Molestie at elementum eu facilisis sed odio morbi quis. Vulputate odio ut enim blandit volutpat maecenas. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit. In aliquam sem fringilla ut morbi tincidunt. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Dignissim sodales ut eu sem. Et leo duis ut diam quam nulla porttitor massa id.
+
+      Mattis molestie a iaculis at erat pellentesque adipiscing commodo. Sed lectus vestibulum mattis ullamcorper velit sed. Maecenas sed enim ut sem viverra. Vitae et leo duis ut. Ut consequat semper viverra nam libero. Habitasse platea dictumst quisque sagittis purus sit amet volutpat. Eget egestas purus viverra accumsan in nisl nisi. Et odio pellentesque diam volutpat commodo. Mattis molestie a iaculis at erat. Aliquam eleifend mi in nulla posuere sollicitudin. Faucibus scelerisque eleifend donec pretium. Rhoncus aenean vel elit scelerisque mauris pellentesque pulvinar.
+
+      Id aliquet risus feugiat in. Cursus eget nunc scelerisque viverra mauris in. Sem integer vitae justo eget magna fermentum iaculis. A diam maecenas sed enim ut sem. Egestas diam in arcu cursus. Pellentesque habitant morbi tristique senectus et netus et malesuada. Nulla facilisi cras fermentum odio eu feugiat pretium. Platea dictumst vestibulum rhoncus est pellentesque. Rhoncus est pellentesque elit ullamcorper dignissim cras tincidunt lobortis. Vel risus commodo viverra maecenas accumsan lacus vel. Aliquam vestibulum morbi blandit cursus risus at. Urna nunc id cursus metus aliquam eleifend mi. Viverra mauris in aliquam sem fringilla ut. Velit ut tortor pretium viverra suspendisse potenti nullam ac tortor. In metus vulputate eu scelerisque felis imperdiet proin. Euismod nisi porta lorem mollis.

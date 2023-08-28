@@ -7,7 +7,15 @@ in {
     ./gui-fix-xdg-data-dirs.nix
     ./gui-force-system-locales.nix
     ./gui-firefox-native-extensions.nix
+    ./gui-espanso-text-expander.nix
   ];
+
+  # Text expansion!
+  my.services.espanso = {
+    enable = true;
+    package = bleedingedge.espanso; # only bleedingedge has a usable/recent version
+    configDir = config.dyndots.mkLink ../../gui/espanso;
+  };
 
   # Check needed native pkg version at:
   # https://github.com/tridactyl/tridactyl/blob/master/native/current_native_version

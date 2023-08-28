@@ -1,0 +1,10 @@
+# App-specific configuration
+
+filter_title: "Event Tester" # xev' window
+
+# same as for wezterm, to test:
+backend: Clipboard
+paste_shortcut: "CTRL+SHIFT+V"
+
+extra_includes:
+  - "../match/_injector_tester.yml"

@@ -1,0 +1,23 @@
+# This file will be auto-loaded.
+
+matches:
+  - trigger: "!shrug"
+    replace: '¯\_(ツ)_/¯'
+
+  - trigger: "!why"
+    replace: 'щ(ºДºщ)'
+
+  - trigger: "!flip"
+    replace: '(╯°□°)╯︵┻━┻'
+
+  - trigger: "!lalala"
+    replace: 'ᕕ( ᐛ )ᕗ'
+
+  - trigger: "!blam!"
+    replace: '(҂-_･) ︻デ═一▸'
+
+  # attacking something, with a few non-breakable spaces
+  # (to ensure they will stay as spaces in Teams for example)
+  - trigger: "!blamfor"
+    replace: '(҂-_･) ︻デ═一⠀⠀⠀· · ▸⠀⠀⠀⠀⠀⠀⠀⠀($|$)'
+    # note: `$|$` places the cursor there

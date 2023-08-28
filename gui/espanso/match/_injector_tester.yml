@@ -1,0 +1,8 @@
+# This file starts with a `_`, it will be auto-loaded.
+
+matches:
+  - trigger: "!t!"
+    replace: Espanso-Working!42
+
+  - trigger: "!test"
+    replace: Espanso-Working!42

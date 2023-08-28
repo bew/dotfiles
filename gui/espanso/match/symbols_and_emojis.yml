@@ -1,0 +1,17 @@
+# This file will be auto-loaded.
+
+matches:
+  - trigger: "!+1"
+    replace: '👍'
+
+  - trigger: "!eyes"
+    replace: '👀'
+
+  - trigger: "!okhand"
+    replace: '👌'
+
+  - trigger: "!pointr"
+    replace: '👉'
+
+  - trigger: "!tm"
+    replace: '™' # (trademark)
