@@ -1,0 +1,9 @@
+
+
+# Show Espanso UI with a trigger
+search_trigger: "!search"
+# disable default Alt-Space shortcut, I want to use it in my tool configs!
+search_shortcut: off
+
+# All match files that don't start with a `_` in ../match/ folder will be loaded
+# and available everywhere by default.
