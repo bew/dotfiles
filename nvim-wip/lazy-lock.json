@@ -1,10 +1,12 @@
 {
   "Comment.nvim": { "branch": "master", "commit": "d0cbbfb539898a275dc4398446ab0ae3b94819bf" },
+  "LuaSnip": { "branch": "master", "commit": "ea7d7ea510c641c4f15042becd27f35b3e5b3c2b" },
   "alpha-nvim": { "branch": "main", "commit": "e4fc5e29b731bdf55d204c5c6a11dc3be70f3b65" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
   "cmp-emoji": { "branch": "main", "commit": "19075c36d5820253d32e2478b6aaf3734aeaafa0" },
   "cmp-path": { "branch": "main", "commit": "91ff86cd9c29299a64f968ebb45846c485725f23" },
   "cmp-tmux": { "branch": "main", "commit": "984772716f66d8ee88535a6bf3f94c4b4e1301f5" },
+  "cmp_luasnip": { "branch": "master", "commit": "18095520391186d634a0045dacaa346291096566" },
   "committia.vim": { "branch": "master", "commit": "0b4df1a7f48ffbc23b009bd14d58ee1be541917c" },
   "diffconflicts": { "branch": "master", "commit": "05e8d2e935a235b8f8e6d308a46a5f028ea5bf97" },
   "fzf-lua": { "branch": "main", "commit": "15e9b1f1494dc1facaffe9543281d015c43b9eba" },

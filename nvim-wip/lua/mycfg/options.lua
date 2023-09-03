@@ -77,7 +77,8 @@ vim.o.linebreak = true      -- Wrapping will break lines on word boundaries
 --set timeoutlen=1000
 -- NOTE: default in nvim
 
-vim.o.updatetime = 500    -- Time (ms) before swapfile & CursorHold autocmd triggers
+-- @2023-09-03: changed 500 -> 2000, to have more time before luasnip' snippet is marked as exited
+vim.o.updatetime = 2000    -- Time (ms) before swapfile & CursorHold autocmd triggers
 
 -- Auto indent the next line
 --set autoindent

@@ -24,15 +24,17 @@ NamedPlug.cmp {
     Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"andersevenrud/cmp-tmux", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-emoji", depends_on = {NamedPlug.cmp} },
+    Plug { source = gh"saadparwaiz1/cmp_luasnip", depends_on = {NamedPlug.cmp, NamedPlug.snippet_engine} },
   },
   on_load = function()
     local cmp = require"cmp"
     -- NOTE: default config is at: https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/default.lua
     local global_cfg = {}
+    global_cfg.preselect = cmp.PreselectMode.None
     global_cfg.snippet = {
       expand = function(args)
-        -- TODO: enable when luasnip configured!
-        -- require'luasnip'.lsp_expand(args.body)
+        -- TODO: enable when luasnip & LSP configured!
+        -- require'luasnip'.lsp_expand(args.body) -- enable soon?
       end
     }
     -- TODO? try the configurable popup menu (value: "custom")
@@ -112,6 +114,7 @@ NamedPlug.cmp {
           end,
         },
       },
+      { name = "luasnip" },
       { name = "path" }, -- By default, '.' is relative to the buffer
       {
         name = "tmux",
@@ -146,6 +149,81 @@ NamedPlug.cmp {
     -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
     --    (only if it's lowercase, to not match ticket numbers like JIRA-456)
     -- 2. for last 100(?) git log summaries (for touched files / for all)
+  end,
+}
+
+NamedPlug.snippet_engine {
+  -- doc: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
+  --
+  -- Great intro to LuaSnip (~50min):
+  -- https://www.youtube.com/watch?v=ub0REXjhpmk
+  source = gh"L3MON4D3/LuaSnip",
+  desc = "Hyper flexible snippet Engine for Neovim",
+  tags = {t.insert, t.editing, t.careful_update, t.extensible},
+  on_load = function()
+    local ls = require"luasnip"
+    local ls_types = require"luasnip.util.types"
+    ls.setup {
+      -- Prevent ability to re-enter snippets that have been exited
+      history = false,
+      -- The events uses to check if we're out of a snippet
+      -- Stuff to read around history and jumps
+      -- https://github.com/L3MON4D3/LuaSnip/issues/91
+      -- https://github.com/L3MON4D3/LuaSnip/issues/170
+      -- https://github.com/L3MON4D3/LuaSnip/issues/780
+      region_check_events = { "CursorHold" }, -- shortly after (`:h 'updatetime'`)
+      -- The events used to update the active nodes' dependents (like replicate nodes)
+      update_events = {"TextChanged", "TextChangedI"},
+      -- The events used to check if a snippet was deleted (to avoid keeping placeholders)
+      delete_check_events = {"TextChanged", "InsertLeave"},
+
+      -- FIXME: When expanding a snippet at another snippet's placeholder, navigating placeholders
+      -- is weird...
+      -- With basic shebang snippet, when typing: `init #!²a #!² b #!² c #!²` and then navigating
+      -- doesn't select correctly the intermediate placeholders, we can kind-of can go
+      -- back-n-forth but when I go back to start of first snippet I'm out of everything..
+      --
+      -- FIXME: I don't want to leave the snip when going to prev node when on first placeholder,
+      --   I want it to be a no-op.
+      --   (same for going next node on last placeholder? quid nested snips? should still work
+      --   across boundaries (if cursor if not leaving top(/sub?) snippet))
+
+      -- Hint/Highlight some nodes
+      ext_opts = {
+        [ls_types.snippet] = {
+          active = {
+            virt_text = { { "<snip>", "Comment" } }
+          }
+        },
+        [ls_types.choiceNode] = {
+          active = {
+            virt_text = { { "<x/y>", "IncSearch" } }
+          }
+        },
+      },
+    }
+    -- Auto-(re)load snippets at this path
+    require("luasnip.loaders.from_lua").load({
+      paths = vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft",
+    })
+
+    -- I: Expand snippet if any
+    toplevel_map{mode={"i"}, key=[[²]], desc="expand snippet!", action=function()
+      ls.expand()
+    end}
+    toplevel_map{mode={"i", "s"}, key=[[<M-j>]], desc="snippet: jump to next placeholder", action=function()
+      -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
+      ls.jump( 1)
+    end}
+    toplevel_map{mode={"i", "s"}, key=[[<M-k>]], desc="snippet: jump to previous placeholder", action=function()
+      -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
+      ls.jump(-1)
+    end}
+    toplevel_map{mode={"i", "s"}, key=[[<M-²>]], desc="snippet: cycle choice node", action=function()
+      if ls.in_snippet() and ls.choice_active() then
+        ls.change_choice(1)
+      end
+    end}
   end,
 }
 
