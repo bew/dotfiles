@@ -98,6 +98,7 @@ Plug {
 }
 
 Plug {
+  -- extra-keywords: neotree
   source = gh"nvim-neo-tree/neo-tree.nvim",
   desc = "Neovim plugin to manage the file system and other tree like structures",
   tags = {t.ui, "filesystem", "nav"},
@@ -128,10 +129,14 @@ Plug {
           -- per-source actions, e.g: <plug>/lua/neo-tree/sources/filesystem/commands.lua
           -- FIXME: how to define custom ad-hoc actions here in the config?
           -- FIXME: missing tree navigation actions to goto parent node, goto next/prev sibling node
+          ["a"] = {"add", config = { show_path = "relative" }},
           ["o"] = "open",
+          ["t"] = "noop", ["s"] = "noop", ["S"] = "noop", -- disable default split/tab opening keys
           ["<M-t>"] = "open_tabnew",
           ["<M-s>"] = "open_split",
           ["<M-v>"] = "open_vsplit",
+
+          ["z"] = "noop",
           ["zC"] = "close_all_nodes",
           -- ["zA"] = "expand_all_nodes", -- BROKEN: crashes neovim :eyes:
         },
@@ -150,7 +155,23 @@ Plug {
         follow_current_file = {
           enabled = true,
           leave_dirs_open = false, -- AFAIU, 'false' -> dirs that were not manually opened will be auto-closed
-        }
+        },
+        window = {
+          mappings = {
+            -- Disable neotree's fuzzy finder on `/`, it's annoying when I just want to jump to something I see
+            ["/"] = "noop",
+            ["#"] = "noop",
+            -- Re-enable neotree's fuzzy finder using shifted letters so I can spam shift `/` + shift
+            -- `f` to activate it, but still do shift `/` + `bla` to search `bla` with vim's search.
+            ["/F"] = "fuzzy_finder",
+            ["//"] = "fuzzy_finder", -- alt mapping, nicer?
+            ["/D"] = "fuzzy_finder_directory", -- only directories
+          },
+          fuzzy_finder_mappings = {
+            ["<M-j>"] = "move_cursor_down",
+            ["<M-k>"] = "move_cursor_up",
+          },
+        },
       }
     }
   end,
