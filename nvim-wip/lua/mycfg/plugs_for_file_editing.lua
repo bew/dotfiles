@@ -145,6 +145,11 @@ NamedPlug.cmp {
         common_sources
       ),
     })
+    cmp.setup.filetype({"gitrebase"}, {
+      sources = {
+        { name = "buffer", keyword_length = 2 }, -- so 'sq'<cmpl.select-next> gives 'squash' directly
+      }
+    })
     -- IDEA of source for gitcommit:
     -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
     --    (only if it's lowercase, to not match ticket numbers like JIRA-456)
