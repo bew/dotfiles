@@ -142,7 +142,8 @@
   pl = pull
   rem = remote -v
 
-  # repo size helpers
+  # git helpers
+  revp = rev-parse
   gc-remove-old-commits = reflog expire --all --expire=now
   gc-compress-repo = gc --aggressive --prune=now
 
