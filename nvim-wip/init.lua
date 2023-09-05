@@ -113,14 +113,13 @@ function _map_define_group(spec)
   end
 end
 
-function leader_map_define_group(spec)
-  _map_define_group(vim.tbl_extend("force", spec, {
-    prefix_key = "<leader>"..spec.prefix_key,
-  }))
-end
-
 function toplevel_map_define_group(spec)
   _map_define_group(spec)
+end
+
+function leader_map_define_group(spec)
+  spec.prefix_key = "<leader>"..spec.prefix_key
+  toplevel_map_define_group(spec)
 end
 
 --- Create top level map

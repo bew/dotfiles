@@ -72,8 +72,10 @@ Plug {
       -- because the popup is mostly annoying/distractful for other keys.
       triggers = {
         "<leader>",
-        "z", -- (help for 'z' can be useful)
-        "<M-f>", -- fuzzy stuff
+        "z", -- (help for 'z' can be useful) -- FIXME: need grouping!
+
+        -- FIXME: why do I need to put the fuzzy group but 'cr' group doesn't need to be put here...
+        "<C-f>", -- fuzzy stuff
       },
     }
     -- Register nmap/vmap keys descriptions
@@ -263,30 +265,15 @@ NamedPlug.fzf_ctrl {
   end,
 }
 Plug {
+  -- TODO: Use https://github.com/nvim-telescope/telescope.nvim (more flexible!)
   source = gh"ibhagwan/fzf-lua",
   desc = "Few pre-configured thing selectors (buffers, files, ...)",
   tags = {"nav"},
   depends_on = {NamedPlug.fzf_ctrl},
   on_load = function()
-    -- command! FuzzyFilesSmart call fzf#run(fzf#wrap({
-    --     \   "source": "fd --type f --type l --follow",
-    --     \   "options": ["--multi", "--prompt", "FilesSmart-> "]
-    --     \ }))
-    -- " Using the default source to find ALL files
-    -- command! FuzzyFiles call fzf#run(fzf#wrap({
-    --     \   "options": ["--multi", "--prompt", "Files-> "]
-    --     \ }))
-    -- " TODO: in FuzzyOldFiles, remove files that do not exist anymore (or are not
-    -- " really files, like `man://foobar`.
-    -- command! FuzzyOldFiles call fzf#run(fzf#wrap({
-    --     \   "source": v:oldfiles,
-    --     \   "options": ["--multi", "--prompt", "OldFiles-> "]
-    --     \ }))
-    -- " FIXME: oldfiles are NOT recent files (files recently opened in current
-    -- " session are not in v:oldfiles. Need a FuzzyRecentFiles !!
-    -- " (same dir? or general? or configurable (in fzf?) ?)
     local act = require"fzf-lua.actions"
-    require"fzf-lua".setup{
+    local fzf = require"fzf-lua"
+    fzf.setup {
       winopts = {
         border = "single",
         preview = {
@@ -295,6 +282,11 @@ Plug {
       },
       fzf_opts = {}, -- don't let them overwrite my own config!
       keymap = {
+        builtin = {
+          -- :tmap mappings for the fzf win
+          ["<M-p>"] = "toggle-preview", -- to work for builtin previewer
+          ["<M-f>"] = "toggle-fullscreen", -- works for all previewers! Fullscreens the terminal, not fzf
+        },
         -- don't let them overwrite my own config! (e.g: their alt-a means select all :/)
         fzf = {},
       },
@@ -309,14 +301,38 @@ Plug {
         },
       },
     }
-    require"fzf-lua".register_ui_select()
+    fzf.register_ui_select()
 
-    -- TODO: move to mappings!!
-    vim.cmd [[
-      nnoremap <silent> <M-f><M-f> <cmd>lua require"fzf-lua".files()<cr>
-      nnoremap <silent> <M-f><M-a> <cmd>lua require"fzf-lua".files()<cr>
-      nnoremap <silent> <M-f><M-g> <cmd>lua require"fzf-lua".git_files()<cr>
-    ]]
+    -- Direct key for most used search!
+    -- TODO: keep history of selected files! (to easily re-select something!)
+    toplevel_map{mode={"n"}, key="<M-f>", desc="Fuzzy search files", action=fzf.files}
+
+    toplevel_map_define_group{mode={"n"}, prefix_key="<C-f>", name="+Fuzzy search"}
+    toplevel_map{mode={"n"}, key="<C-f><C-f>", desc="resume last search", action=fzf.resume} -- ❤️
+    toplevel_map{mode={"n"}, key="<C-f><C-g>", desc="git files", action=fzf.git_files}
+    toplevel_map{mode={"n"}, key="<C-f><C-o>", desc="old files", action=fzf.oldfiles}
+    toplevel_map{mode={"n"}, key="<C-f><C-h>", desc="help tags", action=fzf.help_tags}
+    toplevel_map{mode={"n"}, key="<C-f><C-j>", desc="jumps", action=fzf.jumps}
+    toplevel_map{mode={"n"}, key="<C-f><C-i>", desc="highlight groups", action=fzf.highlights}
+
+    toplevel_map_define_group{mode={"n"}, prefix_key="<C-M-f>", name="+Fuzzy search (alt)"} -- for easy spam <C-M-f><C-M-b>
+    buffers_action = function()
+      fzf.buffers { previewer = "builtin" } -- syntax highlighting for free (buffer opened!)
+    end
+    toplevel_map{mode={"n"}, key="<C-f><C-M-b>" --[[C-b used by tmux!]], desc="buffers", action=buffers_action}
+    toplevel_map{mode={"n"}, key="<C-M-f><C-M-b>" --[[easy spam!]], desc="buffers", action=buffers_action}
+
+    toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="current buffer lines", action=function()
+      fzf.blines {
+        -- Don't pre-open the preview (the lines are already my preview)
+        winopts = {
+          preview = { hidden = "hidden" },
+        },
+        -- When I want some context I can re-enable the preview and see lines around
+        -- (with current line highlighted)
+        previewer = "builtin", -- syntax highlighting for free (buffer already opened!)
+      }
+    end}
   end,
 }
 
