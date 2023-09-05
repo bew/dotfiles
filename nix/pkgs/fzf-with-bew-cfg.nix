@@ -16,15 +16,21 @@ let
     alt-b = "backward-word"; alt-w = "forward-word";
     "alt-^" = "beginning-of-line"; "alt-$" = "end-of-line";
 
-    # suggestions nav
+    # suggestions nav (short movement)
     alt-j = "down"; alt-k     = "up";
-    tab   = "down"; shift-tab = "down";
+    tab   = "down"; shift-tab = "up";
+    # suggestions nav (long movement)
+    alt-g = "first"; alt-G = "last";
+    alt-J = "half-page-down"; alt-K = "half-page-up";
+    alt-z = "jump"; # easymotion-like 1/2-keystroke movement!
 
     # selection
-    ctrl-j = "accept";
+    enter  = "accept-non-empty"; # FIXME: does not seem to work (@ v0.35.1: works same as 'accept')
+    ctrl-j = "accept-non-empty"; # FIXME: does not seem to work (@ v0.35.1: works same as 'accept')
     alt-a     = "toggle+down";
     alt-space = "toggle+down";
     ctrl-a = "toggle-all";
+    ctrl-c = "clear-selection"; # `ctrl-q` & `esc` can still quit!
 
     # preview nav
     alt-p = "toggle-preview";
