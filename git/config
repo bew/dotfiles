@@ -49,7 +49,11 @@
 [rebase]
   # Automatically create a temporary stash entry before the operation begins, and apply it after the
   # operation ends.
-  autoStash = true
+  autostash = true
+
+  # Automatically mark `fixup:` / `amend:` / `squash:` commits as `fixup` so they'll be auto
+  # squashed into their respective commit.
+  autosquash = true
 
   # Print a warning when deleting commit lines in interactive rebase.
   # (use an explicit 'drop' action to avoid the warning)
