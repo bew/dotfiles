@@ -213,6 +213,7 @@ NamedPlug.snippet_engine {
     })
 
     -- I: Expand snippet if any
+    -- IDEA(alternative): <C-x><C-x> (in insert, maybe also visual?)
     toplevel_map{mode={"i"}, key=[[²]], desc="expand snippet!", action=function()
       ls.expand()
     end}
@@ -664,6 +665,9 @@ Plug {
     -- With:  `ConfigBar.options.triggers`
     -- .. converting to dash-case
     -- Gives: `config-bar-options-triggers` changing all camel and dot-case at the same time..
+
+    -- FIXME: I want to keep cursor position as much as possible!
+    --   currently the cursor moves to start-of-converted-word :/
 
     local textcase = require"textcase"
     local key_conversions = {
