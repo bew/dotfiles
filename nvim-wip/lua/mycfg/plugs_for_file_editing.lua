@@ -326,8 +326,8 @@ Plug {
     -- `{   foo    }` -> `ds{` => `foo`
     -- `{ \n foo \n }` -> `ds{` => `foo`
     local openers = {
-      { open = "(", close = ")", open_rx = "%(", close_rx = "%)" },
-      { open = "[", close = "]", open_rx = "%[", close_rx = "%]" },
+      { open = "(", close = ")" },
+      { open = "[", close = "]" },
       { open = "{", close = "}" },
     }
     for _, opener in ipairs(openers) do
@@ -343,9 +343,9 @@ Plug {
         -- NOTE: the plugin requires `()` after each opener/closer to remove
         delete = U.str_concat(
           "^",
-          "(", (opener.open_rx or opener.open), "%s*)()",
+          "(", vim.pesc(opener.open), "%s*)()",
           ".-",
-          "(%s*", (opener.close_rx or opener.close), ")()",
+          "(%s*", vim.pesc(opener.close), ")()",
           "$"
         ),
       }
@@ -359,6 +359,20 @@ Plug {
           surround_utils.default_opts.indent_lines(start_row, end_row)
         end
       end,
+
+      -- FIXME: the mapping functions are not exposed to me for manual binding :/
+      keymaps = {
+        -- add surround (NOTE: uppercase is the 'line' variant)
+        normal = "sa", -- (default: `ys`)
+        normal_line = "sA", -- delims on new lines (default: `yS`)
+        normal_cur = "ss", -- around current line (default: `yss`)
+        normal_cur_line = "sS", -- around current line, delims on new lines (default: `ySS`)
+        visual = "s", -- around selection (default: `S`)
+        visual_line = "S", -- around selection, delims on new lines (default: `gS`)
+        -- delete/replace surround
+        delete = "sd", -- delete surround (default: `ds`)
+        change = "sr", -- replace surround (default: `cs`)
+      },
     }
   end,
 }
