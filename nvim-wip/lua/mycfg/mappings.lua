@@ -70,6 +70,7 @@ actions.hide_search_hl = mk_action{
   for_mode = "n",
   fn = function()
     vim.cmd[[nohlsearch]]
+    -- IDEA: disappear after 0.5s ?
     vim.cmd.echo([["Search cleared"]]) -- note the 'nested' quotes, required for vimscript..
   end,
 }
@@ -212,6 +213,7 @@ toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)
   actions.duplicate_selection()
   vim.fn.execute [[noautocmd normal! gv]]
 end}
+-- IDEA: a mapping to duplicate and comment original selection
 
 -- I: Short navigation on the line in insert mode
 --
