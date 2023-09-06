@@ -350,7 +350,29 @@ Plug {
         ),
       }
     end
+
+
+    -- Use `s*`-based surround mappings
+    -- (more consistent, but eats `s` action,  can still wait timeoutlen to have it though!)
+    -- FIXME: the mapping functions are not exposed to me for manual binding :/
+    keymaps = {
+      -- add surround (NOTE: uppercase is the 'line' variant)
+      normal = "sa", -- (default: `ys`)
+      normal_line = "sA", -- delims on new lines (default: `yS`)
+      normal_cur = "ss", -- around current line (default: `yss`)
+      normal_cur_line = "sS", -- around current line, delims on new lines (default: `ySS`)
+      visual = "s", -- around selection (default: `S`)
+      visual_line = "S", -- around selection, delims on new lines (default: `gS`)
+      -- delete/replace surround
+      delete = "sd", -- delete surround (default: `ds`)
+      change = "sr", -- replace surround (default: `cs`)
+    }
+    -- N: Restore `xs` which I use often to delete 2 chars
+    -- Map it to a change action to make it work as a single edit not two!
+    toplevel_map{mode={"n"}, key="xs", desc="xs (even if `s` does surround)", action="c2l"}
+
     require"nvim-surround".setup {
+      keymaps = keymaps,
       surrounds = my_surrounds,
       -- Do not try to re-indent if the change was on a single line
       -- See: https://github.com/kylechui/nvim-surround/issues/201
@@ -359,20 +381,6 @@ Plug {
           surround_utils.default_opts.indent_lines(start_row, end_row)
         end
       end,
-
-      -- FIXME: the mapping functions are not exposed to me for manual binding :/
-      keymaps = {
-        -- add surround (NOTE: uppercase is the 'line' variant)
-        normal = "sa", -- (default: `ys`)
-        normal_line = "sA", -- delims on new lines (default: `yS`)
-        normal_cur = "ss", -- around current line (default: `yss`)
-        normal_cur_line = "sS", -- around current line, delims on new lines (default: `ySS`)
-        visual = "s", -- around selection (default: `S`)
-        visual_line = "S", -- around selection, delims on new lines (default: `gS`)
-        -- delete/replace surround
-        delete = "sd", -- delete surround (default: `ds`)
-        change = "sr", -- replace surround (default: `cs`)
-      },
     }
   end,
 }
