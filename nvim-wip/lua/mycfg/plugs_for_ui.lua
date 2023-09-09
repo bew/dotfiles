@@ -152,6 +152,7 @@ Plug {
 
       -- Per source configs
       filesystem = {
+        bind_to_cwd = false, -- don't change tab cwd when opening Neotree with a dir
         group_empty_dirs = true,
         use_libuv_file_watcher = true,
         follow_current_file = {
@@ -174,7 +175,13 @@ Plug {
             ["<M-k>"] = "move_cursor_up",
           },
         },
-      }
+      },
+      git_status = {
+        bind_to_cwd = false, -- don't change tab cwd when opening Neotree with a dir
+      },
+      buffers = {
+        bind_to_cwd = false, -- don't change tab cwd when opening Neotree with a dir
+      },
     }
   end,
   on_colorscheme_change = function()
