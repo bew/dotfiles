@@ -34,7 +34,6 @@
   in {
     backbone = legacyPkgsForSystem inputs.nixpkgsBackbone;
     stable = legacyPkgsForSystem inputs.nixpkgsStable;
-    lastStable = legacyPkgsForSystem inputs.nixpkgsLastStable;
     bleedingedge = legacyPkgsForSystem inputs.nixpkgsUnstable;
     myPkgs = pkgsForSystem inputs.self;
   };
