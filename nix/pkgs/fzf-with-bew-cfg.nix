@@ -56,6 +56,11 @@ let
     "--color='${colorsArg}'"
   ];
 
+  otherArgs = [
+    # disable mouse, I don't want to be able to double-click on a result to confirm-select it!
+    "--no-mouse"
+  ];
+
   keybindingsArgs = lib.flatten (
     lib.mapAttrsToList
       (key: bind: ["--bind" "${key}:${bind}"])
