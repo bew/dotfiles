@@ -51,6 +51,8 @@ rec {
   #         ├── nvim-stable -> /nix/store/frlxim9yz5qx34ap3iaf55caawgdqkip-neovim-0.5.1/bin/nvim
   #         └── bar-tmp -> /tmp/foo/bar
   #
+  # TODO: allow to pass `mainProgram = true;` in a spec
+  # => set a bin as the `meta.mainProgram` of the resulting drv
   linkBins = name: binsSpec:
     let
       binSpecHelp = ''
@@ -106,8 +108,9 @@ rec {
   #     └── bin/
   #         └── nvim -> /nix/store/frlxim9yz5qx34ap3iaf55caawgdqkip-neovim-0.5.1/bin/nvim
   #
-  linkSingleBin = path:
-    pkgs.runCommandLocal "${baseNameOf path}-single-bin" { } ''
+  linkSingleBin = path: let
+      binName = baseNameOf path;
+    in pkgs.runCommandLocal "${binName}-single-bin" { meta.mainProgram = binName; } ''
       mkdir -p $out/bin
       ln -s ${lib.escapeShellArg path} $out/bin/
     '';
