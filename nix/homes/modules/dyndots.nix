@@ -19,12 +19,16 @@ in {
     # ideas:
     # - selfInput
     # - selfFlake
+    # - selfFlakeLocation
     # - selfStorePath
+    # - selfStoreLocation
     # - pathToStrip
     # - pureFlakePathToStrip
     # - pureSelfSourcePath
     # - pureFlakeSourcePath
     # - pureSourcePath
+    # - flakeLocation
+    # - flakePureLocation
     # - ?
     dyndots.flakeStorePath = mkOption {
       # type = types.pathInStore;  # only available in unstable nixpkgs (not in 23.05)

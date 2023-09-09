@@ -73,6 +73,7 @@ let
     home.file.".zshenv".text = ''
       source ${zdotdir}/.zshenv
     '';
+    # FIXME: Add `.zlogin` ?
   };
 
 in {

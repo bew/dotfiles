@@ -138,7 +138,7 @@ rec {
   #         ├── fzf -> /nix/store/3fz694nbl7ndyinz7xmhz77inzn0a17h-fzf-0.35.1/share/fzf
   #         ├── man -> /nix/store/5fl47ah7k40j6pk0ln74wf3kby2h8jp1-fzf-0.35.1-man/share/man
   #         └── vim-plugins -> /nix/store/3fz694nbl7ndyinz7xmhz77inzn0a17h-fzf-0.35.1/share/vim-plugins
-  #     
+  #
   #   replaceBinsInPkg {
   #     name = "custom-zsh";
   #     copyFromPkg = zsh;
