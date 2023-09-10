@@ -288,23 +288,15 @@ vim.cmd[[onoremap gV <cmd>normal! `[v`]<cr>]]
 
 -- O: Textobj for current word & WORD
 -- NOTE: for 'change'&'yank' textobj `w` & `W` are actually aliases to `e` & `E` so are not useful, this is better!
-vim.cmd[[onoremap w <cmd>normal! viw<cr>]]
-vim.cmd[[onoremap W <cmd>normal! viW<cr>]]
+toplevel_map{mode="o", key="w", desc="whole word", action="<cmd>normal! viw<cr>"} -- delete word
+toplevel_map{mode="o", key="W", desc="whole WORD", action="<cmd>normal! viW<cr>"} -- delete WORD
 -- BUT this overrides the variant of `w` for `yw` / `cw` / `dw` 😬
--- Restore original behavior for delete (are maybe others??)
-toplevel_map{mode="n", key="dw", desc="w", action="dw"} -- delete word
-toplevel_map{mode="n", key="dW", desc="W", action="dW"} -- delete WORD
--- TRY: do not restore `yw` / `cw` which has same behavior as `ye` / `ce`, let's learn to use that!
--- toplevel_map{mode="n", key="yw", desc="w", action="yw"} -- yank word (to end of word)
--- toplevel_map{mode="n", key="yW", desc="W", action="yW"} -- yank WORD (to end of WORD)
--- toplevel_map{mode="n", key="cw", desc="w", action="cw"} -- change word (to end of word)
--- toplevel_map{mode="n", key="cW", desc="W", action="cW"} -- change WORD (to end of WORD)
+-- For `yw` / `cw` there is `ye` / `ce` with same behavior
 --
--- FIXME(can't find doc): How to define an omap that behaves differently based on where it's used?
---   For `<surround> w`   -> `w` should do `iw`
---   For `y w` and `d w`  -> `w` should do `w`
--- (found `v:operator` but not set for Ex actions :/)
--- (found `v:event.operator` but only set in autocmds :/)
+-- For `dw` there is no equivalent (delete to next word including spaces)
+-- => Restore original behavior of `dw`
+toplevel_map{mode="n", key="dw", desc="delete to next word", action="dw"}
+toplevel_map{mode="n", key="dW", desc="delete to next WORD", action="dW"}
 
 -- V: Clean paste (preserving the content of the current/unnamed register),
 --    so I can paste over multiple visual selections using the same text
