@@ -218,13 +218,14 @@ toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 -- TODO: Make <C-w> delete entire last arg (space separated?)
 --   and <M-BS> delete smaller parts (like builtin <C-w>)
 
--- C: Expand %% to path of current file
-toplevel_map{mode="c", key="%%", desc="current file's dir", opts={expr=true}, action=function()
+-- C: Expand %P to path of current file
+-- (using uppercase P because % also needs shift, so it's easy to 'spam')
+toplevel_map{mode="c", key="%P", desc="current file's dir", opts={expr=true}, action=function()
   return vim.fn.expand("%:.")
 end}
 
--- C: Expand %/ to dir of current file
-toplevel_map{mode="c", key="%/", desc="current file's path", opts={expr=true}, action=function()
+-- C: Expand %% to dir of current file
+toplevel_map{mode="c", key="%%", desc="current file's path", opts={expr=true}, action=function()
   return vim.fn.expand("%:.:h") .. "/"
 end}
 
