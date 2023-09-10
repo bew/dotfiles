@@ -201,7 +201,7 @@ function mk_action(spec)
     spec={spec, "table"},
     spec_fn={spec.fn, "function", true}, -- optional
     spec_action={spec.raw_action, "string", true}, -- optional (only when fn not set)
-    spec_for_mode={spec.for_mode, "string"},
+    spec_for_mode={spec.for_mode, {"string", "table"}},
     spec_desc={spec.default_desc, "string", true}, -- optional
   }
   local raw_action
@@ -214,7 +214,7 @@ function mk_action(spec)
   end
   return setmetatable({
     default_desc = spec.default_desc,
-    for_mode = spec.for_mode,
+    for_mode = spec.for_mode, -- NOTE: currently ZERO checks are done with this..
     raw_action = raw_action,
   }, {
     __index = {
