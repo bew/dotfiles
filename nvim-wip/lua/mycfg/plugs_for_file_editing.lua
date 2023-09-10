@@ -90,10 +90,7 @@ NamedPlug.cmp {
           -- Collect buffer words, following 'iskeyword' option of that buffer
           -- See: https://github.com/hrsh7th/nvim-cmp/issues/453
           keyword_pattern = [[\k\+]],
-          -- By default, 'buffer' source searches words in current buffer only,
-          -- I want instead to look into:
-          -- * visible bufs (on all tabs)
-          -- * loaded bufs with same filetype
+          -- (Default fn searches words in current buffer only)
           -- FIXME: Any way to have special compl entry display for visible / same tab / same ft ?
           get_bufnrs = function()
             local bufs = {}
@@ -125,35 +122,62 @@ NamedPlug.cmp {
         },
       },
     }
+    emoji_source = {
+      name = "emoji",
+      keyword_length = 3,
+      trigger_characters = {}, -- don't trigger on ':'
+      option = {
+        -- insert the emoji char, not the `:txt:`
+        insert = true,
+      },
+    }
 
     global_cfg.sources = common_sources
 
     cmp.setup.global(global_cfg)
-    cmp.setup.filetype({"markdown", "git", "gitcommit"}, {
-      -- NOTE: This list of sources does NOT inherit from the global list of sources
+
+    -- Filetype-specific config
+    -- NOTE: For these, list of sources does NOT inherit from the global list of sources
+
+    cmp.setup.filetype({"markdown"}, {
+      sources = vim.list_extend(
+        { emoji_source },
+        common_sources
+      ),
+    })
+    cmp.setup.filetype({"gitcommit"}, {
+      -- IDEA of source for gitcommit:
+      -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
+      --    (only if it's lowercase, to not match ticket numbers like JIRA-456)
+      -- 2. for last 100(?) git log summaries (for touched files / for all)
       sources = vim.list_extend(
         {
           {
-            name = "emoji",
-            keyword_length = 3,
+            name = "buffer",
+            keyword_length = 2,
             option = {
-              -- insert the emoji char, not the `:txt:`
-              insert = true,
-            },
+              -- (Default fn searches words in current buffer only)
+              get_bufnrs = function()
+                local bufs = {}
+                -- get visible buffers (across all tabs)
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                  bufs[vim.api.nvim_win_get_buf(win)] = true
+                end
+                print("bufs:", vim.inspect(vim.tbl_keys(bufs)))
+                return vim.tbl_keys(bufs)
+              end,
+            }
           },
+          emoji_source,
         },
         common_sources
-      ),
+      )
     })
     cmp.setup.filetype({"gitrebase"}, {
       sources = {
         { name = "buffer", keyword_length = 2 }, -- so 'sq'<cmpl.select-next> gives 'squash' directly
       }
     })
-    -- IDEA of source for gitcommit:
-    -- 1. for last 100(?) git logs' prefix (like `nvim:`, `cli,nix:`, `zsh: prompt:`, ..)
-    --    (only if it's lowercase, to not match ticket numbers like JIRA-456)
-    -- 2. for last 100(?) git log summaries (for touched files / for all)
   end,
 }
 
