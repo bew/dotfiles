@@ -8,37 +8,6 @@ local _q = U.str_simple_quote_surround
 
 -- TODO: Add tags! Define layers!
 
--- Minimal action system
-
----@class ActionSpecInput
----@field for_mode string|string[] Compatible modes at the start of the action
----@field fn fun(): any
-
----@class ActionSpec: ActionSpecInput
-
----@type {[string]: ActionSpec}
-local actions = {}
----@param spec ActionSpecInput
----@return ActionSpec
-local function mk_action(spec)
-  vim.validate{
-    spec={spec, "table"},
-    spec_fn={spec.fn, "function"},
-    spec_for_mode={spec.for_mode, "string"},
-    spec_desc={spec.default_desc, "string", true}, -- optional
-  }
-  return setmetatable({
-    default_desc = spec.default_desc,
-    for_mode = spec.for_mode,
-    fn = spec.fn,
-  }, {
-    __call = function(self)
-      return self.fn()
-    end,
-  })
-end
-
-
 -- Disable keybindings
 
 -- <C-LeftMouse> default to <C-]>, which just give errors in most files..
@@ -65,7 +34,7 @@ vim.cmd[[nnoremap U <C-r>]]
 vim.cmd[[nnoremap Y yy]]
 
 -- N: Discard last search highlight
-actions.hide_search_hl = mk_action{
+my_actions.hide_search_hl = mk_action{
   default_desc="Hide search highlight",
   for_mode = "n",
   fn = function()
@@ -74,10 +43,10 @@ actions.hide_search_hl = mk_action{
     vim.cmd.echo([["Search cleared"]]) -- note the 'nested' quotes, required for vimscript..
   end,
 }
-toplevel_map{mode="n", key="§",     action=actions.hide_search_hl}
+toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}
 -- Outside of tmux, nvim recognizes '§' as '<S-§>'.. So let's bind both :shrug:
 -- FIXME: investigate why ?
-toplevel_map{mode="n", key="<S-§>", action=actions.hide_search_hl}
+toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 
 -- I: Disable up/down keys
 --
@@ -174,7 +143,7 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- That would be a `move selection to same context above/below` (can be repeated)
 
 -- A: Duplicate visual selection
-actions.duplicate_selection = mk_action{
+my_actions.duplicate_selection = mk_action{
   for_mode = "v",
   fn = function()
     -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
@@ -207,10 +176,10 @@ actions.duplicate_selection = mk_action{
   end,
 }
 -- V: Duplicate visual selection
-toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=actions.duplicate_selection}
+toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
-  actions.duplicate_selection()
+  my_actions.duplicate_selection()
   vim.fn.execute [[noautocmd normal! gv]]
 end}
 -- IDEA: a mapping to duplicate and comment original selection

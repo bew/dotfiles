@@ -87,7 +87,8 @@ vim.g.mapleader = " "
 -- And the CtrlSpace plugin would be <leader><space> or <leader><leader>
 -- Also give a new leader possibility with <Alt-space> (:
 
--- Mapping helpers, to be moved, probably
+-- Mapping helpers
+-- TODO: move them to a dedicated module!
 
 -- Create initial leader maps (to be used in init of some plugins)
 wk_toplevel_n_maps = {}
@@ -133,21 +134,21 @@ function toplevel_map(spec)
         if vim.tbl_contains({"function", "string"}, type(a)) then
           return true
         end
-        return type(a) == "table" and getmetatable(a).__call ~= nil
+        return type(a) == "table" and a.to_keymap_action ~= nil
       end,
     }
   }
-  local action_fn = spec.action
+  local keymap_action = spec.action
   local description = spec.desc
   if type(spec.action) == "table" then
     -- vim.keymap.set requires the action to be a string or a function,
-    -- so a pseudo function table must be wrapped
-    action_fn = function(...) return spec.action(...) end
+    -- so get the underlying keymap action from the ActionSpec.
+    keymap_action = spec.action:to_keymap_action()
     if not description then
       description = spec.action.default_desc
     end
   end
-  vim.keymap.set(spec.mode, spec.key, action_fn, spec.opts)
+  vim.keymap.set(spec.mode, spec.key, keymap_action, spec.opts)
 
   -- when the description is set, put the key&desc in appropriate whichkey maps
   if description then
@@ -181,6 +182,49 @@ function leader_remap(spec)
   spec.opts.remap = true
   leader_map(spec)
 end
+
+-- Minimal action system
+
+---@class ActionSpecInput
+---@field for_mode string|string[] Compatible modes at the start of the action
+---@field fn (fun(): any)? The function to execute (conflicts with raw_action)
+---@field raw_action any? The raw action to execute (conflicts with fn)
+
+---@class ActionSpec: ActionSpecInput
+
+---@type {[string]: ActionSpec}
+my_actions = {}
+---@param spec ActionSpecInput
+---@return ActionSpec
+function mk_action(spec)
+  vim.validate{
+    spec={spec, "table"},
+    spec_fn={spec.fn, "function", true}, -- optional
+    spec_action={spec.raw_action, "string", true}, -- optional (only when fn not set)
+    spec_for_mode={spec.for_mode, "string"},
+    spec_desc={spec.default_desc, "string", true}, -- optional
+  }
+  local raw_action
+  if spec.fn then
+    raw_action = function() spec.fn() end
+  elseif spec.raw_action then
+    raw_action = spec.raw_action
+  else
+    error("spec.fn or spec.raw_action must be set!")
+  end
+  return setmetatable({
+    default_desc = spec.default_desc,
+    for_mode = spec.for_mode,
+    raw_action = raw_action,
+  }, {
+    __index = {
+      to_keymap_action = function(self)
+        return self.raw_action
+      end
+    },
+  })
+end
+
 
 ----------------------------
 
