@@ -36,22 +36,6 @@
         "type": "github"
       }
     },
-    "nixpkgsBackbone": {
-      "locked": {
-        "lastModified": 1660496378,
-        "narHash": "sha256-sgAhmrC1iSnl5T2VPPiMpciH1aRw5c7PYEdXX6jd6Gk=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "879121648fe522b38cc1cf75aef160a14a1f2e7b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-22.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgsStable": {
       "locked": {
         "lastModified": 1672781980,
@@ -88,7 +72,6 @@
       "inputs": {
         "flakeTemplates": "flakeTemplates",
         "homeManager": "homeManager",
-        "nixpkgsBackbone": "nixpkgsBackbone",
         "nixpkgsStable": "nixpkgsStable",
         "nixpkgsUnstable": "nixpkgsUnstable"
       }

@@ -1,7 +1,7 @@
 { config, pkgsChannels, lib, mybuilders, flakeInputs, system, ... }:
 
 let
-  inherit (pkgsChannels) backbone stable bleedingedge myPkgs;
+  inherit (pkgsChannels) stable bleedingedge myPkgs;
 
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   cliPkgs = {
@@ -82,9 +82,6 @@ in {
   ];
 
   home.packages = [
-    # packages on backbone channel, upgrades less often
-    backbone.tmux
-
     # The original nvim Nix package, with another bin name
     (mybuilders.replaceBinsInPkg {
       name = "nvim-original";
@@ -106,7 +103,7 @@ in {
       }
     ))
 
-
+    stable.tmux
     cliPkgs.fzf
 
     bleedingedge.eza # alternative ls, more colors!
