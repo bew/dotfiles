@@ -32,7 +32,6 @@
     legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
     pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
   in {
-    backbone = legacyPkgsForSystem inputs.nixpkgsBackbone;
     stable = legacyPkgsForSystem inputs.nixpkgsStable;
     bleedingedge = legacyPkgsForSystem inputs.nixpkgsUnstable;
     myPkgs = pkgsForSystem inputs.self;
