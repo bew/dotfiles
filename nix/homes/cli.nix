@@ -109,7 +109,7 @@ in {
 
     cliPkgs.fzf
 
-    stable.exa # alternative ls, more colors!
+    bleedingedge.eza # alternative ls, more colors!
     stable.bat
     stable.fd
     stable.git
