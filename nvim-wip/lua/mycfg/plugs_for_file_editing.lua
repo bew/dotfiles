@@ -376,28 +376,78 @@ Plug {
       }
     end
 
-
-    -- Use `s*`-based surround mappings
-    -- (more consistent, but eats `s` action,  can still wait timeoutlen to have it though!)
-    -- FIXME: the mapping functions are not exposed to me for manual binding :/
-    keymaps = {
-      -- add surround (NOTE: uppercase is the 'line' variant)
-      normal = "sa", -- (default: `ys`)
-      normal_line = "sA", -- delims on new lines (default: `yS`)
-      normal_cur = "ss", -- around current line (default: `yss`)
-      normal_cur_line = "sS", -- around current line, delims on new lines (default: `ySS`)
-      visual = "s", -- around selection (default: `S`)
-      visual_line = "S", -- around selection, delims on new lines (default: `gS`)
-      -- delete/replace surround
-      delete = "sd", -- delete surround (default: `ds`)
-      change = "sr", -- replace surround (default: `cs`)
+    -- Disable all default keybinds
+    local default_keymaps_disabled = {
+      normal = false, -- (default: `ys`)
+      normal_line = false, -- delims on new lines (default: `yS`)
+      normal_cur = false, -- around current line (default: `yss`)
+      normal_cur_line = false, -- around current line, delims on new lines (default: `ySS`)
+      visual = false, -- around selection (default: `S`)
+      visual_line = false, -- around selection, delims on new lines (default: `gS`)
+      delete = false, -- delete surround (default: `ds`)
+      change = false, -- replace surround (default: `cs`)
     }
+    my_actions.add_surround = mk_action {
+      for_mode="n", default_desc="Add around <motion>",
+      raw_action="<Plug>(nvim-surround-normal)",
+    }
+    my_actions.add_surround_linewise = mk_action {
+      for_mode="n", default_desc="Add around <motion> (linewise)",
+      raw_action="<Plug>(nvim-surround-normal-line)",
+    }
+    my_actions.add_surround_around_line = mk_action {
+      for_mode="n", default_desc="Add around current line",
+      raw_action="<Plug>(nvim-surround-normal-cur)",
+    }
+    my_actions.add_surround_around_line_linewise = mk_action {
+      for_mode="n", default_desc="Add around current line (linewise)",
+      raw_action="<Plug>(nvim-surround-normal-cur-line)",
+    }
+    my_actions.add_surround_on_visual = mk_action {
+      for_mode="v", default_desc="Add around visual selection",
+      raw_action="<Plug>(nvim-surround-visual)",
+    }
+    my_actions.add_surround_on_visual_linewise = mk_action {
+      for_mode="v", default_desc="Add around visual selection (linewise)",
+      raw_action="<Plug>(nvim-surround-visual-line)",
+    }
+    my_actions.change_surround = mk_action {
+      for_mode="n", default_desc="Change nearest <from-pair> <to-pair>",
+      raw_action="<Plug>(nvim-surround-change)",
+    }
+    my_actions.delete_surround = mk_action {
+      for_mode="n", default_desc="Delete nearest <pair>",
+      raw_action="<Plug>(nvim-surround-delete)",
+    }
+
+    -- Setup direct normal `s` to add surround, with more options through `<leader>s`
+    toplevel_map_define_group{mode={"n"}, prefix_key="s", name="+surround"}
+    leader_map_define_group{mode={"n"}, prefix_key="s", name="+extra-surrounds"}
+    -- Map to add surround
+    -- (`s` makes more sense for surround, but eats a key (use `cl` for builtin `s`))
+    toplevel_map{mode="n", key="s", action=my_actions.add_surround}
+
+    -- Maps to change/delete surrounds
+    --
+    -- `sd` & `sr` for delete & replace doesn't really make sense in practice and goes against
+    -- vim's vocabulary of `<verb><on-what>`.
+    toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
+    toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
+
+    -- Extra maps to add surround (NOTE: uppercase is the 'line' variant)
+    leader_map{mode="n", key="sa", action=my_actions.add_surround}
+    leader_map{mode="n", key="sA", action=my_actions.add_surround_linewise}
+    leader_map{mode="n", key="ss", action=my_actions.add_surround_around_line}
+    leader_map{mode="n", key="sS", action=my_actions.add_surround_around_line_linewise}
+    leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
+    leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_linewise}
+
     -- N: Restore `xs` which I use often to delete 2 chars
     -- Map it to a change action to make it work as a single edit not two!
     toplevel_map{mode={"n"}, key="xs", desc="xs (even if `s` does surround)", action="c2l"}
 
     require"nvim-surround".setup {
-      keymaps = keymaps,
+      keymaps = default_keymaps_disabled,
       surrounds = my_surrounds,
       -- Do not try to re-indent if the change was on a single line
       -- See: https://github.com/kylechui/nvim-surround/issues/201
