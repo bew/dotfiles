@@ -731,14 +731,17 @@ Plug {
     -- with `x foo_bar `, coercing `foo_bar` to anything will move the cursor on `f`
     -- => Cursor pos should end on `f` or (maybe) not move at all.
 
-    -- ISSUE(?):
-    -- With:  `Config.options.triggers`
-    -- .. converting to dash-case
-    -- Gives: `config-options-triggers` but doesn't keep the case of `Config`..
-    -- ---
-    -- With:  `ConfigBar.options.triggers`
-    -- .. converting to dash-case
-    -- Gives: `config-bar-options-triggers` changing all camel and dot-case at the same time..
+    -- FIXME: I want an action for interactive change (like for surround),
+    --    where I can say `change dot-case to dash-case`
+    --
+    -- Issues:
+    --   With:  `Config.options.triggers`
+    --   .. converting to dash-case
+    --   Gives: `config-options-triggers` but doesn't keep the case of `Config`..
+    --   ---
+    --   With:  `ConfigBar.options.triggers`
+    --   .. converting to dash-case
+    --   Gives: `config-bar-options-triggers` changing all camel and dot-case at the same time..
 
     -- FIXME: I want to keep cursor position as much as possible!
     --   currently the cursor moves to start-of-converted-word :/
@@ -749,11 +752,13 @@ Plug {
       { key = "u", fn_id = "to_upper_case", desc = "to UPPER case" },
       { key = "U", fn_id = "to_constant_case", desc = "TO_CONSTANT_CASE" },
       { key = "c", fn_id = "to_camel_case", desc = "to lowerCamelCase" },
-      { key = "C", fn_id = "to_pascal_case", desc = "to UpperCamelCase" },
+      { key = "C", fn_id = "to_pascal_case", desc = "to PascalCase" },
+      { key = "p", fn_id = "to_pascal_case", desc = "to PascalCase" },
       { key = "_", fn_id = "to_snake_case", desc = "to_snake_case" },
-      { key = "-", fn_id = "to_dash_case", desc = "to-dash-case" },
+      { key = "-", fn_id = "to_dash_case", desc = "to-dash-case (kebab)" },
+      { key = "k", fn_id = "to_dash_case", desc = "to-dash-case (kebab)" },
       { key = ".", fn_id = "to_dot_case", desc = "to.dot.case" },
-      { key = "/", fn_id = "to_path_case", desc = "to /path/ case" },
+      { key = "/", fn_id = "to_path_case", desc = "to/path/case" },
       { key = "s", fn_id = "to_lower_phrase_case", desc = "to lower sentence" },
       { key = "S", fn_id = "to_upper_phrase_case", desc = "TO UPPER SENTENCE" },
       { key = "t", fn_id = "to_title_case", desc = "To (Title) Sentence" },
