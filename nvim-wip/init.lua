@@ -103,8 +103,8 @@ function get_wk_maps_for_mode(mode)
   return wk_toplevel_maps_for_mode[mode]
 end
 
---- Define leader map group for which_key plugin
-function _map_define_group(spec)
+--- Define map group for which_key plugin
+function toplevel_map_define_group(spec)
   assert(spec.mode, "mode is required")
   for _, m in ipairs(spec.mode) do
     local wk_maps = get_wk_maps_for_mode(m)
@@ -112,10 +112,6 @@ function _map_define_group(spec)
       wk_maps[spec.prefix_key] = { name = spec.name }
     end
   end
-end
-
-function toplevel_map_define_group(spec)
-  _map_define_group(spec)
 end
 
 function leader_map_define_group(spec)
@@ -152,13 +148,16 @@ function toplevel_map(spec)
     -- vim.keymap.set requires the action to be a string or a function,
     -- so get the underlying keymap action from the ActionSpec.
     keymap_action = spec.action:to_keymap_action()
-    if not description then
+    if not description and spec.action.default_desc then
       description = spec.action.default_desc
     end
     -- NOTE: raise error when opts conflicts
     keymap_opts = vim.tbl_extend("error", keymap_opts, spec.action.keymap_opts)
 
     if not debug_keymap then debug_keymap = spec.action.debug end
+  end
+  if description then
+    keymap_opts.desc = description
   end
   if debug_keymap then
     print("Debugging keymap:",
@@ -169,22 +168,6 @@ function toplevel_map(spec)
     )
   end
   vim.keymap.set(spec.mode, spec.key, keymap_action, keymap_opts)
-
-  -- when the description is set, put the key&desc in appropriate whichkey maps
-  if description then
-    local mode_tbl
-    if type(spec.mode) == "table" then
-      mode_tbl = spec.mode
-    else
-      mode_tbl = {spec.mode}
-    end
-    for _, m in ipairs(mode_tbl) do
-      local wk_maps = get_wk_maps_for_mode(m)
-      if wk_maps then
-        wk_maps[spec.key] = description
-      end
-    end
-  end
 end
 
 --- Create leader map & register it on which_key plugin
@@ -288,14 +271,14 @@ function mk_action(spec)
   if spec.opts then error("Set keymap options using field `keymap_opts`") end
   local raw_action
   if spec.fn then
-    raw_action = function() spec.fn() end
+    raw_action = spec.fn
   elseif spec.raw_action then
     raw_action = spec.raw_action
   else
     error("spec.fn or spec.raw_action must be set!")
   end
   return setmetatable({
-    default_desc = spec.default_desc,
+    default_desc = spec.default_desc or false,
     supported_modes = _normalize_mode_or_modes(spec.for_mode),
     raw_action = raw_action,
     keymap_opts = spec.keymap_opts or {},
