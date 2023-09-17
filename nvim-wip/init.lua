@@ -219,6 +219,40 @@ local ActionSpec_mt = {
     -- FIXME: is there a better/simpler way to chain __index metamethods?
     require"mylib.mt_utils".KeyRefMustExist_mt
   ),
+  __call = function(self)
+    if self.keymap_opts.expr then
+      error("Ad-hoc exec of expr action is NOT tested")
+    end
+    local raw_action_type = type(self.raw_action)
+    if raw_action_type == "function" then
+      self.raw_action()
+    elseif raw_action_type == "string" then
+      error("Ad-hoc exec of string raw action is not implemented (failed..)")
+      -- FIXME: I can't get it to work properly,
+      --   e.g with cmd mode or surround actions..
+      ----------------------------------------------------
+      -- local replace_keycodes = self.keymap_opts.expr or false
+      -- local feedkeys_mode = ""
+      -- if self.keymap_opts.remap or not self.keymap_opts.noremap then
+      --   feedkeys_mode = feedkeys_mode .. "m" -- remap
+      -- else
+      --   feedkeys_mode = feedkeys_mode .. "n" -- noremap
+      -- end
+      -- feedkeys_mode = feedkeys_mode .. "x" -- execute right away
+      -- feedkeys_mode = feedkeys_mode .. "!" -- do not auto-end insert mode
+      -- -- if self.debug then
+      --   print("Debugging ad-hoc feedkeys:",
+      --     "raw_action:", vim.inspect(self.raw_action),
+      --     "feedkeys_mode:", vim.inspect(feedkeys_mode),
+      --     "replace_keycodes:", replace_keycodes
+      --   )
+      -- -- end
+      -- -- NOTE: assumes termcodes haven't been replaced yet (<C-x>, <Plug>, etc..)
+      -- vim.api.nvim_feedkeys(self.raw_action, feedkeys_mode, replace_keycodes)
+    else
+      error("Cannot ad-hoc exec raw action of type" .. raw_action_type)
+    end
+  end
 }
 
 ---@type {[string]: ActionSpec}
