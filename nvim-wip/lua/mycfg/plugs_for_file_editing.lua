@@ -22,6 +22,12 @@ NamedPlug.cmp {
   config_depends_on = {
     Plug { source = gh"hrsh7th/cmp-buffer", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
+    Plug {
+      source = gh"hrsh7th/cmp-nvim-lua",
+      desc = "Source for neovim runtime API",
+      tags = {"config-editing"},
+      depends_on = {NamedPlug.cmp},
+    },
     Plug { source = gh"andersevenrud/cmp-tmux", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-emoji", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"saadparwaiz1/cmp_luasnip", depends_on = {NamedPlug.cmp, NamedPlug.snippet_engine} },
@@ -136,8 +142,26 @@ NamedPlug.cmp {
 
     cmp.setup.global(global_cfg)
 
-    -- Filetype-specific config
+    -- Filetype/buffer-specific config
     -- NOTE: For these, list of sources does NOT inherit from the global list of sources
+
+    -- Enable neovim runtime API completion only in Lua/Vim files in my nvim config (or plugins):
+    vim.api.nvim_create_autocmd("BufEnter", {
+      pattern = {
+        vim.fn.stdpath"config" .. "/*.lua",
+        vim.fn.stdpath"config" .. "/*.vim",
+        vim.fn.stdpath"state" .. "/*.lua",
+        vim.fn.stdpath"state" .. "/*.vim",
+      },
+      callback = function()
+        cmp.setup.buffer({
+          sources = vim.list_extend(
+            { { name = "nvim_lua" } },
+            common_sources
+          )
+        })
+      end,
+    })
 
     cmp.setup.filetype({"markdown"}, {
       sources = vim.list_extend(

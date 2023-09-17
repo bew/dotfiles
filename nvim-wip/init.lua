@@ -18,7 +18,7 @@
 --
 -- See this issue for future better way to solve this:
 -- https://github.com/neovim/neovim/issues/21691
-local nvim_cfg_path = "/home/bew/.dot/nvim-wip"
+local nvim_cfg_path = vim.loop.fs_realpath(vim.fs.normalize("~/.dot/nvim-wip"))
 -- Override stdpaths
 --
 -- FIXME: I can't simply require"custom_stdpaths", because I would need
@@ -28,8 +28,8 @@ custom_stdpaths.setup {
   overrides = {
     {
       config = nvim_cfg_path,
-      data = "/home/bew/.local/share/nvim-wip",
-      state = "/home/bew/.local/state/nvim-wip",
+      data = vim.fs.normalize("~/.local/share/nvim-wip"),
+      state = vim.fs.normalize("~/.local/state/nvim-wip"),
     },
     --require"mylib.custom_stdpaths".NVIM_STDPATH_env_overrides,
   }
@@ -40,13 +40,13 @@ vim.opt.runtimepath = {
   vim.fn.stdpath"config",
   -- (system) "/etc/xdg/nvim",
   --vim.fn.stdpath"data" .. "/site",
-  "/home/bew/.nix-profile/share/nvim/site",
+  vim.fs.normalize("~/.nix-profile/share/nvim/site"),
   -- (system) "/usr/share/nvim/site",
   -- (system) "/usr/local/share/nvim/site",
 
   vim.env.VIMRUNTIME,
 
-  "/home/bew/.nix-profile/share/nvim/site/after",
+  vim.fs.normalize("~/.nix-profile/share/nvim/site/after"),
   --vim.fn.stdpath"data" .. "/site/after",
   -- (system) "/etc/xdg/nvim/after",
   vim.fn.stdpath"config" .. "/after",
@@ -58,7 +58,7 @@ vim.opt.packpath = {
 
 -- Setup known-paths for my own config:
 MY_KNOWN_PATHS = setmetatable({
-   myplugins = "/home/bew/.dot/nvim-myplugins",
+   myplugins = vim.fs.normalize("~/.dot/nvim-myplugins"),
 }, require"mylib.mt_utils".KeyRefMustExist_mt)
 
 -- NOTE: Read more about neovim's custom lua file loader at:
