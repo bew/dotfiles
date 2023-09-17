@@ -96,7 +96,11 @@ NamedPlug.pkg_manager {
 
     local lazy_plugin_specs = {}
     for _, plug in pairs(U.filter_list(ctx.all_plugin_specs, enabled_plugins_filter)) do
-      local lazy_single_spec = {}
+      local lazy_single_spec = {
+        -- Set the plugin name, so we can easily reference other plugins by name
+        -- (e.g. for plugin dependencies)
+        name = plug.source.name,
+      }
       if plug.source.type == "github" then
         lazy_single_spec[1] = plug.source.owner_repo
       elseif plug.source.type == "local_path" then
@@ -108,6 +112,17 @@ NamedPlug.pkg_manager {
       lazy_single_spec.config = plug.on_load
       if plug.version and plug.version.branch then
         lazy_single_spec.branch = plug.version.branch
+      end
+      if plug.depends_on then
+        local direct_deps = {}
+        for _, dep_plug in ipairs(plug.depends_on) do
+          table.insert(direct_deps, dep_plug.source.name)
+        end
+        -- Important to ensure that deps are put in rtp before the plugin requiring them,
+        -- can be necessary for vimscript plugins calling autoload functions from immediately
+        -- executed plugin-script.
+        lazy_single_spec.dependencies = direct_deps
+        -- print("Plugin", _q(plug.source.name), "depends on:", vim.inspect(direct_deps)) -- DEBUG
       end
       table.insert(lazy_plugin_specs, lazy_single_spec)
     end
