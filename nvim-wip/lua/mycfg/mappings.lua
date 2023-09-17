@@ -218,16 +218,28 @@ toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 -- TODO: Make <C-w> delete entire last arg (space separated?)
 --   and <M-BS> delete smaller parts (like builtin <C-w>)
 
+my_actions.c_expand_file_path = mk_action{
+  default_desc = "expand current file path",
+  for_mode = "c",
+  keymap_opts = { expr = true },
+  fn = function()
+    return vim.fn.expand("%:.")
+  end,
+}
 -- C: Expand %P to path of current file
 -- (using uppercase P because % also needs shift, so it's easy to 'spam')
-toplevel_map{mode="c", key="%P", desc="current file's dir", opts={expr=true}, action=function()
-  return vim.fn.expand("%:.")
-end}
+toplevel_map{mode="c", key="%P", action=my_actions.c_expand_file_path}
 
+my_actions.c_expand_file_dir = mk_action{
+  default_desc = "expand current file dir",
+  for_mode = "c",
+  keymap_opts = { expr = true },
+  fn = function()
+    return vim.fn.expand("%:.:h") .. "/"
+  end,
+}
 -- C: Expand %% to dir of current file
-toplevel_map{mode="c", key="%%", desc="current file's path", opts={expr=true}, action=function()
-  return vim.fn.expand("%:.:h") .. "/"
-end}
+toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
 
 -- N: toggle wrap
 vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
@@ -287,10 +299,21 @@ my_actions.logical_visual_eol = mk_action{
 }
 toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
 
+my_actions.select_last_inserted_region = mk_action{
+  default_desc = "select last inserted region",
+  for_mode = "n",
+  raw_action = "`[v`]",
+}
+-- FIXME: how to merge the two normal/operator actions?
+my_actions.o_select_last_inserted_region = mk_action{
+  default_desc = "select last inserted region",
+  for_mode = "o",
+  raw_action = [[<cmd>normal! `[v`]<cr>]],
+}
 -- N: Select last inserted region
-vim.cmd[[ nnoremap gV `[v`] ]]
+toplevel_map{mode="n", key="gV", action=my_actions.select_last_inserted_region}
 -- O: Textobj for the last inserted region
-vim.cmd[[onoremap gV <cmd>normal! `[v`]<cr>]]
+toplevel_map{mode="o", key="gV", action=my_actions.o_select_last_inserted_region}
 
 -- O: Textobj for current word & WORD
 -- NOTE: for 'change'&'yank' textobj `w` & `W` are actually aliases to `e` & `E` so are not useful, this is better!
