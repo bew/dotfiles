@@ -3,6 +3,8 @@ local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
+local print_err = vim.api.nvim_err_writeln
+
 -- Return a filter function that checks the given field is present
 local function need_field(field_name)
   return function(p)
@@ -10,22 +12,52 @@ local function need_field(field_name)
   end
 end
 
-local function boot_plugins(plugin_specs)
-  -- TODO(?): would be nice to find the named plugin 'pkg_manager' and boot it first?
-  -- and fallback to a manual boot if no pkg manager found.
-  local can_boot_plugins = U.filter_list(plugin_specs, need_field"on_boot")
-  local ctx = setmetatable({ all_plugin_specs = plugin_specs }, KeyRefMustExist_mt)
-  for _, plug in pairs(can_boot_plugins) do
-    local name = plug.source.name
-    assert(type(plug.on_boot) == "function", _f("Field on_boot of plug spec", _q(name), "is not a function"))
-    if plug.on_boot(ctx) == false then
-      print("Plug", _q(name), "failed to boot, expect errors / lack of plugins / ..")
+--- Returns the first plugin spec with id `pkg_manager` or errors if there is none.
+local function find_pkg_manager(plugin_specs)
+  for _, p in ipairs(plugin_specs) do
+    if p.id == "pkg_manager" then
+      return p
     end
+  end
+  error("No package loader/installer/manager found!")
+end
+
+local function boot_plugins(ctx)
+  ctx = setmetatable(ctx, KeyRefMustExist_mt)
+
+  if #ctx.all_plugin_specs == 0 then
+    return -- nothing to do!
+  end
+
+  local pkg_manager = find_pkg_manager(ctx.all_plugin_specs)
+
+  local check_path_exists = vim.loop.fs_stat
+  if check_path_exists(pkg_manager.install_path) then
+    vim.opt.rtp:prepend(pkg_manager.install_path)
+  else
+    pkg_manager:bootstrap_fn(ctx)
+    if not check_path_exists(pkg_manager.install_path) then
+      -- pkg manager still not bootstrapped, can't load plugins, bye
+      -- (maybe a msg was printed to ask user to install it !shrug)
+      return
+    end
+  end
+
+  local pkg_manager_name = pkg_manager.source.name
+  assert(
+    type(pkg_manager.on_boot) == "function",
+    _f("Field on_boot of pkg_manager plug spec", _q(pkg_manager_name), "is not a function")
+  )
+  local success, error_msg = pcall(pkg_manager.on_boot, ctx)
+  if not success or error_msg then
+    print_err(_f("Package manager", _q(pkg_manager_name), "failed to boot, expect errors / lack of plugins / .."))
+    print_err(_f("Reason:", error_msg))
+    return
   end
 
   -- Setup custom highlight autocommands
   local function apply_custom_highlights()
-    local plugins_with_hl_updates = U.filter_list(plugin_specs, need_field"on_colorscheme_change")
+    local plugins_with_hl_updates = U.filter_list(ctx.all_plugin_specs, need_field"on_colorscheme_change")
     for _, plug in pairs(plugins_with_hl_updates) do
       plug.on_colorscheme_change()
     end
