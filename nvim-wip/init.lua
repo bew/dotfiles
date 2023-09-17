@@ -145,6 +145,10 @@ function toplevel_map(spec)
   local keymap_opts = spec.opts or {}
   local description = spec.desc
   if type(spec.action) == "table" then
+    if not spec.action:supports_mode(spec.mode) then
+      error("Action does not support all given modes: " .. vim.inspect(spec.mode))
+    end
+
     -- vim.keymap.set requires the action to be a string or a function,
     -- so get the underlying keymap action from the ActionSpec.
     keymap_action = spec.action:to_keymap_action()
@@ -214,7 +218,15 @@ local ActionSpec_mt = {
     {
       to_keymap_action = function(self)
         return self.raw_action
-      end
+      end,
+      supports_mode = function(self, given_modes)
+        for _, mode in ipairs(_normalize_mode_or_modes(given_modes)) do
+          if not vim.tbl_contains(self.supported_modes, mode) then
+            return false
+          end
+        end
+        return true
+      end,
     },
     -- FIXME: is there a better/simpler way to chain __index metamethods?
     require"mylib.mt_utils".KeyRefMustExist_mt
@@ -255,6 +267,10 @@ local ActionSpec_mt = {
   end
 }
 
+function _normalize_mode_or_modes(modes)
+  return type(modes) == "table" and modes or { modes }
+end
+
 ---@type {[string]: ActionSpec}
 my_actions = {}
 ---@param spec ActionSpecInput
@@ -280,7 +296,7 @@ function mk_action(spec)
   end
   return setmetatable({
     default_desc = spec.default_desc,
-    for_mode = spec.for_mode, -- NOTE: currently ZERO checks are done with this..
+    supported_modes = _normalize_mode_or_modes(spec.for_mode),
     raw_action = raw_action,
     keymap_opts = spec.keymap_opts or {},
     debug = spec.debug or false,
