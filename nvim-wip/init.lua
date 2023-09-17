@@ -136,8 +136,10 @@ function toplevel_map(spec)
         end
         return type(a) == "table" and a.to_keymap_action ~= nil
       end,
-    }
+    },
+    debug={spec.debug, "boolean", true}, -- optional
   }
+  local debug_keymap = spec.debug or false
   local keymap_action = spec.action
   local description = spec.desc
   if type(spec.action) == "table" then
@@ -147,8 +149,18 @@ function toplevel_map(spec)
     if not description then
       description = spec.action.default_desc
     end
+
+    if not debug_keymap then debug_keymap = spec.action.debug end
   end
-  vim.keymap.set(spec.mode, spec.key, keymap_action, spec.opts)
+  if debug_keymap then
+    print("Debugging keymap:",
+      "mode:", vim.inspect(spec.mode),
+      "key:", vim.inspect(spec.key),
+      "raw_action:", vim.inspect(keymap_action),
+      "opts:", vim.inspect(keymap_opts)
+    )
+  end
+  vim.keymap.set(spec.mode, spec.key, keymap_action, keymap_opts)
 
   -- when the description is set, put the key&desc in appropriate whichkey maps
   if description then
@@ -189,8 +201,20 @@ end
 ---@field for_mode string|string[] Compatible modes at the start of the action
 ---@field fn (fun(): any)? The function to execute (conflicts with raw_action)
 ---@field raw_action any? The raw action to execute (conflicts with fn)
+---@field debug boolean Wheather to debug the effective keymap args on use
 
 ---@class ActionSpec: ActionSpecInput
+local ActionSpec_mt = {
+  __index = setmetatable(
+    {
+      to_keymap_action = function(self)
+        return self.raw_action
+      end
+    },
+    -- FIXME: is there a better/simpler way to chain __index metamethods?
+    require"mylib.mt_utils".KeyRefMustExist_mt
+  ),
+}
 
 ---@type {[string]: ActionSpec}
 my_actions = {}
@@ -203,6 +227,7 @@ function mk_action(spec)
     spec_action={spec.raw_action, "string", true}, -- optional (only when fn not set)
     spec_for_mode={spec.for_mode, {"string", "table"}},
     spec_desc={spec.default_desc, "string", true}, -- optional
+    spec_debug={spec.debug, "boolean", true}, -- optional
   }
   local raw_action
   if spec.fn then
@@ -216,13 +241,8 @@ function mk_action(spec)
     default_desc = spec.default_desc,
     for_mode = spec.for_mode, -- NOTE: currently ZERO checks are done with this..
     raw_action = raw_action,
-  }, {
-    __index = {
-      to_keymap_action = function(self)
-        return self.raw_action
-      end
-    },
-  })
+    debug = spec.debug or false,
+  }, ActionSpec_mt)
 end
 
 
