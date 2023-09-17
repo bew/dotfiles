@@ -230,7 +230,10 @@ end
 
 -- ------ PLUGINS
 local plugin_specs = require"mycfg.plugs"
-require"mylib.do_simple_plugin_boot"(plugin_specs)
+require"mylib.do_simple_plugin_boot" {
+  all_plugin_specs = plugin_specs,
+  install_dir = vim.fn.stdpath"state" .. "/managed-plugins/start",
+}
 
 -- This is my config here!
 -- FIXME: I'd like to have a better place to put these,

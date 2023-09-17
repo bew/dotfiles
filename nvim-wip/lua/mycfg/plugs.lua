@@ -83,10 +83,25 @@ NamedPlug.lib_plenary {
 --
 -- TODO: Ask a way to disable the 'update' tab, which is potentially too dangerous,
 -- I want to review plugins updates before I actually update them!
+--
+-- TODO: Make a dedicated way to register a package manager,
+--   so we can enforce a set of fields / structure
 NamedPlug.pkg_manager {
   source = gh"folke/lazy.nvim",
   desc = "A modern plugin manager for Neovim",
   tags = {"boot", t.careful_update},
+  install_path = vim.fn.stdpath("data") .. "/pkg-manager--lazy",
+  bootstrap_fn = function(self, ctx)
+    local clone_cmd_parts = {
+      "git",
+      "clone",
+      "--filter=blob:none", -- don't fetch blobs until git needs them
+      self.source.url,
+      self.install_path,
+    }
+    local clone_cmd = table.concat(clone_cmd_parts, " ")
+    print("Package manager not found! Install with:", clone_cmd)
+  end,
   on_boot = function(ctx)
     if not U.is_module_available("lazy") then return false end
     local function enabled_plugins_filter(plug)
@@ -130,14 +145,9 @@ NamedPlug.pkg_manager {
     for _, plug in pairs(lazy_plugin_specs) do
       table.insert(plug_names, plug[1])
     end
-    --print("Loading lazy plugins:", vim.inspect(plug_names))
+    -- print("Loading lazy plugins:", vim.inspect(plug_names)) -- DEBUG
     require("lazy").setup(lazy_plugin_specs, {
-      root = "/home/bew/.dot/nvim-wip/pack/lazy-managed-plugins/start",
-      install = { missing = false },
-      custom_keys = false,
-      change_detection = { enabled = false }, -- MAYBE: try it?
-      cache = { enabled = false },
-      performance = { reset_packpath = false },
+      root = ctx.install_dir,
       git = {
         -- In the Logs UI, show commits that are 'pending'
         -- (for plugins not yet updated to their latest fetched commit)
@@ -145,6 +155,12 @@ NamedPlug.pkg_manager {
         --    where the plugin is (can copy path from plugin details) and `git log`!
         log = {"..origin/HEAD"}
       },
+      -- Disable most automations
+      install = { missing = false }, -- do not auto-install plugins
+      custom_keys = false,
+      change_detection = { enabled = false }, -- MAYBE: try it?
+      cache = { enabled = false },
+      performance = { reset_packpath = false },
     })
   end,
 }

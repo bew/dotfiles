@@ -111,7 +111,7 @@ function MasterDeclarator:get_named_plugin_declarator()
       return self:declare_named_plugin(plugin_id)
     end,
     __newindex = function(...)
-      error("Assignements are forbidden, use `NamedPlug.foo { ... }` to declare/define plugin spec")
+      error("Assignements are forbidden, use `NamedPlug.foo { ... }` to declare/define named plugin")
     end,
   })
 end
@@ -138,6 +138,7 @@ function PlugSource.github(owner_repo)
     type = "github",
     owner_repo = owner_repo,
     name = owner_repo:gsub("^.*/", ""), -- remove 'owner/' in 'owner/repo'
+    url = "https://github.com/" .. owner_repo .. ".git",
   }, KeyRefMustExist_mt)
 end
 function PlugSource.local_path(spec)
