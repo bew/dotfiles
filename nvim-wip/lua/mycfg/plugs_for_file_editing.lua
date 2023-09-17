@@ -391,6 +391,21 @@ Plug {
       for_mode="n", default_desc="Add around <motion>",
       raw_action="<Plug>(nvim-surround-normal)",
     }
+    my_actions.add_surround_on_visual = mk_action {
+      for_mode="v", default_desc="Add around visual selection",
+      raw_action="<Plug>(nvim-surround-visual)",
+    }
+    my_actions.change_surround = mk_action {
+      for_mode="n", default_desc="Change nearest <from-pair> <to-pair>",
+      raw_action="<Plug>(nvim-surround-change)",
+    }
+    my_actions.delete_surround = mk_action {
+      for_mode="n", default_desc="Delete nearest <pair>",
+      raw_action="<Plug>(nvim-surround-delete)",
+    }
+    -- Extra surround actions (linewise, on current line)
+    -- NOTE: 'linewise' actions are a bit weird, as they seems add an extra blank line between
+    --   the <motion>/selection and the new delimiters 👀.
     my_actions.add_surround_linewise = mk_action {
       for_mode="n", default_desc="Add around <motion> (linewise)",
       raw_action="<Plug>(nvim-surround-normal-line)",
@@ -403,29 +418,15 @@ Plug {
       for_mode="n", default_desc="Add around current line (linewise)",
       raw_action="<Plug>(nvim-surround-normal-cur-line)",
     }
-    my_actions.add_surround_on_visual = mk_action {
-      for_mode="v", default_desc="Add around visual selection",
-      raw_action="<Plug>(nvim-surround-visual)",
-    }
     my_actions.add_surround_on_visual_linewise = mk_action {
       for_mode="v", default_desc="Add around visual selection (linewise)",
       raw_action="<Plug>(nvim-surround-visual-line)",
     }
-    my_actions.change_surround = mk_action {
-      for_mode="n", default_desc="Change nearest <from-pair> <to-pair>",
-      raw_action="<Plug>(nvim-surround-change)",
-    }
-    my_actions.delete_surround = mk_action {
-      for_mode="n", default_desc="Delete nearest <pair>",
-      raw_action="<Plug>(nvim-surround-delete)",
-    }
 
-    -- Setup direct normal `s` to add surround, with more options through `<leader>s`
-    toplevel_map_define_group{mode={"n"}, prefix_key="s", name="+surround"}
-    leader_map_define_group{mode={"n"}, prefix_key="s", name="+extra-surrounds"}
     -- Map to add surround
-    -- (`s` makes more sense for surround, but eats a key (use `cl` for builtin `s`))
-    toplevel_map{mode="n", key="s", action=my_actions.add_surround}
+    -- (direct `s` would be nice, but eats a key I use too often (I tried...))
+    leader_map{mode="n", key="s", action=my_actions.add_surround}
+    leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
 
     -- Maps to change/delete surrounds
     --
@@ -433,18 +434,6 @@ Plug {
     -- vim's vocabulary of `<verb><on-what>`.
     toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
     toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
-
-    -- Extra maps to add surround (NOTE: uppercase is the 'line' variant)
-    leader_map{mode="n", key="sa", action=my_actions.add_surround}
-    leader_map{mode="n", key="sA", action=my_actions.add_surround_linewise}
-    leader_map{mode="n", key="ss", action=my_actions.add_surround_around_line}
-    leader_map{mode="n", key="sS", action=my_actions.add_surround_around_line_linewise}
-    leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
-    leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_linewise}
-
-    -- N: Restore `xs` which I use often to delete 2 chars
-    -- Map it to a change action to make it work as a single edit not two!
-    toplevel_map{mode={"n"}, key="xs", desc="xs (even if `s` does surround)", action="c2l"}
 
     require"nvim-surround".setup {
       keymaps = default_keymaps_disabled,
