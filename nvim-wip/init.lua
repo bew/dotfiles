@@ -137,10 +137,12 @@ function toplevel_map(spec)
         return type(a) == "table" and a.to_keymap_action ~= nil
       end,
     },
+    opts={spec.opts, "table", true}, -- optional
     debug={spec.debug, "boolean", true}, -- optional
   }
   local debug_keymap = spec.debug or false
   local keymap_action = spec.action
+  local keymap_opts = spec.opts or {}
   local description = spec.desc
   if type(spec.action) == "table" then
     -- vim.keymap.set requires the action to be a string or a function,
@@ -149,6 +151,8 @@ function toplevel_map(spec)
     if not description then
       description = spec.action.default_desc
     end
+    -- NOTE: raise error when opts conflicts
+    keymap_opts = vim.tbl_extend("error", keymap_opts, spec.action.keymap_opts)
 
     if not debug_keymap then debug_keymap = spec.action.debug end
   end
@@ -201,6 +205,7 @@ end
 ---@field for_mode string|string[] Compatible modes at the start of the action
 ---@field fn (fun(): any)? The function to execute (conflicts with raw_action)
 ---@field raw_action any? The raw action to execute (conflicts with fn)
+---@field keymap_opts {string: any}? The raw action to execute (conflicts with fn)
 ---@field debug boolean Wheather to debug the effective keymap args on use
 
 ---@class ActionSpec: ActionSpecInput
@@ -227,8 +232,10 @@ function mk_action(spec)
     spec_action={spec.raw_action, "string", true}, -- optional (only when fn not set)
     spec_for_mode={spec.for_mode, {"string", "table"}},
     spec_desc={spec.default_desc, "string", true}, -- optional
+    spec_keymap_opts={spec.keymap_opts, "table", true}, -- optional
     spec_debug={spec.debug, "boolean", true}, -- optional
   }
+  if spec.opts then error("Set keymap options using field `keymap_opts`") end
   local raw_action
   if spec.fn then
     raw_action = function() spec.fn() end
@@ -241,6 +248,7 @@ function mk_action(spec)
     default_desc = spec.default_desc,
     for_mode = spec.for_mode, -- NOTE: currently ZERO checks are done with this..
     raw_action = raw_action,
+    keymap_opts = spec.keymap_opts or {},
     debug = spec.debug or false,
   }, ActionSpec_mt)
 end
