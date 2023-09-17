@@ -273,13 +273,19 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 -- NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
 -- NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
 -- vim.cmd[[ vnoremap <expr> $ (mode() == "v" ? "$h" : "$") ]]
-toplevel_map{mode="v", key="$", desc="smart eol", opts={expr=true}, action=function()
-  if vim.fn.mode() == "v" then
-    return "$h"
-  else
-    return "$"
-  end
-end}
+my_actions.logical_visual_eol = mk_action{
+  default_desc = "logical EOL",
+  for_mode = "v",
+  keymap_opts = { expr = true }, -- inject keys!
+  fn = function()
+    if vim.fn.mode() == "v" then
+      return "$h"
+    else
+      return "$"
+    end
+  end,
+}
+toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
 
 -- N: Select last inserted region
 vim.cmd[[ nnoremap gV `[v`] ]]
