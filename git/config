@@ -59,6 +59,20 @@
   # (use an explicit 'drop' action to avoid the warning)
   missingCommitsCheck = "warn"
 
+  # Show a diffstat on successful rebase of the effective changes between the new root and HEAD
+  stat = true
+
+  # IDEA(feat request): an option to auto use `--committer-date-is-author-date` when rebasing.
+  # See: https://stackoverflow.com/questions/2973996/git-rebase-without-changing-commit-timestamps
+
+[rerere]
+  # Activate 'reuse recorded resolution' system, tracking before/after conflict resolution when they
+  # happen and auto-resolve future similar ones.
+  # Can be useful while doing git rebases, to auto-resolve conflicts I already fixed in the past.
+  #
+  # Ref: https://www.git-scm.com/book/en/v2/Git-Tools-Rerere
+  enabled = true
+
 [diff]
   # Give a little bit more context in diffs (defaut is 3)
   context = 10
@@ -78,7 +92,7 @@
   interactive = true
 
 [color "status"]
-  untracked = "cyan"
+  untracked = "cyan" # default is red => confusing because modified files are also red..
 
 [color "diff"]
   # color settings for 'colorMoved' option
@@ -103,8 +117,30 @@
   an = add -N
 
   com   = commit
-  comp  = commit -p
-  comam = commit --amend
+  comp  = com -p
+  comdry-run = com --dry-run --untracked-files=no
+  # Edit (replace) last commit (should not be used if already pushed!)
+  comedit-last = com --amend
+  # Fixup last commit message (content untouched)
+  comfix-reword-last = com --fixup=reword:HEAD
+  # Fixup last commit content (message untouched)
+  comfix-add-to-last = com --fixup=HEAD
+  # Fixup last commit message & content
+  comfix-edit-last = com --squash=HEAD
+  #
+  # Would be nice to have aliases that can fixup/squash to any rev, with <rev> completion
+  # (aka, aliases as just another name for the underlying flags)
+  # - `comfix-reword <rev>`
+  # - `comfix-add-to <rev>`
+  # - `comfix-edit <rev>`
+  #
+  # NOTE interesting flags:
+  # --fixup=amend:<rev>
+  # --fixup=reword:<rev>
+  # --squash=<rev>
+  # FIXME: I don't understand the difference between `--fixup=amend:<rev>` & `--squash=<rev>`
+  #
+  # These need to be `git rebase --autosquash`-ed to be merged with the liked commits
 
   # Inverts a previous `git add file`
   # (same as new command `git restore --staged file` except
@@ -125,13 +161,15 @@
   sw = switch
   sth = stash
 
+  mtool = mergetool
+
   # branch manipulations
 
   chb = checkout -b
   swc = switch -c
 
-  br = branch
-  brv = "!git --no-pager branch -vv"
+  br = !git --no-pager branch
+  brv = !git --no-pager branch -vv
 
   br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
   brg = br-gone
@@ -153,13 +191,13 @@
   suf = status --untracked-files
 
   # log (minimal: with metadata + subject)
-  pretty-log = log --graph --decorate --pretty='%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n'
+  pretty-log = log --graph --decorate --pretty=tformat:'%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n'
   l  = pretty-log
   la = pretty-log --all
 
   # log (verbose: with metadata + subject + body + notes)
   # (~same as: pretty-log + the commit body & notes if available)
-  pretty-log-verbose = log --graph --decorate --pretty=format:'%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n'
+  pretty-log-verbose = log --graph --decorate --pretty=tformat:'%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n'
   lv  = pretty-log-verbose
   lva = pretty-log-verbose --all
 
@@ -176,10 +214,10 @@
   lp = pretty-log-next-push
 
   # diff
-  d   = diff
-  dc  = diff --staged
-  dd  = diff -w
-  ddc = diff -w --staged
+  dd  = diff
+  ddc = diff --staged
+  d   = diff -w
+  dc  = diff -w --staged
 
   # Diff side-by-side with delta (instead of unified diff)
   dds = !git -c delta.features=split-layout dd
@@ -196,18 +234,20 @@
   # --- Info aliases on current branch
 
   # --unified is for the up/down diff context around hunks
-  review-diff          = !git diff --unified=30   $(git z--base-branch-helper)
-  review-diff-full-ctx = !git diff --unified=9999 $(git z--base-branch-helper)
+  rv-diff          = !git diff --unified=30   $(git z--base-branch-helper)
+  rv-diff-full-ctx = !git diff --unified=9999 $(git z--base-branch-helper)
   # (now with side-by-side delta diff layout)
-  review-diff-s          = !git dds --unified=30   $(git z--base-branch-helper)
-  review-diff-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
+  rv-diff-s          = !git dds --unified=30   $(git z--base-branch-helper)
+  rv-diff-full-ctx-s = !git dds --unified=9999 $(git z--base-branch-helper)
+  rd  = rv-diff
+  rds = rv-diff-s
 
-  review-log         = !git pretty-log         $(git z--base-branch-helper)..
-  review-log-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
-  rl  = review-log
-  rlv = review-log-verbose
+  rv-log         = !git pretty-log         $(git z--base-branch-helper)..
+  rv-log-verbose = !git pretty-log-verbose $(git z--base-branch-helper)..
+  rl  = rv-log
+  rlv = rv-log-verbose
 
-  review-stat = !git stat $(git z--base-branch-helper)..
+  rv-stat = !git stat $(git z--base-branch-helper)..
 
   # --- Info aliases on last merge
 
@@ -251,6 +291,8 @@
   # Added lines
   plus-style = syntax 22
   plus-emph-style = normal bold 28
+  # NOTE: plus-emph-style uses 'normal' to make the text visible for comments.
+  #   Otherwise, an emphasised comment is very hard to read.
 
   # Line number style to match added/removed line
   # Not working in a useful way for now, see: https://github.com/dandavison/delta/issues/247
@@ -259,11 +301,12 @@
 
   file-style = bold 166
   file-decoration-style = none
+
   # NOTE: the decoration styles ul/ol/box uses unicode chars AFAIK
 
   commit-decoration-style = ol
 
-  hunk-header-style = 243 236 # light grey on dark grey
+  hunk-header-style = 246 237 # light grey on 'dark' grey
   hunk-header-decoration-style = bold
 
 [delta "unified-layout"]
