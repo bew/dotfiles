@@ -373,8 +373,8 @@ SpecialStatuslines.QuickfixOrLoc = {
     __WideSpacing__,
     {
       provider = function()
-        local current_entry_idx1 = vim.fn.getloclist{ idx = 0 }.idx
-        local nb_entries = vim.fn.getloclist{ size = true }.size
+        local current_entry_idx1 = vim.fn.getloclist(0, { idx = 0 }).idx
+        local nb_entries = vim.fn.getloclist(0, { size = true }).size
         return _f("Entry", current_entry_idx1, "of", nb_entries)
       end,
     },
