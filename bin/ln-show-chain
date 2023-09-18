@@ -23,7 +23,10 @@ def print_err(*args, **kwargs):
 
 
 def exit_with_usage():
-    print_err("USAGE: show-symlinks-chain <BIN|PATH>")
+    prog_name = sys.argv[0]
+    if shutil.which(basename := os.path.basename(prog_name)):
+        prog_name = basename
+    print_err(f"USAGE: {prog_name} <BIN|PATH>")
     print_err("  Shows the chain of symlinks to the given argument,")
     print_err("  very useful on systems using many symlinks like Nix/NixOS.")
     print_err()
@@ -31,14 +34,14 @@ def exit_with_usage():
     print_err("  the path needs to be ./relative, relative/ or /absolute.")
     print_err()
     print_err("Example of binary resolution:")
-    print_err("  show-symlinks-chain zsh")
-    print_err("  show-symlinks-chain ls")
-    print_err("  show-symlinks-chain show-symlinks-chain")
+    print_err(f"  {prog_name} zsh")
+    print_err(f"  {prog_name} ls")
+    print_err(f"  {prog_name} {prog_name}")
     print_err()
     print_err("Example of path resolution:")
-    print_err("  show-symlinks-chain ./zsh")
-    print_err("  show-symlinks-chain ./result-symlink")
-    print_err("  show-symlinks-chain /run/current-system")
+    print_err(f"  {prog_name} ./zsh")
+    print_err(f"  {prog_name} ./result-symlink")
+    print_err(f"  {prog_name} /run/current-system")
     print_err()
     sys.exit()
 
