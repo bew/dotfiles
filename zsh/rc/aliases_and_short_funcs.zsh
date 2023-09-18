@@ -1,17 +1,16 @@
 #-------------------------------------------------------------
 #
-# TODO: cleanup old, unused funcs/aliases!
-# 
-# TODO: find a way (kinda profiles?) to split funcs/aliases between:
-# * helpers-for-shell funcs/aliases (for core cli experience)
-#   Specific to the shell
-#   (like j, zsh::safe_reload or NOOUT)
+# Items in this files are roughly grouped in the following kind of categories:
 #
-# * helpers-for-cli-tools funcs/aliases (for common cli tools, dev-lang-agnostic, distro-agnostic)
+# * helpers-for-zsh (for core cli experience)
+#   Specific to zsh
+#   (like j, zsh::safe_reload or NOOUT (global alias))
+#
+# * helpers-for-cli-tools (for common cli tools, dev-lang-agnostic, distro-agnostic)
 #   Specific to my cli env
 #   (like mkcd, ncdu, gclonecd, dl_file or ssh-password-only)
 #
-# * helpers-for-code-tools funcs/aliases (for tech/dev tools, distro-agnostic)
+# * helpers-for-code-tools (for tech/dev tools, distro-agnostic)
 #   Specific to my projects
 #   (like venv* or dk)
 #
@@ -19,13 +18,16 @@
 #   Specific to my distro
 #   (like pac::list_useless_deps or nix-prefetch-url-tarball)
 #
-# * helpers-for-gui-tools funcs/aliases
-#   (like mpv-audio)
+# * helpers-for-media-tools funcs/aliases
+#   (like youtube-dl or ffmpeg)
+#
+# * helpers-for-gui funcs/aliases
+#   (like @mpv (? not in this file))
+#
+# => Start by moving them to separate files?
 
-function _cmd_available
-{
-  command -v "$1" >/dev/null
-}
+
+# === zsh core
 
 function zsh::utils::check_can_reload_or_exit
 {
@@ -52,7 +54,7 @@ function zsh::safe_reload
 
 function zsh::safe_exit
 {
-  zsh::utils::check_can_reload_or_exit "quit" || return 1
+  zsh::utils::check_can_reload_or_exit "exit" || return 1
 
   >&2 echo "--- Exiting safely, bye!"
   exit
@@ -88,35 +90,25 @@ alias -g NOOUTPUT="NOOUT NOERR"
 #     not write-only/read-only ? So it's not possible to redirect stdin for reading or writing to
 #     different files?
 
+alias j=jobs
+
+
+# === common CLI tools / dev-lang-agnostic / distro-agnostic
+
 # Shorters
 
 alias g=git
-alias m=make
-alias dk=docker
-alias dkc=docker-compose
-alias cr=crystal
-alias pac=pacman
 alias tre=tree
-alias py=python
-alias ipy="ipython --no-confirm-exit"
-alias com=command
-alias j=jobs
+alias tx=tmux
 
 # Force tmux to be compatible UTF-8
 # (256 colors & RGB are enabled in tmux config, via `terminal-features`)
 alias tmux="tmux -u"
-alias tx="tmux"
-
-alias hc=herbstclient
 
 # Big-one letter aliases
-
-alias A=ack
 alias H=head
 alias T=tail
 alias L=less
-alias V=vim
-alias G="command grep --color=auto -n"
 
 # Add verbosity to common commands
 
@@ -125,6 +117,7 @@ alias cp="cp -vi"
 alias mv="mv -vi"
 alias ln="ln -iv"
 alias mkdir="mkdir -v"
+alias rename="rename -v"
 
 # ls
 
@@ -153,77 +146,10 @@ alias la="ll -a"
 alias l="la"
 alias l1="ls -1"
 
-# curl
-
-alias dl_file="curl -L -O"
-alias curl_json='curl -H "Accept:application/json" -H "Content-Type:application/json"'
-
-function curl_auth
-{
-  local token="$1"; shift
-  if [[ -z "$token" ]]; then
-    echo 2>/dev/null "Missing <token>"
-    return 1
-  fi
-
-  curl -H "Authorization: Bearer $token" "$@"
-}
-
-function curl_auth_json
-{
-  local token="$1"; shift
-  if [[ -z "$token" ]]; then
-    echo 2>/dev/null "Missing <token>"
-    return 1
-  fi
-
-  curl_auth "$token" -H "Accept:application/json" -H "Content-Type:application/json" "$@"
-}
-
-# misc
-
-alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
-# Add line numbers when output is not a tty,
-# allows to use output as input to `nvim -q <results-file>` for easy navigation \o/
-alias rg='rg -n'
-
-# Search the given bin name in PATH (ignores aliases/functions)
-# -p : always search in PATH
-# -s : show the realpath in addition to the path in PATH
-alias which::realpath="echo \"-- note: use 'show-symlinks-chain' for more details\"; which -ps"
-
-# Always expose a known TERM (not the 256color version) to the server I'm connecting to.
-alias ssh='TERM=xterm ssh'
-
-function cheatsh
-{
-  curl cht.sh/$1
-}
-
-# ps
-# -f : full listing (show process name & args)
-# --forest : Show a processes hierarchy
-alias pss="ps -f --forest"
-
-# git-diff based diff (with delta <3)
-alias gdiff="git dd --no-index"
-alias gdiff::split="git dds --no-index"
-
-# ping
-if _cmd_available prettyping; then
-  alias pg="prettyping google.fr"
-else
-  alias pg="ping google.fr"
-fi
-
-# DNS lookup (`dig` is deprecated on archlinux)
-if _cmd_available drill; then
-  alias dig=drill
-fi
 
 # mkdir
 
-alias mkd="mkdir -p"
+alias mkd="mkdir -p" # note: `mkdir` has -v applied already
 
 # Creates 1 or more directories, then cd into the first one
 function mkcd
@@ -238,42 +164,27 @@ function mkcd
 # --dirsfirst : Dirs then files
 alias tree="tree -C --dirsfirst -F -A"
 
+
 # cd
 
 alias ..="cd ..;"
 alias ...="cd ../..;"
 alias ....="cd ../../..;"
+# IDEA: Remap `.` in ZLE to make these aliases dynamic in zsh, for arbitrary depth, and work even
+#   inside a ,
+#   where I can preview (below prompt in message area) the directory I'm targeting as I add dots..
 
 alias cdt="cd /tmp;"
-alias cdl="cd -;"
 
-alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
+alias cddot="cd ~/.dot"
 
-# pacman
-
-alias pac::list_useless_deps="pacman -Qtdq"
-
-function pac::show_useless_deps
-{
-  for package in $(pac::list_useless_deps); do
-    echo "Package: $package"
-    pacman -Qi $package | grep 'Description'
-    echo
-  done
-}
-
-alias pac::remove_useless_deps="command sudo pacman -Rsv \$(pac::list_useless_deps)"
-alias pac::safe-remove-pkg="pacman -Rsv"
-
-# yay
-
-alias yay="yay --builddir ~/.long_term_cache/yay_build_dir"
 
 # git
 
 alias gnp="git --no-pager"
-alias git::status_in_all_repos="find -name .git -prune -print -execdir git status \;"
 alias git_watch="watch --color -- git --no-pager -c color.ui=always"
+
+alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 
 # Clone git repository and cd to it
 #
@@ -298,6 +209,69 @@ function gclonecd
 # (https://github.com/junegunn/gv.vim)
 alias gv="e +GV"
 
+# git-diff based diff (with delta <3)
+alias gdiff="git dd --no-index"
+alias gdiff::split="git dds --no-index"
+
+
+# nvim
+
+alias e="nvim"
+alias v="nvim -R"
+# e: edit | v: view
+
+alias ewip="nvim-original -u ~/.dot/nvim-wip/init.lua"
+
+
+# rg
+
+alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
+# Add line numbers when output is not a tty,
+# allows to use output as input to `nvim -q <results-file>` for easy navigation \o/
+alias rg='rg -n'
+
+
+# curl
+
+# Download a single file
+# --remote-name (-O): Write output to a file (use URL to deduce filename by default, see -J)
+#
+# --remote-header-name (-J): Use filename from Content-Disposition header if present (usually better than the URL)
+#
+# --location (-L): Follow redirects
+alias dl_file="curl -OJ -L"
+
+alias curl_json='curl -H "Accept:application/json" -H "Content-Type:application/json"'
+
+function curl_auth
+{
+  local token="$1"; shift
+  if [[ -z "$token" ]]; then
+    >&2 echo "Missing <token>"
+    return 1
+  fi
+  curl -H "Authorization: Bearer $token" "$@"
+}
+
+function curl_auth_json
+{
+  local token="$1"; shift
+  if [[ -z "$token" ]]; then
+    >&2 echo "Missing <token>"
+    return 1
+  fi
+  curl_auth "$token" -H "Accept:application/json" -H "Content-Type:application/json" "$@"
+}
+
+
+# ssh
+
+# Always expose a known TERM (not the 256color version) to the server I'm connecting to.
+alias ssh='TERM=xterm ssh'
+
+alias ssh-password-only='ssh -o PubkeyAuthentication=no'
+
+
 # sudo
 
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
@@ -319,52 +293,29 @@ compdef _sudo nosudo
 alias nosudo="nosudo " # allow alias expansion after 'nosudo'
 
 
-# nvim
-
-# launch editor (- let's try that!)
-alias e="nvim"
-alias v="nvim -R"
-# e: edit | v: view
-
-alias ewip="nvim-original -u ~/.dot/nvim-wip/init.lua"
-
-alias clean_swaps='rm ~/.nvim/swap_undo/swapfiles/.* ~/.nvim/swap_undo/swapfiles/*'
+# misc
 
 # ncdu
 alias ncdu='ncdu --color dark'
 
-# ssh
-alias ssh-password-only='ssh -o PubkeyAuthentication=no'
+# Search the given bin name in PATH (ignores aliases/functions)
+# -p : always search in PATH
+# -s : show the realpath in addition to the path in PATH
+alias which::realpath="echo \"-- note: use 'show-symlinks-chain' for more details\"; which -ps"
 
-# nix
-alias nix-prefetch-url-tarball='nix-prefetch-url --unpack'
+# ps
+# -f : full listing (show process name & args)
+# --forest : Show a processes hierarchy
+alias pss="ps -f --forest"
 
-# python
-alias venv::load_helpers="source ~/.dot/shell/venv_helpers.sh"
+# ping
+alias pg="ping google.fr"
 
-# Media commands
+function cheatsh
+{
+  curl cht.sh/$1
+}
 
-# youtube-dl
-
-alias ytdl='yt-dlp'
-alias ytdl-m4a='ytdl --extract-audio -f m4a --ignore-errors'
-alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
-
-# mpv
-
-alias mpv-audio='mpv --no-video'
-alias mpv-audio-loop='mpv-audio --loop-playlist'
-
-# ffmpeg
-
-alias ffmpeg='ffmpeg -hide_banner'
-alias ffprobe='ffprobe -hide_banner'
-
-
-# clock in terminal
-
-alias clock='tty-clock -sc -C6 -d 0.5'
-alias c=clock
 
 # text translation (with https://github.com/soimort/translate-shell)
 
@@ -384,29 +335,34 @@ function en:fr:en
 alias en:def='trans en: -d'
 alias fr:def='trans fr: -d'
 
-# misc
 
-alias makeawesome='make CMAKE_ARGS="-DLUA_LIBRARY=/usr/lib/liblua.so"'
+# === tech/dev-lang tools, distro-agnostic
 
-# Media cool stuff
+# python
+
+alias py=python
+alias ipy="ipython --no-confirm-exit"
+
+# TODO: move somewhere else / do differently?
+alias venv::load_helpers="source ~/.dot/shell/venv_helpers.sh"
+
+
+# === media tools
+
+# chafa
 # NOTE: chafa without custom options is really great on its own!
 alias chafa::braille="chafa -c 256 --fg-only --symbols braille"
 alias chafa::braille::small="chafa::braille --size 70x70"
 
-# Hacks
+# youtube-dl
+alias ytdl='yt-dlp'
+alias ytdl-m4a='ytdl --extract-audio -f m4a --ignore-errors'
+alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 
-# 'pezop' is a firefox profile, where the browser language is in french, to
-# bypass language limitations on some sites :)
-alias ff_streaming="firefox -P pezop www.diagrim.com &!"
+# mpv
+alias mpv-audio='mpv --no-video'
+alias mpv-audio-loop='mpv-audio --loop-playlist'
 
-
-# Fast config edit
-
-alias ezshrc="e ~/.dot/zsh/zshrc"
-alias enviminit="e ~/.dot/nvim/init.vim"
-alias envimmappings="e ~/.dot/nvim/mappings.vim"
-alias cddot="cd ~/.dot"
-alias cdzsh="cd ~/.dot/zsh"
-alias cdnvim="cd ~/.dot/nvim"
-alias cdbin="cd ~/.dot/bin"
-
+# ffmpeg
+alias ffmpeg='ffmpeg -hide_banner'
+alias ffprobe='ffprobe -hide_banner'
