@@ -386,6 +386,19 @@ function venv_with_do
 }
 alias venv_with_do::upgrade="venv_with_do --upgrade"
 
+# cd into current venv (to search something, ..)
+function cdvenv
+{
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    >&2 echo "Not in a virtual env :shrug: (\$VIRTUAL_ENV not set)"
+  fi
+
+  cd $(dirname "$VIRTUAL_ENV")
+
+  local venv_name=$(basename "$VIRTUAL_ENV")
+  >&2 echo "Welcome to your current virtual env, named '$venv_name'"
+}
+
 # A pip replacement, disabled unless in a virtual env or --allow-for-global-env is passed
 # to avoid changing the global user python env by mistake.
 function pip::disabled-for-global-env
@@ -412,9 +425,12 @@ if command -v pip 2>&1 >/dev/null; then
   alias pip-for-global-env="pip::disabled-for-global-env --allow-for-global-env"
 fi
 
+# pytest helpers
+
 alias pytest::no-cov="pytest --no-cov"
 alias pytest::no-warn="echo '!!!! Warnings are disabled !!!!'; pytest --disable-warnings"
-alias pytest::no-cov-no-warn="echo '!!!! Warnings are disabled !!!!'; pytest --no-cov --disable-warnings"
+alias pytest::no-cov-no-warn="pytest::no-warn --no-cov"
+alias pytest::report-10-slowest="pytest::no-cov-no-warn --durations=10"
 alias pytest::fail-fast-verbose="pytest::no-cov-no-warn --exitfirst -vv --showlocals"
 alias pytest::last-failed-verbose="pytest::no-cov-no-warn --last-failed -vv --showlocals"
 alias pytest::failed-first="pytest::no-cov-no-warn --failed-first"

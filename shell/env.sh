@@ -56,6 +56,9 @@ fi
 # OSX bins
 path_maybe_add_entry "/usr/local/bin" fallback
 
+# Make sure _this_ PATH is exported !shrug
+export PATH
+
 # -----------------------
 # FIXME: These env vars are specific to my cli env!!! They should be moved to another file (which will eventually be sourced by bash/zsh)
 
