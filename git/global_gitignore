@@ -1,12 +1,7 @@
-# this is the global git ignore
+# This is the global git ignore
 
 # vim files
-.cs_*
-CS_SESSION
 .vimsession*
-
-# neomake tmp files
-.*neomake*
 
 # Nix result
 result
@@ -14,26 +9,31 @@ result-*
 # Nix profiles (manual)
 *.nix-gc-root*
 
-
-# C/C++ compilation
-*.o
-*.out
-
-# Put any dir link you want to a __vcs_ignore__ directory!
+# Put anything you want in a __vcs_ignore__ directory!
 __vcs_ignore__/
 
+# For binaries that are auto-enabled
+# (put symlinks there to actual binaries you want)
 __auto_bins__/
+
+# History files of various tools
+.*_history
+
+
+# -------- Filetype-specific common ignores
+
+# Terraform
+.terraform/
 
 # Python
 __pycache__/
 *.egg
 venv*/
-
-# local vimrc
-.lvimrc
+.venv*/
 
 # Ruby bundle vendor/bundle directory
 bundle/
 
-# History files of various tools
-.*_history
+# C/C++ compilation
+*.o
+*.out
