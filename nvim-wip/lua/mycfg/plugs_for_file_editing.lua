@@ -30,7 +30,7 @@ NamedPlug.cmp {
     },
     Plug { source = gh"andersevenrud/cmp-tmux", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-emoji", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"saadparwaiz1/cmp_luasnip", depends_on = {NamedPlug.cmp, NamedPlug.snippet_engine} },
+    Plug { source = gh"saadparwaiz1/cmp_luasnip", depends_on = {NamedPlug.cmp, NamedPlug.luasnip} },
   },
   on_load = function()
     local cmp = require"cmp"
@@ -117,7 +117,7 @@ NamedPlug.cmp {
           end,
         },
       },
-      { name = "luasnip" },
+      { name = "luasnip", keyword_length = 2 },
       { name = "path" }, -- By default, '.' is relative to the buffer
       {
         name = "tmux",
@@ -205,7 +205,7 @@ NamedPlug.cmp {
   end,
 }
 
-NamedPlug.snippet_engine {
+NamedPlug.luasnip {
   -- doc: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
   --
   -- Great intro to LuaSnip (~50min):
@@ -235,11 +235,11 @@ NamedPlug.snippet_engine {
       -- With basic shebang snippet, when typing: `init #!²a #!² b #!² c #!²` and then navigating
       -- doesn't select correctly the intermediate placeholders, we can kind-of can go
       -- back-n-forth but when I go back to start of first snippet I'm out of everything..
-      --
+
       -- FIXME: I don't want to leave the snip when going to prev node when on first placeholder,
-      --   I want it to be a no-op.
+      --   I want it to be a no-op (maybe add Ctrl to be able to 'escape' the snip?).
       --   (same for going next node on last placeholder? quid nested snips? should still work
-      --   across boundaries (if cursor if not leaving top(/sub?) snippet))
+      --   across boundaries (if cursor is not leaving top(/sub?) snippet))
 
       -- Hint/Highlight some nodes
       ext_opts = {
@@ -273,11 +273,33 @@ NamedPlug.snippet_engine {
       -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
       ls.jump(-1)
     end}
-    toplevel_map{mode={"i", "s"}, key=[[<M-²>]], desc="snippet: cycle choice node", action=function()
-      if ls.in_snippet() and ls.choice_active() then
-        ls.change_choice(1)
-      end
-    end}
+    my_actions.snip_cycle_choice = mk_action {
+      default_desc = "snippet: cycle choice node",
+      for_mode = {"i", "s", "n"},
+      fn = function()
+        if ls.in_snippet() and ls.choice_active() then
+          ls.change_choice(1)
+        end
+      end,
+    }
+    -- FIXME: On wezterm <M-²> sends <M-`> instead
+    --   Opened issue at: https://github.com/wez/wezterm/issues/4259
+    toplevel_map{mode={"i", "s", "n"}, key=[[<M-²>]], action=my_actions.snip_cycle_choice}
+    -- in the mean time use <M-c>
+    toplevel_map{mode={"i", "s", "n"}, key=[[<M-c>]], action=my_actions.snip_cycle_choice}
+
+    my_actions.snip_store_visual_selection = mk_action {
+      default_desc = "snippet: store selection for later",
+      for_mode = "v",
+      -- Copied from:
+      -- https://github.com/L3MON4D3/LuaSnip/blob/ea7d7ea510c641c4f1504/lua/luasnip/config.lua#L274
+      raw_action = [[:lua require('luasnip.util.util').store_selection()<cr>gv"_s]],
+    }
+    leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
+    -- NOTE: do not use direct `²` in visual mode, could be useful for context actions later..
+
+    -- (IDEA: could make a visual mode action, with a mode conversion when used from select mode 👀)
+    toplevel_map{mode="s", key=[[<BS>]], action=[[<C-g>"_c]]}
   end,
 }
 
