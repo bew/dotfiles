@@ -24,5 +24,32 @@ ZSH_DATA_DIR_SHARED=${ZSH_DATA_DIR:-${XDG_DATA_DIR:-$HOME/.local/share}/zsh-shar
 mkdir -p $ZSH_CACHE_DIR
 mkdir -p $ZSH_DATA_DIR $ZSH_DATA_DIR_SHARED
 
+# Ensure $SHELL is set to `zsh` full path
+# (instead of a default like `bash` if not set at system level)
+#
+# NOTE(nix): $SHELL is used as the default shell in `nix shell ...`
+#
+# We cannot just set it to `which zsh`, because the current zsh instance might not be in PATH
+# (e.g. when executed through `nix run ...`, or directly from its path)
+#
+# ---
+#
+# $ZSH_ARGZERO is either:
+# - the path to zsh binary (when zsh used in interactive mode)  <-- what we're interested in
+# - the path to a script (when doing `zsh foo.zsh` or `./foo.zsh`)
+#
+# We distinguish between the two by checking $ZSH_NAME, which is always the basename of the zsh
+#   executable, so we can use it to compare $ZSH_ARGZERO against it.
+#
+# refs:
+# - ZSH_NAME: https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-ZSH_005fNAME
+# - ZSH_ARGZERO: https://zsh.sourceforge.io/Doc/Release/Parameters.html#index-ZSH_005fARGZERO
+if [[ $(basename "$ZSH_ARGZERO") == "$ZSH_NAME" ]]; then
+  export SHELL="$ZSH_ARGZERO"
+else
+  # ZSH_ARGZERO is not the zsh instance path, it's probably the path to a script.
+  # Do not set $SHELL with it as that would be invalid for downstream uses of the var.
+  true # (if branches require a command..)
+fi
 
 true # The config should always finish well!
