@@ -91,9 +91,19 @@ function _compl_force_rehash
   return 1 # Because we didn't really complete anything
 }
 
+# Add global aliases for completion
+# ref: https://stackoverflow.com/a/59513051/5655255
+function _compl_global_alias
+{
+  # FIXME: How to put these in a tag named 'global aliases' ?
+  [[ -n $PREFIX ]] && compadd -- ${(M)${(k)galiases}:#$PREFIX*}
+  return 1 # Because we didn't really complete anything
+}
+
 # Completer functions to use: (tried in order until we have 1+ match(es))
 # (NOTE: full docs in man zshcompsys)
 # - _compl_force_rehash - refresh commands list if we're completing a command (see definition above)
+# - _compl_global_alias - add global aliases to the completion possibilities (see definition above)
 # - _complete - try standard compl [meta-note: 'compl' stands for 'completion']
 # - _match - retry compl by allowing some input-text coersions (see style 'matcher-list')
 # - _prefix - retry compl with suffix ignored (everything after cursor)
@@ -103,7 +113,7 @@ function _compl_force_rehash
 #       (similar to 'levenshtein distance' algo)
 #
 # ref: https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions-1
-zstyle ':completion:*' completer _compl_force_rehash _complete _match _prefix _ignored _approximate
+zstyle ':completion:*' completer _compl_force_rehash _compl_global_alias _complete _match _prefix _ignored _approximate
 
 # Additional matcher specifications to try one after the other until we have 1+ match.
 # (They will all by tried for all completers)
