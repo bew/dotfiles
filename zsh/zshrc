@@ -169,6 +169,13 @@ zle -N bracketed-paste my-bracketed-paste-with-undo
 
 
 #-------------------------------------------------------------
+# Default directory aliases
+
+hash -d dot=$(realpath ~/.dot)
+hash -d cfg=~/.config
+hash -d pkgs=~/.nix-home-current/nixpkgsStable
+
+#-------------------------------------------------------------
 # Aliases
 source $ZSH_MY_CONF_DIR/rc/aliases_and_short_funcs.zsh
 
