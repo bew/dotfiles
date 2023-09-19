@@ -124,7 +124,10 @@ in {
 
     stable.ncdu
     stable.htop
-    stable.dogdns # nicer `dig`
+
+    # network tools
+    (mybuilders.linkBins "dogdns-as-dig" { dig = "${stable.dogdns}/bin/dog"; }) # nicer `dig`
+    stable.netcat-openbsd # for `nc`
 
     stable.jless # less for JSON
     stable.xsv # Fast toolkit to slice through CSV files (kinda sql-like)
