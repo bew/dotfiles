@@ -24,6 +24,7 @@ setopt NO_auto_remove_slash # Don't remove slash for accepted directory compl
 setopt complete_in_word # Enable compl in the middle of a word
 setopt always_to_end # After a successfull middle word compl, move cursor at end of word
 setopt list_packed # Smaller compl list by 'packing' matches in columns
+setopt menu_complete # Show the menu immediately if ambiguous, and select first entry
 
 # Initialize the completion system
 autoload -U compinit && compinit
@@ -50,6 +51,12 @@ zmodload zsh/complist
 #
 # It is documented in man zshcompsys, section 'COMPLETION SYSTEM CONFIGURATION' in
 # the 'Overview' subsection.
+#
+# Ref: https://zsh.sourceforge.io/Doc/Release/Completion-System.html
+# Guide: https://zsh.sourceforge.io/Guide/zshguide06.html#l152
+#
+# Nice guides/overview on zsh' completion systemm at:
+#   https://thevaluable.dev/zsh-completion-guide-examples/
 
 # Add few missing options completions (_gnu_generic parses and extracts options from 'cmd --help')
 # (maybe move these somewhere else?)
@@ -68,12 +75,12 @@ function zcompl::extract_options_completion_from_cmd_help
 }
 zcompl::extract_options_completion_from_cmd_help "fzf"
 
-# Activate menu completion (in interactive mode!!)
+# Activate menu completion
+# NOTE: interactive mode is buggy, so I didn't left it enabled (check comments mentioning it)
 zstyle ':completion:*' menu select #interactive
-# NOTE: the menu is immediately shown because Tab is mapped to 'menu-complete' in ./mappings.zsh
 
-# Force a reload of completion system if nothing matched; this fixes installing
-# a program and then trying to tab-complete its name.
+# Refresh commands list if we're completing a command
+# This fixes installing a program and then immediately trying to tab-complete its name.
 function _compl_force_rehash
 {
   # rehash only when trying to complete a command name
@@ -94,6 +101,8 @@ function _compl_force_rehash
 # - _ignored - retry compl, without normally ignored matches (see style 'ignored-patterns')
 # - _approximate - retry compl, allowing a certain number of errors (see style 'max-errors')
 #       (similar to 'levenshtein distance' algo)
+#
+# ref: https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions-1
 zstyle ':completion:*' completer _compl_force_rehash _complete _match _prefix _ignored _approximate
 
 # Additional matcher specifications to try one after the other until we have 1+ match.
@@ -122,6 +131,8 @@ zstyle ':completion:*' matcher-list \
 # Make completion stops at the first ambiguous component
 zstyle ':completion:*' ambiguous true
 zstyle ':completion:*' insert-unambiguous true
+# Show the first ambiguous char (underlined by default)
+zstyle ':completion:*' show-ambiguity true
 
 # In a dir with 'nix' and 'nix-home' directories, makes 'nix' match both, and 'nix/' match only 'nix'.
 # Does _not_ block partial path completions like '/u/b/foo'.
@@ -150,8 +161,7 @@ zstyle ':completion:*:manuals.*'  insert-sections   true
 
 # cd/nvim will never select the parent directory (e.g.: cd ../<TAB>)
 zstyle ':completion:*:(cd|nvim):*' ignore-parents parent pwd
-# Enable options completion for `cd -`
-# (I know I can just accept line without completing to go back to last cwd)
+# Do options completion for `something -` instead of suggesting entries in directory stack
 zstyle ':completion:*:(cd|chdir|pushd):*' complete-options true
 
 # Ignore some files when completing a text editor command
