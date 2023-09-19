@@ -1059,11 +1059,12 @@ bindkey -M menuselect "^f"   history-incremental-search-forward
 # TODO (bug report): When interactive mode is on, the action
 #   'menu-complete' (TAB by default) does NOT move to the next match...
 #   => This is annoying when interactive mode is enabled by default (via zstyle)
+#   ('forward-char' can be used as an alternative, but it doesn't cycle back to the top..)
 #
 #   MAYBE RELATED: When interactive mode is on, 'accept-and-infer-next-history'
 #   is not immediate, I need to do it twice: first will exit interactive mode,
 #   and second will do the action.
-bindkey -M menuselect "${keysyms[Tab]}" forward-char # alternative, but does not cycle well
+bindkey -M menuselect "${keysyms[Tab]}" menu-complete
 bindkey -M menuselect "${keysyms[S-Tab]}" reverse-menu-complete
 bindkey -M menuselect "^n" down-line-or-history
 bindkey -M menuselect "^p" up-line-or-history
