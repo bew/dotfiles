@@ -92,6 +92,25 @@ alias -g NOOUTPUT="NOOUT NOERR"
 
 alias j=jobs
 
+# Override 'r' to run the last command stored in history instead of the real last typed command
+# which may start with a space and should be ignored!
+# (space-leading commands are properly ignored now!)
+#
+# fc    : Command to manipulate zsh history
+# -L    : Use the local history (in case shared_history is set)
+# -e -  : Do not edit the command, directly execute it
+# -1    : Select the last command
+alias r="fc -L -e - -1"
+
+# Import zsh's massive rename helper
+autoload -U zmv
+alias zmv='noglob zmv'
+alias zcp='zmv -C'
+alias zln='zmv -L'
+alias zmv::dry-run='zmv -n'
+alias zcp::dry-run='zcp -n'
+alias zln::dry-run='zln -n'
+
 
 # === common CLI tools / dev-lang-agnostic / distro-agnostic
 
@@ -362,6 +381,9 @@ alias ytdl-m4a-nolist='ytdl-m4a --no-playlist'
 # mpv
 alias mpv-audio='mpv --no-video'
 alias mpv-audio-loop='mpv-audio --loop-playlist'
+
+alias tv-start='@mpv daemon-start tv --no-terminal --force-window'
+alias tv-add='@mpv add tv'
 
 # ffmpeg
 alias ffmpeg='ffmpeg -hide_banner'

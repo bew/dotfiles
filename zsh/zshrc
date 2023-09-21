@@ -31,29 +31,6 @@ if command -v $_BIN_dircolors >/dev/null; then
 fi
 
 #-------------------------------------------------------------
-# Setup Hooks
-
-# better zsh-hooks
-source $_ZSH_PLUGIN_SRCREF__zsh_hooks/zsh-hooks.plugin.zsh
-
-## ZSH HOOKS
-
-# precmd_hook
-hooks-define-hook precmd_hook
-function precmd-wrapper { hooks-run-hook precmd_hook }
-add-zsh-hook precmd precmd-wrapper
-
-# preexec_hook
-hooks-define-hook preexec_hook
-function preexec-wrapper { hooks-run-hook preexec_hook "$@" }
-add-zsh-hook preexec preexec-wrapper
-
-# chpwd_hook
-hooks-define-hook chpwd_hook
-function chpwd-wrapper { hooks-run-hook chpwd_hook }
-add-zsh-hook chpwd chpwd-wrapper
-
-#-------------------------------------------------------------
 # Load and configure plugins
 
 # zi (old project names: zinit, zplugin)
@@ -68,10 +45,11 @@ mkdir -vp "$FAST_WORK_DIR" # necessary to exist, other it falls back to ~/.cache
 zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
-# TODO: 
+# TODO: find a way to not have this manual action on first start?
 
 # cd with 'frecency' (recent + frequence)
 zi light $_ZSH_PLUGIN_SRCREF__z
+# TODO: use zoxide! (https://github.com/ajeetdsouza/zoxide)
 
 # autopair all the things!
 # don't auto-init before setting my key bindings, init at the end (with 'autopair-init')
@@ -88,6 +66,27 @@ gitstatus_start MY
 zi ice wait"0" silent # load plugin async & silently
 zi light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
+
+#-------------------------------------------------------------
+# Setup Hooks
+
+# better zsh-hooks
+source $_ZSH_PLUGIN_SRCREF__zsh_hooks/zsh-hooks.plugin.zsh
+
+# precmd_hook
+hooks-define-hook precmd_hook
+function precmd-wrapper { hooks-run-hook precmd_hook }
+add-zsh-hook precmd precmd-wrapper
+
+# preexec_hook
+hooks-define-hook preexec_hook
+function preexec-wrapper { hooks-run-hook preexec_hook "$@" }
+add-zsh-hook preexec preexec-wrapper
+
+# chpwd_hook
+hooks-define-hook chpwd_hook
+function chpwd-wrapper { hooks-run-hook chpwd_hook }
+add-zsh-hook chpwd chpwd-wrapper
 
 #-------------------------------------------------------------
 # remember recent directories (use with 'cdr')
@@ -143,13 +142,6 @@ function chpwd_recent_dirs
 }
 hooks-add-hook chpwd_hook chpwd_recent_dirs
 
-#-------------------------------------------------------------
-# Options
-source $ZSH_MY_CONF_DIR/rc/options.zsh
-
-#-------------------------------------------------------------
-# Completion
-source $ZSH_MY_CONF_DIR/rc/completions.zsh
 
 #-------------------------------------------------------------
 # Bracketed paste that adds an 'undo' point
@@ -169,24 +161,26 @@ zle -N bracketed-paste my-bracketed-paste-with-undo
 
 
 #-------------------------------------------------------------
-# Default directory aliases
 
+# Named directories
 hash -d dot=$(realpath ~/.dot)
 hash -d cfg=~/.config
 hash -d pkgs=~/.nix-home-current/nixpkgsStable
 
-#-------------------------------------------------------------
-# Aliases
-source $ZSH_MY_CONF_DIR/rc/aliases_and_short_funcs.zsh
+# Options
+source $ZSH_MY_CONF_DIR/rc/options.zsh
 
-#-------------------------------------------------------------
+# Completion
+source $ZSH_MY_CONF_DIR/rc/completions.zsh
+
 # Prompt
-
 source $ZSH_MY_CONF_DIR/rc/prompt.zsh
 
-#-------------------------------------------------------------
 # Keybinds
 source $ZSH_MY_CONF_DIR/rc/mappings.zsh
+
+# Aliases
+source $ZSH_MY_CONF_DIR/rc/aliases_and_short_funcs.zsh
 
 #-------------------------------------------------------------
 # Terminal title
@@ -198,47 +192,6 @@ source $ZSH_MY_CONF_DIR/rc/mappings.zsh
 # SSH Agent handling
 # DISABLED, I don't use the ssh agent anymore..
 #source $ZSH_MY_CONF_DIR/rc/ssh_agent.zsh
-
-
-#-------------------------------------------------------------
-# Functions
-
-fpath=($ZSH_MY_CONF_DIR/fpath $fpath)
-
-# Switch terminal colors dark/light at runtime
-function switch-term-colors
-{
-  local color_mode=$(command switch-term-colors "$@")
-  if [[ "$color_mode" =~ "Usage" ]]; then
-    echo "$color_mode" # print error
-    return 1
-  else
-    export TERM_COLOR_MODE="$color_mode"
-  fi
-}
-
-# ------------------------------------------------------------
-# Media helper funcs
-
-# DISABLED: these shouldn't be zsh functions, but external scripts!
-
-#autoload -U ffmpeg::load_funcs
-#
-#autoload -U mpv::load_funcs
-#alias tv-start='mpv::start-daemon tv --no-terminal --force-window'
-#alias tv-add='mpv::add-media tv'
-
-#-------------------------------------------------------------
-# MISC - not sure where to put these...
-
-# Import zsh's massive rename helper
-autoload -U zmv
-alias zmv='noglob zmv'
-alias zcp='zmv -C'
-alias zln='zmv -L'
-alias zmv::dry-run='zmv -n'
-alias zcp::dry-run='zcp -n'
-alias zln::dry-run='zln -n'
 
 
 #-------------------------------------------------------------

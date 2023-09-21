@@ -54,7 +54,7 @@ if [[ -n "$ZSH_VERSION" ]] && [[ $- == *i* ]]; then # when in interactive zsh
 fi
 
 # OSX bins
-path_maybe_add_entry "/usr/local/bin" fallback
+[[ -d "/usr/local/bin" ]] && path_maybe_add_entry "/usr/local/bin" fallback
 
 # Make sure _this_ PATH is exported !shrug
 export PATH
@@ -88,3 +88,11 @@ if [[ -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ]]; then
   # NOTE: the file is guarded against reloads, unset __HM_SESS_VARS_SOURCED to be able to re-source it.
   source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
 fi
+
+# NOTE: It seems like on non-NixOS I can get warnings with the locale when running git, man..
+# And sometimes some things don't work when inside tmux (might be because not everything comes from Nix?)
+# (test case: in zsh, try writing `é`, see `<ffffffff><ffffffff>` when it's not working..)
+#
+# It seems setting LANG to a `.UTF-8` language works to have proper support for accented chars in zsh.
+# Using `LANG=C.UTF-8` works in all cases.
+#LANG=C.UTF-8
