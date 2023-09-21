@@ -1,14 +1,55 @@
 #-------------------------------------------------------------
 # Prompt setup
 
-# TODO: find a way (kinda profiles?) to split prompt segments between:
-# * shell-specific (segmt::shlvl or segmt::short_vim_mode)
-# * common-cli-specific (like segmt::git_branch_fast or segmt::in-nix-shell)
-# * code-tech-specific (like segmt::python_venv)
-
-
 # Import color helpers
 autoload -U colors && colors
+
+
+# === shell-specific segments
+
+function segmt::shlvl
+{
+  [[ $SHLVL == 1 ]] && return
+
+  # e.g: "L3"
+  echo -n "%BL%L%b "
+}
+
+function segmt::jobs
+{
+  # e.g: "J3 "
+  echo -n "%(1j|%B%F{178}J%j%f%b |)"
+}
+
+# Segment variable debug
+function segmt::debug
+{
+  echo -n "%K{blue} DEBUG: $* %k"
+}
+
+# Segment last exit code
+function segmt::exit_code_on_error
+{
+  echo -n "%(?||%K{232}%F{red} %? %f%k )"
+}
+
+# Segment prompt vim mode (normal/insert)
+function segmt::short_vim_mode
+{
+  zle::utils::get-vim-mode
+  case "$REPLY" in
+    insert)  echo -n "%B%K{28}%F{white} I %f%k%b";; # bg: dark green
+    normal)  echo -n "%B%K{26}%F{white} N %f%k%b";; # bg: dark blue
+    replace) echo -n "%B%K{88}%F{white} R %f%k%b";; # bg: dark red
+    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
+    # visualchar) echo -n "%B%K{133}%F{white} V %f%k%b";; # bg: light violet
+    # visualline) echo -n "%B%K{133}%F{white} VL %f%k%b";; # bg: light violet
+    *) echo -n "$KEYMAP";;
+  esac
+}
+
+
+# === common-cli-specific segments
 
 # Segment git branch
 function segmt::git_branch_slow
@@ -90,7 +131,7 @@ function segmt::git_branch_fast
   (( VCS_STATUS_HAS_UNTRACKED )) && worktree_info+="%F{$col_has_untracked}%B${sym_untracked}%b%f"
 
   local commits_info commits_info_short
-  [[ $VCS_STATUS_COMMITS_AHEAD  -gt 0 ]] && {
+  [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]] && {
     commits_info+="%F{$col_is_ahead}${sym_arrow_up}${VCS_STATUS_COMMITS_AHEAD}%f"
     commits_info_short+="%F{$col_is_ahead}${sym_arrow_up}%f"
   }
@@ -118,12 +159,6 @@ function segmt::git_branch_fast
   echo -n "%K{$col_background} $repo_info %k"
 }
 
-# Segment last exit code
-function segmt::exit_code_on_error
-{
-  echo -n "%(?||%K{232}%F{red} %? %f%k )"
-}
-
 # Segment is shell in sudo session
 function segmt::in_sudo
 {
@@ -135,20 +170,10 @@ function segmt::in_sudo
   fi
 }
 
-# Segment prompt vim mode (normal/insert)
-function segmt::short_vim_mode
-{
-  zle::utils::get-vim-mode
-  case "$REPLY" in
-    insert)  echo -n "%B%K{28}%F{white} I %f%k%b";; # bg: dark green
-    normal)  echo -n "%B%K{26}%F{white} N %f%k%b";; # bg: dark blue
-    replace) echo -n "%B%K{88}%F{white} R %f%k%b";; # bg: dark red
-    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
-    # visualchar) echo -n "%B%K{133}%F{white} V %f%k%b";; # bg: light violet
-    # visualline) echo -n "%B%K{133}%F{white} VL %f%k%b";; # bg: light violet
-    *) echo -n "$KEYMAP";;
-  esac
-}
+
+# === code-tech-specific segments
+
+VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
 
 # Set to anything to show a short venv segment
 PROMPT_SEGMT_VENV_SHORT="${PROMPT_SEGMT_VENV_SHORT:-}"
@@ -164,6 +189,8 @@ function segmt::python_venv
   if [[ -n "${VENV_IS_VOLATILE:-}" ]]; then
     # Current venv is volatile (created with venv_with_do)
     venv_display+=" volatile"
+  elif [[ "${POETRY_ACTIVE}" == 1 ]]; then
+    venv_display+=" poetry"
   else
     # Add venv name if not 'venv'
     if [[ "$venv_dir" != "venv" ]]; then
@@ -233,25 +260,8 @@ function segmt::in-nix-shell
   echo -n "(%F{red}$shell_tag%f) "
 }
 
-function segmt::shlvl
-{
-  [[ $SHLVL == 1 ]] && return
 
-  # e.g: "L3"
-  echo -n "%BL%L%b "
-}
-
-function segmt::jobs
-{
-  # e.g: "J3 "
-  echo -n "%(1j|%B%F{178}J%j%f%b |)"
-}
-
-# Segment variable debug
-function segmt::debug
-{
-  echo -n "%K{blue} DEBUG: $* %k"
-}
+# =======================================================
 
 # Build a string from an array of parts.
 # A part can be a function or a simple text.
@@ -375,8 +385,6 @@ function make_prompt_str_from_parts
 
 autoload -U promptinit && promptinit
 
-VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
-
 # -- Left prompt
 
 PROMPT_CURRENT_PARTS=(
@@ -390,6 +398,7 @@ PROMPT_CURRENT_PARTS=(
   func: segmt::short_vim_mode
   text: " "
   text: "%(!.#.>)" # normal (>) or sudo (#) cmd separator
+  text: " "
 )
 PROMPT_PAST_PARTS=(
   func: segmt::shlvl
@@ -401,14 +410,11 @@ PROMPT_PAST_PARTS=(
 
   text: " "
   text: "%(!.#.%B%F{243}%%%f%b)" # normal (%) or sudo (#) cmd separator
+  text: " "
 )
 
 PROMPT_CURRENT="$(make_prompt_str_from_parts "${PROMPT_CURRENT_PARTS[@]}")"
 PROMPT_PAST="$(make_prompt_str_from_parts "${PROMPT_PAST_PARTS[@]}")"
-
-# Add space before user input
-PROMPT_CURRENT+=" "
-PROMPT_PAST+=" "
 
 # -- Right prompt
 
@@ -427,25 +433,28 @@ RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
 # RPROMPT_CURRENT='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 # RPROMPT_PAST='$(segmt::in_sudo)''$(segmt::git_branch_fast)'
 
+
+# =======================================================
+
 # -- Setup prompts hooks
 
-function set-current-prompts
+function prompt::set-current
 {
   PROMPT=$PROMPT_CURRENT
   RPROMPT=$RPROMPT_CURRENT
 }
-hooks-add-hook precmd_hook set-current-prompts
+hooks-add-hook precmd_hook prompt::set-current
 
-function set-past-prompts
+function prompt::set-past
 {
   PROMPT=$PROMPT_PAST
   RPROMPT=$RPROMPT_PAST
 
   zle reset-prompt
 }
-hooks-add-hook zle_line_finish_hook set-past-prompts
+hooks-add-hook zle_line_finish_hook prompt::set-past
 
-function simple_prompts
+function prompt::reset-to-simple-prompts
 {
   PROMPT_CURRENT="[%?] %F{cyan}%2~%f > "
   PROMPT_PAST=$PROMPT_CURRENT

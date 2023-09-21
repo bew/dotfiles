@@ -819,11 +819,11 @@ bindkey -M vicmd "${keysyms[Insert]}" vi-replace
 bindkey "${keysyms[Insert]}" toggle-replace-mode
 
 # Sane default
-bindkey "${keysyms[Delete]}" delete-char
+bindkey "${keysyms[Delete]}" delete-char # Del (Suppr) key
 bindkey -M vicmd "${keysyms[Delete]}" zwidget::noop
 
-vibindkey "${keysyms[Home]}" beginning-of-line
-vibindkey "${keysyms[End]}" end-of-line
+vibindkey "${keysyms[Home]}" beginning-of-line # Home key
+vibindkey "${keysyms[End]}" end-of-line # End key
 
 vibindkey "${keysyms[PageUp]}" beginning-of-buffer-or-history # like gg in vicmd
 vibindkey "${keysyms[PageDown]}" vi-fetch-history             # like G in vicmd
@@ -846,11 +846,9 @@ zle -N add-surround surround
 zle -N change-surround surround
 bindkey -M vicmd cs change-surround
 bindkey -M vicmd ds delete-surround
+# TODO(?): Change to <leader>s to surround? (same as nvim now)
 bindkey -M vicmd ys add-surround
 bindkey -M visual S add-surround
-
-# Logical redo (u U)
-bindkey -M vicmd 'U' redo
 
 # START OF COPY/PASTE SETUP
 
@@ -945,6 +943,9 @@ vibindkey 'e' zwidget::jump-end-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
 vibindkey '^' beginning-of-line
 vibindkey '$' end-of-line
+
+# Logical redo (u U)
+bindkey -M vicmd 'U' redo
 
 # Alt-u/U to undo/redo (from anywhere)
 vibindkey 'u' undo
