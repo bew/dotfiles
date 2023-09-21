@@ -19,6 +19,9 @@ local cfg_misc = {
   -- Ctrl-D and the last command exited with non-zero: the shell will exit
   -- with non-zero and the terminal would hang until the window is closed manually.
   exit_behavior = "Close", -- NOTE: this is now the default, remove?
+
+  -- Disable all noises
+  audible_bell = "Disabled",
 }
 
 -- Merge configs and return!
