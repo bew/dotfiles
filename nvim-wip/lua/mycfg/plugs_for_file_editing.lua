@@ -50,6 +50,9 @@ NamedPlug.cmp {
     --   entries = {name = 'custom', selection_order = 'near_cursor' }
     -- }
     global_cfg.view = { entries = "native" } -- the builtin completion menu
+    global_cfg.performance = {
+      max_view_entries = 15,
+    }
     global_cfg.confirmation = {
       -- disable auto-confirmations!
       get_commit_characters = function() return {} end,

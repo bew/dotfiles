@@ -376,6 +376,15 @@ vim.cmd[[inoremap <M-cr> <C-o>A<cr>]]
 --   go in insert mode with a leading comment.
 vim.cmd[[nnoremap <M-cr> A<cr>]]
 
+-- I: Alt-, to insert a comma after cursor.
+-- * When the cursor is at EOL, inserts only ','
+-- * When the cursor is in text, inserts ', '
+--
+-- => Useful for most languages so make it global!
+-- TODO: be smarter based on surrounding text! (even without treesitter)
+vim.cmd[[inoremap <expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')]]
+
+
 
 --------------------------------
 -- Window manipulation
@@ -470,8 +479,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- Start interactive EasyAlign for a motion/text object (e.g. geaip)
 --nmap gea <Plug>(EasyAlign)
 
---nnoremap <silent> <C-Space> :CtrlSpace<cr>
-
 -- Toggle terminal
 --nnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
 --tnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
@@ -486,18 +493,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 
 ---- Navigation
 --------------------------------------------------------------------
-
--- N: Side-scroll using Alt+ScrollWheel
---nmap <M-ScrollWheelUp> zhzhzh
---nmap <M-ScrollWheelDown> zlzlzl
-
--- Insert helper, useful for most languages so I make it global!
---
--- I: Alt-, to insert a comma after cursor.
--- * When the cursor is at EOL, inserts only ','
--- * When the cursor is in text, inserts ', '
---inoremap <expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')
-
 
 -- CrazyIDEA: Map Alt-MouseClick to resize a window by finding nearest edge??
 
@@ -574,12 +569,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- N: Format the entire file
 --nnoremap <M-C-f> gg=G``
 
--- N: un-join (split) the current line at the cursor position
---nnoremap <M-J> i<c-j><esc>k$
-
--- Copy absolute filepath
---nnoremap <silent> y%% :let @" = expand("%:p") \| echo "File path copied (" . @" . ")"<cr>
-
 -- Vim eval-and-replace:
 -- Evaluate the current selection as a vimscript expression and replace
 -- the selection with the result
@@ -587,7 +576,7 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- NOTE2: <C-r><C-r>{register} takes the register content verbatim
 --   (whereas <C-r> inserts the register content as if typed)
 --vnoremap <Plug>(my-EvalAndReplaceVimExpr-visual) c<C-r>=<C-r><C-r>"<cr><esc>
-
+--
 -- Vim eval-as-ex:
 -- Run the current line/selection as an EX command
 -- NOTE: changes the unnamed register
@@ -605,6 +594,20 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --nnoremap <Plug>(my-ExecuteAsVimEx-normal) yy:call ExecuteAsExFromUnnamed("current line")<cr>
 --vnoremap <Plug>(my-ExecuteAsVimEx-visual) y:call ExecuteAsExFromUnnamed("visual selection")<cr>gv
 --nnoremap <Plug>(my-ExecuteAsVimEx-full-file) <cmd>source % <bar> echo "Sourced current file! (" . line("$") . " lines)"<cr>
+--
+--nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
+--nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
+--vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
+--lua wk_leader_n_maps.v = {name = "+vim"}
+--lua wk_leader_v_maps.v = {name = "+vim"}
+--lua wk_leader_n_maps.v.s = "source current file"
+--lua wk_leader_n_maps.v.x = "exec current line as VimEx"
+--lua wk_leader_v_maps.v.x = "exec selection as VimEx"
+--nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
+--vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
+--lua wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
+--lua wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
+
 
 -- Search with{,out} word boundaries
 -- V: search selection with word boundaries
@@ -687,127 +690,9 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --  unlet b:macro_visual_is_vblock
 --endf
 
--- Toggles signcolumn, number & relativenumber at once
---function! ToggleSignsAndLineNumbers()
---  if exists('w:saved_signs_and_linenum_options')
---    let status = "restored"
---
---    " Restore saved option values
---    let &signcolumn = w:saved_signs_and_linenum_options['signcolumn']
---    let &number = w:saved_signs_and_linenum_options['number']
---    let &relativenumber = w:saved_signs_and_linenum_options['relativenumber']
---
---    if w:saved_signs_and_linenum_options["indentLine_enabled"]
---      IndentLinesEnable
---    endif
---
---    unlet w:saved_signs_and_linenum_options
---  else
---    let status = "saved & disabled"
---
---    " Save options and disable them
---    let w:saved_signs_and_linenum_options = {
---        \ 'signcolumn': &signcolumn,
---        \ 'number': &number,
---        \ 'relativenumber': &relativenumber,
---        \ }
---    if exists("b:indentLine_enabled")
---      " If the buffer local var exists, g:indentLine_enabled should not be checked
---      " (it's always 1, even when disabled locally)
---      let w:saved_signs_and_linenum_options.indentLine_enabled = b:indentLine_enabled
---    else
---      let w:saved_signs_and_linenum_options.indentLine_enabled = g:indentLine_enabled
---    endif
---    let &signcolumn = "no"
---    let &number = 0
---    let &relativenumber = 0
---    IndentLinesDisable
---  endif
---
---  echo "Signs and line numbers: " . l:status
---endf
---nnoremap <M-R>  <cmd>call ToggleSignsAndLineNumbers()<cr>
-
--- Toggle Mundo tree
---nnoremap <silent> <F5> :MundoToggle<cr>
-
--- Open or focus NERDTree window
---nnoremap <silent> <F6> :call NERDTreeFocus()<cr>
--- Note: Shift-F6 is F16 (on urxvt)
---nnoremap <silent> <F16> :NERDTreeFind<cr>
-
--- Show highlight infos
---function! s:syntax_query(verbose) abort
---  if a:verbose == v:true
---    let cmd = "verbose hi"
---  else
---    let cmd = "hi"
---  endif
-
---  echo "--- Syntax stack at line:" . line(".") . " col:" . col(".") . " ---"
---  for id in synstack(line("."), col("."))
---    execute cmd synIDattr(id, "name")
---  endfor
---endfunction
---nnoremap <silent> <F2> :call <SID>syntax_query(v:false)<cr>
---nnoremap <silent> <F3> :call <SID>syntax_query(v:true)<cr>
-
--- ---- Command mode
-
 -- Save the file as sudo
 --cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin-gui/zenity_passwd.sh sudo tee % >/dev/null
 
-
--- ---- Various Leader key mappings ----
--- (NOTE: some mappings are in init.vim)
---
--- Nice example of mappings! (https://github.com/phaazon/config/blob/ea8378065/nvim/key_bindings.vim)
-
--- -- Vim
---nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
---nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
---vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
---lua wk_leader_n_maps.v = {name = "+vim"}
---lua wk_leader_v_maps.v = {name = "+vim"}
---lua wk_leader_n_maps.v.s = "source current file"
---lua wk_leader_n_maps.v.x = "exec current line as VimEx"
---lua wk_leader_v_maps.v.x = "exec selection as VimEx"
---nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
---vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
---lua wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
---lua wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
-
--- -- Code
---lua wk_leader_n_maps.c = {name = "+code"}
---lua wk_leader_v_maps.c = {name = "+code"}
-
--- code language tools
--- FIXME: These should be buffer-local maps
---nmap <leader>c²   <Plug>(lcn-menu)
---nmap <leader>cd   <Plug>(lcn-definition)
---nmap <leader>ct   <Plug>(lcn-type-definition)
---nmap <leader>cu   <Plug>(lcn-references)
---nmap <leader>cr   <Plug>(lcn-rename)
---nmap <leader>ca   <Plug>(lcn-code-action)
---nmap <leader>ci   <Plug>(lcn-implementation)
---nmap <leader>ch   <Plug>(lcn-hover)
---nmap <leader>c<space>   <Plug>(lcn-hover)
---lua wk_leader_n_maps.c["²"] = "lang menu"
---lua wk_leader_n_maps.c.d = "lang goto def"
---lua wk_leader_n_maps.c.t = "lang goto type"
---lua wk_leader_n_maps.c.u = "lang usages/references"
---lua wk_leader_n_maps.c.r = "lang rename"
---lua wk_leader_n_maps.c.a = "lang code actions"
---lua wk_leader_n_maps.c.i = "lang implementation"
---lua wk_leader_n_maps.c.h = "lang hover info"
---lua wk_leader_n_maps.c["<space>"] = "lang hover info"
--- Additional keys, which should be better defined..
--- TODO: Use virtual keys!
---nmap ²   <Plug>(lcn-hover)
--- TODO: nmap K   <please always give documentation in an upper split>
-
--- TODO: Setup virtual keys for language tools/actions (with default msg),
---   and enable for python (jedi) and when the language client is active
 
 -- code/content context (using context.vim plugin)
 --nmap <Leader>cx   <cmd>MyContextPeek<cr>
@@ -821,52 +706,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --lua wk_leader_n_maps["!"].c = "open qf list (global)"
 --lua wk_leader_n_maps["!"].l = "open loc list (local)"
 --lua wk_leader_n_maps["!"]["!"] = "jump to next/first in last list"
-
--- Try to detect the qf or loc list, and save which one is the last one
---function! s:TryRegisterLastUsedQfOrLocList()
---  let wininfo = getwininfo(win_getid())[0]
---  " let r = getwininfo(win_getid())[0] | echo "qf: " . r.quickfix . " loc: " . r.loclist
---  let is_qf_list = (wininfo.quickfix && !wininfo.loclist)  " qf: 1 && loc: 0
---  let is_loc_list = (wininfo.quickfix && wininfo.loclist)  " qf: 1 && loc: 1
---  if is_qf_list
---    let w:last_used_qf_or_loc_list = "qf"
---  elseif is_loc_list
---    let w:last_used_qf_or_loc_list = "loc"
---  else
---    " Do nothing, leave the current value as is.
---  endif
---endf
---augroup my_detect_last_used_qf_loc_list
---  au!
---  " Init the win variable on each new win
---  autocmd VimEnter,WinNew * let w:last_used_qf_or_loc_list = get(w:, "last_used_qf_or_loc_list", "none")
---  " Try to detect the qf or loc list, and save which one is the last one
---  autocmd BufWinEnter * call <SID>TryRegisterLastUsedQfOrLocList()
---augroup END
---function! s:OnLastQfLocListDoTryNextOrFirst()
---  let qf_cmds = {"name": "qf", "action_next": "cnext", "action_first": "cfirst"}
---  let loc_cmds = {"name": "loc", "action_next": "lnext", "action_first": "lfirst"}
---  if w:last_used_qf_or_loc_list == "qf"
---    let cmds = qf_cmds
---  elseif w:last_used_qf_or_loc_list == "loc"
---    let cmds = loc_cmds
---  else
---    " Default to the location list
---    let cmds = loc_cmds
---  endif
-
---  try
---    " echo "[". cmds.name ." list] trying next: ". cmds.action_next
---    execute cmds.action_next
---  catch
---    try
---      " echo "[". cmds.name ." list] nop.. trying first: ". cmds.action_first
---      execute cmds.action_first
---    catch
---      echo "[". cmds.name ." list] nope, it's empty!"
---    endtry
---  endtry
---endf
 
 -- -- Edit
 -- Use this to make a few nice mappings

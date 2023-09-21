@@ -1,10 +1,6 @@
 -- FIXME: &rtp and &pp defaults to loaaads of stuff on NixOS, using the
 -- maannyyyy dirs from XDG_CONFIG_DIRS & XDG_DATA_DIRS...
 -- => Remove the ones from these folders that don't actually exist?
---
--- Force rtp to use the new ~/.dot/nvim-wip dir, not the std ~/.config/nvim one (with my old config)
--- NOTE: Here is how lazy.nvim resets these:
--- https://github.com/folke/lazy.nvim/blob/c7122d64cdf16766433588486adcee67571de6d0/lua/lazy/core/config.lua#L183
 
 -- TODO: re-enable, and contribute fixes to all plugins with undefined global vars..
 --_G = setmetatable(_G, {
@@ -71,21 +67,11 @@ require"mycfg.options"
 -- NOTE: If trying to move it AFTER plugin load, double check git signs are of correct color!
 vim.cmd[[ colorscheme bew256-dark ]]
 
--- Specify the python binary to use for the plugins, this is necessary to be
--- able to use them while inside a project' venv (which does not have pynvim)
--- let $NVIM_DATA_HOME = ($XDG_DATA_HOME != '' ? $XDG_DATA_HOME : $HOME . "/.local/share") . "/nvim-wip"
--- NOTE: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ use custom dir for nvim-wip !!!!!!!!
-
--- FIXME: python env, still needed?
--- let $NVIM_PY_VENV = $NVIM_DATA_HOME . "/py-venv"
--- let g:python3_host_prog = $NVIM_PY_VENV . "/bin/python3"
--- NOTE: Make sure to install pynvim in this environment! (and jedi for py dev)
-
 -- map leader definition - space
 vim.g.mapleader = " "
 -- IDEA: Change <leader> to <Ctrl-space> | Have <localleader> be <space>
 -- And the CtrlSpace plugin would be <leader><space> or <leader><leader>
--- Also give a new leader possibility with <Alt-space> (:
+-- Also give a new leader possibility with <Alt-space> (for a command center?) (:
 
 -- Mapping helpers
 -- TODO: move them to a dedicated module!
