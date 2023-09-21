@@ -16,6 +16,9 @@ vim.cmd[[filetype plugin indent on]]
 --   => I have to move/select with `t-` if I don't want this..
 vim.opt.iskeyword:append("-")
 
+-- Greatly increase max number of tab pages (default 50!..)
+vim.o.tabpagemax = 10000
+
 -- always show the statusline
 vim.o.laststatus = 2
 
@@ -68,7 +71,8 @@ vim.opt.display = {
   "msgsep", -- When showing more than 'cmdheight' lines of msg, only scroll the message lines, not the entire screen.
 }
 
-vim.o.showbreak = "……"   -- Prefix for wrapped lines
+-- Prefix for wrapped lines
+vim.o.showbreak = "󱞵 " -- "……"
 vim.o.linebreak = true      -- Wrapping will break lines on word boundaries
 
 --set hidden   -- Allow to have unsaved hidden buffers
@@ -97,7 +101,7 @@ vim.o.foldcolumn = "auto:2"     -- Auto show fold column, use at most 2 columns
 -- Show non visible chars (tabs/trailing spaces/too long lines/etc..)
 vim.o.list = true
 vim.opt.listchars = {
-  tab = "· ",      -- Tab char
+  tab = "󱦰 ",      -- Tab char (unicode arrow then <space> (for filler))
   trail = "@",     -- Trailing spaces
   precedes = "<",  -- First char when line too long for display
   extends = ">",   -- Last char when line too long for display
@@ -111,8 +115,8 @@ vim.opt.fillchars = {
   vert = " ",    -- separator between vertical splits
 }
 
-vim.o.scrolloff = 3           -- minimum lines to keep above and below cursor
-vim.o.sidescrolloff = 16        -- minimum chars to keep on the left/right of the cursor
+vim.o.scrolloff = 3        -- minimum lines to keep above and below cursor
+vim.o.sidescrolloff = 10   -- minimum chars to keep on the left/right of the cursor
 
 --set sidescroll=1          -- side scroll chars one by one
 -- NOTE: default in nvim
@@ -170,10 +174,9 @@ vim.opt.wildignore:append({
 -- TODO: to update! (?)
 
 -- Default indentation
-vim.o.tabstop = 2
-vim.o.softtabstop = 2
 vim.o.shiftwidth = 2
-vim.o.expandtab = true   -- Always expand TAB to spaces
+vim.o.tabstop = 4
+vim.o.expandtab = true   -- Expand TAB to spaces by default
 
 -- vim's continuation line indent defaults to 3 * shiftwidth, it's
 -- too much, let's reduce it:
