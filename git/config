@@ -110,6 +110,7 @@
 #   helper = github-bew-password-from-env
 
 [alias]
+
   # index manipulation (staging area)
 
   a  = add
@@ -185,7 +186,8 @@
   gc-remove-old-commits = reflog expire --all --expire=now
   gc-compress-repo = gc --aggressive --prune=now
 
-  # --- Info aliases
+
+  # info aliases
 
   s   = status --ignore-submodules=all
   suf = status --untracked-files
@@ -261,6 +263,15 @@
 
   stat-last-merge = stat ORIG_HEAD..
   slm = stat-last-merge
+
+  # NOTE: autocompletion of complex aliases like `!f() { foo; bar "$@"; baz }; f` doesn't work on my
+  # zsh config, but there seems to be support for that anyway in the provided contrib in git's git repo:
+  #   https://github.com/git/git/blob/43c8a30d150ecede970/contrib/completion/git-completion.bash#L26-L30
+  # the bash completion script should be supported on zsh as well if I refer to the zsh completion at:
+  #   https://github.com/git/git/blob/43c8a30d150ecede9709c1/contrib/completion/git-completion.zsh#L21
+  # My zsh uses the default zsh-specific completions for git that comes with zsh, which support the
+  # full power of zsh categories (tags) for completions (cf `git checkout <trigger-completion>`).
+  # I don't think the completion scripts in https://github.com/git/git use zsh' full features.. :/
 
 # --- BEGIN delta config
 
