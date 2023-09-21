@@ -15,22 +15,7 @@ in {
       default = null;
     };
 
-    # TODO(?): find a better option name?
-    # ideas:
-    # - selfInput
-    # - selfFlake
-    # - selfFlakeLocation
-    # - selfStorePath
-    # - selfStoreLocation
-    # - pathToStrip
-    # - pureFlakePathToStrip
-    # - pureSelfSourcePath
-    # - pureFlakeSourcePath
-    # - pureSourcePath
-    # - flakeLocation
-    # - flakePureLocation
-    # - ?
-    dyndots.flakeStorePath = mkOption {
+    dyndots.flakeRootPath = mkOption {
       # type = types.pathInStore;  # only available in unstable nixpkgs (not in 23.05)
       # here is a copy/paste from more recent nixpkgs:
       type = let
@@ -52,7 +37,7 @@ in {
 
       description = ''
         Since flake eval is pure, the source is moved to the store and all resolved ./relative paths
-        start in the store. This `flakeStorePath` will be used to strip the store location and get
+        start in the store. This `flakeRootPath` will be used to strip the store location and get
         back a real relative path from the flake (dotfiles directory).
       '';
     };
@@ -71,12 +56,12 @@ in {
       # given givenPath = ./foo
       # then  pathStr = "/nix/store/aaaaaaa-the-flake-source/path/to/foo"
       # then  pathRelativeToDots = "path/to/foo"
-      pathRelativeToDots = lib.removePrefix ((toString cfg.flakeStorePath) + "/") pathStr;
+      pathRelativeToDots = lib.removePrefix ((toString cfg.flakeRootPath) + "/") pathStr;
     in
       # note: builtin `assert` does not have a msg...
       # https://github.com/NixOS/nix/issues/3233
-      assert lib.asserts.assertMsg (cfg.dotfilesRepoPath != null && cfg.flakeStorePath != null) ''
-        Options 'dotfilesRepoPath' and 'flakeStorePath' must be set for editable dyndots links
+      assert lib.asserts.assertMsg (cfg.dotfilesRepoPath != null && cfg.flakeRootPath != null) ''
+        Options 'dotfilesRepoPath' and 'flakeRootPath' must be set for editable dyndots links
       '';
       # NOTE: Using mkOutOfStoreSymlink is necessary in home-manager (not in NixOS), it might be
       #   easier in the future: https://github.com/nix-community/home-manager/issues/3032

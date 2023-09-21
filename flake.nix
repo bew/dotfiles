@@ -7,9 +7,6 @@
 # - https://github.com/mjlbach/nix-dotfiles/blob/master/nixpkgs/flake.nix
 # - https://discourse.nixos.org/t/example-use-nix-flakes-with-home-manager-on-non-nixos-systems/10185
 
-# TODO: a (sensible) minimal flake that can build a home config package for
-# normal (copy-files-to-store) & dev use (link-to-dot-files).
-
 {
   description = "Nix flake packaging bew's dotfiles";
 
@@ -27,19 +24,17 @@
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
   };
 
-  # TO-EXPERIMENT: flake-parts (https://github.com/hercules-ci/flake-parts) to
+  # TO-EXPERIMENT: flakelight (https://github.com/accelbread/flakelight) to
   # define my toplevel flake in multiples files, like:
-  # * ./nix/homes.flake-module.nix
-  # * ./nix/exposed-pkgs.flake-module.nix
-  outputs = { self, ... }@inputs: let
+  outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
   in {
     homeConfig = let
       username = "bew";
-    in import "${inputs.homeManager}/modules" {
-      pkgs = inputs.nixpkgsStable.legacyPackages.${system};
-      configuration = import ./nix/homes/main.nix { inherit inputs system username; };
+    in import "${flakeInputs.homeManager}/modules" {
+      pkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
+      configuration = import ./nix/homes/main.nix { inherit flakeInputs system username; };
     };
 
     # TODO(idea): expose packages (& apps?) of my tools pre-configured,
@@ -62,7 +57,7 @@
     # - a `fzf` bin, for fzf with my config
     packages.${system} = let
       selfPkgs = self.packages.${system};
-      stablePkgs = inputs.nixpkgsStable.legacyPackages.${system};
+      stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
       mpv-bew = stablePkgs.callPackage ./nix/pkgs/mpv {};
