@@ -9,10 +9,13 @@
 SetTitleMatchMode 2 ; match on partial substring
 
 GroupAdd, bew_input, ahk_exe chrome.exe
+GroupAdd, bew_input, ahk_exe msedge.exe ; Microsoft Edge
 GroupAdd, bew_input, ahk_exe lync.exe ; Skype
+GroupAdd, bew_input, ahk_exe powerpnt.exe ; Powerpoint
 GroupAdd, bew_input, ahk_exe Teams.exe
 GroupAdd, bew_input, ahk_exe Outlook.exe
 GroupAdd, bew_input, ahk_exe Mattermost.exe
+GroupAdd, bew_input, ahk_exe notepad.exe
 GroupAdd, bew_input, Firefox
 
 ; Windows Explorer and parts of the Windows's Shell (the desktop environment)

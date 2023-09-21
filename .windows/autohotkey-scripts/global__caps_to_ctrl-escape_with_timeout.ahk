@@ -31,17 +31,7 @@ CapsDownTime := A_TickCount - CapsDownStart
 CapsDownStart := -1
 if (A_PRIORKEY == "CapsLock" && CapsDownTime < 500)
 {
-  ; NOTE: For Skype, sending Escape closes the window.. I didn't find how to remap
-  ; the Escape key sent by this script (should be sth with SendLevel/InputLevel),
-  ; So in the meantime we do this check here to NOT send Escape for Skype windows.
-  IfWinActive, ahk_exe lync.exe ; Any Skype window
-  {
-    return
-  }
-  Else
-  {
-    ; In ALL other cases, send the glorious Escape key :)
-    Send {Esc}
-  }
+  ; Send the glorious Escape key :)
+  Send {Esc}
 }
 return
