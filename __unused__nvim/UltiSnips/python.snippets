@@ -15,8 +15,15 @@ snippet fromdata "import for @dataclass" b
 from dataclasses import dataclass
 endsnippet
 
+priority 10
+snippet /^    def/ "method" r
+	def ${10:method_name}(${20:self${21:, ${22:arg}}})${30: -> ${31:Any}}:
+		${40:${VISUAL:pass}}
+endsnippet
+# By default, use non-method method snippet
+priority 0
 snippet def "function" b
-def ${10:function_name}(${20:self${21:, ${22:arg}}})${30: -> ${31:Any}}:
+def ${10:function_name}(${20:arg})${30: -> ${31:Any}}:
 	${40:${VISUAL:pass}}
 endsnippet
 
@@ -61,21 +68,16 @@ def ${10:function_name}(self) -> ${20:Any}:
 	return self._${30:$10}
 endsnippet
 
-snippet deft "test function" b
-def test_${10:something_is_working}($20):
+snippet defps "property setter method" b
+@$10.setter
+def ${10:function_name}(self, ${20:value: ${21:Any}}):
 	${30:${VISUAL:pass}}
 endsnippet
 
-snippet deftu "pytest unit test function" b
-@pytest.mark.unit
-def test_${10:something_is_working}($20):
-	${30:${VISUAL:pass}}
-endsnippet
-
-snippet deftx "pytest fixture function" b
-@pytest.fixture${1:(scope="${2:function}"${3:, autouse=True})}
-def ${10:some_prefilled_obj}($20) -> ${30:Any}:
-	${40:${VISUAL:pass}}
+# NOTE: the 'in-word expansion' snippet option is necessary to recognize the '='-ending trigger.
+# => `foo=<TAB>` gives `foo=foo`
+snippet /(\w+)=/ "arg=arg auto fill" ri
+`!p snip.rv = match.group(1)`=`!p snip.rv = match.group(1)`
 endsnippet
 
 snippet pytu "pytest unit test decorator" b
@@ -104,6 +106,23 @@ with pytest.raises(${1:MyException}${2:, match=r"${3:matching text}"):
 	${10:pass}
 endsnippet
 
+snippet deft "test function" b
+def test_${10:something_is_working}($20):
+	${30:${VISUAL:pass}}
+endsnippet
+
+snippet deftu "pytest unit test function" b
+@pytest.mark.unit
+def test_${10:something_is_working}($20):
+	${30:${VISUAL:pass}}
+endsnippet
+
+snippet deftx "pytest fixture function" b
+@pytest.fixture${1:(scope="${2:function}"${3:, autouse=True})}
+def ${10:some_prefilled_obj}($20) -> ${30:Any}:
+	${40:${VISUAL:pass}}
+endsnippet
+
 # decorators
 
 snippet @data "@dataclass" b
@@ -122,7 +141,7 @@ snippet @st "@staticmethod" b
 @staticmethod
 endsnippet
 
-snippet @prop "@property" b
+snippet @pr "@property" b
 @property
 endsnippet
 
@@ -199,13 +218,6 @@ snippet doc "One line doc" b
 """${1:${VISUAL:TODO: doc}}"""
 endsnippet
 
-snippet mdoc "Multi line doc" b
-"""${1:TODO: oneline doc}
-
-${2:${VISUAL:TODO: doc}}
-"""
-endsnippet
-
 snippet :p ":param ..: dor line" b
 :param ${1:name}: $0
 endsnippet
@@ -218,8 +230,12 @@ snippet pf "print(f-string...)" b
 print(f"${1:${VISUAL}}"$2)
 endsnippet
 
-snippet pp "pprint(...)" b
-from pprint import pprint; pprint(${1:${VISUAL}})  # noqa: E702 E402 E501
+snippet pp "debug pretty print (...)" b
+__import__("pprint").pprint(${1:${VISUAL}})  # FIXME!: REMOVE DEBUG! # noqa
+endsnippet
+
+snippet ppj "debug pretty print via json (...)" b
+print(__import__("json").dumps(${1:${VISUAL}}, indent=4, sort_keys=True))  # FIXME!: REMOVE DEBUG! # noqa
 endsnippet
 
 snippet f "f format str" w
@@ -265,7 +281,14 @@ endsnippet
 # NOTE: this can be necessary sometimes when the running process closes stdio
 # __import__("sys").stdin = open('/dev/tty')
 snippet bp "Add pdb breakpoint"
-breakpoint()  # FIXME: remove this debug probe
+breakpoint()  # FIXME!: REMOVE DEBUG PROBE!
+endsnippet
+
+# For some reason adding a normal breakpoint and running pytest doesn't stop execution and we need
+# a special set_trace to actually stop execution and get a basic pdb.
+# (and pdbpp isn't triggered :/)
+snippet bpt "Add pytest breakpoint"
+__import__("pytest").set_trace()  # FIXME!: REMOVE DEBUG PROBE! # noqa
 endsnippet
 
 # Increase priority of this 'rtype' snippet, to avoid conflict with the
