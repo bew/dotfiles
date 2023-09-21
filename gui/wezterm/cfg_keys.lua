@@ -94,18 +94,18 @@ cfg.keys = {
   keybind(mods.CS, "t", act.SpawnTab("DefaultDomain")),
   keybind(mods.C,  "Tab", act.ActivateTabRelative(1)),
   keybind(mods.CS, "Tab", act.ActivateTabRelative(-1)),
-  keybind(mods.CS, "w", act.CloseCurrentTab{confirm=false}),
+  -- keybind(mods.CS, "w", act.CloseCurrentTab{confirm=false}),
 
   keybind(mods.CS, "x", act.ShowLauncher),
   keybind(mods.CS, "p", act.ActivateCommandPalette),
   keybind(mods.CS, "c", act.CharSelect),
-  -- note: overlays don't use OS-defined keyboard layout, fixed in nightly (@2023-07)
-  -- (fixed in https://github.com/wez/wezterm/issues/3470)
 
   -- Font size
   keybind(mods.C, "0", act.ResetFontSize),    -- Ctrl-Shift-0
   keybind(mods.C, "+", act.IncreaseFontSize), -- Ctrl-Shift-+ (key with +)
   keybind(mods.C, "6", act.DecreaseFontSize), -- Ctrl-Shift-- (key with -)
+  -- On Windows, the Shift modifier seems to not be removed for these ^ shifted keys,
+  -- so I may have to add SHIFT.
 
   -- Toggle font ligatures
   keybind(mods.CS, "g", act_callback(function(win, _)

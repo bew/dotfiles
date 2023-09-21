@@ -7,6 +7,7 @@ local act = wezterm.action
 local cfg = {}
 
 cfg.disable_default_mouse_bindings = true
+cfg.swallow_mouse_click_on_window_focus = true
 
 
 local mouse_bindings = {}
