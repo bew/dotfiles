@@ -651,6 +651,25 @@ autocmd BufWritePre *.md if tablemode#IsActive() | exe "TableModeRealign" | endi
 " (also disables '||' behavior to fill a separator line, enter '|-|' and realign to get it)
 let g:table_mode_separator_map = ""
 
+
+"# DB manager
+Plug 'tpope/vim-dadbod'
+Plug 'kristijanhusak/vim-dadbod-completion'
+
+" DB workflow for vim-dadbod
+" - open some sql file
+" - associate a db uri to the current buffer:"
+"     :DB b:db = $DATABASE_URI
+" - visual select a query
+" - run the query:
+"     :'<,'>DB b:db
+
+" sql: Run current sql query with the DB targeted by b:db variable
+" - mm & `m          to save & restore cursor position
+" - vip              to select the current query (the current paragraph)
+" - :DB b:db<cr>     to run the visually selected query on b:db
+
+
 "# Python
 " NOTE: new syntax elements are now in ./after/syntax/python.vim
 " FIXME: how to properly set my chosen highlights? move them in ./colors/bew256-dark.vim ?

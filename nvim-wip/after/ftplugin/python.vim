@@ -1,5 +1,3 @@
-let g:neomake_python_enabled_makers = ["python", "flake8", "mypy"]
-
 " I: Alt-: to insert a colon after cursor.
 inoremap <buffer> <M-:>  : <C-g>U<Left><C-g>U<Left>
 
