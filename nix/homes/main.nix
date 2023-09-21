@@ -1,6 +1,7 @@
-{ inputs
-, system
-, username
+{
+  flakeInputs,
+  system,
+  username,
 }:
 
 # -------- Start of main home config module --------
@@ -24,17 +25,17 @@
   _module.args.mybuilders = pkgs.callPackage ./mylib/mybuilders.nix {};
 
   # Flake inputs
-  _module.args.flakeInputs = inputs;
+  _module.args.flakeInputs = flakeInputs;
 
-  # Pkgs channels from inputs
+  # Pkgs channels from flakeInputs
   # => Allows to have a stable sharing point for multiple pkgs sets
   _module.args.pkgsChannels = let
     legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
     pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
   in {
-    stable = legacyPkgsForSystem inputs.nixpkgsStable;
-    bleedingedge = legacyPkgsForSystem inputs.nixpkgsUnstable;
-    myPkgs = pkgsForSystem inputs.self;
+    stable = legacyPkgsForSystem flakeInputs.nixpkgsStable;
+    bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsUnstable;
+    myPkgs = pkgsForSystem flakeInputs.self;
   };
 
   _module.args.system = system;
@@ -49,7 +50,7 @@
   # my repo (editable!).
   dyndots.mode = "editable";
   dyndots.dotfilesRepoPath = "${config.home.homeDirectory}/.dot";
-  dyndots.flakeStorePath = inputs.self;
+  dyndots.flakeRootPath = flakeInputs.self;
   home.file.".test-dyndots-link".source = config.dyndots.mkLink ../../git/config;
 
   # Link flake inputs to home
@@ -59,7 +60,7 @@
   # Restrict user nix/registry.json to the following indirect flakes:
   nixRegistry.indirectFlakes = {
     # -> flake ref: "path:${nixpkgs.outPath}"
-    pkgs = { type = "path"; path = inputs.nixpkgsStable.outPath; };
+    pkgs = { type = "path"; path = flakeInputs.nixpkgsStable.outPath; };
     # -> flake ref: "github:nixos/nixpkgs/nixpkgs-unstable"
     unstable = {
       type = "github";
@@ -68,7 +69,7 @@
       ref = "nixpkgs-unstable";
     };
     # -> flake ref: "path:${flakeTemplates.outPath}"
-    templates = { type = "path"; path = inputs.flakeTemplates.outPath; };
+    templates = { type = "path"; path = flakeInputs.flakeTemplates.outPath; };
   };
 
   # Do not build home-manager's manual, it brings a number of useless dependencies and I don't need
