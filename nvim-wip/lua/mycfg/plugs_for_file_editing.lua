@@ -393,6 +393,7 @@ Plug {
     --   gotcha: `%s` in patterns includes `\n`!
     local surround_utils = require"nvim-surround.config"
     local my_surrounds = {}
+    local my_surrounds_by_ft = {}
 
     -- Override opening brace&co surrounds: They should represent the braces and
     -- any spaces between them and actual content.
@@ -414,7 +415,7 @@ Plug {
         -- For `[`: "^(%[%s*)().-(%s*%])()$",
         -- For `{`: "^({%s*)().-(%s*})()$",
         -- NOTE: the delete pattern will be applied on text returned by `find` above
-        -- NOTE: the plugin requires `()` after each opener/closer to remove
+        -- NOTE: the plugin requires `()` after opener/closer pattern-groups to remove it
         delete = U.str_concat(
           "^",
           "(", vim.pesc(opener.open), "%s*)()",
@@ -425,8 +426,33 @@ Plug {
       }
     end
 
+    my_surrounds_by_ft.lua = {}
+    -- open/close surrounds for Lua's `[[` & `]]` strings
+    my_surrounds_by_ft.lua["<M-[>"] = {
+      add = { "[[ ", " ]]" },
+      find = vim.pesc"[[" .. ".-" .. vim.pesc"]]",
+      delete = U.str_concat(
+        "^",
+        "(", vim.pesc"[[", "%s*)()",
+        ".-",
+        "(%s*", vim.pesc"]]", ")()",
+        "$"
+      )
+    }
+    my_surrounds_by_ft.lua["<M-]>"] = {
+      add = { "[[", "]]" },
+      find = vim.pesc"[[" .. ".-" .. vim.pesc"]]",
+      delete = U.str_concat(
+        "^",
+        "(", vim.pesc"[[", ")()",
+        ".-",
+        "(", vim.pesc"]]", ")()",
+        "$"
+      )
+    }
+
     -- Disable all default keybinds
-    local default_keymaps_disabled = {
+    local disabled_keymaps = {
       normal = false, -- (default: `ys`)
       normal_line = false, -- delims on new lines (default: `yS`)
       normal_cur = false, -- around current line (default: `yss`)
@@ -488,9 +514,19 @@ Plug {
     toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
 
     require"nvim-surround".setup {
-      keymaps = default_keymaps_disabled,
+      keymaps = disabled_keymaps,
       surrounds = my_surrounds,
     }
+
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("surround-ft-lua", {}),
+      pattern = "lua",
+      callback = function()
+        require"nvim-surround".buffer_setup {
+          surrounds = my_surrounds_by_ft.lua
+        }
+      end
+    })
   end,
 }
 
