@@ -514,8 +514,12 @@ Plug {
       -- would be REALLY handy!
       -- => For example  `<M-,>$` could add a `,` at EOL without moving cursor,
       --    while keeping flexibility, because `$` is _not_ the only hint position!
+      --
+      -- FIXME<i-action-not-repeatable>
       fast_wrap = {
-        map = "<C-l>",
+        map = "<C-M-l>",
+        before_key = "i", -- put wrap before targeted position
+        after_key = "a", -- put wrap after targeted position
 
         -- Add '`' char as a potential wrap position
         -- Default pattern: [=[[%'%"%)%>%]%)%}%,]]=]
@@ -527,9 +531,6 @@ Plug {
           "%,",
           "]"
         ),
-        -- FIXME: I can't wrap _before_ a '`', only _after_ :/
-        -- Would need a way to target the char before it and give it as a position..
-        --
         -- IDEA: Since pattern is a charset that match a single char,
         -- and Lua patterns don't support logical OR, the plugin could receive a
         -- list of lua patterns, and logical OR them!
@@ -550,10 +551,10 @@ Plug {
       -- Do not disable in macros (didn't see much trouble with having it enabled)
       disable_in_macro = false,
 
-      -- map <C-h> to delete a pair if possible
-      map_c_h = true,
-      -- map <C-w> to delete a pair if possible, like <C-h>
-      map_c_w = true,
+      -- map keys to delete a pair if possible
+      map_c_h = true, -- <C-h>
+      map_c_w = true, -- <C-w>
+      map_bs = true, -- <BS> (backspace)
 
       -- Don't auto-wrap quoted text
       -- `foo |"bar"` -> press `{` => `foo {|"bar"` (not: `foo {|"bar"}`)
@@ -569,9 +570,9 @@ Plug {
     -- NOTE: Not possible by default, made a PR for it (& changed locally)
     --   https://github.com/windwp/nvim-autopairs/pull/316
     Rule.insert_pair_when = Rule.with_pair
+    Rule.end_pair_moves_right_when = Rule.with_move
     Rule.cr_expands_pair_when = Rule.with_cr
     Rule.bs_deletes_pair_when = Rule.with_del
-    Rule.end_moves_right_when = Rule.with_move
     cond.never = cond.none()
     cond.always = cond.done()
     cond.smart_move_right = cond.move_right
@@ -592,6 +593,9 @@ Plug {
     -- FIXME: I want <bs> at bol to join multiline empty brackets!
     -- text: `(\n|\n)` ; press `<backspace>` ; text: `(|)`
 
+    -- IDEA: `<Tab><Tab>` for `tabout.nvim`-like feature
+    --   see: https://github.com/abecodes/tabout.nvim (requires treesitter!)
+
     -- Properly add 2-spaces or delete 2-spaces when inside brackets
     -- `(|)`   -> press `<space>`     => get: `( | )`
     -- `( | )` -> press `<backspace>` => get: `(|)`
@@ -608,7 +612,7 @@ Plug {
           brackets[3][1]..brackets[3][2],
         }, pair)
       end)
-      :end_moves_right_when(cond.never) -- is this the default? (why not?)
+      :end_pair_moves_right_when(cond.never) -- is this the default? (why not?)
       :cr_expands_pair_when(cond.never) -- is this the default? (why not?)
       :bs_deletes_pair_when(function(ctx)
         local col0 = vim.api.nvim_win_get_cursor(0)[2]
@@ -627,55 +631,72 @@ Plug {
     npairs.add_rule(
       Rule{start_pair = "<", end_pair = ">"}
         :insert_pair_when(cond.preceded_by_regex("%a+"))
-        :end_moves_right_when(cond.always)
+        :end_pair_moves_right_when(cond.always)
     )
 
-    -- Ensure dquotes are _always_ paired, even when inside quotes
-    -- (useful in shell interpolations, or to split a python str in two..)
-    -- `x="foo $(bla |) bar"` -> press `"` => `x="foo $(bla "|") bar"`
-    -- `" abc | def "`        -> press `"` => `" abc "|" def "`
-    -- (use `<M-">` for only one dquote, see below)
-    npairs.add_rule(
-      Rule{start_pair = [["]], end_pair = [["]]}
-        :insert_pair_when(cond.always)
-        -- Try to not be smart about dquote insertion, even if in quotes
-        -- `|"`
-        :end_moves_right_when(cond.never)
-        -- normal behavior is:
-        -- :end_moves_right_when(cond.smart_move_right())
-    )
-    -- I: Map `<M-">` to dquote, for when I want only one!
-    toplevel_map{mode={"i"}, key=[[<M-">]], action=[["]], desc="insert single dquote"}
-
-    -- Don't use smart squote (`'`) by default!
-    -- It's really annoying to have to repeat the second squote in strings.. like "foo 'bar|"
-    npairs.remove_rule([[']])
-    npairs.add_rule(
-      Rule{start_pair = [[']], end_pair = [[']]}
-        -- Always insert second squote unless preceded by text (alphanumeric)
-        :insert_pair_when(cond.not_preceded_by_regex("%w"))
-        :end_moves_right_when(cond.never)
-        -- builtin behavior is normally using cond.smart_move_right()
-    )
-    -- I: Map `<M-'>` to squote, for when I want only one!
-    toplevel_map{mode={"i"}, key=[[<M-'>]], action=[[']], desc="insert single squote"}
-
-    -- Uniformize bquotes handling, for all filetypes!
-    -- Makes it work like dquotes, always inserting pair (no smartness)
-    -- '|' -> press '`' => '`|`' (normal pairs)
-    -- '`|`' -> press '`' => '``|``' (instead of '``|')
-    -- Allows to do 3+ bquote blocks without special logic:
+    -- Uniformize (single/double/back) quotes handling by disabling smart-ness for all filetypes!
+    --
+    -- `|`   -> press `'` => `'|'`
+    -- `'|'` -> press `'` => `''|''` (instead of `''|`)
+    --
+    -- Allows to do 3+ B-quote blocks without special logic:
     -- '```|```' -> press '`' => '````|````' (instead of weird '````|``````')
-    -- TODO(issue,impl?): `tabout.nvim`-like feature, see: https://github.com/abecodes/tabout.nvim
-    npairs.remove_rule("`")
-    npairs.remove_rule("```")
-    npairs.add_rule(
-      Rule{start_pair = "`", end_pair = "`"}
-        :insert_pair_when(cond.always)
-        :end_moves_right_when(cond.never) -- ?
-    )
-    -- I: Map '<M-`>' to bquote, for when I want only one!
-    toplevel_map{mode={"i"}, key=[[<M-`>]], action=[[`]], desc="insert single bquote"}
+    --
+    -- Useful in shell interpolations
+    -- `x="foo $(bla |) bar"` -> press `"` => `x="foo $(bla "|") bar"`
+    --
+    -- Useful in a str, to split the str in two strs
+    -- `" abc | def "`        -> press `"` => `" abc "|" def "`
+    --
+    -- (was annoying to repeat the 2nd S-quote in strings.. like `"foo 'bar|"`)
+    do
+      -- remove builtin quote pairs
+      npairs.remove_rule([[']])
+      npairs.remove_rule([["]])
+      npairs.remove_rule([[`]])
+      npairs.remove_rule([[```]])
+
+      npairs.add_rule(
+        Rule{start_pair = [[']], end_pair = [[']]}
+          -- Always insert second S-quote unless preceded by text (alphanumeric)
+          -- (important to write `it's`!)
+          :insert_pair_when(cond.not_preceded_by_regex("%w"))
+          :end_pair_moves_right_when(cond.never)
+          -- builtin behavior is normally using cond.smart_move_right()
+      )
+
+      npairs.add_rule(
+        Rule{start_pair = [["]], end_pair = [["]]}
+          :insert_pair_when(cond.always)
+          :end_pair_moves_right_when(cond.never)
+          -- builtin behavior is normally using cond.smart_move_right()
+      )
+
+      npairs.add_rule(
+        Rule{start_pair = [[`]], end_pair = [[`]]}
+          :insert_pair_when(cond.always)
+          :end_pair_moves_right_when(cond.never)
+          -- builtin behavior is normally using cond.smart_move_right()
+      )
+
+      -- Use <M-THEQUOTE> to get a single quote if needed
+      toplevel_map{mode="i", key=[[<M-'>]], action=[[']], desc="insert single S-quote"}
+      toplevel_map{mode="i", key=[[<M-">]], action=[["]], desc="insert single D-quote"}
+      toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
+    end
+
+    -- Define <C-l> to easily delete the following char (not smart, by design)
+    --
+    -- Can be useful to delete right-part of a pair if inserted by mistake
+    toplevel_map{
+      mode="i",
+      -- opposite to <C-h>:
+      -- <C-h> deletes <-|
+      -- <C-l> deletes |->
+      key=[[<C-l>]],
+      desc="Delete right char (opposite of <BS>)",
+      action=[[<Del>]],
+    }
   end,
 }
 
