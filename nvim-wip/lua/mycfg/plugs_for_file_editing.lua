@@ -577,6 +577,7 @@ Plug {
     cond.smart_move_right = cond.move_right
     cond.not_preceded_by_char = cond.not_before_char
     cond.preceded_by_regex = cond.before_regex
+    cond.not_preceded_by_regex = cond.not_before_regex
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -645,6 +646,19 @@ Plug {
     )
     -- I: Map `<M-">` to dquote, for when I want only one!
     toplevel_map{mode={"i"}, key=[[<M-">]], action=[["]], desc="insert single dquote"}
+
+    -- Don't use smart squote (`'`) by default!
+    -- It's really annoying to have to repeat the second squote in strings.. like "foo 'bar|"
+    npairs.remove_rule([[']])
+    npairs.add_rule(
+      Rule{start_pair = [[']], end_pair = [[']]}
+        -- Always insert second squote unless preceded by text (alphanumeric)
+        :insert_pair_when(cond.not_preceded_by_regex("%w"))
+        :end_moves_right_when(cond.never)
+        -- builtin behavior is normally using cond.smart_move_right()
+    )
+    -- I: Map `<M-'>` to squote, for when I want only one!
+    toplevel_map{mode={"i"}, key=[[<M-'>]], action=[[']], desc="insert single squote"}
 
     -- Uniformize bquotes handling, for all filetypes!
     -- Makes it work like dquotes, always inserting pair (no smartness)
