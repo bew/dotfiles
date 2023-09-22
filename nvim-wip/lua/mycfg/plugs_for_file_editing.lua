@@ -387,7 +387,7 @@ Plug {
   tags = {t.editing, t.extensible},
   on_load = function()
     -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red)
-    -- highlights to the modified surrounds? (like with vim-sandwich)
+    --   highlights to the modified surrounds? (like with vim-sandwich)
 
     -- NOTE: Doc on Lua patterns: https://www.lua.org/pil/20.2.html
     --   gotcha: `%s` in patterns includes `\n`!
@@ -435,6 +435,7 @@ Plug {
       visual_line = false, -- around selection, delims on new lines (default: `gS`)
       delete = false, -- delete surround (default: `ds`)
       change = false, -- replace surround (default: `cs`)
+      change_line = false, -- replace surround, delims on new lines (default: `cS`)
     }
     my_actions.add_surround = mk_action {
       for_mode="n", default_desc="Add around <motion>",
@@ -452,48 +453,43 @@ Plug {
       for_mode="n", default_desc="Delete nearest <pair>",
       raw_action="<Plug>(nvim-surround-delete)",
     }
-    -- Extra surround actions (linewise, on current line)
-    -- NOTE: 'linewise' actions are a bit weird, as they seems add an extra blank line between
-    --   the <motion>/selection and the new delimiters 👀.
-    my_actions.add_surround_linewise = mk_action {
-      for_mode="n", default_desc="Add around <motion> (linewise)",
+    -- Extra surround actions (on current line, add delims on newlines)
+    my_actions.add_surround_on_newline = mk_action {
+      for_mode="n", default_desc="Add around <motion>, delims on newlines",
       raw_action="<Plug>(nvim-surround-normal-line)",
     }
     my_actions.add_surround_around_line = mk_action {
       for_mode="n", default_desc="Add around current line",
       raw_action="<Plug>(nvim-surround-normal-cur)",
     }
-    my_actions.add_surround_around_line_linewise = mk_action {
-      for_mode="n", default_desc="Add around current line (linewise)",
+    my_actions.add_surround_around_line_on_newline = mk_action {
+      for_mode="n", default_desc="Add around current line, delims on newlines",
       raw_action="<Plug>(nvim-surround-normal-cur-line)",
     }
-    my_actions.add_surround_on_visual_linewise = mk_action {
-      for_mode="v", default_desc="Add around visual selection (linewise)",
+    my_actions.add_surround_on_visual_on_newline = mk_action {
+      for_mode="v", default_desc="Add around visual selection, delims on newlines",
       raw_action="<Plug>(nvim-surround-visual-line)",
+    }
+    my_actions.change_surround_on_newline = mk_action {
+      for_mode="n", default_desc="Change surrounds, delims on newlines",
+      raw_action="<Plug>(nvim-surround-change-line)",
     }
 
     -- Map to add surround
     -- (direct `s` would be nice, but eats a key I use too often (I tried...))
     leader_map{mode="n", key="s", action=my_actions.add_surround}
+    leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
     leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
+    leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
 
     -- Maps to change/delete surrounds
-    --
-    -- `sd` & `sr` for delete & replace doesn't really make sense in practice and goes against
-    -- vim's vocabulary of `<verb><on-what>`.
     toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
+    toplevel_map{mode="n", key="cS", action=my_actions.change_surround_on_newline}
     toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
 
     require"nvim-surround".setup {
       keymaps = default_keymaps_disabled,
       surrounds = my_surrounds,
-      -- Do not try to re-indent if the change was on a single line
-      -- See: https://github.com/kylechui/nvim-surround/issues/201
-      indent_lines = function(start_row, end_row)
-        if start_row ~= end_row then
-          surround_utils.default_opts.indent_lines(start_row, end_row)
-        end
-      end,
     }
   end,
 }
