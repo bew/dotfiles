@@ -6,7 +6,7 @@ local U = require"mylib.utils"
 local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 
--- TODO: Add tags! Define layers!
+-- TODO: Add tags! Define layers! (& group of related keys?)
 
 -- Disable keybindings
 
