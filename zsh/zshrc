@@ -11,6 +11,7 @@
 # BIN_* vars are used to specify the binary dependencies of this config file.
 # NOTE: These lines may be rewritten by config manager.
 _BIN_dircolors=dircolors
+_BIN_zoxide=zoxide
 
 # _ZSH_PLUGIN_SRCREF_* vars are used to specify from where the plugin should be init from
 # (may be a path for things that are sourced, may be a org/repo for things that reference a GH repo)
@@ -47,10 +48,6 @@ zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
 # TODO: find a way to not have this manual action on first start?
 
-# cd with 'frecency' (recent + frequence)
-zi light $_ZSH_PLUGIN_SRCREF__z
-# TODO: use zoxide! (https://github.com/ajeetdsouza/zoxide)
-
 # autopair all the things!
 # don't auto-init before setting my key bindings, init at the end (with 'autopair-init')
 AUTOPAIR_INHIBIT_INIT=1
@@ -66,6 +63,10 @@ gitstatus_start MY
 zi ice wait"0" silent # load plugin async & silently
 zi light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
+
+# cd with 'frecency' (recent + frequence)
+eval "$($_BIN_zoxide init --no-cmd zsh)"
+
 
 #-------------------------------------------------------------
 # Setup Hooks

@@ -6,6 +6,7 @@ _BIN_fzf=fzf
 _BIN_fd=fd
 _BIN_bat=bat
 _BIN_git=git
+_BIN_zoxide=zoxide
 
 if [[ $- != *i* ]]; then
   # -> This is not an interactive shell, bail out!
@@ -212,26 +213,23 @@ function zwidget::fzf::history
 }
 zle -N zwidget::fzf::history
 
-function zwidget::fzf::z
+function zwidget::fzf::frecent_directory
 {
-  local last_pwd=$PWD
-
-  # Replace all {} with {2..} to ensure we don't pass the first field (popularity of the dir)
-  local _braces="{}"
-  local _braces_skip_first="{2..}"
-  local preview_cmd="${FZF_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
-
-  # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
-  # --nth 2..         | ignore first field (the popularity of the dir) when matching
-  local fzf_cmd=($FZF_BASE_CMD --tac --scheme=history --nth 2..)
+  # --scheme=history  | Scoring scheme for command history (no additional bonus points)
+  #                   | (prefer lines that are first in the input)
+  # --no-sort         | Do not sort the results (keep history order)
+  #                   | => use ctrl-r for better matches if needed
+  local fzf_cmd=($FZF_BASE_CMD --scheme=history --no-sort --bind=ctrl-r:toggle-sort)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
-  fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
+  fzf_cmd+=(--preview "$FZF_PREVIEW_CMD_FOR_DIR" --preview-window down:10)
   fzf_cmd+=(
     --bind='focus:transform-preview-label:echo [ {} ]'
     --color=preview-label:247:bold
   )
 
-  local selected=( $( z | "${fzf_cmd[@]}" ) )
+  local last_pwd=$PWD
+
+  local selected=( $( $_BIN_zoxide query --list | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
     if [[ -n "$directory" ]]; then
@@ -245,7 +243,7 @@ function zwidget::fzf::z
     zle -M "welcome to '${(D)PWD}' :)"
   fi
 }
-zle -N zwidget::fzf::z
+zle -N zwidget::fzf::frecent_directory
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 # Copied from zle::utils::check_git here to have a mostly self-contained file

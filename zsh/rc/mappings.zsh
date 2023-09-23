@@ -753,7 +753,7 @@ source $ZSH_MY_CONF_DIR/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
 vibindkey 'F' zwidget::fzf::find_file
 vibindkey 'c' zwidget::fzf::find_directory
-vibindkey 'z' zwidget::fzf::z
+vibindkey 'z' zwidget::fzf::frecent_directory
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
 vibindkey 'a' zwidget::fzf::git_changed_files_in_cwd

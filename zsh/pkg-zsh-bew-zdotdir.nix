@@ -4,12 +4,13 @@
   runCommandLocal,
   stdenv,
   makeWrapper,
+
   coreutils,
+  zoxide,
 
   # plugins
   #zi, # only on unstable!
   zsh-autopair,
-  zsh-z,
   gitstatus,
 
   # for fzf mappings
@@ -22,7 +23,6 @@
 
 let
   plugins = {
-    zsh-z = "${zsh-z}/share/zsh-z";
     zsh-autopair = "${zsh-autopair}/share/zsh/zsh-autopair";
     gitstatus = "${gitstatus}/share/gitstatus";
     zi = fetchFromGitHub {
@@ -84,6 +84,7 @@ let
     bat = binFromDrv "bat" bat;
     git = binFromDrv "git" git;
     dircolors = binFromDrv "dircolors" coreutils;
+    zoxide = binFromDrv "zoxide" zoxide;
   };
   # NOTE: all bins from this list should also have their 'man' output installed!
   # not tested/used..
@@ -116,7 +117,9 @@ runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
     --replace "_BIN_fzf=" "_BIN_fzf=${bins.fzf} #" \
     --replace "_BIN_fd="  "_BIN_fd=${bins.fd} #" \
     --replace "_BIN_bat=" "_BIN_bat=${bins.bat} #" \
-    --replace "_BIN_git=" "_BIN_git=${bins.git} #"
+    --replace "_BIN_git=" "_BIN_git=${bins.git} #" \
+    --replace "_BIN_zoxide=" "_BIN_zoxide=${bins.zoxide} #" \
+    #
 
   >&2 echo "Patching config-specific env vars .zshenv"
   substitute ${./zshenv} $out/.zshenv \
@@ -126,11 +129,11 @@ runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
   >&2 echo "Patching binaries and plugins in .zshrc"
   substitute ${./zshrc} $out/.zshrc \
     --replace "_BIN_dircolors=" "_BIN_dircolors=${bins.dircolors} #" \
+    --replace "_BIN_zoxide=" "_BIN_zoxide=${bins.zoxide} #" \
     \
     --replace "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
     --replace "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
     --replace "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
-    --replace "_ZSH_PLUGIN_SRCREF__z="         "_ZSH_PLUGIN_SRCREF__z=${plugins.zsh-z} #" \
     --replace "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
     --replace "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
     --replace "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"
