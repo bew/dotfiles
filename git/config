@@ -82,6 +82,13 @@
   # (which is not automatically detected for some reasons..)
   statGraphWidth = 30
 
+  # Detect renames & copies (defaults to only renames)
+  renames = copy
+
+[fetch]
+  # Auto remove any remote-tracking refs that no longer exist on the remote
+  prune = true
+
 [color]
   interactive = true
 
