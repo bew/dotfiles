@@ -8,9 +8,6 @@
 
 # ------
 
-[core]
-  excludesfile = ~/.dot/git/global_gitignore
-
 [help]
   autocorrect = immediate
 
