@@ -1,0 +1,70 @@
+[core]
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  features = unified-layout
+  syntax-theme = DarkNeon
+
+  paging = always ; always use a pager
+  # NOTE: diffs in `git add -p` will never use the pager.
+
+  line-numbers = true
+
+  relative-paths = true
+  file-modified-label = "changed:"
+  file-removed-label = "nuked:"
+  hunk-label = "§"
+
+  # Removed lines
+  minus-style = syntax 52
+  minus-emph-style = normal bold 88
+
+  # Added lines
+  plus-style = syntax 22
+  plus-emph-style = normal bold 28
+  # NOTE: plus-emph-style uses 'normal' to make the text visible for comments.
+  #   Otherwise, an emphasised comment is very hard to read.
+
+  # Line number style to match added/removed line
+  # Not working in a useful way for now, see: https://github.com/dandavison/delta/issues/247
+  ; line-numbers-minus-style = normal 52
+  ; line-numbers-plus-style = normal 22
+
+  file-style = bold 166
+  file-decoration-style = none
+
+  # NOTE: the decoration styles ul/ol/box uses unicode chars AFAIK
+
+  commit-decoration-style = ol
+
+  hunk-header-style = 246 237 # light grey on 'dark' grey
+  hunk-header-decoration-style = bold
+
+[delta "unified-layout"]
+  features = navigate
+
+  ; >> Unicode separators:
+  line-numbers-left-format = {nm:^5}¦
+  line-numbers-right-format = {np:^5}│
+  ; >> ASCII separators:
+  ; line-numbers-left-format = {nm:^5}:
+  ; line-numbers-right-format = {np:^5}|
+
+# NOTE: This group of delta settings is enabled for some of my git aliases
+#       using `git -c delta.features=split-layout ...`
+[delta "split-layout"]
+  features = navigate side-by-side
+
+  ; >> Unicode separators:
+  line-numbers-left-format = ┃{nm:^5}│
+  line-numbers-right-format = ┃{np:^5}│
+  ; >> ASCII separators:
+  ; line-numbers-left-format = |{nm:^5}|
+  ; line-numbers-right-format = |{np:^5}|
+  line-numbers-left-style = red
+  line-numbers-right-style = green
+
+# vim:set ft=gitconfig:
