@@ -106,6 +106,26 @@
 #   username = bew
 #   helper = github-bew-password-from-env
 
+# --- BEGIN log configs
+
+[log]
+  decorate = true
+
+[pretty]
+  # aliases to use with `git log --pretty=<alias>`
+
+  # bew-minimal: with metadata + subject
+  bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n
+
+  # bew-verbose: with metadata + subject + body + notes
+  # (~same as bew-minimal + the commit body & notes if available)
+  bew-verbose = tformat:%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n
+
+  # bew-oneline: simplified logs, similar to --oneline but prettier
+  bew-oneline = tformat:%C(red)%h%C(reset) - %s %C(green)(%cr) %C(blue)<%an>%C(reset)%C(auto)%d%C(reset)
+
+# --- END log configs
+
 [alias]
 
   # index manipulation (staging area)
@@ -190,18 +210,18 @@
   suf = status --untracked-files
 
   # log (minimal: with metadata + subject)
-  pretty-log = log --graph --decorate --pretty=tformat:'%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n'
+  pretty-log = log --graph --pretty=bew-minimal
   l  = pretty-log
   la = pretty-log --all
 
   # log (verbose: with metadata + subject + body + notes)
   # (~same as: pretty-log + the commit body & notes if available)
-  pretty-log-verbose = log --graph --decorate --pretty=tformat:'%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n'
+  pretty-log-verbose = log --graph --pretty=bew-verbose
   lv  = pretty-log-verbose
   lva = pretty-log-verbose --all
 
   # log (simplified logs, similar to --oneline but prettier)
-  pretty-log-oneline = log --graph --decorate --pretty=tformat:'%C(red)%h%C(reset) - %s %C(green)(%cr) %C(blue)<%an>%C(reset)%C(auto)%d%C(reset)'
+  pretty-log-oneline = log --graph --pretty=bew-oneline
   lo = pretty-log-oneline
 
   # NOTE: using the verbose version, because it's more complete,
