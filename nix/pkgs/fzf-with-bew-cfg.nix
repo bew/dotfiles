@@ -18,7 +18,6 @@ let
 
     # suggestions nav (short movement)
     alt-j = "down"; alt-k     = "up";
-    tab   = "down"; shift-tab = "up";
     # suggestions nav (long movement)
     ctrl-alt-j = "next-selected"; ctrl-alt-k = "prev-selected";
     alt-g = "first"; alt-G = "last";
@@ -35,8 +34,8 @@ let
 
     # preview nav
     alt-p = "toggle-preview";
-    pgup   = "preview-page-up"; pgdn   = "preview-page-down";
-    ctrl-p = "preview-page-up"; ctrl-n = "preview-page-down";
+    pgup       = "preview-page-up"; pgdn       = "preview-page-down";
+    ctrl-alt-p = "preview-page-up"; ctrl-alt-n = "preview-page-down";
 
     # Ensure I can't double-click on a result to confirm-select it
     double-click = "ignore";

@@ -119,6 +119,12 @@ function zwidget::utils::__fzf_generic_impl_for_paths
   if [[ -n "${FZF_PREVIEW_WINDOW:-}" ]]; then
     fzf_cmd+=(--preview-window "$FZF_PREVIEW_WINDOW")
   fi
+  if [[ -n "${FZF_USE_FOCUS_AS_PREVIEW_LABEL}" ]]; then
+    fzf_cmd+=(
+      --bind='focus:transform-preview-label:echo [ {} ]'
+      --color=preview-label:247:bold
+    )
+  fi
 
   local selected_completions=$( \
     (cd "$search_root_path"; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" | "${results_transformer[@]}") |
@@ -162,7 +168,7 @@ zle -N zwidget::fzf::find_file
 
 # -F : show / for dirs, and other markers
 # -C : show dirs in columns
-FZF_PREVIEW_CMD_FOR_DIR="echo --- {} ---; ls --color=always --group-directories-first -F -C --dereference -- {}"
+FZF_PREVIEW_CMD_FOR_DIR="ls --color=always --group-directories-first -F -C --dereference -- {}"
 
 function zwidget::fzf::find_directory
 {
@@ -170,16 +176,20 @@ function zwidget::fzf::find_directory
   FZF_FINDER_CMD=($_BIN_fd --type d --type l --follow) # follow symlinks
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_DIR"
   FZF_PREVIEW_WINDOW="down:10"
+  FZF_USE_FOCUS_AS_PREVIEW_LABEL=true
 
   zwidget::utils::__fzf_generic_impl_for_paths
 
-  unset FZF_PROMPT FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_PREVIEW_WINDOW
+  unset FZF_PROMPT FZF_FINDER_CMD FZF_PREVIEW_CMD FZF_PREVIEW_WINDOW FZF_USE_FOCUS_AS_PREVIEW_LABEL
 }
 zle -N zwidget::fzf::find_directory
 
-# --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
-# --nth 2..         | ignore first field (the popularity of the dir) when matching
-FZF_HISTORY_OPTIONS=(--no-multi --tiebreak=index --nth 2..)
+# --scheme=history  | Scoring scheme for command history (no additional bonus points)
+#                   | (prefer lines that are first in the input)
+# --nth 2..         | Ignore first field when matching (history entry number)
+# --no-sort         | Do not sort the results (keep history order)
+#                   | => use ctrl-r for better matches if needed
+FZF_HISTORY_OPTIONS=(--scheme=history --nth 2.. --no-sort --no-multi --bind=ctrl-r:toggle-sort)
 
 function zwidget::fzf::history
 {
@@ -213,9 +223,13 @@ function zwidget::fzf::z
 
   # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
   # --nth 2..         | ignore first field (the popularity of the dir) when matching
-  local fzf_cmd=($FZF_BASE_CMD --tac --tiebreak=index --nth 2..)
+  local fzf_cmd=($FZF_BASE_CMD --tac --scheme=history --nth 2..)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
   fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
+  fzf_cmd+=(
+    --bind='focus:transform-preview-label:echo [ {} ]'
+    --color=preview-label:247:bold
+  )
 
   local selected=( $( z | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
