@@ -58,6 +58,7 @@
     packages.${system} = let
       selfPkgs = self.packages.${system};
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
+      bleedingedgePkgs = flakeInputs.nixpkgsUnstable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
       mpv-bew = stablePkgs.callPackage ./nix/pkgs/mpv {};
@@ -81,6 +82,7 @@
       zsh-bew-bin = mybuilders.linkSingleBin "${selfPkgs.zsh-bew}/bin/zsh";
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
+        fzf = bleedingedgePkgs.fzf;
         replaceBinsInPkg = mybuilders.replaceBinsInPkg;
       };
       fzf-bew-bin = mybuilders.linkSingleBin "${selfPkgs.fzf-bew}/bin/fzf";

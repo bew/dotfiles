@@ -5,7 +5,7 @@ let
 
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   cliPkgs = {
-    fzf = myPkgs.fzf-bew.override { fzf = stable.fzf; };
+    fzf = myPkgs.fzf-bew;
     neovim = bleedingedge.neovim.override {
       # NOTE: somePkgs.neovim is a drv using 'legacyWrapper' function:
       # defined in: nixpkgs-repo/pkgs/applications/editors/neovim/utils.nix
