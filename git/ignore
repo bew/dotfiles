@@ -1,4 +1,6 @@
 # This is the global git ignore
+#
+# Must be placed at $XDG_CONFIG_DIR/git/ignore
 
 # vim files
 .vimsession*
