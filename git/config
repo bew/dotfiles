@@ -59,9 +59,6 @@
   # Show a diffstat on successful rebase of the effective changes between the new root and HEAD
   stat = true
 
-  # IDEA(feat request): an option to auto use `--committer-date-is-author-date` when rebasing.
-  # See: https://stackoverflow.com/questions/2973996/git-rebase-without-changing-commit-timestamps
-
 [rerere]
   # Activate 'reuse recorded resolution' system, tracking before/after conflict resolution when they
   # happen and auto-resolve future similar ones.
@@ -178,6 +175,11 @@
   ch = checkout
   sw = switch
   sth = stash
+
+  reb = rebase
+  # Do not changes commit dates of rebased commits
+  # NOTE: the entire history of the rebased branch will be composed of new commits
+  reb-keep-dates = rebase --committer-date-is-author-date
 
   mtool = mergetool
 
