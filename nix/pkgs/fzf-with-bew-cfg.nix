@@ -20,6 +20,7 @@ let
     alt-j = "down"; alt-k     = "up";
     tab   = "down"; shift-tab = "up";
     # suggestions nav (long movement)
+    ctrl-alt-j = "next-selected"; ctrl-alt-k = "prev-selected";
     alt-g = "first"; alt-G = "last";
     alt-J = "half-page-down"; alt-K = "half-page-up";
     alt-z = "jump"; # easymotion-like 1/2-keystroke movement!
@@ -36,6 +37,9 @@ let
     alt-p = "toggle-preview";
     pgup   = "preview-page-up"; pgdn   = "preview-page-down";
     ctrl-p = "preview-page-up"; ctrl-n = "preview-page-down";
+
+    # Ensure I can't double-click on a result to confirm-select it
+    double-click = "ignore";
   };
 
   # Better highlights (current line, substring matches, multiline markers)
@@ -45,6 +49,7 @@ let
     "hl"  = "166"; # matching substring on all lines (fg)
     "gutter" = "-1"; # bg color for left gutter : use default terminal bg
     "marker" = "220:bold"; # current line marker in the gutter
+    "preview-bg" = "233"; # bg of preview window
   };
   colorsArg = lib.concatStringsSep ","
     (lib.mapAttrsToList (hl: color: "${hl}:${color}") colors);
@@ -52,13 +57,10 @@ let
   layoutArgs = [
     "--height=40%"
     "--reverse" # prompt at the top
-    "--inline-info" # include info on right of prompt
+    "--info=inline-right" # put info on right of prompt
     "--color='${colorsArg}'"
-  ];
-
-  otherArgs = [
-    # disable mouse, I don't want to be able to double-click on a result to confirm-select it!
-    "--no-mouse"
+    "--scrollbar=▌▐"
+    "--preview-window=border-bold"
   ];
 
   keybindingsArgs = lib.flatten (

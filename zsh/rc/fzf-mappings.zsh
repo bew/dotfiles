@@ -40,8 +40,7 @@ function zwidget::utils::results_to_args
   done
 }
 
-# Those layout & keybindings vars come from ~/.zshenv
-FZF_BASE_CMD=($_BIN_fzf ${FZF_BEW_LAYOUT_ARRAY} ${FZF_BEW_KEYBINDINGS_ARRAY})
+FZF_BASE_CMD=($_BIN_fzf)
 
 function zwidget::utils::__fzf_generic_impl_for_paths
 {
