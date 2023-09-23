@@ -228,6 +228,11 @@ NamedPlug.luasnip {
       -- https://github.com/L3MON4D3/LuaSnip/issues/170
       -- https://github.com/L3MON4D3/LuaSnip/issues/780
       region_check_events = { "CursorHold" }, -- shortly after (`:h 'updatetime'`)
+      -- FIXME: Make snippet expansion buffer-window-local, not buffer-local 👀
+      --   When I have 2 windows A & B opened on a buffer (at very different positions),
+      --   if I'm in snippet in win A, and I switch to win B to check something at a different part
+      --   of the buffer, waiting for region_check_events will exit me from the snippet in win A.
+      --
       -- The events used to update the active nodes' dependents (like replicate nodes)
       update_events = {"TextChanged", "TextChangedI"},
       -- The events used to check if a snippet was deleted (to avoid keeping placeholders)
@@ -240,9 +245,12 @@ NamedPlug.luasnip {
       -- back-n-forth but when I go back to start of first snippet I'm out of everything..
 
       -- FIXME: I don't want to leave the snip when going to prev node when on first placeholder,
-      --   I want it to be a no-op (maybe add Ctrl to be able to 'escape' the snip?).
-      --   (same for going next node on last placeholder? quid nested snips? should still work
-      --   across boundaries (if cursor is not leaving top(/sub?) snippet))
+      --   or when going next node on the last placeholder.
+      --   => I want it to be a no-op
+      --
+      --   (maybe add Ctrl to be able to 'escape' the snip?)
+      --   (quid nested snips? should still work across boundaries
+      --   if cursor is not leaving top(/sub?) snippet)
 
       -- Hint/Highlight some nodes
       ext_opts = {
@@ -747,6 +755,8 @@ Plug {
     -- FIXME: Allow `gcA` to be dot-repeated
     -- Opened issue: https://github.com/numToStr/Comment.nvim/issues/222
     -- (closed as wontfix :/ TODO: make a PR that does it!)
+
+    -- TODO: make omap `ac` also delete leading / trailing spaces for delete action!
 
     -- NOTE: smart uncomment on inline comments (like `foo /* bar */ baz`) doesn't work automatically by default
     -- => There is a way, when triggering a 'linewise' un/comment/toggle on a region

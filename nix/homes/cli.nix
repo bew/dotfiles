@@ -65,6 +65,11 @@ let
       # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
       ../../bash_minimal/proxy_to_zsh.home-module.nix
     ];
+    # This module installs my config in ~, using usual config files discovery of zsh in home
+    # (`~/.zshrc` & `~/.zshenv`).
+    # => Every config change still require a home rebuild & activation, but it's less hardcoded
+    # than if the package itself had an internal reference to a specific zdotdir,
+    # which would make reloading shell config (to use new one) from existing shells impossible.
     home.packages = [ stable.zsh ];
     home.file.".zshrc".text = ''
       ZDOTDIR=${zdotdir}
