@@ -190,7 +190,7 @@ zle -N zwidget::fzf::find_directory
 # --nth 2..         | Ignore first field when matching (history entry number)
 # --no-sort         | Do not sort the results (keep history order)
 #                   | => use ctrl-r for better matches if needed
-FZF_HISTORY_OPTIONS=(--scheme=history --nth 2.. --no-sort --no-multi --bind=ctrl-r:toggle-sort)
+FZF_HISTORY_OPTIONS=(--scheme=history --tiebreak=begin,index --nth 2.. --no-sort --no-multi --bind=ctrl-r:toggle-sort)
 
 function zwidget::fzf::history
 {

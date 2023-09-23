@@ -65,6 +65,7 @@ zi light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
 
 # cd with 'frecency' (recent + frequence)
+# FIXME: zoxide init script is not self-referencial and depends on zoxide being globally available..
 eval "$($_BIN_zoxide init --no-cmd zsh)"
 
 

@@ -66,6 +66,20 @@
 
       zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {
         fzf = selfPkgs.fzf-bew;
+        zoxide = stablePkgs.zoxide.override {
+          # Technically I don't need fzf in zoxide since I only use it as a backend and have my own
+          # fzf bindings.
+          withFzf = false;
+          # FIXME: zoxide init script is not self-referencial and depends on zoxide being globally available..
+          # TODO: add postPatch to fix this ?
+          #                 OR
+          #    put zoxide in an env (would avoid many hardcoded paths...)
+          #
+          # => => => Faire un truc 'purement' parfait... ou faire un truc qui marche...
+          #                                                 ========================
+          #     C'EST MIEUX DE FAIRE UN TRUC QUI MARCHE....
+          #     je vais mettre ce commit de coté, et bosser sur faire un env pour zsh
+        };
       };
       zsh-bew = let
         # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration
