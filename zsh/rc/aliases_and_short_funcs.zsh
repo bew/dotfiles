@@ -145,10 +145,16 @@ alias ls="ls-backend --group-directories-first --color=auto"
 
 alias eza="eza --group-directories-first"
 # Config eza colors to shades of grey instead of a distractful bright colors
+# Read more at `man 5 eza_colors`
 EZA_COLORS=""
 EZA_COLORS+="da=38;5;243:" # darker
 EZA_COLORS+="uu=38;5;239:gu=38;5;239:" # darker username & group
-EZA_COLORS+="sn=38;5;29:sb=38;5;100:" # darker and better contrast for file size
+# Color file sizes by order of magnitude
+EZA_COLORS+="nb=38;5;239:ub=38;5;241:"    #  0  -> <1KB : grey
+EZA_COLORS+="nk=38;5;29:uk=38;5;100:"     # 1KB -> <1MB : green
+EZA_COLORS+="nm=38;5;26:um=38;5;32:"      # 1MB -> <1GB : blue
+EZA_COLORS+="ng=38;5;130:ug=38;5;166;1:"  # 1GB -> <1TB : orange
+EZA_COLORS+="nt=38;5;160:ut=38;5;197;1:"  # 1TB -> +++  : red
 # Darker permissions (shades of grey)
 EZA_COLORS+="ur=38;5;240:uw=38;5;244:ux=38;5;248:ue=38;5;248:" # user permissions
 EZA_COLORS+="gr=38;5;240:gw=38;5;244:gx=38;5;248:" # group permissions
