@@ -162,9 +162,6 @@ EZA_COLORS+="tr=38;5;240:tw=38;5;244:tx=38;5;248:" # other permissions
 EZA_COLORS+="xa=38;5;24:" # xattr marker ('@')
 EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
 export EZA_COLORS
-# eza still uses exa' env vars
-# Opened: https://github.com/eza-community/eza/issues/374
-export EXA_COLORS="$EZA_COLORS"
 
 alias ll="ls -l"
 alias la="ll -a"
