@@ -1,5 +1,5 @@
 ; Map Capslock to Escape on tap or to Control with another key
-
+#Requires AutoHotkey v2.0
 #SingleInstance Force
 
 ; https://www.autohotkey.com/docs/Hotkeys.htm#Symbols
@@ -14,24 +14,24 @@
 ;
 ; If Caps is held down more than 500ms, release won't register as a tap
 
-CapsDownStart := -1
+global CapsDownStart := -1
 
-*Capslock::
-
-Send {Blind}{LControl down}
-if (CapsDownStart == -1)
-    CapsDownStart := A_TickCount
-return
-
-
-*Capslock up::
-
-Send {Blind}{LControl up}
-CapsDownTime := A_TickCount - CapsDownStart
-CapsDownStart := -1
-if (A_PRIORKEY == "CapsLock" && CapsDownTime < 500)
-{
-  ; Send the glorious Escape key :)
-  Send {Esc}
+*Capslock:: {
+    global CapsDownStart ; refer to the global var
+    Send "{Blind}{LControl down}"
+    if (CapsDownStart == -1)
+        CapsDownStart := A_TickCount
 }
-return
+
+
+*Capslock up:: {
+    global CapsDownStart ; refer to the global var
+    Send "{Blind}{LControl up}"
+    CapsDownTime := A_TickCount - CapsDownStart
+    CapsDownStart := -1
+    if (A_PRIORKEY == "CapsLock" && CapsDownTime < 500)
+    {
+        ; Send the glorious Escape key :)
+        Send "{Esc}"
+    }
+}
