@@ -56,4 +56,27 @@ U.myfmt = function(args)
   return fmt(unpack(args))
 end
 
+U.insert_node_default_selection = function(index, default_text)
+  local default_text = default_text or ""
+  return ls.dynamic_node(index, function(_, snip)
+    local env = snip.env
+    -- NOTE: Would be better to have a `has_selected_text` function to check this, so my code don't
+    -- need to depend on the default/empty value of LS_SELECT_RAW when there are no 'stored' selection.
+    --
+    --   There is `require"luasnip.extras.conditions.show".has_selected_text` but it always seems to
+    --   return `false` when in a snippet..
+    --   And it feels weird to import something from such a specific module for a check that is not
+    --   specific to show conditions..
+    --
+    -- => Opened: https://github.com/L3MON4D3/LuaSnip/issues/1030
+    if env.LS_SELECT_RAW and env.LS_SELECT_RAW ~= "" then
+      -- override default text with last selection
+      default_text = env.LS_SELECT_RAW
+    end
+    return ls.snippet_node(nil, {
+      ls.insert_node(1, default_text),
+    })
+  end)
+end
+
 return U
