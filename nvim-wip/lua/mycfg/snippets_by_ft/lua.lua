@@ -10,11 +10,16 @@ local t = ls.text_node
 
 -- Start of snippets definitions
 
-snip("req", {desc = "local require"}, U.myfmt {
-  [[local <var> = require"<module>"]],
+snip("r", {desc = "require"}, U.myfmt {
+  [[require"<module>"]],
+  { module = i(1, "module") },
+})
+
+snip("l", {desc = "local var = ..."}, U.myfmt {
+  [[local <var> = <value>]],
   {
     var = i(1, "var"),
-    module = i(2, "module"),
+    value = i(2),
   },
 })
 
@@ -27,7 +32,7 @@ snip("do", {desc = "do ... end"}, U.myfmt {
   { body = i(0) },
 })
 
-snip("!=", {desc = "Lua's not-equal operator"}, { t"~= " })
+snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 snip("fn", {desc = "function definition"}, U.myfmt {
   [[

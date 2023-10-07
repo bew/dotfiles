@@ -70,6 +70,10 @@ snip("cond", {desc = "[[ ... ]]"}, U.myfmt {
   { test = i(1) },
 })
 
+snip("err", {desc = "echo to stderr"}, {
+  t">&2 echo ",
+})
+
 -- End of snippets definitions
 
 return SNIPS, {} -- snippets, autosnippets
