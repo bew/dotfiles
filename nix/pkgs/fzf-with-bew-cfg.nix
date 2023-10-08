@@ -3,6 +3,7 @@
   lib,
   replaceBinsInPkg,
 
+  ncurses,
   fzf,
 }:
 
@@ -37,6 +38,9 @@ let
     pgup       = "preview-page-up"; pgdn       = "preview-page-down";
     ctrl-alt-p = "preview-page-up"; ctrl-alt-n = "preview-page-down";
 
+    # history
+    ctrl-n = "next-history"; ctrl-p = "prev-history";
+
     # Ensure I can't double-click on a result to confirm-select it
     double-click = "ignore";
   };
@@ -54,9 +58,8 @@ let
     (lib.mapAttrsToList (hl: color: "${hl}:${color}") colors);
 
   layoutArgs = [
-    "--height=40%"
     "--reverse" # prompt at the top
-    "--info=inline-right" # put info on right of prompt
+    "--info=inline" # put info on right of prompt
     "--color='${colorsArg}'"
     "--scrollbar=▌▐"
     "--preview-window=border-bold"
@@ -75,7 +78,13 @@ replaceBinsInPkg {
   meta.mainProgram = "fzf";
   bins = {
     fzf = writeShellScript "fzf" ''
-      exec ${fzf}/bin/fzf ${toString keybindingsArgs} ${toString layoutArgs} "$@"
+      TERMINAL_HEIGHT=$(${ncurses}/bin/tput lines)
+      if (( TERMINAL_HEIGHT <= 30 )); then
+        SMART_HEIGHT=90%
+      else
+        SMART_HEIGHT=20
+      fi
+      exec ${fzf}/bin/fzf ${toString keybindingsArgs} --height=$SMART_HEIGHT ${toString layoutArgs} "$@"
     '';
   };
 }
