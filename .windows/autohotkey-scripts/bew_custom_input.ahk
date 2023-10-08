@@ -76,8 +76,8 @@ GroupAdd("bew_input", "ahk_exe Explorer.exe")
 
 ; Alt+o -> End then Shift+Enter (new line below)
 !o:: {
-  Send "{End}"
-  Send "+{Enter}"
+    Send "{End}"
+    Send "+{Enter}"
 }
 
 ; Alt+Shift+o -> Home then Shift+Enter then Up (new line above)
