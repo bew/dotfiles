@@ -238,12 +238,6 @@ NamedPlug.luasnip {
       -- The events used to check if a snippet was deleted (to avoid keeping placeholders)
       delete_check_events = {"TextChanged", "InsertLeave"},
 
-      -- FIXME: When expanding a snippet at another snippet's placeholder, navigating placeholders
-      -- is weird...
-      -- With basic shebang snippet, when typing: `init #!²a #!² b #!² c #!²` and then navigating
-      -- doesn't select correctly the intermediate placeholders, we can kind-of can go
-      -- back-n-forth but when I go back to start of first snippet I'm out of everything..
-
       -- FIXME: I don't want to leave the snip when going to prev node when on first placeholder,
       --   or when going next node on the last placeholder.
       --   => I want it to be a no-op
@@ -271,8 +265,15 @@ NamedPlug.luasnip {
       paths = vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft",
     })
 
+    -- FIXME: when cmp popup is visible and I expand a snippet directly I have issues
+    -- with trigger and placeholders..
+    -- When I use cmp's confirm action there is zero issue
+    -- Opened
+    -- * https://github.com/L3MON4D3/LuaSnip/issues/1019
+    -- * https://github.com/L3MON4D3/LuaSnip/issues/1020
+
     -- I: Expand snippet if any
-    -- IDEA(alternative): <C-x><C-x> (in insert, maybe also visual?)
+    -- IDEA(alternative?): <C-x><C-x> (in insert, maybe also visual?)
     toplevel_map{mode={"i"}, key=[[²]], desc="expand snippet!", action=function()
       ls.expand()
     end}
@@ -573,6 +574,9 @@ Plug {
           "%'", [[%"]], "%`",
           "%)", "%>", "%]", "%}",
           "%,",
+          "%?",
+          "%/",
+          "%=",
           "]"
         ),
         -- IDEA: Since pattern is a charset that match a single char,

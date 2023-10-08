@@ -10,7 +10,7 @@ local t = ls.text_node
 
 -- Start of snippets definitions
 
-snip("r", {desc = "require"}, U.myfmt {
+snip("rq", {desc = "require"}, U.myfmt {
   [[require"<module>"]],
   { module = i(1, "module") },
 })
@@ -36,9 +36,9 @@ snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 snip("fn", {desc = "function definition"}, U.myfmt {
   [[
-  function<maybe_name>(<args>)
-  	<body>
-  end
+    function<maybe_name>(<args>)
+      <body>
+    end
   ]],
   {
     maybe_name = i(1),
