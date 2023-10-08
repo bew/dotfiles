@@ -222,8 +222,9 @@ function zwidget::fzf::z
   local preview_cmd="${FZF_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
 
   # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
+  # --no-sort         | Don't pre-sort the input
   # --nth 2..         | ignore first field (the popularity of the dir) when matching
-  local fzf_cmd=($FZF_BASE_CMD --tac --scheme=history --nth 2..)
+  local fzf_cmd=($FZF_BASE_CMD --tac --no-sort --tiebreak=index --nth 2..)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
   fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
   fzf_cmd+=(
