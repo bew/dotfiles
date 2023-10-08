@@ -1,17 +1,29 @@
 # This file will be auto-loaded.
 
 matches:
-  - trigger: "!+1"
+  - trigger: "!+!"
     replace: '👍'
 
-  - trigger: "!eyes"
+  - trigger: "!ey!" # eyes
     replace: '👀'
 
-  - trigger: "!okhand"
+  - trigger: "!okh!" # ok hand
     replace: '👌'
 
-  - trigger: "!pointr"
+  - trigger: "!ok!"
+    replace: '✅'
+
+  - trigger: "!x!"
+    replace: '❌'
+
+  - trigger: "!pr!" # point right
     replace: '👉'
 
-  - trigger: "!tm"
+  - trigger: "!hr!" # heart
+    replace: '❤️'
+
+  - trigger: "!tk!" # thinking
+    replace: '🤔'
+
+  - trigger: "!tm!"
     replace: '™' # (trademark)
