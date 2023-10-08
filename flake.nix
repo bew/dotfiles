@@ -29,6 +29,8 @@
   outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
+    selfPkgs = self.packages.${system};
+    selfApps = self.apps.${system};
   in {
     homeConfig = let
       username = "bew";
@@ -56,7 +58,6 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages.${system} = let
-      selfPkgs = self.packages.${system};
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
       bleedingedgePkgs = flakeInputs.nixpkgsUnstable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
@@ -74,8 +75,10 @@
             name = "zsh-bew";
             copyFromPkg = zsh;
             nativeBuildInputs = [ makeWrapper ];
+            meta.mainProgram = "zsh";
             postBuild = /* sh */ ''
-              makeWrapper ${zsh}/bin/zsh $out/bin/zsh --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
+              makeWrapper ${zsh}/bin/zsh $out/bin/zsh \
+                --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
             '';
           };
       in stablePkgs.callPackage pkg { zdotdir = selfPkgs.zsh-bew-zdotdir; };
@@ -89,13 +92,8 @@
 
       #tmux-bew = ...
     };
-    apps.${system} = let
-      selfPkgs = self.packages.${system};
-      selfApps = self.apps.${system};
-    in {
+    apps.${system} = {
       default = selfApps.zsh-bew; # FIXME: should be an env with all 'core' cli tools
-      zsh-bew = { type = "app"; program = "${selfPkgs.zsh-bew}/bin/zsh"; };
-      fzf-bew = { type = "app"; program = "${selfPkgs.fzf-bew}/bin/fzf"; };
     };
   };
 }

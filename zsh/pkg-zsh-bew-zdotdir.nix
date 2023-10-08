@@ -73,17 +73,20 @@ let
   };
 
   bins = let
-    binFromDrv = binName: drv: {
-      outPath = "${drv}/bin/${binName}";
+    binInfo = { drv, binName ? null }: {
+      outPath = (
+        if binName == null
+        then lib.getExe drv
+        else "${lib.getBin drv}/bin/${binName}" # TODO: use `getExe'` when in my nixpkgs
+      );
       manOutput = drv ? man;
     };
   in {
-    # NOTE: one day all these will be Nix Flake Apps, so we can auto find the main bin :)
-    fzf = binFromDrv "fzf" fzf;
-    fd = binFromDrv "fd" fd;
-    bat = binFromDrv "bat" bat;
-    git = binFromDrv "git" git;
-    dircolors = binFromDrv "dircolors" coreutils;
+    fzf = binInfo { drv = fzf; };
+    fd = binInfo { drv = fd; };
+    bat = binInfo { drv = bat; };
+    git = binInfo { drv = git; };
+    dircolors = binInfo { drv = coreutils; binName = "dircolors"; };
   };
   # NOTE: all bins from this list should also have their 'man' output installed!
   # not tested/used..

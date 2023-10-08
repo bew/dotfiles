@@ -72,6 +72,7 @@ in
 replaceBinsInPkg {
   name = "fzf-bew";
   copyFromPkg = fzf;
+  meta.mainProgram = "fzf";
   bins = {
     fzf = writeShellScript "fzf" ''
       exec ${fzf}/bin/fzf ${toString keybindingsArgs} ${toString layoutArgs} "$@"
