@@ -8,10 +8,14 @@ local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
 local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
 
 -- Define custom plugin source for my local plugins
+local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
+assert((
+  myplugins_path or not vim.fn.filereadable(myplugins_path)
+), "$NVIM_BEW_MYPLUGINS_PATH is not set or doesn't exist!!")
 PluginSystem.sources.myplug = function(name)
   return PluginSystem.sources.local_path {
     name = name,
-    path = vim.fs.normalize(MY_KNOWN_PATHS.myplugins .. "/" .. name)
+    path = vim.fs.normalize(myplugins_path .. "/" .. name)
   }
 end
 

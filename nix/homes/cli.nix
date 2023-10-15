@@ -3,57 +3,14 @@
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
 
+  neovim-pseudo-flake = stable.callPackage ./../../nvim-wip/cli-package.nix {
+    inherit (bleedingedge) neovim;
+    inherit mybuilders;
+  };
+
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   cliPkgs = {
     fzf = myPkgs.fzf-bew;
-    neovim = bleedingedge.neovim.override {
-      # NOTE: somePkgs.neovim is a drv using 'legacyWrapper' function:
-      # defined in: nixpkgs-repo/pkgs/applications/editors/neovim/utils.nix
-      # used in: nixpkgs-repo/pkgs/top-level/all-packages.nix for 'wrapNeovim' function
-      # ---
-      # python3 & ruby providers are enabled by default..
-      # => I think I won't need them, I want to have vimscript or Lua based plugins ONLY
-      withPython3 = false;
-      withRuby = false;
-    };
-  };
-
-  neovim-minimal = cliPkgs.neovim.override {
-    configure = {
-      # TODO: make this a proper nvim plugin dir 'myMinimalNvimConfig'
-      customRC = /* vim */ ''
-        set shiftwidth=2 expandtab
-        set mouse=nv
-        set iskeyword+=-
-        set ignorecase smartcase
-        set smartindent
-        set number relativenumber
-        set cursorline
-
-        nnoremap Y yy
-        nnoremap <M-s> :w<cr>
-        inoremap <M-s> <esc>:w<cr>
-        nnoremap § :nohl<cr>
-        nnoremap <M-a> gT
-        nnoremap <M-z> gt
-        nnoremap Q :q<cr>
-
-        nnoremap U <C-r>
-
-        nnoremap <C-h> <C-w>h
-        nnoremap <C-j> <C-w>j
-        nnoremap <C-k> <C-w>k
-        nnoremap <C-l> <C-w>l
-
-        cnoremap <M-k> <Up>
-        cnoremap <M-j> <Down>
-
-        source ${./../../nvim-wip/colors/bew256-dark.vim}
-      '';
-      packages.myVimPackage = with stable.vimPlugins; {
-        start = [ vim-nix ];
-      };
-    };
   };
 
   zshHomeModule = let
@@ -84,30 +41,11 @@ let
 in {
   imports = [
     zshHomeModule
+    neovim-pseudo-flake.homeConfig.nvim-base-bins
+    neovim-pseudo-flake.homeConfig.nvim-bew
   ];
 
   home.packages = [
-    # The original nvim Nix package, with another bin name
-    (mybuilders.replaceBinsInPkg {
-      name = "nvim-original";
-      copyFromPkg = cliPkgs.neovim;
-      bins = { nvim-original = "${cliPkgs.neovim}/bin/nvim"; };
-    })
-    (mybuilders.linkBins "nvim-bins" (
-      let
-        nvim-wip = stable.writeShellScript "nvim-wip" ''
-          exec ${cliPkgs.neovim}/bin/nvim -u ~/.dot/nvim-wip/init.lua "$@"
-        '';
-        nvim-minimal = "${neovim-minimal}/bin/nvim";
-      in {
-        inherit nvim-minimal nvim-wip;
-
-        # My WIP config, directly accessible as `nvim` (may be broken!)
-        # Change drv to `nvim-minimal` if all is broken! So `nvim` always points to ~working config
-        nvim = nvim-wip;
-      }
-    ))
-
     stable.tmux
     cliPkgs.fzf
 
