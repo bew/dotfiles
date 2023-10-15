@@ -84,7 +84,7 @@ replaceBinsInPkg {
       else
         SMART_HEIGHT=20
       fi
-      exec ${fzf}/bin/fzf ${toString keybindingsArgs} --height=$SMART_HEIGHT ${toString layoutArgs} "$@"
+      exec ${lib.getExe fzf} ${toString keybindingsArgs} --height=$SMART_HEIGHT ${toString layoutArgs} "$@"
     '';
   };
 }

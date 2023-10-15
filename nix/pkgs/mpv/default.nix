@@ -40,7 +40,7 @@ in
     nativeBuildInputs = [ makeWrapper ];
     # Setup the binary to point to the config dir, and disable default OSC.
     postBuild = /* sh */ ''
-      makeWrapper ${mpv-unwrapped}/bin/mpv $out/bin/mpv \
+      makeWrapper ${lib.getExe mpv-unwrapped} $out/bin/mpv \
         --set MPV_HOME ${mpv-config-dir}/share/mpv \
         --add-flags '--no-osc'
     '';

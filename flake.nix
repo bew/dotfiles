@@ -29,8 +29,8 @@
   outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
-    selfPkgs = self.packages.${system};
-    selfApps = self.apps.${system};
+    myPkgs = self.packages.${system};
+    myApps = self.apps.${system};
   in {
     homeConfig = let
       username = "bew";
@@ -58,6 +58,7 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages.${system} = let
+      lib = stablePkgs.lib;
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
       bleedingedgePkgs = flakeInputs.nixpkgsUnstable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
@@ -66,7 +67,7 @@
       mpv-helpers = stablePkgs.callPackage ./nix/pkgs/mpv-helpers {};
 
       zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {
-        fzf = selfPkgs.fzf-bew;
+        fzf = myPkgs.fzf-bew;
       };
       zsh-bew = let
         # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration
@@ -77,23 +78,23 @@
             nativeBuildInputs = [ makeWrapper ];
             meta.mainProgram = "zsh";
             postBuild = /* sh */ ''
-              makeWrapper ${zsh}/bin/zsh $out/bin/zsh \
-                --set ZDOTDIR ${selfPkgs.zsh-bew-zdotdir}
+              makeWrapper ${lib.getExe zsh} $out/bin/zsh \
+                --set ZDOTDIR ${myPkgs.zsh-bew-zdotdir}
             '';
           };
-      in stablePkgs.callPackage pkg { zdotdir = selfPkgs.zsh-bew-zdotdir; };
-      zsh-bew-bin = mybuilders.linkSingleBin "${selfPkgs.zsh-bew}/bin/zsh";
+      in stablePkgs.callPackage pkg { zdotdir = myPkgs.zsh-bew-zdotdir; };
+      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.zsh-bew);
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = bleedingedgePkgs.fzf;
         replaceBinsInPkg = mybuilders.replaceBinsInPkg;
       };
-      fzf-bew-bin = mybuilders.linkSingleBin "${selfPkgs.fzf-bew}/bin/fzf";
+      fzf-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.fzf-bew);
 
       #tmux-bew = ...
     };
     apps.${system} = {
-      default = selfApps.zsh-bew; # FIXME: should be an env with all 'core' cli tools
+      default = myApps.zsh-bew; # FIXME: should be an env with all 'core' cli tools
     };
   };
 }

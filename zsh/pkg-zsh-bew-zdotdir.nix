@@ -59,6 +59,7 @@ let
           mkdir -p $out/bin
           mv feeder $out/bin/feeder
         '';
+        meta.mainProgram = "feeder";
       };
     in runCommandLocal "zconvey" {} /* sh */ ''
       mkdir -p $out
@@ -68,7 +69,7 @@ let
       chmod +w $out/feeder
 
       echo "Copying built feeder binary to plugin files"
-      cp -v ${zconvey-feeder}/bin/feeder $out/feeder/feeder
+      cp -v ${lib.getExe zconvey-feeder} $out/feeder/feeder
     '';
   };
 

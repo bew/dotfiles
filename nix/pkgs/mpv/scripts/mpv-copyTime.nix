@@ -23,7 +23,7 @@ stdenvNoCC.mkDerivation rec {
   postPatch = ''
     substituteInPlace copyTime.lua \
       --replace 'return "xclip' \
-                'return "${xclip}/bin/xclip'
+                'return "${lib.getExe xclip}'
   '';
 
   dontBuild = true;
