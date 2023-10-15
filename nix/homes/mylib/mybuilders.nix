@@ -22,7 +22,7 @@ rec {
   #
   # Examples:
   #   (linkBins "my-bins1" [
-  #     "${pkgs.neovim}/bin/nvim"
+  #     pkgs.neovim
   #     "/tmp/foo/bar"
   #   ])
   #   => creates a derivation like:
@@ -32,7 +32,7 @@ rec {
   #         └── bar -> /tmp/foo/bar
   #
   #   (linkBins "my-bins2" [
-  #     {name = "nvim-stable"; path = "${pkgs.neovim}/bin/nvim";}
+  #     {name = "nvim-stable"; path = pkgs.neovim;}
   #     "/tmp/foo/bar"
   #   ])
   #   => creates a derivation like:
@@ -42,7 +42,7 @@ rec {
   #         └── bar -> /tmp/foo/bar
   #
   #   (linkBins "my-bins3" {
-  #     nvim-stable = "${pkgs.neovim}/bin/nvim";
+  #     nvim-stable = pkgs.neovim;
   #     bar-tmp = "/tmp/foo/bar";
   #   })
   #   => creates a derivation like:
@@ -58,7 +58,9 @@ rec {
       binSpecHelp = ''
         a binSpec can be either:
         - a string: "/path/to/foo"
-        - a set: { name = "foo"; path = "/path/to/foo"; }
+        - a set pointing to a string: { name = "foo"; path = "/path/to/foo"; }
+        - a derivation: pkgs.neovim
+        - a set pointing to a derivation: { name = "nvim-custom"; path = pkgs.neovim; }
       '';
       binsSpecHelp = ''
         binsSpec argument can be either:
@@ -82,7 +84,20 @@ rec {
         if (typeOf item) == "string" then
           { name = baseNameOf item; path = item; }
         else if (typeOf item) == "set" && (item ? "name") && (item ? "path") then
-          item
+          let binTarget = item.path; in {
+            inherit (item) name;
+            path = (
+              if (typeOf binTarget) == "string" then
+                binTarget
+              else if (typeOf binTarget) == "set" && (binTarget ? outPath) then
+                lib.getExe binTarget
+              else
+                throw ''
+                  For linkBins: Unable to find target bin path '${name}' of type '${typeOf binTarget}'
+                  ${binsSpecHelp}
+                ''
+            );
+          }
         else
           throw ''
             For linkBins: Unable to normalize bin spec of type '${typeOf item}'
