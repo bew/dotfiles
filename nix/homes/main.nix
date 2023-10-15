@@ -27,17 +27,6 @@
   # Flake inputs
   _module.args.flakeInputs = flakeInputs;
 
-  # Pkgs channels from flakeInputs
-  # => Allows to have a stable sharing point for multiple pkgs sets
-  _module.args.pkgsChannels = let
-    legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
-    pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
-  in {
-    stable = legacyPkgsForSystem flakeInputs.nixpkgsStable;
-    bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsUnstable;
-    myPkgs = pkgsForSystem flakeInputs.self;
-  };
-
   _module.args.system = system;
 
   # -------- Global home setup --------

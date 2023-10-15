@@ -37,6 +37,29 @@
     in import "${flakeInputs.homeManager}/modules" {
       pkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
       configuration = import ./nix/homes/main.nix { inherit flakeInputs system username; };
+
+      # Pkgs channels from flakeInputs
+      # => Allows to have a stable sharing point for multiple pkgs sets
+      #
+      # NOTE: `pkgsChannels` CANNOT be set through `_module.args` without a major limitation:
+      #   Using `_module.args...` somewhere in `imports` is NOT possible because evaluating
+      #   an option like `_module` needs to resolve all imports _first_.
+      #   (e.g. to use `callPackage` to dynamically fill/configure a function that returns a module,
+      #   like `(pkgsChannels.fooPkgs.callPackage ./bar.nix {}).someBarSpecificModule`)
+      #
+      #   => Setting `pkgsChannels` via `specialArgs` of the underlying `evalModules` function works
+      #      because it statically sets module arguments from OUTSIDE of the module system,
+      #      without going through all of the fixpoint stuff and resolving all imports.
+      #
+      #   (Thank you `Lily Foster` on Matrix for quickly helping me find the recursion issue! ❤️)
+      extraSpecialArgs.pkgsChannels = let
+        legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
+        pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
+      in {
+        stable = legacyPkgsForSystem flakeInputs.nixpkgsStable;
+        bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsUnstable;
+        myPkgs = pkgsForSystem flakeInputs.self;
+      };
     };
 
     # TODO(idea): expose packages (& apps?) of my tools pre-configured,
