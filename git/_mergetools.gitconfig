@@ -1,0 +1,8 @@
+[diff]
+  tool = nvim_diffconflicts
+
+[mergetool "nvim_diffconflicts"]
+  # Using vim helper plugin: https://github.com/whiteinge/diffconflicts
+  cmd = nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
+
+# vim:set ft=gitconfig:

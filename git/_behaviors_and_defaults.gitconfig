@@ -1,0 +1,62 @@
+[help]
+  autocorrect = immediate
+
+[init]
+  defaultBranch = main
+
+[commit]
+  # Always enable `--verbose` on commit/squash/...
+  # (shows diff of what is being commited <3)
+  verbose = true
+
+[push]
+  # When 'push' subcmd is called without a remote branch,
+  # use the current local branch name as the remote branch name.
+  default = current
+
+[pull]
+  # Only allow fast-forward merge when using 'pull'.
+  # => Non-ff merge is not attempted automatically and will need to be done manually.
+  ff = only
+
+[merge]
+  # When 'merge' subcmd is called without any ref, merge the upstream branch in.
+  defaultToUpstream = true
+
+  # Do not keep '.orig' files around after a merge conflict for that file,
+  # (I can always find the original files with git!)
+  keepBackup = false
+
+[rebase]
+  # Automatically create a temporary stash entry before the operation begins, and apply it after the
+  # operation ends.
+  autostash = true
+
+  # Automatically mark `fixup:` / `amend:` / `squash:` commits as `fixup` so they'll be auto
+  # squashed into their respective commit.
+  autosquash = true
+
+  # Print a warning when deleting commit lines in interactive rebase.
+  # (use an explicit 'drop' action to avoid the warning)
+  missingCommitsCheck = "warn"
+
+  # Show a diffstat on successful rebase of the effective changes between the new root and HEAD
+  stat = true
+
+[rerere]
+  # Activate 'reuse recorded resolution' system, tracking before/after conflict resolution when they
+  # happen and auto-resolve future similar ones.
+  # Can be useful while doing git rebases, to auto-resolve conflicts I already fixed in the past.
+  #
+  # Ref: https://www.git-scm.com/book/en/v2/Git-Tools-Rerere
+  enabled = true
+
+[diff]
+  # Detect renames & copies (defaults to only renames)
+  renames = copy
+
+[fetch]
+  # Auto remove any remote-tracking refs that no longer exist on the remote
+  prune = true
+
+# vim:set ft=gitconfig:

@@ -3,135 +3,23 @@
   name = Benoit de Chezelles
 
 [github]
-  # some tools uses this
+  # some tools use this
   user = bew
 
-# ------
+[include]
+  path = ./_behaviors_and_defaults.gitconfig
+  path = ./_appearance.gitconfig
+  path = ./_mergetools.gitconfig
+  path = ./_aliases.gitconfig
+  path = ./_delta.gitconfig
 
-[help]
-  autocorrect = immediate
-
-[init]
-  defaultBranch = main
-
-[commit]
-  # Always enable `--verbose` on commit/squash/...
-  # (shows diff of what is being commited <3)
-  verbose = true
-
-[push]
-  # When 'push' subcmd is called without a remote branch,
-  # use the current local branch name as the remote branch name.
-  default = current
-
-[pull]
-  # Only allow fast-forward merge when using 'pull'.
-  # => Non-ff merge is not attempted automatically and will need to be done manually.
-  ff = only
-
-[merge]
-  # When 'merge' subcmd is called without any ref, merge the upstream branch in.
-  defaultToUpstream = true
-
-  # Do not keep '.orig' files around after a merge conflict for that file,
-  # (I can always find the original files with git!)
-  keepBackup = false
-
-  tool = nvim_diffconflicts
-
-[mergetool "nvim_diffconflicts"]
-  # Using vim helper plugin: https://github.com/whiteinge/diffconflicts
-  cmd = nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
-
-[rebase]
-  # Automatically create a temporary stash entry before the operation begins, and apply it after the
-  # operation ends.
-  autostash = true
-
-  # Automatically mark `fixup:` / `amend:` / `squash:` commits as `fixup` so they'll be auto
-  # squashed into their respective commit.
-  autosquash = true
-
-  # Print a warning when deleting commit lines in interactive rebase.
-  # (use an explicit 'drop' action to avoid the warning)
-  missingCommitsCheck = "warn"
-
-  # Show a diffstat on successful rebase of the effective changes between the new root and HEAD
-  stat = true
-
-[rerere]
-  # Activate 'reuse recorded resolution' system, tracking before/after conflict resolution when they
-  # happen and auto-resolve future similar ones.
-  # Can be useful while doing git rebases, to auto-resolve conflicts I already fixed in the past.
-  #
-  # Ref: https://www.git-scm.com/book/en/v2/Git-Tools-Rerere
-  enabled = true
-
-[diff]
-  # Give a little bit more context in diffs (defaut is 3)
-  context = 10
-  # TODO (bug report?): does not seems to work on diffs visible in `git add -p`.
-
-  # Moved lines of code are colored differently
-  colorMoved = default
-  # Ignore whitespace changes for indentation only
-  colorMovedWS = allow-indentation-change
-
-  # Limit the size of --stat graph (++++----)
-  # Important for `git show --patch-with-stat` to avoid line wrapping
-  # (which is not automatically detected for some reasons..)
-  statGraphWidth = 30
-
-  # Detect renames & copies (defaults to only renames)
-  renames = copy
-
-[fetch]
-  # Auto remove any remote-tracking refs that no longer exist on the remote
-  prune = true
-
-[color]
-  interactive = true
-
-[color "status"]
-  untracked = "cyan" # default is red => confusing because modified files are also red..
-
-[color "diff"]
-  # color settings for 'colorMoved' option
-  oldMoved = italic 31 52
-  newMoved = italic 31 22
-  # (alternative color, used when 2 different block of moved lines are next to each other)
-  oldMovedAlternative = italic 97 52
-  newMovedAlternative = italic 97 22
+# ----------------------------------
+# Other less used stuff
 
 # Useful when I can't use SSH to communicate with github and I don't want to
 # type my password/personal-token everytime.
-#
 # [credential "https://github.com"]
 #   username = bew
 #   helper = github-bew-password-from-env
-
-# --- BEGIN log configs
-
-[log]
-  decorate = true
-
-[pretty]
-  # aliases to use with `git log --pretty=<alias>`
-
-  # bew-minimal: with metadata + subject
-  bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n
-
-  # bew-verbose: with metadata + subject + body + notes
-  # (~same as bew-minimal + the commit body & notes if available)
-  bew-verbose = tformat:%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n
-
-  # bew-oneline: simplified logs, similar to --oneline but prettier
-  bew-oneline = tformat:%C(red)%h%C(reset) - %s %C(green)(%cr) %C(blue)<%an>%C(reset)%C(auto)%d%C(reset)
-
-# --- END log configs
-
-[include]
-  path = ./_aliases.gitconfig
-  path = ./_delta.gitconfig
 
 # vim:set ft=gitconfig:

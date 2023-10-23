@@ -1,0 +1,46 @@
+[color]
+  interactive = true
+
+[color "status"]
+  untracked = "cyan" # default is red => confusing because modified files are also red..
+
+[color "diff"]
+  # color settings for 'colorMoved' option
+  oldMoved = italic 31 52
+  newMoved = italic 31 22
+  # (alternative color, used when 2 different block of moved lines are next to each other)
+  oldMovedAlternative = italic 97 52
+  newMovedAlternative = italic 97 22
+
+[log]
+  decorate = true
+
+[pretty]
+  # aliases to use with `git log --pretty=<alias>`
+
+  # bew-minimal: with metadata + subject
+  bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n
+
+  # bew-verbose: with metadata + subject + body + notes
+  # (~same as bew-minimal + the commit body & notes if available)
+  bew-verbose = tformat:%C(bold blue)%h%C(auto)%d - %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n
+
+  # bew-oneline: simplified logs, similar to --oneline but prettier
+  bew-oneline = tformat:%C(red)%h%C(reset) - %s %C(green)(%cr) %C(blue)<%an>%C(reset)%C(auto)%d%C(reset)
+
+[diff]
+  # Give a little bit more context in diffs (defaut is 3)
+  context = 10
+  # TODO (bug report?): does not seems to work on diffs visible in `git add -p`.
+
+  # Moved lines of code are colored differently
+  colorMoved = default
+  # Ignore whitespace changes for indentation only
+  colorMovedWS = allow-indentation-change
+
+  # Limit the size of --stat graph (++++----)
+  # Important for `git show --patch-with-stat` to avoid line wrapping
+  # (which is not automatically detected for some reasons..)
+  statGraphWidth = 30
+
+# vim:set ft=gitconfig:
