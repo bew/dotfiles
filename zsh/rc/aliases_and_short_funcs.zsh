@@ -163,6 +163,9 @@ EZA_COLORS+="xa=38;5;24:" # xattr marker ('@')
 EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
 export EZA_COLORS
 
+alias ltre="eza -la --tree --git-ignore"
+alias lltre="eza -l --tree --git-ignore"
+
 alias ll="ls -l"
 alias la="ll -a"
 alias l="la"
