@@ -105,26 +105,30 @@ table.insert(mouse_bindings, {
   }),
   -- Also enable this binding when mouse reporting is enabled.
   wezterm.permute_any_or_no_mods({
+    mouse_reporting=true,
     event={Down={streak=1, button="Middle"}},
     action=act.PasteFrom("Clipboard"),
-    mouse_reporting=true,
   }),
 })
 
 -- Scrolling!
 -- Since 20220807-113146-c2fee766 the WheelUp/WheelDown events can be bound to
--- custom actions. When using `disable_default_mouse_bindings=true`, scrolling
--- is completely disabled and we need to enable it again.
+-- custom actions. When using `disable_default_mouse_bindings=true`, scrolling is (almost)
+-- completely disabled and we need to enable it again.
+-- NOTE: There is still a builtin behavior when alt_screen=true that auto-sends up/down arrows to
+-- simulate scrolling. No need to bind this myself.
 table.insert(mouse_bindings, {
   {
     mods=mods._,
     event={Down={streak=1, button={WheelUp=1}}},
     action=act.ScrollByCurrentEventWheelDelta,
+    alt_screen=false, -- ⚠⚠⚠ important, scroll on alt-screen will auto-send arrows
   },
   {
     mods=mods._,
     event={Down={streak=1, button={WheelDown=1}}},
     action=act.ScrollByCurrentEventWheelDelta,
+    alt_screen=false, -- ⚠⚠⚠ important, scroll on alt-screen will auto-send arrows
   },
 })
 
