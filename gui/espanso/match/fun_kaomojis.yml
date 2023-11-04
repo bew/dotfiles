@@ -1,16 +1,16 @@
 # This file will be auto-loaded.
 
 matches:
-  - trigger: "!shrug"
+  - trigger: "!shrug!"
     replace: '¯\_(ツ)_/¯'
 
-  - trigger: "!why"
+  - trigger: "!why!"
     replace: 'щ(ºДºщ)'
 
-  - trigger: "!flip"
+  - trigger: "!flip!"
     replace: '(╯°□°)╯︵┻━┻'
 
-  - trigger: "!lalala"
+  - trigger: "!lalala!"
     replace: 'ᕕ( ᐛ )ᕗ'
 
   - trigger: "!blam!"
@@ -18,6 +18,6 @@ matches:
 
   # attacking something, with a few non-breakable spaces
   # (to ensure they will stay as spaces in Teams for example)
-  - trigger: "!blamfor"
+  - trigger: "!blamfor!"
     replace: '(҂-_･) ︻デ═一⠀⠀⠀· · ▸⠀⠀⠀⠀⠀⠀⠀⠀($|$)'
     # note: `$|$` places the cursor there
