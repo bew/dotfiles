@@ -20,8 +20,8 @@
 
     flakeTemplates.url = "github:nixos/templates";
 
-    homeManager.url = "github:nix-community/home-manager/release-22.05";
-    homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
+    homeManager.url = "github:nix-community/home-manager/release-23.05";
+    homeManager.inputs.nixpkgs.follows = "nixpkgsUnstable";
   };
 
   # TO-EXPERIMENT: flakelight (https://github.com/accelbread/flakelight) to

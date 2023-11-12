@@ -1,10 +1,10 @@
 _default:
-  @{{just_executable()}} --list
+  @{{ just_executable() }} --list
 
 _build-only *ARGS:
   #!/usr/bin/env bash
   set -e
-  nix build .#homeConfig.activationPackage {{ ARGS }}
+  nix build '.#homeConfig.activationPackage' {{ ARGS }}
   echo
   echo "Home config successfully build!"
   echo
@@ -15,7 +15,7 @@ build-and-diff *ARGS: (_build-only ARGS)
   set -euo pipefail
   cd {{ justfile_directory() }}
 
-  CURRENT_HOME_MANAGER_PATH="/nix/var/nix/profiles/per-user/$USER/home-manager"
+  CURRENT_HOME_MANAGER_PATH="${XDG_STATE_HOME:-$HOME/.local/state}/nix/profiles/home-manager"
   BUILT_HOME_MANAGER_PATH="./result"
   DIFF_FILE="./.nix-lastBuild-homeDiff.txt"
 
