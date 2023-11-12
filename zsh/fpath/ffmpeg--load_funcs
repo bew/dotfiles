@@ -110,6 +110,7 @@ function ffmpeg::transcode-movie::single-file
     cmd+=(-b:v "$FFMPEG_VIDEO_AVG_BITRATE" -maxrate:v "$FFMPEG_VIDEO_AVG_BITRATE")
   fi
   cmd+=(-c:a aac -maxrate:a 512k) # best quality & widely supported format
+  cmd+=(-threads "${FFMPEG_THREADS:-auto}") # use this to limit CPU usage
   # output
   cmd+=("$output_path")
 
