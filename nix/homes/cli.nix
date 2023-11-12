@@ -41,8 +41,8 @@ let
 in {
   imports = [
     zshHomeModule
-    neovim-pseudo-flake.homeConfig.nvim-base-bins
-    neovim-pseudo-flake.homeConfig.nvim-bew
+    neovim-pseudo-flake.homeModules.nvim-base-bins
+    neovim-pseudo-flake.homeModules.nvim-bew
   ];
 
   home.packages = [

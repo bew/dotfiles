@@ -1,5 +1,5 @@
 {
-  writeShellScript,
+  writeShellScriptBin,
   mybuilders,
   lib,
 
@@ -70,17 +70,17 @@ in {
   packages = {
     inherit nvim-original nvim-minimal;
   };
-  homeConfig.nvim-base-bins = { config, ... }: {
+  homeModules.nvim-base-bins = { config, ... }: {
     home.packages = [
       (mybuilders.linkBins "nvim-base-bins" {
         inherit nvim-original nvim-minimal;
       })
     ];
   };
-  homeConfig.nvim-bew = { config, ... }: let
+  homeModules.nvim-bew = { config, ... }: let
     # My WIP config, directly accessible as `nvim`
     # Use `nvim-minimal` if all is broken!
-    nvim-wip = writeShellScript "nvim-wip" ''
+    nvim-wip = writeShellScriptBin "nvim-wip" ''
       export NVIM_APPNAME=nvim-wip
       export NVIM_BEW_MYPLUGINS_PATH=${config.dyndots.mkLink ./../nvim-myplugins} # config specific
       exec ${lib.getExe nvim-base} "$@"
