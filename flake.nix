@@ -24,8 +24,10 @@
     homeManager.inputs.nixpkgs.follows = "nixpkgsUnstable";
   };
 
-  # TO-EXPERIMENT: flakelight (https://github.com/accelbread/flakelight) to
-  # define my toplevel flake in multiples files, like:
+  # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
+  #   define my toplevel flake in multiples files
+  # TO-EXPERIMENT(?): flakelight (https://github.com/accelbread/flakelight) to
+  #   auto-define the flake elements from files and folder structure..
   outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
@@ -102,7 +104,8 @@
             meta.mainProgram = "zsh";
             postBuild = /* sh */ ''
               makeWrapper ${lib.getExe zsh} $out/bin/zsh \
-                --set ZDOTDIR ${myPkgs.zsh-bew-zdotdir}
+                --set ZDOTDIR ${zdotdir} \
+                --set SHELL_CLI_ENV : ${zdotdir.shellCliEnv}
             '';
           };
       in stablePkgs.callPackage pkg { zdotdir = myPkgs.zsh-bew-zdotdir; };

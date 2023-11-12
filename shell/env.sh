@@ -29,6 +29,13 @@ function path_maybe_add_entry
   fi
 }
 
+# Add CLI env if available
+# This would be the path to a Nix-pkg-like folder with binaries to be used by the shell.
+# Useful if the shell+config is a standalone 'install' on a non-NixOS / other system.
+if [[ -n "$SHELL_CLI_ENV" ]]; then
+  path_maybe_add_entry "$SHELL_CLI_ENV/bin"
+fi
+
 # Dotfiles bins
 path_maybe_add_entry "$HOME/.dot/bin"
 path_maybe_add_entry "$HOME/.dot/gui/bin"

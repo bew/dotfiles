@@ -8,9 +8,32 @@
 # d8888888P  8""888P' o888o o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o
 #
 
-# BIN_* vars are used to specify the binary dependencies of this config file.
-# NOTE: These lines may be rewritten by config manager.
-_BIN_dircolors=dircolors
+_CFG_BINS_DEPENDENCIES=()
+function cfg::depends-on-bin()
+{
+  local bin="$1"
+  _CFG_BINS_DEPENDENCIES+=($bin)
+}
+function cfg::has-bin()
+{
+  local bin="$1"
+  command -v "$bin" >/dev/null
+}
+function cfg::check-dependencies()
+{
+  local missing_bins=()
+  for bin in ${_CFG_BINS_DEPENDENCIES[@]}; do
+    if ! cfg::has-bin "$bin"; then
+      missing_bins+=("$bin")
+    fi
+  done
+  if [[ ${#missing_bins} != 0 ]]; then
+    >&2 echo ":: Missing binaries for this zsh config (expect some broken stuff!)"
+    for missing_bin in ${missing_bins[@]}; do
+      >&2 echo "::   - $missing_bin"
+    done
+  fi
+}
 
 # _ZSH_PLUGIN_SRCREF_* vars are used to specify from where the plugin should be init from
 # (may be a path for things that are sourced, may be a org/repo for things that reference a GH repo)
@@ -23,10 +46,8 @@ _ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
 _ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
 _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
 
-# colors for common binaries (ls, tree, etc..)
-#
-# NOTE: must be done early (not sure why)
-if command -v $_BIN_dircolors >/dev/null; then
+# Init `LS_COLORS`, colors for common binaries (ls, tree, etc..)
+if cfg::has-bin dircolors; then
   eval `dircolors --sh`
 fi
 
@@ -198,6 +219,8 @@ source $ZSH_MY_CONF_DIR/rc/aliases_and_short_funcs.zsh
 # LATE INIT - initialize things that should be init last
 
 autopair-init
+
+cfg::check-dependencies
 
 #-------------------------------------------------------------
 # Load local per-machine zsh config

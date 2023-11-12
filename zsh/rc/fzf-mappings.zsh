@@ -6,6 +6,10 @@ _BIN_fzf=fzf
 _BIN_fd=fd
 _BIN_bat=bat
 _BIN_git=git
+cfg::depends-on-bin fzf
+cfg::depends-on-bin fd
+cfg::depends-on-bin bat
+cfg::depends-on-bin git
 
 if [[ $- != *i* ]]; then
   # -> This is not an interactive shell, bail out!

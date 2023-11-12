@@ -2,6 +2,7 @@
   lib,
   fetchFromGitHub,
   runCommandLocal,
+  buildEnv,
   stdenv,
   makeWrapper,
   coreutils,
@@ -73,31 +74,22 @@ let
     '';
   };
 
-  bins = let
-    binInfo = { drv, binName ? null }: {
-      outPath = (
-        if binName == null
-        then lib.getExe drv
-        else "${lib.getBin drv}/bin/${binName}" # TODO: use `getExe'` when in my nixpkgs
-      );
-      manOutput = drv ? man;
-    };
-  in {
-    fzf = binInfo { drv = fzf; };
-    fd = binInfo { drv = fd; };
-    bat = binInfo { drv = bat; };
-    git = binInfo { drv = git; };
-    dircolors = binInfo { drv = coreutils; binName = "dircolors"; };
+  # dependencies
+  drvForBinDeps = {
+    fzf = fzf;
+    fd = fd;
+    bat = bat;
+    git = git;
+    dircolors = coreutils;
   };
-  # NOTE: all bins from this list should also have their 'man' output installed!
-  # not tested/used..
-  binsManPages = lib.mapAttrsToList (_: binInfo: binInfo.manOutput) bins;
-  # FIXME: How to propagate the 'man' outputs?
-  # this looks like a job for the cliPkgModule system
+  shellCliEnv = buildEnv {
+    name = "shell-cli-env";
+    paths = lib.mapAttrsToList (_binName: drv: drv) drvForBinDeps;
+  };
 
 in
 
-runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
+runCommandLocal "zsh-bew-zdotdir" { passthru.shellCliEnv = shellCliEnv; } /* sh */ ''
   mkdir -p $out $out/rc
 
   >&2 echo "Copying no-deps files"
@@ -106,6 +98,8 @@ runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
   cp ${./.}/rc/completions.zsh $out/rc/
   cp ${./.}/rc/options.zsh $out/rc/
   cp ${./.}/rc/prompt.zsh $out/rc/
+  cp ${./.}/rc/mappings.zsh $out/rc/
+  cp ${./.}/rc/fzf-mappings.zsh $out/rc/
 
   # FIXME: this should be part of a sort of activation?
   # Or can I detect it's not set and suggest to run the activation command for that if it's not?
@@ -114,23 +108,13 @@ runCommandLocal "zsh-bew-zdotdir" {} /* sh */ ''
   ###cp -R ${./.}/completions $out/  # nothing important there
   ###cp -R ${./.}/fpath $out/        # nothing important there
 
-  >&2 echo "Patching binaries in rc/mappings.zsh"
-  cp ${./.}/rc/mappings.zsh $out/rc/
-  substitute ${./rc/fzf-mappings.zsh} $out/rc/fzf-mappings.zsh \
-    --replace "_BIN_fzf=" "_BIN_fzf=${bins.fzf} #" \
-    --replace "_BIN_fd="  "_BIN_fd=${bins.fd} #" \
-    --replace "_BIN_bat=" "_BIN_bat=${bins.bat} #" \
-    --replace "_BIN_git=" "_BIN_git=${bins.git} #"
-
-  >&2 echo "Patching config-specific env vars .zshenv"
+  >&2 echo "Patching config-specific env vars in .zshenv"
   substitute ${./zshenv} $out/.zshenv \
     --replace "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
     --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=bew-nixified #"
 
   >&2 echo "Patching binaries and plugins in .zshrc"
   substitute ${./zshrc} $out/.zshrc \
-    --replace "_BIN_dircolors=" "_BIN_dircolors=${bins.dircolors} #" \
-    \
     --replace "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
     --replace "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
     --replace "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
