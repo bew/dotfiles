@@ -16,6 +16,12 @@
 # ----------------------------------
 # Other less used stuff
 
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
 # Useful when I can't use SSH to communicate with github and I don't want to
 # type my password/personal-token everytime.
 # [credential "https://github.com"]
