@@ -62,6 +62,7 @@ in {
     stable.tree
     stable.just
     (stable.ranger.override { imagePreviewSupport = false; })
+    stable.pueue # interactive cli process 'scheduler' & manager
 
     stable.less
 
