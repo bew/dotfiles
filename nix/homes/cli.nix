@@ -1,4 +1,4 @@
-{ config, pkgsChannels, lib, mybuilders, flakeInputs, system, ... }:
+{ config, pkgsChannels, lib, mybuilders, flakeInputs, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
@@ -77,14 +77,14 @@ in {
     stable.xsv # Fast toolkit to slice through CSV files (kinda sql-like)
 
     stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
-    stable.cloc
     stable.httpie
-    stable.strace
     stable.entr
     stable.tokei
 
     stable.units # gnu's unit converter, has MANY units (https://www.gnu.org/software/units/)
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
+
+    stable.strace
 
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
     stable.gron # to have grep-able json <3
