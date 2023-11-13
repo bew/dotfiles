@@ -39,8 +39,8 @@ my_actions.hide_search_hl = mk_action{
   for_mode = "n",
   fn = function()
     vim.cmd[[nohlsearch]]
-    -- IDEA: disappear after 0.5s ?
-    vim.cmd.echo([["Search cleared"]]) -- note the 'nested' quotes, required for vimscript..
+    -- IDEA: disappear after 1s ?
+    vim.notify "Search cleared"
   end,
 }
 toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}

@@ -467,6 +467,12 @@ Plug {
 }
 
 Plug {
+  source = gh"2KAbhishek/nerdy.nvim",
+  desc = "UI to find nerd-font glyphs easily",
+  tags = {"utils", t.ui},
+}
+
+Plug {
   source = gh"vim-scripts/xterm-color-table.vim",
   desc = "Provide some commands to display all cterm colors",
   tags = {"utils", t.ui, t.vimscript},

@@ -88,6 +88,12 @@ Plug {
 }
 
 Plug {
+  source = gh"NoahTheDuke/vim-just",
+  desc = "Just's justfile support",
+  tags = {t.vimscript, t.ft_support},
+}
+
+Plug {
   source = gh"LnL7/vim-nix",
   desc = "Nix files support",
   tags = {t.vimscript, t.ft_support},
