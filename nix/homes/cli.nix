@@ -69,6 +69,9 @@ in {
     stable.ncdu
     stable.htop
 
+    # try some nu!
+    bleedingedge.nushell
+
     # network tools
     (mybuilders.linkBins "dogdns-as-dig" { dig = "${stable.dogdns}/bin/dog"; }) # nicer `dig`
     stable.netcat-openbsd # for `nc`
