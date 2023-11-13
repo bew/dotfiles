@@ -34,6 +34,8 @@ snip("do", {desc = "do ... end"}, U.myfmt {
 
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
+-- TODO: when cursor has text before, <maybe_name> should be skipped
+-- TODO(treesitter): same when cursor is not at a 'statement' scope
 snip("fn", {desc = "function definition"}, U.myfmt {
   [[
     function<maybe_name>(<args>)

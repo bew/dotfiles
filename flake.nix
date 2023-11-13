@@ -32,7 +32,6 @@
     # I only care about ONE system for now...
     system = "x86_64-linux";
     myPkgs = self.packages.${system};
-    myApps = self.apps.${system};
   in {
     homeConfig = let
       username = "bew";
@@ -95,7 +94,7 @@
         fzf = myPkgs.fzf-bew;
       };
       zsh-bew = let
-        # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration
+        # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration, and using a cli env for dependent binaries
         pkg = { buildEnv, makeWrapper, zsh, zdotdir }:
           mybuilders.replaceBinsInPkg {
             name = "zsh-bew";
@@ -120,7 +119,8 @@
       #tmux-bew = ...
     };
     apps.${system} = {
-      default = myApps.zsh-bew; # FIXME: should be an env with all 'core' cli tools
+      # FIXME: should be an env with all 'core' cli tools
+      default = { type = "app"; program = myPkgs.zsh-bew; };
     };
   };
 }

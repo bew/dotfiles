@@ -1,6 +1,6 @@
-local M = {}
+local U = {}
 
-function M.filter_list(tbl, filter_fn)
+function U.filter_list(tbl, filter_fn)
   vim.validate{
     tbl={tbl, "table"},
     filter_fn={filter_fn, "function"},
@@ -22,7 +22,7 @@ end
 -- ```
 -- TODO(?): Might be nice to allow a table as single param,
 --   so I can have trailing comma for the last item to concat!
-function M.str_space_concat(...)
+function U.str_space_concat(...)
   local final_str = ""
   for idx, item in ipairs({...}) do
     if idx ~= 1 then final_str = final_str .. " " end
@@ -43,7 +43,7 @@ end
 -- ```
 -- TODO(?): Might be nice to allow a table as single param,
 --   so I can have trailing comma for the last item to concat!
-function M.str_concat(...)
+function U.str_concat(...)
   local final_str = ""
   for idx, item in ipairs({...}) do
     final_str = final_str .. tostring(item)
@@ -59,19 +59,19 @@ end
 -- local _q = U.str_simple_quote_surround
 -- print("foo", _q(thing), "bar")
 -- ```
-function M.str_surround(before, str, after)
+function U.str_surround(before, str, after)
   return before .. tostring(str) .. after
 end
-function M.str_simple_quote_surround(str)
-  return M.str_surround("'", str, "'")
+function U.str_simple_quote_surround(str)
+  return U.str_surround("'", str, "'")
 end
 
 ---Checks if the given module is available
 ---@param module_name string The module to check
 ---@return bool
-function M.is_module_available(module_name)
+function U.is_module_available(module_name)
   local module_available = pcall(require, module_name)
   return module_available
 end
 
-return M
+return U

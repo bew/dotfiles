@@ -131,7 +131,7 @@ NamedPlug.cmp {
         },
       },
     }
-    emoji_source = {
+    local emoji_source = {
       name = "emoji",
       keyword_length = 3,
       trigger_characters = {}, -- don't trigger on ':'
@@ -155,6 +155,7 @@ NamedPlug.cmp {
         vim.fn.stdpath"config" .. "/*.vim",
         vim.fn.stdpath"state" .. "/*.lua",
         vim.fn.stdpath"state" .. "/*.vim",
+        "/*nvim*", -- match any file that mentions `nvim` in its full path
       },
       callback = function()
         cmp.setup.buffer({
@@ -306,6 +307,8 @@ NamedPlug.luasnip {
       -- Copied from:
       -- https://github.com/L3MON4D3/LuaSnip/blob/ea7d7ea510c641c4f1504/lua/luasnip/config.lua#L274
       raw_action = [[:lua require('luasnip.util.util').store_selection()<cr>gv"_s]],
+      -- TODO: Display a short message like 'LuaSnip: selection stored' (via `vim.notify`?)
+      keymap_opts = {silent = true},
     }
     leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
     -- NOTE: do not use direct `²` in visual mode, could be useful for context actions later..

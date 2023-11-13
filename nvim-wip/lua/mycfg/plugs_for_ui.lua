@@ -70,6 +70,7 @@ Plug {
       },
       -- Ensure the which-key popup is auto-triggered ONLY for a very limited set of keys,
       -- because the popup is mostly annoying/distractful for other keys.
+      -- IDEA: possible to show which-key when timeout-ing `operator` mode?
       triggers = {
         "<leader>",
         "z", -- (help for 'z' can be useful) -- FIXME: need grouping!
@@ -170,6 +171,13 @@ Plug {
             ["/F"] = "fuzzy_finder",
             ["//"] = "fuzzy_finder", -- alt mapping, nicer?
             ["/D"] = "fuzzy_finder_directory", -- only directories
+            -- FIXME: how to make the fuzzy_finder NOT auto-open found file?
+            --   (when pressing <cr> after searching something to hide)
+            --   => Then, how to hide results? Maybe with an empty fuzzy search? (not great..)
+            -- NOTE: I'd expect the fuzzy finder thing to not be specific to filesystem view,
+            --   and to work over any sets of tree of nodes
+            -- FIXME: how to close the fuzzy_finder searchbox while keeping the filtered view of
+            --   results??
           },
           fuzzy_finder_mappings = {
             ["<M-j>"] = "move_cursor_down",

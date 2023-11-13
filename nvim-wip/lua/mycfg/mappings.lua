@@ -196,6 +196,8 @@ vim.cmd[[inoremap <M-l>   <C-g>U<Right>]]
 -- cmdline!
 vim.cmd[[inoremap <M-b> <C-g>U<S-Left>]]
 vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
+-- FIXME: there are no way to move to end-of-word from insert mode
+-- And if I make a custom mapping it wouldn't be repeatable :/ (FIXME<i-action-not-repeatable>)
 
 
 -- Survival keybindings - Command mode

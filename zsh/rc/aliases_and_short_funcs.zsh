@@ -161,6 +161,10 @@ EZA_COLORS+="gr=38;5;240:gw=38;5;244:gx=38;5;248:" # group permissions
 EZA_COLORS+="tr=38;5;240:tw=38;5;244:tx=38;5;248:" # other permissions
 EZA_COLORS+="xa=38;5;24:" # xattr marker ('@')
 EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
+# TODO: Enable git column with darker colors as well?
+# FIXME(feature request): Ask to make configurable git symbols
+#   (e.g. I don't like `N` for untracked => would prefer `U` (grey);
+#    and instead of `U` for conflicts => would prefer `X` (red))
 export EZA_COLORS
 
 alias ltre="eza -la --tree --git-ignore"

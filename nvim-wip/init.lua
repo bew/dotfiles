@@ -18,9 +18,13 @@ vim.cmd[[ colorscheme bew256-dark ]]
 
 -- map leader definition - space
 vim.g.mapleader = " "
--- IDEA: Change <leader> to <Ctrl-space> | Have <localleader> be <space>
--- And the CtrlSpace plugin would be <leader><space> or <leader><leader>
--- Also give a new leader possibility with <Alt-space> (for a command center?) (:
+-- IDEA: Change <leader> to <C-space> | Have <localleader> be <space>
+-- And the CtrlSpace plugin would be <leader><Space> or <leader><leader>
+-- Also give a new leader possibility with <Alt-Space> (for a command center?) (:
+
+local U = require"mylib.utils"
+local _f = U.str_space_concat
+local _q = U.str_simple_quote_surround
 
 -- Mapping helpers
 -- TODO: move them to a dedicated module!
@@ -77,7 +81,7 @@ function toplevel_map(spec)
   local description = spec.desc
   if type(spec.action) == "table" then
     if not spec.action:supports_mode(spec.mode) then
-      error("Action does not support all given modes: " .. vim.inspect(spec.mode))
+      error(_f("Action does not support all given modes:", vim.inspect(spec.mode)))
     end
 
     -- vim.keymap.set requires the action to be a string or a function,
@@ -151,7 +155,7 @@ local ActionSpec_mt = {
   ),
   __call = function(self)
     if self.keymap_opts.expr then
-      error("Ad-hoc exec of expr action is NOT tested")
+      error("Ad-hoc exec of expr action is NOT tested/supported")
     end
     local raw_action_type = type(self.raw_action)
     if raw_action_type == "function" then
@@ -180,7 +184,7 @@ local ActionSpec_mt = {
       -- -- NOTE: assumes termcodes haven't been replaced yet (<C-x>, <Plug>, etc..)
       -- vim.api.nvim_feedkeys(self.raw_action, feedkeys_mode, replace_keycodes)
     else
-      error("Cannot ad-hoc exec raw action of type" .. raw_action_type)
+      error(_f("Cannot ad-hoc exec raw action of type", raw_action_type))
     end
   end
 }

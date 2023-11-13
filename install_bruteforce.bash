@@ -60,10 +60,10 @@ label "bin links"
 make-link ~/.dot/bin     ~/.bin
 make-link ~/.dot/gui/bin ~/.bin-gui
 
-label "zsh links"
+skip label "zsh links"
 skip make-link ~/.dot/zsh/zshrc   ~/.zshrc
 skip make-link ~/.dot/zsh/zshenv  ~/.zshenv
-make-link ~/.dot/zsh/zlogin  ~/.zlogin
+skip make-link ~/.dot/zsh/zlogin  ~/.zlogin
 
 skip label "nvim link"
 skip make-link ~/.dot/nvim  ~/.config/nvim
@@ -76,7 +76,7 @@ label "Nix stuff"
 make-link ~/.dot/nix/nix-self-config  ~/.config/nix
 
 label "other cli tools"
-make-link ~/.dot/htop            ~/.config/htop
+make-link ~/.dot/gui/htop        ~/.config/htop
 make-link ~/.dot/tmux/tmux.conf  ~/.tmux.conf
 make-link ~/.dot/gdb             ~/.config/gdb
 

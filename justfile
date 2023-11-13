@@ -19,6 +19,12 @@ build-and-diff *ARGS: (_build-only ARGS)
   BUILT_HOME_MANAGER_PATH="./result"
   DIFF_FILE="./.nix-lastBuild-homeDiff.txt"
 
+  # FIXME FIXME FIXME:
+  # This doesn't work right, I need to diff the whole final home-manager derivation, not just it's 'path' derivation!
+  # => I'm currently missing any changes of the files (home/xdg/..) and added dependencies that are
+  #    not in 'path' (like something that is referenced in a file / in a string)
+  # I'd like to also see what new binaries I have in bin/ (and where they come from?)
+
   # Helper script to nicely show:
   # * `nix store diff-closures`'s output
   # * the closure sizes (and +/- diff)
@@ -36,14 +42,3 @@ upgrade-multiuser-nix:
   sudo systemctl daemon-reload
   sudo systemctl restart nix-daemon
   sudo -k
-
-# Bootstrap dotfiles, remove default channel, build and switch home config
-# NOTE: task starts with 'z-' because ~never used, and I want 'just b<TAB>' to compl to build
-z-bootstrap-build-and-switch:
-  # Setup channels (rename default in case we really need it)
-  nix-channel --remove nixpkgs || true
-  nix-channel --remove legacy_channel_please_use_flakes_now || true
-  nix-channel --add https://nixos.org/channels/nixpkgs-unstable legacy_channel_please_use_flakes_now
-  nix-channel --update
-
-  {{ just_executable() }} switch

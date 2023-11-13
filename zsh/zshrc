@@ -60,8 +60,8 @@ source $_ZSH_PLUGIN_SRCREF__zi/zi.zsh
 
 # Syntax highlighting
 FAST_WORK_DIR=$ZSH_DATA_DIR/plugin--fast-syntax-highlighting
-mkdir -vp "$FAST_WORK_DIR" # necessary to exist, other it falls back to ~/.cache :/
-# | => to avoid the selected theme to be saved in ~/.cache tmpfs (empty on boot)
+mkdir -vp "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.cache :/
+# | => to avoid the selected theme to be saved in ~/.cache (tmpfs => empty on boot)
 # \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
 zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
@@ -79,7 +79,7 @@ zi light $_ZSH_PLUGIN_SRCREF__autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
 GITSTATUS_CACHE_DIR=$ZSH_DATA_DIR/plugin--gitstatus
-# \__ to avoid binary auto install in ~/.cache tmpfs (empty on boot)
+# \__ to avoid binary auto install in ~/.cache (tmpfs => empty on boot)
 zi light $_ZSH_PLUGIN_SRCREF__gitstatus
 gitstatus_start MY
 

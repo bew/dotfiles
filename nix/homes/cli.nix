@@ -47,9 +47,9 @@ in {
 
   home.packages = [
     stable.tmux
-    cliPkgs.fzf
 
     bleedingedge.eza # alternative ls, more colors!
+    cliPkgs.fzf
     stable.bat
     stable.fd
     stable.git

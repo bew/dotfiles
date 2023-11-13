@@ -7,8 +7,8 @@ rec {
   # Can be used:
   # * to rename binaries
   # * to rename binaries to allow multiple version of the same software
-  #   in the same derivation or the same top-level environment (which is also a derivation).
-  # * to expose only a few binaries of a derivation.
+  #   in the same environment
+  # * to expose only a few binaries of a derivation
   #
   # NOTE: Using linkBins, the packages used to define the new binaries can't install their normal
   # outputs, thus 'man' output is never available... Similarly shell completions, icons, libs,
@@ -123,9 +123,11 @@ rec {
   #     └── bin/
   #         └── nvim -> /nix/store/frlxim9yz5qx34ap3iaf55caawgdqkip-neovim-0.5.1/bin/nvim
   #
-  linkSingleBin = path: let
+  linkSingleBin = path:
+    let
       binName = baseNameOf path;
-    in pkgs.runCommandLocal "${binName}-single-bin" { meta.mainProgram = binName; } ''
+      meta.mainProgram = binName;
+    in pkgs.runCommandLocal "${binName}-single-bin" { inherit meta; } ''
       mkdir -p $out/bin
       ln -s ${lib.escapeShellArg path} $out/bin/
     '';
