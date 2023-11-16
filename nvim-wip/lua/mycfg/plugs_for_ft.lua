@@ -104,3 +104,9 @@ Plug {
   desc = "Vim plugin for Typst language",
   tags = {t.vimscript, t.ft_support},
 }
+
+Plug {
+  source = gh"elkasztano/nushell-syntax-vim",
+  desc = "nushell files support",
+  tags = {t.vimscript, t.ft_support},
+}
