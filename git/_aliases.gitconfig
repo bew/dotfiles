@@ -1,3 +1,4 @@
+# See IDEA for complex aliases metadata & completions at the end of the file
 [alias]
 
   # List aliases that start with given word, defaults to all
@@ -179,5 +180,17 @@
   # My zsh uses the default zsh-specific completions for git that comes with zsh, which support the
   # full power of zsh categories (tags) for completions (cf `git checkout <trigger-completion>`).
   # I don't think the completion scripts in https://github.com/git/git use zsh' full features.. :/
+  #
+  #
+  # IDEA: define additional aliases that aren't supposed to be used,
+  # to define completion values & information.
+  #
+  # Example:
+  # aliases = ...
+  # _aliases--description = "Get aliases, all or prefix"
+  # _aliases--usage = "$ALIASNAME [<prefix>]"
+  # _aliases--completer = "!f() { git aliases | awk -F' |\\.' '{print $2}' }; f"
+  # Or even more generic (but requires good json(/nuon?) support.. hard to type in gitconfig)
+  # _aliases--metadata = "{description: ..., usage: ..., ... }"
 
 # vim:set ft=gitconfig:
