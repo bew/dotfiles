@@ -15,12 +15,27 @@
   comdry-run = com --dry-run --untracked-files=no
   # Edit (replace) last commit (should not be used if already pushed!)
   comedit-last = com --amend
-  # Fixup last commit message (content untouched)
+  # Fixup (last) commit message (content untouched)
   comfix-reword-last = com --fixup=reword:HEAD
-  # Fixup last commit content (message untouched)
+  comfix-reword = "!f() { \
+    [[ $# -eq 0 ]] && { >&2 echo \"Usage: git comfix-reword <rev>\"; exit 1; }; \
+    local rev=$1; shift; \
+    git com --fixup=reword:$rev \"$@\"; \
+  }; f"
+  # Fixup (last) commit content (message untouched)
   comfix-add-to-last = com --fixup=HEAD
-  # Fixup last commit message & content
+  comfix-add-to = "!f() { \
+    [[ $# -eq 0 ]] && { >&2 echo \"Usage: git comfix-add-to <rev>\"; exit 1; }; \
+    local rev=$1; shift; \
+    git com --fixup=$rev \"$@\"; \
+  }; f"
+  # Fixup (last) commit message & content
   comfix-edit-last = com --squash=HEAD
+  comfix-edit = "!f() { \
+    [[ $# -eq 0 ]] && { >&2 echo \"Usage: git comfix-edit <rev>\"; exit 1; }; \
+    local rev=$1; shift; \
+    git com --squash=$rev \"$@\"; \
+  }; f"
   #
   # Would be nice to have aliases that can fixup/squash to any rev, with <rev> completion
   # (aka, aliases as just another name for the underlying flags)
