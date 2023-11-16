@@ -35,6 +35,15 @@
   #
   # These need to be `git rebase --autosquash`-ed to be merged with the liked commits
 
+  # Show the raw commit msg in a (potentially different) repo
+  # Can be used to get/use the same commit message for a new commit, optionally from another repo.
+  # Usage: `git get-msg [<repo-path=.>] [<rev=HEAD>]`
+  # NOTE: If the first param is a path to a directory, it is used as the repo path
+  get-msg = "!f() { \
+    [[ -d "$1" ]] && { repo_path="$1"; shift; }; \
+    git --no-pager -C ${repo_path:-.} log -n1 --pretty=format:%B ${1:-HEAD}; \
+  }; f"
+
   # Inverts a previous `git add file`
   # (same as new command `git restore --staged file` except
   # that it also works without `file` and unstages all files)
