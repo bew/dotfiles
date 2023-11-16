@@ -60,10 +60,11 @@ label "bin links"
 make-link ~/.dot/bin     ~/.bin
 make-link ~/.dot/gui/bin ~/.bin-gui
 
-skip label "zsh links"
+skip label "shell links"
 skip make-link ~/.dot/zsh/zshrc   ~/.zshrc
 skip make-link ~/.dot/zsh/zshenv  ~/.zshenv
 skip make-link ~/.dot/zsh/zlogin  ~/.zlogin
+make-link ~/.dot/nushell  ~/.config/nushell
 
 skip label "nvim link"
 skip make-link ~/.dot/nvim  ~/.config/nvim
