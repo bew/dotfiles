@@ -1,7 +1,7 @@
 [alias]
 
   # List aliases that start with given word, defaults to all
-  aliases = !git --no-pager config --get-regexp ^alias.$1
+  aliases = "!f() { git --no-pager config --get-regexp ^alias.$1; }; f"
 
   # index manipulation (staging area)
 
