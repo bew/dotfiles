@@ -1,6 +1,46 @@
 #!/usr/bin/env zsh
 
+# Expose config vars when sourcing the file, to be easily tab-completable
 FFMPEG_DRY_RUN=${FFMPEG_DRY_RUN:-}
+FFMPEG_LOGLEVEL=${FFMPEG_LOGLEVEL:-}
+FFMPEG_VIDEO_SIZE=${FFMPEG_VIDEO_SIZE:-}
+FFMPEG_VIDEO_AVG_BITRATE=${FFMPEG_VIDEO_AVG_BITRATE:-}
+FFMPEG_THREADS=${FFMPEG_THREADS:-}
+FFMPEG_SKIP_EXISTING_OUTPUTS=${FFMPEG_SKIP_EXISTING_OUTPUTS:-}
+FFMPEG_DEFAULT_VIDEO_EXT=${FFMPEG_DEFAULT_VIDEO_EXT:-mkv}
+FFMPEG_DEFAULT_AUDIO_EXT=${FFMPEG_DEFAULT_AUDIO_EXT:-m4a}
+
+# NOTE: Would be nice if FFMPEG_SKIP_EXISTING_OUTPUTS was a size like `300MB`, that would allow to
+# skip files of at least that size (to be able to cancel a run, and restart it without having to
+# delete the last in-progress)
+# OR: go the other route, name the in-progress files in a specific way, and rename to the final file
+# when finished..
+
+function ffmpeg::show_config()
+{
+  _ffmpeg::show_single_config FFMPEG_DRY_RUN "$FFMPEG_DRY_RUN"
+  _ffmpeg::show_single_config FFMPEG_LOGLEVEL "$FFMPEG_LOGLEVEL"
+  _ffmpeg::show_single_config FFMPEG_VIDEO_SIZE "$FFMPEG_VIDEO_SIZE"
+  _ffmpeg::show_single_config FFMPEG_VIDEO_AVG_BITRATE "$FFMPEG_VIDEO_AVG_BITRATE"
+  _ffmpeg::show_single_config FFMPEG_THREADS "$FFMPEG_THREADS"
+  _ffmpeg::show_single_config FFMPEG_SKIP_EXISTING_OUTPUTS "$FFMPEG_SKIP_EXISTING_OUTPUTS"
+  _ffmpeg::show_single_config FFMPEG_DEFAULT_VIDEO_EXT "$FFMPEG_DEFAULT_VIDEO_EXT" mkv
+  _ffmpeg::show_single_config FFMPEG_DEFAULT_AUDIO_EXT "$FFMPEG_DEFAULT_AUDIO_EXT" m4a
+}
+
+function _ffmpeg::show_single_config()
+{
+  local name="$1"
+  local value="$2"
+  local default="${3:-}"
+  if [[ -z "$value" ]]; then
+    echo "  $name: (not set)"
+  elif [[ "$value" = "$default" ]]; then
+    echo "  $name: $value (default)"
+  else
+    echo "+ $name: $value"
+  fi
+}
 
 function _ffmpeg::quote_arg_if_needed
 {
@@ -24,53 +64,83 @@ function _ffmpeg::display_and_run
   echo
 
   if [[ -n "${FFMPEG_DRY_RUN:-}" ]]; then
-    echo "--> \$FFMPEG_DRY_RUN is set, nothing to run"
+    echo "==> \$FFMPEG_DRY_RUN is set, nothing to run"
   else
-    echo "--> Now running..."
+    echo "==> Now running..."
     echo
     "$@"
   fi
 }
 
+function _ffmpeg::check_need_skip()
+{
+  [[ -n "$FFMPEG_SKIP_EXISTING_OUTPUTS" ]] || return 1 # should NOT skip
+
+  local output_path="$1"
+  if [[ -f "$output_path" ]]; then
+    echo "==> \$FFMPEG_SKIP_EXISTING_OUTPUTS is set, and output path already exists, skipping"
+    echo
+    return 0 # should skip
+  else
+    return 1 # should NOT skip
+  fi
+}
+
+function _ffmpeg::doing_action_from_to()
+{
+  local action="$1"
+  local from="$2"
+  local to="$3"
+
+  echo
+  echo "::: $action..."
+  echo "    ├ From: '$from'"
+  echo "    └── To: '$to'"
+  echo
+}
+
 function ffmpeg::extract-audio
 {
   if [[ $# == 0 ]]; then
-    echo "Usage: ffmpeg::extract-audio <filename> [<format>]"
-    echo "  <format> defaults to m4a"
+    echo "Usage: ffmpeg::extract-audio <input_path> [<format>]"
+    echo "  <format> defaults to \$FFMPEG_DEFAULT_AUDIO_EXT ($FFMPEG_DEFAULT_AUDIO_EXT)"
     return 1
   fi
 
-  local filename="$1"
-  local format="${2:-m4a}"
-  local target_filename="${filename}.${format}"
+  local input_path="$1"
+  local format="${2:-$FFMPEG_DEFAULT_AUDIO_EXT}"
+  local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
+  local input_filename_no_ext="${input_filename%.*}" # remove extension
+  local output_path="./$input_filename_no_ext.$format"
 
-  echo ">>> Extracting audio from '$filename'..."
+  _ffmpeg::doing_action_from_to "Extracting audio" "$input_path" "$output_path"
+  _ffmpeg::check_need_skip "$output_path" && return 0
 
   # -i    input file
   # -vn   disable video
-  ffmpeg -hide_banner -i "$filename" -vn "$target_filename"
+  ffmpeg -hide_banner -i "$input_path" -vn "$output_path"
   local ret=$?
   if [[ $? == 0 ]]; then
-    echo " >> Audio extracted to '$target_filename'."
+    echo "::: Audio extracted to '$output_path'"
   else
-    echo " >> Audio extract from '$filename' failed."
+    echo "!!! Failed to extract audio from '$input_path'"
   fi
   return $ret
 }
 
 function ffmpeg::extract-audio::rm_source
 {
-  local filename="$1"
+  local input_path="$1"
 
   ffmpeg::extract-audio "${@}"
   local ret=$?
   if [[ $? == 0 ]]; then
-    echo ">>> Deleting source '$filename'..."
+    echo "::: Deleting source '$input_path'..."
   else
     return $ret
   fi
 
-  command rm "$filename"
+  command rm "$input_path"
   ret=$?
   [[ $ret == 0 ]] && echo " >> Done!"
   return $ret
@@ -82,17 +152,26 @@ function ffmpeg::transcode-movie::single-file
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
 
-  if [[ -n "${FFMPEG_VIDEO_SIZE:-}" ]]; then
-    local output_path="${input_filename_no_ext}.transcoded-${FFMPEG_VIDEO_SIZE}.mkv"
-  else
-    local output_path="${input_filename_no_ext}.transcoded.mkv"
-  fi
+  local transcode_suffix && {
+    [[ -n "${FFMPEG_VIDEO_SIZE:-}" ]] && transcode_suffix+="-sz(${FFMPEG_VIDEO_SIZE})"
+    [[ -n "${FFMPEG_VIDEO_AVG_BITRATE}" ]] && transcode_suffix+="-v(${FFMPEG_VIDEO_AVG_BITRATE})"
+  }
+  local rename_id="transcoded" && {
+    [[ -n "$transcode_suffix" ]] && {
+      # $transcode_suffix looks like '-foo', remove '-' prefix
+      rename_id+="[${transcode_suffix#-}]"
+    }
+  }
+  local output_path="./${input_filename_no_ext}.$rename_id.${FFMPEG_DEFAULT_VIDEO_EXT}"
 
-  echo
-  echo "--- Transcoding file -> '$output_path'"
-  echo
+  _ffmpeg::doing_action_from_to "Transcoding file" "$input_path" "$output_path"
+  _ffmpeg::check_need_skip "$output_path" && return 0
 
   local cmd=(ffmpeg -hide_banner)
+  if [[ -n "$FFMPEG_LOGLEVEL" ]]; then
+    # Good ones are: warning (⚠), error (can recover), fatal (cannot recover)
+    cmd+=(-loglevel "$FFMPEG_LOGLEVEL" -stats)
+  fi
   # input
   cmd+=(-i "$input_path")
   # output config
@@ -118,7 +197,7 @@ function ffmpeg::transcode-movie::single-file
   local ret=$?
   if [[ $? == 0 ]]; then
     echo
-    echo "--- File transcoded -> '$output_path'"
+    echo "::: File transcoded -> '$output_path'"
     echo
   fi
   return $ret
@@ -150,7 +229,7 @@ function ffmpeg::transcode-movie--med-qual
   fi
 
   for input_path in "${@}"; do
-    # medium resolution (qhd <=> 960x540), enough for movies or high qual tv shows
+    # medium resolution (qhd <=> 960x540), enough for movies or med qual tv shows
     if ! FFMPEG_VIDEO_SIZE=qhd FFMPEG_VIDEO_AVG_BITRATE=700k ffmpeg::transcode-movie::single-file "$input_path"; then
       echo
       echo "... Movie transcode failed/cancelled ..."
@@ -205,9 +284,16 @@ function ffmpeg::take-sample
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
   local input_ext="${input_filename##*.}" # remove everything until last '.'
-  local output_path="${input_filename_no_ext}.sample-${start}-${_end}.${input_ext}"
+  local output_path="./${input_filename_no_ext}.sample-${start}-${_end}.${input_ext}"
+
+  _ffmpeg::doing_action_from_to "Taking sample" "$input_path" "$output_path"
+  _ffmpeg::check_need_skip "$output_path" && return 0
 
   local cmd=(ffmpeg -hide_banner)
+  if [[ -n "$FFMPEG_LOGLEVEL" ]]; then
+    # Good ones are: warning (⚠), error (can recover), fatal (cannot recover)
+    cmd+=(-loglevel "$FFMPEG_LOGLEVEL" -stats)
+  fi
   cmd+=(-ss "$start")
   cmd+=(-to "$_end")
   cmd+=(-i "$input_path")
@@ -218,7 +304,7 @@ function ffmpeg::take-sample
   local ret=$?
   if [[ $? == 0 ]]; then
     echo
-    echo "--- File sample cut -> '$output_path'"
+    echo "::: File sample cut -> '$output_path'"
     echo
   fi
   return $ret
@@ -235,15 +321,23 @@ function ffmpeg::keep-only-subs
   local input_path="$1"; shift
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
+  local input_ext="${input_filename##*.}" # remove everything until last '.'
   local langs=() langs_str
   for lang in "$@"; do
     langs+="$lang"
-    langs_str+="$lang,"
+    langs_str+="$lang-"
   done
-  langs_str="${langs_str[1,-2]}" # remove last ','
-  local output_path="${input_filename_no_ext}.only-subs(${langs_str}).mkv"
+  langs_str="${langs_str[1,-2]}" # remove last '-'
+  local output_path="./$input_filename_no_ext.only-subs($langs_str).$input_ext"
+
+  _ffmpeg::doing_action_from_to "Keeping only subtitles ($langs_str)" "$input_path" "$output_path"
+  _ffmpeg::check_need_skip "$output_path" && return 0
 
   local cmd=(ffmpeg -hide_banner)
+  if [[ -n "$FFMPEG_LOGLEVEL" ]]; then
+    # Good ones are: warning (⚠), error (can recover), fatal (cannot recover)
+    cmd+=(-loglevel "$FFMPEG_LOGLEVEL" -stats)
+  fi
   cmd+=(-i "$input_path") # input
   cmd+=(-c copy)
   cmd+=(-map 0:V -map 0:a) # video, then all audios
@@ -252,7 +346,7 @@ function ffmpeg::keep-only-subs
     # '0:s' for subtitles streams
     # and with additional specifier 'm:language:<lang>'
     # to only match subtitles with metadata of <lang>
-    cmd+=(-map 0:s:m:language:$lang)
+    cmd+=(-map "0:s:m:language:$lang?")
   done
   # output
   cmd+=("$output_path")
@@ -261,7 +355,7 @@ function ffmpeg::keep-only-subs
   local ret=$?
   if [[ $? == 0 ]]; then
     echo
-    echo "--- File with only subs (${langs_str}) -> '$output_path'"
+    echo "::: File with only subs (${langs_str}) -> '$output_path'"
     echo
   fi
   return $ret
