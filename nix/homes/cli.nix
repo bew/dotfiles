@@ -98,6 +98,8 @@ in {
     stable.translate-shell
     stable.asciiquarium # nice ASCII aquarium 'screen saver'
     bleedingedge.yt-dlp # youtube-dl FTW!!
+    stable.ffmpeg # (transcode all-the-things!)
+    # FIXME(?): Would be nice to be able to use the same ffmpeg pkg as used for mpv
 
     # Languages
     # NOTE: Compilers, interpreter shouldn't really be made available in a global way..
