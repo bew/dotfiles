@@ -203,47 +203,6 @@ Plug {
   end
 }
 
-Plug {
-  enable = false,
-  source = gh"kyazdani42/nvim-tree.lua",
-  desc = "file explorer tree",
-  tags = {t.ui, "filesystem"},
-  on_load = function()
-    require"nvim-tree".setup {
-      view = {
-        signcolumn = "no", -- used to show files diagnostics (FIXME: can these be toggled?)
-        preserve_window_proportions = true,
-      },
-      renderer = {
-        add_trailing = true, -- add '/' to folders
-        group_empty = true,
-        full_name = true, -- for long names, show full name in float win on hover <3
-        indent_markers = { enable = true },
-        icons = {
-          symlink_arrow = "->",
-          show = {
-            -- disable icons
-            -- FIXME: icons on symlinks are still there..
-            file = false,
-            folder = false,
-            git = false,
-          }
-        },
-        -- highlight files by their git status (NvimTreeGit* hl groups)
-        highlight_git = true,
-      },
-      actions = {
-        open_file = { resize_window = false },
-        -- For actions copy_name, copy_path, copy_absolute_path:
-        -- don't put copied text in "+ register (let me manage system clip'), put it in "1 & "" regs
-        -- FIXME: need an easy way to transfer "" to "+ on demand ?
-        use_system_clipboard = false,
-      },
-      -- TODO(later): rewrite full mappings to be easier more logical (my own) to use / remember.
-    }
-  end,
-}
-
 NamedPlug.startup_screen {
   source = gh"goolord/alpha-nvim",
   desc = "a lua powered greeter like vim-startify / dashboard-nvim",
