@@ -20,6 +20,8 @@
 
   # bew-minimal: with metadata + subject
   bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n
+  # (FIXME: I'd like to show ` [……]` after the summary if the commit has a body;
+  # this kind of conditional are NOT supported by git (@2023-11) ☹️)
 
   # bew-verbose: with metadata + subject + body + notes
   # (~same as bew-minimal + the commit body & notes if available)
