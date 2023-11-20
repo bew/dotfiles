@@ -80,7 +80,7 @@ in {
     stable.xsv # Fast toolkit to slice through CSV files (kinda sql-like)
 
     stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
-    stable.httpie
+    stable.xh # httpie but fasterrr
     stable.entr
     stable.tokei
 
