@@ -87,8 +87,8 @@
       bleedingedgePkgs = flakeInputs.nixpkgsUnstable.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
-      mpv-bew = stablePkgs.callPackage ./nix/pkgs/mpv {};
-      mpv-helpers = stablePkgs.callPackage ./nix/pkgs/mpv-helpers {};
+      mpv-bew = bleedingedgePkgs.callPackage ./nix/pkgs/mpv {};
+      mpv-helpers = bleedingedgePkgs.callPackage ./nix/pkgs/mpv-helpers {};
 
       zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {
         fzf = myPkgs.fzf-bew;
