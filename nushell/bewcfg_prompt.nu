@@ -75,15 +75,18 @@ def exits_successfully [cmd: closure] -> bool {
 }
 
 def "segment git-status-slow" [] {
-  # FIXME: The fast version would use nushell_plugin_gstat
+  # FIXME: A faster alternative would be to use nushell_plugin_gstat
   #   https://github.com/nushell/nushell/tree/main/crates/nu_plugin_gstat
-  #   (should be in nixpkgs already)
+  #   (it's in nixpkgs already)
 
   # FIXME: Find a way to disable the segment if it's really slow
   #   (-> How to expose 'settings' to the runtime?)
   if (not (exits_successfully { ^git rev-parse --is-inside-work-tree })) {
     return
   }
+
+  # NOTE: can take inspiration from:
+  # https://github.com/nushell/nu_scripts/blob/91b6a2b2280123ed5789f5c0870b9de22c722fb3/modules/git/git-v2.nu#L449-L542
 
   let status = do {
     mut status = {
@@ -96,7 +99,7 @@ def "segment git-status-slow" [] {
       unstaged.any: null
       untracked.any: null
     }
-    ^git status --porcelain=v2 --branch --show-stash | lines | each {|line|
+    ^git status --porcelain=v2 --branch --show-stash | lines | each { |line|
       # process here!
       null
     }
