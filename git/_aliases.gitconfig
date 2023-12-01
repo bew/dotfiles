@@ -37,12 +37,6 @@
     git com --squash=$rev \"$@\"; \
   }; f"
   #
-  # Would be nice to have aliases that can fixup/squash to any rev, with <rev> completion
-  # (aka, aliases as just another name for the underlying flags)
-  # - `comfix-reword <rev>`
-  # - `comfix-add-to <rev>`
-  # - `comfix-edit <rev>`
-  #
   # NOTE interesting flags:
   # --fixup=amend:<rev>
   # --fixup=reword:<rev>
