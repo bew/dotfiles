@@ -87,6 +87,11 @@ in {
     stable.units # gnu's unit converter, has MANY units (https://www.gnu.org/software/units/)
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
 
+    bleedingedge.ouch # ~universal {,de}compression utility
+    # NOTE: decompressing to a specific folder with `--dir` creates a subfolder if the archive
+    #   contains multiple files.. (can be annoying if I know what I'm doing)
+    #   Existing issue: https://github.com/ouch-org/ouch/issues/322
+
     stable.strace
 
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
