@@ -102,6 +102,21 @@ Plug {
 }
 
 Plug {
+  -- Use `:Oil <path>`, use `g?` for help
+  source = gh"stevearc/oil.nvim",
+  desc = "Edit your filesystem like a normal Neovim buffer",
+  tags = {"filesystem"},
+  on_load = function()
+    require"oil".setup {
+      -- Don't hijack nvim's file explorer, neotree already does that
+      -- NOTE: last hijacker wins, so plugin load order is important but my plugins
+      --   definition system doesn't support plugin ordering for now..
+      default_file_explorer = false,
+    }
+  end,
+}
+
+Plug {
   -- extra-keywords: neotree
   source = gh"nvim-neo-tree/neo-tree.nvim",
   desc = "Neovim plugin to manage the file system and other tree like structures",
