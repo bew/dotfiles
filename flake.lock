@@ -18,7 +18,7 @@
     "homeManager": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgsUnstable"
+          "nixpkgsBleedingEdge"
         ]
       },
       "locked": {
@@ -33,6 +33,22 @@
         "owner": "nix-community",
         "ref": "release-23.05",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "nixpkgsBleedingEdge": {
+      "locked": {
+        "lastModified": 1702206697,
+        "narHash": "sha256-vE9oEx3Y8TO5MnWwFlmopjHd1JoEBno+EhsfUCq5iR8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "29d6c96900b9b576c2fb89491452f283aa979819",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -52,28 +68,12 @@
         "type": "github"
       }
     },
-    "nixpkgsUnstable": {
-      "locked": {
-        "lastModified": 1700416016,
-        "narHash": "sha256-Qp8Of0BUYGjqodmE912h+/uGknB7J11ypcQMKnEDUrg=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "0bf3f5cf6a98b5d077cdcdb00a6d4b3d92bc78b5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "flakeTemplates": "flakeTemplates",
         "homeManager": "homeManager",
-        "nixpkgsStable": "nixpkgsStable",
-        "nixpkgsUnstable": "nixpkgsUnstable"
+        "nixpkgsBleedingEdge": "nixpkgsBleedingEdge",
+        "nixpkgsStable": "nixpkgsStable"
       }
     }
   },

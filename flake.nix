@@ -16,12 +16,12 @@
   # We use specific branches to get most/all packages from the official cache.
   inputs = {
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-22.11";
-    nixpkgsUnstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgsBleedingEdge.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     flakeTemplates.url = "github:nixos/templates";
 
     homeManager.url = "github:nix-community/home-manager/release-23.05";
-    homeManager.inputs.nixpkgs.follows = "nixpkgsUnstable";
+    homeManager.inputs.nixpkgs.follows = "nixpkgsBleedingEdge";
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
@@ -58,7 +58,7 @@
         pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
       in {
         stable = legacyPkgsForSystem flakeInputs.nixpkgsStable;
-        bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsUnstable;
+        bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsBleedingEdge;
         myPkgs = pkgsForSystem flakeInputs.self;
       };
     };
@@ -84,7 +84,7 @@
     packages.${system} = let
       lib = stablePkgs.lib;
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
-      bleedingedgePkgs = flakeInputs.nixpkgsUnstable.legacyPackages.${system};
+      bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
       mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     in {
       mpv-bew = bleedingedgePkgs.callPackage ./nix/pkgs/mpv {};
