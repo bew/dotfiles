@@ -169,6 +169,8 @@ bind --mode=insert <A-A> tabmove -1
 bind --mode=insert <A-Z> tabmove +1
 bind --mode=ex     <A-A> tabmove -1
 bind --mode=ex     <A-Z> tabmove +1
+# NOTE: Those can also be mapped externally (e.g. via AutoHotkey), FF has many builtin keybinds:
+# https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
 
 # tab operations
 bind <CA-t> tabduplicate
