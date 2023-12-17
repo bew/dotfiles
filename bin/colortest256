@@ -66,6 +66,7 @@ from functools import wraps
 # output constants
 fg_escape = "\x1b[38;5;%dm"
 bg_escape = "\x1b[48;5;%dm"
+bold_escape = "\x1b[1m"
 clear = "\x1b[0m"
 
 
@@ -82,6 +83,8 @@ def _get_options(args):
                     help="Use color for foreground text."),
         make_option("-l", "--rgb", action="store_true", dest="rgb",
                     default=False, help="Long format. RGB values as text."),
+        make_option("-d", "--bold", action="store_true", dest="bold",
+                    default=False, help="Display text in bold"),
         make_option("-n", "--numbers", action="store_true", dest="numbers",
                     default=False, help="Include color escape numbers on chart."),
         make_option("-o", "--ansicodes", action="store_true",
@@ -180,10 +183,13 @@ class term16(object):
         """
         space = " " * geo_multiplier
         pre_num_space = " " * (geo_multiplier - 1)
+        text = lambda txt: txt
+        if options.bold:
+            text = lambda txt: bold_escape + txt
         if options.numbers:
-            return esc(n) + pre_num_space + ("%3d" % n) + space
+            return esc(n) + pre_num_space + text("%3d" % n) + space
         elif options.hex:
-            return esc(n) + space + ("%2x" % n) + space
+            return esc(n) + space + text("%2x" % n) + space
         return esc(n) + "  " * geo_multiplier
 
     def _render():
