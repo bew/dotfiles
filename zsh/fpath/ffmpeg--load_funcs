@@ -2,13 +2,13 @@
 
 # Expose config vars when sourcing the file, to be easily tab-completable
 FFMPEG_DRY_RUN=${FFMPEG_DRY_RUN:-}
-FFMPEG_LOGLEVEL=${FFMPEG_LOGLEVEL:-}
+FFMPEG_LOGLEVEL=${FFMPEG_LOGLEVEL:-warning}
 FFMPEG_VIDEO_SIZE=${FFMPEG_VIDEO_SIZE:-}
 FFMPEG_VIDEO_AVG_BITRATE=${FFMPEG_VIDEO_AVG_BITRATE:-}
 FFMPEG_THREADS=${FFMPEG_THREADS:-}
 FFMPEG_SKIP_EXISTING_OUTPUTS=${FFMPEG_SKIP_EXISTING_OUTPUTS:-}
-FFMPEG_DEFAULT_VIDEO_EXT=${FFMPEG_DEFAULT_VIDEO_EXT:-mkv}
-FFMPEG_DEFAULT_AUDIO_EXT=${FFMPEG_DEFAULT_AUDIO_EXT:-m4a}
+FFMPEG_VIDEO_EXT=${FFMPEG_VIDEO_EXT:-mkv}
+FFMPEG_AUDIO_EXT=${FFMPEG_AUDIO_EXT:-m4a}
 
 # NOTE: Would be nice if FFMPEG_SKIP_EXISTING_OUTPUTS was a size like `300MB`, that would allow to
 # skip files of at least that size (to be able to cancel a run, and restart it without having to
@@ -19,13 +19,13 @@ FFMPEG_DEFAULT_AUDIO_EXT=${FFMPEG_DEFAULT_AUDIO_EXT:-m4a}
 function ffmpeg::show_config()
 {
   _ffmpeg::show_single_config FFMPEG_DRY_RUN "$FFMPEG_DRY_RUN"
-  _ffmpeg::show_single_config FFMPEG_LOGLEVEL "$FFMPEG_LOGLEVEL"
+  _ffmpeg::show_single_config FFMPEG_LOGLEVEL "$FFMPEG_LOGLEVEL" warning
   _ffmpeg::show_single_config FFMPEG_VIDEO_SIZE "$FFMPEG_VIDEO_SIZE"
   _ffmpeg::show_single_config FFMPEG_VIDEO_AVG_BITRATE "$FFMPEG_VIDEO_AVG_BITRATE"
   _ffmpeg::show_single_config FFMPEG_THREADS "$FFMPEG_THREADS"
   _ffmpeg::show_single_config FFMPEG_SKIP_EXISTING_OUTPUTS "$FFMPEG_SKIP_EXISTING_OUTPUTS"
-  _ffmpeg::show_single_config FFMPEG_DEFAULT_VIDEO_EXT "$FFMPEG_DEFAULT_VIDEO_EXT" mkv
-  _ffmpeg::show_single_config FFMPEG_DEFAULT_AUDIO_EXT "$FFMPEG_DEFAULT_AUDIO_EXT" m4a
+  _ffmpeg::show_single_config FFMPEG_VIDEO_EXT "$FFMPEG_VIDEO_EXT" mkv
+  _ffmpeg::show_single_config FFMPEG_AUDIO_EXT "$FFMPEG_AUDIO_EXT" m4a
 }
 
 function _ffmpeg::show_single_config()
@@ -35,7 +35,7 @@ function _ffmpeg::show_single_config()
   local default="${3:-}"
   if [[ -z "$value" ]]; then
     echo "  $name: (not set)"
-  elif [[ "$value" = "$default" ]]; then
+  elif [[ "$value" == "$default" ]]; then
     echo "  $name: $value (default)"
   else
     echo "+ $name: $value"
@@ -103,12 +103,12 @@ function ffmpeg::extract-audio
 {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::extract-audio <input_path> [<format>]"
-    echo "  <format> defaults to \$FFMPEG_DEFAULT_AUDIO_EXT ($FFMPEG_DEFAULT_AUDIO_EXT)"
+    echo "  <format> defaults to '$FFMPEG_AUDIO_EXT'"
     return 1
   fi
 
   local input_path="$1"
-  local format="${2:-$FFMPEG_DEFAULT_AUDIO_EXT}"
+  local format="${2:-$FFMPEG_AUDIO_EXT}"
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
   local output_path="./$input_filename_no_ext.$format"
@@ -148,6 +148,11 @@ function ffmpeg::extract-audio::rm_source
 
 function ffmpeg::transcode-movie::single-file
 {
+  if [[ "$1" == "--verbose" ]] || [[ "$1" == "-v" ]]; then
+    shift
+    >&2 echo "-> Verbose requested, using loglevel 'info' (was: '$FFMPEG_LOGLEVEL')"
+    local FFMPEG_LOGLEVEL=info # local, to only affect this function
+  fi
   local input_path="$1"
   local input_filename=$(basename "$input_path") # remove eventual path, output is for CWD
   local input_filename_no_ext="${input_filename%.*}" # remove extension
@@ -162,14 +167,14 @@ function ffmpeg::transcode-movie::single-file
       rename_id+="[${transcode_suffix#-}]"
     }
   }
-  local output_path="./${input_filename_no_ext}.$rename_id.${FFMPEG_DEFAULT_VIDEO_EXT}"
+  local output_path="./${input_filename_no_ext}.$rename_id.${FFMPEG_VIDEO_EXT}"
 
   _ffmpeg::doing_action_from_to "Transcoding file" "$input_path" "$output_path"
   _ffmpeg::check_need_skip "$output_path" && return 0
 
   local cmd=(ffmpeg -hide_banner)
   if [[ -n "$FFMPEG_LOGLEVEL" ]]; then
-    # Good ones are: warning (⚠), error (can recover), fatal (cannot recover)
+    # Good ones are: info (the default), warning (⚠), error (can recover), fatal (cannot recover)
     cmd+=(-loglevel "$FFMPEG_LOGLEVEL" -stats)
   fi
   # input
