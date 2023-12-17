@@ -1,20 +1,11 @@
 # This file will be auto-loaded.
 
 matches:
-  - trigger: "!tm!"
-    replace: '™' # (trademark)
-
-  - trigger: "!...!"
-    replace: '…' # (ellipsis)
-
   - trigger: "!+!"
     replace: '👍'
 
-  - trigger: "!ey!" # eyes
+  - trigger: "!ey!"
     replace: '👀'
-
-  - trigger: "!spk!" # eyes
-    replace: '✨'
 
   - trigger: "!okh!" # ok hand
     replace: '👌'
@@ -22,25 +13,34 @@ matches:
   - trigger: "!thk!" # thinking face
     replace: '🤔'
 
-  - triggers: ["!blink!", "!;)!"] # ;)
+  - trigger: "!blink!" # ;)
     replace: '😉'
+
+  - trigger: "!bad!" # :( (strong)
+    replace: '☹'
 
   - trigger: "!grim!" # grimacing
     replace: '😬'
 
-  - triggers: ["!updown!", "!(:!"] # upside-down
+  - trigger: "!updown!" # upside-down
     replace: '🙃'
-
-  - trigger: "!bad!"
-    replace: '☹️'
 
   - trigger: "!pls!" # grimacing
     replace: '🙏'
 
+  - trigger: "!spk!" # sparkles
+    replace: '✨'
+
+  - trigger: "!tada!"
+    replace: '🎉'
+
+  - trigger: "!hr!" # heart
+    replace: '❤'
+
   - trigger: "!ok!"
     replace: '✔'
 
-  - triggers: ["!x!", "!err!"]
+  - trigger: "!x!"
     replace: '❌'
 
   - trigger: "!?!"
@@ -51,3 +51,9 @@ matches:
 
   - trigger: "!warn!" # point right
     replace: '⚠'
+
+  - trigger: "!tm!" # trademark
+    replace: '™'
+
+  - trigger: "!..!" # ellipsis
+    replace: '…'
