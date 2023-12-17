@@ -66,8 +66,10 @@ Plug {
     -- otherwise dead key might be triggered (like `^e` to make `ê`).
     -- (wezterm implemented this after my issue: https://github.com/wez/wezterm/issues/877)
     -- vim.cmd[[inoremap <M-^> <C-g>U<Home>]] -- BUT: <Home> moves like 0 not like ^
-    toplevel_map{mode={"n", "i"}, key=[[<M-^>]], desc="smart bol", action=require"smart-bol.actions".do_smart_bol}
-    toplevel_map{mode={"n", "i"}, key=[[<M-$>]], desc="eol", action=[[<End>]]}
+    local smart_bol_act = require"smart-bol.actions"
+    toplevel_map{mode={"n", "i"}, key=[[<M-^>]],  desc="smart bol", action=smart_bol_act.do_smart_bol}
+    toplevel_map{mode={"n", "i"}, key=[[<Home>]], desc="smart bol", action=smart_bol_act.do_smart_bol}
+    toplevel_map{mode={"n", "i"}, key=[[<M-$>]],  desc="eol", action=[[<End>]]}
   end,
 }
 

@@ -57,6 +57,17 @@ end
 --   and key should be the shifted key that is going to reach the terminal.
 --   (based on the keyboard-layout)
 cfg.keys = {
+  -- Remap C-Backspace to C-w everywhere
+  keybind(mods.C, "Backspace", act.SendKey{mods=mods.C, key="w"}),
+  -- Remap A-^/$ to Home/End globally
+  -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
+  -- (could also be done at system/desktop level, but this is a good level for all terminal apps)
+  keybind(mods.A, get_raw_key("^"), act.SendKey{key="Home"}),
+  keybind(mods.A, "$",              act.SendKey{key="End"}),
+  -- Force map `Alt-^` itself to terminal program (like neovim!).
+  -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
+  --keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
+
   keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
   keybind(mods.S, "PageDown", act.ScrollByPage(1)),
 
@@ -80,7 +91,7 @@ cfg.keys = {
 
   -- Smart copy with Alt-c:
   -- - If active selection, will copy it to Clipboard & Primary
-  -- - If NO selection, sends Alt-c to the running program
+  -- - If NO selection, sends Alt-c to the running program (which may do a copy in context)
   keybind(mods.A, "c", act_callback(function(win, pane)
     local has_selection = win:get_selection_text_for_pane(pane) ~= ""
     if has_selection then
@@ -119,10 +130,6 @@ cfg.keys = {
     end
     win:set_config_overrides(overrides)
   end)),
-
-  -- Map `Alt-^`'s raw key code to bypass dead key handling (for ^e -> ê) when Alt is pressed,
-  -- and directly send `<M-^>` to terminal program (like neovim!).
-  keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
 
   keybind(mods.CS, "Space", define_and_activate_keytable{
     name = "Leader",
