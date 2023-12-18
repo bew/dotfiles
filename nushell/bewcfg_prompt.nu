@@ -38,11 +38,19 @@ def maybe_space [where: string text: closure] -> string {
   }
 }
 
-def "segment path" [] {
-  let style = {
-    path: ((ansi reset) + (ansi attr_bold) + (ansi darkorange))
-    sep: ((ansi reset) + (ansi red3b))
-    special: ((ansi reset) + (ansi orangered1))
+def "segment path" [--old-prompt] {
+  let style = if $old_prompt {
+    {
+      special: ((ansi reset) + (ansi attr_bold) + (ansi springgreen4))
+      path: ((ansi reset) + (ansi turquoise4))
+      sep: ((ansi reset) + (ansi darkseagreen4b))
+    }
+  } else {
+    {
+      special: ((ansi reset) + (ansi attr_bold) + (ansi orangered1))
+      path: ((ansi reset) + (ansi attr_bold) + (ansi darkorange))
+      sep: ((ansi reset) + (ansi red1))
+    }
   }
   let path = shorten_path $env.PWD
   let path_parts = $path | path split
@@ -110,7 +118,7 @@ def "segment git-status-slow" [] {
 
 # -------------------------------------------------------------
 
-def create_left_prompt [] {
+def create_current_left_prompt [] {
   let segments = [
     (
       # to differenciate my nu prompt vs zsh prompt
@@ -122,19 +130,50 @@ def create_left_prompt [] {
   $segments | str join
 }
 
-def create_right_prompt [] {
+def create_current_right_prompt [] {
   let segments = [
     (segment git-status-slow)
   ]
   $segments | str join
 }
 
+def create_old_left_prompt [] {
+  let segments = [
+    (
+      # to differenciate my nu prompt vs zsh prompt
+      color_surround {fg: grey58 attr: b} {"NU "}
+    )
+    (maybe_space after { segment exit_code })
+    (segment path --old-prompt)
+  ]
+  $segments | str join
+}
+
+def create_old_right_prompt [] {
+  create_current_right_prompt
+}
+
 export-env {
-  $env.PROMPT_COMMAND = { create_left_prompt }
-  $env.PROMPT_COMMAND_RIGHT = { create_right_prompt }
+  $env.PROMPT_COMMAND = { create_current_left_prompt }
+  $env.PROMPT_COMMAND_RIGHT = { create_current_right_prompt }
+
+  $env.IN_TRANSIENT_PROMPT = false
+  $env.TRANSIENT_PROMPT_COMMAND = {
+    $env.IN_TRANSIENT_PROMPT = true
+    let ret = create_old_left_prompt
+    $env.IN_TRANSIENT_PROMPT = false
+    $ret
+  }
+  $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {
+    $env.IN_TRANSIENT_PROMPT = true
+    let ret = create_old_right_prompt
+    $env.IN_TRANSIENT_PROMPT = false
+    $ret
+  }
 
   # The prompt indicators are environmental variables that represent
   # the state of the prompt
+  # -- Current prompt
   $env.PROMPT_INDICATOR = { " > " }
   $env.PROMPT_INDICATOR_VI_INSERT = {
     $" (color_surround {fg: green3a attr: b} {"I"})> "
@@ -145,4 +184,12 @@ export-env {
   $env.PROMPT_MULTILINE_INDICATOR = {||
     $"(color_surround {fg: grey39} {":::"}) "
   }
+
+  # -- Past prompts
+  $env.TRANSIENT_PROMPT_INDICATOR = {
+    $" (color_surround {fg: grey46 attr: b} {"%"}) "
+  }
+  $env.TRANSIENT_PROMPT_INDICATOR_VI_INSERT = $env.TRANSIENT_PROMPT_INDICATOR
+  $env.TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = $env.TRANSIENT_PROMPT_INDICATOR
+  $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = $env.PROMPT_MULTILINE_INDICATOR
 }

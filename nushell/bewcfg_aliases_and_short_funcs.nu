@@ -1,3 +1,5 @@
+export alias cddot = cd ~/.dot
+
 export alias cp = cp --verbose --interactive --progress
 export alias mv = mv --verbose --interactive
 export alias rm = rm --verbose --interactive-once
