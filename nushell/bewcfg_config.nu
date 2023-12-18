@@ -252,6 +252,38 @@ export def get_config [] {
       modifier: Alt_Shift keycode: Char_u
       event: {edit: Redo}
     }
+
+    # ------------------------------------------------
+
+    # (try adding git auto commands)
+    {
+      name: git_status
+      mode: [vi_insert vi_normal]
+      modifier: Alt keycode: Char_g
+      event: {
+        send: ExecuteHostCommand
+        cmd: "git status"
+      }
+    }
+    {
+      name: git_diff
+      mode: [vi_insert vi_normal]
+      modifier: Alt keycode: Char_d
+      event: {
+        send: ExecuteHostCommand
+        cmd: "git d"
+      }
+    }
+    {
+      name: git_diff_staged
+      mode: [vi_insert vi_normal]
+      modifier: Alt_Shift keycode: Char_d
+      event: {
+        send: ExecuteHostCommand
+        cmd: "git d --cached"
+      }
+    }
+    # FIXME: How to implement 'go right or git log?' (maybe via 'until'?)
   ])
 
   $cfg
