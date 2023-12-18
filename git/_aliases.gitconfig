@@ -151,12 +151,12 @@
   stat = !git --no-pager diff --stat --summary
   show-with-stat = !git show --patch-with-stat --summary
 
+  # --- Info aliases on current branch
+
   # Helper to find the base-commit between a base branch (usually master/main) and
   # a head ref (usually HEAD).
   # (we want to find the commit before the first commit on the branch)
   z--base-branch-helper = !git merge-base --octopus ${BASE_BRANCH:-main@\\{u\\}} ${HEAD_REF:-HEAD}
-
-  # --- Info aliases on current branch
 
   # --unified is for the up/down diff context around hunks
   rv-diff          = !git diff --unified=30   $(git z--base-branch-helper)

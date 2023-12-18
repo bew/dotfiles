@@ -1,4 +1,4 @@
-{ config, pkgsChannels, lib, mybuilders, flakeInputs, ... }:
+{ config, pkgsChannels, lib, mybuilders, flakeInputs, pkgs, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
@@ -52,10 +52,19 @@ in {
     cliPkgs.fzf
     stable.bat
     stable.fd
-    stable.git
-    stable.git-lfs
-    stable.gh  # github cli for view & operations
-    bleedingedge.delta # for nice git diffs
+    (pkgs.buildEnv {
+      name = "git-bew-env";
+      paths = [
+        stable.git
+        # config tools
+        bleedingedge.delta # for nice git diffs
+        # extra commands
+        stable.git-lfs # store specific (large) files out-of-repo
+        # other tools
+        stable.gh # github cli for view & operations
+      ];
+      meta.mainProgram = "git";
+    })
     stable.jq
     stable.yq
     stable.ripgrep
