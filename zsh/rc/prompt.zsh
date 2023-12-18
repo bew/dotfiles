@@ -47,7 +47,19 @@ function segmt::short_vim_mode
     *) echo -n "$KEYMAP";;
   esac
 }
-
+function segmt::tiny_vim_mode
+{
+  zle::utils::get-vim-mode
+  case "$REPLY" in
+    insert)  echo -n "%B%F{34}"I"%f%b";; # fg: green
+    normal)  echo -n "%B%F{33}"N"%f%b";; # fg: blue
+    replace) echo -n "%B%F{160}"R"%f%b";; # fg: dark red
+    # NOTE: does not work, we're NOT notified on normal<=>visual mode change
+    # visualchar) echo -n "%B%F{134}V%f%b";; # fg: light violet
+    # visualline) echo -n "%B%F{134}VL%f%b";; # fg: light violet
+    *) echo -n "($KEYMAP)";;
+  esac
+}
 
 # === common-cli-specific segments
 
@@ -395,8 +407,8 @@ PROMPT_CURRENT_PARTS=(
 
   text: "%B%F{166}%2~%f%b " # current dir
 
-  func: segmt::short_vim_mode
-  text: " "
+  func: segmt::tiny_vim_mode
+  # text: " "
   text: "%(!.#.>)" # normal (>) or sudo (#) cmd separator
   text: " "
 )
@@ -406,7 +418,7 @@ PROMPT_PAST_PARTS=(
   func: segmt::python_venv
   func: segmt::exit_code_on_error
 
-  text: "%K{235}%B%F{30} %2~ %f%b%k" # current dir
+  text: "%B%F{30}%2~%f%b" # current dir
 
   text: " "
   text: "%(!.#.%B%F{243}%%%f%b)" # normal (%) or sudo (#) cmd separator
