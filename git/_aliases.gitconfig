@@ -151,6 +151,8 @@
   stat = !git --no-pager diff --stat --summary
   show-with-stat = !git show --patch-with-stat --summary
 
+  repo-info = !onefetch
+
   # --- Info aliases on current branch
 
   # Helper to find the base-commit between a base branch (usually master/main) and
