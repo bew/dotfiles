@@ -60,6 +60,7 @@ let
     name = "nvim-original";
     copyFromPkg = nvim-base;
     bins = { nvim-original = lib.getExe nvim-base; };
+    meta.mainProgram = "nvim-original";
   };
 
   # TODO: expose an environment with:
