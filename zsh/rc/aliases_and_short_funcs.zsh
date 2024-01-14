@@ -315,7 +315,9 @@ function nosudo
     sudo -k # Close the current sudo session if any
   else
     sudo "$@"
+    local ret=$?
     sudo -k # Close the current sudo session
+    return $ret
   fi
 }
 compdef _sudo nosudo

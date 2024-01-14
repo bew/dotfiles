@@ -56,6 +56,8 @@ export def --wrapped nosudo [...args] {
     sudo -k # Close the current sudo session if any
   } else {
     sudo $args
+    let exit_code = $env.LAST_EXIT_CODE
     sudo -k # Close the current sudo session
+    # FIXME: how to forward the $exit_code to the outside world?
   }
 }
