@@ -5,6 +5,7 @@ FFMPEG_DRY_RUN=${FFMPEG_DRY_RUN:-}
 FFMPEG_LOGLEVEL=${FFMPEG_LOGLEVEL:-warning}
 FFMPEG_VIDEO_SIZE=${FFMPEG_VIDEO_SIZE:-}
 FFMPEG_VIDEO_AVG_BITRATE=${FFMPEG_VIDEO_AVG_BITRATE:-}
+FFMPEG_AUDIO_MAX_BITRATE=${FFMPEG_AUDIO_MAX_BITRATE:-}
 FFMPEG_THREADS=${FFMPEG_THREADS:-}
 FFMPEG_SKIP_EXISTING_OUTPUTS=${FFMPEG_SKIP_EXISTING_OUTPUTS:-}
 FFMPEG_VIDEO_EXT=${FFMPEG_VIDEO_EXT:-mkv}
@@ -22,6 +23,7 @@ function ffmpeg::show_config()
   _ffmpeg::show_single_config FFMPEG_LOGLEVEL "$FFMPEG_LOGLEVEL" warning
   _ffmpeg::show_single_config FFMPEG_VIDEO_SIZE "$FFMPEG_VIDEO_SIZE"
   _ffmpeg::show_single_config FFMPEG_VIDEO_AVG_BITRATE "$FFMPEG_VIDEO_AVG_BITRATE"
+  _ffmpeg::show_single_config FFMPEG_AUDIO_MAX_BITRATE "$FFMPEG_AUDIO_MAX_BITRATE"
   _ffmpeg::show_single_config FFMPEG_THREADS "$FFMPEG_THREADS"
   _ffmpeg::show_single_config FFMPEG_SKIP_EXISTING_OUTPUTS "$FFMPEG_SKIP_EXISTING_OUTPUTS"
   _ffmpeg::show_single_config FFMPEG_VIDEO_EXT "$FFMPEG_VIDEO_EXT" mkv
@@ -160,6 +162,7 @@ function ffmpeg::transcode-movie::single-file
   local transcode_suffix && {
     [[ -n "${FFMPEG_VIDEO_SIZE:-}" ]] && transcode_suffix+="-sz(${FFMPEG_VIDEO_SIZE})"
     [[ -n "${FFMPEG_VIDEO_AVG_BITRATE}" ]] && transcode_suffix+="-v(${FFMPEG_VIDEO_AVG_BITRATE})"
+    [[ -n "${FFMPEG_AUDIO_MAX_BITRATE}" ]] && transcode_suffix+="-a(${FFMPEG_AUDIO_MAX_BITRATE})"
   }
   local rename_id="transcoded" && {
     [[ -n "$transcode_suffix" ]] && {
@@ -193,7 +196,7 @@ function ffmpeg::transcode-movie::single-file
     #   (the default video encoding for mkv files) does seems to set it by itself.
     cmd+=(-b:v "$FFMPEG_VIDEO_AVG_BITRATE" -maxrate:v "$FFMPEG_VIDEO_AVG_BITRATE")
   fi
-  cmd+=(-c:a aac -maxrate:a 512k) # best quality & widely supported format
+  cmd+=(-c:a aac -maxrate:a ${FFMPEG_AUDIO_MAX_BITRATE:-512k}) # best quality & widely supported format
   [[ -n "${FFMPEG_THREADS:-}" ]] && cmd+=(-threads "$FFMPEG_THREADS") # limit CPU usage
   # output
   cmd+=("$output_path")
