@@ -121,6 +121,12 @@ bind --mode=normal <A-:> fillcmdline_notrail
 bind --mode=hint   <A-:> fillcmdline_notrail
 bind --mode=visual <A-:> fillcmdline_notrail
 
+# Ignore next keybind
+# (don't use C-v for this, as this can prevent use of C-v in non-input context, like copying cells
+# in Excel/GithubProjects)
+unbind <C-v>
+bind <C-A-i>   nmode ignore 1 mode normal
+
 # --- Open bindings
 
 # open new tab (right after current tab)
