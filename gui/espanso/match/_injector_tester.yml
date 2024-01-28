@@ -4,5 +4,5 @@ matches:
   - trigger: "!t!"
     replace: Espanso-Working!42
 
-  - trigger: "!test"
+  - trigger: "!test!"
     replace: Espanso-Working!42

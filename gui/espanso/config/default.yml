@@ -1,7 +1,7 @@
 
 
 # Show Espanso UI with a trigger
-search_trigger: "!search"
+search_trigger: "!search!"
 # disable default Alt-Space shortcut, I want to use it in my tool configs!
 search_shortcut: off
 

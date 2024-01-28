@@ -1,7 +1,12 @@
 # This file will be auto-loaded.
 
+# NOTE: All triggers have a ending delimiter, `!`, to ensure a trigger like `!foo` doesn't
+#   auto-trigger when I actually wanted `!foobar`.
+# => Using a trigger ending delimiter avoids this problem and always triggers when the trigger is
+#   fully typed with its ending delimiter.
+
 matches:
-  - trigger: "!date"
+  - trigger: "!date!"
     replace: "{{mydate}}"
     vars:
       - name: mydate
@@ -9,7 +14,7 @@ matches:
         params:
           format: "%Y-%m-%d"
 
-  - trigger: "!mkid"
+  - trigger: "!mkid!"
     replace: "{{brain2ID}}"
     vars:
       - name: brain2ID
@@ -19,11 +24,11 @@ matches:
           format: "%Y%m%dT%H%M"
 
   - triggers:
-     - "!nohello"
-     - "!nohi"
+     - "!nohello!"
+     - "!nohi!"
     replace: 'https://nohello.net/'
 
-  - trigger: "!ghdetails"
+  - trigger: "!ghdetails!"
     replace: |
       <details>
       <summary>FILL_ME</summary>
@@ -36,7 +41,7 @@ matches:
     replace: |
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra et ultrices neque ornare aenean euismod elementum nisi quis. Pretium aenean pharetra magna ac placerat. Euismod quis viverra nibh cras pulvinar. Laoreet sit amet cursus sit amet dictum sit. Molestie at elementum eu facilisis sed odio morbi quis. Vulputate odio ut enim blandit volutpat maecenas. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit. In aliquam sem fringilla ut morbi tincidunt. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Dignissim sodales ut eu sem. Et leo duis ut diam quam nulla porttitor massa id.
 
-  - trigger: "!loremlong"
+  - trigger: "!loremlong!"
     replace: |
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pharetra et ultrices neque ornare aenean euismod elementum nisi quis. Pretium aenean pharetra magna ac placerat. Euismod quis viverra nibh cras pulvinar. Laoreet sit amet cursus sit amet dictum sit. Molestie at elementum eu facilisis sed odio morbi quis. Vulputate odio ut enim blandit volutpat maecenas. Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit. In aliquam sem fringilla ut morbi tincidunt. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Dignissim sodales ut eu sem. Et leo duis ut diam quam nulla porttitor massa id.
 
