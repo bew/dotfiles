@@ -162,6 +162,53 @@ local ActionSpec_mt = {
         end
         return true
       end,
+
+      -- WIP WIP WIP (and untested) functions to enable configurable actions
+      --
+      -- --- Returns true if the action has configuration options, false otherwise.
+      -- is_configurable = function(self)
+      --   return type(self.options_def) == "table" and not vim.tbl_isempty(self.options_def)
+      -- end,
+      --
+      -- --- Set given options as the default options for this action from now on.
+      -- set_default_opts = function(self, given_opts)
+      --   self:_ensure_is_configurable()
+      --   self:_validate_given_opts(given_opts)
+      --   self.opts = vim.tbl_extend("force", self.opts, given_opts)
+      -- end,
+      --
+      -- --- Duplicate this action with the given options replacing default ones
+      -- with_opts = function(self_parent, given_opts)
+      --   self:_ensure_is_configurable()
+      --   self:_validate_given_opts(given_opts)
+      --   local new_action_opts = vim.tbl_extend("keep", given_opts, self_parent.opts)
+      --   -- FIXME: make a cheap proxy action with new opts (and good mt) & return that
+      --   local proxy_action = {opts = new_action_opts}
+      --   -- FIXME: copy self_parent's metatable, and add original action as `__index` metamethod
+      --   local self_mt = getmetatable(self_parent)
+      --   local proxy_mt = vim.tbl_extend("force", {}, self_mt) -- copy metatable
+      --   proxy_mt.__index = self_parent -- if not found in parent, its mt should be triggered
+      --   return setmetatable(proxy_action, proxy_mt)
+      -- end,
+      --
+      -- -- Ensure the action is configurable before trying to access/use options
+      -- _ensure_is_configurable = function(self)
+      --   if not self:is_configurable() then
+      --     error("This action is NOT configurable!")
+      --   end
+      -- end,
+      -- -- Validate given_opts has only declared options & values are of valid types.
+      -- _validate_given_opts = function(self, given_opts)
+      --   for opt_name, new_value in pairs(given_opts) do
+      --     if not self.options_def[opt_name] then
+      --       error("This action doesn't have option '" .. opt_name .. "'")
+      --     end
+      --     local opt_spec = self.options_def[opt_name]
+      --     if type(new_value) ~= opt_spec.type then
+      --       error(_f("Given value for option", _q(opt_name), "has invalid type", _q(type(new_value))))
+      --     end
+      --   end
+      -- end,
     },
     -- FIXME: is there a better/simpler way to chain __index metamethods?
     require"mylib.mt_utils".KeyRefMustExist_mt
