@@ -48,6 +48,128 @@ toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}
 --   In the meantime let's bind both :shrug:
 toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 
+-- NOTE: Configurable actions are not ready yet at all..
+--   Let's still keep the spec written down, and use the functions directly in mappings
+-- IDEA: alt action definition interface:
+-- mk_configurable_action(function(act)
+--   local function foo() end
+--   act.options.bounded = ...
+--   act.default_desc = ...
+--   act.mode.n = ... -- (use local function 'foo'…)
+--   act.mode.n.default_desc = ...
+-- end)
+--
+-- Search current word/selection (without moving the cursor)
+-- (initially inspired from https://github.com/neovim/neovim/discussions/24285)
+-- => IDEA(later): Package as a plugin (with optional action) for others?
+my_actions.hlsearch_current = {
+  default_desc = function(self)
+    -- IDEA: could make a templating system to be able to write dynamic doc like:
+    --   `Search current {x.mode==n:word}{x.mode==v:selection}` (+ if/else for extra)
+    if self.ctx.mode == "n" then
+      doc = "Search current word"
+    end
+    if self.ctx.mode == "v" then
+      doc = "Search current selection"
+    end
+    if self.ctx.mode == "v" and self.opts.word_bounds then
+      -- Bounds are 'smart' in visual mode as we inspect selection surrounding chars to put bounds
+      -- only where it makes sense.
+      doc = doc .. " (with smart bounds)"
+    elseif self.opts.word_bounds then
+      doc = doc .. " (with bounds)"
+    else
+      doc = doc .. " (unbounded)"
+    end
+    return doc
+  end,
+  options = {
+    -- IDEA for other names: word_bounds, with_bounds, with_word_bounds
+    word_bounds = mk_action_opt{
+      desc = [[Whether the search should be bounded (true) or anywhere (false) (in visual mode, bounds are guessed to best match selection)]],
+      type = "boolean", -- nicer: `t.bool`
+      default = false,
+    },
+    embed_cursor_pos_in_search = mk_action_opt{ -- TODO: impl this!
+      desc = [[Whether to embed cursor position in search, to keep the current offset for all matches]],
+      type = "boolean", -- nicer: `t.bool`
+      default = false,
+    },
+    -- TODO: currently always as if `true`, need to impl `false`
+    -- GOTCHA: if this is false, `embed_cursor_pos_in_search` cannot be `true` 👀
+    -- FIXME: => does it even make sense to have a separate option for this?
+    --   => Might be better to merge `embed_cursor_pos_in_search` & `preserve_cursor_pos` ?
+    -- preserve_cursor_pos = mk_action_opt{
+    --   desc = [[]],
+    --   type = "boolean", -- nicer: `t.bool`
+    --   default = false,
+    -- },
+  },
+  for_mode = {
+    n = function(self)
+      local current_word = vim.fn.expand("<cword>")
+      U.set_current_search(current_word, { with_bounds = self.opts.word_bounds })
+    end,
+    -- IDEA(later): make searching `with` by selecting it in `withFoo` NOT match `without` NOR `with-you`
+    -- IDEA(even later): make searching TS-aware, only match positions that have the same TS note type 👀
+    --   (would need neovim changes to integrate well with other search builtin actions and plugins
+    --   based on them; need to find compelling use-cases to attempt a neovim core change..)
+    v = function(self)
+      if vim.fn.mode() == "" then
+        -- FIXME: what else could I do here? 🤔
+        --   Neovim can't make disjoint text searches..
+        error("search_current in visual mode does not support visual block")
+      end
+      local necessary_word_bounds = self.opts.word_bounds
+      if self.opts.word_bounds then
+        -- Guess required word bounds to best match selected text, with max restrictions.
+        -- => This is necessary to ensure the search will AT LEAST match the selected text.
+        -- NOTE: If we always add word bounds before/after, it can happen that the selection doesn't
+        --   actually start/end on a word bound, and the resulting search doesn't match it..
+        local visual_bounds = U.get_visual_start_end_pos0()
+        local start_pos0, end_pos0 = visual_bounds.start_pos0, visual_bounds.end_pos0
+        local start_char = U.try_get_buf_char_at_pos0(start_pos0)
+        local before_start_char = U.try_get_buf_char_at_pos0(start_pos0:with_delta{col = -1})
+        local end_char = U.try_get_buf_char_at_pos0(end_pos0)
+        local after_end_char = U.try_get_buf_char_at_pos0(end_pos0:with_delta{col = 1})
+        necessary_word_bounds = {
+          -- A word bound is appropriate when the visual selection starts / ends a keyword
+          -- NOTE: Some chars are out of bound in visual line mode
+          --   => they'll default to `""` (not a keyword)
+          before = U.char_is_keyword(start_char or "") and not U.char_is_keyword(before_start_char or ""),
+          after = U.char_is_keyword(end_char or "") and not U.char_is_keyword(after_end_char or ""),
+        }
+        -- print(_f{
+        --   "start_char", vim.inspect(start_char),
+        --   "before_start_char", vim.inspect(before_start_char),
+        --   "end_char", vim.inspect(end_char),
+        --   "after_end_char", vim.inspect(after_end_char),
+        --   "word_bounds", vim.inspect{ necessary_word_bounds.before, necessary_word_bounds.after },
+        -- })
+      end
+      local selection_lines = U.get_visual_selection_lines()
+      U.set_current_search(selection_lines, { with_bounds = necessary_word_bounds })
+    end,
+  },
+}
+-- For when the configurable action is ready:
+--toplevel_map{mode={"n", "v"}, key="*", action=my_actions.hlsearch_current:with_opts{word_bounds=true}}
+--toplevel_map{mode={"n", "v"}, key="<M-*>", action=my_actions.hlsearch_current}
+--
+-- NOTE: For now I'm using direct functions, simulating a call by the action system
+toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
+  my_actions.hlsearch_current.for_mode.n({ opts = { word_bounds = true } })
+end}
+toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
+  my_actions.hlsearch_current.for_mode.v({ opts = { word_bounds = true } })
+end}
+toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
+  my_actions.hlsearch_current.for_mode.n({ opts = { word_bounds = false } })
+end}
+toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
+  my_actions.hlsearch_current.for_mode.v({ opts = { word_bounds = false } })
+end}
+
 -- I: Disable up/down keys
 --
 -- This is required to disable scrolling in insert mode when running under tmux with scrolling

@@ -84,6 +84,11 @@ function toplevel_map(spec)
       error(_f("Action does not support all given modes:", vim.inspect(spec.mode)))
     end
 
+    -- FIXME: Complex actions (like `my_actions.hlsearch_current`) can have different desc/function
+    --   for each mode.
+    --   => Need to generate a set of keymap parameters for each in this case..
+    --   (only the case when `spec.for_mode` is a table? (idea: make it always a table?))
+
     -- vim.keymap.set requires the action to be a string or a function,
     -- so get the underlying keymap action from the ActionSpec.
     keymap_action = spec.action:to_keymap_action()
@@ -215,6 +220,7 @@ function mk_action(spec)
   else
     error("spec.fn or spec.raw_action must be set!")
   end
+  -- TODO: normalize actual actions to `raw_action_for_mode` table
   return setmetatable({
     default_desc = spec.default_desc or false,
     supported_modes = U.normalize_arg_one_or_more(spec.for_mode),
@@ -222,6 +228,17 @@ function mk_action(spec)
     keymap_opts = spec.keymap_opts or {},
     debug = spec.debug or false,
   }, ActionSpec_mt)
+end
+function mk_configurable_action(spec)
+  -- NOTE: A configurable action has options (inspired from NixOS options, at a single level),
+  -- and can be configured where it's going to be used.
+
+  -- TODO: validate `spec` inputs!
+  assert(spec.options, "a configurable action must actually expose options to be configurable..")
+end
+function mk_action_opt(spec)
+  -- NOT IMPLEMENTED YET
+  return false
 end
 
 
