@@ -32,6 +32,15 @@ snip("do", {desc = "do ... end"}, U.myfmt {
   { body = i(0) },
 })
 
+snip("then", {desc = "then ... end"}, U.myfmt {
+  [[
+    then
+      <body>
+    end
+  ]],
+  { body = i(0) },
+})
+
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 -- TODO: when cursor has text before, <maybe_name> should be skipped
