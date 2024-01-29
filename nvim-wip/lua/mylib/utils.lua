@@ -51,14 +51,14 @@ function U.str_concat(...)
   return final_str
 end
 
--- Helper functions to surround a str with 2 parts
--- ```
--- local _s = U.str_surround
--- print("foo", _s("(", thing, ")"), "bar")
---
--- local _q = U.str_simple_quote_surround
--- print("foo", _q(thing), "bar")
--- ```
+--- Helper functions to surround a str with 2 parts
+--- ```
+--- local _s = U.str_surround
+--- print("foo", _s("(", thing, ")"), "bar")
+---
+--- local _q = U.str_simple_quote_surround
+--- print("foo", _q(thing), "bar")
+--- ```
 function U.str_surround(before, str, after)
   return before .. tostring(str) .. after
 end
@@ -66,7 +66,7 @@ function U.str_simple_quote_surround(str)
   return U.str_surround("'", str, "'")
 end
 
----Checks if the given module is available
+--- Checks if the given module is available
 ---@param module_name string The module to check
 ---@return bool
 function U.is_module_available(module_name)

@@ -93,7 +93,7 @@ function toplevel_map(spec)
     -- NOTE: raise error when opts conflicts
     keymap_opts = vim.tbl_extend("error", keymap_opts, spec.action.keymap_opts)
 
-    if not debug_keymap then debug_keymap = spec.action.debug end
+    debug_keymap = debug_keymap or spec.action.debug
   end
   if description then
     keymap_opts.desc = description
@@ -126,13 +126,21 @@ function leader_remap(spec)
 end
 
 -- Minimal action system
+--
+-- IDEA of a plugin name:
+-- - `factions` [short: `fact`]: Framework for Actions
+--   BAD: plugin short name `fact` doesn't make me think about actions, but facts which an entirely
+--     different thing..
+-- - `nactions` [short: `nact`]: Neovim Actions
+-- - `spectacle` [short: `acts`]: Like at a spectacle we present only nice interface (nice show),
+--   through acts (meaning actions for us, but parts of a play for a spectacle).
 
 ---@class ActionSpecInput
 ---@field for_mode string|string[] Compatible modes at the start of the action
----@field fn (fun(): any)? The function to execute (conflicts with raw_action)
----@field raw_action any? The raw action to execute (conflicts with fn)
----@field keymap_opts {string: any}? The raw action to execute (conflicts with fn)
----@field debug boolean Wheather to debug the effective keymap args on use
+---@field fn? (fun(): any) The function to execute (conflicts with raw_action)
+---@field raw_action? any The raw action to execute (conflicts with fn)
+---@field keymap_opts? {string: any} The raw action to execute (conflicts with fn)
+---@field debug? boolean Wheather to debug the effective keymap args on use
 
 ---@class ActionSpec: ActionSpecInput
 local ActionSpec_mt = {
@@ -246,5 +254,7 @@ require"mycfg.mappings"
 -- FIXME: I don't know where to put this...
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Briefly highlight yanked text",
-  callback = function() vim.highlight.on_yank{ timeout = 300 } end,
+  callback = function()
+    vim.highlight.on_yank{ timeout = 300 }
+  end,
 })

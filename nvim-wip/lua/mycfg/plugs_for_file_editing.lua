@@ -94,6 +94,7 @@ NamedPlug.cmp {
         name = "buffer",
         -- Mainly used for long words, leveraging fuzzy search!
         -- => Helps with speed & responsiveness :)
+        -- FIXME: I want to use keyword_length=2 when only uppercase chars entered
         keyword_length = 3,
         option = {
           -- Collect buffer words, following 'iskeyword' option of that buffer
@@ -126,6 +127,7 @@ NamedPlug.cmp {
         name = "tmux",
         keyword_length = 4,
         option = {
+          capture_history = true,
           all_panes = true,
           trigger_characters = {}, -- all
         },

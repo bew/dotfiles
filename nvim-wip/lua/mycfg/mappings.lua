@@ -44,8 +44,8 @@ my_actions.hide_search_hl = mk_action{
   end,
 }
 toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}
--- Outside of tmux, nvim recognizes '§' as '<S-§>'.. So let's bind both :shrug:
--- FIXME: investigate why ?
+-- FIXME: Investigate why outside of tmux, nvim recognizes '§' as '<S-§>'..
+--   In the meantime let's bind both :shrug:
 toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 
 -- I: Disable up/down keys
