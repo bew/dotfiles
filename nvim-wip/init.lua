@@ -150,7 +150,7 @@ local ActionSpec_mt = {
         return self.raw_action
       end,
       supports_mode = function(self, given_modes)
-        for _, mode in ipairs(_normalize_mode_or_modes(given_modes)) do
+        for _, mode in ipairs(U.normalize_arg_one_or_more(given_modes)) do
           if not vim.tbl_contains(self.supported_modes, mode) then
             return false
           end
@@ -173,33 +173,24 @@ local ActionSpec_mt = {
       -- FIXME: I can't get it to work properly,
       --   e.g with cmd mode or surround actions..
       ----------------------------------------------------
-      -- local replace_keycodes = self.keymap_opts.expr or false
-      -- local feedkeys_mode = ""
-      -- if self.keymap_opts.remap or not self.keymap_opts.noremap then
-      --   feedkeys_mode = feedkeys_mode .. "m" -- remap
-      -- else
-      --   feedkeys_mode = feedkeys_mode .. "n" -- noremap
-      -- end
-      -- feedkeys_mode = feedkeys_mode .. "x" -- execute right away
-      -- feedkeys_mode = feedkeys_mode .. "!" -- do not auto-end insert mode
+      -- local feed_keys_opts = {
+      --   remap = self.keymap_opts.remap,
+      --   replace_keycodes = self.keymap_opts.expr or false,
+      -- }
       -- -- if self.debug then
       --   print("Debugging ad-hoc feedkeys:",
       --     "raw_action:", vim.inspect(self.raw_action),
-      --     "feedkeys_mode:", vim.inspect(feedkeys_mode),
-      --     "replace_keycodes:", replace_keycodes
+      --     "feed_keys_opts:", vim.inspect(feed_keys_opts),
       --   )
       -- -- end
       -- -- NOTE: assumes termcodes haven't been replaced yet (<C-x>, <Plug>, etc..)
+      -- U.feed_keys_sync(self.raw_action, feed_keys_opts)
       -- vim.api.nvim_feedkeys(self.raw_action, feedkeys_mode, replace_keycodes)
     else
       error(_f("Cannot ad-hoc exec raw action of type", raw_action_type))
     end
   end
 }
-
-function _normalize_mode_or_modes(modes)
-  return type(modes) == "table" and modes or { modes }
-end
 
 ---@type {[string]: ActionSpec}
 my_actions = {}
@@ -226,7 +217,7 @@ function mk_action(spec)
   end
   return setmetatable({
     default_desc = spec.default_desc or false,
-    supported_modes = _normalize_mode_or_modes(spec.for_mode),
+    supported_modes = U.normalize_arg_one_or_more(spec.for_mode),
     raw_action = raw_action,
     keymap_opts = spec.keymap_opts or {},
     debug = spec.debug or false,
