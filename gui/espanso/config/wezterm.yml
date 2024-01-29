@@ -5,25 +5,5 @@ filter_class: org.wezfurlong.wezterm
 backend: Clipboard
 paste_shortcut: "CTRL+SHIFT+V"
 
-# Switch to a slower (but sometimes more supported) way of injecting key events based on
-# XTestFakeKeyEvent instead of XSendEvent.
-#
-# => Seems to be the only way to make pasting work in wezterm, otherwise the `paste_shortcut` is
-# received in a wrong way by Wezterm (`v` is detected as pressed without modifiers)
-# ref (my tests): https://github.com/wez/wezterm/issues/3840#issuecomment-1677974127
-#
-# ... I checked with xev that Espanso correctly sends the modifiers before the key and marks the key
-# event as having the correct modifiers.
-# However Wezterm registers modifiers by listening for XkbStateNotify events from X (it doesn't not
-# use the modifiers available in the key event itself), and since Espanso only sends the KeyEvent
-# but not the XkbStateNotify events, Wezterm is not aware of the modifiers that Espanso sends..
-#
-# => I made a PR on Wezterm to use the modifiers in the key event if none were detected:
-#    https://github.com/wez/wezterm/pull/4151
-#    This makes Espanso work in Wezterm without `disable_x11_fast_inject` \o/
-# There might be a better impl to do though, see my ideas at:
-#   https://github.com/wez/wezterm/issues/3840#issuecomment-1680087150
-disable_x11_fast_inject: true
-
 # extra_includes:
 #   - "../match/_injector_tester.yml"
