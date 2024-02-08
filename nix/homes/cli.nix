@@ -104,6 +104,8 @@ in {
     #   contains multiple files.. (can be annoying if I know what I'm doing)
     #   Existing issue: https://github.com/ouch-org/ouch/issues/322
 
+    stable.dupeguru # Nice cross-platform duplicate finder
+
     stable.strace
 
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
