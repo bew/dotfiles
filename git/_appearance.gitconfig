@@ -12,6 +12,11 @@
   oldMovedAlternative = italic 97 52
   newMovedAlternative = italic 97 22
 
+[branch]
+  # Sort `git branch` by last committed-to first.
+  # (`-` prefix reverses the sort order)
+  sort = -committerdate
+
 [log]
   decorate = true
 

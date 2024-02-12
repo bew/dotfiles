@@ -14,6 +14,10 @@
   # use the current local branch name as the remote branch name.
   default = current
 
+  # When `--force-with-lease` is used, force an update only if the tip of the remote-tracking ref has been integrated locally.
+  # (this is the safest force behavior, let's try!)
+  useForceIfIncludes = true
+
 [pull]
   # Only allow fast-forward merge when using 'pull'.
   # => Non-ff merge is not attempted automatically and will need to be done manually.
@@ -58,5 +62,10 @@
 [fetch]
   # Auto remove any remote-tracking refs that no longer exist on the remote
   prune = true
+
+  # Writes the commit graph on fetch, takes a bit more time but significantly improves performance
+  # of many Git commands that need to navigate the graph of commits (e.g. `git log --graph`).
+  # ref: https://blog.gitbutler.com/git-tips-3-really-large-repositories/#commit-graph
+  writeCommitGraph = true
 
 # vim:set ft=gitconfig:

@@ -50,8 +50,8 @@
   # Usage: `git get-msg [<repo-path=.>] [<rev=HEAD>]`
   # NOTE: If the first param is a path to a directory, it is used as the repo path
   get-msg = "!f() { \
-    [[ -d "$1" ]] && { repo_path="$1"; shift; }; \
-    git --no-pager -C ${repo_path:-.} log -n1 --pretty=format:%B ${1:-HEAD}; \
+    [[ -d \"$1\" ]] && { repo_path=\"$1\"; shift; }; \
+    git --no-pager -C \"${repo_path:-.}\" log -n1 --pretty=format:%B ${1:-HEAD}; \
   }; f"
 
   # Inverts a previous `git add file`
@@ -100,10 +100,14 @@
 
   # remote interaction
   ph = push
+  # ref: https://blog.gitbutler.com/git-tips-2-new-stuff-in-git/#safe-force-pushing
+  ph-force-safe = push --force-with-lease
+  phF = ph-force-safe
   pl = pull
   rem = remote -v
 
   # git helpers
+  clone-fast = clone --filter=blob:none
   revp = rev-parse
   gc-remove-old-commits = reflog expire --all --expire=now
   gc-compress-repo = gc --aggressive --prune=now
