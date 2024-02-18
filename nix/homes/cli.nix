@@ -1,4 +1,4 @@
-{ config, pkgsChannels, lib, mybuilders, flakeInputs, pkgs, ... }:
+{ config, pkgsChannels, lib, mybuilders, flakeInputs, pkgs, myHomeModules, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
@@ -9,38 +9,19 @@ let
   };
 
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
+  #
+  # TODO: need to make a proper module, potentially at higher level than the home config?..
+  #   (see comment above mkHomeModule in </zsh/tool-package.nix> for thoughts on bins deps propagation..)
   cliPkgs = {
     fzf = myPkgs.fzf-bew;
   };
 
-  zshHomeModule = let
-    zdotdir = (myPkgs.zsh-bew-zdotdir.override {
-      inherit (cliPkgs) fzf; # make sure to use my fzf config with specific fzf version
-    });
-  in {
-    imports = [
-      # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
-      ../../bash_minimal/proxy_to_zsh.home-module.nix
-    ];
-    # This module installs my config in ~, using usual config files discovery of zsh in home
-    # (`~/.zshrc` & `~/.zshenv`).
-    # => Every config change still require a home rebuild & activation, but it's less hardcoded
-    # than if the package itself had an internal reference to a specific zdotdir,
-    # which would make reloading shell config (to use new one) from existing shells impossible.
-    home.packages = [ stable.zsh ];
-    home.file.".zshrc".text = ''
-      ZDOTDIR=${zdotdir}
-      source ${zdotdir}/.zshrc
-    '';
-    home.file.".zshenv".text = ''
-      source ${zdotdir}/.zshenv
-    '';
-    # FIXME: Add `.zlogin` ?
-  };
-
 in {
   imports = [
-    zshHomeModule
+    myHomeModules.zsh-bew
+    # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
+    ../../bash_minimal/proxy_to_zsh.home-module.nix
+
     neovim-pseudo-flake.homeModules.nvim-base-bins
     neovim-pseudo-flake.homeModules.nvim-bew
   ];

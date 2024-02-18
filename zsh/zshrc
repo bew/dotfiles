@@ -35,16 +35,33 @@ function cfg::check-dependencies()
   fi
 }
 
-# _ZSH_PLUGIN_SRCREF_* vars are used to specify from where the plugin should be init from
-# (may be a path for things that are sourced, may be a org/repo for things that reference a GH repo)
-# NOTE: These lines may be rewritten by config manager.
-_ZSH_PLUGIN_SRCREF__zsh_hooks=$ZSH_MY_CONF_DIR/third-party/zsh-hooks
-_ZSH_PLUGIN_SRCREF__zi=$ZSH_MY_CONF_DIR/third-party/zi
-_ZSH_PLUGIN_SRCREF__F_Sy_H=z-shell/F-Sy-H
-_ZSH_PLUGIN_SRCREF__z=rupa/z
-_ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
-_ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
-_ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
+{
+  local _zsh_plugins_srcrefs=()
+  # _ZSH_PLUGIN_SRCREF_* vars are used to specify from where the plugin should be init from
+  # (can be a path for things that are sourced, or a `org/repo` for things that reference a GH repo)
+  # NOTE: These lines may be rewritten by config manager.
+  _ZSH_PLUGIN_SRCREF__zsh_hooks=$ZSH_MY_CONF_DIR/third-party/zsh-hooks
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zsh_hooks
+  _ZSH_PLUGIN_SRCREF__zi=$ZSH_MY_CONF_DIR/third-party/zi
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zi
+  _ZSH_PLUGIN_SRCREF__F_Sy_H=z-shell/F-Sy-H
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__F_Sy_H
+  _ZSH_PLUGIN_SRCREF__z=rupa/z
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__z
+  _ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autopair
+  _ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__gitstatus
+  _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zconvey
+  # Check plugin folders exist if paths (start with `/`)
+  for p in "${_zsh_plugins_srcrefs[@]}"; do
+    if [[ "${p[1]}" == "/" ]] && ! [[ -d "$p" ]]; then
+      >&2 echo ":: Plugin folder '$p' does not exist (expect some broken stuff!)"
+    fi
+  done
+  unset _zsh_plugins_srcrefs
+}
 
 # Init `LS_COLORS`, colors for common binaries (ls, tree, etc..)
 if cfg::has-bin dircolors; then

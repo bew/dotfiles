@@ -25,13 +25,37 @@
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
-  #   define my toplevel flake in multiples files
-  # TO-EXPERIMENT(?): flakelight (https://github.com/accelbread/flakelight) to
-  #   auto-define the flake elements from files and folder structure..
+  #   define my toplevel flake in multiples files & auto-merge packages, homeConfig, homeModules, {tool,…}ConfigModules...
   outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
     myPkgs = self.packages.${system};
+
+    lib = stablePkgs.lib;
+    stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
+    bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
+
+    mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
+    # IDEA: rename to `pkglib`?
+    #   (to show it's a lib but about packages (so not system-agnostic))
+
+    # NOTE: flake-parts would help with imports & auto-merging here.
+    zsh-tool-package = stablePkgs.callPackage ./zsh/tool-package.nix {
+      inherit mybuilders;
+    };
+    # TODO: find a better place to instantiate the config & configure it..
+    zsh-bew-config = zsh-tool-package.lib.mkZshConfig {
+      pkgs = stablePkgs;
+      configuration = {
+        imports = [
+          zsh-tool-package.zshConfigModule.zsh-bew
+        ];
+        # NOTE: FORCE the config to use a different fzf bin dependency
+        #   (see comment above mkHomeModule in </zsh/tool-package.nix> for thoughts on bins deps propagation..)
+        deps.bins.fzf.pkg = lib.mkForce myPkgs.fzf-bew;
+      };
+    };
+
   in {
     homeConfig = let
       username = "bew";
@@ -61,11 +85,15 @@
         bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsBleedingEdge;
         myPkgs = pkgsForSystem flakeInputs.self;
       };
-    };
 
-    # TODO(idea): expose packages (& apps?) of my tools pre-configured,
-    # like tmux-bew (easiest), fzf-bew (easy?), nvim-bew (hard), zsh-bew (hard), ...
-    # and finally cli-bew (with all previous packages)
+      # Expose to home modules a set of 'private' home modules from other places
+      # (but not exposed out of the dotfiles flake')
+      #
+      # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
+      extraSpecialArgs.myHomeModules = {
+        zsh-bew = (zsh-tool-package.lib.mkZshHomeModule zsh-bew-config);
+      };
+    };
 
     # --- Stuff I want to be able to do with binaries & packages:
     # In my packages:
@@ -82,33 +110,12 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages.${system} = let
-      lib = stablePkgs.lib;
-      stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
-      bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
-      mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
+      zsh-bew-pkgs = zsh-tool-package.lib.mkZshPackages zsh-bew-config;
     in {
+      inherit (zsh-bew-pkgs) zsh-bew zsh-bew-bin zsh-bew-zdotdir;
+
       mpv-bew = bleedingedgePkgs.callPackage ./nix/pkgs/mpv {};
       mpv-helpers = bleedingedgePkgs.callPackage ./nix/pkgs/mpv-helpers {};
-
-      zsh-bew-zdotdir = stablePkgs.callPackage ./zsh/pkg-zsh-bew-zdotdir.nix {
-        fzf = myPkgs.fzf-bew;
-      };
-      zsh-bew = let
-        # zsh pkg wrapper, using my zsh-bew-zdotdir as configuration, and using a cli env for dependent binaries
-        pkg = { buildEnv, makeWrapper, zsh, zdotdir }:
-          mybuilders.replaceBinsInPkg {
-            name = "zsh-bew";
-            copyFromPkg = zsh;
-            nativeBuildInputs = [ makeWrapper ];
-            meta.mainProgram = "zsh";
-            postBuild = /* sh */ ''
-              makeWrapper ${lib.getExe zsh} $out/bin/zsh \
-                --set ZDOTDIR ${zdotdir} \
-                --set SHELL_CLI_ENV : ${zdotdir.shellCliEnv}
-            '';
-          };
-      in stablePkgs.callPackage pkg { zdotdir = myPkgs.zsh-bew-zdotdir; };
-      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.zsh-bew);
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = bleedingedgePkgs.fzf;
@@ -120,7 +127,7 @@
     };
     apps.${system} = {
       # FIXME: should be an env with all 'core' cli tools
-      default = { type = "app"; program = myPkgs.zsh-bew; };
+      default = { type = "app"; program = lib.getExe myPkgs.zsh-bew; };
     };
   };
 }
