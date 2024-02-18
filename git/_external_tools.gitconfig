@@ -1,0 +1,27 @@
+[diff]
+  tool = nvim_diff
+
+[difftool]
+  # Don't prompt before opening each diff in difftool
+  prompt = false
+
+  # Stop showing diffs when difftool exits with an error
+  # (useful when `difftool.prompt` is disabled)
+  #
+  # NOTE: use `:cq[uit]` in neovim to exit editor with an error.
+  trustExitCode = true
+
+[difftool "nvim_diff"]
+  # (FIXME(?): Does not support `g difftool --dir-diff`, which passses tmpdirs instead of files to the difftool)
+  cmd = echo "difftool on: $REMOTE" && nvim -R -d "$LOCAL" "$REMOTE"
+
+# ---------------------------------------
+
+[merge]
+  tool = nvim_diffconflicts
+
+[mergetool "nvim_diffconflicts"]
+  # Using vim helper plugin: https://github.com/whiteinge/diffconflicts
+  cmd = nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
+
+# vim:set ft=gitconfig:

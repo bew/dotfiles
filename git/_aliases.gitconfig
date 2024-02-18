@@ -84,6 +84,7 @@
   # FIXME: is it safe to enable in all cases? (add it to `reb` alias)
   reb-keep-dates = rebase --committer-date-is-author-date
 
+  dtool = difftool
   mtool = mergetool
 
   # branch manipulations

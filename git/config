@@ -9,7 +9,7 @@
 [include]
   path = ./_behaviors_and_defaults.gitconfig
   path = ./_appearance.gitconfig
-  path = ./_mergetools.gitconfig
+  path = ./_external_tools.gitconfig
   path = ./_aliases.gitconfig
   path = ./_delta.gitconfig
 
