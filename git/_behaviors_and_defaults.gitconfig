@@ -59,6 +59,11 @@
   # Detect renames & copies (defaults to only renames)
   renames = copy
 
+  # Use diff algorithm with better / more logical changes detection & clustering
+  # https://luppeng.wordpress.com/2020/10/10/when-to-use-each-of-the-git-diff-algorithms/ (with examples)
+  # https://stackoverflow.com/a/32367597/5655255
+  algorithm = histogram
+
 [fetch]
   # Auto remove any remote-tracking refs that no longer exist on the remote
   prune = true
