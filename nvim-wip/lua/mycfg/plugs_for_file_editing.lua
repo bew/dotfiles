@@ -20,6 +20,7 @@ NamedPlug.cmp {
   -- IDEA: could enable plugins based on roles?
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
   config_depends_on = {
+    Plug { source = gh"onsails/lspkind.nvim", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-buffer", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
     Plug {
@@ -43,16 +44,44 @@ NamedPlug.cmp {
         -- require'luasnip'.lsp_expand(args.body) -- enable soon?
       end
     }
-    -- TODO? try the configurable popup menu (value: "custom")
-    -- => Need to set all CmpItem* hl groups!
-    --    (they only have gui* styles by default, no cterm*)
-    -- global_cfg.view = {
-    --   entries = {name = 'custom', selection_order = 'near_cursor' }
-    -- }
-    global_cfg.view = { entries = "native" } -- the builtin completion menu
+    global_cfg.view = {
+      -- NOTE: 'custom' view works best at the moment @2024-02-25
+      --   ('native' view has a number of issues with surrounding text editing,
+      --   especially snippets from LuaSnip)
+      entries = {name = 'custom', selection_order = 'near_cursor' }
+    }
     global_cfg.performance = {
       max_view_entries = 15,
     }
+
+    local protected_formatter = function(custom_fmt_fn)
+      return function(entry, original_vim_item)
+        local ok, nice_vim_item = pcall(custom_fmt_fn, entry, vim.deepcopy(original_vim_item))
+        if not ok then
+          original_vim_item.kind = "FAIL" -- indicate something failed during formatting
+          return original_vim_item
+        end
+        return nice_vim_item
+      end
+    end
+    local lspkind = require"lspkind"
+    lspkind.init { preset = "codicons" }
+    global_cfg.formatting = {
+      fields = {"abbr", "kind"},
+      -- WARNING: if this function fails, completion will NOT work
+      --   (no completion window will be opened), so we protect it with a wrapper and a default.
+      format = protected_formatter(function(entry, vim_item)
+        -- Get symbol for LSP kind
+        vim_item.kind = lspkind.symbolic(vim_item.kind) .. " "
+        return vim_item
+      end),
+    }
+    -- NOTE: this should really be in `on_colorscheme_change` hook, but it's better here, close
+    -- to formatting code..
+    vim.api.nvim_set_hl(0, "CmpItemKind", { cterm={bold = true}, ctermfg=20 })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { cterm={bold = true}, ctermfg=20 })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { cterm={bold = true}, ctermfg=20 })
+
     global_cfg.confirmation = {
       -- disable auto-confirmations!
       get_commit_characters = function() return {} end,
