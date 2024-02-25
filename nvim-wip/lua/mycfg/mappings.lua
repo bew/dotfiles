@@ -473,6 +473,10 @@ toplevel_map{mode="v", key="W", desc="select whole WORD", action="iW"}
 toplevel_map{mode={"o", "v"}, key="<M-w>", desc="original w selection", action="w"}
 toplevel_map{mode={"o", "v"}, key="<M-W>", desc="original W selection", action="W"}
 
+-- TODO: omap `A)` to allow `dA)` to delete parentheses and surrounding spaces.
+--   (FIXME: On `foo (bar) baz`, should remove space or after or both? 🤔)
+-- TODO: omap `I}` to allow `cI}` to change `foo` on `bla { foo }` (inside braces and spaces)
+
 -- V: Clean paste (preserving the content of the current/unnamed register),
 --    so I can paste over multiple visual selections using the same text
 toplevel_map{mode="v", key="p", desc="paste (preserves register)", action="P"}

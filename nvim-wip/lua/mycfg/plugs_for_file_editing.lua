@@ -362,17 +362,13 @@ Plug {
   tags = {t.vimscript, t.textobj},
   depends_on = { NamedPlug.lib_textobj_user },
   -- IDEA: when the comment is the last thing of the line,
-  -- `ac` could also take the spaces before it!
+  -- `Ac` could also take the spaces before it!
   -- Meaning that when I have:
   -- `foobar  -- |some comment`
-  -- Doing `dac` currently does:
+  -- Doing `dAc` currently does:
   -- `foobar  ` (trailing spaces left!)
   -- I'd like to have:
   -- `foobar`
-  --
-  -- BUT I usually don't want it when I do `vac` or `cac`...
-  -- Maybe a better solution could be that when `ac` binding is enabled,
-  -- add a `dac` binding that implements this behavior?
 }
 
 -- textobj: ie ae

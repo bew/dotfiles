@@ -225,6 +225,14 @@ local FileType = {
 }
 local CursorPos_only = {
   provider = function()
+    -- Use nvim_strwidth to determine the cursor column (unicode-aware) ?
+    -- Try to play with these lines for example:
+    -- ```
+    -- |example normal text - example normal text - example normal text|
+    -- |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    -- ```
+    -- Cursor column differs when on first vs second line.
+
     -- NOTE: %c is the byte-column of the cursor
     -- IDEA: It would be nice to also have the unicode-aware column when different than %c,
     --   to see the 'character' column.
@@ -235,6 +243,8 @@ local CursorPos_only = {
       -- Ref: https://stackoverflow.com/a/13544885
       -- NOTE: It is not _always_ enabled, because it would appear too often,
       --   e.g. when on a wrapped line with 'linebreak' set.
+      --
+      -- FIXME: column info can be wrong when line wraps
       return "%l:%02c%V"
     end
   end,

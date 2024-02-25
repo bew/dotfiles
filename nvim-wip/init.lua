@@ -139,6 +139,12 @@ end
 -- - `nactions` [short: `nact`]: Neovim Actions
 -- - `spectacle` [short: `acts`]: Like at a spectacle we present only nice interface (nice show),
 --   through acts (meaning actions for us, but parts of a play for a spectacle).
+-- - Words related to 'somebody/something who does actions':
+--   * "performer" (❤ ?)
+--   * "actor"
+--   * "operator"
+--   * "executor"
+--   Nice ones!
 
 ---@class ActionSpecInput
 ---@field for_mode string|string[] Compatible modes at the start of the action

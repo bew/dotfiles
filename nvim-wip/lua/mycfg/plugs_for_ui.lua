@@ -422,6 +422,7 @@ Plug {
     toplevel_map{mode={"o", "x"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
 }
+
 -- FIXME: 'mbbill/undotree' does NOT have diff preview when going up/down :/
 -- Best would be 'simnalamburt/vim-mundo' BUT it requires python...
 -- See: https://github.com/nvim-lua/wishlist/issues/21
