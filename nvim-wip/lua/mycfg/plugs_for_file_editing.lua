@@ -325,20 +325,21 @@ Plug {
   desc = "Indent guides",
   tags = {t.code_ui},
   on_load = function()
-    require("indent_blankline").setup {
-      char_list = {"¦", "│"},
-      show_first_indent_level = false,
-      -- show the current indent level on empty lines
-      -- (setting it to false would only show the previous indent, not current one)
-      show_trailing_blankline_indent = true,
-      -- The maximum indent level increase from line to line
-      -- => Make sudden big indent not add more indent lines than necessary
-      max_indent_increase = 1,
-
-      -- TODO: TEST THIS!
-      use_treesitter = U.is_module_available("treesitter"),
-      show_current_context = U.is_module_available("treesitter"),
+    require("ibl").setup {
+      indent = {
+        char = {"¦", "│"},
+      },
+      scope = {
+        char = "┃",
+        show_exact_scope = true, -- Don't mark whole lines at start/end of the scope
+      },
     }
+    -- NOTE: Once scope is setup, see doc for hooks.builtin.scope_highlight_from_extmark to use
+    -- the same highlight groups as rainbow-highlights.
+    local hooks = require"ibl.hooks"
+    -- Replaces the first indentation guide for space/tab indentation with a normal space
+    hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_space_indent_level)
+    hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_tab_indent_level)
   end,
 }
 
