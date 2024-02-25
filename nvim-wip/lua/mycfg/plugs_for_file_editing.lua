@@ -91,11 +91,20 @@ NamedPlug.cmp {
       --        NOTE: looking at cmp_tmux's source, it seems to be set per completion item, in
       --        `item.labelDetails.detail`.
       {
+        -- Mainly used for long words, leveraging fuzzy search (:
         name = "buffer",
-        -- Mainly used for long words, leveraging fuzzy search!
-        -- => Helps with speed & responsiveness :)
-        -- FIXME: I want to use keyword_length=2 when only uppercase chars entered
-        keyword_length = 3,
+        -- I really never need completion of short 2-3 letter words, but it's useful to kick the
+        -- auto-completion early to be able to get completion when typing 2-chars with upper or
+        -- number chars.
+        keyword_length = 2,
+        -- Remove simple entries of 3 lowercase chars, since they're simple to write
+        entry_filter = function(entry, _ctx)
+          local label = entry:get_completion_item().label
+          if #label >= 3 then return true end
+          -- Remove _simple_ lowercase words (`end` is removed, but `ba3` or `FOo` is kept)
+          return label:lower() ~= label
+        end,
+
         option = {
           -- Collect buffer words, following 'iskeyword' option of that buffer
           -- See: https://github.com/hrsh7th/nvim-cmp/issues/453
