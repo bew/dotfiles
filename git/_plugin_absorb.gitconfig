@@ -1,0 +1,9 @@
+# Config for plugin `git-absorb` to help squash changes
+#   https://github.com/tummychow/git-absorb
+
+[absorb]
+  # Make only 1 fixup commit for all hunks that absorb into the same commit.
+  # (instead of the default of 1 fixup commit per absorbable hunk 😬)
+  oneFixupPerCommit = true
+
+# vim:set ft=gitconfig:

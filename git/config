@@ -12,6 +12,7 @@
   path = ./_external_tools.gitconfig
   path = ./_aliases.gitconfig
   path = ./_plugin_delta.gitconfig
+  path = ./_plugin_absorb.gitconfig
 
 # ----------------------------------
 # Other less used stuff
