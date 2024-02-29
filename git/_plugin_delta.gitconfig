@@ -1,3 +1,6 @@
+# Config for plugin `delta` as a diff pager
+#   https://github.com/dandavison/delta
+
 [core]
   pager = delta
 

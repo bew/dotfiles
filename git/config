@@ -11,7 +11,7 @@
   path = ./_appearance.gitconfig
   path = ./_external_tools.gitconfig
   path = ./_aliases.gitconfig
-  path = ./_delta.gitconfig
+  path = ./_plugin_delta.gitconfig
 
 # ----------------------------------
 # Other less used stuff
