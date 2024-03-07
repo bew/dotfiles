@@ -68,6 +68,10 @@ if cfg::has-bin dircolors; then
   eval `dircolors --sh`
 fi
 
+if cfg::depends-on-bin direnv; then
+  eval "$(direnv hook zsh)"
+fi
+
 #-------------------------------------------------------------
 # Load and configure plugins
 

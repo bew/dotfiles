@@ -163,7 +163,10 @@ in {
     # => Every config change still require a home rebuild & activation, but it's less hardcoded
     # than if the package itself had an internal reference to a specific zdotdir,
     # which would make reloading shell config (to use new one) from existing shells much harder.
-    home.packages = [ zshConfig.package ];
+    home.packages = [
+      zshConfig.package
+      zshConfig.outputs.depsEnv
+    ];
     home.file.".zshrc".text = ''
       ZDOTDIR=${zdotdir}
       source ${zdotdir}/.zshrc

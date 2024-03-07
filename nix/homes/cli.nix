@@ -55,6 +55,7 @@ in {
     stable.tree
     stable.just
     (stable.ranger.override { imagePreviewSupport = false; })
+    stable.direnv # FIXME: mention it only in zsh cli env definition?
     stable.pueue # interactive cli process 'scheduler' & manager
 
     stable.less

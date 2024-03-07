@@ -20,6 +20,7 @@ in {
       #   (coreutils pkg POLLUTES the depsEnv closure significantly even if we _only_ need dircolors bin..)
       pkg = pkgs.coreutils;
     };
+    direnv.pkg = pkgs.direnv;
 
     # bins used in fzf mappings (only)
     fzf.pkg = pkgs.fzf;
