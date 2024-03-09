@@ -5,6 +5,9 @@ ORIGINAL_PATH=$PATH
 
 # ------------------ shell config
 
+# FIXME: ⚠ ⚠ This is not reproducible, should NOT load anything from ~/...  ⚠ ⚠
+#   => We must find a way to inject cross-shell env script (or DATA)..
+# (In the meantime, the following line is HARD-replaced on zdotdir pkg build with a nix store path)
 source ~/.dot/shell/env.sh
 
 ZSH_MY_CONF_DIR=~/.zsh
