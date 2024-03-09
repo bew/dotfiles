@@ -148,7 +148,9 @@ alias eza="eza --group-directories-first"
 # Read more at `man 5 eza_colors`
 EZA_COLORS=""
 EZA_COLORS+="da=38;5;243:" # darker
-EZA_COLORS+="uu=38;5;239:gu=38;5;239:" # darker username & group
+EZA_COLORS+="uu=38;5;239:gu=38;5;239:" # darker user/group that is me
+EZA_COLORS+="un=38;5;250:gn=38;5;250:" # white(visible!) user/group that is not me / am not part of
+EZA_COLORS+="uR=38;5;124:gR=38;5;124:" # dark red user/group that is 'root'
 # Color file sizes by order of magnitude
 EZA_COLORS+="nb=38;5;239:ub=38;5;241:"    #  0  -> <1KB : grey
 EZA_COLORS+="nk=38;5;29:uk=38;5;100:"     # 1KB -> <1MB : green
