@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Depends on:
+# - python3 (runtime)
+# - file
+
 # -- IDEAs:
 # Naming: `trace-which`, `trace-link`, `trace-bin`, `trace-path`
 # (from: https://gist.github.com/hellwolf/39feed6c494b4b93ebbd6e52aba2e8df)
@@ -13,6 +17,7 @@
 
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import List
@@ -111,6 +116,10 @@ def main(args: List[str]):
     for link in symlinks_chain:
         print(f" -->  {path_to_str_with_info(link)}")
 
+    # Add information about the target file
+    print()
+    print("Target file info:")
+    subprocess.run(["file", "--brief", "--dereference", initpath])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
