@@ -38,7 +38,7 @@
 [diff]
   # Give a little bit more context in diffs (defaut is 3)
   context = 10
-  # TODO (bug report?): does not seems to work on diffs visible in `git add -p`.
+  # TODO (bug report?): does not seem to work on diffs visible in `git add -p`.
 
   # Moved lines of code are colored differently
   colorMoved = default

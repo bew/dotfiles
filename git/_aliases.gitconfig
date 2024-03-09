@@ -67,20 +67,20 @@
   untrack = rm --cached
 
   # repo manipulation
+
   f = fetch
+  fa = fetch --all
+
   m = merge
   ch = checkout
   sw = switch
+
   sth = stash
 
   reb  = rebase
   rebi = rebase -i
-  # Auto apply `fixup`-family of commits (non-interactive)
-  # `-i` is necessary for the autosquash behavior, and we disable the editor to actually make it non-interactive.
-  # ref: https://til.codeinthehole.com/posts/how-to-perform-a-noninteractive-interactive-git-rebase/
-  reb-auto-rewrite-from = !git -c sequence.editor=true rebase -i
   # Do not changes commit dates of rebased commits
-  # NOTE: the entire history of the rebased branch will be composed of new commits
+  # NOTE: the entire history of the rebased branch will be composed of new commits (WHY??)
   # FIXME: is it safe to enable in all cases? (add it to `reb` alias)
   reb-keep-dates = rebase --committer-date-is-author-date
 
@@ -91,6 +91,8 @@
 
   chb = checkout -b
   swc = switch -c
+  nb = switch -c
+  # note: nb is 'new branch'
 
   br = !git --no-pager branch
   brv = !git --no-pager branch -vv
