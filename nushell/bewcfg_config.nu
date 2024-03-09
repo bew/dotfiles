@@ -88,8 +88,11 @@ export def get_config [] {
   # - keybindings list
   # - keybindings listen
   $cfg.keybindings = ($default_cfg.keybindings | append [
-    # FIXME: Add `MenuCancel`, to cancel the menu without going to normal mode!
-    # FIXME: Add `MenuAcceptHold` to accept current menu selection without closing menu
+    # FIXME: I want more menu actions:
+    #   - `MenuCancel`, to cancel the menu without going to normal mode!
+    #   - `MenuAcceptHold` to accept current menu selection without closing menu
+    #   => Created: https://github.com/nushell/reedline/issues/767
+
     # FIXME: Add `InsertLine{Below,Above}` for Alt-o/O
     # ...
 
@@ -167,7 +170,7 @@ export def get_config [] {
       modifier: Alt keycode: Char_w
       event: {
         until: [ # try actions until one works
-          {send: historyhintwordcomplete}
+          {send: HistoryHintWordComplete}
           {edit: MoveWordRightStart}
         ]
       }
