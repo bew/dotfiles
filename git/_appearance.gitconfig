@@ -23,14 +23,14 @@
 [pretty]
   # aliases to use with `git log --pretty=<alias>`
 
-  # bew-minimal: with metadata + subject
-  bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(reset 237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n
+  # bew-minimal: with metadata + subject + date (relative) + author
+  bew-minimal = tformat:%C(bold blue)%h%C(auto)%d %C(reset 237)[%C(italic 65)%ar%C(reset 237)] %C(italic 240)by %an%C(reset)%n%s%n
   # (FIXME: I'd like to show ` [……]` after the summary if the commit has a body;
   # this kind of conditional are NOT supported by git (@2023-11) ☹️)
 
-  # bew-verbose: with metadata + subject + body + notes
+  # bew-verbose: with metadata + subject + date (exact) + author + body + notes
   # (~same as bew-minimal + the commit body & notes if available)
-  bew-verbose = tformat:%C(bold blue)%h%C(auto)%d - %C(reset 237)[%C(italic 65)%ar%C(reset 237)]   %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n
+  bew-verbose = tformat:%C(bold blue)%h%C(auto)%d - %C(reset 237)[%C(italic 65)%aD%C(reset 237)] %C(italic 240)by %an%C(reset)%n%s%n%+b%-N%n
 
   # bew-oneline: simplified logs, similar to --oneline but prettier
   bew-oneline = tformat:%C(red)%h%C(reset) - %s %C(green)(%cr) %C(blue)<%an>%C(reset)%C(auto)%d%C(reset)
