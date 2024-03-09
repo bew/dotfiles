@@ -96,6 +96,8 @@
 
   br = !git --no-pager branch
   brv = !git --no-pager branch -vv
+  brr = !git --no-pager branch -r
+  bra = !git --no-pager branch -a
 
   br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
   brg = br-gone
