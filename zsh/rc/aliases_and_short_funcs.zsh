@@ -90,8 +90,6 @@ alias -g NOOUTPUT="NOOUT NOERR"
 #     not write-only/read-only ? So it's not possible to redirect stdin for reading or writing to
 #     different files?
 
-alias j=jobs
-
 # Override 'r' to run the last command stored in history instead of the real last typed command
 # which may start with a space and should be ignored!
 # (space-leading commands are properly ignored now!)
@@ -119,6 +117,7 @@ alias zln::dry-run='zln -n'
 alias g=git
 alias tre=tree
 alias tx=tmux
+alias j=just
 
 # Force tmux to be compatible UTF-8
 # (256 colors & RGB are enabled in tmux config, via `terminal-features`)
