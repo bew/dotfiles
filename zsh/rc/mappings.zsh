@@ -664,10 +664,51 @@ zle::utils::register_keysym Delete "${terminfo[kdch1]}" "[3~"
 zle::utils::register_keysym PageUp "${terminfo[kpp]}" "[5~"
 zle::utils::register_keysym PageDown "${terminfo[knp]}" "[6~"
 
+# Arrow keys
 zle::utils::register_keysym Left "${terminfo[kcub1]}" "[D"
 zle::utils::register_keysym Down "${terminfo[kcud1]}" "[B"
 zle::utils::register_keysym Up "${terminfo[kcuu1]}" "[A"
 zle::utils::register_keysym Right "${terminfo[kcuf1]}" "[C"
+
+# Arrow keys with modifiers (#yolo!)
+#
+# NOTE: These are kinda non-standard keys from XTERM extensions,
+#   also sent by some terminals (Wezterm!)
+# ref: https://stackoverflow.com/a/31393336/5655255
+# ref: https://invisible-island.net/ncurses/terminfo.src.html#tic-xterm_pcc3
+#   (see comment above... quite hard to understand... :/)
+#
+# From https://invisible-island.net/ncurses/terminfo.src.html#tic-xterm_pcfkeys
+# (above in the comment...)
+#
+#    Code     Modifiers
+#  ---------------------------------
+#     2       Shift
+#     3       Alt
+#     4       Shift + Alt
+#     5       Control
+#     6       Shift + Control
+#     7       Alt + Control
+#     8       Shift + Alt + Control
+#  ---------------------------------
+#
+# Ctrl-Arrow keys
+zle::utils::register_keysym C-Left "${terminfo[kLFT5]}" "[1;5D"
+zle::utils::register_keysym C-Down "${terminfo[kDN5]}" "[1;5B"
+zle::utils::register_keysym C-Up "${terminfo[kUP5]}" "[1;5A"
+zle::utils::register_keysym C-Right "${terminfo[kRIT5]}" "[1;5C"
+#
+# Alt-Arrow keys
+zle::utils::register_keysym A-Left "${terminfo[kLFT3]}" "[1;3D"
+zle::utils::register_keysym A-Down "${terminfo[kDN3]}" "[1;3B"
+zle::utils::register_keysym A-Up "${terminfo[kUP3]}" "[1;3A"
+zle::utils::register_keysym A-Right "${terminfo[kRIT3]}" "[1;3C"
+#
+# Ctrl-Alt-Arrow keys
+zle::utils::register_keysym CA-Left "${terminfo[kLFT7]}" "[1;7D"
+zle::utils::register_keysym CA-Down "${terminfo[kDN7]}" "[1;7B"
+zle::utils::register_keysym CA-Up "${terminfo[kUP7]}" "[1;7A"
+zle::utils::register_keysym CA-Right "${terminfo[kRIT7]}" "[1;7C"
 
 # The backspace key is usually ^? but can be ^h on some terminal.
 # NOTE: None of my installed ones (xterm, urxvt, termite, konsole, kitty, wezterm) uses ^h
@@ -723,6 +764,9 @@ bindkey -M viins "${keysyms[S-Tab]}" reverse-menu-complete
 bindkey -M viins "^n" menu-complete
 
 bindkey -M viins ":" execute-named-cmd
+
+vibindkey "${keysyms[C-Left]}" vi-backward-word
+vibindkey "${keysyms[C-Right]}" vi-forward-word
 
 vibindkey '^l' zwidget::clear-but-keep-scrollback
 
@@ -943,6 +987,16 @@ vibindkey 'e' zwidget::jump-end-shell-arg
 vibindkey 'w' zwidget::jump-next-shell-arg
 vibindkey '^' beginning-of-line
 vibindkey '$' end-of-line
+
+# Also map arrow + few modifiers to jump between args
+# => It's always better to have them mapped to something,
+#    otherwise typing these will do unexpected action
+#    (from their keys and their bindings) and usually will just delete some
+#    parts of the buffer ☹ GRR
+vibindkey "${keysyms[A-Left]}"   zwidget::jump-previous-shell-arg
+vibindkey "${keysyms[A-Right]}"  zwidget::jump-next-shell-arg
+vibindkey "${keysyms[CA-Left]}"  zwidget::jump-previous-shell-arg
+vibindkey "${keysyms[CA-Right]}" zwidget::jump-next-shell-arg
 
 # Logical redo (u U)
 bindkey -M vicmd 'U' redo
