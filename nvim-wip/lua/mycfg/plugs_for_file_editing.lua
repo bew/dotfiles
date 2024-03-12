@@ -53,6 +53,8 @@ NamedPlug.cmp {
     global_cfg.performance = {
       max_view_entries = 15,
     }
+    global_cfg.formatting = {}
+    global_cfg.window = { completion = {} }
 
     local protected_formatter = function(custom_fmt_fn)
       return function(entry, original_vim_item)
@@ -66,21 +68,33 @@ NamedPlug.cmp {
     end
     local lspkind = require"lspkind"
     lspkind.init { preset = "codicons" }
-    global_cfg.formatting = {
-      fields = {"abbr", "kind"},
-      -- WARNING: if this function fails, completion will NOT work
-      --   (no completion window will be opened), so we protect it with a wrapper and a default.
-      format = protected_formatter(function(entry, vim_item)
-        -- Get symbol for LSP kind
-        vim_item.kind = lspkind.symbolic(vim_item.kind) .. " "
-        return vim_item
-      end),
-    }
+    -- WARNING: if this function fails, completion will NOT work
+    --   (no completion window will be opened), so we protect it with a wrapper and a default.
+    global_cfg.formatting.format = protected_formatter(function(entry, vim_item)
+      -- Get symbol for LSP kind
+      vim_item.kind = " " .. lspkind.symbolic(vim_item.kind) .. " │"
+      return vim_item
+    end)
+
+    -- Completion window field ordering & alignment under cursor
+    global_cfg.formatting.fields = {"kind", "abbr"}
+    -- Tweak completion window to have 'kind' _before_ 'abbr', while keeping 'abbr' right under
+    -- current keyword & cursor in-buffer.
+    global_cfg.window.completion.col_offset = -4 -- MUST match length of `vim_item.kind` (but as a negative value)
+    global_cfg.window.completion.side_padding = 0 -- remove default 1 char padding on the left
+
     -- NOTE: this should really be in `on_colorscheme_change` hook, but it's better here, close
     -- to formatting code..
-    vim.api.nvim_set_hl(0, "CmpItemKind", { cterm={bold = true}, ctermfg=20 })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { cterm={bold = true}, ctermfg=20 })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { cterm={bold = true}, ctermfg=20 })
+    vim.api.nvim_set_hl(0, "CmpItemKind", { ctermfg=33 })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { cterm={bold = true}, ctermfg=202 })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { cterm={bold = true}, ctermfg=202 })
+    vim.api.nvim_set_hl(0, "CmpWinBG", { ctermbg=235, ctermfg=252 })
+    vim.api.nvim_set_hl(0, "CmpWinSelection", { cterm={bold = true}, ctermbg=238 })
+    -- vim.api.nvim_set_hl(0, "CmpWinSelection", { ctermbg=237 })
+    global_cfg.window.completion.winhighlight = "Normal:CmpWinBG,CursorLine:CmpWinSelection,Search:None,PmenuSbar:Identifier,PmenuThumb:Keyword"
+    -- (!!) Scrollbar HL is not custommizable
+    --   cf PR https://github.com/hrsh7th/nvim-cmp/pull/1741
+    global_cfg.window.completion.scrollbar = false
 
     global_cfg.confirmation = {
       -- disable auto-confirmations!
@@ -305,13 +319,6 @@ NamedPlug.luasnip {
     require("luasnip.loaders.from_lua").load({
       paths = vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft",
     })
-
-    -- FIXME: when cmp popup is visible and I expand a snippet directly I have issues
-    -- with trigger and placeholders..
-    -- When I use cmp's confirm action there is zero issue
-    -- Opened
-    -- * https://github.com/L3MON4D3/LuaSnip/issues/1019
-    -- * https://github.com/L3MON4D3/LuaSnip/issues/1020
 
     -- I: Expand snippet if any
     -- IDEA(alternative?): <C-x><C-x> (in insert, maybe also visual?)
