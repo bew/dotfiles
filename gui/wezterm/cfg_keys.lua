@@ -75,8 +75,6 @@ cfg.keys = {
   keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
 
   keybind(mods.CS, "l", act.ClearScrollback("ScrollbackAndViewport")),
-  keybind(mods.CS, " ", act.QuickSelect),
-  keybind(mods.CA, " ", act.QuickSelect), -- note: eats a valid term input
   keybind(mods.CS, "d", act.ShowDebugOverlay),
   keybind(mods.CS, "y", act.ActivateCopyMode),
   -- note: last search is now prefilled, may need to clear it first with Ctrl-u
@@ -136,7 +134,10 @@ cfg.keys = {
     -- Make this layer volatile, easily dismissed
     activation = {one_shot=true, until_unknown=true},
     keys = {
+      -- Safe key table exit
       keybind(mods._, "Escape", act.PopKeyTable),
+      -- Trigger repeated!
+      keybind(mods.CS, "Space", act.QuickSelect),
 
       keybind(mods.C, "v", act.PasteFrom("Clipboard")),
 
