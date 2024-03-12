@@ -50,7 +50,8 @@ Plug {
       icons = { separator = "->" },
       key_labels = {
         -- Override the label used to display some keys
-        ["<space>"] = "SPC",
+        ["<C-Space>"] = "C-SPC",
+        ["<Space>"] = "SPC",
         ["<tab>"] = "TAB",
         ["<cr>"] = "Enter",
         ["<NL>"] = "<C-J>",
@@ -72,7 +73,8 @@ Plug {
       -- because the popup is mostly annoying/distractful for other keys.
       -- IDEA: possible to show which-key when timeout-ing `operator` mode?
       triggers = {
-        "<leader>",
+        "<Leader>",
+        "<LocalLeader>", -- FIXME: Sometimes broken, see: https://github.com/folke/which-key.nvim/issues/476
         "z", -- (help for 'z' can be useful) -- FIXME: need grouping!
 
         "<C-f>", -- fuzzy stuff
@@ -356,7 +358,7 @@ Plug {
   source = gh"rhysd/git-messenger.vim",
   desc = "Popup the commit message of the line under cursor",
   tags = {t.vimscript, t.git, t.ui},
-  on_load = function()
+  on_pre_load = function()
     vim.g.git_messenger_no_default_mappings = true
   end,
 }
@@ -388,34 +390,51 @@ Plug {
     -- FIXME: use 'on_attach' to config keybinds?
 
     -- define these globally for now.. (until good solution for per-buffer which_key helper)
-    leader_map_define_group{mode={"n"}, prefix_key="h", name="+git-hunks"}
+    local_leader_map_define_group{mode={"n"}, prefix_key="h", name="+hunks"}
+    local_leader_map_define_group{mode={"n"}, prefix_key="H", name="__hide__"}
+    -- NOTE: 'H' group exists to make 'HN' spam-able by holding shift
+
     local gs = require"gitsigns"
-    leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="preview hunk"}
-    leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="undo (reset) hunk"}
-    leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="diff file"}
+    local_leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="preview hunk"}
+    local_leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="undo (reset) hunk"}
+    local_leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="diff file"}
     -- FIXME: there is no action to toggle fold of everything that didn't change
-    -- leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
+    -- local_leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
 
     -- next/prev hunk that also work in vim's diff mode
-    leader_map{mode={"n"}, key="hn", desc="next hunk", opts={expr=true}, action=function()
-      if vim.wo.diff then return "]c" end
-      vim.schedule(gs.next_hunk) -- need to schedule, cannot run it in an expr mapping
-      return "<Ignore>"
-    end}
-    leader_map{mode={"n"}, key="hN", desc="prev hunk", opts={expr=true}, action=function()
-      if vim.wo.diff then return "[c" end
-      vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
-      return "<Ignore>"
-    end}
+    my_actions.goto_next_changed_hunk = mk_action{
+      default_desc = "Goto next changed hunk",
+      for_mode = "n",
+      keymap_opts = { expr = true }, -- inject keys!
+      fn = function()
+        if vim.wo.diff then return "]c" end
+        vim.schedule(gs.next_hunk) -- need to schedule, cannot run it in an expr mapping
+        return "<Ignore>"
+      end,
+    }
+    my_actions.goto_prev_changed_hunk = mk_action{
+      default_desc = "Goto prev changed hunk",
+      for_mode = "n",
+      keymap_opts = { expr = true }, -- inject keys!
+      fn = function()
+        if vim.wo.diff then return "[c" end
+        vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
+        return "<Ignore>"
+      end,
+    }
+    local_leader_map{mode={"n"}, key="hn", action=my_actions.goto_next_changed_hunk}
+    local_leader_map{mode={"n"}, key="hN", action=my_actions.goto_prev_changed_hunk}
+    -- also map HN so I can 'spam' the letters easily :)
+    local_leader_map{mode={"n"}, key="HN", action=my_actions.goto_prev_changed_hunk}
 
     -- TODO: move closer to git-messenger plugin? Should simply add to a 'git' keymap.
-    leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
+    local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
 
     -- toggles
-    leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
-    leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
-    leader_map{mode={"n"}, key="htd", action=gs.toggle_deleted,            desc="toggle deleted lines"}
-    leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
+    local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
+    local_leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
+    local_leader_map{mode={"n"}, key="htd", action=gs.toggle_deleted,            desc="toggle deleted lines"}
+    local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
     -- define hunk text object & visual selector
     toplevel_map{mode={"o", "x"}, key="ih", action=gs.select_hunk, desc="select hunk"}

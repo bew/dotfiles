@@ -16,10 +16,13 @@ require"mycfg.options"
 -- NOTE: If trying to move it AFTER plugin load, double check git signs are of correct color!
 vim.cmd[[ colorscheme bew256-dark ]]
 
--- map leader definition - space
-vim.g.mapleader = " "
--- IDEA: Change <leader> to <C-space> | Have <localleader> be <space>
--- And the CtrlSpace plugin would be <leader><Space> or <leader><leader>
+-- Map leaders
+-- NOTE: Special termcode (like `<foo>`) must be replaced to avoid _very_ unexpected behavior
+--   See: https://github.com/neovim/neovim/issues/27826 😬
+vim.g.mapleader = vim.api.nvim_replace_termcodes([[<C-Space>]], true, true, true)
+vim.g.maplocalleader = vim.api.nvim_replace_termcodes([[<Space>]], true, true, true)
+-- IDEA: Change <Leader> to <C-space> | Have <localleader> be <space>
+-- And the CtrlSpace plugin would be <Leader><Space> or <Leader><Leader>
 -- Also give a new leader possibility with <Alt-Space> (for a command center?) (:
 
 local U = require"mylib.utils"
@@ -45,17 +48,13 @@ end
 --- Define map group for which_key plugin
 function toplevel_map_define_group(spec)
   assert(spec.mode, "mode is required")
+  local group_name = spec.name ~= "__hide__" and spec.name or "which_key_ignore"
   for _, m in ipairs(spec.mode) do
     local wk_maps = get_wk_maps_for_mode(m)
     if wk_maps then
-      wk_maps[spec.prefix_key] = { name = spec.name }
+      wk_maps[spec.prefix_key] = { name = group_name }
     end
   end
-end
-
-function leader_map_define_group(spec)
-  spec.prefix_key = "<leader>"..spec.prefix_key
-  toplevel_map_define_group(spec)
 end
 
 --- Create top level map
@@ -114,20 +113,45 @@ function toplevel_map(spec)
   vim.keymap.set(spec.mode, spec.key, keymap_action, keymap_opts)
 end
 
---- Create leader map & register it on which_key plugin
-function leader_map(spec)
+--- Create global leader key mapping
+function global_leader_map(spec)
   toplevel_map(vim.tbl_extend("force", spec, {
-    key = "<leader>"..spec.key,
+    key = "<Leader>"..spec.key,
   }))
 end
-
---- Helper to create remap-enabled leader map, see `leader_map` for details
-function leader_remap(spec)
+--- Helper to create remap-enabled leader map, see `global_leader_map` for details
+function global_leader_remap(spec)
   if not spec.opts then
     spec.opts = {}
   end
   spec.opts.remap = true
-  leader_map(spec)
+  global_leader_map(spec)
+end
+function global_leader_map_define_group(spec)
+  spec.prefix_key = "<Leader>"..spec.prefix_key
+  toplevel_map_define_group(spec)
+end
+
+----
+
+--- Create local (content-related) leader key mapping
+-- FIXME: these should be probably only used with <buffer> local keymaps 👀
+--   But for that I'd need to setup my plugins to load content-related mappings on file init.. 🤔
+function local_leader_map(spec)
+  toplevel_map(vim.tbl_extend("force", spec, {
+    key = "<LocalLeader>"..spec.key,
+  }))
+end
+function local_leader_remap(spec)
+  if not spec.opts then
+    spec.opts = {}
+  end
+  spec.opts.remap = true
+  local_leader_map(spec)
+end
+function local_leader_map_define_group(spec)
+  spec.prefix_key = "<LocalLeader>"..spec.prefix_key
+  toplevel_map_define_group(spec)
 end
 
 -- Minimal action system

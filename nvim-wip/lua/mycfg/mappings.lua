@@ -861,12 +861,12 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- Use this to make a few nice mappings
 -- Taken from: http://vimcasts.org/episodes/the-edit-command/
 --lua <<LUA
---leader_map_define_group{mode={"n"}, prefix_key="e", name="+relative-edit"}
+--local_leader_map_define_group{mode={"n"}, prefix_key="e", name="+relative-edit"}
 ---- note: remap needed for '%/' to trigger!
---leader_remap{mode={"n"}, key="ee", action=":e %/",      desc="here"}
---leader_remap{mode={"n"}, key="es", action=":split %/",  desc="in split"}
---leader_remap{mode={"n"}, key="ev", action=":vsplit %/", desc="in v' split"}
---leader_remap{mode={"n"}, key="et", action=":tabe %/",   desc="in tab"}
+--local_leader_remap{mode={"n"}, key="ee", action=":e %/",      desc="here"}
+--local_leader_remap{mode={"n"}, key="es", action=":split %/",  desc="in split"}
+--local_leader_remap{mode={"n"}, key="ev", action=":vsplit %/", desc="in v' split"}
+--local_leader_remap{mode={"n"}, key="et", action=":tabe %/",   desc="in tab"}
 --LUA
 
 -- -----------------

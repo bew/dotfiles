@@ -350,10 +350,9 @@ NamedPlug.luasnip {
       -- TODO: Display a short message like 'LuaSnip: selection stored' (via `vim.notify`?)
       keymap_opts = {silent = true},
     }
-    leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
+    local_leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
     -- NOTE: do not use direct `²` in visual mode, could be useful for context actions later..
 
-    -- (IDEA: could make a visual mode action, with a mode conversion when used from select mode 👀)
     toplevel_map{mode="s", key=[[<BS>]], action=[[<C-g>"_c]]}
   end,
 }
@@ -552,10 +551,10 @@ Plug {
 
     -- Map to add surround
     -- (direct `s` would be nice, but eats a key I use too often (I tried...))
-    leader_map{mode="n", key="s", action=my_actions.add_surround}
-    leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
-    leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
-    leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
+    local_leader_map{mode="n", key="s", action=my_actions.add_surround}
+    local_leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
+    local_leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
+    local_leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
 
     -- Maps to change/delete surrounds
     toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
@@ -808,9 +807,9 @@ Plug {
     --    around that region when possible.
     -- Tracking issue: https://github.com/numToStr/Comment.nvim/issues/39
 
-    leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
+    local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
 
-    leader_map{
+    local_leader_map{
       mode={"n"},
       key="cc<Space>",
       action=function()
@@ -823,7 +822,7 @@ Plug {
       desc="toggle current (linewise)",
       opts={expr=true},
     }
-    leader_map{
+    local_leader_map{
       mode={"n"},
       key="ccb<Space>",
       action=function()
@@ -836,35 +835,35 @@ Plug {
       desc="toggle current (blockwise)",
       opts={expr=true},
     }
-    leader_map{mode={"v"}, key="cc<Space>", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle selection"}
+    local_leader_map{mode={"v"}, key="cc<Space>", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle selection"}
 
     -- These mappings work as a prefix for an operator-pending-like mode
     -- (e.g: '<leader> cct 3j' to toggle comment on 4 lines (linewise))
     -- (e.g: '<leader> cct ip' to toggle comment in-paragraph (linewise))
     -- (e.g: '<leader> cct e' to toggle comment next word (blockwise (it's a little smart!))
-    leader_map_define_group{mode={"n", "v"}, prefix_key="cct", name="+for-motion"}
-    leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
-    leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
-    --leader_map{mode={"n"}, key="ccmb", action="<Plug>(comment_toggle_blockwise)",        desc="toggle for motion (blockwise)"}
-    --leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
+    local_leader_map_define_group{mode={"n", "v"}, prefix_key="cct", name="+for-motion"}
+    local_leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
+    local_leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
+    --local_leader_map{mode={"n"}, key="ccmb", action="<Plug>(comment_toggle_blockwise)",        desc="toggle for motion (blockwise)"}
+    --local_leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
 
     local comment_api = require"Comment.api"
-    leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
-    leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
-    leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
+    local_leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
+    local_leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
+    local_leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
 
     -- force comment/uncomment line
     -- (normal)
-    leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
-    leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
+    local_leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
+    local_leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
     -- (visual)
-    leader_map{
+    local_leader_map{
       mode={"v"},
       key="ccc",
       action=[[<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>]],
       desc="force (linewise)",
     }
-    leader_map{
+    local_leader_map{
       mode={"v"},
       key="ccu",
       action=[[<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>]],
@@ -942,10 +941,10 @@ Plug {
       end}
     end
 
-    leader_map_define_group{mode={"v"}, prefix_key="cr", name="+coerce"}
+    local_leader_map_define_group{mode={"v"}, prefix_key="cr", name="+coerce"}
     for _, conv in pairs(key_conversions) do
       -- V: <leader> cr <action>     => coerce   visual selection
-      leader_map{mode={"v"}, key="cr"..conv.key, desc=conv.desc, action=function()
+      local_leader_map{mode={"v"}, key="cr"..conv.key, desc=conv.desc, action=function()
         textcase.operator(conv.fn_id)
       end}
     end
