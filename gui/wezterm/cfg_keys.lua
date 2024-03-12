@@ -3,7 +3,7 @@ local mytable = require "lib/mystdlib".mytable
 local mods = require "cfg_utils".mods
 
 local act = wezterm.action
-local act_callback = wezterm.action_callback
+local callback = wezterm.action_callback
 
 local cfg = {}
 
@@ -90,7 +90,7 @@ cfg.keys = {
   -- Smart copy with Alt-c:
   -- - If active selection, will copy it to Clipboard & Primary
   -- - If NO selection, sends Alt-c to the running program (which may do a copy in context)
-  keybind(mods.A, "c", act_callback(function(win, pane)
+  keybind(mods.A, "c", callback(function(win, pane)
     local has_selection = win:get_selection_text_for_pane(pane) ~= ""
     if has_selection then
       win:perform_action(act.CopyTo("ClipboardAndPrimarySelection"), pane)
@@ -117,7 +117,7 @@ cfg.keys = {
   -- so I may have to add SHIFT.
 
   -- Toggle font ligatures
-  keybind(mods.CS, "g", act_callback(function(win, _)
+  keybind(mods.CS, "g", callback(function(win, _)
     local overrides = win:get_config_overrides() or {}
     if not overrides.harfbuzz_features then
       -- If we haven't overriden it yet, then override with ligatures disabled
