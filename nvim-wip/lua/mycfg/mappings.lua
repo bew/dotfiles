@@ -25,6 +25,8 @@ vim.cmd[[vnoremap <silent> <M-s> <Esc>:lockmarks w<cr>]]
 
 -- N: Quit window
 vim.cmd[[nnoremap <silent> Q :q<cr>]]
+-- <wm-mappings>
+global_leader_map{mode="n", key="<C-M-d>", desc="Close window", action="<cmd>q<cr>"}
 
 
 -- N: logical redo
@@ -574,6 +576,11 @@ vim.keymap.set("n", "<C-w><C-h>", function() directional_split("left") end)
 vim.keymap.set("n", "<C-w><C-j>", function() directional_split("down") end)
 vim.keymap.set("n", "<C-w><C-k>", function() directional_split("up") end)
 vim.keymap.set("n", "<C-w><C-l>", function() directional_split("right") end)
+-- <wm-mappings>
+global_leader_map{mode="n", key="<C-h>", desc="Split left", action=function() directional_split("left") end}
+global_leader_map{mode="n", key="<C-j>", desc="Split down", action=function() directional_split("down") end}
+global_leader_map{mode="n", key="<C-k>", desc="Split up", action=function() directional_split("up") end}
+global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function() directional_split("right") end}
 
 -- Focus windows by WinNr
 -- <C-w>N   -> N<C-w>w
