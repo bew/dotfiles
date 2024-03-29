@@ -116,6 +116,10 @@
   revp = rev-parse
   gc-remove-old-commits = reflog expire --all --expire=now
   gc-compress-repo = gc --aggressive --prune=now
+  # ref: https://stackoverflow.com/a/47580886/5655255
+  # (note: does not add untracked files)
+  normalize-crlf = add --renormalize
+  repo-normalize-crlf = normalize-crlf .
 
 
   # info aliases
