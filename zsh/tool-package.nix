@@ -17,7 +17,7 @@ let
     in {
       options = {
         binName = lib.mkOption {
-          description = "Name of the binary we depend on in the *pkg*";
+          description = "Name of the binary we depend on in the *pkg* (defaults to attr name)";
           type = ty.str;
           default = name;
         };
@@ -70,7 +70,7 @@ let
 
   # Eval a tool config!
   # TODO: move to a 'core' module when using it for other tools
-  mkToolConfig = {
+  evalToolConfig = {
     pkgs,
     toolName,
     configuration,
@@ -101,7 +101,7 @@ let
       package = lib.mkDefault pkgs.zsh;
 
       outputs.depsEnv = pkgs.buildEnv {
-        name = "config-deps-env-${config.ID}";
+        name = "zsh-config-deps-env-${config.ID}";
         paths = lib.mapAttrsToList (_key: dep: dep.pkg) config.deps.bins;
       };
       # FIXME: What exactly to expose to the zsh config?
@@ -135,7 +135,7 @@ in {
   };
 
   lib.mkZshConfig = { pkgs, configuration }: (
-    mkToolConfig {
+    evalToolConfig {
       inherit pkgs configuration;
       toolName = "zsh";
     }

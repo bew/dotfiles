@@ -286,6 +286,7 @@ export def get_config [] {
         cmd: "git d --cached"
       }
     }
+
     # FIXME: How to implement 'go right or git log?' (maybe via 'until'?)
   ])
 

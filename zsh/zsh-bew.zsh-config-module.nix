@@ -12,7 +12,7 @@ in {
 
   # Default bin dependencies
   # NOTE: bins are only made available in PATH, they won't be hardcoded in the config files
-  #   (to easy config reloading)
+  #   (to ease config reloading)
   deps.bins = {
     git.pkg = pkgs.git;
     dircolors = {

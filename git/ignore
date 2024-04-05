@@ -10,6 +10,8 @@ result
 result-*
 # Nix profiles (manual)
 *.nix-gc-root*
+# direnv cache
+.direnv/
 
 # Put anything you want in a __vcs_ignore__ directory!
 __vcs_ignore__/

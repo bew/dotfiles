@@ -1,6 +1,11 @@
 # A set of fzf-based zsh widgets, for key bindings
 # TODO: add a LICENSE for these!
 
+if [[ $- != *i* ]]; then
+  # -> This is not an interactive shell, bail out!
+  return
+fi
+
 # NOTE: These lines may be rewritten by config manager.
 _BIN_fzf=fzf
 _BIN_fd=fd
@@ -10,11 +15,6 @@ cfg::depends-on-bin fzf
 cfg::depends-on-bin fd
 cfg::depends-on-bin bat
 cfg::depends-on-bin git
-
-if [[ $- != *i* ]]; then
-  # -> This is not an interactive shell, bail out!
-  return
-fi
 
 # Transforms a list of results to a list of relative paths to the given dir
 # (it must be given _at least_ relative to CWD, or as an absolute path).
@@ -51,12 +51,12 @@ function zwidget::utils::__fzf_generic_impl_for_paths
   local completion_prefix="${LBUFFER/* /}" # we remove everything until the last space
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
-  # NOTE: it's important to NOT put it inside quotes, the expansion wouldn't work :eyes:.
+  # NOTE: it's important to NOT put it inside quotes, the expansion wouldn't work 👀.
   local expanded_completion_prefix=${~completion_prefix}
 
   # --- cases ---
-  # completion_prefix ~ "foo/bar/"
-  # completion_prefix ~ "foo/bar/ba"
+  # completion_prefix = "foo/bar/"
+  # completion_prefix = "foo/bar/ba"
   # completion_prefix = "~/" or "~special/"
   # completion_prefix = "~/bar" or "~special/bar"
   # (INFO: 'foo' can be anything, including . or ..)
@@ -116,14 +116,14 @@ function zwidget::utils::__fzf_generic_impl_for_paths
 
   local fzf_cmd=($FZF_BASE_CMD --multi)
   fzf_cmd+=(--query "$query_prefill")
-  fzf_cmd+=(--prompt "${final_prompt}")
+  fzf_cmd+=(--prompt "$final_prompt")
   if [[ -n "${FZF_PREVIEW_CMD:-}" ]]; then
     fzf_cmd+=(--preview "$FZF_PREVIEW_CMD")
   fi
   if [[ -n "${FZF_PREVIEW_WINDOW:-}" ]]; then
     fzf_cmd+=(--preview-window "$FZF_PREVIEW_WINDOW")
   fi
-  if [[ -n "${FZF_USE_FOCUS_AS_PREVIEW_LABEL}" ]]; then
+  if [[ -n "${FZF_USE_FOCUS_AS_PREVIEW_LABEL:-}" ]]; then
     fzf_cmd+=(
       --bind='focus:transform-preview-label:echo [ {} ]'
       --color=preview-label:247:bold
