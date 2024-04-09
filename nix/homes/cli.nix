@@ -46,6 +46,10 @@ in {
         stable.git-absorb # automatic `git commit --fixup` on relevant commits
         # other tools
         stable.gh # github cli for view & operations
+
+        # EXPERIMENT with git annex
+        # https://git-annex.branchable.com/
+        stable.git-annex
       ];
       meta.mainProgram = "git";
     })
