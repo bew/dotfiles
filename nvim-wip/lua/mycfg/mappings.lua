@@ -180,6 +180,25 @@ end}
 vim.cmd[[inoremap <Up> <nop>]]
 vim.cmd[[inoremap <Down> <nop>]]
 
+-- N: Remap n/N to always move in a stable direction
+--
+-- `n` will always go forward (even after a backward search)
+-- `N` will always go backward (even after a forward search)
+toplevel_map{mode="n", key="n", desc="", opts={ expr = true }, action=function()
+  if vim.v.searchforward == 1 then
+    return "n" -- continue forward
+  else
+    return "N" -- go backward instead
+  end
+end}
+toplevel_map{mode="n", key="N", desc="", opts={ expr = true }, action=function()
+  if vim.v.searchforward == 1 then
+    return "N" -- go forward instead
+  else
+    return "n" -- continue backward
+  end
+end}
+
 -- Windows navigation
 vim.cmd[[nnoremap <C-h> <C-w>h]]
 vim.cmd[[nnoremap <C-j> <C-w>j]]
