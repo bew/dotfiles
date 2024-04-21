@@ -258,14 +258,15 @@ export def get_config [] {
 
     # ------------------------------------------------
 
-    # (try adding git auto commands)
     {
       name: git_status
       mode: [vi_insert vi_normal]
       modifier: Alt keycode: Char_g
       event: {
         send: ExecuteHostCommand
-        cmd: "git status"
+        # Need `echo` to ensure command starts on a fresh line
+        # NOTE: a better solution would be a `commandline cursor --after-prompt`
+        cmd: "echo; git status"
       }
     }
     {
