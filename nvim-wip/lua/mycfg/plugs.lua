@@ -73,6 +73,37 @@ Plug {
   end,
 }
 
+Plug {
+  source = gh"ii14/neorepl.nvim",
+  desc = "Neovim REPL for lua and vim script",
+  tags = {"config"},
+  -- NOTE: use `/h` to get help inside the repl buffer
+  on_load = function()
+    -- NOTE: need my PR (#21) to merge config with plugin's default config
+    require"neorepl".config {
+      startinsert = false, -- Don't start REPL in insert mode
+      indent = 4, -- Indent outputs
+      on_init = function(bufnr)
+        -- Plugin comes with its own completion, so other auto-completion plugins must be disabled
+        require"cmp".setup.buffer({ enabled = false })
+        -- Map plugin's completion to usual completion key (Which is <Tab> here by default :/)
+        vim.keymap.set("i", "<C-n>", function()
+          return vim.fn.pumvisible() == 1 and "<C-n>" or "<Plug>(neorepl-complete)"
+        end, { expr = true, buffer = true })
+      end,
+    }
+
+    my_actions.neovim_lua_repl = mk_action {
+      for_mode="n", default_desc="Neovim Lua Repl buffer",
+      raw_action="<cmd>Repl lua<cr>",
+    }
+    my_actions.neovim_vim_repl = mk_action {
+      for_mode="n", default_desc="Neovim Vim Repl buffer",
+      raw_action="<cmd>Repl vim<cr>",
+    }
+  end,
+}
+
 NamedPlug.lib_plenary {
  source = gh"nvim-lua/plenary.nvim",
  desc = "Lua contrib stdlib for plugins, used by many plugins",

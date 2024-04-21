@@ -18,6 +18,7 @@
   "indent-blankline.nvim": { "branch": "master", "commit": "821a7acd88587d966f7e464b0b3031dfe7f5680c" },
   "lspkind.nvim": { "branch": "master", "commit": "1735dd5a5054c1fb7feaf8e8658dbab925f4f0cf" },
   "neo-tree.nvim": { "branch": "v3.x", "commit": "f3941c57ec85d7bdb44fa53fd858fd80f159018f" },
+  "neorepl.nvim": { "branch": "master", "commit": "e60b114217248907a3a1d27bab9988a092865ee0" },
   "nerdy.nvim": { "branch": "main", "commit": "7c9a4ea4a9ca7063e86dbcf7ce0f233cb59bdc10" },
   "nui.nvim": { "branch": "main", "commit": "c3c7fd618dcb5a89e443a2e1033e7d11fdb0596b" },
   "nushell-syntax-vim": { "branch": "main", "commit": "67245f4fac505d137635e8c0bbf2e33717b3a36b" },
