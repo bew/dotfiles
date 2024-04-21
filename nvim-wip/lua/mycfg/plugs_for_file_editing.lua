@@ -271,6 +271,7 @@ NamedPlug.luasnip {
   source = gh"L3MON4D3/LuaSnip",
   desc = "Hyper flexible snippet Engine for Neovim",
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
+  rev = "v2.3.0", -- last release @2024-04
   on_load = function()
     local ls = require"luasnip"
     local ls_types = require"luasnip.util.types"
@@ -891,6 +892,11 @@ Plug {
   desc = "Plugin for converting text case",
   tags = {t.editing},
   on_load = function()
+    local textcase = require"textcase"
+    textcase.setup {
+      default_keymappings_enabled = false,
+    }
+
     -- ISSUE: cursor off-by-one after case conversion when line doesn't end with a space
     -- with `x foo_bar`, coercing `foo_bar` to anything will move the cursor between `x` and `foo_bar`
     -- with `x foo_bar `, coercing `foo_bar` to anything will move the cursor on `f`
@@ -911,7 +917,6 @@ Plug {
     -- FIXME: I want to keep cursor position as much as possible!
     --   currently the cursor moves to start-of-converted-word :/
 
-    local textcase = require"textcase"
     local key_conversions = {
       { key = "l", fn_id = "to_lower_case", desc = "to lower case" },
       { key = "u", fn_id = "to_upper_case", desc = "to UPPER case" },
