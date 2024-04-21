@@ -18,6 +18,9 @@ def color_surround [color: any text: closure] {
   [(ansi $color) (do $text) (ansi reset)] | str join
 }
 
+# IDEA: alt call signature:
+#   maybe_space __space__ { something }   # maybe space before
+#   maybe_space { something } __space__   # maybe space after
 def maybe_space [where: string text: closure] -> string {
   if $where not-in [after before] {
     error make {
