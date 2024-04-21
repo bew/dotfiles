@@ -22,9 +22,9 @@ let
           default = name;
         };
         pkg = lib.mkOption {
-          description = "Derivation with the binary (optional)";
-          type = ty.nullOr ty.package;
-          default = null;
+          description = "Derivation having the binary (optional)";
+          type = ty.either (ty.strMatching "from-PATH") ty.package;
+          default = "from-PATH";
         };
       };
     });
@@ -102,7 +102,12 @@ let
 
       outputs.depsEnv = pkgs.buildEnv {
         name = "zsh-config-deps-env-${config.ID}";
-        paths = lib.mapAttrsToList (_key: dep: dep.pkg) config.deps.bins;
+        paths = let
+          # NOTE: a bin dep without pkg finds its binary in PATH, not in a known pkg at this level.
+          #   Here we're only interested in binaries with a pkg.
+          # (TODO(maybe): find a way to check that all bins are available in PATH?)
+          binsWithPkg = lib.filterAttrs (_name: dep: dep.pkg != "from-PATH") config.deps.bins;
+        in lib.mapAttrsToList (_name: dep: dep.pkg) binsWithPkg;
       };
       # FIXME: What exactly to expose to the zsh config?
       #   - Whole env with whole packages of dependencies?
