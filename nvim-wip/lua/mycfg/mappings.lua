@@ -389,8 +389,8 @@ vim.g.clipboard = {
 }
 
 -- Copy
-vim.cmd[[xnoremap <silent> <M-c> "+y :echo "Copied to session clipboard!"<cr>]]
-vim.cmd[[xnoremap <silent> <M-C> "*y :echo "Copied to system clipboard!"<cr>]]
+vim.cmd[[xnoremap <silent> <M-c> "+y<cmd>echo "Copied to session clipboard!"<cr>]]
+vim.cmd[[xnoremap <silent> <M-C> "*y<cmd>echo "Copied to system clipboard!"<cr>]]
 
 -- Paste
 vim.cmd[[nnoremap <M-v> "+p]]
