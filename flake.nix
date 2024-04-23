@@ -29,29 +29,29 @@
   outputs = { self, ... }@flakeInputs: let
     # I only care about ONE system for now...
     system = "x86_64-linux";
-    myPkgs = self.packages.${system};
 
-    lib = stablePkgs.lib;
+    myPkgs = self.packages.${system};
     stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
     bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
 
+    lib = stablePkgs.lib;
     mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
     # IDEA: rename to `pkglib`?
     #   (to show it's a lib but about packages (so not system-agnostic))
 
     # NOTE: flake-parts would help with imports & auto-merging here.
-    zsh-tool-package = stablePkgs.callPackage ./zsh/tool-package.nix {
+    zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {
       inherit mybuilders;
     };
-    # TODO: find a better place to instantiate the config & configure it..
-    zsh-bew-config = zsh-tool-package.lib.mkZshConfig {
+    # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
+    zsh-bew-config = zsh-configs.lib.evalZshConfig {
       pkgs = stablePkgs;
       configuration = {
         imports = [
-          zsh-tool-package.zshConfigModule.zsh-bew
+          zsh-configs.zshConfigModule.zsh-bew
         ];
         # NOTE: FORCE the config to use a different fzf bin dependency
-        #   (see comment above mkHomeModule in </zsh/tool-package.nix> for thoughts on bins deps propagation..)
+        #   (see comment above primaryHomeManagerModule in </zsh/tool-configs.nix> for thoughts on bins deps propagation..)
         deps.bins.fzf.pkg = lib.mkForce myPkgs.fzf-bew;
       };
     };
@@ -77,21 +77,18 @@
       #      without going through all of the fixpoint stuff and resolving all imports.
       #
       #   (Thank you `Lily Foster` on Matrix for quickly helping me find the recursion issue! ❤️)
-      extraSpecialArgs.pkgsChannels = let
-        legacyPkgsForSystem = nixpkgs: nixpkgs.legacyPackages.${system};
-        pkgsForSystem = nixpkgs: nixpkgs.packages.${system};
-      in {
-        stable = legacyPkgsForSystem flakeInputs.nixpkgsStable;
-        bleedingedge = legacyPkgsForSystem flakeInputs.nixpkgsBleedingEdge;
-        myPkgs = pkgsForSystem flakeInputs.self;
+      extraSpecialArgs.pkgsChannels = {
+        stable = stablePkgs;
+        bleedingedge = bleedingedgePkgs;
+        myPkgs = myPkgs;
       };
 
-      # Expose to home modules a set of 'private' home modules from other places
+      # Expose to home modules various tool configs.
       # (but not exposed out of the dotfiles flake')
       #
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
-      extraSpecialArgs.myHomeModules = {
-        zsh-bew = (zsh-tool-package.lib.mkZshHomeModule zsh-bew-config);
+      extraSpecialArgs.myToolConfigs = {
+        zsh-bew = zsh-bew-config;
       };
     };
 
@@ -109,10 +106,10 @@
     # - a `zsh` bin, with my config (may be editable?)
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
-    packages.${system} = let
-      zsh-bew-pkgs = zsh-tool-package.lib.mkZshPackages zsh-bew-config;
-    in {
-      inherit (zsh-bew-pkgs) zsh-bew zsh-bew-bin zsh-bew-zdotdir;
+    packages.${system} = {
+      zsh-bew = zsh-bew-config.outputs.toolWithConfig;
+      zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
+      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolWithConfig);
 
       mpv-bew = bleedingedgePkgs.callPackage ./nix/pkgs/mpv {};
       mpv-helpers = bleedingedgePkgs.callPackage ./nix/pkgs/mpv-helpers {};

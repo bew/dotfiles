@@ -21,12 +21,12 @@ setopt glob_star_short
 #-------------------------------------------------------------
 
 # Set the history file, shared between all zsh instances
-if [[ -n "$ZSH_DATA_DIR_SHARED" ]]; then
-  HISTFILE=$ZSH_DATA_DIR_SHARED/shell_history
+if [[ -n "$ZSH_STATE_DIR_SHARED" ]]; then
+  HISTFILE=$ZSH_STATE_DIR_SHARED/shell_history
 else
   # History is important!
   # If there is no shared data dir set, make sure I'm aware of the problem and the consequences
-  >&2 echo "/!\\ WARNING /!\\: Something is wrong, \$ZSH_DATA_DIR_SHARED is not set 👀"
+  >&2 echo "/!\\ WARNING /!\\: Something is wrong, \$ZSH_STATE_DIR_SHARED is not set 👀"
   >&2 echo "-> History will not persist unless you set \$HISTFILE manually"
 fi
 

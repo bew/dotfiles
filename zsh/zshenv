@@ -16,16 +16,21 @@ ZSH_MY_CONF_DIR=~/.zsh
 ZSH_CONFIG_ID=main
 
 # Dir where to store cache / volatile files
-ZSH_CACHE_DIR=${ZSH_CACHE_DIR:-${XDG_CACHE_DIR:-$HOME/.cache}/zsh-${ZSH_CONFIG_ID}}
+ZSH_CACHE_DIR=${XDG_CACHE_DIR:-$HOME/.cache}/zsh-${ZSH_CONFIG_ID}
 
-# Dir where to store files shared between all configs $ZSH_CONFIG_ID
+# Dir where to store state files specific to $ZSH_CONFIG_ID
 # (e.g. shell history, recent directories, ..)
-ZSH_DATA_DIR_SHARED=${ZSH_DATA_DIR:-${XDG_DATA_DIR:-$HOME/.local/share}/zsh-shared}
-# Dir where to store files specific to a $ZSH_CONFIG_ID
-       ZSH_DATA_DIR=${ZSH_DATA_DIR:-${XDG_DATA_DIR:-$HOME/.local/share}/zsh-${ZSH_CONFIG_ID}}
+ZSH_STATE_DIR=${XDG_STATE_DIR:-$HOME/.local/state}/zsh-${ZSH_CONFIG_ID}
+# Dir where to store files shared between all configs
+# (e.g. shell history, recent directories, ..)
+ZSH_STATE_DIR_SHARED=${XDG_STATE_DIR:-$HOME/.local/state}/zsh-shared
+
+# Dir where to store data files specific to $ZSH_CONFIG_ID
+ZSH_DATA_DIR=${XDG_DATA_DIR:-$HOME/.local/share}/zsh-${ZSH_CONFIG_ID}
 
 mkdir -p $ZSH_CACHE_DIR
-mkdir -p $ZSH_DATA_DIR $ZSH_DATA_DIR_SHARED
+mkdir -p $ZSH_DATA_DIR
+mkdir -p $ZSH_STATE_DIR $ZSH_STATE_DIR_SHARED
 
 # Ensure $SHELL is set to `zsh` full path
 # (instead of a default like `bash` if not set at system level)

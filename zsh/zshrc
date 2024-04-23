@@ -81,7 +81,7 @@ source $_ZSH_PLUGIN_SRCREF__zi/zi.zsh
 
 # Syntax highlighting
 FAST_WORK_DIR=$ZSH_DATA_DIR/plugin--fast-syntax-highlighting
-mkdir -vp "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.cache :/
+mkdir -p "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.cache :/
 # | => to avoid the selected theme to be saved in ~/.cache (tmpfs => empty on boot)
 # \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
 zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
@@ -136,8 +136,8 @@ autoload -Uz cdr
 # Store chpwd file in a shared dir across all zsh configs,
 # and use other files if our file is less filled than the others.
 zstyle ':chpwd:*' recent-dirs-file \
-  "$ZSH_DATA_DIR_SHARED/chpwd-recent-dirs-${ZSH_CONFIG_ID}" \
-  "$ZSH_DATA_DIR_SHARED/chpwd-recent-dirs-*"
+  "$ZSH_STATE_DIR_SHARED/chpwd-recent-dirs-${ZSH_CONFIG_ID}" \
+  "$ZSH_STATE_DIR_SHARED/chpwd-recent-dirs-*"
 
 # The original chpwd_recent_dirs (from autoload) doesn't work when the
 # chpwd hook is called after a non-toplevel `cd`, e.g when we `cd` from a script
