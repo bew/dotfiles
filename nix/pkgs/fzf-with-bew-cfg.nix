@@ -50,6 +50,8 @@ let
     "bg+" = "237"; # bg of current line
     "hl+" = "202"; # matching substring in current line (fg)
     "hl"  = "166"; # matching substring on all lines (fg)
+    "selected-bg" = "235"; # selected lines
+    "selected-fg" = "bold"; # selected lines
     "gutter" = "-1"; # bg color for left gutter : use default terminal bg
     "marker" = "220:bold"; # current line marker in the gutter
     "preview-bg" = "233"; # bg of preview window
@@ -61,6 +63,9 @@ let
     "--reverse" # prompt at the top
     "--info=inline" # put info on right of prompt
     "--color='${colorsArg}'"
+    "--highlight-line"
+    "--pointer=╸"
+    "--marker=▎" # multi-selection markers (looks good with full line highlight)
     "--scrollbar=▌▐"
     "--preview-window=border-bold"
   ];
