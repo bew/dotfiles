@@ -334,10 +334,9 @@ NamedPlug.luasnip {
       -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
       ls.jump(-1)
     end}
-    my_actions.snip_cycle_choice = mk_action {
+    my_actions.snip_cycle_choice = mk_action_v2 {
       default_desc = "snippet: cycle choice node",
-      for_mode = {"i", "s", "n"},
-      fn = function()
+      [{"n", "i", "s"}] = function()
         if ls.in_snippet() and ls.choice_active() then
           ls.change_choice(1)
         end
@@ -349,14 +348,13 @@ NamedPlug.luasnip {
     -- in the mean time use <M-c>
     toplevel_map{mode={"i", "s", "n"}, key=[[<M-c>]], action=my_actions.snip_cycle_choice}
 
-    my_actions.snip_store_visual_selection = mk_action {
+    my_actions.snip_store_visual_selection = mk_action_v2 {
       default_desc = "snippet: store selection for later",
-      for_mode = "v",
       -- Copied from:
       -- https://github.com/L3MON4D3/LuaSnip/blob/ea7d7ea510c641c4f1504/lua/luasnip/config.lua#L274
-      raw_action = [[:lua require('luasnip.util.util').store_selection()<cr>gv"_s]],
+      v = [[:lua require('luasnip.util.util').store_selection()<cr>gv"_s]],
       -- TODO: Display a short message like 'LuaSnip: selection stored' (via `vim.notify`?)
-      keymap_opts = {silent = true},
+      map_opts = {silent = true},
     }
     local_leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
     -- NOTE: do not use direct `²` in visual mode, could be useful for context actions later..
@@ -507,7 +505,7 @@ Plug {
       )
     }
 
-    -- Disable all default keybinds
+    -- Disable all default keybinds to use my action system instead
     local disabled_keymaps = {
       normal = false, -- (default: `ys`)
       normal_line = false, -- delims on new lines (default: `yS`)
@@ -519,42 +517,42 @@ Plug {
       change = false, -- replace surround (default: `cs`)
       change_line = false, -- replace surround, delims on new lines (default: `cS`)
     }
-    my_actions.add_surround = mk_action {
-      for_mode="n", default_desc="Add around <motion>",
-      raw_action="<Plug>(nvim-surround-normal)",
+    my_actions.add_surround = mk_action_v2 {
+      default_desc = "Add around <motion>",
+      n = "<Plug>(nvim-surround-normal)",
     }
-    my_actions.add_surround_on_visual = mk_action {
-      for_mode="v", default_desc="Add around visual selection",
-      raw_action="<Plug>(nvim-surround-visual)",
+    my_actions.add_surround_on_visual = mk_action_v2 {
+      default_desc = "Add around visual selection",
+      v = "<Plug>(nvim-surround-visual)",
     }
-    my_actions.change_surround = mk_action {
-      for_mode="n", default_desc="Change nearest <from-pair> <to-pair>",
-      raw_action="<Plug>(nvim-surround-change)",
+    my_actions.change_surround = mk_action_v2 {
+      default_desc = "Change nearest <from-pair> <to-pair>",
+      n = "<Plug>(nvim-surround-change)",
     }
-    my_actions.delete_surround = mk_action {
-      for_mode="n", default_desc="Delete nearest <pair>",
-      raw_action="<Plug>(nvim-surround-delete)",
+    my_actions.delete_surround = mk_action_v2 {
+      default_desc = "Delete nearest <pair>",
+      n = "<Plug>(nvim-surround-delete)",
     }
     -- Extra surround actions (on current line, add delims on newlines)
-    my_actions.add_surround_on_newline = mk_action {
-      for_mode="n", default_desc="Add around <motion>, delims on newlines",
-      raw_action="<Plug>(nvim-surround-normal-line)",
+    my_actions.add_surround_on_newline = mk_action_v2 {
+      default_desc = "Add around <motion>, delims on newlines",
+      n = "<Plug>(nvim-surround-normal-line)",
     }
-    my_actions.add_surround_around_line = mk_action {
-      for_mode="n", default_desc="Add around current line",
-      raw_action="<Plug>(nvim-surround-normal-cur)",
+    my_actions.add_surround_around_line = mk_action_v2 {
+      default_desc = "Add around current line",
+      n = "<Plug>(nvim-surround-normal-cur)",
     }
-    my_actions.add_surround_around_line_on_newline = mk_action {
-      for_mode="n", default_desc="Add around current line, delims on newlines",
-      raw_action="<Plug>(nvim-surround-normal-cur-line)",
+    my_actions.add_surround_around_line_on_newline = mk_action_v2 {
+      default_desc = "Add around current line, delims on newlines",
+      n = "<Plug>(nvim-surround-normal-cur-line)",
     }
-    my_actions.add_surround_on_visual_on_newline = mk_action {
-      for_mode="v", default_desc="Add around visual selection, delims on newlines",
-      raw_action="<Plug>(nvim-surround-visual-line)",
+    my_actions.add_surround_on_visual_on_newline = mk_action_v2 {
+      default_desc = "Add around visual selection, delims on newlines",
+      v = "<Plug>(nvim-surround-visual-line)",
     }
-    my_actions.change_surround_on_newline = mk_action {
-      for_mode="n", default_desc="Change surrounds, delims on newlines",
-      raw_action="<Plug>(nvim-surround-change-line)",
+    my_actions.change_surround_on_newline = mk_action_v2 {
+      default_desc = "Change surrounds, delims on newlines",
+      n = "<Plug>(nvim-surround-change-line)",
     }
 
     -- Map to add surround

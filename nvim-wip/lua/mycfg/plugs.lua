@@ -93,13 +93,13 @@ Plug {
       end,
     }
 
-    my_actions.neovim_lua_repl = mk_action {
-      for_mode="n", default_desc="Neovim Lua Repl buffer",
-      raw_action="<cmd>Repl lua<cr>",
+    my_actions.neovim_lua_repl = mk_action_v2 {
+      default_desc = "Neovim Lua Repl buffer",
+      n = "<cmd>Repl lua<cr>",
     }
-    my_actions.neovim_vim_repl = mk_action {
-      for_mode="n", default_desc="Neovim Vim Repl buffer",
-      raw_action="<cmd>Repl vim<cr>",
+    my_actions.neovim_vim_repl = mk_action_v2 {
+      default_desc = "Neovim Vim Repl buffer",
+      n = "<cmd>Repl vim<cr>",
     }
   end,
 }

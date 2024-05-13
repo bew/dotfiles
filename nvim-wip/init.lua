@@ -57,60 +57,70 @@ function toplevel_map_define_group(spec)
   end
 end
 
---- Create top level map
-function toplevel_map(spec)
+--- Create top level maps
+---@param map_spec.mode string|{string} Mode(s) for which to map the key
+---@param map_spec.key string Key to map
+---@param map_spec.action ActionV2|ModeActionSpecInput|ModeRawActionInput Action to assign to key
+---@param map_spec.opts table Keymap options (same as for `vim.keymap.set`). When map_spec.action is
+---   an ActionV2 obj, opts must not conflict.
+---@param map_spec.debug bool Whether to print debugging info about the keymap
+function toplevel_map(map_spec)
   vim.validate{
-    mode={spec.mode, {"string", "table"}},
-    key={spec.key, "string"},
+    mode={map_spec.mode, {"string", "table"}},
+    key={map_spec.key, "string"},
     action={
-      spec.action,
+      map_spec.action,
       function(a)
         if vim.tbl_contains({"function", "string"}, type(a)) then
           return true
         end
-        return type(a) == "table" and a.to_keymap_action ~= nil
+        return type(a) == "table" and a.meta.action_version == "v2"
       end,
     },
-    opts={spec.opts, "table", true}, -- optional
-    debug={spec.debug, "boolean", true}, -- optional
+    opts={map_spec.opts, "table", true}, -- optional
+    debug={map_spec.debug, "boolean", true}, -- optional
   }
-  local debug_keymap = spec.debug or false
-  local keymap_action = spec.action
-  local keymap_opts = spec.opts or {}
-  local description = spec.desc
-  if type(spec.action) == "table" then
-    if not spec.action:supports_mode(spec.mode) then
-      error(_f("Action does not support all given modes:", vim.inspect(spec.mode)))
+  local debug_keymap = map_spec.debug or false
+
+  -- When the action is not an action obj, so transform it quickly to a cheap action v2:
+  if type(map_spec.action) ~= "table" then
+    map_spec.action = mk_action_v2 {
+      [map_spec.mode] = map_spec.action,
+    }
+  end
+  -- map_spec.action is now guaranteed to be a action v2 object
+
+  -- Check the action supports all requested modes
+  if not map_spec.action:supports_mode(map_spec.mode) then
+    print(vim.inspect(map_spec.action))
+    error(_f("Action does not support all given modes:", vim.inspect(map_spec.mode)))
+  end
+
+  for _, mode in ipairs(U.normalize_arg_one_or_more(map_spec.mode)) do
+    local action_for_mode = map_spec.action.mode_actions[mode]
+    assert(action_for_mode, _f("action missing for mode", _q(mode)))
+
+    -- Options
+    -- NOTE: prevent opts conflicts
+    local map_opts = vim.tbl_extend("error", map_spec.opts or {}, action_for_mode.map_opts or {})
+    -- Description
+    local description = map_spec.desc or action_for_mode.default_desc
+    if description then
+      map_opts.desc = description
     end
 
-    -- FIXME: Complex actions (like `my_actions.hlsearch_current`) can have different desc/function
-    --   for each mode.
-    --   => Need to generate a set of keymap parameters for each in this case..
-    --   (only the case when `spec.for_mode` is a table? (idea: make it always a table?))
-
-    -- vim.keymap.set requires the action to be a string or a function,
-    -- so get the underlying keymap action from the ActionSpec.
-    keymap_action = spec.action:to_keymap_action()
-    if not description and spec.action.default_desc then
-      description = spec.action.default_desc
+    if map_spec.debug or action_for_mode.debug or false then
+      print(
+        "Debugging keymap (action v2):",
+        "mode:", vim.inspect(mode),
+        "key:", vim.inspect(map_spec.key),
+        "raw-action:", vim.inspect(action_for_mode.raw_action),
+        "opts:", vim.inspect(map_opts, { newline = " ", indent = "" })
+      )
     end
-    -- NOTE: raise error when opts conflicts
-    keymap_opts = vim.tbl_extend("error", keymap_opts, spec.action.keymap_opts)
 
-    debug_keymap = debug_keymap or spec.action.debug
+    vim.keymap.set(mode, map_spec.key, action_for_mode.raw_action, map_opts)
   end
-  if description then
-    keymap_opts.desc = description
-  end
-  if debug_keymap then
-    print("Debugging keymap:",
-      "mode:", vim.inspect(spec.mode),
-      "key:", vim.inspect(spec.key),
-      "raw_action:", vim.inspect(keymap_action),
-      "opts:", vim.inspect(keymap_opts)
-    )
-  end
-  vim.keymap.set(spec.mode, spec.key, keymap_action, keymap_opts)
 end
 
 --- Create global leader key mapping
@@ -170,23 +180,36 @@ end
 --   * "executor"
 --   Nice ones!
 
----@class ActionSpecInput
----@field for_mode string|string[] Compatible modes at the start of the action
----@field fn? (fun(): any) The function to execute (conflicts with raw_action)
----@field raw_action? any The raw action to execute (conflicts with fn)
----@field keymap_opts? {string: any} The raw action to execute (conflicts with fn)
+---@alias ModeRawActionInput string|(fun(): any)
+
+---@class ModeActionSpecInput
+---@field raw_action ModeRawActionInput The raw action to execute
+---@field default_desc? string The default description for the keymap when this action is used
+---@field map_opts? {string: any} The keymap options for that action
 ---@field debug? boolean Wheather to debug the effective keymap args on use
 
----@class ActionSpec: ActionSpecInput
+---@class ActionSpecInput: ModeActionSpecInput (used as defaults for each mode)
+---@field n ModeRawActionInput|ModeActionSpecInput Action spec for normal mode
+---@field i ModeRawActionInput|ModeActionSpecInput Action spec for insert mode
+---@field v ModeRawActionInput|ModeActionSpecInput Action spec for visual mode
+---@field o ModeRawActionInput|ModeActionSpecInput Action spec for operator mode
+---@field c ModeRawActionInput|ModeActionSpecInput Action spec for command mode
+--- + key like `{"n", "i"}` to set both `n` & `i` action spec.
+
+---@class ActionV2
+---@field meta Metadata about this action
+---@field mode_actions {string: ModeAction} Action for each mode
+
+---@class ModeAction: ModeActionSpecInput
+
 local ActionSpec_mt = {
   __index = setmetatable(
     {
-      to_keymap_action = function(self)
-        return self.raw_action
-      end,
       supports_mode = function(self, given_modes)
+        vim.validate { mode={given_modes, {"string", "table"}} }
+        local supported_modes = vim.tbl_keys(self.mode_actions)
         for _, mode in ipairs(U.normalize_arg_one_or_more(given_modes)) do
-          if not vim.tbl_contains(self.supported_modes, mode) then
+          if not vim.tbl_contains(supported_modes, mode) then
             return false
           end
         end
@@ -244,14 +267,24 @@ local ActionSpec_mt = {
     require"mylib.mt_utils".KeyRefMustExist_mt
   ),
   __call = function(self)
-    if self.keymap_opts.expr then
-      error("Ad-hoc exec of expr action is NOT tested/supported")
+    local nb_mode_actions = #vim.tbl_keys(self.mode_actions)
+    if nb_mode_actions ~= 1 then
+      error(_f(
+        "Ad-hoc action call ONLY supports single mode action, got", nb_mode_actions,
+        "(mode(s)", vim.inspect(vim.tbl_keys(self.mode_actions)), ")"
+      ))
     end
-    local raw_action_type = type(self.raw_action)
+    local adhoc_action = vim.tbl_values(self.mode_actions)[1]
+
+    if (adhoc_action.map_opts or {}).expr then
+      error("Ad-hoc action call of expr-based action is NOT tested/supported")
+    end
+
+    local raw_action_type = type(adhoc_action.raw_action)
     if raw_action_type == "function" then
-      self.raw_action()
+      adhoc_action.raw_action()
     elseif raw_action_type == "string" then
-      error("Ad-hoc exec of string raw action is not implemented (failed..)")
+      error("Ad-hoc action call of a string raw action is not implemented (failed..)")
       -- FIXME: I can't get it to work properly,
       --   e.g with cmd mode or surround actions..
       ----------------------------------------------------
@@ -269,42 +302,108 @@ local ActionSpec_mt = {
       -- U.feed_keys_sync(self.raw_action, feed_keys_opts)
       -- vim.api.nvim_feedkeys(self.raw_action, feedkeys_mode, replace_keycodes)
     else
-      error(_f("Cannot ad-hoc exec raw action of type", raw_action_type))
+      error(_f("Ad-hoc action call with raw action of type", _q(raw_action_type), "is not supported"))
     end
   end
 }
 
 ---@type {[string]: ActionSpec}
 my_actions = {}
----@param spec ActionSpecInput
----@return ActionSpec
-function mk_action(spec)
-  vim.validate{
-    spec={spec, "table"},
-    spec_fn={spec.fn, "function", true}, -- optional
-    spec_action={spec.raw_action, "string", true}, -- optional (only when fn not set)
-    spec_for_mode={spec.for_mode, {"string", "table"}},
-    spec_desc={spec.default_desc, "string", true}, -- optional
-    spec_keymap_opts={spec.keymap_opts, "table", true}, -- optional
-    spec_debug={spec.debug, "boolean", true}, -- optional
-  }
-  if spec.opts then error("Set keymap options using field `keymap_opts`") end
-  local raw_action
-  if spec.fn then
-    raw_action = spec.fn
-  elseif spec.raw_action then
-    raw_action = spec.raw_action
-  else
-    error("spec.fn or spec.raw_action must be set!")
+
+-- Usage:
+-- mk_action_v2 {
+--   default_desc = "Description for n/i (normal/insert mode) actions"
+--
+--   n = "zz",
+--   -- same as
+--   n = {
+--     "zz",
+--     -- other options for action for normal mode
+--   }
+--   -- same as
+--   n = {
+--     raw_action = "zz"
+--   }
+--   -- technically same as
+--   n = {
+--     map_opts = { expr = true },
+--     raw_action = function() return "zz" end
+--   }
+--
+--   i = {
+--     function() return "<Left>" end,
+--     map_opts = { expr = true },
+--   }
+--
+--   v = {
+--     default_desc = "Description for visual mode action"
+--     "zf"
+--     map_opts = { silent = true },
+--   }
+-- }
+function mk_action_v2(global_spec)
+  -- For a given mode, I want these fields:
+  -- - default_desc
+  -- - raw_action
+  -- - map_opts
+  -- - debug
+  -- If field not given (except for `raw_action`), use the field at parent level (for all modes) if any
+
+  local function mk_action_single_mode(mode_spec)
+    -- (note: uses upvalue 'global_spec')
+    if type(mode_spec) == "function" or type(mode_spec) == "string" then
+      mode_spec = { raw_action = mode_spec }
+    end
+    if type(mode_spec) ~= "table" then
+      error(_f("spec for mode must be a function, a string or a mode spec, got", _q(type(mode_spec))))
+    end
+    -- Allow raw_action to be given without the key, as first item of a table list
+    -- => `n = { "foo" }` is same as `n = { raw_action = "foo" }`
+    if mode_spec.raw_action == nil then
+      if mode_spec[1] ~= nil then
+        mode_spec.raw_action = mode_spec[1]
+      else
+        error("Missing action!")
+      end
+    end
+    return {
+      raw_action = mode_spec.raw_action,
+      default_desc = mode_spec.default_desc or global_spec.default_desc,
+      map_opts = mode_spec.map_opts or global_spec.map_opts,
+      debug = mode_spec.debug or global_spec.debug,
+    }
   end
-  -- TODO: normalize actual actions to `raw_action_for_mode` table
-  return setmetatable({
-    default_desc = spec.default_desc or false,
-    supported_modes = U.normalize_arg_one_or_more(spec.for_mode),
-    raw_action = raw_action,
-    keymap_opts = spec.keymap_opts or {},
-    debug = spec.debug or false,
-  }, ActionSpec_mt)
+
+  local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "o", "c", "s"}
+
+  -- Find all action specs for each valid mode
+  local spec_for_mode = {}
+  for maybe_mode, value in pairs(global_spec) do
+    if type(maybe_mode) == "string" then
+      if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, maybe_mode) then
+        spec_for_mode[maybe_mode] = value
+      end
+    end
+    if type(maybe_mode) == "table" then
+      for _, mode in ipairs(maybe_mode) do
+        if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, mode) then
+          spec_for_mode[mode] = value
+        end
+      end
+    end
+  end
+  if vim.tbl_isempty(spec_for_mode) then
+    error("Action has no mode available")
+  end
+
+  local action_obj = {
+    meta = { action_version = "v2" },
+    mode_actions = vim.tbl_map(mk_action_single_mode, spec_for_mode),
+  }
+  if global_spec.debug then
+    print("Debugging action v2:", vim.inspect(action_obj))
+  end
+  return setmetatable(action_obj, ActionSpec_mt)
 end
 function mk_configurable_action(spec)
   -- NOTE: A configurable action has options (inspired from NixOS options, at a single level),

@@ -402,30 +402,28 @@ Plug {
     -- local_leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
 
     -- next/prev hunk that also work in vim's diff mode
-    my_actions.goto_next_changed_hunk = mk_action{
+    my_actions.go_next_changed_hunk = mk_action_v2 {
       default_desc = "Goto next changed hunk",
-      for_mode = "n",
-      keymap_opts = { expr = true }, -- inject keys!
-      fn = function()
+      map_opts = { expr = true }, -- inject keys!
+      n = function()
         if vim.wo.diff then return "]c" end
         vim.schedule(gs.next_hunk) -- need to schedule, cannot run it in an expr mapping
         return "<Ignore>"
       end,
     }
-    my_actions.goto_prev_changed_hunk = mk_action{
+    my_actions.go_prev_changed_hunk = mk_action_v2 {
       default_desc = "Goto prev changed hunk",
-      for_mode = "n",
-      keymap_opts = { expr = true }, -- inject keys!
-      fn = function()
+      map_opts = { expr = true }, -- inject keys!
+      n = function()
         if vim.wo.diff then return "[c" end
         vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
         return "<Ignore>"
       end,
     }
-    local_leader_map{mode={"n"}, key="hn", action=my_actions.goto_next_changed_hunk}
-    local_leader_map{mode={"n"}, key="hN", action=my_actions.goto_prev_changed_hunk}
+    local_leader_map{mode={"n"}, key="hn", action=my_actions.go_next_changed_hunk}
+    local_leader_map{mode={"n"}, key="hN", action=my_actions.go_prev_changed_hunk}
     -- also map HN so I can 'spam' the letters easily :)
-    local_leader_map{mode={"n"}, key="HN", action=my_actions.goto_prev_changed_hunk}
+    local_leader_map{mode={"n"}, key="HN", action=my_actions.go_prev_changed_hunk}
 
     -- TODO: move closer to git-messenger plugin? Should simply add to a 'git' keymap.
     local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
@@ -437,8 +435,8 @@ Plug {
     local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
     -- define hunk text object & visual selector
-    toplevel_map{mode={"o", "x"}, key="ih", action=gs.select_hunk, desc="select hunk"}
-    toplevel_map{mode={"o", "x"}, key="ah", action=gs.select_hunk, desc="select hunk"}
+    toplevel_map{mode={"o", "v"}, key="ih", action=gs.select_hunk, desc="select hunk"}
+    toplevel_map{mode={"o", "v"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
 }
 

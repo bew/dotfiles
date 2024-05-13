@@ -36,10 +36,9 @@ vim.cmd[[nnoremap U <C-r>]]
 vim.cmd[[nnoremap Y yy]]
 
 -- N: Discard last search highlight
-my_actions.hide_search_hl = mk_action{
+my_actions.hide_search_hl = mk_action_v2 {
   default_desc="Hide search highlight",
-  for_mode = "n",
-  fn = function()
+  n = function()
     vim.cmd[[nohlsearch]]
     -- IDEA: disappear after 1s ?
     vim.notify "Search cleared"
@@ -107,7 +106,7 @@ my_actions.hlsearch_current = {
     --   default = false,
     -- },
   },
-  for_mode = {
+  mode_actions = {
     n = function(self)
       local current_word = vim.fn.expand("<cword>")
       U.set_current_search(current_word, { with_bounds = self.opts.word_bounds })
@@ -160,16 +159,16 @@ my_actions.hlsearch_current = {
 --
 -- NOTE: For now I'm using direct functions, simulating a call by the action system
 toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
-  my_actions.hlsearch_current.for_mode.n({ opts = { word_bounds = true } })
+  my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = true } })
 end}
 toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
-  my_actions.hlsearch_current.for_mode.v({ opts = { word_bounds = true } })
+  my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = true } })
 end}
 toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
-  my_actions.hlsearch_current.for_mode.n({ opts = { word_bounds = false } })
+  my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = false } })
 end}
 toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
-  my_actions.hlsearch_current.for_mode.v({ opts = { word_bounds = false } })
+  my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
 end}
 
 -- I: Disable up/down keys
@@ -286,9 +285,8 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- That would be a `move selection to same context above/below` (can be repeated)
 
 -- A: Duplicate visual selection
-my_actions.duplicate_selection = mk_action{
-  for_mode = "v",
-  fn = function()
+my_actions.duplicate_selection = mk_action_v2 {
+  v = function()
     -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
     -- however Visual selection is a pain to get reliably while handling all cases.
     -- See this PR that attempts to add a vim.get_visual_selection() function:
@@ -297,25 +295,23 @@ my_actions.duplicate_selection = mk_action{
     -- So until we have better APIs to manipulate visual mode, let's just implement it
     -- in a way similar to my old vimscript implementation :shrug:
 
-    local save_reg = vim.fn.getreginfo([["]])
-
-    local visual_mode = vim.fn.mode()
-    if visual_mode == "v" or visual_mode == "V" then
-      --- Char or Line selection mode:
-      -- Copy, go to the end of the selection, paste
-      -- then re-enter visual (for easy repeat)
-      vim.fn.execute [[noautocmd normal! y`>p]]
-    else
-      --- Block selection mode:
-      -- Copy (cursor moves to top left of block), paste before
-      -- then re-enter visual (for easy repeat)
-      --
-      -- NOTE: for some reason paste before in block mode does _not_ move
-      -- last visual marks.. (they do move when using this in the other visual modes)
-      vim.fn.execute [[noautocmd normal! yP]]
-    end
-
-    vim.fn.setreg([["]], save_reg.regcontents, save_reg.regtype)
+    U.save_run_restore({ save_registers = {[["]]} }, function()
+      local visual_mode = vim.fn.mode()
+      if visual_mode == "v" or visual_mode == "V" then
+        --- Char or Line selection mode:
+        -- Copy, go to the end of the selection, paste
+        -- then re-enter visual (for easy repeat)
+        vim.fn.execute [[noautocmd normal! y`>p]]
+      else
+        --- Block selection mode:
+        -- Copy (cursor moves to top left of block), paste before
+        -- then re-enter visual (for easy repeat)
+        --
+        -- NOTE: for some reason paste before in block mode does _not_ move
+        -- last visual marks.. (they do move when using this in the other visual modes)
+        vim.fn.execute [[noautocmd normal! yP]]
+      end
+    end)
   end,
 }
 -- V: Duplicate visual selection
@@ -363,11 +359,10 @@ toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 -- TODO: Make <C-w> delete entire last arg (space separated?)
 --   and <M-BS> delete smaller parts (like builtin <C-w>)
 
-my_actions.c_expand_file_path = mk_action{
+my_actions.c_expand_file_path = mk_action_v2 {
   default_desc = "expand current file path",
-  for_mode = "c",
-  keymap_opts = { expr = true },
-  fn = function()
+  map_opts = { expr = true },
+  c = function()
     return vim.fn.expand("%:.")
   end,
 }
@@ -375,11 +370,10 @@ my_actions.c_expand_file_path = mk_action{
 -- (using uppercase P because % also needs shift, so it's easy to 'spam')
 toplevel_map{mode="c", key="%P", action=my_actions.c_expand_file_path}
 
-my_actions.c_expand_file_dir = mk_action{
+my_actions.c_expand_file_dir = mk_action_v2 {
   default_desc = "expand current file dir",
-  for_mode = "c",
-  keymap_opts = { expr = true },
-  fn = function()
+  map_opts = { expr = true },
+  c = function()
     return vim.fn.expand("%:.:h") .. "/"
   end,
 }
@@ -430,11 +424,10 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 -- NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
 -- NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
 -- vim.cmd[[ vnoremap <expr> $ (mode() == "v" ? "$h" : "$") ]]
-my_actions.logical_visual_eol = mk_action{
+my_actions.logical_visual_eol = mk_action_v2 {
   default_desc = "logical EOL",
-  for_mode = "v",
-  keymap_opts = { expr = true }, -- inject keys!
-  fn = function()
+  map_opts = { expr = true }, -- inject keys!
+  v = function()
     if vim.fn.mode() == "v" then
       return "$h"
     else
@@ -444,16 +437,14 @@ my_actions.logical_visual_eol = mk_action{
 }
 toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
 
-my_actions.select_last_inserted_region = mk_action{
+my_actions.select_last_inserted_region = mk_action_v2 {
   default_desc = "select last inserted region",
-  for_mode = "n",
-  raw_action = "`[v`]",
+  n = "`[v`]",
 }
 -- FIXME: how to merge the two normal/operator actions?
-my_actions.o_select_last_inserted_region = mk_action{
+my_actions.o_select_last_inserted_region = mk_action_v2 {
   default_desc = "select last inserted region",
-  for_mode = "o",
-  raw_action = [[<cmd>normal! `[v`]<cr>]],
+  o = [[<cmd>normal! `[v`]<cr>]],
 }
 -- N: Select last inserted region
 toplevel_map{mode="n", key="gV", action=my_actions.select_last_inserted_region}
