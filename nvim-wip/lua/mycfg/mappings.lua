@@ -10,30 +10,64 @@ local _q = U.str_simple_quote_surround
 
 -- Disable keybindings
 
+my_actions.disabled = mk_action_v2 {
+  [{"n", "i", "v", "c"}] = "<nop>"
+}
+
 -- <C-LeftMouse> default to <C-]>, which just give errors in most files..
--- I'll re-enable it in a smart way whenever I really want it!
-vim.cmd[[nnoremap <C-LeftMouse> <nop>]]
+-- I may re-enable it in a smart way whenever I really want it!
+toplevel_map{mode="n", key="<C-LeftMouse>", action=my_actions.disabled}
+
+-- I: Disable up/down keys
+--
+-- This is required to disable scrolling in insert mode when running under tmux with scrolling
+-- emulation mouse bindings for the alternate screen, because it would move Up/Down N times based on
+-- the scrolling emulation config.
+toplevel_map{mode="i", key=[[<Up>]], action=my_actions.disabled}
+toplevel_map{mode="i", key=[[<Down>]], action=my_actions.disabled}
+
 
 ----- Survival keybindings..
 
 -- N,I,V: Save buffer
 -- NOTE: using lockmarks to avoid overwriting '[ & '] marks by the 'write'
 --   See: https://neovim.discourse.group/t/using-after-w/3608
-vim.cmd[[nnoremap <silent> <M-s> :lockmarks w<cr>]]
-vim.cmd[[inoremap <silent> <M-s> <Esc>:lockmarks w<cr>]]
-vim.cmd[[vnoremap <silent> <M-s> <Esc>:lockmarks w<cr>]]
+my_actions.save_buffer = mk_action_v2 {
+  default_desc = "Save buffer",
+  [{"n", "i", "v"}] = [[<esc><cmd>lockmarks write<cr>]],
+  map_opts = { silent = true },
+}
+toplevel_map{mode={"n", "i", "v"}, key=[[<M-s>]], action=my_actions.save_buffer}
 
 -- N: Quit window
-vim.cmd[[nnoremap <silent> Q :q<cr>]]
+my_actions.close_window = mk_action_v2 {
+  default_desc = "Close window",
+  n = [[<cmd>quit<cr>]],
+  map_opts = { silent = true },
+}
+toplevel_map{mode="n", key="Q", action=my_actions.close_window}
 -- <wm-mappings>
-global_leader_map{mode="n", key="<C-M-d>", desc="Close window", action="<cmd>q<cr>"}
+global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_window}
 
 
 -- N: logical redo
-vim.cmd[[nnoremap U <C-r>]]
+my_actions.undo = mk_action_v2 {
+  default_desc = "Undo",
+  n = [[u]],
+}
+my_actions.redo = mk_action_v2 {
+  default_desc = "Redo",
+  n = [[<C-r>]],
+}
+toplevel_map{mode="n", key="u", action=my_actions.undo}
+toplevel_map{mode="n", key="U", action=my_actions.redo}
 
 -- N: Y to copy whole line
-vim.cmd[[nnoremap Y yy]]
+my_actions.copy_line = mk_action_v2 {
+  default_desc = "Copy line",
+  n = "yy",
+}
+toplevel_map{mode="n", key="Y", action=my_actions.copy_line}
 
 -- N: Discard last search highlight
 my_actions.hide_search_hl = mk_action_v2 {
@@ -171,59 +205,68 @@ toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)",
   my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
 end}
 
--- I: Disable up/down keys
---
--- This is required to disable scrolling in insert mode when running under tmux with scrolling
--- emulation mouse bindings for the alternate screen, because it would move Up/Down N times based on
--- the scrolling emulation config.
-vim.cmd[[inoremap <Up> <nop>]]
-vim.cmd[[inoremap <Down> <nop>]]
-
 -- N: Remap n/N to always move in a stable direction
 --
 -- `n` will always go forward (even after a backward search)
 -- `N` will always go backward (even after a forward search)
-toplevel_map{mode="n", key="n", desc="", opts={ expr = true }, action=function()
-  if vim.v.searchforward == 1 then
-    return "n" -- continue forward
-  else
-    return "N" -- go backward instead
-  end
-end}
-toplevel_map{mode="n", key="N", desc="", opts={ expr = true }, action=function()
-  if vim.v.searchforward == 1 then
-    return "N" -- go forward instead
-  else
-    return "n" -- continue backward
-  end
-end}
+my_actions.go_next_search_result = mk_action_v2 {
+  default_desc = "Goto next search result (always forward)",
+  map_opts = { expr = true },
+  n = function()
+    if vim.v.searchforward == 1 then
+      return "n" -- continue forward
+    else
+      return "N" -- go backward instead
+    end
+  end,
+}
+my_actions.go_prev_search_result = mk_action_v2 {
+  default_desc = "Goto previous search result (always backward)",
+  map_opts = { expr = true },
+  n = function()
+    if vim.v.searchforward == 1 then
+      return "N" -- go forward instead
+    else
+      return "n" -- continue backward
+    end
+  end,
+}
+toplevel_map{mode="n", key="n", action=my_actions.go_next_search_result}
+toplevel_map{mode="n", key="N", action=my_actions.go_prev_search_result}
 
 -- Windows navigation
 vim.cmd[[nnoremap <C-h> <C-w>h]]
 vim.cmd[[nnoremap <C-j> <C-w>j]]
 vim.cmd[[nnoremap <C-k> <C-w>k]]
 vim.cmd[[nnoremap <C-l> <C-w>l]]
--- When mapping <C-j> has no effect
---vim.cmd[[nmap <cr> <C-j>]]
---
--- When mapping <C-h> has no effect
---vim.cmd[[nmap <BS> <C-h>]]
-
--- I: CTRL-U with undo point to avoid loosing text by mistake
---vim.cmd[[inoremap <C-u> <C-g>u<C-u>]]
--- NOTE: now a nvim default
+--vim.cmd[[nmap <cr> <C-j>]] -- When mapping <C-j> has no effect
+--vim.cmd[[nmap <BS> <C-h>]] -- When mapping <C-h> has no effect
 
 -- Goto tabs Alt-a/z
-vim.cmd[[nnoremap <M-a> gT]]
-vim.cmd[[nnoremap <M-z> gt]]
-vim.cmd[[inoremap <M-a> <esc>gT]]
-vim.cmd[[inoremap <M-z> <esc>gt]]
+my_actions.go_prev_tab = mk_action_v2 {
+  default_desc = "Go to prev tab",
+  [{"n", "i"}] = "<esc>gT",
+}
+my_actions.go_next_tab = mk_action_v2 {
+  default_desc = "Go to next tab",
+  [{"n", "i"}] = "<esc>gt",
+}
+toplevel_map{mode="n", key=[[<M-a>]], action=my_actions.go_prev_tab}
+toplevel_map{mode="n", key=[[<M-z>]], action=my_actions.go_next_tab}
 
 -- Move tabs (with Shift + goto keys)
-vim.cmd[[nnoremap <silent> <M-A> :tabmove -1<cr>]]
-vim.cmd[[nnoremap <silent> <M-Z> :tabmove +1<cr>]]
-vim.cmd[[inoremap <silent> <M-A> <esc>:tabmove -1<cr>]]
-vim.cmd[[inoremap <silent> <M-Z> <esc>:tabmove +1<cr>]]
+my_actions.move_tab_left = mk_action_v2 {
+  default_desc = "Move tab left",
+  [{"n", "i"}] = [[<esc><cmd>tabmove -1<cr>]],
+  map_opts = { silent = true },
+}
+my_actions.move_tab_right = mk_action_v2 {
+  default_desc = "Move tab right",
+  [{"n", "i"}] = [[<esc><cmd>tabmove +1<cr>]],
+  map_opts = { silent = true },
+}
+toplevel_map{mode="n", key=[[<M-A>]], action=my_actions.move_tab_left}
+toplevel_map{mode="n", key=[[<M-Z>]], action=my_actions.move_tab_right}
 
 -- Open current buffer in new tab (in a new window)
 vim.cmd[[nnoremap <silent> <M-t> :tab split<cr>]]
