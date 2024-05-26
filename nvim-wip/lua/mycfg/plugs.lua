@@ -162,8 +162,13 @@ NamedPlug.pkg_manager {
       end
       lazy_single_spec.init = plug.on_pre_load
       lazy_single_spec.config = plug.on_load
-      if plug.version and plug.version.branch then
-        lazy_single_spec.branch = plug.version.branch
+      if plug.version then
+        if plug.version.branch then
+          lazy_single_spec.branch = plug.version.branch
+        end
+        if plug.version.tag then
+          lazy_single_spec.tag = plug.version.tag
+        end
       end
       if plug.depends_on then
         local direct_deps = {}

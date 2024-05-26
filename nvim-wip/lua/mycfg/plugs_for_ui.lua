@@ -30,8 +30,27 @@ NamedPlug.statusline {
   -- Full doc is available at: https://github.com/rebelot/heirline.nvim/blob/master/cookbook.md
   -- (no vim doc for now)
   tags = {t.ui, t.careful_update, t.extensible},
+  config_depends_on = {
+    Plug {
+      source = gh"Zeioth/heirline-components.nvim",
+      version = { tag = "v1.1.2" }, -- For support for nvim <0.10
+    },
+  },
   on_load = function()
-    require("mycfg.heirline_statusline_setup").setup()
+    local heirline = require"heirline"
+    local external_heirline_components = require "heirline-components.all"
+
+    heirline.load_colors(external_heirline_components.hl.get_colors())
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      desc = "Re-apply heirline colors",
+      callback = function()
+        local hl = require"heirline-components.core.hl"
+        require"heirline.utils".on_colorscheme(hl.get_colors())
+      end,
+    })
+
+    local hline_mycfg = require("mycfg.heirline_statusline_setup")
+    heirline.setup(hline_mycfg.get_heirline_setup_opts())
   end,
 }
 

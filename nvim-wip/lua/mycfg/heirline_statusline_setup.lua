@@ -231,7 +231,19 @@ local GeneralPurposeStatusline = {
       end
     end,
   },
+  external_components.diagnostics(),
   __WIDE_SPACE__,
+  external_components.lsp({ lsp_client_names = false }), -- LSP progress messages
+  {
+    condition = my.lsp_ts_diags.LspActive.condition,
+    my.lsp_ts_diags.LspActive,
+    _,
+  },
+  {
+    condition = my.lsp_ts_diags.TreesitterStatus.condition,
+    my.lsp_ts_diags.TreesitterStatus,
+    _,
+  },
   my.nvim.FileType,
   my.nvim.RulerAndCursorPos,
 }
@@ -258,16 +270,16 @@ local Statuslines = {
   GeneralPurposeStatusline, -- last fallback
 }
 
-local function setup()
+local function get_heirline_setup_opts()
   -- FIXME: doesn't behave well when no space to show whole statuline..
-  require"heirline".setup({
+  return {
     statusline = Statuslines,
-  })
-  -- TODO: I want to setup the 'statusline' option myself, and only call heirline for initialization.
-  -- This would allow to setup local statuslines in some file / for some window, without putting
-  -- that config in the global statusline.
+  }
+  -- TODO: I would like to setup the 'statusline' option myself, and only call heirline for
+  -- initialization. This would allow to setup local statuslines in some file / for some window,
+  -- without putting that config in the global statusline.
 end
 
 return {
-  setup = setup,
+  get_heirline_setup_opts = get_heirline_setup_opts,
 }
