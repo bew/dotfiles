@@ -9,6 +9,16 @@ local U = {}
 
 U.save_run_restore = require"mylib.save_restore_utils".save_run_restore
 
+function U.iter_chars(str)
+  local i = 0
+  local len = #str
+  return function()
+    i = i + 1
+    if i > len then return nil end
+    return i, str:sub(i, i)
+  end
+end
+
 function U.filter_list(tbl, filter_fn)
   vim.validate{
     tbl={tbl, "table"},
