@@ -14,6 +14,8 @@ local myplug = PluginSystem.sources.myplug
 
 --------------------------------
 
+require"mycfg.diagnostics_and_lsp"
+
 NamedPlug.cmp {
   source = gh"hrsh7th/nvim-cmp",
   desc = "Auto-completion framework",
@@ -21,6 +23,7 @@ NamedPlug.cmp {
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
   config_depends_on = {
     Plug { source = gh"onsails/lspkind.nvim", depends_on = {NamedPlug.cmp} },
+    Plug { source = gh"hrsh7th/cmp-nvim-lsp", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-buffer", depends_on = {NamedPlug.cmp} },
     Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
     Plug {
@@ -124,6 +127,7 @@ NamedPlug.cmp {
       -- TODO(?): fork?
     }
     local common_sources = {
+      { name = 'nvim_lsp' },
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
       -- FIXME: There doesn't seem to be a way to change the associated label we see in compl menu

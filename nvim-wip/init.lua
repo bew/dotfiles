@@ -57,6 +57,12 @@ function toplevel_map_define_group(spec)
   end
 end
 
+function toplevel_buf_map(map_spec)
+  map_spec.opts = map_spec.opts or {}
+  map_spec.opts.buffer = true
+  toplevel_map(map_spec)
+end
+
 --- Create top level maps
 ---@param map_spec.mode string|{string} Mode(s) for which to map the key
 ---@param map_spec.key string Key to map
@@ -153,15 +159,18 @@ function local_leader_map(spec)
   }))
 end
 function local_leader_remap(spec)
-  if not spec.opts then
-    spec.opts = {}
-  end
+  spec.opts = spec.opts or {}
   spec.opts.remap = true
   local_leader_map(spec)
 end
 function local_leader_map_define_group(spec)
   spec.prefix_key = "<LocalLeader>"..spec.prefix_key
   toplevel_map_define_group(spec)
+end
+function local_leader_buf_map(spec)
+  spec.opts = spec.opts or {}
+  spec.opts.buffer = true
+  local_leader_map(spec)
 end
 
 -- Minimal action system

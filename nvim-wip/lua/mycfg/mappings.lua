@@ -26,6 +26,9 @@ toplevel_map{mode="n", key="<C-LeftMouse>", action=my_actions.disabled}
 toplevel_map{mode="i", key=[[<Up>]], action=my_actions.disabled}
 toplevel_map{mode="i", key=[[<Down>]], action=my_actions.disabled}
 
+-- N: Disable some builtin keys around goto def/decl (I use other mappings anyway)
+toplevel_map{mode="n", key="gd", action=my_actions.disabled}
+toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 
 ----- Survival keybindings..
 
