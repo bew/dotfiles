@@ -263,10 +263,10 @@ function U.get_visual_start_end_pos0()
   -- limit to visualchar & visualline (don't need for visualblock for now)
   local visual_mode_kind = U.assert_visual_mode("get visual start/end", {"visualchar", "visualline"})
 
-  -- TODO: get current cursor pos
+  -- get current cursor pos
   local cursor_pos10 = vim.api.nvim_win_get_cursor(0)
   local cursor_pos0 = Pos0.new{ row = cursor_pos10[1] -1, col = cursor_pos10[2] }
-  -- TODO: get other side of visual selection
+  -- get other side of visual selection
   local other_side_posinfo = vim.fn.getpos("v")
   local other_side_pos0 = Pos0.new{ row = other_side_posinfo[2] -1, col = other_side_posinfo[3] -1 }
 

@@ -254,8 +254,8 @@ my_actions.go_next_tab = mk_action_v2 {
   default_desc = "Go to next tab",
   [{"n", "i"}] = "<esc>gt",
 }
-toplevel_map{mode="n", key=[[<M-a>]], action=my_actions.go_prev_tab}
-toplevel_map{mode="n", key=[[<M-z>]], action=my_actions.go_next_tab}
+toplevel_map{mode={"n", "i"}, key=[[<M-a>]], action=my_actions.go_prev_tab}
+toplevel_map{mode={"n", "i"}, key=[[<M-z>]], action=my_actions.go_next_tab}
 
 -- Move tabs (with Shift + goto keys)
 my_actions.move_tab_left = mk_action_v2 {
