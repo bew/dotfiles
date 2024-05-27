@@ -1,3 +1,6 @@
+" Force disable auto-comment-leader on 'o' or 'O'.
+setlocal formatoptions-=o
+
 " What to open when doing `K` on a word
 " Using `:help` allows us to get vim-related help of lua function
 setlocal keywordprg=:help

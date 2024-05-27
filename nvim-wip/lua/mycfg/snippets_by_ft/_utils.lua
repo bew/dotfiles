@@ -32,6 +32,9 @@ end
 ---   t"Hello world!",
 --- })
 --- ```
+--
+-- FIXME: support multiple triggers
+--   !!! luasnip doesn't seem to support to assign the same 'context' to 2 snippets :/
 U.get_snip_fn = function(list_of_snippets)
   return function(trigger, context, ...)
     context.trig = trigger
