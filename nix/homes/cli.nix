@@ -25,6 +25,8 @@ in {
 
     neovim-pseudo-flake.homeModules.nvim-base-bins
     neovim-pseudo-flake.homeModules.nvim-bew
+
+    ./cli/direnv.nix
   ];
 
   home.packages = [
@@ -60,7 +62,6 @@ in {
     stable.tree
     stable.just
     (stable.ranger.override { imagePreviewSupport = false; })
-    stable.direnv # FIXME: mention it only in zsh cli env definition?
     stable.pueue # interactive cli process 'scheduler' & manager
 
     stable.less
