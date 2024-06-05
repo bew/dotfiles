@@ -749,6 +749,7 @@ Plug {
     do
       -- remove builtin quote pairs
       npairs.remove_rule([[']])
+      npairs.remove_rule([['']]) -- default rule for Nix 👀
       npairs.remove_rule([["]])
       npairs.remove_rule([[`]])
       npairs.remove_rule([[```]])
