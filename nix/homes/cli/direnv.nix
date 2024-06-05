@@ -5,6 +5,14 @@ let
 in {
   home.packages = [
     stable.direnv
+
+    # For some reason the `direnv` pkg does not provide ZSH completions, but `zsh-completions` pkg does
+    # (but I don't want all the other ones in there if I don't need them)
+    # So only extract the completion file I need o/
+    (stable.runCommand "direnv-zsh-completions" {} ''
+      mkdir -p $out/share/zsh/site-functions
+      cp ${stable.zsh-completions}/share/zsh/site-functions/_direnv $out/share/zsh/site-functions
+    '')
   ];
 
   # Add nix-direnv' `use nix`/`use flake` impl to have good caching of the generated nix dev shells
