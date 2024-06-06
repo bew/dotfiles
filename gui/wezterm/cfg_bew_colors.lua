@@ -2,8 +2,8 @@
 local col = {}
 
 -- Bew colors
-col.background = "#191919"
-col.foreground = "#eeeeee"
+col.background = "#141414"
+col.foreground = "#f4f4f4"
 
 col.cursor_bg = "#eeeeee"
 col.cursor_fg = "#202020"
