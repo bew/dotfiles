@@ -401,3 +401,4 @@ alias tv-add='@mpv add tv'
 # ffmpeg
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
+alias ffmpeg-no-verbose='ffmpeg -loglevel warning -stats'
