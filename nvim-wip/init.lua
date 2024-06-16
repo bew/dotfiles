@@ -63,6 +63,18 @@ function toplevel_buf_map(map_spec)
   toplevel_map(map_spec)
 end
 
+-- Normalize mode `v` to always mean `x` (visual mode ONLY instead of both visual/select)
+-- ⚠️⚠️ Prevent mapping to both visual & select mode with `v`
+-- 👉 Always replace `v` by `x` so `v` is ONLY visual mode instead of both visual/select
+-- (ref: `:h mapmode-x`)
+local function normalize_mode(mode)
+  if mode == "v" then
+    return "x"
+  else
+    return mode
+  end
+end
+
 --- Create top level maps
 ---@param map_spec.mode string|{string} Mode(s) for which to map the key
 ---@param map_spec.key string Key to map
@@ -88,21 +100,24 @@ function toplevel_map(map_spec)
   }
   local debug_keymap = map_spec.debug or false
 
+  -- ⚠️ Ensure `v` mode means visual ONLY (replace `v` with `x`)
+  local map_modes = vim.tbl_map(normalize_mode, U.normalize_arg_one_or_more(map_spec.mode))
+
   -- When the action is not an action obj, so transform it quickly to a cheap action v2:
   if type(map_spec.action) ~= "table" then
     map_spec.action = mk_action_v2 {
-      [map_spec.mode] = map_spec.action,
+      [map_modes] = map_spec.action,
     }
   end
   -- map_spec.action is now guaranteed to be a action v2 object
 
   -- Check the action supports all requested modes
-  if not map_spec.action:supports_mode(map_spec.mode) then
+  if not map_spec.action:supports_mode(map_modes) then
     print(vim.inspect(map_spec.action))
-    error(_f("Action does not support all given modes:", vim.inspect(map_spec.mode)))
+    error(_f("Action does not support all given modes:", vim.inspect(map_modes)))
   end
 
-  for _, mode in ipairs(U.normalize_arg_one_or_more(map_spec.mode)) do
+  for _, mode in ipairs(map_modes) do
     local action_for_mode = map_spec.action.mode_actions[mode]
     assert(action_for_mode, _f("action missing for mode", _q(mode)))
 
@@ -383,19 +398,21 @@ function mk_action_v2(global_spec)
     }
   end
 
-  local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "o", "c", "s"}
+  local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "x", "o", "c", "s"}
 
   -- Find all action specs for each valid mode
   local spec_for_mode = {}
   for maybe_mode, value in pairs(global_spec) do
     if type(maybe_mode) == "string" then
       if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, maybe_mode) then
+        maybe_mode = normalize_mode(maybe_mode) -- ⚠️ Ensure `v` mode means visual ONLY
         spec_for_mode[maybe_mode] = value
       end
     end
     if type(maybe_mode) == "table" then
       for _, mode in ipairs(maybe_mode) do
         if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, mode) then
+          mode = normalize_mode(mode) -- ⚠️ Ensure `v` mode means visual ONLY
           spec_for_mode[mode] = value
         end
       end
