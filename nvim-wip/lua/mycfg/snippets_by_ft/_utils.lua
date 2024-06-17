@@ -59,6 +59,11 @@ U.myfmt = function(args)
   return fmt(unpack(args))
 end
 
+-- Same as the builtin luasnip fmt, using `{}` delimiters
+U.myfmt_braces = function(args)
+  return fmt(unpack(args))
+end
+
 U.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
