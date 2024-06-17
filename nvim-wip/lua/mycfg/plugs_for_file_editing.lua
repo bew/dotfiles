@@ -642,7 +642,7 @@ Plug {
         -- => Would allow to add some positions only if none matched so far..
       },
 
-      -- Do not break undo when pairing default rules
+      -- Do not add an undo break when pairing with default rules
       break_undo = false,
 
       -- Do not disable in macros (didn't see much trouble with having it enabled)
@@ -676,6 +676,7 @@ Plug {
     cond.not_preceded_by_char = cond.not_before_char
     cond.preceded_by_regex = cond.before_regex
     cond.not_preceded_by_regex = cond.not_before_regex
+    cond.not_followed_by_regex = cond.not_after_regex
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -728,7 +729,7 @@ Plug {
     npairs.add_rule(
       Rule{start_pair = "<", end_pair = ">"}
         :insert_pair_when(cond.preceded_by_regex("%a+"))
-        :end_pair_moves_right_when(cond.always)
+        :end_pair_moves_right_when(cond.never)
     )
 
     -- Uniformize (single/double/back) quotes handling by disabling smart-ness for all filetypes!
@@ -747,7 +748,7 @@ Plug {
     --
     -- (was annoying to repeat the 2nd S-quote in strings.. like `"foo 'bar|"`)
     do
-      -- remove builtin quote pairs
+      -- remove builtin quote pairing rules
       npairs.remove_rule([[']])
       npairs.remove_rule([['']]) -- default rule for Nix 👀
       npairs.remove_rule([["]])
@@ -755,10 +756,11 @@ Plug {
       npairs.remove_rule([[```]])
 
       npairs.add_rule(
-        Rule{start_pair = [[']], end_pair = [[']]}
+        -- NOTE: Autopairs plugin do not have an override system, need to disable the global pairing
+        --   rule for Rust for the Rust-specific rule (wanted override) to work.
+        Rule{start_pair = [[']], end_pair = [[']], not_filetypes = {"rust"}}
           -- Always insert second S-quote unless preceded by text (alphanumeric)
-          -- (important to write `it's`!)
-          :insert_pair_when(cond.not_preceded_by_regex("%w"))
+          :insert_pair_when(cond.not_preceded_by_regex"%w") -- to write `it's`
           :end_pair_moves_right_when(cond.never)
           -- builtin behavior is normally using cond.smart_move_right()
       )
@@ -782,6 +784,17 @@ Plug {
       toplevel_map{mode="i", key=[[<M-">]], action=[["]], desc="insert single D-quote"}
       toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
     end
+
+    -- [Rust] Override S-quote to avoid pairing when writing fn/type signatures
+    -- NOTE: Autopairs plugin do not have an override system, need to disable the global pairing
+    --   rule for Rust for this Rust-specific rule to work.
+    npairs.add_rule(
+      Rule{start_pair = [[']], end_pair = [[']], filetypes = {"rust"}}
+        :insert_pair_when(cond.not_preceded_by_regex"%w") -- to write `it's` (same as global rule)
+        :insert_pair_when(cond.not_preceded_by_regex"[&<]") -- to write `<'a, Foo>` or `&'a Foo`
+        :insert_pair_when(cond.not_followed_by_regex"[>]") -- when going from `<Foo>` to `<Foo, 'a>`
+        :end_pair_moves_right_when(cond.never)
+    )
 
     -- Define <C-l> to easily delete the following char (not smart, by design)
     --
