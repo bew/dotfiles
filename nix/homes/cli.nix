@@ -69,6 +69,9 @@ in {
     stable.ncdu
     stable.htop
 
+    stable.tldr # Examples for many programs
+    # NOTE: local cache doesn't seem to work :/
+
     # try some nu!
     bleedingedge.nushell
 
