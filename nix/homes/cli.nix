@@ -68,6 +68,7 @@ in {
 
     stable.ncdu
     stable.htop
+    stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
 
     stable.tldr # Examples for many programs
     # NOTE: local cache doesn't seem to work :/
