@@ -10,6 +10,7 @@ FFMPEG_THREADS=${FFMPEG_THREADS:-}
 FFMPEG_SKIP_EXISTING_OUTPUTS=${FFMPEG_SKIP_EXISTING_OUTPUTS:-}
 FFMPEG_VIDEO_EXT=${FFMPEG_VIDEO_EXT:-mkv}
 FFMPEG_AUDIO_EXT=${FFMPEG_AUDIO_EXT:-m4a}
+FFMPEG_DONT_NORMALIZE_SUBTITLES=${FFMPEG_DONT_NORMALIZE_SUBTITLES:-}
 
 # NOTE: Would be nice if FFMPEG_SKIP_EXISTING_OUTPUTS was a size like `300MB`, that would allow to
 # skip files of at least that size (to be able to cancel a run, and restart it without having to
@@ -28,6 +29,7 @@ function ffmpeg::show_config()
   _ffmpeg::show_single_config FFMPEG_SKIP_EXISTING_OUTPUTS "$FFMPEG_SKIP_EXISTING_OUTPUTS"
   _ffmpeg::show_single_config FFMPEG_VIDEO_EXT "$FFMPEG_VIDEO_EXT" mkv
   _ffmpeg::show_single_config FFMPEG_AUDIO_EXT "$FFMPEG_AUDIO_EXT" m4a
+  _ffmpeg::show_single_config FFMPEG_DONT_NORMALIZE_SUBTITLES "$FFMPEG_DONT_NORMALIZE_SUBTITLES"
 }
 
 function _ffmpeg::show_single_config()
@@ -198,6 +200,13 @@ function ffmpeg::transcode-movie::single-file
   fi
   cmd+=(-c:a aac -maxrate:a ${FFMPEG_AUDIO_MAX_BITRATE:-512k}) # best quality & widely supported format
   [[ -n "${FFMPEG_THREADS:-}" ]] && cmd+=(-threads "$FFMPEG_THREADS") # limit CPU usage
+  if [[ -n "${FFMPEG_DONT_NORMALIZE_SUBTITLES:-}" ]]; then
+    # Just copy subtitles (some subtitles formats can't be re-encoded by ffmpeg)
+    cmd+=(-c:s copy)
+  else
+    cmd+=(-c:s aas)
+  fi
+
   # output
   cmd+=("$output_path")
 
