@@ -70,8 +70,7 @@ in {
     stable.htop
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
 
-    stable.tldr # Examples for many programs
-    # NOTE: local cache doesn't seem to work :/
+    stable.tealdeer # tldr, examples for many programs (offline once DB cached)
 
     # try some nu!
     bleedingedge.nushell
