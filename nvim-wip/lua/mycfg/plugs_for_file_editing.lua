@@ -574,6 +574,7 @@ Plug {
     require"nvim-surround".setup {
       keymaps = disabled_keymaps,
       surrounds = my_surrounds,
+      move_cursor = "sticky",
     }
 
     vim.api.nvim_create_autocmd("FileType", {

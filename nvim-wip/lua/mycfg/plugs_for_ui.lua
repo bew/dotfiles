@@ -423,20 +423,22 @@ Plug {
     -- next/prev hunk that also work in vim's diff mode
     my_actions.go_next_changed_hunk = mk_action_v2 {
       default_desc = "Goto next changed hunk",
-      map_opts = { expr = true }, -- inject keys!
       n = function()
-        if vim.wo.diff then return "]c" end
-        vim.schedule(gs.next_hunk) -- need to schedule, cannot run it in an expr mapping
-        return "<Ignore>"
+        if vim.wo.diff then
+          vim.cmd.normal({']c', bang = true})
+        else
+          gs.nav_hunk('next')
+        end
       end,
     }
     my_actions.go_prev_changed_hunk = mk_action_v2 {
       default_desc = "Goto prev changed hunk",
-      map_opts = { expr = true }, -- inject keys!
       n = function()
-        if vim.wo.diff then return "[c" end
-        vim.schedule(gs.prev_hunk) -- need to schedule, cannot run it in an expr mapping
-        return "<Ignore>"
+        if vim.wo.diff then
+          vim.cmd.normal({'[c', bang = true})
+        else
+          gs.nav_hunk('prev')
+        end
       end,
     }
     local_leader_map{mode={"n"}, key="hn", action=my_actions.go_next_changed_hunk}
