@@ -37,10 +37,10 @@ toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 --   See: https://neovim.discourse.group/t/using-after-w/3608
 my_actions.save_buffer = mk_action_v2 {
   default_desc = "Save buffer",
-  [{"n", "i", "v"}] = [[<esc><cmd>lockmarks write<cr>]],
+  [{"n", "i", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
   map_opts = { silent = true },
 }
-toplevel_map{mode={"n", "i", "v"}, key=[[<M-s>]], action=my_actions.save_buffer}
+toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
 
 -- N: Quit window
 my_actions.close_window = mk_action_v2 {
