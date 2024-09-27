@@ -665,8 +665,6 @@ Plug {
     local Rule = require"nvim-autopairs.rule"
     local cond = require"nvim-autopairs.conds"
     -- Rename some functions to have a more readable config (has many more!)
-    -- NOTE: Not possible by default, made a PR for it (& changed locally)
-    --   https://github.com/windwp/nvim-autopairs/pull/316
     Rule.insert_pair_when = Rule.with_pair
     Rule.end_pair_moves_right_when = Rule.with_move
     Rule.cr_expands_pair_when = Rule.with_cr
@@ -724,12 +722,13 @@ Plug {
       end)
     )
 
-    -- Pair angle brackets when directly preceded by a word, useful in
-    -- languages using angle brackets generics, like Rust (`Foo<T>`)
-    -- Taken from https://github.com/windwp/nvim-autopairs/issues/330
+    -- Pair angle brackets when directly preceded by a word, optionally with `::`,
+    -- useful in languages using angle brackets generics, like Rust (`Foo<T>`, `bla::<T>`)
+    -- Taken from comments at <https://github.com/windwp/nvim-autopairs/issues/330>
     npairs.add_rule(
       Rule{start_pair = "<", end_pair = ">"}
-        :insert_pair_when(cond.preceded_by_regex("%a+"))
+        -- NOTE: 2nd param hints the regex to check at least last 3 chars (to work for `foo::|`)
+        :insert_pair_when(cond.preceded_by_regex("%a+:?:?$", 3))
         :end_pair_moves_right_when(cond.never)
     )
 
