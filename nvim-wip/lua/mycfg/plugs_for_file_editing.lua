@@ -795,19 +795,6 @@ Plug {
         :insert_pair_when(cond.not_followed_by_regex"[>]") -- when going from `<Foo>` to `<Foo, 'a>`
         :end_pair_moves_right_when(cond.never)
     )
-
-    -- Define <C-l> to easily delete the following char (not smart, by design)
-    --
-    -- Can be useful to delete right-part of a pair if inserted by mistake
-    toplevel_map{
-      mode="i",
-      -- opposite to <C-h>:
-      -- <C-h> deletes <-|
-      -- <C-l> deletes |->
-      key=[[<C-l>]],
-      desc="Delete right char (opposite of <BS>)",
-      action=[[<Del>]],
-    }
   end,
 }
 

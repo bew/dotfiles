@@ -76,7 +76,7 @@ toplevel_map{mode="n", key="Y", action=my_actions.copy_line}
 my_actions.hide_search_hl = mk_action_v2 {
   default_desc="Hide search highlight",
   n = function()
-    vim.cmd[[nohlsearch]]
+    vim.cmd.nohlsearch()
     -- IDEA: disappear after 1s ?
     vim.notify "Search cleared"
   end,
@@ -271,10 +271,18 @@ my_actions.move_tab_right = mk_action_v2 {
 toplevel_map{mode="n", key=[[<M-A>]], action=my_actions.move_tab_left}
 toplevel_map{mode="n", key=[[<M-Z>]], action=my_actions.move_tab_right}
 
--- Open current buffer in new tab (in a new window)
-vim.cmd[[nnoremap <silent> <M-t> :tab split<cr>]]
--- Move current window to new tab
-vim.cmd[[nnoremap <silent> <M-T> <C-w>T]]
+my_actions.buf_view_in_new_tab = mk_action_v2 {
+  default_desc = "Duplicate buf in new tab (in new win)",
+  n = [[:tab split<cr>]],
+  map_opts = { silent = true },
+}
+my_actions.win_move_to_new_tab = mk_action_v2 {
+  default_desc = "Move win to new tab",
+  n = [[<C-w>T]],
+  map_opts = { silent = true },
+}
+toplevel_map{mode="n", key="<M-t>", action=my_actions.buf_view_in_new_tab}
+toplevel_map{mode="n", key="<M-T>", action=my_actions.win_move_to_new_tab}
 
 
 -- N,I: Insert empty lines below or above
@@ -556,7 +564,32 @@ vim.cmd[[nnoremap <M-cr> A<cr>]]
 --
 -- => Useful for most languages so make it global!
 -- TODO: be smarter based on surrounding text! (even without treesitter)
-vim.cmd[[inoremap <expr> <M-,> (col(".") == col("$") ? ',<C-g>U<Left>' : ', <C-g>U<Left><C-g>U<Left>')]]
+toplevel_map{
+  mode="i",
+  key=[[<M-,>]],
+  opts = { expr = true },
+  action=function()
+    local left = [[<C-g>U<Left>]]
+    local cursor_at_eol = vim.fn.col"." == vim.fn.col"$"
+    if cursor_at_eol then
+      return "," .. left
+    else
+      return ", " .. left .. left
+    end
+  end,
+}
+
+-- I: <C-l> to easily delete the following char (not smart, by design)
+-- Can be useful to delete right-part of a pair if inserted by mistake
+toplevel_map{
+  mode="i",
+  -- opposite to <C-h>:
+  -- <C-h> deletes <-|
+  -- <C-l> deletes |->
+  key=[[<C-l>]],
+  desc="Delete right char",
+  action=[[<Del>]],
+}
 
 
 
@@ -577,16 +610,16 @@ local function directional_split(direction)
 
   if direction == "up" then
     vim.o.splitbelow = false
-    vim.cmd[[  split ]]
+    vim.cmd.split()
   elseif direction == "down" then
     vim.o.splitbelow = true
-    vim.cmd[[  split ]]
+    vim.cmd.split()
   elseif direction == "left" then
     vim.o.splitright = false
-    vim.cmd[[ vsplit ]]
+    vim.cmd.vsplit()
   elseif direction == "right" then
     vim.o.splitright = true
-    vim.cmd[[ vsplit ]]
+    vim.cmd.vsplit()
   else
     vim.api.nvim_err_writeln(_f("Unknown split direction", _q(direction)))
   end
