@@ -53,11 +53,10 @@ NamedPlug.cmp {
       --   especially snippets from LuaSnip)
       entries = {name = 'custom', selection_order = 'near_cursor' }
     }
-    global_cfg.performance = {
-      max_view_entries = 15,
-    }
     global_cfg.formatting = {}
     global_cfg.window = { completion = {} }
+    -- Limit height of completion window
+    vim.opt.pumheight = 15
 
     local protected_formatter = function(custom_fmt_fn)
       return function(entry, original_vim_item)
