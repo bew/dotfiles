@@ -216,7 +216,11 @@ function segmt::python_venv
     fi
 
     local venv_parent_dir_path=$(dirname "$VIRTUAL_ENV")
-    if [[ "$(realpath $PWD)" == "$(realpath $venv_parent_dir_path)" ]]; then
+    if ! [[ -d "$VIRTUAL_ENV" ]]; then
+      # !! The Virtual Env does NOT exist anymore !!
+      venv_display+=" ERROR"
+      # …else it exists, and we can describe where it is…
+    elif [[ "$(realpath $PWD)" == "$(realpath $venv_parent_dir_path)" ]]; then
       # venv is in PWD, no need to repeat the dir name
       venv_display+=" here"
     else
