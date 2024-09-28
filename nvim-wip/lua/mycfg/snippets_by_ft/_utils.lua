@@ -64,6 +64,7 @@ U.myfmt_braces = function(args)
   return fmt(unpack(args))
 end
 
+--- Insert node that default to last visual (saved) selection if any, else given text
 U.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
@@ -85,6 +86,18 @@ U.insert_node_default_selection = function(index, default_text)
       ls.insert_node(1, default_text),
     })
   end)
+end
+
+local node_key_ref = require("luasnip.nodes.key_indexer").new_key -- to use key indexed node refs
+local node_absolute_ref = require("luasnip.nodes.absolute_indexer")
+U.node_ref = function(ref)
+  if type(ref) == "string" then
+    return node_key_ref(ref)
+  elseif type(ref) == "table" then
+    return node_absolute_ref(ref)
+  else
+    return ref
+  end
 end
 
 return U

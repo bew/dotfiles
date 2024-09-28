@@ -12,7 +12,7 @@ local rep = ls_extras.rep
 
 -- Start of snippets definitions
 
-snip("rq", {desc = "require"}, U.myfmt {
+snip("rq", {desc = [[require"…"]]}, U.myfmt {
   [[require"<module>"]],
   { module = i(1, "module") },
 })
@@ -22,6 +22,34 @@ snip("l", {desc = "local var = ..."}, U.myfmt {
   {
     var = i(1, "var"),
     value = i(2),
+  },
+})
+
+-- On call, I'm first on <module>. as I write the module name I want <var> to be the last part of
+-- <module> unless I change it manually.
+-- 👉 This is actually non-trivial, see: <https://github.com/L3MON4D3/LuaSnip/discussions/1194>
+-- snip("lr", {desc = "local require"}, U.myfmt {
+--   [[local <var> = require"<module>"]],
+--   {
+--     module = i(1, "module", {key="mod-name"}),
+--
+--     -- must be the 'last part of <module>' except if I set it to something else
+--     var = ls.dynamic_node(
+--       2,
+--       function(given_nodes_text)
+--         return ls.snippet_node(nil, { ls.restore_node(1, "var-name", i(nil, given_nodes_text[1])) })
+--       end,
+--       {U.node_ref"mod-name"}
+--     )
+--   },
+-- })
+--
+-- Since having the local variable be dynamic, let's opt for the basic simple solution for now…
+snip("lr", {desc = [[local require"…"]]}, U.myfmt {
+  [[local <var> = require"<module>"]],
+  {
+    module = i(1, "some.module"),
+    var = i(2, "var"),
   },
 })
 
