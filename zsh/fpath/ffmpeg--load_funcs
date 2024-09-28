@@ -232,6 +232,96 @@ function ffmpeg::transcode-movie::single-file
   return $ret
 }
 
+function ffmpeg::auto-sync-all-subtitles
+{
+  if [[ $# != 1 ]]; then
+    echo "Usage: ffmpeg::auto-sync-subtitles <input_path>"
+    echo
+    echo "NOTE: Audio in <input_path> will be used as reference (must be in 'aac' format)"
+    echo "  => It MUST be in sync with the video stream"
+    echo
+    return 1
+  fi
+  # TODO: make Nix pkg for these ffmpeg helpers and add depedency on `alass` & `jq` !
+  if ! command -v alass-cli >/dev/null; then
+    >&2 echo "Error: subtitle auto-sync requires 'alass-cli' binary"
+    >&2 echo "  Tool for 'Automatic Language-Agnostic Subtitle Synchronization'"
+    >&2 echo "  -> https://github.com/kaegi/alass"
+    return 1
+  fi
+  if ! command -v jq >/dev/null; then
+    >&2 echo "Error: subtitle auto-sync requires 'jq' binary'"
+    >&2 echo "  Tool for querying JSON from shell"
+    >&2 echo "  -> https://github.com/jqlang/jq"
+    return 1
+  fi
+
+  local input_path="$1"
+
+  # note: '-t' makes the template relative to $TMPDIR
+  local tmpdir=$(mktemp --directory ffmpeg-auto-sync-subs-XXXX -t)
+  echo "(note: created tmp dir '$tmpdir')"
+
+  local tmp_reference_stream="$tmpdir/reference-audio.aac"
+
+  local tmp_audio_json="$tmpdir/audio-info.json"
+  local tmp_subs_info_json="$tmpdir/subtitles-info.json"
+  ffprobe -v error -select_streams s -show_entries stream=index:disposition:stream_tags=language -print_format json "$input_path" > "$tmp_subs_info_json"
+  local subs_stream_indices=( $(jq <"$tmp_subs_info_json" '.streams[].index') )
+  local nb_subs=${#subs_stream_indices}
+  if [[ $nb_subs == 0 ]]; then
+    echo ":: found 0 subtitles, nothing to do ¯\\_(ツ)_/¯"
+    return
+  fi
+
+  # Prepare vars, indexable to access relevant values
+  local loop_indices=( $(seq 1 $nb_subs) )
+  local subs_tmppath_old=()
+  local subs_tmppath_synced=()
+  for stream_idx in $subs_stream_indices; do
+    subs_tmppath_old+=("$tmpdir/old-subtitle-$stream_idx.srt")
+    subs_tmppath_synced+=("$tmpdir/synced-subtitle-$stream_idx.srt")
+  done
+
+  local cmd=(ffmpeg -hide_banner -loglevel error -stats)
+  cmd+=(-i "$input_path")
+  for idx in $loop_indices; do
+    cmd+=( -map 0:${subs_stream_indices[$idx]} ${subs_tmppath_old[$idx]})
+  done
+  cmd+=( -c:a copy -map 0:a "$tmp_reference_stream" )
+  # TODO: separate extraction of subtitles & ref audio stream
+  echo ":: Extracting all $nb_subs subtitles + audio reference (best) stream"
+  _ffmpeg::display_and_run "${cmd[@]}" || return 1
+
+  for idx in $loop_indices; do
+    local stream_idx="${subs_stream_indices[$idx]}"
+    echo ":: Syncing subtitle (stream $stream_idx) to '${subs_tmppath_synced[$idx]}'"
+    # alass-cli usage: `alass-cli <reference-file> <incorrect-sub-file> <output-file-path>`
+    # note: <reference-file> can be either an audio file or a media with audio stream.
+    _ffmpeg::display_and_run alass-cli "$tmp_reference_stream" "${subs_tmppath_old[$idx]}" "${subs_tmppath_synced[$idx]}" || return 1
+  done
+
+  return 42 # FIXME: remove early return
+
+  # TODO: mention how extracting ALL subs and re-creating media file is easier than replacing a
+  # single subtitle stream in the output..
+  # FIXME: OR IS IT?
+  #
+  # Make new media file with replaced bad sub stream in input file by $tmpdir/good-aligned-sub.srt
+  # FIXME: how to make new media file while replacing a stream?
+  #   => Doesn't look like it's possible...
+  #
+  # Might need to play with ffprobe to get info on all subtitles, to be able to re-create them on
+  # the new mdia file.
+  # => Might be easier to just extract, sync & replace all subtitles then?
+
+  # Cleanup if all went well
+  echo ":: Cleaning up tmp dir '$tmpdir'"
+  rm -f $tmp_old_subtitle
+  rm -f $tmp_synced_subtitle
+  rmdir $tmpdir
+}
+
 function ffmpeg::transcode-movie--low-qual
 {
   if [[ $# == 0 ]]; then
