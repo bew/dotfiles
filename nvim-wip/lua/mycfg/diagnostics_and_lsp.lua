@@ -11,6 +11,20 @@ local_leader_map_define_group{mode={"n"}, prefix_key="d", name="+diagnostics"}
 local_leader_map{mode="n", key="dd", desc="Show diagnostics in popup", action=vim.diagnostic.open_float}
 local_leader_map{mode="n", key="dn", desc="Go to next diagnostic", action=vim.diagnostic.goto_next}
 local_leader_map{mode="n", key="dp", desc="Go to prev diagnostic", action=vim.diagnostic.goto_prev}
+local_leader_map{mode="n", key="dj", desc="Go to next error (!= line)", action=function()
+  vim.diagnostic.goto_next {
+    severity = vim.diagnostic.severity.ERROR,
+    -- Start searching from next line
+    cursor_position = { --[[ row ]] vim.fn.line('.') + 1, --[[ col ]] 0 },
+  }
+end}
+local_leader_map{mode="n", key="dk", desc="Go to prev error (!= line)", action=function()
+  vim.diagnostic.goto_prev {
+    severity = vim.diagnostic.severity.ERROR,
+    -- Start searching from previous line
+    cursor_position = { --[[ row ]] vim.fn.line('.') - 1, --[[ col ]] 0 },
+  }
+end}
 
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
