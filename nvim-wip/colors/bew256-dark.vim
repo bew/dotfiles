@@ -125,10 +125,12 @@ exe "HiResetTo Constant"   .s:fg_cyan
 "        Number          a number constant: 234, 0xff
 "        Boolean         a boolean constant: TRUE, false
 "        Float           a floating point constant: 2.3e10
+hi! link String Constant
 
 exe "HiResetTo Identifier"   .s:fg_blue
 "       *Identifier      any variable name
 "        Function        function name (also: methods for classes)
+hi! link Function Identifier
 "
 exe "HiResetTo Statement"   .s:fg_green
 "       *Statement       any statement
@@ -188,6 +190,7 @@ exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fg_base02 .s:bg_base00
+hi! link WinSeparator VertSplit
 
 " 236 (grey)
 " 17 (dark blue) is nice BUT a bit too subtle

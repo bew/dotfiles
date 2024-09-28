@@ -15,6 +15,7 @@ require"mycfg.options"
 
 -- NOTE: If trying to move it AFTER plugin load, double check git signs are of correct color!
 vim.cmd[[ colorscheme bew256-dark ]]
+vim.opt.termguicolors = false -- TODO: convert my theme to RGB!
 
 -- Map leaders
 -- NOTE: Special termcode (like `<foo>`) must be replaced to avoid _very_ unexpected behavior
