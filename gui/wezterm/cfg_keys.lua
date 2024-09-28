@@ -59,6 +59,7 @@ end
 cfg.keys = {
   -- Remap C-Backspace to C-w everywhere
   keybind(mods.C, "Backspace", act.SendKey{mods=mods.C, key="w"}),
+
   -- Remap A-^/$ to Home/End globally
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
   -- (could also be done at system/desktop level, but this is a good level for all terminal apps)
@@ -67,6 +68,10 @@ cfg.keys = {
   -- Force map `Alt-^` itself to terminal program (like neovim!).
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
   --keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
+
+  -- Remap C-/ to A-/
+  -- (C-/ cannot be represented, and it's nice to hit to comment sth!)
+  keybind(mods.C, ":" --[[ key with / ]], act.SendKey{mods=mods.A, key="/"}),
 
   keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
   keybind(mods.S, "PageDown", act.ScrollByPage(1)),
