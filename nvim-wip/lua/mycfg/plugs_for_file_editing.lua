@@ -833,18 +833,38 @@ Plug {
 
     local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
 
-    local_leader_map{
-      mode={"n"},
-      key="cc<Space>",
-      action=function()
-        if vim.v.count == 0 then
-          return "<Plug>(comment_toggle_linewise_current)"
-        else
-          return "<Plug>(comment_toggle_linewise_count)"
+    local K = {}
+    K.esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+    my_actions.toggle_line_comment = mk_action_v2 {
+      n = {
+        default_desc = "toggle comment (linewise)",
+        map_opts = {expr = true},
+        function()
+          if vim.v.count == 0 then
+            return "<Plug>(comment_toggle_linewise_current)"
+          else
+            return "<Plug>(comment_toggle_linewise_count)"
+          end
+        end,
+      },
+      v = {
+        default_desc = "toggle comment on selection (linewise)",
+        function()
+          local vmode = vim.fn.visualmode()
+          U.feed_keys_sync(K.esc)
+          require"Comment.api".locked('toggle.linewise')(vmode)
+          U.feed_keys_sync"gv" -- re-select
         end
-      end,
-      desc="toggle current (linewise)",
-      opts={expr=true},
+      },
+    }
+
+    -- note: C-/ is remapped to A-/ at terminal-level
+    toplevel_map{mode={"n", "v"}, key="<M-/>", action=my_actions.toggle_line_comment}
+
+    local_leader_map{
+      mode={"n", "v"},
+      key="cc<Space>",
+      action=my_actions.toggle_line_comment,
     }
     local_leader_map{
       mode={"n"},
@@ -859,7 +879,6 @@ Plug {
       desc="toggle current (blockwise)",
       opts={expr=true},
     }
-    local_leader_map{mode={"v"}, key="cc<Space>", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle selection"}
 
     -- These mappings work as a prefix for an operator-pending-like mode
     -- (e.g: '<leader> cct 3j' to toggle comment on 4 lines (linewise))

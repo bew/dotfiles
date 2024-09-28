@@ -333,7 +333,7 @@ function U.feed_keys_sync(keys, opts)
   feedkeys_mode = feedkeys_mode .. "!" -- do not auto-end insert mode
 
   -- escape_ks=false : keys should have gone through nvim_replace_termcodes already
-  vim.api.nvim_feedkeys(keys, "nx", false)
+  vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
 end
 
 return U
