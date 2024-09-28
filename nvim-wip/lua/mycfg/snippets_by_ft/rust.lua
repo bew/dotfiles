@@ -14,6 +14,11 @@ snip("an", {desc = "Annotation #[…]"}, U.myfmt {
   { annotation = i(1, "annotation") },
 })
 
+snip("anc", {desc = "Crate annotation #![…]"}, U.myfmt {
+  "#![<annotation>]",
+  { annotation = i(1, "crate-annotation") },
+})
+
 snip("and", {desc = "Derive annotation #[derive(…)]"}, U.myfmt {
   "#[derive(<derives>)]",
   { derives = i(1) },
@@ -22,16 +27,16 @@ snip("and", {desc = "Derive annotation #[derive(…)]"}, U.myfmt {
 
 -- Type helpers
 
-snip("ok", {desc = "Ok(…)"}, U.myfmt {
-  "Ok(<value>)",
-  { value = i(1, "()") },
-  -- FIXME: default to last selected text if any
-})
-
 snip("opt", {desc = "Option<…>"}, U.myfmt_braces {
   "Option<{type}>",
   { type = i(1, "type") },
-  -- FIXME: default to last selected text if any
+  -- FIXME: default to last selected type if any
+})
+
+snip("ok", {desc = "Ok(…)"}, U.myfmt {
+  "Ok(<value>)",
+  { value = i(1, "()") },
+  -- FIXME: default to last selected expr if any
 })
 
 snip("vec", {desc = "vec![…] literal"}, U.myfmt {
@@ -45,6 +50,22 @@ snip("db", {desc = "Debug! dbg!(…)"}, U.myfmt {
   -- FIXME: when not in an expression, add `;` at the end 🙏
 })
 
+snip("p", {desc = "println!(…)"}, U.myfmt {
+  [[println!("<thing>"<args>);]],
+  {
+    thing = i(1),
+    args = i(2),
+  }
+})
+
+snip("w", {desc = "write!(…)?"}, U.myfmt {
+  [[write!(<writer>, "<thing>"<args>)?;]],
+  {
+    writer = i(1, "writer"),
+    thing = i(2),
+    args = i(3),
+  }
+})
 
 -- Test helpers
 
