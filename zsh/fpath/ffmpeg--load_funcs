@@ -216,7 +216,7 @@ function ffmpeg::transcode-movie::single-file
     # Just copy subtitles (some subtitles formats can't be re-encoded by ffmpeg)
     cmd+=(-c:s copy)
   else
-    cmd+=(-c:s aas)
+    cmd+=(-c:s ass)
   fi
 
   # output
