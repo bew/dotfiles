@@ -54,7 +54,12 @@ NamedPlug.cmp {
       entries = {name = 'custom', selection_order = 'near_cursor' }
     }
     global_cfg.formatting = {}
-    global_cfg.window = { completion = {} }
+    global_cfg.window = {
+      documentation = {},
+      completion = {
+        scrolloff = 2,
+      },
+    }
     -- Limit height of completion window
     vim.opt.pumheight = 15
 
@@ -62,7 +67,8 @@ NamedPlug.cmp {
       return function(entry, original_vim_item)
         local ok, nice_vim_item = pcall(custom_fmt_fn, entry, vim.deepcopy(original_vim_item))
         if not ok then
-          original_vim_item.kind = "FAIL" -- indicate something failed during formatting
+          original_vim_item.kind = "FMTFAIL" -- indicate something failed during formatting
+          -- print(vim.inspect(nice_vim_item --[[ the error ]]))
           return original_vim_item
         end
         return nice_vim_item
@@ -70,33 +76,84 @@ NamedPlug.cmp {
     end
     local lspkind = require"lspkind"
     lspkind.init { preset = "codicons" }
+    local SRC_TO_MENU_TAG = {
+      buffer   = "@Buf+",
+      emoji    = "@Emo ",
+      luasnip  = "@Snip",
+      nvim_lsp = "@Lsp ",
+      nvim_lua = "@Lua ",
+      path     = "@Path",
+      tmux     = "@Tmux",
+    }
     -- WARNING: if this function fails, completion will NOT work
     --   (no completion window will be opened), so we protect it with a wrapper and a default.
     global_cfg.formatting.format = protected_formatter(function(entry, vim_item)
       -- Get symbol for LSP kind
       vim_item.kind = " " .. lspkind.symbolic(vim_item.kind) .. " │"
+
+      -- Entry source name
+      local src_name = entry.source.name
+      local src_label
+      if SRC_TO_MENU_TAG[src_name] then
+        src_label = SRC_TO_MENU_TAG[src_name]
+      else
+        src_label = src_name:sub(1, 5)
+      end
+
+      -- Limit width of completion window
+      -- Inspired from: <https://github.com/hrsh7th/nvim-cmp/discussions/609#discussioncomment-5727678>
+      do
+        local MAX_LABEL_WIDTH = 47
+        local MIN_LABEL_WIDTH = 10
+        local label = vim_item.abbr
+        if #label > MAX_LABEL_WIDTH then
+          vim_item.abbr = vim.fn.strcharpart(label, 0, MAX_LABEL_WIDTH - 1) .. "…"
+        elseif #label < MIN_LABEL_WIDTH then
+          vim_item.abbr = label .. (" "):rep(MIN_LABEL_WIDTH - #label)
+        end
+
+        local MAX_INFO_WIDTH = 40
+        local info = vim_item.menu or "" -- (nil for simple sources)
+        if #info > MAX_INFO_WIDTH then
+          info = vim.fn.strcharpart(info, 0, MAX_INFO_WIDTH - 1) .. "…"
+        end
+
+        -- note: We put the src_label before, so they're all aligned vertically
+        if #info > 0 then
+          info = "║ " .. info
+        end
+        vim_item.menu = " " .. src_label .. info
+      end
+
       return vim_item
     end)
 
     -- Completion window field ordering & alignment under cursor
-    global_cfg.formatting.fields = {"kind", "abbr"}
+    global_cfg.formatting.fields = {"kind", "abbr", "menu"}
     -- Tweak completion window to have 'kind' _before_ 'abbr', while keeping 'abbr' right under
     -- current keyword & cursor in-buffer.
-    global_cfg.window.completion.col_offset = -4 -- MUST match length of `vim_item.kind` (but as a negative value)
+    global_cfg.window.completion.col_offset = -4 -- MUST match length of `vim_item.kind` (but with a negative value)
     global_cfg.window.completion.side_padding = 0 -- remove default 1 char padding on the left
 
     -- NOTE: this should really be in `on_colorscheme_change` hook, but it's better here, close
     -- to formatting code..
-    vim.api.nvim_set_hl(0, "CmpItemKind", { ctermfg=33 })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { cterm={bold = true}, ctermfg=202 })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { cterm={bold = true}, ctermfg=202 })
+    vim.api.nvim_set_hl(0, "CmpItemKind", { ctermfg=33 }) -- TODO: add more specialized Kind colors
+    vim.api.nvim_set_hl(0, "CmpItemKindText", { ctermfg=242 })
+    vim.api.nvim_set_hl(0, "CmpItemKindFolder", { ctermfg=33 })
+    vim.api.nvim_set_hl(0, "CmpItemKindFile", { ctermfg=250 })
+    --
+    vim.api.nvim_set_hl(0, "CmpItemMenu", { ctermfg=244, cterm={italic = true} })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrDeprecated", { ctermfg=244, cterm={strikethrough = true} })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { ctermfg=202, cterm={bold = true} })
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { ctermfg=202, cterm={bold = true} })
+    --
     vim.api.nvim_set_hl(0, "CmpWinBG", { ctermbg=235, ctermfg=252 })
-    vim.api.nvim_set_hl(0, "CmpWinSelection", { cterm={bold = true}, ctermbg=238 })
-    -- vim.api.nvim_set_hl(0, "CmpWinSelection", { ctermbg=237 })
+    vim.api.nvim_set_hl(0, "CmpWinSelection", { ctermbg=238, cterm={bold = true} })
     global_cfg.window.completion.winhighlight = "Normal:CmpWinBG,CursorLine:CmpWinSelection,Search:None,PmenuSbar:Identifier,PmenuThumb:Keyword"
     -- (!!) Scrollbar HL is not custommizable
     --   cf PR https://github.com/hrsh7th/nvim-cmp/pull/1741
     global_cfg.window.completion.scrollbar = false
+    global_cfg.window.documentation.scrollbar = false
 
     global_cfg.confirmation = {
       -- disable auto-confirmations!
@@ -129,13 +186,6 @@ NamedPlug.cmp {
       { name = 'nvim_lsp' },
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
-      -- FIXME: There doesn't seem to be a way to change the associated label we see in compl menu
-      --        for a given source block..
-      --        Only `tmux` source allow configurating the source name in compl menu.
-      --        => it should really be a config on source config level, not source definition
-      --        level. (or can a single source provide multiple labels???)
-      --        NOTE: looking at cmp_tmux's source, it seems to be set per completion item, in
-      --        `item.labelDetails.detail`.
       {
         -- Mainly used for long words, leveraging fuzzy search (:
         name = "buffer",
@@ -182,6 +232,7 @@ NamedPlug.cmp {
         name = "tmux",
         keyword_length = 4,
         option = {
+          label = "", -- remove label in 'menu', I put mine already
           capture_history = true,
           all_panes = true,
           trigger_characters = {}, -- all
