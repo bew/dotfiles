@@ -49,6 +49,7 @@ end
 --  <> <!-- --> ->> --> <= >= ++ == === := a::b::c a&&b a||b
 
 cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
+cfg.strikethrough_position = "0.6cell"
 
 -- Enable various OpenType features
 -- See https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
