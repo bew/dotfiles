@@ -111,9 +111,6 @@
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
       zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolWithConfig);
 
-      mpv-bew = bleedingedgePkgs.callPackage ./nix/pkgs/mpv {};
-      mpv-helpers = bleedingedgePkgs.callPackage ./nix/pkgs/mpv-helpers {};
-
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = bleedingedgePkgs.fzf;
         replaceBinsInPkg = mybuilders.replaceBinsInPkg;

@@ -23,11 +23,6 @@ in {
   my.firefox-native-extensions.tridactyl-native = stable.tridactyl-native;
 
   home.packages = [
-    myPkgs.mpv-bew # mpv with scripts
-    (myPkgs.mpv-helpers.override { mpv = myPkgs.mpv-bew; }) # @mpv helpers
-    # note: need to pass mpv-bew in so that my mpv with config is used when starting
-    #   channel-controlled mpv using `@mpv daemon-start foo`
-
     # desktop/wm related (TODO? nixify config)
     stable.dunst
     # FIXME: herbstluftwm is missing here (can't get it to compile last version)
