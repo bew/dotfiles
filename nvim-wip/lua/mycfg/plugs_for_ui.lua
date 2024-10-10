@@ -348,6 +348,23 @@ Plug {
 }
 
 Plug {
+  source = gh"0xAdk/full_visual_line.nvim",
+  desc = "Highlights whole lines in linewise visual mode",
+  tags = {t.ui},
+  on_load = function()
+    require"full_visual_line".setup()
+
+    my_actions.full_visual_line = {}
+    my_actions.full_visual_line.toggle = mk_action_v2 {
+      default_desc = "Full Visual Line - Toggle",
+      [{"n", "v"}] = function()
+        require"full_visual_line".toggle()
+      end,
+    }
+  end,
+}
+
+Plug {
   source = gh"jremmen/vim-ripgrep",
   desc = "Use RipGrep in Vim and display results in a quickfix list",
   tags = {t.vimscript, "nav"},

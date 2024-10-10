@@ -11,6 +11,7 @@
   "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
   "committia.vim": { "branch": "master", "commit": "a187b8633694027ab5ef8a834527d33093282f95" },
   "diffconflicts": { "branch": "master", "commit": "4972d1401e008c5e9afeb703eddd1b2c2a1d1199" },
+  "full_visual_line.nvim": { "branch": "master", "commit": "4cf9977388e09d876ae59ae32b303cdd3e100ae4" },
   "fzf-lua": { "branch": "main", "commit": "fb058bd718aabe9a5abb3e9df3d5c1023d06cdae" },
   "git-messenger.vim": { "branch": "master", "commit": "8a61bdfa351d4df9a9118ee1d3f45edbed617072" },
   "gitsigns.nvim": { "branch": "main", "commit": "f4928ba14eb6c667786ac7d69927f6aee6719f1e" },
