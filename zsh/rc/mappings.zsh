@@ -658,6 +658,8 @@ function zle::utils::register_keysym
 
 zle::utils::register_keysym Home "${terminfo[khome]}" "[1~"
 zle::utils::register_keysym End  "${terminfo[kend]}"  "[4~"
+zle::utils::register_keysym C-Home "[1;5H"
+zle::utils::register_keysym C-End  "[1;5F"
 
 zle::utils::register_keysym Insert "${terminfo[kich1]}" "[2~"
 zle::utils::register_keysym Delete "${terminfo[kdch1]}" "[3~"
@@ -1132,9 +1134,12 @@ bindkey -M menuselect "j" down-line-or-history
 bindkey -M menuselect "k" up-line-or-history
 bindkey -M menuselect "l" forward-char
 
-# Alt-$/0 => go to first/last results on current line
+# Alt-$/0 or Home/End => go to first/last results on current line
 bindkey -M menuselect "0" beginning-of-line
 bindkey -M menuselect "$" end-of-line
+bindkey -M menuselect "${keysyms[Home]}" beginning-of-line
+bindkey -M menuselect "${keysyms[End]}" end-of-line
+# NOTE: Alt-^/$ is usually bound to Home/End at terminal level in my config
 
 # Ctrl-Alt-j/k (or (Alt-){/}) => Go to next/previous match group
 bindkey -M menuselect "^k" vi-backward-blank-word
@@ -1152,8 +1157,8 @@ bindkey -M menuselect "J" forward-word
 bindkey -M menuselect "${keysyms[PageUp]}"   backward-word
 bindkey -M menuselect "${keysyms[PageDown]}" forward-word
 
-# Alt-g/G or Home/End => Go to first/last line (of all lines of matches)
+# Alt-g/G or Ctrl-Home/End => Go to first/last line (of all lines of matches)
 bindkey -M menuselect "g" beginning-of-history
 bindkey -M menuselect "G" end-of-history
-bindkey -M menuselect "${keysyms[Home]}" beginning-of-history
-bindkey -M menuselect "${keysyms[End]}"  end-of-history
+bindkey -M menuselect "${keysyms[C-Home]}" beginning-of-history
+bindkey -M menuselect "${keysyms[C-End]}"  end-of-history

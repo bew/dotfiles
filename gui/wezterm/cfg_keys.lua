@@ -65,6 +65,8 @@ cfg.keys = {
   -- (could also be done at system/desktop level, but this is a good level for all terminal apps)
   keybind(mods.A, get_raw_key("^"), act.SendKey{key="Home"}),
   keybind(mods.A, "$",              act.SendKey{key="End"}),
+  keybind(mods.CA, get_raw_key("^"), act.SendKey{mods=mods.C, key="Home"}),
+  keybind(mods.CA, "$",              act.SendKey{mods=mods.C, key="End"}),
   -- Force map `Alt-^` itself to terminal program (like neovim!).
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
   --keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
