@@ -32,7 +32,25 @@ in {
   home.packages = [
     stable.tmux
 
-    bleedingedge.eza # alternative ls, more colors!
+    # alternative ls, more colors!
+    (bleedingedge.eza.overrideAttrs (final: prev: {
+      patches = prev.patches ++ [
+        (pkgs.fetchpatch {
+          # Commit: fix(color-scale): use file size unit custom color when not using color scale
+          # PR: https://github.com/eza-community/eza/pull/975
+          url = "https://github.com/eza-community/eza/commit/e52c367a421c7109e23a4d69b8c5ba7882c1b20b.patch";
+          hash = "sha256-kWR65F0LxqQp6LBP/TXLIzt1zFpgKT1jA3b4VvHfnUw=";
+        })
+        (pkgs.fetchpatch {
+          # Commit: fix(tree-view): Ensure nested tree parts align under item name
+          # PR: https://github.com/eza-community/eza/pull/1193
+          url = "https://github.com/eza-community/eza/commit/7ad1b8765977227a78e1d9a4554ffb96d756f8e5.patch";
+          excludes = ["tests/*"]; # Exlude tests files, seems they are not found when patching (weird..)
+          hash = "sha256-w5uUyD8T8Oziyi6Z+9VMsYhzHr4EfKvh+XyDIzW0kdw=";
+        })
+      ];
+    }))
+
     cliPkgs.fzf
     stable.bat
     stable.fd
