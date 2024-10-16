@@ -350,7 +350,7 @@ Plug {
 Plug {
   source = gh"0xAdk/full_visual_line.nvim",
   desc = "Highlights whole lines in linewise visual mode",
-  tags = {t.ui},
+  tags = {"content_ui"}, -- FIXME: move to ./plugs_for_file_editing.lua ?
   on_load = function()
     require"full_visual_line".setup()
 
@@ -360,6 +360,24 @@ Plug {
       [{"n", "v"}] = function()
         require"full_visual_line".toggle()
       end,
+    }
+  end,
+}
+
+Plug {
+  source = gh"mcauley-penney/visual-whitespace.nvim",
+  desc = "Reveal whitespace characters in visual mode, like VSCode",
+  tags = {"content_ui"}, -- FIXME: move to ./plugs_for_file_editing.lua ?
+  on_load = function()
+    require"visual-whitespace".setup {
+      highlight = {
+        ctermfg = vim.api.nvim_get_hl(0, {name="Comment"}).ctermfg,
+        ctermbg = vim.api.nvim_get_hl(0, {name="VisualNormal"}).ctermbg,
+      },
+      space_char = " ", -- avoid noise
+      nl_char = "󰘌 ",
+      cr_char = "󰞗 ",
+      tab_char = "󱦰 ",
     }
   end,
 }
