@@ -46,6 +46,7 @@
   "vim-textobj-entire": { "branch": "master", "commit": "64a856c9dff3425ed8a863b9ec0a21dbaee6fb3a" },
   "vim-textobj-indent": { "branch": "master", "commit": "deb76867c302f933c8f21753806cbf2d8461b548" },
   "vim-textobj-user": { "branch": "master", "commit": "41a675ddbeefd6a93664a4dc52f302fe3086a933" },
+  "visual-whitespace.nvim": { "branch": "main", "commit": "53206b0e9a79f22bcabb4d24e14af0260eb1f7cb" },
   "which-key.nvim": { "branch": "main", "commit": "4433e5ec9a507e5097571ed55c02ea9658fb268a" },
   "xterm-color-table.vim": { "branch": "master", "commit": "efa63b4311f6d1328d214bd93149c14c77c9dd7b" }
 }
