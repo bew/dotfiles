@@ -66,6 +66,18 @@ let
   # TODO: expose an environment with:
   # - treesitter parsers
   # - lsp servers
+  lspDeps = pkgs: [
+    # python
+    (pkgs.python3.withPackages (pp: [
+      pp.python-lsp-server
+      pp.python-lsp-ruff
+      pp.pylsp-mypy
+      # pp.python-lsp-isort (not in nixpkgs yet..)
+    ]))
+
+    # rust
+    pkgs.rust-analyzer
+  ];
 
 in {
   packages = {
@@ -78,10 +90,14 @@ in {
       })
     ];
   };
-  homeModules.nvim-bew = { config, ... }: let
+  homeModules.nvim-bew = { config, pkgs, ... }: let
     # My WIP config, directly accessible as `nvim`
     # Use `nvim-minimal` if all is broken!
     nvim-wip = writeShellScriptBin "nvim-wip" ''
+      export PATH=$PATH:${
+        # FIXME: should use bleedingedge for these deps 👀
+        lib.makeBinPath (lspDeps pkgs)
+      }
       export NVIM_APPNAME=nvim-wip
       export NVIM_BEW_MYPLUGINS_PATH=${config.dyndots.mkLink ./../nvim-myplugins} # config specific
       exec ${lib.getExe nvim-base} "$@"

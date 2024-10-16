@@ -1,16 +1,11 @@
 -- Force disable auto-comment-leader on 'o' or 'O'.
 vim.opt_local.formatoptions:remove { "o" }
 
--- TODO: Remap some insert-mode keys to disable/enable auto-pairing based on
---       the presence of char before or not:
---       Example:
---       * `impl│`    then `<`  should become `impl<│>`     (autopair)
---       * `if foo │` then `<`  should become `if foo <│`   (no autopair)
---       * `foo: &│`  then `'`  should become `foo: &'│`    (no autopair)
---       * `just(│)`  then `'`  should become `just('│')`   (autopair)
-
 ------ LSP Setup 🤔
-local function lsp_setup()
+-- TODO: setup https://github.com/mrcjkb/rustaceanvim
+-- 👉 Need sth to disable snippets support 👀
+--    Opened: https://github.com/mrcjkb/rustaceanvim/issues/544
+local function start_lsp_server()
   vim.lsp.start {
     name = "rust-az",
     cmd = {"rust-analyzer"},
@@ -29,7 +24,7 @@ local function lsp_setup()
   }
 end
 if vim.fn.executable("rust-analyzer") == 1 then
-  lsp_setup()
+  start_lsp_server()
 else
   vim.notify("LSP not found")
 end
