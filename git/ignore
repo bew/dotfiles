@@ -34,6 +34,7 @@ __pycache__/
 *.egg
 venv*/
 .venv*/
+.dmypy.json
 
 # Ruby bundle vendor/bundle directory
 bundle/
