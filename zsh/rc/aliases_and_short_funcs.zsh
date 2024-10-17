@@ -140,7 +140,7 @@ alias rename="rename -v"
 # ls
 
 alias ls-backend=eza
-alias ls="ls-backend --group-directories-first --color=auto"
+alias ls="ls-backend --group-directories-first --color=auto --classify"
 
 alias eza="eza --group-directories-first"
 # Config eza colors to shades of grey instead of a distractful bright colors
@@ -168,8 +168,8 @@ EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
 #    and instead of `U` for conflicts => would prefer `X` (red))
 export EZA_COLORS
 
-alias ltre="eza -la --tree --git-ignore"
-alias lltre="eza -l --tree --git-ignore"
+alias ltre="eza -la --tree --git-ignore --classify"
+alias lltre="eza -l --tree --git-ignore --classify"
 
 alias ll="ls -l"
 alias la="ll -a"
