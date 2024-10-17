@@ -323,6 +323,11 @@ function U.feed_keys_sync(keys, opts)
     remap = false,
     replace_termcodes = false,
   })
+
+  if opts.replace_termcodes then
+    keys = vim.api.nvim_replace_termcodes(keys, true, false, true)
+  end
+
   local feedkeys_mode = ""
   if opts.remap then
     feedkeys_mode = feedkeys_mode .. "m" -- remap

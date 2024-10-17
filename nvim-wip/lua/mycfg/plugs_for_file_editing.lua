@@ -870,8 +870,6 @@ Plug {
 
     local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
 
-    local K = {}
-    K.esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
     my_actions.toggle_line_comment = mk_action_v2 {
       n = {
         default_desc = "toggle comment (linewise)",
@@ -888,7 +886,7 @@ Plug {
         default_desc = "toggle comment on selection (linewise)",
         function()
           local vmode = vim.fn.visualmode()
-          U.feed_keys_sync(K.esc)
+          U.feed_keys_sync("<esc>", { replace_termcodes = true })
           require"Comment.api".locked('toggle.linewise')(vmode)
           U.feed_keys_sync"gv" -- re-select
         end
