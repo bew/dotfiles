@@ -130,12 +130,27 @@ alias L=less
 
 # Add verbosity to common commands
 
-alias rm="rm -vI"
+# alias rm="rm -vI" # disabled in favor of trash
 alias cp="cp -vi"
 alias mv="mv -vi"
 alias ln="ln -iv"
 alias mkdir="mkdir -v"
 alias rename="rename -v"
+
+# rm/trash
+
+function rm
+{
+  echo "ERROR: 'rm' is discouraged, use 'trash …' (or 'rmtrash …') instead"
+  echo "  For immediate permanant deletion use 'rm::yes-i-am-sure …'"
+}
+alias rm::yes-i-am-sure="command rm -vI"
+if command -v trashy; then
+  # For once https://github.com/oberblastmeister/trashy/pull/106 is released
+  alias trash=trashy
+fi
+# for easier completion (`rmt<compl>`)
+alias rmtrash=trash
 
 # ls
 

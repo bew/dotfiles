@@ -54,6 +54,7 @@ in {
     cliPkgs.fzf
     stable.bat
     stable.fd
+    stable.trashy
     (pkgs.buildEnv {
       name = "git-bew-env";
       paths = [
