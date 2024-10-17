@@ -186,6 +186,7 @@ exe "HiResetTo Directory"   .s:fg_blue
 exe "HiResetTo ErrorMsg"       .s:bg_red
 exe "HiResetTo IncSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
 exe "HiResetTo Search"         .s:fmt_bold   .s:fg_base03 .s:bg_yellow
+exe "HiResetTo CurSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
 exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
