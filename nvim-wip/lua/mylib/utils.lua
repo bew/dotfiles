@@ -225,11 +225,13 @@ function U.get_visual_selection_lines()
   -- NOTE: Visual selection is a pain to get reliably while handling all cases.
   -- See this PR that attempts to add a vim.get_visual_selection() function:
   --   https://github.com/neovim/neovim/pull/13896
-  U.assert_visual_mode("get visual lines")
+  U.assert_visual_mode("get visual selection")
   -- Register 'v' is used to copy visual selection in (easiest way to get visual selection)
   -- We also save/restore the cursor as yank would move it
   return U.save_run_restore({ save_registers = {"v"}, save_cursor = true }, function()
-    vim.cmd[[noautocmd normal! "vy]]
+    vim.cmd[[noautocmd normal! "vygv]]
+    -- NOTE: we switch back to original visual mode after the copy
+    -- (we didn't trigger ModeChanged autocmd when moving to normal mode which could be unexpected and give visual artefacts)
     return vim.fn.getreginfo("v").regcontents
   end)
 end

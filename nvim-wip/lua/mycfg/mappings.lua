@@ -186,6 +186,8 @@ my_actions.hlsearch_current = {
         -- })
       end
       local selection_lines = U.get_visual_selection_lines()
+      -- note: explicitely switch back to normal mode
+      U.feed_keys_sync("<esc>", { replace_termcodes = true })
       U.set_current_search(selection_lines, { with_bounds = necessary_word_bounds })
     end,
   },
