@@ -101,16 +101,15 @@ function toplevel_map(map_spec)
   }
   local debug_keymap = map_spec.debug or false
 
-  -- ⚠️ Ensure `v` mode means visual ONLY (replace `v` with `x`)
-  local map_modes = vim.tbl_map(normalize_mode, U.normalize_arg_one_or_more(map_spec.mode))
+  local map_modes = U.normalize_arg_one_or_more(map_spec.mode)
 
-  -- When the action is not an action obj, so transform it quickly to a cheap action v2:
+  -- When the action is not an action obj, transform it quickly to a cheap action v2:
   if type(map_spec.action) ~= "table" then
     map_spec.action = mk_action_v2 {
       [map_modes] = map_spec.action,
     }
   end
-  -- map_spec.action is now guaranteed to be a action v2 object
+  -- map_spec.action is now guaranteed to be an action v2 object
 
   -- Check the action supports all requested modes
   if not map_spec.action:supports_mode(map_modes) then
@@ -123,7 +122,7 @@ function toplevel_map(map_spec)
     assert(action_for_mode, _f("action missing for mode", _q(mode)))
 
     -- Options
-    -- NOTE: prevent opts conflicts
+    -- note: map_opts set at action-level are required, make sure the given opts don't conflict
     local map_opts = vim.tbl_extend("error", map_spec.opts or {}, action_for_mode.map_opts or {})
     -- Description
     local description = map_spec.desc or action_for_mode.default_desc
@@ -131,17 +130,19 @@ function toplevel_map(map_spec)
       map_opts.desc = description
     end
 
+    -- ⚠️ Ensure `v` mode means visual ONLY (replace `v` with `x`)
+    local normalized_mode = normalize_mode(mode)
     if map_spec.debug or action_for_mode.debug or false then
       print(
         "Debugging keymap (action v2):",
-        "mode:", vim.inspect(mode),
+        "mode:", vim.inspect(mode) .. " (normalized: " .. vim.inspect(normalized_mode) .. ")",
         "key:", vim.inspect(map_spec.key),
         "raw-action:", vim.inspect(action_for_mode.raw_action),
         "opts:", vim.inspect(map_opts, { newline = " ", indent = "" })
       )
     end
 
-    vim.keymap.set(mode, map_spec.key, action_for_mode.raw_action, map_opts)
+    vim.keymap.set(normalized_mode, map_spec.key, action_for_mode.raw_action, map_opts)
   end
 end
 
@@ -406,14 +407,12 @@ function mk_action_v2(global_spec)
   for maybe_mode, value in pairs(global_spec) do
     if type(maybe_mode) == "string" then
       if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, maybe_mode) then
-        maybe_mode = normalize_mode(maybe_mode) -- ⚠️ Ensure `v` mode means visual ONLY
         spec_for_mode[maybe_mode] = value
       end
     end
     if type(maybe_mode) == "table" then
       for _, mode in ipairs(maybe_mode) do
         if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, mode) then
-          mode = normalize_mode(mode) -- ⚠️ Ensure `v` mode means visual ONLY
           spec_for_mode[mode] = value
         end
       end
