@@ -420,7 +420,7 @@ NamedPlug.luasnip {
 Plug {
   source = gh"lukas-reineke/indent-blankline.nvim",
   desc = "Indent guides",
-  tags = {t.code_ui},
+  tags = {t.content_ui},
   on_load = function()
     require("ibl").setup {
       indent = {
