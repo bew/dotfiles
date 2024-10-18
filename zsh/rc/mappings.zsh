@@ -4,7 +4,7 @@
 
 # TODO: find a way (kinda profiles?) to split utils/mappings between:
 # * shell-specific (like zle::utils::no-history-run, zwidget::force-scroll-window or zwidget::fg)
-# * common-cli-specific (like zwidget::git-diff, zwidget::fzf::z or zwidget::toggle-sudo-nosudo)
+# * common-cli-specific (like zwidget::git-diff, zwidget::fzf::zoxide or zwidget::toggle-sudo-nosudo)
 #
 # => Where to put clipboard stuff? in a seperate plugin? (mostly specific to my setup then)
 
@@ -799,7 +799,7 @@ source $ZSH_MY_CONF_DIR/rc/fzf-mappings.zsh
 vibindkey 'f' zwidget::fzf::smart_find_file
 vibindkey 'F' zwidget::fzf::find_file
 vibindkey 'c' zwidget::fzf::find_directory
-vibindkey 'z' zwidget::fzf::z
+vibindkey 'z' zwidget::fzf::zoxide
 bindkey -M vicmd '/' zwidget::fzf::history
 bindkey -M viins '/' zwidget::fzf::history
 vibindkey 'a' zwidget::fzf::git_changed_files_in_cwd

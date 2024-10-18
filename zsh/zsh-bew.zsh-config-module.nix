@@ -21,6 +21,7 @@ in {
       pkg = pkgs.coreutils;
     };
     direnv.pkg = pkgs.direnv;
+    zoxide.pkg = pkgs.zoxide;
 
     # bins used in fzf mappings (only)
     fzf.pkg = pkgs.fzf;
@@ -29,7 +30,6 @@ in {
   };
 
   deps.plugins = {
-    zsh-z = "${pkgs.zsh-z}/share/zsh-z";
     zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair";
     gitstatus = "${pkgs.gitstatus}/share/gitstatus";
     zi = fetchFromGitHub {
@@ -126,7 +126,6 @@ in {
       --replace "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
       --replace "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
       --replace "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__z="         "_ZSH_PLUGIN_SRCREF__z=${plugins.zsh-z} #" \
       --replace "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
       --replace "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
       --replace "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"

@@ -46,8 +46,6 @@ function cfg::check-dependencies()
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zi
   _ZSH_PLUGIN_SRCREF__F_Sy_H=z-shell/F-Sy-H
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__F_Sy_H
-  _ZSH_PLUGIN_SRCREF__z=rupa/z
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__z
   _ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autopair
   _ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
@@ -68,9 +66,12 @@ if cfg::has-bin dircolors; then
   eval `dircolors --sh`
 fi
 
-if cfg::depends-on-bin direnv; then
-  eval "$(direnv hook zsh)"
-fi
+cfg::depends-on-bin direnv
+eval "$(direnv hook zsh)"
+
+cfg::depends-on-bin zoxide
+eval "$(zoxide init zsh --no-cmd)"
+# --no-cmd to skip `z` & `zi` aliases (`zi` conflicts with zinit's `zi` shortcut…)
 
 #-------------------------------------------------------------
 # Load and configure plugins
@@ -88,10 +89,6 @@ zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
 # TODO: find a way to not have this manual action on first start?
-
-# cd with 'frecency' (recent + frequence)
-zi light $_ZSH_PLUGIN_SRCREF__z
-# TODO: use zoxide! (https://github.com/ajeetdsouza/zoxide)
 
 # autopair all the things!
 # don't auto-init before setting my key bindings, init at the end (with 'autopair-init')

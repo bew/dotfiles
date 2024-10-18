@@ -50,9 +50,9 @@
         imports = [
           zsh-configs.zshConfigModule.zsh-bew
         ];
-        # NOTE: FORCE the config to use a different fzf bin dependency
-        #   (see comment above primaryHomeManagerModule in </zsh/tool-configs.nix> for thoughts on bins deps propagation..)
-        deps.bins.fzf.pkg = lib.mkForce myPkgs.fzf-bew;
+        deps.bins.fzf.pkg = lib.mkForce "from-PATH";
+        # Don't hardcode fzf in zoxide, will use the one in PATH
+        deps.bins.zoxide.pkg = lib.mkForce (stablePkgs.zoxide.override { withFzf = false; });
       };
     };
 

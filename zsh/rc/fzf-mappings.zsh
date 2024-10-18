@@ -216,7 +216,7 @@ function zwidget::fzf::history
 }
 zle -N zwidget::fzf::history
 
-function zwidget::fzf::z
+function zwidget::fzf::zoxide
 {
   local last_pwd=$PWD
 
@@ -228,7 +228,7 @@ function zwidget::fzf::z
   # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
   # --no-sort         | Don't pre-sort the input
   # --nth 2..         | ignore first field (the popularity of the dir) when matching
-  local fzf_cmd=($FZF_BASE_CMD --tac --no-sort --tiebreak=index --nth 2..)
+  local fzf_cmd=($FZF_BASE_CMD --no-sort --tiebreak=index --nth 2..)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
   fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
   fzf_cmd+=(
@@ -236,7 +236,7 @@ function zwidget::fzf::z
     --color=preview-label:247:bold
   )
 
-  local selected=( $( z | "${fzf_cmd[@]}" ) )
+  local selected=( $( zoxide query --list --score | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
     if [[ -n "$directory" ]]; then
@@ -250,7 +250,7 @@ function zwidget::fzf::z
     zle -M "welcome to '${(D)PWD}' :)"
   fi
 }
-zle -N zwidget::fzf::z
+zle -N zwidget::fzf::zoxide
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 # Copied from zle::utils::check_git here to have a mostly self-contained file
