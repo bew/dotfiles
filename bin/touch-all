@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+for f in "$@"; do
+  dir=$(dirname "$f")
+  if [[ -n "$dir" ]] && ! [[ -d "$dir" ]]; then
+    mkdir -vp "$dir"
+  fi
+  touch $f
+  echo "touch-all: touched '$f'"
+done
