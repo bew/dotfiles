@@ -342,7 +342,16 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 
 -- A: Duplicate visual selection
 my_actions.duplicate_selection = mk_action_v2 {
-  v = function()
+  options = {
+    stay_in_visual_mode = mk_action_opt{
+      desc = [[Whether to stay in visual mode after the duplication (for easy repeat)]],
+      type = "boolean",
+      default = false,
+    },
+  },
+  v = function(self)
+    self = self or {}
+    self.opts = self.opts or {}
     -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
     -- however Visual selection is a pain to get reliably while handling all cases.
     -- See this PR that attempts to add a vim.get_visual_selection() function:
@@ -350,32 +359,40 @@ my_actions.duplicate_selection = mk_action_v2 {
     --
     -- So until we have better APIs to manipulate visual mode, let's just implement it
     -- in a way similar to my old vimscript implementation :shrug:
+    local maybe_prefix = ""
+    if self.opts.stay_in_visual_mode then
+      -- When the goal is to stay in visual mode, the yanking would trigger TextYankPost which can
+      -- make the visual selection to flash with some colorscheme.
+      -- To avoid this we disable autocmds.
+      maybe_prefix = "noautocmd "
+    end
 
     U.save_run_restore({ save_registers = {[["]]} }, function()
       local visual_mode = vim.fn.mode()
       if visual_mode == "v" or visual_mode == "V" then
         --- Char or Line selection mode:
         -- Copy, go to the end of the selection, paste
-        -- then re-enter visual (for easy repeat)
-        vim.fn.execute [[noautocmd normal! y`>p]]
+        vim.fn.execute(maybe_prefix .. [[normal! y`>p]])
       else
         --- Block selection mode:
         -- Copy (cursor moves to top left of block), paste before
-        -- then re-enter visual (for easy repeat)
         --
         -- NOTE: for some reason paste before in block mode does _not_ move
         -- last visual marks.. (they do move when using this in the other visual modes)
-        vim.fn.execute [[noautocmd normal! yP]]
+        vim.fn.execute(maybe_prefix .. [[normal! yP]])
       end
     end)
+
+    if self.opts.stay_in_visual_mode then
+      vim.fn.execute [[noautocmd normal! gv]]
+    end
   end,
 }
 -- V: Duplicate visual selection
 toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
-  my_actions.duplicate_selection()
-  vim.fn.execute [[noautocmd normal! gv]]
+  my_actions.duplicate_selection.mode_actions.v { opts = { stay_in_visual_mode = true } }
 end}
 -- IDEA: a mapping to duplicate and comment original selection
 
