@@ -35,6 +35,7 @@ end
 -- https://wezfurlong.org/wezterm/config/keys.html#raw-key-assignments
 local known_raw_keys_by_os = {
   ["^"] = { linux = "raw:34", win = nil },
+  ["²"] = { linux = "raw:49", win = nil },
 }
 local function get_raw_key(keysym)
   local target_triple_to_os = {
@@ -63,17 +64,21 @@ cfg.keys = {
   -- Remap A-^/$ to Home/End globally
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
   -- (could also be done at system/desktop level, but this is a good level for all terminal apps)
-  keybind(mods.A, get_raw_key("^"), act.SendKey{key="Home"}),
+  keybind(mods.A, get_raw_key"^", act.SendKey{key="Home"}),
   keybind(mods.A, "$",              act.SendKey{key="End"}),
-  keybind(mods.CA, get_raw_key("^"), act.SendKey{mods=mods.C, key="Home"}),
+  keybind(mods.CA, get_raw_key"^", act.SendKey{mods=mods.C, key="Home"}),
   keybind(mods.CA, "$",              act.SendKey{mods=mods.C, key="End"}),
   -- Force map `Alt-^` itself to terminal program (like neovim!).
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
-  --keybind(mods.A, get_raw_key("^"), act.SendKey{mods=mods.A, key="^"}),
+  --keybind(mods.A, get_raw_key"^", act.SendKey{mods=mods.A, key="^"}),
 
   -- Remap C-/ to A-/
   -- (C-/ cannot be represented, and it's nice to hit to comment sth!)
   keybind(mods.C, ":" --[[ key with / ]], act.SendKey{mods=mods.A, key="/"}),
+
+  -- Ensure Alt-² is encoded correctly
+  -- (By default it's wrong.. https://github.com/wez/wezterm/issues/4259)
+  keybind(mods.A, get_raw_key"²", act.SendKey{mods=mods.A, key="²"}),
 
   keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
   keybind(mods.S, "PageDown", act.ScrollByPage(1)),
