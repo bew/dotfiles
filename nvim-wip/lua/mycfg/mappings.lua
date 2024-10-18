@@ -185,7 +185,7 @@ my_actions.hlsearch_current = {
         --   "word_bounds", vim.inspect{ necessary_word_bounds.before, necessary_word_bounds.after },
         -- })
       end
-      local selection_lines = U.get_visual_selection_lines()
+      local selection_lines = U.get_visual_selection_as_lines()
       -- note: explicitely switch back to normal mode
       U.feed_keys_sync("<esc>", { replace_termcodes = true })
       U.set_current_search(selection_lines, { with_bounds = necessary_word_bounds })
