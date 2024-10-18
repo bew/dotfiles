@@ -43,7 +43,7 @@
   # --squash=<rev>
   # FIXME: I don't understand the difference between `--fixup=amend:<rev>` & `--squash=<rev>`
   #
-  # These need to be `git rebase --autosquash`-ed to be merged with the liked commits
+  # These need to be `git rebase --autosquash`-ed to be merged with their related commits
 
   # Show the raw commit msg in a (potentially different) repo
   # Can be used to get/use the same commit message for a new commit, optionally from another repo.
@@ -80,9 +80,11 @@
   reb  = rebase
   rebi = rebase -i
   # Do not changes commit dates of rebased commits
-  # NOTE: the entire history of the rebased branch will be composed of new commits (WHY??)
-  # FIXME: is it safe to enable in all cases? (add it to `reb` alias)
-  reb-keep-dates = rebase --committer-date-is-author-date
+  # NOTE: the entire history of the rebased branch will be composed of new commits.
+  # (posts where I found that mentioned it's not 100% reliable for all commit types, so this is
+  # not in default reb/rebi, and make sure to check the resulting history)
+  reb-keep-dates  = rebase --committer-date-is-author-date
+  rebi-keep-dates = rebase --committer-date-is-author-date
 
   dtool = difftool
   mtool = mergetool
