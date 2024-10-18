@@ -292,7 +292,7 @@ local ActionSpec_mt = {
     -- FIXME: is there a better/simpler way to chain __index metamethods?
     require"mylib.mt_utils".KeyRefMustExist_mt
   ),
-  __call = function(self)
+  __call = function(self, ...)
     local nb_mode_actions = #vim.tbl_keys(self.mode_actions)
     if nb_mode_actions ~= 1 then
       error(_f(
@@ -301,14 +301,18 @@ local ActionSpec_mt = {
       ))
     end
     local adhoc_action = vim.tbl_values(self.mode_actions)[1]
-
-    if (adhoc_action.map_opts or {}).expr then
+    adhoc_action(...)
+  end
+}
+local SingleModeActionSpec_mt = {
+  __call = function(self, ...)
+    if (self.map_opts or {}).expr then
       error("Ad-hoc action call of expr-based action is NOT tested/supported")
     end
 
-    local raw_action_type = type(adhoc_action.raw_action)
+    local raw_action_type = type(self.raw_action)
     if raw_action_type == "function" then
-      adhoc_action.raw_action()
+      self.raw_action(...)
     elseif raw_action_type == "string" then
       error("Ad-hoc action call of a string raw action is not implemented (failed..)")
       -- FIXME: I can't get it to work properly,
@@ -330,7 +334,7 @@ local ActionSpec_mt = {
     else
       error(_f("Ad-hoc action call with raw action of type", _q(raw_action_type), "is not supported"))
     end
-  end
+  end,
 }
 
 ---@type {[string]: ActionSpec}
@@ -392,12 +396,13 @@ function mk_action_v2(global_spec)
         error("Missing action!")
       end
     end
-    return {
+    local mode_action = {
       raw_action = mode_spec.raw_action,
       default_desc = mode_spec.default_desc or global_spec.default_desc,
       map_opts = mode_spec.map_opts or global_spec.map_opts,
       debug = mode_spec.debug or global_spec.debug,
     }
+    return setmetatable(mode_action, SingleModeActionSpec_mt)
   end
 
   local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "x", "o", "c", "s"}
