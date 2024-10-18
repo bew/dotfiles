@@ -221,7 +221,7 @@ end
 ---   - preserves cursor position
 ---
 ---@return string[]
-function U.get_visual_selection_lines()
+function U.get_visual_selection_as_lines()
   -- NOTE: Visual selection is a pain to get reliably while handling all cases.
   -- See this PR that attempts to add a vim.get_visual_selection() function:
   --   https://github.com/neovim/neovim/pull/13896
