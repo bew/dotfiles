@@ -23,7 +23,7 @@ local predefined_tags = PluginSystem.predefined_tags
 predefined_tags.careful_update = { desc = "Plugins I want to update carefully" }
 predefined_tags.vimscript = { desc = "Plugins in vimscript" }
 predefined_tags.ui = { desc = "Plugins for the global UI" }
-predefined_tags.code_ui = { desc = "Plugins for code UI" }
+predefined_tags.content_ui = { desc = "Plugins for content UI" }
 predefined_tags.editing = { desc = "Plugins about code/content editing" }
 predefined_tags.insert = { desc = "Plugins adding stuff in insert mode" }
 predefined_tags.git = { desc = "Plugins around git VCS" }

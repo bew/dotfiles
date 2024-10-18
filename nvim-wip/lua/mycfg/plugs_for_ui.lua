@@ -17,7 +17,7 @@ local myplug = PluginSystem.sources.myplug
 Plug {
   source = myplug"restore-cursor.nvim",
   desc = "Restore cursor when opening file for first time, customizable :)",
-  tags = {t.code_ui},
+  tags = {t.content_ui},
   on_load = function()
     require("restore-cursor").setup()
   end,
@@ -350,7 +350,7 @@ Plug {
 Plug {
   source = gh"0xAdk/full_visual_line.nvim",
   desc = "Highlights whole lines in linewise visual mode",
-  tags = {"content_ui"}, -- FIXME: move to ./plugs_for_file_editing.lua ?
+  tags = {t.content_ui},
   on_load = function()
     require"full_visual_line".setup()
 
@@ -367,7 +367,7 @@ Plug {
 Plug {
   source = gh"mcauley-penney/visual-whitespace.nvim",
   desc = "Reveal whitespace characters in visual mode, like VSCode",
-  tags = {"content_ui"}, -- FIXME: move to ./plugs_for_file_editing.lua ?
+  tags = {t.content_ui},
   on_load = function()
     require"visual-whitespace".setup {
       highlight = {
@@ -387,7 +387,6 @@ Plug {
   desc = "Use RipGrep in Vim and display results in a quickfix list",
   tags = {t.vimscript, "nav"},
 }
-
 
 NamedPlug.fugitive {
   source = gh"tpope/vim-fugitive",
@@ -420,7 +419,7 @@ Plug {
 Plug {
   source = gh"lewis6991/gitsigns.nvim",
   desc = "Git integration for buffers",
-  tags = {t.code_ui, t.git},
+  tags = {t.content_ui, t.git},
   on_load = function()
     require"gitsigns".setup{
       signs = {
