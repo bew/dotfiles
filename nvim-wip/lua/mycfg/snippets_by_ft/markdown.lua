@@ -18,6 +18,28 @@ snip("b", { desc = "bold text" }, U.myfmt {
   },
 })
 
+snip("em", { desc = "italic (emph) text" }, U.myfmt {
+  [[_<text>_]],
+  {
+    text = U.insert_node_default_selection(1),
+  },
+})
+
+snip("ln", { desc = "link" }, U.myfmt {
+  "[<desc>](<target>)",
+  {
+    desc = i(1),
+    target = U.insert_node_default_selection(2),
+  },
+})
+
+snip("com", { desc = "HTML comment" }, U.myfmt_braces {
+  [[<!-- {text} -->]],
+  {
+    text = U.insert_node_default_selection(1),
+  },
+})
+
 -- End of snippets definitions
 
 return SNIPS, {} -- snippets, autosnippets
