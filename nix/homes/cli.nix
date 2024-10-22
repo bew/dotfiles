@@ -119,6 +119,7 @@ in {
     stable.libtree # a better & more secure `ldd` (see: 20240331T1410)
     stable.strace
 
+    stable.pastel # generate, analyze, convert & manipulate RGB colors
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
     stable.gron # to have grep-able json <3
     stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
