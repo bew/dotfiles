@@ -47,9 +47,12 @@ end
 -- 0 1 2 3 4 5 6 7 8 9
 -- Some ligatures: != <-> <-  -> ----> => ==> ===> -- --- /../;;/ #{}
 --  <> <!-- --> ->> --> <= >= ++ == === := a::b::c a&&b a||b
+--
+-- Some emojis: ☹ 🔎 😇 🤷 🙃 🖐 ❤ ⚠ ✨ 👋
 
 cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
 cfg.strikethrough_position = "0.6cell"
+cfg.unicode_version = 15
 
 -- Enable various OpenType features
 -- See https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
