@@ -27,8 +27,11 @@ in {
     "${config.home.profileDirectory}/share"
 
     # Also load standard-Linux system/user xdg data directories
+    "${config.home.homeDirectory}/.local/share"
     "/usr/share"
     "/usr/local/share"
-    "${config.home.homeDirectory}/.local/share"
+
+    # And finally load NixOS' global data directories
+    "/run/current-system/sw/share"
   ];
 }
