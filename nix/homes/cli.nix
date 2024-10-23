@@ -11,7 +11,7 @@ let
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   #
   # TODO: need to make a proper module, potentially at higher level than the home config?..
-  #   (see comment above primaryHomeManagerModule in </zsh/tool-configs.nix> for thoughts on bins deps propagation..)
+  #   (see comment above homeModules.withDefaults in </zsh/tool-configs.nix> for thoughts on bins deps propagation..)
   cliPkgs = {
     fzf = myPkgs.fzf-bew;
   };
@@ -21,7 +21,7 @@ in {
     # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
     ../../bash_minimal/proxy_to_zsh.home-module.nix
 
-    myToolConfigs.zsh-bew.outputs.primaryHomeManagerModule
+    myToolConfigs.zsh-bew.outputs.homeModules.withDefaults
 
     neovim-pseudo-flake.homeModules.nvim-base-bins
     neovim-pseudo-flake.homeModules.nvim-bew
