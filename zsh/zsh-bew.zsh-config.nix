@@ -24,7 +24,9 @@ in {
       pkg = mybuilders.linkSingleBin "${pkgs.coreutils}/bin/dircolors";
     };
     direnv.pkg = pkgs.direnv;
-    zoxide.pkg = pkgs.zoxide;
+
+    # Don't hardcode fzf in zoxide, will use the one in PATH
+    zoxide.pkg = pkgs.zoxide.override { withFzf = false; };
 
     # bins used in fzf mappings (only)
     fzf.pkg = pkgs.fzf;
