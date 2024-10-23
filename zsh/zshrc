@@ -28,10 +28,13 @@ function cfg::check-dependencies()
     fi
   done
   if [[ ${#missing_bins} != 0 ]]; then
-    >&2 echo ":: Missing binaries for this zsh config (expect some broken stuff!)"
+    >&2 echo
+    >&2 echo ":: Missing binaries from PATH for this zsh config (ID: $ZSH_CONFIG_ID)"
     for missing_bin in ${missing_bins[@]}; do
       >&2 echo "::   - $missing_bin"
     done
+    >&2 echo ":: => expect some broken stuff! 😬"
+    >&2 echo
   fi
 }
 

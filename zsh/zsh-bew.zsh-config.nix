@@ -6,6 +6,8 @@ let
     runCommandLocal
     stdenv
   ;
+  mybuilders = pkgs.callPackage ../nix/homes/mylib/mybuilders.nix {};
+  cfg = config;
 in {
   # Config ID, responsible for state & cache folders naming
   ID = "bew-nixified"; # !!! do not change unless you know what you're doing
@@ -15,10 +17,11 @@ in {
   #   (to ease config reloading)
   deps.bins = {
     git.pkg = pkgs.git;
+    eza.pkg = pkgs.eza;
     dircolors = {
       # FIXME: remove all non-dircolors bins?
       #   (coreutils pkg POLLUTES the depsEnv closure significantly even if we _only_ need dircolors bin..)
-      pkg = pkgs.coreutils;
+      pkg = mybuilders.linkSingleBin "${pkgs.coreutils}/bin/dircolors";
     };
     direnv.pkg = pkgs.direnv;
     zoxide.pkg = pkgs.zoxide;
@@ -81,7 +84,7 @@ in {
   };
 
   outputs.zdotdir = let
-    plugins = config.deps.plugins;
+    plugins = cfg.deps.plugins;
   in runCommandLocal "zsh-bew-zdotdir" {
     src = lib.fileset.toSource {
       root = ./.;
@@ -116,7 +119,7 @@ in {
     >&2 echo "Patching config-specific env vars in .zshenv"
     substitute $src/zshenv $out/.zshenv \
       --replace "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
-      --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=${config.ID} #" \
+      --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=${cfg.ID} #" \
       \
       --replace "source ~/.dot/shell/env.sh" "source ${../shell/env.sh}"
     # NOTE(!!!): last one is _TEMPORARY_ until we find a better way to inject cross-shell env script..

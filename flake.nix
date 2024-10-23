@@ -40,9 +40,7 @@
     #   (to show it's a lib but about packages (so not system-agnostic))
 
     # NOTE: flake-parts would help with imports & auto-merging here.
-    zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {
-      inherit mybuilders;
-    };
+    zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
     # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
     zsh-bew-config = zsh-configs.lib.evalZshConfig {
       pkgs = stablePkgs;
@@ -107,9 +105,9 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages.${system} = {
-      zsh-bew = zsh-bew-config.outputs.toolWithConfig;
+      zsh-bew = zsh-bew-config.outputs.preConfiguredToolPkg;
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
-      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolWithConfig);
+      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.preConfiguredToolPkg);
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = bleedingedgePkgs.fzf;
