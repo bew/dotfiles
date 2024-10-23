@@ -83,8 +83,8 @@
   # NOTE: the entire history of the rebased branch will be composed of new commits.
   # (posts where I found that mentioned it's not 100% reliable for all commit types, so this is
   # not in default reb/rebi, and make sure to check the resulting history)
-  reb-keep-dates  = rebase --committer-date-is-author-date
-  rebi-keep-dates = rebase --committer-date-is-author-date
+  reb-keep-dates  = rebase    --committer-date-is-author-date
+  rebi-keep-dates = rebase -i --committer-date-is-author-date
 
   dtool = difftool
   mtool = mergetool
