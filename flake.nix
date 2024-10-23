@@ -42,15 +42,16 @@
     # NOTE: flake-parts would help with imports & auto-merging here.
     zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
     # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
-    zsh-bew-config = zsh-configs.lib.evalZshConfig {
+    mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
       pkgs = stablePkgs;
       configuration = {
         imports = [
           zsh-configs.zshConfigModule.zsh-bew
         ];
-        deps.bins.fzf.pkg = lib.mkForce "from-PATH";
-        # Don't hardcode fzf in zoxide, will use the one in PATH
-        deps.bins.zoxide.pkg = lib.mkForce (stablePkgs.zoxide.override { withFzf = false; });
+        config = lib.mkIf fewBinsFromPATH {
+          deps.bins.fzf.pkg = lib.mkForce "from-PATH";
+          deps.bins.eza.pkg = lib.mkForce "from-PATH";
+        };
       };
     };
 
@@ -86,7 +87,7 @@
       #
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
       extraSpecialArgs.myToolConfigs = {
-        zsh-bew = zsh-bew-config;
+        zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
       };
     };
 
@@ -104,7 +105,7 @@
     # - a `zsh` bin, with my config (may be editable?)
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
-    packages.${system} = {
+    packages.${system} = let zsh-bew-config = mk-zsh-bew-config {}; in {
       zsh-bew = zsh-bew-config.outputs.preConfiguredToolPkg;
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
       zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.preConfiguredToolPkg);
