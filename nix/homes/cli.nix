@@ -3,11 +3,6 @@
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
 
-  neovim-pseudo-flake = stable.callPackage ./../../nvim-wip/cli-package.nix {
-    inherit (bleedingedge) neovim;
-    inherit mybuilders;
-  };
-
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   #
   # TODO: need to make a proper module, potentially at higher level than the home config?..
@@ -23,9 +18,7 @@ in {
 
     myToolConfigs.zsh-bew.outputs.homeModules.withDefaults
 
-    neovim-pseudo-flake.homeModules.nvim-base-bins
-    neovim-pseudo-flake.homeModules.nvim-bew
-
+    ./cli/neovim.nix
     ./cli/direnv.nix
   ];
 

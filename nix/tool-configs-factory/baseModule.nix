@@ -33,7 +33,7 @@ in {
     };
     lib = lib.mkOption {
       description = "Set of lib functions to help write configs";
-      type = ty.attrsOf ty.uniq ty.anything;
+      type = ty.attrsOf (ty.uniq ty.anything);
     };
     package = lib.mkOption {
       description = "The package of the tool being configured";
@@ -65,8 +65,8 @@ in {
           description = "Derivation for the config env with config' dependencies";
           type = ty.package;
         };
-        options.preConfiguredToolPkg = lib.mkOption {
-          description = "Derivation of the tool being configured, where tool binary is pre-configured with the config";
+        options.toolPkg.standalone = lib.mkOption {
+          description = "Derivation of the tool being configured, where tool binary is pre-configured with the config and usable by itself";
           type = ty.package;
         };
         # NOTE: This can only be used ONCE in a home config since it takes over default config paths.
@@ -89,6 +89,10 @@ in {
   };
 
   config = {
+    # Function (overridable) used to get the target of a symlink, to a (potentially editable) file/dir.
+    # Defaults to copy to store (not editable).
+    lib.mkLink = path: "${path}";
+
     outputs.deps.bins = pkgs.buildEnv {
       name = "${cfg.toolName}-config-deps-bins-${cfg.ID}";
       paths = let

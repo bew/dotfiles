@@ -55,6 +55,8 @@
       };
     };
 
+    nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
+
   in {
     homeConfig = let
       username = "bew";
@@ -88,8 +90,14 @@
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
       extraSpecialArgs.myToolConfigs = {
         zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
+        nvim-minimal = nvim-configs.lib.evalNvimConfig {
+          pkgs = bleedingedgePkgs;
+          configuration = nvim-configs.nvimConfigModule.nvim-minimal;
+        };
       };
     };
+
+    zshConfig.zsh-bew = mk-zsh-bew-config {};
 
     # --- Stuff I want to be able to do with binaries & packages:
     # In my packages:
@@ -106,9 +114,9 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages.${system} = let zsh-bew-config = mk-zsh-bew-config {}; in {
-      zsh-bew = zsh-bew-config.outputs.preConfiguredToolPkg;
+      zsh-bew = zsh-bew-config.outputs.toolPkg.standalone;
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
-      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.preConfiguredToolPkg);
+      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolPkg.standalone);
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = bleedingedgePkgs.fzf;

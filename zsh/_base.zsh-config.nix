@@ -28,7 +28,7 @@ in {
     #    packages and use overriden bins if any (HOW?)
 
     # Standalone zsh binary with the config
-    outputs.preConfiguredToolPkg = mybuilders.replaceBinsInPkg {
+    outputs.toolPkg.standalone = mybuilders.replaceBinsInPkg {
       name = "zsh-bew"; # FIXME: this should be `zsh-with-config-{ID}` 🤔
       copyFromPkg = cfg.package;
       nativeBuildInputs = [ pkgs.makeWrapper ];
