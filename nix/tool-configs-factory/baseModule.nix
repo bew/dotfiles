@@ -25,7 +25,7 @@ in {
   options = {
     ID = lib.mkOption {
       description = "Config ID (should be unique), usually used for state/cache folders naming";
-      type = ty.singleLineStr;
+      type = ty.strMatching "[a-zA-Z_-]+";
     };
     toolName = lib.mkOption {
       description = "Name of the tool, used to name some default pkg";
@@ -91,7 +91,7 @@ in {
   config = {
     # Function (overridable) used to get the target of a symlink, to a (potentially editable) file/dir.
     # Defaults to copy to store (not editable).
-    lib.mkLink = path: "${path}";
+    lib.mkLink = lib.mkDefault (path: "${path}");
 
     outputs.deps.bins = pkgs.buildEnv {
       name = "${cfg.toolName}-config-deps-bins-${cfg.ID}";

@@ -56,6 +56,24 @@
     };
 
     nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
+    mk-nvim-config = {nvimConfig, asDefault ? false}: (
+      nvim-configs.lib.evalNvimConfig {
+        pkgs = bleedingedgePkgs;
+        configuration = {
+          imports = [
+            nvimConfig
+          ];
+          # Is config supposed to be the default 🤔
+          config.useDefaultBinName = asDefault;
+          # Override the symlinker function, to point to editable paths
+          config.lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
+            nixStorePath = self;
+            realPath = "/home/bew/.dot"; # FIXME: leak hardcoded $USER
+          };
+          # FIXME(?): find a way to avoid having to do that for every config manually?
+        };
+      }
+    );
 
   in {
     homeConfig = let
@@ -90,9 +108,10 @@
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
       extraSpecialArgs.myToolConfigs = {
         zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
-        nvim-minimal = nvim-configs.lib.evalNvimConfig {
-          pkgs = bleedingedgePkgs;
-          configuration = nvim-configs.nvimConfigModule.nvim-minimal;
+        nvim-minimal = mk-nvim-config { nvimConfig = nvim-configs.nvimConfigModule.nvim-minimal; };
+        nvim-bew = mk-nvim-config {
+          nvimConfig = nvim-configs.nvimConfigModule.nvim-bew;
+          asDefault = true;
         };
       };
     };
@@ -123,6 +142,19 @@
         replaceBinsInPkg = mybuilders.replaceBinsInPkg;
       };
       fzf-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.fzf-bew);
+
+      nvim-minimal = let
+        cfg = nvim-configs.lib.evalNvimConfig {
+          pkgs = bleedingedgePkgs;
+          configuration = nvim-configs.nvimConfigModule.nvim-minimal;
+        };
+      in cfg.outputs.toolPkg.standalone;
+      nvim-bew = let
+        cfg = nvim-configs.lib.evalNvimConfig {
+          pkgs = bleedingedgePkgs;
+          configuration = nvim-configs.nvimConfigModule.nvim-bew;
+        };
+      in cfg.outputs.toolPkg.standalone;
 
       #tmux-bew = ...
     };

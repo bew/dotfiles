@@ -10,11 +10,6 @@ let
     withRuby = false;
   };
 
-  neovim-pseudo-flake = stable.callPackage ../../../nvim-wip/cli-package.nix {
-    inherit mybuilders pkgs;
-    neovim = nvim-base;
-  };
-
   # this is not a config, it's the raw original nvim but as another name
   # 👉 Should be moved out of this file ?
   # .. But then how to access `nvim-base` ? Move `nvim-base` out of this file as well & pass it as input ?
@@ -26,18 +21,18 @@ let
     meta.mainProgram = "nvim-original";
   };
 
-  inherit (myToolConfigs) nvim-minimal;
+  inherit (myToolConfigs) nvim-minimal nvim-bew;
 in {
   imports = [
-    # FIXME: convert to a proper config module..
-    neovim-pseudo-flake.homeModules.nvim-bew
+    nvim-bew.outputs.homeModules.specific
   ];
 
   home.packages = [
     nvim-original
 
-    (mybuilders.linkBins "nvim-bins" {
-      nvim = "${neovim-pseudo-flake.pkgs.nvim-wip-bin}/bin/nvim-wip";
+    nvim-bew.outputs.toolPkg.configured
+
+    (mybuilders.linkBins "extra-nvim-bins" {
       nvim-minimal = lib.getExe nvim-minimal.outputs.toolPkg.standalone;
     })
   ];

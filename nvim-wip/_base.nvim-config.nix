@@ -8,7 +8,10 @@ let
   outs = cfg.outputs;
 
   makeNvimWrapperPkg =
-    { binName ? "nvim", extraWrapperParams ? "" }:
+    { extraWrapperParams ? "" }:
+    let
+      binName = if cfg.useDefaultBinName then "nvim" else outs.NVIM_APPNAME;
+    in
     mybuilders.replaceBinsInPkg {
       name = "nvim-with-config-${cfg.ID}";
       copyFromPkg = cfg.package;
@@ -17,6 +20,9 @@ let
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/nvim $out/bin/${binName} \
           --prefix PATH : ${outs.deps.bins}/bin \
+          ${lib.concatStringsSep " " (
+            lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}") cfg.env
+          )} \
           ${extraWrapperParams}
       '';
     };
@@ -26,7 +32,7 @@ in {
 
   options = {
     nvimDirSource = lib.mkOption {
-      description = "Source for the nvim dir, if set `nvimDir.*` options are not used";
+      description = "Source for the nvim dir (if set, `nvimDir.*` options are NOT used)";
       type = ty.nullOr ty.path;
       default = null;
     };
@@ -60,6 +66,18 @@ in {
         else null
       );
     };
+
+    env = lib.mkOption {
+      description = "Env vars to set for this config";
+      type = ty.attrsOf ty.str;
+      default = {};
+    };
+
+    useDefaultBinName = lib.mkOption {
+      description = "Whether outputs should use the default bin name or a config-specific one";
+      type = ty.bool;
+      default = false;
+    };
   };
 
   config = {
@@ -77,9 +95,9 @@ in {
             ''
               echo "Adding path '${spec.path}' (text)"
               mkdir -p "$out/$(dirname "${spec.path}")"
-              cat > "$out/${spec.path}" <<-EOF
+              cat > "$out/${spec.path}" <<-EndOfTheFile
               ${spec.text}
-              EOF
+              EndOfTheFile
             ''
           else if spec.source != null then
             ''
@@ -97,30 +115,30 @@ in {
     );
 
     outputs.toolPkg.standalone = let
-      nvim_appname = "nvim-${lib.removePrefix "nvim-" cfg.ID}";
       xdgConfigDir = pkgs.runCommandLocal "nvim-dir-${cfg.ID}-xdg" {} ''
         # note: dirname of NVIM_APPNAME necessary to support NVIM_APPNAME like `nvim-foo/bar`
-        mkdir -p $out/$(dirname "${nvim_appname}")
-        ln -s ${outs.nvimDir} $out/${nvim_appname}
+        mkdir -p $out/$(dirname "${outs.NVIM_APPNAME}")
+        ln -s ${outs.nvimDir} $out/${outs.NVIM_APPNAME}
       '';
     in makeNvimWrapperPkg {
       extraWrapperParams = ''
-        --set NVIM_APPNAME ${nvim_appname} \
+        --set NVIM_APPNAME ${outs.NVIM_APPNAME} \
         --prefix XDG_CONFIG_DIRS : ${xdgConfigDir} \
         ${lib.optionalString (cfg.initFile != null) ''--add-flags "-u ${outs.nvimDir}/${cfg.initFile}" ''}
       '';
     };
 
-    outputs.homeModules.specific = let
-      nvim_appname = "nvim-${lib.removePrefix "nvim-" cfg.ID}";
-      nvim_binname = nvim_appname;
-    in {
+    # Tool is configured to point to config where it's installed in the system (it is NOT a standalone pkg)
+    outputs.toolPkg.configured = makeNvimWrapperPkg {
+      extraWrapperParams = ''--set NVIM_APPNAME ${outs.NVIM_APPNAME}'';
+    };
+
+    outputs.homeModules.specific = {
       xdg.configFile.${outs.NVIM_APPNAME}.source = outs.nvimDir;
       home.packages = [
         (makeNvimWrapperPkg {
-          binName = nvim_appname;
           extraWrapperParams = ''
-            --set NVIM_APPNAME ${nvim_appname}
+            --set NVIM_APPNAME ${outs.NVIM_APPNAME}
           '';
         })
       ];
