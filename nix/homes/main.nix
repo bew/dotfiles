@@ -36,8 +36,8 @@
   # Configure my dotfiles path, so that direct links created with `config.dyndots.mkLink` point to
   # my repo (editable!).
   dyndots.mode = "editable";
-  dyndots.dotfilesRepoPath = "${config.home.homeDirectory}/.dot";
-  dyndots.flakeRootPath = flakeInputs.self;
+  dyndots.dotfilesRealPath = "${config.home.homeDirectory}/.dot";
+  dyndots.dotfilesNixPath = flakeInputs.self;
   home.file.".test-dyndots-link".source = config.dyndots.mkLink ../../git/config;
 
   # Link flake inputs to home
