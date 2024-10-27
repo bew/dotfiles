@@ -19,15 +19,30 @@ function U.iter_chars(str)
   end
 end
 
-function U.filter_list(tbl, filter_fn)
+function U.filter_list(list, filter_fn)
   vim.validate{
-    tbl={tbl, "table"},
+    list={list, "table"},
     filter_fn={filter_fn, "function"},
   }
   local ret = {}
-  for _, item in ipairs(tbl) do
+  for _, item in ipairs(list) do
     if filter_fn(item) then
       table.insert(ret, item)
+    end
+  end
+  return ret
+end
+
+function U.filter_map_list(list, fn)
+  vim.validate{
+    list={list, "table"},
+    fn={fn, "function"},
+  }
+  local ret = {}
+  for _, item in ipairs(list) do
+    local new_item = fn(item)
+    if new_item ~= nil then
+      table.insert(ret, new_item)
     end
   end
   return ret

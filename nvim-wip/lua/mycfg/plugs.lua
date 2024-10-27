@@ -244,7 +244,22 @@ NamedPlug.pkg_manager {
       custom_keys = false,
       change_detection = { enabled = false }, -- MAYBE: try it?
       cache = { enabled = false },
-      performance = { reset_packpath = false },
+      performance = {
+        reset_packpath = false,
+        rtp = {
+          reset = true, -- (this is the default, but it removes all $XDG_CONFIG_DIRS..)
+          -- => We need to ADD `$XDG_CONFIG_DIRS[*]/$NVIM_APPNAME` paths that exists to ensure
+          -- standalone Nix-managed config dir (passed in $XDG_CONFIG_DIRS) is available:
+          paths = U.filter_map_list(vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}, function(path)
+            local maybe_cfg_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim")
+            if vim.fn.isdirectory(maybe_cfg_path) == 1 then
+              -- print(vim.inspect({path, maybe_cfg_path}))
+              return maybe_cfg_path
+            end
+            return nil -- skip
+          end)
+        },
+      },
     })
   end,
 }
