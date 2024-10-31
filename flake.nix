@@ -22,64 +22,74 @@
 
     homeManager.url = "github:nix-community/home-manager/release-23.11";
     homeManager.inputs.nixpkgs.follows = "nixpkgsBleedingEdge";
+
+    systems.url = "github:nix-systems/default";
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
   #   define my toplevel flake in multiples files & auto-merge packages, homeConfig, homeModules, {tool,…}ConfigModules...
-  outputs = { self, ... }@flakeInputs: let
-    # I only care about ONE system for now...
-    system = "x86_64-linux";
+  outputs = { self, systems, ... }@flakeInputs: let
+    lib = flakeInputs.nixpkgsStable.lib;
+    eachSystem = lib.genAttrs (import systems);
 
-    myPkgs = self.packages.${system};
-    stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
-    bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
-
-    lib = stablePkgs.lib;
-    mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
-    # IDEA: rename to `pkglib`?
-    #   (to show it's a lib but about packages (so not system-agnostic))
-
-    # NOTE: flake-parts would help with imports & auto-merging here.
-    zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
-    # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
-    mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
-      pkgs = stablePkgs;
-      configuration = {
-        imports = [
-          zsh-configs.zshConfigModule.zsh-bew
-        ];
-        config = lib.mkIf fewBinsFromPATH {
-          deps.bins.fzf.pkg = lib.mkForce "from-PATH";
-          deps.bins.eza.pkg = lib.mkForce "from-PATH";
-        };
-      };
+    pkgsForSys = system: {
+      myPkgs = self.packages.${system};
+      stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
+      bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
     };
+    forSys = system: let
+      inherit (pkgsForSys system) myPkgs stablePkgs bleedingedgePkgs;
+    in rec {
+      inherit myPkgs stablePkgs bleedingedgePkgs;
 
-    nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
-    mk-nvim-config = {nvimConfig, asDefault ? false}: (
-      nvim-configs.lib.evalNvimConfig {
-        pkgs = bleedingedgePkgs;
+      lib = stablePkgs.lib;
+      mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
+      # IDEA: rename to `pkglib`?
+      #   (to show it's a lib but about packages (so not system-agnostic))
+
+      # NOTE: flake-parts would help with imports & auto-merging here.
+      zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
+      # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
+      mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
+        pkgs = stablePkgs;
         configuration = {
           imports = [
-            nvimConfig
+            zsh-configs.zshConfigModule.zsh-bew
           ];
-          # Is config supposed to be the default 🤔
-          config.useDefaultBinName = asDefault;
-          # Override the symlinker function, to point to editable paths
-          config.lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
-            nixStorePath = self;
-            realPath = "/home/bew/.dot"; # FIXME: leak hardcoded $USER
+          config = lib.mkIf fewBinsFromPATH {
+            deps.bins.fzf.pkg = lib.mkForce "from-PATH";
+            deps.bins.eza.pkg = lib.mkForce "from-PATH";
           };
-          # FIXME(?): find a way to avoid having to do that for every config manually?
         };
-      }
-    );
+      };
+
+      nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
+      mk-nvim-config = {nvimConfig, asDefault ? false}: (
+        nvim-configs.lib.evalNvimConfig {
+          pkgs = bleedingedgePkgs;
+          configuration = {
+            imports = [
+              nvimConfig
+            ];
+            # Is config supposed to be the default 🤔
+            config.useDefaultBinName = asDefault;
+            # Override the symlinker function, to point to editable paths
+            config.lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
+              nixStorePath = self;
+              realPath = "/home/bew/.dot"; # FIXME: leak hardcoded $USER
+            };
+            # FIXME(?): find a way to avoid having to do that for every config manually?
+          };
+        }
+      );
+    };
 
   in {
-    homeConfig = let
+    # note: force system
+    homeConfig = with (forSys "x86_64-linux"); let
       username = "bew";
     in import "${flakeInputs.homeManager}/modules" {
-      pkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
+      pkgs = stablePkgs;
       configuration = import ./nix/homes/main.nix { inherit flakeInputs system username; };
 
       # Pkgs channels from flakeInputs
@@ -116,7 +126,8 @@
       };
     };
 
-    zshConfig.zsh-bew = mk-zsh-bew-config {};
+    # note: it's annoying w.r.t system (this is now a multi-system flake)
+    # zshConfig.zsh-bew = mk-zsh-bew-config {};
 
     # --- Stuff I want to be able to do with binaries & packages:
     # In my packages:
@@ -132,7 +143,9 @@
     # - a `zsh` bin, with my config (may be editable?)
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
-    packages.${system} = let zsh-bew-config = mk-zsh-bew-config {}; in {
+    packages = eachSystem (system: with (forSys system); let
+      zsh-bew-config = mk-zsh-bew-config {};
+    in {
       zsh-bew = zsh-bew-config.outputs.toolPkg.standalone;
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
       zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolPkg.standalone);
@@ -157,10 +170,10 @@
       in cfg.outputs.toolPkg.standalone;
 
       #tmux-bew = ...
-    };
-    apps.${system} = {
+    });
+    apps = eachSystem (system: with (forSys system); {
       # FIXME: should be an env with all 'core' cli tools
       default = { type = "app"; program = lib.getExe myPkgs.zsh-bew; };
-    };
+    });
   };
 }

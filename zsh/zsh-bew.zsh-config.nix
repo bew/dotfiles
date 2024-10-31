@@ -19,8 +19,8 @@ in {
     git.pkg = pkgs.git;
     eza.pkg = pkgs.eza;
     dircolors = {
-      # FIXME: remove all non-dircolors bins?
-      #   (coreutils pkg POLLUTES the depsEnv closure significantly even if we _only_ need dircolors bin..)
+      # Remove all bins I don't need
+      # (coreutils pkg POLLUTES the depsEnv closure significantly even if we _only_ need dircolors bin..)
       pkg = mybuilders.linkSingleBin "${pkgs.coreutils}/bin/dircolors";
     };
     direnv.pkg = pkgs.direnv;
@@ -67,6 +67,10 @@ in {
       zconvey-feeder = stdenv.mkDerivation {
         name = "zconvey-feeder";
         src = "${zconvey-src}/feeder";
+        # Override buildPhase to work equally on Linux & MacOS (where gcc doesn't exist)
+        buildPhase = /* sh */ ''
+          $CC feeder.c -o feeder
+        '';
         installPhase = /* sh */ ''
           mkdir -p $out/bin
           mv feeder $out/bin/feeder
