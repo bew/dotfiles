@@ -171,9 +171,31 @@
 
       #tmux-bew = ...
     });
+
     apps = eachSystem (system: with (forSys system); {
-      # FIXME: should be an env with all 'core' cli tools
-      default = { type = "app"; program = lib.getExe myPkgs.zsh-bew; };
+      # An env with all 'core' cli tools :)
+      default = {
+        type = "app";
+        program = let
+          env = stablePkgs.buildEnv {
+            name = "cli-base-env";
+            paths = [
+              myPkgs.zsh-bew
+              myPkgs.nvim-minimal
+              myPkgs.nvim-bew
+              myPkgs.fzf-bew
+              (mybuilders.linkBins "nvim-default" {
+                nvim = lib.getExe myPkgs.nvim-bew;
+              })
+            ];
+            meta.mainProgram = myPkgs.zsh-bew.meta.mainProgram;
+          };
+          entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" ''
+            export PATH=${env}/bin:$PATH
+            exec ${lib.getExe env} "$@"
+          '';
+        in entrypoint.outPath;
+      };
     });
   };
 }
