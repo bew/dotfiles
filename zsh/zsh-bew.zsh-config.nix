@@ -18,11 +18,6 @@ in {
   deps.bins = {
     git.pkg = pkgs.git;
     eza.pkg = pkgs.eza;
-    dircolors = {
-      # Remove all bins I don't need
-      # (coreutils pkg POLLUTES the depsEnv closure significantly even if we _only_ need dircolors bin..)
-      pkg = mybuilders.linkSingleBin "${pkgs.coreutils}/bin/dircolors";
-    };
     direnv.pkg = pkgs.direnv;
 
     # Don't hardcode fzf in zoxide, will use the one in PATH
@@ -32,7 +27,18 @@ in {
     fzf.pkg = pkgs.fzf;
     fd.pkg = pkgs.fd;
     bat.pkg = pkgs.bat;
-  };
+  } // (let
+    coreutilsBin = binName: mybuilders.linkSingleBin "${pkgs.coreutils}/bin/${binName}";
+  in {
+    # coreutils bins
+    # (only link bins we need to avoid mass bins pollution of the env closure)
+    #
+    # note: This is especially necessary on MacOS, where default set of base binaries are much
+    #   simpler and don't support params I need…
+    dircolors.pkg = coreutilsBin "dircolors";
+    realpath.pkg = coreutilsBin "realpath"; # MacOS's `realpath` don't support `--relative-to`
+    ls.pkg = coreutilsBin "ls"; # MacOS's `ls` don't support `--group-directories-first`
+  });
 
   deps.plugins = {
     zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair";
