@@ -50,6 +50,7 @@ local function start_lsp_server()
   }
 end
 if vim.fn.executable("pylsp") == 1 then
+  vim.notify("Starting LSP server..")
   start_lsp_server()
 else
   vim.notify("LSP not found")
@@ -81,12 +82,14 @@ local function fstring_toggle()
     local row0 = cur_row0
     local col0 = f_idx1 -1
     vim.api.nvim_buf_set_text(0, row0, col0, row0, col0 +1, {}) -- 0-indexed
-    vim.api.nvim_win_set_cursor(0, cur_row0 +1, ) -- (1, 0)-indexed
+    --vim.api.nvim_win_set_cursor(0, cur_row0 +1, ) -- (1, 0)-indexed
+    --FIXME: finish this!
   else
     -- Insert `f` at quote position
     local row0 = cur_row0
     local col0 = quote_idx1 -1
     vim.api.nvim_buf_set_text(0, row0, col0, row0, col0, {"f"})
+    --FIXME: finish this! (move cursor)
   end
 end
 toplevel_buf_map{mode="i", key=[[<M-f>]], action=fstring_toggle}
