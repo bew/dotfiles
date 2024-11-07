@@ -263,6 +263,8 @@ NamedPlug.pkg_manager {
         --    where the plugin is (can copy path from plugin details) and `git log`!
         log = {"..origin/HEAD"}
       },
+      -- open a pseudo terminal with git diff (for nice diffs with delta!)
+      diff = { cmd = "terminal_git" },
       lockfile = try_find_lazy_lockfile(),
       -- Disable most automations
       install = { missing = false }, -- do not auto-install plugins
