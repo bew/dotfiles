@@ -40,21 +40,26 @@ local myplug = PluginSystem.sources.myplug
 
 --------------------------------
 
-Plug {
-  source = myplug"debug-autocmds.nvim",
-  desc = "Tool to debug/understand autocmd flow while using neovim",
-  tags = {"utils", "debug"},
-  on_load = function()
-    require("debug-autocmds").setup{
-      global_tracking_on_start = false, -- switch to `true` to debug builtin events from start :)
-    }
-  end,
-}
+-- Uncomment when exploring/debugging stuff
+-- Plug {
+--   source = myplug"debug-autocmds.nvim",
+--   desc = "Tool to debug/understand autocmd flow while using neovim",
+--   tags = {"utils", "debug"},
+--   on_load = function()
+--     require("debug-autocmds").setup{
+--       global_tracking_on_start = true, -- switch to `true` to debug builtin events from start :)
+--     }
+--   end,
+-- }
+--
+-- FIXME: why does `enabled = false` not completely disable it
+--   (it still appears in `:Lazy profile`...)
 
 Plug {
   source = myplug"smart-bol.nvim",
   desc = "Provide action to cycle movements ^ and 0 with a single key",
   tags = {"movement", t.insert},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     -- I: Move cursor to begin/end of line
     -- NOTE: BREAKS UNDO
@@ -77,6 +82,7 @@ Plug {
   source = gh"ii14/neorepl.nvim",
   desc = "Neovim REPL for lua and vim script",
   tags = {"config"},
+  defer_load = { on_event = "VeryLazy" },
   -- NOTE: use `/h` to get help inside the repl buffer
   on_load = function()
     -- NOTE: need my PR (#21) to merge config with plugin's default config
@@ -147,9 +153,10 @@ Plug {
 }
 
 NamedPlug.lib_plenary {
- source = gh"nvim-lua/plenary.nvim",
- desc = "Lua contrib stdlib for plugins, used by many plugins",
- tags = {t.lib_only}
+  source = gh"nvim-lua/plenary.nvim",
+  desc = "Lua contrib stdlib for plugins, used by many plugins",
+  tags = {t.lib_only},
+  defer_load = { autodetect = true },
 }
 
 -- NOTE: I don't want all the lazyness and perf stuff of 'lazy'
@@ -223,6 +230,12 @@ NamedPlug.pkg_manager {
         lazy_single_spec.dependencies = direct_deps
         -- print("Plugin", _q(plug.source.name), "depends on:", vim.inspect(direct_deps)) -- DEBUG
       end
+      if plug.defer_load then
+        lazy_single_spec.lazy = plug.defer_load.autodetect -- bool
+        lazy_single_spec.event = plug.defer_load.on_event
+        lazy_single_spec.cmd = plug.defer_load.on_cmd
+        lazy_single_spec.ft = plug.defer_load.on_ft
+      end
       table.insert(lazy_plugin_specs, lazy_single_spec)
     end
     local plug_names = {}
@@ -255,8 +268,8 @@ NamedPlug.pkg_manager {
       install = { missing = false }, -- do not auto-install plugins
       custom_keys = false,
       change_detection = { enabled = false }, -- MAYBE: try it?
-      cache = { enabled = false },
       performance = {
+        cache = { enabled = true },
         reset_packpath = false,
         rtp = {
           reset = true, -- (this is the default, but it removes all $XDG_CONFIG_DIRS..)

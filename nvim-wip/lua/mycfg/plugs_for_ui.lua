@@ -34,8 +34,10 @@ NamedPlug.statusline {
     Plug {
       source = gh"Zeioth/heirline-components.nvim",
       version = { tag = "v1.1.2" }, -- For support for nvim <0.10
+      defer_load = { on_event = "UIEnter" }, -- same as heirline
     },
   },
+  defer_load = { on_event = "UIEnter" },
   on_load = function()
     local heirline = require"heirline"
     local external_heirline_components = require "heirline-components.all"
@@ -58,6 +60,7 @@ Plug {
   source = gh"folke/which-key.nvim",
   desc = "Display a popup with possible keybindings of the command you started typing",
   tags = {"keys", t.ui},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local wk = require"which-key"
     wk.setup {
@@ -127,6 +130,7 @@ Plug {
   source = gh"stevearc/oil.nvim",
   desc = "Edit your filesystem like a normal Neovim buffer",
   tags = {"filesystem"},
+  defer_load = { on_cmd = "Oil" },
   on_load = function()
     require"oil".setup {
       -- Don't hijack nvim's file explorer, neotree already does that
@@ -144,6 +148,7 @@ Plug {
   tags = {t.ui, "filesystem", "nav"},
   version = { branch = "v3.x" },
   depends_on = {NamedPlug.lib_plenary, NamedPlug.lib_nui, NamedPlug.lib_web_devicons},
+  defer_load = { on_cmd = "Neotree" },
   on_load = function()
     require("neo-tree").setup {
       sources = {
@@ -244,6 +249,7 @@ NamedPlug.startup_screen {
   desc = "a lua powered greeter like vim-startify / dashboard-nvim",
   tags = {t.ui, t.extensible},
   depends_on = {NamedPlug.lib_web_devicons},
+  defer_load = { on_event = "VimEnter" },
   on_load = function()
     -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
     -- simple theme, until I want to make my own...
@@ -266,6 +272,7 @@ NamedPlug.fzf_ctrl {
   source = gh"vijaymarupudi/nvim-fzf",
   desc = "A powerful Lua API for using fzf in neovim",
   tags = {"nav"},
+  defer_load = { autodetect = true },
   on_load = function()
     require"fzf".default_options = {
       relative = "editor", -- open a centered floating win
@@ -281,6 +288,7 @@ Plug {
   desc = "Few pre-configured thing selectors (buffers, files, ...)",
   tags = {"nav"},
   depends_on = {NamedPlug.fzf_ctrl},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local act = require"fzf-lua.actions"
     local fzf = require"fzf-lua"
@@ -351,6 +359,7 @@ Plug {
   source = gh"0xAdk/full_visual_line.nvim",
   desc = "Highlights whole lines in linewise visual mode",
   tags = {t.content_ui},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require"full_visual_line".setup()
 
@@ -368,6 +377,7 @@ Plug {
   source = gh"mcauley-penney/visual-whitespace.nvim",
   desc = "Reveal whitespace characters in visual mode, like VSCode",
   tags = {t.content_ui},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require"visual-whitespace".setup {
       highlight = {
@@ -386,18 +396,21 @@ Plug {
   source = gh"jremmen/vim-ripgrep",
   desc = "Use RipGrep in Vim and display results in a quickfix list",
   tags = {t.vimscript, "nav"},
+  defer_load = { on_event = "VeryLazy" },
 }
 
 NamedPlug.fugitive {
   source = gh"tpope/vim-fugitive",
   desc = "A Git wrapper so awesome, it should be illegal",
   tags = {t.vimscript, t.git},
+  defer_load = { on_event = "VeryLazy" },
 }
 Plug {
   source = gh"junegunn/gv.vim",
   depends_on = { NamedPlug.fugitive },
   desc = "Simple (<3) git commit browser, based on vim-fugitive",
   tags = {t.vimscript, t.git},
+  defer_load = { on_event = "VeryLazy" },
 }
 Plug {
   source = gh"whiteinge/diffconflicts",
@@ -405,6 +418,10 @@ Plug {
   --   nvim -c DiffConflictsWithHistory "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
   desc = "Helper plugin for git merges",
   tags = {t.vimscript, t.git, t.ui},
+  defer_load = {
+    on_event = "VeryLazy",
+    on_cmd = "DiffConflictsWithHistory",
+  },
 }
 
 Plug {
@@ -414,12 +431,14 @@ Plug {
   on_pre_load = function()
     vim.g.git_messenger_no_default_mappings = true
   end,
+  defer_load = { on_event = "VeryLazy" },
 }
 
 Plug {
   source = gh"lewis6991/gitsigns.nvim",
   desc = "Git integration for buffers",
   tags = {t.content_ui, t.git},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require"gitsigns".setup{
       signs = {
@@ -502,6 +521,7 @@ Plug {
   source = gh"mbbill/undotree",
   desc = "Vim undo tree visualizer",
   tags = {t.vimscript, t.ui, t.need_better_plugin},
+  defer_load = { on_cmd = "UndotreeToggle" },
   -- pre_load because it must be set before `plugin/` files are loaded!
   on_pre_load = function()
     -- (e.g) Use 'd' instead of 'days' to save some space.
@@ -517,12 +537,14 @@ Plug {
   source = gh"2KAbhishek/nerdy.nvim",
   desc = "UI to find nerd-font glyphs easily",
   tags = {"utils", t.ui},
+  defer_load = { on_event = "VeryLazy" },
 }
 
 Plug {
   source = gh"vim-scripts/xterm-color-table.vim",
   desc = "Provide some commands to display all cterm colors",
   tags = {"utils", t.ui, t.vimscript},
+  defer_load = { on_event = "VeryLazy" },
 }
 
 --------------------------------
@@ -531,6 +553,7 @@ NamedPlug.lib_web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
   tags = {t.ui, t.lib_only},
+  defer_load = { autodetect = true },
   on_load = function()
     require'nvim-web-devicons'.set_default_icon("", "#cccccc", 244)
     require'nvim-web-devicons'.setup { default = true } -- give a default icon when nothing matches
@@ -538,7 +561,8 @@ NamedPlug.lib_web_devicons {
 }
 
 NamedPlug.lib_nui {
- source = gh"MunifTanjim/nui.nvim",
- desc = "UI Component Library for Neovim",
- tags = {t.ui, t.lib_only}
+  source = gh"MunifTanjim/nui.nvim",
+  desc = "UI Component Library for Neovim",
+  tags = {t.ui, t.lib_only},
+  defer_load = { autodetect = true },
 }

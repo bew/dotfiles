@@ -16,26 +16,33 @@ local myplug = PluginSystem.sources.myplug
 
 require"mycfg.diagnostics_and_lsp"
 
+local function cmp_source_dep(plug_spec)
+  local spec = vim.tbl_extend("error", plug_spec, {
+    depends_on = U.concat_lists({ NamedPlug.cmp }, plug_spec.extra_depends_on),
+    defer_load = { on_event = "VeryLazy" }, -- 🤔 (like cmp)
+  })
+  return Plug(spec)
+end
 NamedPlug.cmp {
   source = gh"hrsh7th/nvim-cmp",
   desc = "Auto-completion framework",
   -- IDEA: could enable plugins based on roles?
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
   config_depends_on = {
-    Plug { source = gh"onsails/lspkind.nvim", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"hrsh7th/cmp-nvim-lsp", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"hrsh7th/cmp-buffer", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"hrsh7th/cmp-path", depends_on = {NamedPlug.cmp} },
-    Plug {
+    Plug { source = gh"onsails/lspkind.nvim", defer_load = { autodetect = true } },
+    cmp_source_dep { source = gh"hrsh7th/cmp-nvim-lsp" },
+    cmp_source_dep { source = gh"hrsh7th/cmp-buffer" },
+    cmp_source_dep { source = gh"hrsh7th/cmp-path" },
+    cmp_source_dep {
       source = gh"hrsh7th/cmp-nvim-lua",
       desc = "Source for neovim runtime API",
       tags = {"config-editing"},
-      depends_on = {NamedPlug.cmp},
     },
-    Plug { source = gh"andersevenrud/cmp-tmux", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"hrsh7th/cmp-emoji", depends_on = {NamedPlug.cmp} },
-    Plug { source = gh"saadparwaiz1/cmp_luasnip", depends_on = {NamedPlug.cmp, NamedPlug.luasnip} },
+    cmp_source_dep { source = gh"andersevenrud/cmp-tmux" },
+    cmp_source_dep { source = gh"hrsh7th/cmp-emoji" },
+    cmp_source_dep { source = gh"saadparwaiz1/cmp_luasnip", extra_depends_on = {NamedPlug.luasnip} },
   },
+  defer_load = { on_event = "VeryLazy" }, -- 🤔 (seems to work 🤷)
   on_load = function()
     local cmp = require"cmp"
     -- NOTE: default config is at: https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/default.lua
@@ -325,6 +332,7 @@ NamedPlug.luasnip {
   desc = "Hyper flexible snippet Engine for Neovim",
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
   rev = "v2.3.0", -- last release @2024-04
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local ls = require"luasnip"
     local ls_types = require"luasnip.util.types"
@@ -420,6 +428,7 @@ Plug {
   source = gh"lukas-reineke/indent-blankline.nvim",
   desc = "Indent guides",
   tags = {t.content_ui},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require("ibl").setup {
       indent = {
@@ -450,6 +459,7 @@ Plug {
   desc = "Indent-based text object",
   tags = {t.vimscript, t.textobj},
   depends_on = { NamedPlug.lib_textobj_user },
+  defer_load = { on_event = "VeryLazy" },
 }
 
 -- textobj: ic ac
@@ -466,6 +476,7 @@ Plug {
   -- `foobar  ` (trailing spaces left!)
   -- I'd like to have:
   -- `foobar`
+  defer_load = { on_event = "VeryLazy" },
 }
 
 -- textobj: ie ae
@@ -476,6 +487,7 @@ Plug {
   desc = "Entire-buffer-content text object",
   tags = {t.vimscript, t.textobj},
   depends_on = { NamedPlug.lib_textobj_user },
+  defer_load = { on_event = "VeryLazy" },
 }
 
 -- textobj: i<Space> a<Space>
@@ -485,6 +497,7 @@ Plug {
   source = gh"vim-utils/vim-space",
   desc = "Whitespace text object",
   tags = {t.vimscript, t.textobj},
+  defer_load = { on_event = "VeryLazy" },
 }
 
 Plug {
@@ -492,6 +505,7 @@ Plug {
   desc = "Add/change/delete surrounding delimiter pairs with ease",
   -- Nice showcases at: https://github.com/kylechui/nvim-surround/discussions/53
   tags = {t.editing, t.extensible},
+  defer_load = { on_event = "VeryLazy" }, -- 🤔
   on_load = function()
     -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red)
     --   highlights to the modified surrounds? (like with vim-sandwich)
@@ -642,6 +656,7 @@ Plug {
   source = gh"windwp/nvim-autopairs",
   desc = "auto insert of second ()''{}[]\"\" etc...",
   tags = {t.editing, t.extensible, t.insert},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     -- The plugin is _very_ configurable!
     -- See Rules API at: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
@@ -851,6 +866,7 @@ Plug {
   source = gh"numToStr/Comment.nvim",
   desc = "Smart and powerful comment plugin for neovim",
   tags = {t.editing, t.textobj},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require("Comment").setup {
       mappings = false,
@@ -954,12 +970,14 @@ Plug {
   desc = "Arbitrarily exchange(swap) blocks of code!",
   tags = {t.vimscript, t.editing},
   -- TODO(later): Explicit keybinds, so I can better control which normal keybinds are active.
+  defer_load = { on_event = "VeryLazy" },
 }
 
 Plug {
   source = gh"johmsalas/text-case.nvim",
   desc = "Plugin for converting text case",
   tags = {t.editing},
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local textcase = require"textcase"
     textcase.setup {

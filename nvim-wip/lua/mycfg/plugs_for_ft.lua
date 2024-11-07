@@ -18,12 +18,14 @@ Plug {
   source = gh"rhysd/committia.vim",
   desc = "More pleasant editing on commit messages with dedicated msg/status/diff windows",
   tags = {t.vimscript, t.git, t.ft_support},
+  -- Can't use defer_load, otherwise it doesn't appear when opening a commit msg buffer :/
 }
 
 Plug {
   source = gh"preservim/vim-markdown",
   desc = "Markdown Vim Mode",
   tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "markdown" },
   on_pre_load = function()
     vim.g.vim_markdown_folding_disabled = true
     vim.g.vim_markdown_conceal = false
@@ -91,22 +93,26 @@ Plug {
   source = gh"NoahTheDuke/vim-just",
   desc = "Just's justfile support",
   tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "just" },
 }
 
 Plug {
   source = gh"LnL7/vim-nix",
   desc = "Nix files support",
   tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "nix" },
 }
 
 Plug {
   source = gh"kaarmu/typst.vim",
   desc = "Vim plugin for Typst language",
   tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "typst" },
 }
 
 Plug {
   source = gh"elkasztano/nushell-syntax-vim",
   desc = "nushell files support",
   tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "nu" },
 }
