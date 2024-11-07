@@ -229,6 +229,7 @@ NamedPlug.pkg_manager {
     for _, plug in pairs(lazy_plugin_specs) do
       table.insert(plug_names, plug[1])
     end
+    local xdg_config_dirs = vim.env.XDG_CONFIG_DIRS ~= nil and vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}
     -- print("Loading lazy plugins:", vim.inspect(plug_names)) -- DEBUG
     require("lazy").setup(lazy_plugin_specs, {
       root = ctx.install_dir,
@@ -249,15 +250,27 @@ NamedPlug.pkg_manager {
         rtp = {
           reset = true, -- (this is the default, but it removes all $XDG_CONFIG_DIRS..)
           -- => We need to ADD `$XDG_CONFIG_DIRS[*]/$NVIM_APPNAME` paths that exists to ensure
-          -- standalone Nix-managed config dir (passed in $XDG_CONFIG_DIRS) is available:
-          paths = U.filter_map_list(vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}, function(path)
-            local maybe_cfg_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim")
-            if vim.fn.isdirectory(maybe_cfg_path) == 1 then
-              -- print(vim.inspect({path, maybe_cfg_path}))
-              return maybe_cfg_path
-            end
-            return nil -- skip
-          end)
+          -- standalone Nix-managed config dir (passed in $XDG_CONFIG_DIRS) is available.
+          -- => We also need to ADD `$XDG_CONFIG_DIRS[*]/$NVIM_APPNAME/after` paths (reverse order)
+          -- to ensure 'after' scripts like ft-related configs are loaded.
+          paths = U.concat_lists {
+            U.filter_map_list(xdg_config_dirs, function(path)
+              local cfg_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim")
+              if vim.fn.isdirectory(cfg_path) == 1 then
+                -- print("config dir", vim.inspect(cfg_path))
+                return cfg_path
+              end
+              return nil -- skip
+            end),
+            U.filter_map_list(U.reverse_list(xdg_config_dirs), function(path)
+              local cfg_after_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim", "after")
+              if vim.fn.isdirectory(cfg_after_path) == 1 then
+                -- print("config dir (after)", vim.inspect(cfg_after_path))
+                return cfg_after_path
+              end
+              return nil -- skip
+            end),
+          }
         },
       },
     })

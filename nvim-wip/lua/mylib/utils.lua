@@ -48,14 +48,33 @@ function U.filter_map_list(list, fn)
   return ret
 end
 
+function U.concat_lists(...)
+  local res = {}
+  for _, list in ipairs(U.normalize_multi_args(...)) do
+    for _, item in ipairs(list) do
+      table.insert(res, item)
+    end
+  end
+  return res
+end
+
+function U.reverse_list(list)
+  local res = {}
+  for _, item in ipairs(list) do
+    table.insert(res, 1, item)
+  end
+  return res
+end
+
 --- Normalizes received table-args or multi-args to a table.
 ---   Allows the caller to pass it a set of args or a table of args, and always get a table of args
 ---   back to manipulate.
 ---@param ... any|any[] Args or table of args
 ---@return any[]
 function U.normalize_multi_args(...)
+  local nargs = select("#", ...)
   local first_arg = ({...})[1] -- note: nil when no args
-  if type(first_arg) == "table" then
+  if nargs == 1 and type(first_arg) == "table" then
     return first_arg
   else
     return {...}
