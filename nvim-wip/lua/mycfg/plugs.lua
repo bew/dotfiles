@@ -230,6 +230,16 @@ NamedPlug.pkg_manager {
       table.insert(plug_names, plug[1])
     end
     local xdg_config_dirs = vim.env.XDG_CONFIG_DIRS ~= nil and vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}
+    local function try_find_lazy_lockfile()
+      local candidates = U.concat_lists { {vim.fn.stdpath"config"}, xdg_config_dirs }
+      for _, cfg_dir in ipairs(candidates) do
+        local maybe_path = vim.fs.joinpath(cfg_dir, vim.env.NVIM_APPNAME or "nvim", "lazy-lock.json")
+        if vim.fn.filereadable(maybe_path) == 1 then
+          return maybe_path
+        end
+      end
+      return nil
+    end
     -- print("Loading lazy plugins:", vim.inspect(plug_names)) -- DEBUG
     require("lazy").setup(lazy_plugin_specs, {
       root = ctx.install_dir,
@@ -240,6 +250,7 @@ NamedPlug.pkg_manager {
         --    where the plugin is (can copy path from plugin details) and `git log`!
         log = {"..origin/HEAD"}
       },
+      lockfile = try_find_lazy_lockfile(),
       -- Disable most automations
       install = { missing = false }, -- do not auto-install plugins
       custom_keys = false,
