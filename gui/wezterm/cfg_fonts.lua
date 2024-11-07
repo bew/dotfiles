@@ -19,6 +19,10 @@ local function font_with_fallback(font_family)
   -- family names, not file names
   return wezterm.font_with_fallback({
     font_family,
+    -- FIXME: I'd like to use this emoji font, but currently it doesn't seem to work :/
+    --   Related: https://github.com/wez/wezterm/issues/4713 & https://github.com/wez/wezterm/issues/5460
+    -- Preview: https://jdecked.github.io/twemoji/v/latest/preview-svg.html 👀
+    -- "Twitter Color Emoji",
     "Font Awesome 6 Free Solid", -- nice double-spaced symbols!
   })
 end
