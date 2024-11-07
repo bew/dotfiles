@@ -35,8 +35,10 @@ M.TreesitterStatus = {
   end,
   hl = function()
     if vim.o.syntax ~= "" then
+      -- TS is NOT used for syntax highlighting
       return { ctermfg = 244 }
     else
+      -- TS is used for syntax highlighting
       return { ctermfg = 34 }
     end
   end,

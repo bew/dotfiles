@@ -267,6 +267,8 @@ NamedPlug.pkg_manager {
 --------------------------------
 
 -- FIXME: avoid global state!
+--   Each file could have its own plugin declarator (and could import common stuff like tags),
+--   then here we merge all plugin declarators before checking for missing plugins..
 require"mycfg.plugs_for_ui"
 require"mycfg.plugs_for_ft"
 require"mycfg.plugs_for_file_editing"
