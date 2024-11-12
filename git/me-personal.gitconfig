@@ -1,0 +1,9 @@
+[user]
+  name  = Benoit de Chezelles
+  email = benoit.dechezelles@gmail.com
+
+[github]
+  # some tools use this
+  user = bew
+
+# vim:set ft=gitconfig:

@@ -1,0 +1,40 @@
+[include]
+  path = ./common/_behaviors_and_defaults.gitconfig
+  path = ./common/_appearance.gitconfig
+  path = ./common/_external_tools.gitconfig
+  path = ./common/_aliases.gitconfig
+  path = ./common/_plugin_delta.gitconfig
+  path = ./common/_plugin_absorb.gitconfig
+
+# Config when inside a git repo under my personal folder
+[includeIf "gitdir:~/self/**"]
+  path = ./me-personal.gitconfig
+  # OR (e.g.):
+  # path = ./specific/personal-with-explicit-ssh.gitconfig
+
+# # Config when inside a git repo under a work folder
+# [includeIf "gitdir:~/work/**"]
+#   path = ./specific/work.gitconfig
+
+# # Config when remote is github (ssh)
+# # (useful for personal config on a work setup)
+# [includeIf "hasconfig:remote.*.url:git@github.com:**"]
+#   path = ./explicit_ssh_for_github.gitconfig
+
+# ----------------------------------
+# Other less used stuff
+
+# Enable git LFS support in repos
+# [filter "lfs"]
+#   clean = git-lfs clean -- %f
+#   smudge = git-lfs smudge -- %f
+#   process = git-lfs filter-process
+#   required = true
+
+# Useful when I can't use SSH to communicate with github and I don't want to
+# type my password/personal-token everytime.
+# [credential "https://github.com"]
+#   username = bew
+#   helper = github-bew-password-from-env
+
+# vim:set ft=gitconfig:

@@ -1,0 +1,2 @@
+# Ignore the actual config entrypoint, it will be different for potentially every install (work/personal/MacOS/..)
+config

@@ -24,6 +24,12 @@ __auto_bins__/
 .*_history
 
 
+# -------- Platform-specific common ignores
+
+# MacOS
+.DS_Store
+# (proprietary file for custom attributes on the folder..)
+
 # -------- Filetype-specific common ignores
 
 # Terraform
