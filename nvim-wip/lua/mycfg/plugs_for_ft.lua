@@ -116,3 +116,10 @@ Plug {
   tags = {t.vimscript, t.ft_support},
   defer_load = { on_event = "VeryLazy", on_ft = "nu" },
 }
+
+Plug {
+  source = gh"hashivim/vim-terraform",
+  desc = "basic vim/terraform integration",
+  tags = {t.vimscript, t.ft_support},
+  defer_load = { on_event = "VeryLazy", on_ft = "terraform" },
+}
