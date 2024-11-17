@@ -7,6 +7,7 @@ FFMPEG_VIDEO_SIZE=${FFMPEG_VIDEO_SIZE:-}
 FFMPEG_VIDEO_AVG_BITRATE=${FFMPEG_VIDEO_AVG_BITRATE:-}
 FFMPEG_AUDIO_MAX_BITRATE=${FFMPEG_AUDIO_MAX_BITRATE:-}
 FFMPEG_THREADS=${FFMPEG_THREADS:-}
+FFMPEG_CPU_NO_LIMIT=${FFMPEG_CPU_NO_LIMIT:-}
 FFMPEG_CPU_LIMIT_PERCENTAGE=${FFMPEG_CPU_LIMIT_PERCENTAGE:-300} # default to 3 full CPUs
 FFMPEG_SKIP_EXISTING_OUTPUTS=${FFMPEG_SKIP_EXISTING_OUTPUTS:-}
 FFMPEG_VIDEO_EXT=${FFMPEG_VIDEO_EXT:-mkv}
@@ -27,6 +28,7 @@ function ffmpeg::show_config()
   _ffmpeg::show_single_config FFMPEG_VIDEO_AVG_BITRATE "$FFMPEG_VIDEO_AVG_BITRATE"
   _ffmpeg::show_single_config FFMPEG_AUDIO_MAX_BITRATE "$FFMPEG_AUDIO_MAX_BITRATE"
   _ffmpeg::show_single_config FFMPEG_THREADS "$FFMPEG_THREADS"
+  _ffmpeg::show_single_config FFMPEG_CPU_NO_LIMIT "$FFMPEG_CPU_NO_LIMIT"
   _ffmpeg::show_single_config FFMPEG_CPU_LIMIT_PERCENTAGE "$FFMPEG_CPU_LIMIT_PERCENTAGE" 300
   _ffmpeg::show_single_config FFMPEG_SKIP_EXISTING_OUTPUTS "$FFMPEG_SKIP_EXISTING_OUTPUTS"
   _ffmpeg::show_single_config FFMPEG_VIDEO_EXT "$FFMPEG_VIDEO_EXT" mkv
@@ -180,14 +182,16 @@ function ffmpeg::transcode-movie::single-file
   _ffmpeg::check_need_skip "$output_path" && return 0
 
   local cmd=()
-  # Reduce process priority & limit CPU usage
-  # => avoid overwelming the CPU and locking other processes
-  cmd+=(nice -n 15)
-  # NOTE: Surprisingly, ONLY changing & reducing process priority of a CPU-intensive task can badly
-  #   impact other process that are at normal priority, making them wait for CPU time.
-  #   (ref: https://www.perplexity.ai/search/After-using-nice-qg7U7rPQRzS.wErucd2P3A)
-  cmd+=(cpulimit -l "$FFMPEG_CPU_LIMIT_PERCENTAGE" --include-children)
-  cmd+=(--)
+  if [[ -z "$FFMPEG_CPU_NO_LIMIT" ]]; then
+    # Reduce process priority & limit CPU usage
+    # => avoid overwelming the CPU and locking other processes
+    cmd+=(nice -n 15)
+    # NOTE: Surprisingly, ONLY changing & reducing process priority of a CPU-intensive task can badly
+    #   impact other process that are at normal priority, making them wait for CPU time.
+    #   (ref: https://www.perplexity.ai/search/After-using-nice-qg7U7rPQRzS.wErucd2P3A)
+    cmd+=(cpulimit -l "$FFMPEG_CPU_LIMIT_PERCENTAGE" --include-children)
+    cmd+=(--)
+  fi
 
   cmd+=(ffmpeg -hide_banner)
   if [[ -n "$FFMPEG_LOGLEVEL" ]]; then
