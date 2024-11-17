@@ -142,9 +142,9 @@ alias rename="rename -v"
 function rm
 {
   echo "ERROR: 'rm' is discouraged, use 'trash …' (or 'rmtrash …') instead"
-  echo "  For immediate permanant deletion use 'rm::yes-i-am-sure …'"
+  echo "  For immediate permanant deletion use 'rmpermanantly …'"
 }
-alias rm::yes-i-am-sure="command rm -vI"
+alias rmpermanantly="command rm -vI"
 if command -v trashy; then
   # For once https://github.com/oberblastmeister/trashy/pull/106 is released
   alias trash=trashy
