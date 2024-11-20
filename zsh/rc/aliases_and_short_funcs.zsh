@@ -155,7 +155,7 @@ alias rmtrash=trash
 # ls
 
 alias ls-backend=eza
-alias ls="ls-backend --group-directories-first --color=auto --classify"
+alias ls="ls-backend --group-directories-first --color=auto --classify=auto"
 
 alias eza="eza --group-directories-first"
 # Config eza colors to shades of grey instead of a distractful bright colors
@@ -183,8 +183,8 @@ EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
 #    and instead of `U` for conflicts => would prefer `X` (red))
 export EZA_COLORS
 
-alias ltre="eza -la --tree --git-ignore --classify"
-alias lltre="eza -l --tree --git-ignore --classify"
+alias ltre="eza -la --tree --git-ignore --classify=auto"
+alias lltre="eza -l --tree --git-ignore --classify=auto"
 
 alias ll="ls -l"
 alias la="ll -a"
