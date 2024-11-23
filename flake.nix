@@ -86,11 +86,13 @@
 
   in {
     # note: force system
-    homeConfig = with (forSys "x86_64-linux"); let
-      username = "bew";
-    in import "${flakeInputs.homeManager}/modules" {
+    homeConfig = with (forSys "x86_64-linux"); import "${flakeInputs.homeManager}/modules" {
       pkgs = stablePkgs;
-      configuration = import ./nix/homes/main.nix { inherit flakeInputs system username; };
+      configuration = import ./nix/homes/main.nix {
+        inherit flakeInputs;
+        system = "x86_64-linux";
+        username = "bew";
+      };
 
       # Pkgs channels from flakeInputs
       # => Allows to have a stable sharing point for multiple pkgs sets
