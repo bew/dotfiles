@@ -82,7 +82,7 @@ export def get_config [] {
     }
   ]
 
-  $cfg.edit_mode = vi
+  $cfg.edit_mode = "vi"
 
   # Useful commands:
   # - keybindings list
