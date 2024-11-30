@@ -9,9 +9,9 @@
 
 {
   imports = [
-    ./modules/link-flake-inputs.nix
-    ./modules/nix-registry.nix
-    ./modules/dyndots.nix
+    ../modules/generic/dyndots.nix
+    ../modules/home/link-flake-inputs.nix
+    ../modules/home/nix-registry.nix
   ] ++ [
     # NOTE: I'll need to split more! (editor, shell, desktop, ....)
     ./cli.nix
