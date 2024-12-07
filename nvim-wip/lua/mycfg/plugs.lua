@@ -311,6 +311,7 @@ NamedPlug.pkg_manager {
 require"mycfg.plugs_for_ui"
 require"mycfg.plugs_for_ft"
 require"mycfg.plugs_for_file_editing"
+require"mycfg.plugs_for_git"
 
 PluginSystem.MasterDeclarator:check_missing_plugins()
 return PluginSystem.MasterDeclarator:all_specs()
