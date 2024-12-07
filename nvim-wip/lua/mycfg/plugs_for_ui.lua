@@ -356,6 +356,26 @@ Plug {
 }
 
 Plug {
+  source = gh"NStefan002/screenkey.nvim",
+  desc = "Screencast your keys",
+  tags = {"keys", t.ui},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"screenkey".setup {
+      clear_after = 30, -- in seconds
+      group_mappings = true,
+    }
+
+    my_actions.screencast_toggle = mk_action_v2 {
+      default_desc = "Toggle keys screencast",
+      n = function()
+        vim.cmd.Screenkey("toggle")
+      end
+    }
+  end
+}
+
+Plug {
   source = gh"0xAdk/full_visual_line.nvim",
   desc = "Highlights whole lines in linewise visual mode",
   tags = {t.content_ui},
