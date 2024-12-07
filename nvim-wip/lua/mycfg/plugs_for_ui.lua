@@ -393,6 +393,25 @@ Plug {
 }
 
 Plug {
+  source = gh"sphamba/smear-cursor.nvim",
+  desc = "Animate the cursor with a smear/trail effect in all terminals",
+  -- Last release (@2024-12-07) has stable impl, `main` branch has a new impl that's not polished yet
+  -- Follow: https://github.com/sphamba/smear-cursor.nvim/issues/47
+  -- Diff mentioned in: https://github.com/sphamba/smear-cursor.nvim/issues/48#issuecomment-2522295672
+  version = { tag = "v0.2.0" },
+  tags = {t.content_ui},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"smear_cursor".setup {
+      -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
+      legacy_computing_symbols_support = true,
+      -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
+      distance_stop_animating = 2, -- don't animate when target is this close
+    }
+  end
+}
+
+Plug {
   source = gh"jremmen/vim-ripgrep",
   desc = "Use RipGrep in Vim and display results in a quickfix list",
   tags = {t.vimscript, "nav"},
