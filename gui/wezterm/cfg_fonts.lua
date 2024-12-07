@@ -55,8 +55,10 @@ end
 -- Some emojis: ☹ 🔎 😇 🤷 🙃 🖐 ❤ ⚠ ✨ 👋
 
 cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
-cfg.strikethrough_position = "0.6cell"
 cfg.unicode_version = 15
+
+cfg.strikethrough_position = "0.6cell"
+cfg.underline_position = -6
 
 -- Enable various OpenType features
 -- See https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
