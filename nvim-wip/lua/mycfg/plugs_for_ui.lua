@@ -412,6 +412,18 @@ Plug {
 }
 
 Plug {
+  source = gh"echasnovski/mini.hipatterns",
+  desc = "Highlight patterns in text",
+  tags = {t.content_ui},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"mini.hipatterns".setup {
+      highlighters = require"mycfg.hl_patterns"
+    }
+  end,
+}
+
+Plug {
   source = gh"jremmen/vim-ripgrep",
   desc = "Use RipGrep in Vim and display results in a quickfix list",
   tags = {t.vimscript, "nav"},
