@@ -32,6 +32,7 @@ local function font_and_rules_for_jetbrains()
   local font = font_with_fallback({family="JetBrains Mono", weight="Light"})
   local font_rules = {
     {
+      intensity = "Normal",
       italic = true,
       font = font_with_fallback({family="JetBrains Mono", weight="Light", italic=true}),
     },
