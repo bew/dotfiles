@@ -15,10 +15,10 @@ cfg.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
 -- Additional font directory (necessary to find FontAwesome font!)
 cfg.font_dirs = {"fonts"} -- relative to main config file
 
-local function font_with_fallback(font_family)
+local function font_with_fallback(font_spec)
   -- family names, not file names
   return wezterm.font_with_fallback({
-    font_family,
+    font_spec,
     -- FIXME: I'd like to use this emoji font, but currently it doesn't seem to work :/
     --   Related: https://github.com/wez/wezterm/issues/4713 & https://github.com/wez/wezterm/issues/5460
     -- Preview: https://jdecked.github.io/twemoji/v/latest/preview-svg.html 👀
@@ -29,19 +29,20 @@ end
 
 local function font_and_rules_for_jetbrains()
   -- Use a _very slightly_ lighter variant, so that regular bold really stand out
-  local font = font_with_fallback("JetBrains Mono Light")
+  local font = font_with_fallback({family="JetBrains Mono", weight="Light"})
   local font_rules = {
     {
       italic = true,
-      font = font_with_fallback("JetBrains Mono Light Italic"),
-    },
-    {
-      italic = true, intensity = "Bold",
-      font = font_with_fallback("JetBrains Mono Bold Italic"),
+      font = font_with_fallback({family="JetBrains Mono", weight="Light", italic=true}),
     },
     {
       intensity = "Bold",
-      font = font_with_fallback("JetBrains Mono Bold"),
+      italic = true,
+      font = font_with_fallback({family="JetBrains Mono", weight="Bold", italic=true}),
+    },
+    {
+      intensity = "Bold",
+      font = font_with_fallback({family="JetBrains Mono", weight="Bold"}),
     },
   }
   return font, font_rules
