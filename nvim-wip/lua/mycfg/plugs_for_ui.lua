@@ -415,10 +415,6 @@ Plug {
 Plug {
   source = gh"sphamba/smear-cursor.nvim",
   desc = "Animate the cursor with a smear/trail effect in all terminals",
-  -- Last release (@2024-12-07) has stable impl, `main` branch has a new impl that's not polished yet
-  -- Follow: https://github.com/sphamba/smear-cursor.nvim/issues/47
-  -- Diff mentioned in: https://github.com/sphamba/smear-cursor.nvim/issues/48#issuecomment-2522295672
-  version = { tag = "v0.2.0" },
   tags = {t.content_ui},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
