@@ -378,8 +378,19 @@ NamedPlug.luasnip {
       },
     }
     -- Auto-(re)load snippets at this path
+    local xdg_config_dirs = vim.env.XDG_CONFIG_DIRS ~= nil and vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}
     require("luasnip.loaders.from_lua").load({
-      paths = vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft",
+      paths = U.concat_lists {
+        { vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft" },
+        U.filter_map_list(xdg_config_dirs, function(path)
+          local snippets_cfg_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim", "lua", "mycfg", "snippets_by_ft")
+          if vim.fn.isdirectory(snippets_cfg_path) == 1 then
+            -- print("snippets dir", vim.inspect(snippets_cfg_path))
+            return snippets_cfg_path
+          end
+          return nil -- skip
+        end),
+      },
     })
 
     -- I: Expand snippet if any
