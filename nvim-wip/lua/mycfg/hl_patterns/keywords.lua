@@ -39,6 +39,17 @@ patterns.big_fixme = {
   }),
 }
 
+patterns.big_idea = {
+  pattern = {
+    U.keywordize"IDEA",
+    U.keywordize"IDEA:",
+  },
+  group = U.define_hl("big_idea", {
+    ctermfg = 128,
+    bold = true,
+  }),
+}
+
 patterns.big_maybe = {
   pattern = {
     U.keywordize"MAYBE",
@@ -46,6 +57,17 @@ patterns.big_maybe = {
   },
   group = U.define_hl("big_maybe", {
     ctermfg = 128,
+    bold = true,
+  }),
+}
+
+patterns.big_fail = {
+  pattern = {
+    U.keywordize"FAIL",
+    U.keywordize"FAIL:",
+  },
+  group = U.define_hl("big_fixme", {
+    ctermfg = 124,
     bold = true,
   }),
 }
