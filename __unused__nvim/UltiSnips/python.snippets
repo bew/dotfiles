@@ -40,7 +40,7 @@ endsnippet
 
 snippet defap "abstract property" b
 @abstractproperty
-def ${10:function_name}(self) -> ${20:Any}:${40:  # pragma: no cover}
+def ${10:prop_name}(self) -> ${20:Any}:${40:  # pragma: no cover}
 	pass
 endsnippet
 
@@ -58,19 +58,19 @@ endsnippet
 
 snippet defp "property method" b
 @property
-def ${10:function_name}(self) -> ${20:Any}:
+def ${10:prop_name}(self) -> ${20:Any}:
 	${30:${VISUAL:pass}}
 endsnippet
 
 snippet defpr "property method (getter for _prop)" b
 @property
-def ${10:function_name}(self) -> ${20:Any}:
+def ${10:prop_name}(self) -> ${20:Any}:
 	return self._${30:$10}
 endsnippet
 
 snippet defps "property setter method" b
 @$10.setter
-def ${10:function_name}(self, ${20:value: ${21:Any}}):
+def ${10:prop_name}(self, ${20:value: ${21:Any}}):
 	${30:${VISUAL:pass}}
 endsnippet
 
