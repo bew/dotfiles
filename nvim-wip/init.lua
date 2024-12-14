@@ -33,28 +33,23 @@ local _q = U.str_simple_quote_surround
 -- Mapping helpers
 -- TODO: move them to a dedicated module!
 
--- Create initial leader maps (to be used in init of some plugins)
-wk_toplevel_n_maps = {}
-wk_toplevel_v_maps = {}
-
---- Get the which_key's <group> map for the given mode
-function get_wk_maps_for_mode(mode)
-  local wk_toplevel_maps_for_mode = {
-    n = wk_toplevel_n_maps,
-    v = wk_toplevel_v_maps,
-  }
-  return wk_toplevel_maps_for_mode[mode]
-end
-
 --- Define map group for which_key plugin
+wk_groups_lazy = {}
 function toplevel_map_define_group(spec)
+  assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
-  local group_name = spec.name ~= "__hide__" and spec.name or "which_key_ignore"
-  for _, m in ipairs(spec.mode) do
-    local wk_maps = get_wk_maps_for_mode(m)
-    if wk_maps then
-      wk_maps[spec.prefix_key] = { name = group_name }
-    end
+  local group_wk_spec = {
+    spec.prefix_key,
+    group = spec.name,
+    mode = spec.mode,
+    hidden = spec.name == "__hide__",
+  }
+  -- NOTE: if which-key can be loaded, use it, otherwise register the group spec for later
+  local success, wk = pcall(require, "which-key")
+  if success then
+    wk.add { group_wk_spec }
+  else
+    table.insert(wk_groups_lazy, group_wk_spec)
   end
 end
 
@@ -65,8 +60,7 @@ function toplevel_buf_map(map_spec)
 end
 
 -- Normalize mode `v` to always mean `x` (visual mode ONLY instead of both visual/select)
--- ⚠️⚠️ Prevent mapping to both visual & select mode with `v`
--- 👉 Always replace `v` by `x` so `v` is ONLY visual mode instead of both visual/select
+-- 👉 Always replace `v` by `x`, so `v` is ONLY visual mode instead of both visual/select
 -- (ref: `:h mapmode-x`)
 local function normalize_mode(mode)
   if mode == "v" then

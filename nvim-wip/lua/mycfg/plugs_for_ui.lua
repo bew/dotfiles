@@ -64,22 +64,34 @@ Plug {
   on_load = function()
     local wk = require"which-key"
     wk.setup {
+      delay = function()
+        -- Don't popup helper window until N milliseconds passed without key continuation
+        return 1000
+      end,
       layout = {
-        align = "center",
-        spacing = 5,
-        height = { min = 1 }, -- Ref: https://github.com/folke/which-key.nvim/issues/195
+        -- align = "center", -- (!!) no alternative..
+        spacing = 5, -- spacing between columns
+        -- Make better use of horizontal space
+        -- Ref: https://github.com/folke/which-key.nvim/issues/195
+        height = { min = 1 },
       },
-      icons = { separator = "->" },
-      key_labels = {
-        -- Override the label used to display some keys
-        ["<C-Space>"] = "C-SPC",
-        ["<Space>"] = "SPC",
-        ["<tab>"] = "TAB",
-        ["<cr>"] = "Enter",
-        ["<NL>"] = "<C-J>",
+      icons = {
+        separator = "->",
+        keys = {
+          C = "C-",
+          M = "M-",
+          D = " ",
+          S = "󰘶 ",
+          CR = "󰌑 ",
+          Esc = "󱊷 ",
+          NL = "󰌑 ",
+          BS = "󰁮 ",
+          Space = "󱁐",
+          Tab = "TAB",
+        },
       },
       plugins = {
-        -- Enable spelling popup on 'z='
+        -- Enable spelling popup on `z=`
         spelling = { enabled = true },
         -- Disable most presets (auto-doc for builtin keys) which assume the default keys
         -- are used. It is distractful, and doesn't detect everything right.
@@ -91,32 +103,18 @@ Plug {
           nav = false,
         },
       },
-      -- Ensure the which-key popup is auto-triggered ONLY for a very limited set of keys,
-      -- because the popup is mostly annoying/distractful for other keys.
-      -- IDEA: possible to show which-key when timeout-ing `operator` mode?
       triggers = {
-        "<Leader>",
-        "<LocalLeader>", -- FIXME: Sometimes broken, see: https://github.com/folke/which-key.nvim/issues/476
-        "z", -- (help for 'z' can be useful) -- FIXME: need grouping!
-
-        "<C-f>", -- fuzzy stuff
-        -- NOTE: 'cr' isn't supported here for some reason..
-        --   so I have to register the key to trigger which-key myself (see just below)
+        { "<auto>", mode = "nxo" },
       },
+      -- Start hidden and wait for a key to be pressed before showing the popup
+      defer = function(ctx)
+        -- Always defer in all visual modes
+        return ctx.mode:lower() == "v" or ctx.mode == "<C-V>"
+      end,
     }
-    toplevel_map{mode={"n"}, key="cr", action=function()
-      wk.show("cr", {mode = "n", auto = true})
-    end, desc="+coerce"}
-    -- Register nmap/vmap keys descriptions
-    wk.register(wk_toplevel_n_maps, { mode = "n" })
-    wk.register(wk_toplevel_v_maps, { mode = "v" })
-    -- TODO: Create a per-buffer map, to avoid crashing WhichKey when the variable
-    -- does not exist, we must create a buffer dict, empty for most files,
-    -- which will be filled for some file types
-    -- FIXME: This does NOT work, because vim-which-key does NOT merge the
-    --        dicts of multiple register('same-prefix', different-dict).
-    -- autocmd BufRead * let b:which_key_map = {}
-    -- autocmd User PluginsLoaded call which_key#register("<space>", "b:which_key_map")
+
+    -- Register groups defined before plugin was available
+    wk.add(wk_groups_lazy)
   end,
   on_colorscheme_change = function()
     vim.cmd[[hi WhichKey      ctermfg=33 cterm=bold]]
