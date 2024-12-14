@@ -422,9 +422,81 @@ Plug {
       -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
       legacy_computing_symbols_support = true,
       -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
-      distance_stop_animating = 2, -- don't animate when target is this close
+      distance_stop_animating = 3, -- don't animate when target is this close
+      -- trailing_stiffness = 0.03, -- much slower trail for DEBUG (0.05)
     }
-  end
+  end,
+  on_colorscheme_change = function()
+    -- @2024-12 the plugin doesn't expose a way to customize hl groups as they are created
+    -- on-the-fly based on various RGB colors (not terminal colors).
+    -- So we need to get creative, and manually trigger group creation and override them.
+    -- REF: https://github.com/sphamba/smear-cursor.nvim/issues/50#issuecomment-2525347852
+    local config = require("smear_cursor.config")
+    local color = require("smear_cursor.color")
+    for i = 1, config.color_levels do
+      color.get_hl_group({ level = i })
+      -- note: my config doesn't seem to ever use the inverted color groups
+      -- color.get_hl_group({ level = i, inverted = true })
+    end
+    local smear_palette_fire = {
+      { ctermfg = 137 },
+      { ctermfg = 137 },
+      { ctermfg = 137 },
+      { ctermfg = 137 },
+      { ctermfg = 136 },
+      { ctermfg = 136 },
+      { ctermfg = 136 },
+      { ctermfg = 136 },
+      { ctermfg = 136 },
+      { ctermfg = 136 },
+      { ctermfg = 130 },
+      { ctermfg = 130 },
+      { ctermfg = 130 },
+      { ctermfg = 130 },
+      { ctermfg = 166 },
+      { ctermfg = 166 },
+    }
+    local smear_palette_darkwhite = {
+      { ctermfg = 235 },
+      { ctermfg = 235 },
+      { ctermfg = 235 },
+      { ctermfg = 235 },
+      { ctermfg = 235 },
+      { ctermfg = 235 },
+      { ctermfg = 240 },
+      { ctermfg = 240 },
+      { ctermfg = 240 },
+      { ctermfg = 240 },
+      { ctermfg = 240 },
+      { ctermfg = 240 },
+      { ctermfg = 245 },
+      { ctermfg = 245 },
+      { ctermfg = 245 },
+      { ctermfg = 255 },
+    }
+    local smear_palette_debug_colors = {
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 232 },
+      { ctermfg = 236 },
+      { ctermfg = 239 },
+      { ctermfg = 242 },
+      { ctermfg = 245 },
+      { ctermfg = 248 },
+      { ctermfg = 255 },
+    }
+    local smear_palette = smear_palette_fire
+    for i, hl_spec in ipairs(smear_palette) do
+      vim.api.nvim_set_hl(0, "SmearCursorNormal"..i, hl_spec)
+    end
+  end,
 }
 
 Plug {
