@@ -26,7 +26,7 @@ end
 NamedPlug.cmp {
   source = gh"hrsh7th/nvim-cmp",
   desc = "Auto-completion framework",
-  -- IDEA: could enable plugins based on roles?
+  -- IDEA: could enable plugins based on buffer roles?
   tags = {t.insert, t.editing, t.careful_update, t.extensible},
   config_depends_on = {
     Plug { source = gh"onsails/lspkind.nvim", defer_load = { autodetect = true } },
@@ -688,8 +688,14 @@ Plug {
       -- FIXME<i-action-not-repeatable>
       fast_wrap = {
         map = "<C-M-l>",
+        -- FIXME: why fast-wrap with $ can't be placed at the very end?!
+        --   Opened: https://github.com/windwp/nvim-autopairs/issues/398
         before_key = "i", -- put wrap before targeted position
         after_key = "a", -- put wrap after targeted position
+        -- Fast wrap is not deterministic,
+        --   Opened: https://github.com/windwp/nvim-autopairs/issues/399
+        -- Fast wrap doesn't use the same pairs, & options are not documented,
+        --   Opened: https://github.com/windwp/nvim-autopairs/issues/400
 
         -- Add '`' char as a potential wrap position
         -- Default pattern: [=[[%'%"%)%>%]%)%}%,]]=]
