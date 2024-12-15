@@ -52,6 +52,9 @@ matches:
   - trigger: "!warn!" # point right
     replace: '⚠'
 
+  - trigger: "!/!" # start of /!\
+    replace: "/!\\"
+
   - trigger: "!tm!" # trademark
     replace: '™'
 
