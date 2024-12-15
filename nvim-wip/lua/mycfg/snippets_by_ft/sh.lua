@@ -20,7 +20,7 @@ snip("fn", { desc = "function foo() { ... }" }, SU.myfmt {
   ]],
   {
     name = i(1, "function_name"),
-    body = i(2),
+    body = SU.insert_node_default_selection(2),
   },
 })
 
@@ -45,7 +45,7 @@ snip("do", {desc = "do ... end"}, SU.myfmt {
       <body>
     done
   ]],
-  { body = i(1) },
+  { body = SU.insert_node_default_selection(1) },
 })
 
 snip("if", {desc = "if ...; then ... fi"}, SU.myfmt {

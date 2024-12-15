@@ -22,7 +22,7 @@ snip("l", {desc = "local var = ..."}, SU.myfmt {
   [[local <var> = <value>]],
   {
     var = i(1, "var"),
-    value = i(2),
+    value = SU.insert_node_default_selection(2),
   },
 })
 
@@ -55,7 +55,7 @@ snip("do", {desc = "do ... end"}, SU.myfmt {
       <body>
     end
   ]],
-  { body = i(0) },
+  { body = SU.insert_node_default_selection(1) },
 })
 
 snip("if", {desc = "if ... then ... end"}, SU.myfmt {
@@ -66,7 +66,7 @@ snip("if", {desc = "if ... then ... end"}, SU.myfmt {
   ]],
   {
     cond = i(1),
-    body = i(2),
+    body = SU.insert_node_default_selection(2),
   },
 })
 
@@ -76,15 +76,16 @@ snip("then", {desc = "then ... end"}, SU.myfmt {
       <body>
     end
   ]],
-  { body = i(0) },
+  { body = SU.insert_node_default_selection(1) },
 })
+
 snip("th", {desc = "then ... end"}, SU.myfmt {
   [[
     then
       <body>
     end
   ]],
-  { body = i(0) },
+  { body = SU.insert_node_default_selection(1) },
 })
 
 snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myfmt {
@@ -97,7 +98,7 @@ snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myf
     idx = i(1, "i"),
     value = i(2, "value"),
     tbl = i(3, "tbl"),
-    body = i(0),
+    body = SU.insert_node_default_selection(4),
   }
 })
 
@@ -111,7 +112,7 @@ snip("fork", {desc = "for each pairs", condition = conds.start_of_line}, SU.myfm
     key = i(1, "key"),
     value = i(2, "value"),
     tbl = i(3, "tbl"),
-    body = i(0),
+    body = SU.insert_node_default_selection(4),
   }
 })
 
@@ -148,7 +149,7 @@ snip("fn", {desc = "function def", condition = conds.start_of_line}, SU.myfmt {
       t"",
     }),
     args = i(2),
-    body = i(3),
+    body = SU.insert_node_default_selection(3),
   },
 })
 -- NOTE: condition is reversed with `-` before condition obj,
@@ -161,7 +162,7 @@ snip("fn", {desc = "function def (anon)", condition = -conds.start_of_line}, SU.
   ]],
   {
     args = i(1),
-    body = i(2),
+    body = SU.insert_node_default_selection(2),
   },
 })
 
@@ -171,7 +172,7 @@ snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   ]],
   {
     args = i(1),
-    body = i(2),
+    body = SU.insert_node_default_selection(2),
   },
 })
 
@@ -184,7 +185,7 @@ snip("lfn", {desc = "local function def", condition = conds.start_of_line}, SU.m
   {
     name = i(1, "function_name"),
     args = i(2),
-    body = i(3),
+    body = SU.insert_node_default_selection(3),
   },
 })
 

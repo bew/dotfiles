@@ -67,21 +67,24 @@ SU.myfmt_braces = function(args)
   return fmt(unpack(args))
 end
 
+
+------------------------------------
+-- Node helpers
+
+--- Returns whether luasnip has an active selection stored,
+---   to be used by snip.env.SELECT_RAW and related snip env vars.
+SU.has_stored_selection = function()
+  -- REF: https://github.com/L3MON4D3/LuaSnip/blob/33b06d72d220aa56a/lua/luasnip/util/select.lua
+  local success, _ = pcall(vim.api.nvim_buf_get_var, 0, "LUASNIP_SELECT_RAW")
+  return success
+end
+
 --- Insert node that default to last visual (saved) selection if any, else given text
 SU.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
     local env = snip.env
-    -- NOTE: Would be better to have a `has_selected_text` function to check this, so my code don't
-    -- need to depend on the default/empty value of LS_SELECT_RAW when there are no 'stored' selection.
-    --
-    --   There is `require"luasnip.extras.conditions.show".has_selected_text` but it always seems to
-    --   return `false` when in a snippet..
-    --   And it feels weird to import something from such a specific module for a check that is not
-    --   specific to show conditions..
-    --
-    -- => Opened: https://github.com/L3MON4D3/LuaSnip/issues/1030
-    if env.LS_SELECT_RAW and env.LS_SELECT_RAW ~= "" then
+    if SU.has_stored_selection() then
       -- override default text with last selection
       default_text = env.LS_SELECT_RAW
     end

@@ -422,9 +422,7 @@ NamedPlug.luasnip {
 
     my_actions.snip_store_visual_selection = mk_action_v2 {
       default_desc = "snippet: store selection for later",
-      -- Copied from:
-      -- https://github.com/L3MON4D3/LuaSnip/blob/ea7d7ea510c641c4f1504/lua/luasnip/config.lua#L274
-      v = [[:lua require('luasnip.util.util').store_selection()<cr>gv"_s]],
+      v = require"luasnip.util.select".cut_keys,
       -- TODO: Display a short message like 'LuaSnip: selection stored' (via `vim.notify`?)
       map_opts = {silent = true},
     }

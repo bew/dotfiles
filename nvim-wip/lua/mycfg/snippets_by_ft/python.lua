@@ -24,7 +24,7 @@ snip("cl", {desc = "class def", condition = conds.very_start_of_line}, SU.myfmt 
       t"",
       ls.snippet_node(nil, {t"(", i(1, "object"), t")"})
     }),
-    body = i(3, "pass"),
+    body = SU.insert_node_default_selection(3, "pass"),
   }
 })
 
@@ -44,7 +44,7 @@ snip("data", {desc = "dataclass def", condition = conds.very_start_of_line}, SU.
       t"",
       ls.snippet_node(nil, {t"(", i(1, "object"), t")"}),
     }),
-    body = i(4, "pass"),
+    body = SU.insert_node_default_selection(4, "pass"),
   }
 })
 
@@ -112,7 +112,7 @@ local function make_def_snip(opts)
       ),
       body = (
         opts.simple_body_node and opts.simple_body_node(next_insert_idx)
-        or i(next_insert_idx(), "pass")
+        or SU.insert_node_default_selection(next_insert_idx(), "pass")
       ),
     }
   }
