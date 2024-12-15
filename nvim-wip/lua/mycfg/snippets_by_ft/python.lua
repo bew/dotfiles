@@ -1,11 +1,11 @@
 -- vim:set ft=lua.luasnip:
 local ls = require"luasnip"
 local ls_extras = require"luasnip.extras"
-local U = require"mycfg.snippets_by_ft._utils"
+local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local conds = require"mycfg.snippets_by_ft._conditions"
 
 local SNIPS = {}
-local snip = U.get_snip_fn(SNIPS)
+local snip = SU.get_snip_fn(SNIPS)
 
 local i = ls.insert_node
 local t = ls.text_node
@@ -13,7 +13,7 @@ local rep = ls_extras.rep
 
 -- Start of snippets definitions
 
-snip("cl", {desc = "class def", condition = conds.very_start_of_line}, U.myfmt {
+snip("cl", {desc = "class def", condition = conds.very_start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
         <body>
@@ -28,7 +28,7 @@ snip("cl", {desc = "class def", condition = conds.very_start_of_line}, U.myfmt {
   }
 })
 
-snip("data", {desc = "dataclass def", condition = conds.very_start_of_line}, U.myfmt {
+snip("data", {desc = "dataclass def", condition = conds.very_start_of_line}, SU.myfmt {
   [[
     @dataclass<maybe_decor_params>
     class <name><maybe_parents>:
@@ -64,7 +64,7 @@ local function make_def_snip(opts)
     return current_insert_idx
   end
 
-  return U.myfmt {
+  return SU.myfmt {
     -- NOTE: we don't use [[…]] string to be able to optionally have a decorator,
     --   without leaving a blank line or breaking expansion indent.
     (
@@ -180,14 +180,14 @@ snip(
         t"pass",
         ls.dynamic_node(nil, function(given_nodes_text)
           local def_name = given_nodes_text[1][1]
-          return ls.snippet_node(nil, U.myfmt {
+          return ls.snippet_node(nil, SU.myfmt {
             [[raise NotImplementedError("<msg>"<after>)]],
             {
               msg = i(1, "Function '"..def_name.."' must be implemented in subclass!"),
               after = i(2),
             }
           })
-        end, {U.node_ref"def-name"})
+        end, {SU.node_ref"def-name"})
       })
     end,
   }
@@ -277,7 +277,7 @@ snip(
     simple_body_node = function()
       return ls.function_node(function(given_nodes_text)
         return "return self._" .. given_nodes_text[1][1]
-      end, {U.node_ref"def-name"})
+      end, {SU.node_ref"def-name"})
     end,
   }
 )
@@ -313,12 +313,12 @@ snip(
 
 -------------------
 
-snip("p", {desc = "print(...)"}, U.myfmt {
+snip("p", {desc = "print(...)"}, SU.myfmt {
   [[print(<stuff>)]],
   { stuff = i(1) }
 })
 
-snip("r", {desc = "return ..."}, U.myfmt {
+snip("r", {desc = "return ..."}, SU.myfmt {
   [[return<maybe_space><rest>]],
   {
     rest = i(0),

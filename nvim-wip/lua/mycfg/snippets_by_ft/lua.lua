@@ -1,11 +1,11 @@
 -- vim:set ft=lua.luasnip:
 local ls = require"luasnip"
 local ls_extras = require"luasnip.extras"
-local U = require"mycfg.snippets_by_ft._utils"
+local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local conds = require"mycfg.snippets_by_ft._conditions"
 
 local SNIPS = {}
-local snip = U.get_snip_fn(SNIPS)
+local snip = SU.get_snip_fn(SNIPS)
 
 local i = ls.insert_node
 local t = ls.text_node
@@ -13,12 +13,12 @@ local rep = ls_extras.rep
 
 -- Start of snippets definitions
 
-snip("rq", {desc = [[require"…"]]}, U.myfmt {
+snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   [[require"<module>"]],
   { module = i(1, "module") },
 })
 
-snip("l", {desc = "local var = ..."}, U.myfmt {
+snip("l", {desc = "local var = ..."}, SU.myfmt {
   [[local <var> = <value>]],
   {
     var = i(1, "var"),
@@ -29,8 +29,8 @@ snip("l", {desc = "local var = ..."}, U.myfmt {
 -- On call, I'm first on <module>. as I write the module name I want <var> is set to the last part
 -- of <module>, but it a choice node, so it can be changed to an insert node if want custom name.
 -- 👉 This is actually non-trivial, see: <https://github.com/L3MON4D3/LuaSnip/discussions/1194>
-snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, U.myfmt {
-  [[local <var> = require"<module>"]],
+snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, SU.myfmt {
+  [[local <var> = require"<modulepath>"]],
   {
     module = i(1, "module", {key="mod-name"}),
 
@@ -42,14 +42,14 @@ snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, U.m
           local last_part = vim.iter(vim.gsplit(module_name, ".", {plain=true})):last()
           return last_part
         end,
-        {U.node_ref"mod-name"}
+        {SU.node_ref"mod-path"}
       ),
       i(nil, "mod"),
     })
   },
 })
 
-snip("do", {desc = "do ... end"}, U.myfmt {
+snip("do", {desc = "do ... end"}, SU.myfmt {
   [[
     do
       <body>
@@ -58,7 +58,7 @@ snip("do", {desc = "do ... end"}, U.myfmt {
   { body = i(0) },
 })
 
-snip("if", {desc = "if ... then ... end"}, U.myfmt {
+snip("if", {desc = "if ... then ... end"}, SU.myfmt {
   [[
     if <cond> then
       <body>
@@ -70,7 +70,7 @@ snip("if", {desc = "if ... then ... end"}, U.myfmt {
   },
 })
 
-snip("then", {desc = "then ... end"}, U.myfmt {
+snip("then", {desc = "then ... end"}, SU.myfmt {
   [[
     then
       <body>
@@ -78,7 +78,7 @@ snip("then", {desc = "then ... end"}, U.myfmt {
   ]],
   { body = i(0) },
 })
-snip("th", {desc = "then ... end"}, U.myfmt {
+snip("th", {desc = "then ... end"}, SU.myfmt {
   [[
     then
       <body>
@@ -87,7 +87,7 @@ snip("th", {desc = "then ... end"}, U.myfmt {
   { body = i(0) },
 })
 
-snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, U.myfmt {
+snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myfmt {
   [[
     for <idx>, <value> in ipairs(<tbl>) do
       <body>
@@ -101,7 +101,7 @@ snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, U.myfm
   }
 })
 
-snip("fork", {desc = "for each pairs", condition = conds.start_of_line}, U.myfmt {
+snip("fork", {desc = "for each pairs", condition = conds.start_of_line}, SU.myfmt {
   [[
     for <key>, <value> in pairs(<tbl>) do
       <body>
@@ -136,7 +136,7 @@ snip("r", {desc = "return ..."}, {
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 -- TODO(treesitter): only when cursor is at a 'statement' scope
-snip("fn", {desc = "function def", condition = conds.start_of_line}, U.myfmt {
+snip("fn", {desc = "function def", condition = conds.start_of_line}, SU.myfmt {
   [[
     function<maybe_name>(<args>)
       <body>
@@ -153,7 +153,7 @@ snip("fn", {desc = "function def", condition = conds.start_of_line}, U.myfmt {
 })
 -- NOTE: condition is reversed with `-` before condition obj,
 --   to activate when the usual snippet (with name) is not active.
-snip("fn", {desc = "function def (anon)", condition = -conds.start_of_line}, U.myfmt {
+snip("fn", {desc = "function def (anon)", condition = -conds.start_of_line}, SU.myfmt {
   [[
     function(<args>)
       <body>
@@ -165,7 +165,7 @@ snip("fn", {desc = "function def (anon)", condition = -conds.start_of_line}, U.m
   },
 })
 
-snip("fni", {desc = "function def (inline, anon)"}, U.myfmt {
+snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   [[
     function(<args>) <body> end
   ]],
@@ -174,7 +174,8 @@ snip("fni", {desc = "function def (inline, anon)"}, U.myfmt {
     body = i(2),
   },
 })
-snip("lfn", {desc = "local function def", condition = conds.start_of_line}, U.myfmt {
+
+snip("lfn", {desc = "local function def", condition = conds.start_of_line}, SU.myfmt {
   [[
     local function <name>(<args>)
       <body>
@@ -187,12 +188,12 @@ snip("lfn", {desc = "local function def", condition = conds.start_of_line}, U.my
   },
 })
 
-snip("p", {desc = "print(...)"}, U.myfmt {
+snip("p", {desc = "print(..)"}, SU.myfmt {
   [[print(<stuff>)]],
   { stuff = i(1) }
 })
 
-snip("mod", {desc = "Module init M = {}; ret M", condition = conds.very_start_of_line}, U.myfmt {
+snip("mod", {desc = "Module init M = {}; ret M", condition = conds.very_start_of_line}, SU.myfmt {
   [[
     local <mod_name> = {}
 

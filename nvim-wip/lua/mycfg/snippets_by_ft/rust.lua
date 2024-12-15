@@ -1,25 +1,25 @@
 -- vim:set ft=lua.luasnip:
 local ls = require"luasnip"
-local U = require"mycfg.snippets_by_ft._utils"
+local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 
 local SNIPS = {}
-local snip = U.get_snip_fn(SNIPS)
+local snip = SU.get_snip_fn(SNIPS)
 
 local i = ls.insert_node
 
 -- Start of snippets definitions
 
-snip("an", {desc = "Annotation #[…]"}, U.myfmt {
+snip("an", {desc = "Annotation #[…]"}, SU.myfmt {
   "#[<annotation>]",
   { annotation = i(1, "annotation") },
 })
 
-snip("anc", {desc = "Crate annotation #![…]"}, U.myfmt {
+snip("anc", {desc = "Crate annotation #![…]"}, SU.myfmt {
   "#![<annotation>]",
   { annotation = i(1, "crate-annotation") },
 })
 
-snip("and", {desc = "Derive annotation #[derive(…)]"}, U.myfmt {
+snip("and", {desc = "Derive annotation #[derive(…)]"}, SU.myfmt {
   "#[derive(<derives>)]",
   { derives = i(1) },
 })
@@ -27,30 +27,30 @@ snip("and", {desc = "Derive annotation #[derive(…)]"}, U.myfmt {
 
 -- Type helpers
 
-snip("opt", {desc = "Option<…>"}, U.myfmt_braces {
+snip("opt", {desc = "Option<…>"}, SU.myfmt_braces {
   "Option<{type}>",
   { type = i(1, "type") },
   -- FIXME: default to last selected type if any
 })
 
-snip("ok", {desc = "Ok(…)"}, U.myfmt {
+snip("ok", {desc = "Ok(…)"}, SU.myfmt {
   "Ok(<value>)",
   { value = i(1, "()") },
   -- FIXME: default to last selected expr if any
 })
 
-snip("vec", {desc = "vec![…] literal"}, U.myfmt {
+snip("vec", {desc = "vec![…] literal"}, SU.myfmt {
   "vec![<values>]",
   { values = i(1) }
 })
 
-snip("db", {desc = "Debug! dbg!(…)"}, U.myfmt {
+snip("db", {desc = "Debug! dbg!(…)"}, SU.myfmt {
   "dbg!(<thing>)",
   { thing = i(1) }
   -- FIXME: when not in an expression, add `;` at the end 🙏
 })
 
-snip("p", {desc = "println!(…)"}, U.myfmt {
+snip("p", {desc = "println!(…)"}, SU.myfmt {
   [[println!("<thing>"<args>);]],
   {
     thing = i(1),
@@ -58,7 +58,7 @@ snip("p", {desc = "println!(…)"}, U.myfmt {
   }
 })
 
-snip("w", {desc = "write!(…)?"}, U.myfmt {
+snip("w", {desc = "write!(…)?"}, SU.myfmt {
   [[write!(<writer>, "<thing>"<args>)?;]],
   {
     writer = i(1, "writer"),
@@ -69,7 +69,7 @@ snip("w", {desc = "write!(…)?"}, U.myfmt {
 
 -- Test helpers
 
-snip("modt", {desc = "Module for unit tests"}, U.myfmt {
+snip("modt", {desc = "Module for unit tests"}, SU.myfmt {
   [[
     #[cfg(test)]
     mod tests {
@@ -81,7 +81,7 @@ snip("modt", {desc = "Module for unit tests"}, U.myfmt {
   { body = i(1) },
 })
 
-snip("fnt", {desc = "Unit test function"}, U.myfmt {
+snip("fnt", {desc = "Unit test function"}, SU.myfmt {
   [[
     #[test]
     fn <name>() {
