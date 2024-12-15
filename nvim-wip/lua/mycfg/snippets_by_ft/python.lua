@@ -13,7 +13,7 @@ local rep = ls_extras.rep
 
 -- Start of snippets definitions
 
-snip("cl", {desc = "class def", condition = conds.very_start_of_line}, SU.myfmt {
+snip("cl", {desc = "class def", when = conds.very_start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
         <body>
@@ -28,7 +28,7 @@ snip("cl", {desc = "class def", condition = conds.very_start_of_line}, SU.myfmt 
   }
 })
 
-snip("data", {desc = "dataclass def", condition = conds.very_start_of_line}, SU.myfmt {
+snip("data", {desc = "dataclass def", when = conds.very_start_of_line}, SU.myfmt {
   [[
     @dataclass<maybe_decor_params>
     class <name><maybe_parents>:
@@ -48,7 +48,7 @@ snip("data", {desc = "dataclass def", condition = conds.very_start_of_line}, SU.
   }
 })
 
-snip("fromd", {desc = "import for @dataclass", condition = conds.very_start_of_line}, {
+snip("fromd", {desc = "import for @dataclass", when = conds.very_start_of_line}, {
   t[[from dataclasses import dataclass]]
 })
 
@@ -120,7 +120,7 @@ end
 
 snip(
   "def",
-  {desc = "function def", condition = conds.very_start_of_line},
+  {desc = "function def", when = conds.very_start_of_line},
   make_def_snip {
     default_name = "function_name",
     first_arg_name = false, -- no first arg
@@ -136,7 +136,7 @@ snip(
 -- ```
 snip(
   "def",
-  {desc = "method def", condition = conds.after_indent},
+  {desc = "method def", when = conds.after_indent},
   make_def_snip {
     default_name = "method_name",
     first_arg_name = "self",
@@ -151,7 +151,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defi", { desc = "initializer def", condition = conds.after_indent },
+  "defi", { desc = "initializer def", when = conds.after_indent },
   make_def_snip {
     name = "__init__",
     first_arg_name = "self",
@@ -167,7 +167,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defa", { desc = "abstract method def", condition = conds.after_indent },
+  "defa", { desc = "abstract method def", when = conds.after_indent },
   make_def_snip {
     decor_name = "abstractmethod",
     default_name = "method_name",
@@ -200,7 +200,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defap", { desc = "abstract property def", condition = conds.after_indent },
+  "defap", { desc = "abstract property def", when = conds.after_indent },
   make_def_snip {
     decor_name = "abstractproperty",
     default_name = "prop_name",
@@ -218,7 +218,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defc", { desc = "class method def", condition = conds.after_indent },
+  "defc", { desc = "class method def", when = conds.after_indent },
   make_def_snip {
     decor_name = "classmethod",
     default_name = "function_name",
@@ -235,7 +235,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defs", { desc = "static method def", condition = conds.after_indent },
+  "defs", { desc = "static method def", when = conds.after_indent },
   make_def_snip {
     decor_name = "staticmethod",
     default_name = "function_name",
@@ -252,7 +252,7 @@ snip(
 --     pass
 -- ```
 snip(
-  "defp", { desc = "property def", condition = conds.after_indent },
+  "defp", { desc = "property def", when = conds.after_indent },
   make_def_snip {
     decor_name = "property",
     default_name = "prop_name",
@@ -268,7 +268,7 @@ snip(
 --     return self._prop_name
 -- ```
 snip(
-  "defpr", { desc = "property def (getter for _prop)", condition = conds.after_indent },
+  "defpr", { desc = "property def (getter for _prop)", when = conds.after_indent },
   make_def_snip {
     decor_name = "property",
     default_name = "prop_name",

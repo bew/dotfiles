@@ -29,7 +29,7 @@ snip("l", {desc = "local var = ..."}, SU.myfmt {
 -- NOTE: By default, use custom name for <var>.
 -- But I want choice to auto-set <var> as the last part of <modulepath>.
 -- 👉 This is actually non-trivial, see: <https://github.com/L3MON4D3/LuaSnip/discussions/1194>
-snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, SU.myfmt {
+snip("lr", {desc = [[local require"…"]], when = conds.start_of_line}, SU.myfmt {
   [[local <var> = require"<modulepath>"]],
   {
     modulepath = i(1, "the.module", {key="mod-path"}),
@@ -88,7 +88,7 @@ snip("th", {desc = "then ... end"}, SU.myfmt {
   { body = SU.insert_node_default_selection(1) },
 })
 
-snip("forn", {desc = "for n in incl-range", condition = conds.start_of_line}, SU.myfmt {
+snip("forn", {desc = "for n in incl-range", when = conds.start_of_line}, SU.myfmt {
   [[
     for <idx> = <range> do
       <body>
@@ -127,7 +127,7 @@ snip("forn", {desc = "for n in incl-range", condition = conds.start_of_line}, SU
   },
 })
 
-snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myfmt {
+snip("fori", {desc = "for each ipairs", when = conds.start_of_line}, SU.myfmt {
   [[
     for <idx>, <value> in ipairs(<tbl>) do
       <body>
@@ -141,7 +141,7 @@ snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myf
   }
 })
 
-snip("fork", {desc = "for each pairs", condition = conds.start_of_line}, SU.myfmt {
+snip("fork", {desc = "for each pairs", when = conds.start_of_line}, SU.myfmt {
   [[
     for <key>, <value> in pairs(<tbl>) do
       <body>
@@ -173,7 +173,7 @@ snip(
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 -- TODO(treesitter): only when cursor is at a 'statement' scope
-snip("fn", {desc = "function def", condition = conds.start_of_line}, SU.myfmt {
+snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
   [[
     function<maybe_name>(<args>)
       <body>
@@ -190,7 +190,7 @@ snip("fn", {desc = "function def", condition = conds.start_of_line}, SU.myfmt {
 })
 -- NOTE: condition is reversed with `-` before condition obj,
 --   to activate when the usual snippet (with name) is not active.
-snip("fn", {desc = "function def (anon)", condition = -conds.start_of_line}, SU.myfmt {
+snip("fn", {desc = "function def (anon)", when = -conds.start_of_line}, SU.myfmt {
   [[
     function(<args>)
       <body>
@@ -212,7 +212,7 @@ snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   },
 })
 
-snip("lfn", {desc = "local function def", condition = conds.start_of_line}, SU.myfmt {
+snip("lfn", {desc = "local function def", when = conds.start_of_line}, SU.myfmt {
   [[
     local function <name>(<args>)
       <body>
@@ -243,7 +243,7 @@ snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
   { expr = SU.insert_node_default_selection(1) }
 })
 
-snip("mod", {desc = "Module init M = {}; ret M", condition = conds.very_start_of_line}, SU.myfmt {
+snip("mod", {desc = "Module init M = {}; ret M", when = conds.very_start_of_line}, SU.myfmt {
   [[
     local <mod_name> = {}
 

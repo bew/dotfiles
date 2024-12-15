@@ -38,6 +38,7 @@ end
 SU.get_snip_fn = function(list_of_snippets)
   return function(trigger, context, ...)
     context.trig = trigger
+    context.condition = context.cond or context.when or nil
     table.insert(list_of_snippets, ls.snippet(context, ...))
   end
 end
