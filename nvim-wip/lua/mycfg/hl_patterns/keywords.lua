@@ -90,6 +90,16 @@ patterns.sym_question = {
   }),
 }
 
+patterns.sym_warn = {
+  -- note: Match `BLA /!\`
+  pattern = "/!\\",
+  group = _U.define_hl("sym_warn", {
+    ctermfg = 11,
+    bold = true,
+    underline = true,
+  }),
+}
+
 patterns.sym_excl = {
   -- note: Match `BLA(!!)`
   pattern = "%(!!%)",
