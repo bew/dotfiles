@@ -24,6 +24,7 @@ let
   inherit (myToolConfigs) nvim-minimal nvim-bew;
 in {
   imports = [
+    # install my setup in HOME
     nvim-bew.outputs.homeModules.specific
   ];
 

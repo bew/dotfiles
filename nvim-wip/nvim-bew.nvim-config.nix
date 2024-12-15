@@ -13,7 +13,12 @@ in {
 
   # TODO: expose an environment with:
   # - treesitter parsers (or enough to compile/install them?)
-  # - plugins 🤔
+  # NOTE(inspiration): https://github.com/debugloop/dotfiles/blob/main/home/nvim/default.nix
+
+  # NOTE: at the moment, all plugins are put in `opt` (need to be loaded with `:packadd <key>`)
+  deps.plugins = {
+    telescope-fzf-native = pkgs.vimPlugins.telescope-fzf-native-nvim;
+  };
 
   deps.lspServers = {
     # python
