@@ -26,16 +26,17 @@ snip("l", {desc = "local var = ..."}, SU.myfmt {
   },
 })
 
--- On call, I'm first on <module>. as I write the module name I want <var> is set to the last part
--- of <module>, but it a choice node, so it can be changed to an insert node if want custom name.
+-- NOTE: By default, use custom name for <var>.
+-- But I want choice to auto-set <var> as the last part of <modulepath>.
 -- 👉 This is actually non-trivial, see: <https://github.com/L3MON4D3/LuaSnip/discussions/1194>
 snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, SU.myfmt {
   [[local <var> = require"<modulepath>"]],
   {
-    module = i(1, "module", {key="mod-name"}),
+    modulepath = i(1, "the.module", {key="mod-path"}),
 
-    -- choice node for 'last part of <module>' or custom name
+    -- choice node for custom name or 'last part of <modulepath>'
     var = ls.choice_node(2, {
+      i(nil, "customname"),
       ls.function_node(
         function(given_nodes_text)
           local module_name = given_nodes_text[1][1]
@@ -44,7 +45,6 @@ snip("lr", {desc = [[local require"…"]], condition = conds.start_of_line}, SU.
         end,
         {SU.node_ref"mod-path"}
       ),
-      i(nil, "mod"),
     })
   },
 })
