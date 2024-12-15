@@ -1,4 +1,4 @@
-local U = require"mycfg.hl_patterns.utils"
+local _U = require"mycfg.hl_patterns.utils"
 
 local patterns = {}
 
@@ -9,11 +9,13 @@ patterns.cterm_color = {
   pattern = {
     "ctermfg=%d+",
     "ctermfg = %d+",
+    "ctermbg=%d+",
+    "ctermbg = %d+",
   },
   group = "", -- no highlight, only extmark
   extmark_opts = function(_, match)
     local color = match:match "%d+$" -- find color ID at the end
-    local hl_group = U.define_hl("term"..color, {
+    local hl_group = _U.define_hl("term"..color, {
       ctermfg = tonumber(color),
     })
     return {
