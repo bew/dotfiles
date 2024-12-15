@@ -127,3 +127,26 @@ Plug {
     toplevel_map{mode={"o", "v"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
 }
+
+Plug {
+  source = gh"sindrets/diffview.nvim",
+  desc = "Single tabpage interface for easily cycling through diffs for all modified files for any git revs",
+  tags = {t.ui, t.git},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    -- FIXME: anything to do here?
+    require"diffview".setup {
+      default_args = {    -- Default args prepended to the arg-list for the listed commands
+        DiffviewOpen = {"--untracked-files=false", "--imply-local"},
+      },
+      view = {
+        default = { winbar_info = true },
+        file_history = { winbar_info = true },
+      },
+      keymaps = {
+        -- NOTE: use `g?` in any view to get help panel
+        -- disable_defaults = true, -- (?) (there are a lot...)
+      }
+    }
+  end
+}
