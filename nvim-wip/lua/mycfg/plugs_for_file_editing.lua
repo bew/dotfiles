@@ -142,20 +142,7 @@ NamedPlug.cmp {
     global_cfg.window.completion.col_offset = -4 -- MUST match length of `vim_item.kind` (but with a negative value)
     global_cfg.window.completion.side_padding = 0 -- remove default 1 char padding on the left
 
-    -- NOTE: this should really be in `on_colorscheme_change` hook, but it's better here, close
-    -- to formatting code..
-    vim.api.nvim_set_hl(0, "CmpItemKind", { ctermfg=33 }) -- TODO: add more specialized Kind colors
-    vim.api.nvim_set_hl(0, "CmpItemKindText", { ctermfg=242 })
-    vim.api.nvim_set_hl(0, "CmpItemKindFolder", { ctermfg=33 })
-    vim.api.nvim_set_hl(0, "CmpItemKindFile", { ctermfg=250 })
-    --
-    vim.api.nvim_set_hl(0, "CmpItemMenu", { ctermfg=244, cterm={italic = true} })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrDeprecated", { ctermfg=244, cterm={strikethrough = true} })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { ctermfg=202, cterm={bold = true} })
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { ctermfg=202, cterm={bold = true} })
-    --
-    vim.api.nvim_set_hl(0, "CmpWinBG", { ctermbg=235, ctermfg=252 })
-    vim.api.nvim_set_hl(0, "CmpWinSelection", { ctermbg=238, cterm={bold = true} })
+    -- NOTE: see highlight groups defined below
     global_cfg.window.completion.winhighlight = "Normal:CmpWinBG,CursorLine:CmpWinSelection,Search:None,PmenuSbar:Identifier,PmenuThumb:Keyword"
     -- (!!) Scrollbar HL is not custommizable
     --   cf PR https://github.com/hrsh7th/nvim-cmp/pull/1741
@@ -320,6 +307,24 @@ NamedPlug.cmp {
         { name = "buffer", keyword_length = 2 }, -- so 'sq'<cmpl.select-next> gives 'squash' directly
       }
     })
+  end,
+  on_colorscheme_change = function()
+    local cols = {}
+    cols.CmpItemKind = { ctermfg=33 } -- TODO: add more specialized Kind colors
+    cols.CmpItemKindText = { ctermfg=242 }
+    cols.CmpItemKindFolder = { ctermfg=33 }
+    cols.CmpItemKindFile = { ctermfg=250 }
+    --
+    cols.CmpItemMenu = { ctermfg=244, italic = true }
+    cols.CmpItemAbbrDeprecated = { ctermfg=244, strikethrough = true }
+    cols.CmpItemAbbrMatch = { ctermfg=202, bold = true }
+    cols.CmpItemAbbrMatchFuzzy = { ctermfg=202, bold = true }
+    --
+    cols.CmpWinBG = { ctermbg=235, ctermfg=252 }
+    cols.CmpWinSelection = { ctermbg=238, bold = true }
+    for hlgroup, hlspec in pairs(cols) do
+      vim.api.nvim_set_hl(0, hlgroup, hlspec)
+    end
   end,
 }
 
