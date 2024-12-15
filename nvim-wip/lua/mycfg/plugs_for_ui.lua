@@ -421,7 +421,7 @@ Plug {
       legacy_computing_symbols_support = true,
       distance_stop_animating = 3, -- don't animate when target is this close
       -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
-      color_levels = 4, -- limit color range, see below for color256 palettes
+      color_levels = 5, -- limit color range, see below for color256 palettes
 
       -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
     }
@@ -443,11 +443,13 @@ Plug {
       { ctermfg = 137 },
       { ctermfg = 136 },
       { ctermfg = 130 },
+      { ctermfg = 130 },
       { ctermfg = 166 },
     }
     local smear_palette_darkwhite = {
       { ctermfg = 235 },
       { ctermfg = 240 },
+      { ctermfg = 245 },
       { ctermfg = 245 },
       { ctermfg = 255 },
     }
