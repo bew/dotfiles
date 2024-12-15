@@ -88,6 +88,45 @@ snip("th", {desc = "then ... end"}, SU.myfmt {
   { body = SU.insert_node_default_selection(1) },
 })
 
+snip("forn", {desc = "for n in incl-range", condition = conds.start_of_line}, SU.myfmt {
+  [[
+    for <idx> = <range> do
+      <body>
+    end
+  ]],
+  {
+    idx = i(1, "n"),
+    range = ls.choice_node(2, {
+      ls.snippet_node(nil, SU.myfmt {
+        "<start>, <end_>",
+        {
+          start = ls.restore_node(1, "start"),
+          end_ = ls.restore_node(2, "end_"),
+        }
+      }),
+      ls.snippet_node(nil, SU.myfmt {
+        "<start>, <end_>, <step>",
+        {
+          start = ls.restore_node(1, "start"),
+          end_ = ls.restore_node(2, "end_"),
+          step = i(3, "-1"),
+        },
+      }),
+    }, {
+      -- Seemlessly keep cursor pos across choice branches ✨
+      restore_cursor = true
+    }),
+    body = SU.insert_node_default_selection(3),
+  }
+}, {
+  stored = {
+    -- Keys for ls.restore_node
+    -- (used to share nodes between choice node branches ✨)
+    start = i(nil, "1"),
+    end_ = i(nil, "10"),
+  },
+})
+
 snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myfmt {
   [[
     for <idx>, <value> in ipairs(<tbl>) do
@@ -95,7 +134,7 @@ snip("fori", {desc = "for each ipairs", condition = conds.start_of_line}, SU.myf
     end
   ]],
   {
-    idx = i(1, "i"),
+    idx = i(1, "idx"),
     value = i(2, "value"),
     tbl = i(3, "tbl"),
     body = SU.insert_node_default_selection(4),
@@ -189,6 +228,19 @@ snip("lfn", {desc = "local function def", condition = conds.start_of_line}, SU.m
 snip("p", {desc = "print(..)"}, SU.myfmt {
   [[print(<stuff>)]],
   { stuff = i(1) }
+})
+
+snip("pp", {desc = "pretty print / inspect"}, SU.myfmt {
+  [[print("DEBUG", "<prompt>:", vim.inspect(<expr>))]],
+  {
+    prompt = i(1, "debug this thing"),
+    expr = SU.insert_node_default_selection(2)
+  }
+})
+
+snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
+  [[vim.inspect(<expr>)]],
+  { expr = SU.insert_node_default_selection(1) }
 })
 
 snip("mod", {desc = "Module init M = {}; ret M", condition = conds.very_start_of_line}, SU.myfmt {
