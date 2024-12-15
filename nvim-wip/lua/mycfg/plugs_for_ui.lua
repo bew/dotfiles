@@ -312,6 +312,7 @@ NamedPlug.telescope {
       -- N/I: Select actions
       ["<CR>"] = tel_actions.select_default,
       ["<C-j>"] = tel_actions.select_default,
+      -- FIXME: multi-selection not handled properly FIXME :/
       ["<M-s>"] = tel_actions.select_horizontal,
       ["<M-v>"] = tel_actions.select_vertical,
       ["<M-t>"] = tel_actions.select_tab,
@@ -415,6 +416,12 @@ NamedPlug.telescope {
     }
     default_cfg.sorting_strategy = "ascending" -- make sure results are from top-to-bottom
     default_cfg.scroll_strategy = "limit" -- (not cycle!)
+    default_cfg.borderchars = { "━", "┃", "━", "┃", "┏", "┓", "┛", "┗" } -- heavier borders
+    -- // some ideas..
+    -- heavy single border: { "━", "┃", "━", "┃", "┏", "┓", "┛", "┗" }
+    -- half blocks (outer): { "▀", "▐", "▄", "▌", "▛", "▜", "▟", "▙" }
+    -- half blocks (inner): { "▄", "▌", "▀", "▐", "▗", "▖", "▘", "▝" }
+    -- thin blocks: { "▔", "▕", "▁", "▏", "🭽", "🭾", "🭿", "🭼" }
 
     local extensions_cfg = {}
     local extensions_to_load = {}
@@ -488,6 +495,28 @@ NamedPlug.telescope {
     toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="Buffer lines", action=tel_builtin.current_buffer_fuzzy_find}
     toplevel_map{mode={"n"}, key="<C-f><C-Space>", desc="Buffers", action=tel_builtin.buffers}
   end,
+  on_colorscheme_change = function()
+    local function get_hl(name)
+      return vim.api.nvim_get_hl(0, { name = name })
+    end
+    local normal = get_hl"Normal"
+    local cols = {}
+    cols.TelescopeBorder = normal
+    cols.TelescopePromptBorder = {
+      ctermfg = 202,
+      ctermbg = normal.ctermbg,
+    }
+    -- Titles are the reverse of borders
+    cols.TelescopeTitle = vim.tbl_extend("force", cols.TelescopeBorder, { reverse = true, bold = true })
+    cols.TelescopePromptTitle = vim.tbl_extend("force", cols.TelescopePromptBorder, { reverse = true, bold = true })
+
+    cols.TelescopeMatching = { ctermfg = 202 }
+    cols.TelescopeMultiSelection = { ctermbg = 22, bold = true }
+
+    for hlgroup, hlspec in pairs(cols) do
+      vim.api.nvim_set_hl(0, hlgroup, hlspec)
+    end
+  end
 }
 
 Plug {
