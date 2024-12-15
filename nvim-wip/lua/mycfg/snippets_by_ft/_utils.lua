@@ -39,6 +39,23 @@ SU.get_snip_fn = function(list_of_snippets)
   return function(trigger, context, ...)
     context.trig = trigger
     context.condition = context.cond or context.when or nil
+    -- IDEA: add feature system, to compose context features like resolveExpandParams 🤔
+    -- I want to be able to define a snip like:
+    -- snip(
+    --   "trig!", {desc = "some desc", feats = {SU.ignore_spaces_after}},
+    --   ...
+    -- )
+    -- Where `feats` is a list of 'features' aka functions that return set of context fields to be
+    --   merged with snip context.
+    --
+    -- IDEA: Allow snip def with trig in context tbl (almost like ls.snippet):
+    --   snip({"trig!", desc = ...}, ...)
+    -- This would allow support for multi-trigger snippets like:
+    --   snip({
+    --     common = {cond = common_condition_fn}
+    --     {"trig!", desc = ...},
+    --     {"other-trig!", desc = ..., feats = {weird_stuff_fn}},
+    --   }, ...)
     table.insert(list_of_snippets, ls.snippet(context, ...))
   end
 end
