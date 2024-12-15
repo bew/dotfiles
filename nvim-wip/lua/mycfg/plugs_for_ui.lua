@@ -419,9 +419,11 @@ Plug {
     require"smear_cursor".setup {
       -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
       legacy_computing_symbols_support = true,
-      -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
       distance_stop_animating = 3, -- don't animate when target is this close
-      -- trailing_stiffness = 0.03, -- much slower trail for DEBUG (0.05)
+      -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
+      color_levels = 4, -- limit color range, see below for color256 palettes
+
+      -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
     }
   end,
   on_colorscheme_change = function()
@@ -436,58 +438,17 @@ Plug {
       -- note: my config doesn't seem to ever use the inverted color groups
       -- color.get_hl_group({ level = i, inverted = true })
     end
+    -- WARN: assert(#palette == config.color_levels) !
     local smear_palette_fire = {
       { ctermfg = 137 },
-      { ctermfg = 137 },
-      { ctermfg = 137 },
-      { ctermfg = 137 },
-      { ctermfg = 136 },
-      { ctermfg = 136 },
-      { ctermfg = 136 },
-      { ctermfg = 136 },
-      { ctermfg = 136 },
       { ctermfg = 136 },
       { ctermfg = 130 },
-      { ctermfg = 130 },
-      { ctermfg = 130 },
-      { ctermfg = 130 },
-      { ctermfg = 166 },
       { ctermfg = 166 },
     }
     local smear_palette_darkwhite = {
       { ctermfg = 235 },
-      { ctermfg = 235 },
-      { ctermfg = 235 },
-      { ctermfg = 235 },
-      { ctermfg = 235 },
-      { ctermfg = 235 },
-      { ctermfg = 240 },
-      { ctermfg = 240 },
-      { ctermfg = 240 },
-      { ctermfg = 240 },
-      { ctermfg = 240 },
       { ctermfg = 240 },
       { ctermfg = 245 },
-      { ctermfg = 245 },
-      { ctermfg = 245 },
-      { ctermfg = 255 },
-    }
-    local smear_palette_debug_colors = {
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 232 },
-      { ctermfg = 236 },
-      { ctermfg = 239 },
-      { ctermfg = 242 },
-      { ctermfg = 245 },
-      { ctermfg = 248 },
       { ctermfg = 255 },
     }
     local smear_palette = smear_palette_fire
