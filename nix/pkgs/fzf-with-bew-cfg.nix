@@ -29,7 +29,7 @@ let
     enter  = "accept-non-empty"; # FIXME: does not seem to work (@ v0.35.1: works same as 'accept')
     ctrl-j = "accept-non-empty"; # FIXME: does not seem to work (@ v0.35.1: works same as 'accept')
     alt-a     = "toggle+down";
-    alt-space = "toggle+down";
+    alt-space = "toggle";
     ctrl-a = "toggle-all";
     ctrl-c = "clear-selection"; # `ctrl-q` & `esc` can still quit!
 

@@ -266,90 +266,227 @@ NamedPlug.startup_screen {
   end,
 }
 
-NamedPlug.fzf_ctrl {
-  source = gh"vijaymarupudi/nvim-fzf",
-  desc = "A powerful Lua API for using fzf in neovim",
+NamedPlug.telescope {
+  source = gh"nvim-telescope/telescope.nvim",
+  desc = "Find, Filter, Preview, Pick. All lua, all the time…",
   tags = {"nav"},
-  defer_load = { autodetect = true },
-  on_load = function()
-    require"fzf".default_options = {
-      relative = "editor", -- open a centered floating win
-      width = 90, -- FIXME: not a percentage!!!! Ask to allow function here?
-      height = 40, -- FIXME: not a percentage!!!! Ask to allow function here?
-      border = "single",
-    }
-  end,
-}
-Plug {
-  -- TODO: Use https://github.com/nvim-telescope/telescope.nvim (more flexible!)
-  source = gh"ibhagwan/fzf-lua",
-  desc = "Few pre-configured thing selectors (buffers, files, ...)",
-  tags = {"nav"},
-  depends_on = {NamedPlug.fzf_ctrl},
+  -- FIXME: install native sorter!
+  depends_on = {NamedPlug.lib_plenary},
+  config_depends_on = {
+    Plug { source = gh"nvim-telescope/telescope-ui-select.nvim" },
+    Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
+    Plug { source = gh"OliverChao/telescope-picker-list.nvim" },
+    Plug { source = gh"piersolenski/telescope-import.nvim" },
+  },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    local act = require"fzf-lua.actions"
-    local fzf = require"fzf-lua"
-    fzf.setup {
-      winopts = {
-        border = "single",
-        preview = {
-          default = "bat", -- instead of builtin one, using nvim buffers
-        },
+    local tel_actions = require"telescope.actions"
+    local tel_actions_lay = require"telescope.actions.layout"
+    local action_state = require"telescope.actions.state"
+    local wrap_tel_action_fn = function(action_name, fn)
+      return require"telescope.actions.mt".transform_mod({[action_name] = fn})[action_name]
+    end
+    local default_cfg = {}
+    -- DEFAULT (my) MAPPINGS
+    default_cfg.default_mappings = {} -- disable all default mappings
+    -- Available actions:
+    -- - https://github.com/nvim-telescope/telescope.nvim/blob/2eca9ba22002184ac/lua/telescope/actions/init.lua
+    -- - https://github.com/nvim-telescope/telescope.nvim/blob/2eca9ba22002184ac/lua/telescope/actions/layout.lua
+    -- Default mappings:
+    -- - https://github.com/nvim-telescope/telescope.nvim/blob/2eca9ba22002184ac/lua/telescope/mappings.lua#L133
+    default_cfg.mappings = {n = {}, i = {}}
+    -- Telescope doesn't support adding to both modes at the same time
+    -- so we'll add common mappings after all others.
+    local both_n_i = {
+      -- Close on empty prompt
+      ["<C-d>"] = wrap_tel_action_fn("close_on_empty_prompt", function(prompt_bufnr)
+        local prompt = action_state.get_current_line()
+        -- print("DEBUG", "prompt text:", vim.inspect(prompt), "len:", #prompt)
+        if #prompt == 0 then
+          tel_actions.close(prompt_bufnr)
+        else
+          vim.notify("Cannot close, prompt is not empty")
+        end
+      end),
+
+      -- N/I: Select actions
+      ["<CR>"] = tel_actions.select_default,
+      ["<C-j>"] = tel_actions.select_default,
+      ["<M-s>"] = tel_actions.select_horizontal,
+      ["<M-v>"] = tel_actions.select_vertical,
+      ["<M-t>"] = tel_actions.select_tab,
+      -- FIXME: what's the diff between file_* & select_* actions?
+
+      -- N/I: Move selection
+      ["<Down>"] = tel_actions.move_selection_next,
+      ["<Up>"] = tel_actions.move_selection_previous,
+
+      -- N/I: Manage multi-selection
+      ["<C-a>"] = tel_actions.toggle_all,
+      ["<C-c>"] = tel_actions.drop_all,
+      ["<M-a>"] = tel_actions.toggle_selection + tel_actions.move_selection_worse,
+      ["<M-Space>"] = tel_actions.toggle_selection,
+
+      -- N/I: Results up/down scrolling
+      ["<M-K>"] = tel_actions.results_scrolling_up,
+      ["<M-J>"] = tel_actions.results_scrolling_down,
+
+      -- N/I: Preview up/down scrolling
+      ["<C-M-k>"] = tel_actions.preview_scrolling_up,
+      ["<C-M-j>"] = tel_actions.preview_scrolling_down,
+
+      -- N/I: History nav
+      ["<C-n>"] = tel_actions.cycle_history_next,
+      ["<C-p>"] = tel_actions.cycle_history_prev,
+
+      -- N/I: Integration with quickfix list (send/add)
+      ["<M-q>"] = tel_actions.send_selected_to_qflist + tel_actions.open_qflist,
+      ["<C-M-q>"] = tel_actions.add_selected_to_qflist + tel_actions.open_qflist, -- (?)
+
+      -- N/I: Layout actions
+      ["<C-M-P>"] = tel_actions_lay.toggle_preview,
+      ["<C-f>"] = wrap_tel_action_fn("toggle_fullscreen", function(prompt_bufnr)
+        local picker = action_state.get_current_picker(prompt_bufnr)
+        if vim.b[prompt_bufnr].telescope_last_layout_config then
+          -- Restore layout config, out of fullscreen!
+          picker.layout_config = vim.b[prompt_bufnr].telescope_last_layout_config
+          -- print("DEBUG", "restoring layout config:", vim.inspect(picker.layout_config))
+          vim.b[prompt_bufnr].telescope_last_layout_config = nil
+        else
+          -- Save layout config, set fullscreen!
+          -- print("DEBUG", "saving layout config:", vim.inspect(picker.layout_config))
+          vim.b[prompt_bufnr].telescope_last_layout_config = vim.deepcopy(picker.layout_config)
+          -- Set current layout strategy size to (almost) 100% (note: 1.0 doesn't work…)
+          picker.layout_config[picker.layout_strategy].height = 0.99
+          picker.layout_config[picker.layout_strategy].width = 0.99
+        end
+        picker:full_layout_update()
+      end),
+
+      -- N/I: Mouse actions
+      ["<LeftMouse>"] = {
+        tel_actions.mouse_click,
+        type = "action",
+        opts = { expr = true },
       },
-      fzf_opts = {}, -- don't let them overwrite my own config!
-      keymap = {
-        builtin = {
-          -- :tmap mappings for the fzf win
-          ["<M-p>"] = "toggle-preview", -- to work for builtin previewer
-          ["<M-f>"] = "toggle-fullscreen", -- works for all previewers! Fullscreens the terminal, not fzf
-        },
-        -- don't let them overwrite my own config! (e.g: their alt-a means select all :/)
-        fzf = {},
+    }
+    default_cfg.mappings.i = {
+      -- Move selection
+      ["<M-j>"] = tel_actions.move_selection_next,
+      ["<M-k>"] = tel_actions.move_selection_previous,
+      ["<M-g>"] = tel_actions.move_to_top,
+      ["<M-G>"] = tel_actions.move_to_bottom,
+
+      -- Insert file/line/cword
+      ["<C-r><C-f>"] = tel_actions.insert_original_cfile,
+      ["<C-r><C-l>"] = tel_actions.insert_original_cline,
+      ["<C-r><C-w>"] = tel_actions.insert_original_cword,
+      ["<C-r><C-a>"] = tel_actions.insert_original_cWORD,
+    }
+    default_cfg.mappings.n = {
+      ["<esc>"] = tel_actions.close,
+      ["?"] = tel_actions.which_key,
+
+      -- Move selection
+      ["j"] = tel_actions.move_selection_next,
+      ["k"] = tel_actions.move_selection_previous,
+      ["g"] = tel_actions.move_to_top,
+      -- ["M"] = tel_actions.move_to_middle,
+      ["G"] = tel_actions.move_to_bottom,
+
+      -- Results up/down/left/right scrolling
+      ["<PageUp>"] = tel_actions.results_scrolling_up,
+      ["<PageDown>"] = tel_actions.results_scrolling_down,
+      ["<K>"] = tel_actions.results_scrolling_up,
+      ["<J>"] = tel_actions.results_scrolling_down,
+      ["H"] = tel_actions.results_scrolling_left,
+      ["L"] = tel_actions.results_scrolling_right,
+    }
+    -- Add mappings common for both modes:
+    for _, mode in ipairs{"i", "n"} do
+      for key, mapping in pairs(both_n_i) do
+        default_cfg.mappings[mode][key] = mapping
+      end
+    end
+
+    -- DEFAULT LAYOUT
+    default_cfg.layout_config = {
+      prompt_position = "top",
+    }
+    default_cfg.sorting_strategy = "ascending" -- make sure results are from top-to-bottom
+    default_cfg.scroll_strategy = "limit" -- (not cycle!)
+
+    local extensions_cfg = {}
+    local extensions_to_load = {}
+
+    -- Extension: fzf
+    extensions_cfg.fzf = {} -- default config
+    vim.cmd.packadd"telescope-fzf-native" -- from Nix-managed plugins (has native pkg!)
+    table.insert(extensions_to_load, "fzf")
+
+    -- Extension: ui-select
+    extensions_cfg["ui-select"] = {
+      require('telescope.themes').get_dropdown(),
+    }
+    table.insert(extensions_to_load, "ui-select")
+
+    -- Extension: frecency
+    extensions_cfg.frecency = {
+      matcher = "fuzzy",
+    }
+    table.insert(extensions_to_load, "frecency")
+
+    -- Extension: import (find imports in files around)
+    extensions_cfg.import = {} -- default config
+    table.insert(extensions_to_load, "import")
+
+    -- Extension: picker_list
+    -- /!\ must be the last extension
+    extensions_cfg.picker_list = {
+      -- ignore some pickers I don't need here
+      excluded_pickers = {
+        "fzf", -- native searcher
+        "fd", -- alias for find_files
+        "grep_string", -- live_grep is better
+        "tags", "current_buffer_tags", -- never use tags now..
+        "git_files", -- find_files is basically the same.. (with fd-based finder)
       },
-      actions = {
-        files = {
-          -- keys for all providers that act on files
-          ["default"] = act.file_edit,
-          ["alt-s"]   = act.file_split,
-          ["alt-v"]   = act.file_vsplit,
-          ["alt-t"]   = act.file_tabedit,
-          ["alt-q"]   = act.file_sel_to_qf, -- this is interesting! (TODO: similar to arglist?)
+    }
+    table.insert(extensions_to_load, "picker_list")
+
+    require"telescope".setup {
+      extensions = extensions_cfg,
+      defaults = default_cfg,
+      pickers = {
+        colorscheme = {
+          ignore_builtins = true,
+          enable_preview = true,
         },
       },
     }
-    fzf.register_ui_select()
+    -- Load extensions
+    for _, ext_name in ipairs(extensions_to_load) do
+      require"telescope".load_extension(ext_name)
+    end
+
+    local tel_builtin = require"telescope.builtin"
 
     -- Direct key for most used search!
-    -- TODO: keep history of selected files! (to easily re-select something!)
-    toplevel_map{mode={"n"}, key="<M-f>", desc="Fuzzy search files", action=fzf.files}
+    toplevel_map{mode={"n"}, key="<M-f>", desc="Fuzzy search files", action=tel_builtin.find_files}
+    toplevel_map{mode={"n"}, key="<M-F>", desc="Fuzzy search _all_ files", action=function()
+      tel_builtin.find_files { no_ignore = true }
+    end}
 
     toplevel_map_define_group{mode={"n"}, prefix_key="<C-f>", name="+Fuzzy search"}
-    toplevel_map{mode={"n"}, key="<C-f><C-f>", desc="resume last search", action=fzf.resume} -- ❤️
-    toplevel_map{mode={"n"}, key="<C-f><C-g>", desc="git files", action=fzf.git_files}
-    toplevel_map{mode={"n"}, key="<C-f><C-o>", desc="old files", action=fzf.oldfiles}
-    toplevel_map{mode={"n"}, key="<C-f><C-h>", desc="help tags", action=fzf.help_tags}
-    toplevel_map{mode={"n"}, key="<C-f><C-j>", desc="jumps", action=fzf.jumps}
-    toplevel_map{mode={"n"}, key="<C-f><C-i>", desc="highlight groups", action=fzf.highlights}
-
-    toplevel_map_define_group{mode={"n"}, prefix_key="<C-M-f>", name="+Fuzzy search (alt)"} -- for easy spam <C-M-f><C-M-b>
-    buffers_action = function()
-      fzf.buffers { previewer = "builtin" } -- syntax highlighting for free (buffer opened!)
-    end
-    toplevel_map{mode={"n"}, key="<C-f><C-M-b>" --[[C-b used by tmux!]], desc="buffers", action=buffers_action}
-    toplevel_map{mode={"n"}, key="<C-M-f><C-M-b>" --[[easy spam!]], desc="buffers", action=buffers_action}
-
-    toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="current buffer lines", action=function()
-      fzf.blines {
-        -- Don't pre-open the preview (the lines are already my preview)
-        winopts = {
-          preview = { hidden = "hidden" },
-        },
-        -- When I want some context I can re-enable the preview and see lines around
-        -- (with current line highlighted)
-        previewer = "builtin", -- syntax highlighting for free (buffer already opened!)
-      }
-    end}
+    toplevel_map{mode={"n"}, key="<C-f><C-f>", desc="… Resume last", action=tel_builtin.resume} -- ✨
+    toplevel_map{mode={"n"}, key="<C-f><C-z>", desc="Pick a picker…", action=function() vim.cmd.Telescope("picker_list") end}
+    toplevel_map{mode={"n"}, key="<C-f><C-g>", desc="Live Grep", action=tel_builtin.live_grep} -- use C-Space to fuzzy refine
+    toplevel_map{mode={"n"}, key="<C-f><C-r>", desc="Frecency", action=function() vim.cmd.Telescope("frecency") end}
+    toplevel_map{mode={"n"}, key="<C-f><C-m>", desc="Commands", action=tel_builtin.commands} -- note: <C-f><C-c> broken 🤔
+    toplevel_map{mode={"n"}, key="<C-f><C-h>", desc="Help Tags", action=tel_builtin.help_tags}
+    toplevel_map{mode={"n"}, key="<C-f><C-j>", desc="Jumps", action=tel_builtin.jumplist}
+    toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="Buffer lines", action=tel_builtin.current_buffer_fuzzy_find}
+    toplevel_map{mode={"n"}, key="<C-f><C-Space>", desc="Buffers", action=tel_builtin.buffers}
   end,
 }
 
