@@ -116,23 +116,20 @@ snip("fork", {desc = "for each pairs", condition = conds.start_of_line}, SU.myfm
   }
 })
 
-snip("r", {desc = "return ..."}, {
-  -- NOTE: Adds the space after `return` only if needed,
-  --   -- (FAIL for now): but always leave the cursor after the space.
-  ls.function_node(function()
-    local line = vim.api.nvim_get_current_line()
-    local col = vim.fn.col(".")
-    local char = line:sub(col, col)
-    if char == " " then
-      -- local move_right = vim.api.nvim_replace_termcodes("<C-g>U<Right>", true, false, true)
-      -- return "return" .. move_right
-      -- FAIL: https://github.com/L3MON4D3/LuaSnip/discussions/1271
-      return "return"
-    else
-      return "return "
-    end
-  end)
-})
+-- NOTE: Adds the space after `return` only if needed,
+--   but _always_ leave the cursor after the space.
+snip(
+  "r",
+  {
+    desc = "return ...",
+    -- Tweak what will be removed exactly before snip expansion
+    -- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
+    resolveExpandParams = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" },
+  },
+  {
+    t"return "
+  }
+)
 
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 

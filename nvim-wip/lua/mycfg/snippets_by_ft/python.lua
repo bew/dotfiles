@@ -318,15 +318,20 @@ snip("p", {desc = "print(...)"}, SU.myfmt {
   { stuff = i(1) }
 })
 
-snip("r", {desc = "return ..."}, SU.myfmt {
-  [[return<maybe_space><rest>]],
+-- NOTE: Adds the space after `return` only if needed,
+--   but _always_ leave the cursor after the space.
+snip(
+  "r",
   {
-    rest = i(0),
-    -- FIXME: remove space if there is already a space after cursor.
-    -- e.g: with `foo = bar`, when I do `^cf=r<SNIP>` the snip should not have a trailing space
-    maybe_space = t" ",
+    desc = "return ...",
+    -- Tweak what will be removed exactly before snip expansion
+    -- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
+    resolveExpandParams = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" },
+  },
+  {
+    t"return "
   }
-})
+)
 
 -- End of snippets definitions
 

@@ -67,6 +67,47 @@ SU.myfmt_braces = function(args)
   return fmt(unpack(args))
 end
 
+local function _get_cursor_pos0()
+  local cur = vim.api.nvim_win_get_cursor(0)
+  return {
+    row = cur[1] - 1,
+    col = cur[2],
+  }
+end
+
+--- Make fn for resolveExpandParams context option, following given spec
+---@param spec table
+---  @field delete_after_trig string|string[] Text patterns to ignore (delete) before snip expansion
+--
+-- The `resolveExpandParams` snip ctx fn allows (among other things) to tweak what will be deleted
+-- before snip expansion.
+--
+-- SEE: https://github.com/L3MON4D3/LuaSnip/discussions/1271
+-- REF: https://github.com/L3MON4D3/LuaSnip/blob/33b06d72d220aa56/lua/luasnip/extras/postfix.lua#L13
+SU.mk_expand_params_resolver = function(spec)
+  spec = spec or {}
+  local delete_after_trig_pats = U.normalize_arg_one_or_more(spec.delete_after_trig or {})
+
+  return function(_snip, line_to_cursor, matched, _captures)
+    local pos0 = _get_cursor_pos0()
+    local line = vim.api.nvim_get_current_line()
+    local line_after_cursor = line:sub(vim.fn.col".")
+    local longest_after_match = ""
+    for _, pattern in ipairs(delete_after_trig_pats) do
+      local match = line_after_cursor:match(pattern)
+      if match and #match > #longest_after_match then
+        longest_after_match = match
+      end
+    end
+    return {
+      clear_region = {
+        from = {pos0.row, pos0.col - #matched}, -- before snip match
+        to = {pos0.row, pos0.col + #longest_after_match}, -- after spaces
+      }
+    }
+  end
+end
+
 
 ------------------------------------
 -- Node helpers
