@@ -130,22 +130,20 @@ end
 ------------------------------------
 -- Node helpers
 
---- Returns whether luasnip has an active selection stored,
----   to be used by snip.env.SELECT_RAW and related snip env vars.
-SU.has_stored_selection = function()
-  -- REF: https://github.com/L3MON4D3/LuaSnip/blob/33b06d72d220aa56a/lua/luasnip/util/select.lua
-  local success, _ = pcall(vim.api.nvim_buf_get_var, 0, "LUASNIP_SELECT_RAW")
-  return success
+--- Returns whether the snippet has a previously-cut selection available.
+---   to be used via snip.env.LS_SELECT_RAW and related snip env vars.
+SU.has_stored_selection = function(snip)
+  -- REF: https://github.com/L3MON4D3/LuaSnip/issues/1030
+  return snip.env.LS_SELECT_RAW and #snip.env.LS_SELECT_RAW > 0
 end
 
 --- Insert node that default to last visual (saved) selection if any, else given text
 SU.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
-    local env = snip.env
-    if SU.has_stored_selection() then
+    if SU.has_stored_selection(snip) then
       -- override default text with last selection
-      default_text = env.LS_SELECT_RAW
+      default_text = snip.env.LS_SELECT_RAW
     end
     return ls.snippet_node(nil, {
       ls.insert_node(1, default_text),
