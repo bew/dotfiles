@@ -372,6 +372,8 @@ NamedPlug.telescope {
       },
     }
     default_cfg.mappings.i = {
+      ["<M-Esc>"] = tel_actions.close,
+
       -- Move selection
       ["<M-j>"] = tel_actions.move_selection_next,
       ["<M-k>"] = tel_actions.move_selection_previous,
