@@ -78,6 +78,12 @@ in {
       type = ty.bool;
       default = false;
     };
+
+    deps.plugins = lib.mkOption {
+      description = "Vim plugins to install in DATA site dir (note: atm the those are only 'opt' plugins)";
+      type = ty.attrsOf ty.package;
+      default = {};
+    };
   };
 
   config = {
@@ -115,7 +121,7 @@ in {
       else nvimDirGenerated
     );
 
-    outputs.deps.pluginsDataSiteDir = pkgs.runCommandLocal "nvim-deps-dir-${cfg.ID}-xdg" {} ''
+    outputs.deps.pluginsDataSiteDir = pkgs.runCommandLocal "nvim-deps-dir-${cfg.ID}-site" {} ''
       packOptPlugins="$out/pack/nix-managed-plugins/opt"
       mkdir -p $packOptPlugins
       ${lib.concatStringsSep "\n" (
@@ -132,7 +138,7 @@ in {
         ln -s ${outs.nvimDir} $out/${outs.NVIM_APPNAME}
       '';
       xdgDataDir = pkgs.runCommandLocal "nvim-deps-dir-${cfg.ID}-xdg" {} ''
-        mkdir -p $out/$(dirname "${outs.NVIM_APPNAME}")
+        mkdir -p "$out/${outs.NVIM_APPNAME}"
         ln -s ${outs.deps.pluginsDataSiteDir} $out/${outs.NVIM_APPNAME}/site
       '';
     in makeNvimWrapperPkg {
