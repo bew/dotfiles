@@ -23,6 +23,9 @@ __auto_bins__/
 # History files of various tools
 .*_history
 
+# Graphviz graph file
+# (name I usually use for this..)
+out.dot
 
 # -------- Platform-specific common ignores
 
