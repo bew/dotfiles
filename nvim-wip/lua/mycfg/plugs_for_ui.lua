@@ -128,14 +128,33 @@ Plug {
   source = gh"stevearc/oil.nvim",
   desc = "Edit your filesystem like a normal Neovim buffer",
   tags = {"filesystem"},
-  defer_load = { on_cmd = "Oil" },
+  defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require"oil".setup {
       -- Don't hijack nvim's file explorer, neotree already does that
       -- NOTE: last hijacker wins, so plugin load order is important but my plugins
       --   definition system doesn't support plugin ordering for now..
       default_file_explorer = false,
+
+      keymaps = {
+        -- Disable default split/tab actions that use Ctrl 😬
+        ["<C-s>"] = false,
+        ["<C-h>"] = false,
+        ["<C-t>"] = false,
+        -- Disable more defaults that use Ctrl 😬
+        ["<C-p>"] = false,
+        ["<C-l>"] = false,
+
+        ["<M-s>"] = { "actions.select", opts = { horizontal = true } },
+        ["<M-h>"] = { "actions.select", opts = { vertical = true } },
+        ["<M-t>"] = { "actions.select", opts = { tab = true } },
+        ["<M-p>"] = "actions.preview",
+        ["<M-r>"] = "actions.refresh",
+        ["<BS>"] = "actions.parent",
+      },
     }
+
+    toplevel_map{mode={"n"}, key="-", action=[[<cmd>Oil<cr>]], desc="Oil: Open parent dir"}
   end,
 }
 
