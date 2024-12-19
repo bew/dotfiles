@@ -128,13 +128,10 @@ Plug {
   source = gh"stevearc/oil.nvim",
   desc = "Edit your filesystem like a normal Neovim buffer",
   tags = {"filesystem"},
-  defer_load = { on_event = "VeryLazy" },
+  -- NOTE: can't use defer_load, or it wouldn't hijack netrw on `nvim <dir>`
   on_load = function()
     require"oil".setup {
-      -- Don't hijack nvim's file explorer, neotree already does that
-      -- NOTE: last hijacker wins, so plugin load order is important but my plugins
-      --   definition system doesn't support plugin ordering for now..
-      default_file_explorer = false,
+      default_file_explorer = true,
 
       keymaps = {
         -- Disable default split/tab actions that use Ctrl 😬
@@ -168,6 +165,9 @@ Plug {
   defer_load = { on_cmd = "Neotree" },
   on_load = function()
     require("neo-tree").setup {
+      -- Don't hijack nvim's file explorer, Oil is nicer for that!
+      hijack_netrw_behavior = "disabled",
+
       sources = {
         "filesystem", -- builtin
         "buffers", -- builtin
