@@ -605,47 +605,31 @@ Plug {
   tags = {t.content_ui},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    require"smear_cursor".setup {
-      -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
-      legacy_computing_symbols_support = true,
-      distance_stop_animating = 3, -- don't animate when target is this close
-      -- cursor_color = "#ff8800", -- FIXME: Cursor color need _RGB_ colors for that
-      color_levels = 5, -- limit color range, see below for color256 palettes
-
-      -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
-    }
-  end,
-  on_colorscheme_change = function()
-    -- @2024-12 the plugin doesn't expose a way to customize hl groups as they are created
-    -- on-the-fly based on various RGB colors (not terminal colors).
-    -- So we need to get creative, and manually trigger group creation and override them.
-    -- REF: https://github.com/sphamba/smear-cursor.nvim/issues/50#issuecomment-2525347852
-    local config = require("smear_cursor.config")
-    local color = require("smear_cursor.color")
-    for i = 1, config.color_levels do
-      color.get_hl_group({ level = i })
-      -- note: my config doesn't seem to ever use the inverted color groups
-      -- color.get_hl_group({ level = i, inverted = true })
-    end
-    -- WARN: assert(#palette == config.color_levels) !
+    -- NOTE: to get nice color highlight my config requires need to have `ctermfg = number` text,
+    -- but smear config wants a list of numbers, so I made these lists to have highlights ;)
     local smear_palette_fire = {
-      { ctermfg = 137 },
+      { ctermfg = 179 },
+      { ctermfg = 179 },
       { ctermfg = 136 },
-      { ctermfg = 130 },
-      { ctermfg = 130 },
+      { ctermfg = 136 },
+      { ctermfg = 166 },
       { ctermfg = 166 },
     }
     local smear_palette_darkwhite = {
       { ctermfg = 235 },
       { ctermfg = 240 },
-      { ctermfg = 245 },
-      { ctermfg = 245 },
+      { ctermfg = 243 },
+      { ctermfg = 250 },
       { ctermfg = 255 },
     }
-    local smear_palette = smear_palette_fire
-    for i, hl_spec in ipairs(smear_palette) do
-      vim.api.nvim_set_hl(0, "SmearCursorNormal"..i, hl_spec)
-    end
+    require"smear_cursor".setup {
+      -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
+      legacy_computing_symbols_support = true,
+      distance_stop_animating = 3, -- don't animate when target is this close
+
+      cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palette_fire),
+      -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
+    }
   end,
 }
 
