@@ -391,7 +391,9 @@ NamedPlug.telescope {
       },
     }
     default_cfg.mappings.i = {
-      ["<M-Esc>"] = tel_actions.close,
+      -- FIXME: <C-w> in insert mode in prompt buffer does NOT delete last word... /!\
+      ["<Esc>"] = tel_actions.close, -- Quick exit
+      ["<M-Esc>"] = { "<Esc>", type = "command" }, -- Insert to Normal mode (used less often)
 
       -- Move selection
       ["<M-j>"] = tel_actions.move_selection_next,
@@ -406,7 +408,7 @@ NamedPlug.telescope {
       ["<C-r><C-a>"] = tel_actions.insert_original_cWORD,
     }
     default_cfg.mappings.n = {
-      ["<esc>"] = tel_actions.close,
+      ["<Esc>"] = tel_actions.close,
       ["?"] = tel_actions.which_key,
 
       -- Move selection
