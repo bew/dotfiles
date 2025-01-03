@@ -33,11 +33,7 @@ NamedPlug.cmp {
     cmp_source_dep { source = gh"hrsh7th/cmp-nvim-lsp" },
     cmp_source_dep { source = gh"hrsh7th/cmp-buffer" },
     cmp_source_dep { source = gh"hrsh7th/cmp-path" },
-    cmp_source_dep {
-      source = gh"hrsh7th/cmp-nvim-lua",
-      desc = "Source for neovim runtime API",
-      tags = {"config-editing"},
-    },
+    NamedPlug.lazydev_lua,
     cmp_source_dep { source = gh"andersevenrud/cmp-tmux" },
     cmp_source_dep { source = gh"hrsh7th/cmp-emoji" },
     cmp_source_dep { source = gh"saadparwaiz1/cmp_luasnip", extra_depends_on = {NamedPlug.luasnip} },
@@ -88,7 +84,7 @@ NamedPlug.cmp {
       emoji    = "@Emo ",
       luasnip  = "@Snip",
       nvim_lsp = "@Lsp ",
-      nvim_lua = "@Lua ",
+      lazydev  = "@LLua",
       path     = "@Path",
       tmux     = "@Tmux",
     }
@@ -250,23 +246,11 @@ NamedPlug.cmp {
     -- Filetype/buffer-specific config
     -- NOTE: For these, list of sources does NOT inherit from the global list of sources
 
-    -- Enable neovim runtime API completion only in Lua/Vim files in my nvim config (or plugins):
-    vim.api.nvim_create_autocmd("BufEnter", {
-      pattern = {
-        vim.fn.stdpath"config" .. "/*.lua",
-        vim.fn.stdpath"config" .. "/*.vim",
-        vim.fn.stdpath"state" .. "/*.lua",
-        vim.fn.stdpath"state" .. "/*.vim",
-        "/*nvim*", -- match any file that mentions `nvim` in its full path
-      },
-      callback = function()
-        cmp.setup.buffer({
-          sources = vim.list_extend(
-            { { name = "nvim_lua" } },
-            common_sources
-          )
-        })
-      end,
+    cmp.setup.filetype({"lua"}, {
+      sources = vim.list_extend(
+        { { name = "lazydev" } },
+        common_sources
+      ),
     })
 
     cmp.setup.filetype({"markdown"}, {

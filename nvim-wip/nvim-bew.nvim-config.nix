@@ -21,6 +21,9 @@ in {
   };
 
   deps.lspServers = {
+    # Lua
+    lua-language-server.pkg = pkgs.lua-language-server;
+
     # python
     python-lsp-server.pkg = pkgs.python3.withPackages (pp: [
       pp.python-lsp-server
