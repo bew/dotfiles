@@ -3,8 +3,7 @@ local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
-local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
+local Plug = PluginSystem.PlugDeclarator
 
 -- Define custom plugin source for my local plugins
 ---@param name string Name of my local plugin (found in $NVIM_BEW_MYPLUGINS_PATH)
@@ -19,45 +18,40 @@ PluginSystem.sources.myplug = function(name)
   }
 end
 
-local predefined_tags = PluginSystem.predefined_tags
 ---@diagnostic disable: missing-fields
 -- Having different type for table & `__newindex` isn't supported nor easy to.. skip diags for this..
 --   REF: https://github.com/LuaLS/lua-language-server/issues/3020
-predefined_tags.careful_update = { desc = "Plugins I want to update carefully" }
-predefined_tags.vimscript = { desc = "Plugins in vimscript" }
-predefined_tags.ui = { desc = "Plugins for the global UI" }
-predefined_tags.content_ui = { desc = "Plugins for content UI" }
-predefined_tags.editing = { desc = "Plugins about code/content editing" }
-predefined_tags.insert = { desc = "Plugins adding stuff in insert mode" }
-predefined_tags.git = { desc = "Plugins around git VCS" }
-predefined_tags.textobj = { desc = "Plugins to add textobjects" }
-predefined_tags.ft_support = { desc = "Plugins to support specific filetype(s)" }
-predefined_tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
-predefined_tags.extensible = { desc = "Plugins that can be extended" } -- TODO: apply on all relevant!
-predefined_tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
+PluginSystem.tags.careful_update = { desc = "Plugins I want to update carefully" }
+PluginSystem.tags.vimscript = { desc = "Plugins in vimscript" }
+PluginSystem.tags.ui = { desc = "Plugins for the global UI" }
+PluginSystem.tags.content_ui = { desc = "Plugins for content UI" }
+PluginSystem.tags.editing = { desc = "Plugins about code/content editing" }
+PluginSystem.tags.insert = { desc = "Plugins adding stuff in insert mode" }
+PluginSystem.tags.git = { desc = "Plugins around git VCS" }
+PluginSystem.tags.textobj = { desc = "Plugins to add textobjects" }
+PluginSystem.tags.ft_support = { desc = "Plugins to support specific filetype(s)" }
+PluginSystem.tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
+PluginSystem.tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
 ---@diagnostic enable: missing-fields
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
-local t = predefined_tags
+local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 local myplug = PluginSystem.sources.myplug
 
---------------------------------
+-- --------------------------------
 
--- Uncomment when exploring/debugging stuff
--- Plug {
---   source = myplug"debug-autocmds.nvim",
---   desc = "Tool to debug/understand autocmd flow while using neovim",
---   tags = {"utils", "debug"},
---   on_load = function()
---     require("debug-autocmds").setup{
---       global_tracking_on_start = true, -- switch to `true` to debug builtin events from start :)
---     }
---   end,
--- }
---
--- FIXME: why does `enabled = false` not completely disable it
---   (it still appears in `:Lazy profile`...)
+Plug {
+  enabled = false, -- NOTE(DEBUG): Enable when exploring/debugging stuff
+  source = myplug"debug-autocmds.nvim",
+  desc = "Tool to debug/understand autocmd flow while using neovim",
+  tags = {"utils", "debug"},
+  on_load = function()
+    require("debug-autocmds").setup{
+      global_tracking_on_start = true, -- switch to `true` to debug builtin events from start :)
+    }
+  end,
+}
 
 Plug {
   source = myplug"smart-bol.nvim",
@@ -156,7 +150,7 @@ Plug {
   end,
 }
 
-NamedPlug.lib_plenary {
+Plug.lib_plenary {
   source = gh"nvim-lua/plenary.nvim",
   desc = "Lua contrib stdlib for plugins, used by many plugins",
   tags = {t.lib_only},
@@ -176,12 +170,12 @@ NamedPlug.lib_plenary {
 --
 -- TODO: Make a dedicated way to register a package manager,
 --   so we can enforce a set of fields / structure
-NamedPlug.pkg_manager {
+Plug.pkg_manager {
   source = gh"folke/lazy.nvim",
   desc = "A modern plugin manager for Neovim",
-  tags = {"boot", t.careful_update},
+  tags = {"boot"},
   install_path = vim.fn.stdpath("data") .. "/pkg-manager--lazy",
-  bootstrap_fn = function(self, _ctx)
+  bootstrap_itself = function(self, _ctx)
     local clone_cmd_parts = {
       "git",
       "clone",
@@ -190,13 +184,14 @@ NamedPlug.pkg_manager {
       self.install_path,
     }
     local clone_cmd = table.concat(clone_cmd_parts, " ")
-    print("Package manager not found! Install with:", clone_cmd)
+    print("Package manager not found! Install with:")
+    print(clone_cmd) -- note: on separate line for easy copy/paste
   end,
-  on_boot = function(ctx)
+  on_boot = function(_self, ctx)
     if not U.is_module_available("lazy") then return false end
     local function enabled_plugins_filter(plug)
       if plug.on_boot then return false end -- not a regular plugin
-      return plug.enable ~= false
+      return plug.enabled ~= false
     end
 
     local lazy_plugin_specs = {}
@@ -309,13 +304,10 @@ NamedPlug.pkg_manager {
 
 --------------------------------
 
--- FIXME: avoid global state!
---   Each file could have its own plugin declarator (and could import common stuff like tags),
---   then here we merge all plugin declarators before checking for missing plugins..
 require"mycfg.plugs_for_ui"
 require"mycfg.plugs_for_ft"
 require"mycfg.plugs_for_file_editing"
 require"mycfg.plugs_for_git"
 
-PluginSystem.MasterDeclarator:check_missing_plugins()
-return PluginSystem.MasterDeclarator:all_specs()
+PluginSystem.check_missing_plugins()
+return PluginSystem.all_plugin_specs()

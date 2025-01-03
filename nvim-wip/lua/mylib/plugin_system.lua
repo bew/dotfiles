@@ -17,6 +17,31 @@
 -- So `NamedPlug.foobar` must declare the named plugin on first reference, and always refer to the
 -- same object before and after it is defined.
 
+---@class plugin_system.DeclaredPluginSpec
+---@field id string The plugin ID
+---@field __is_placeholder_plugin_spec boolean?
+
+---@class plugin_system.PluginSpec: plugin_system.DeclaredPluginSpec
+---@field source PlugSourceBase
+---@field desc string
+---@field tags string[]
+---@field enabled boolean
+---@field version plugin_system.PluginVersionSpec
+---@field depends_on plugin_system.PluginSpec[]
+---@field config_depends_on plugin_system.PluginSpec[]
+---@field on_load fun()
+---@field on_pre_load fun()
+---@field on_colorscheme_change fun()
+
+---@class plugin_system.PluginSpecPkgManager: plugin_system.PluginSpec
+---@field install_path string Where the pkg manager is installed
+---@field bootstrap_itself? fun(self, ctx: plugin_system.BootPlugContext)
+---@field on_boot fun(self, ctx: plugin_system.BootPlugContext)
+
+---@class plugin_system.PluginVersionSpec
+---@field tag? string
+---@field branch? string
+
 local U = require"mylib.utils"
 local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
@@ -24,68 +49,55 @@ local _s = U.str_surround
 
 local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
--- FIXME: avoid global state!
--- FIXME: find a better name!
-local MasterDeclarator = {
+local STATE = {
   -- Contains anonymous plugin specs
-  ---@type PluginSpec[]
+  ---@type plugin_system.PluginSpec[]
   _anon_plugin_specs = {},
   -- Contains named plugin specs
-  ---@type {[string]: PluginSpec}
+  ---@type {[string]: plugin_system.PluginSpec}
   _named_plugin_specs = {},
 }
 
----@class DeclaredPluginSpec
----@field id string The plugin ID
----@field __is_placeholder_plugin_spec boolean?
+local M = {}
 
----@class PluginSpec: DeclaredPluginSpec
----@field source PlugSourceBase
----@field desc string
----@field tags string[]
----@field enabled boolean
----@field version PluginVersionSpec
----@field depends_on PluginSpec[]
----@field config_depends_on PluginSpec[]
----@field on_load fun()
----@field on_pre_load fun()
----@field on_colorscheme_change fun()
-
----@class PluginVersionSpec
----@field tag? string
----@field branch? string
-
-function MasterDeclarator:all_specs()
+function M.all_plugin_specs()
   local all_specs = {}
-  vim.list_extend(all_specs, self._anon_plugin_specs)
-  vim.list_extend(all_specs, vim.tbl_values(self._named_plugin_specs))
+  vim.list_extend(all_specs, STATE._anon_plugin_specs)
+  vim.list_extend(all_specs, vim.tbl_values(STATE._named_plugin_specs))
   return all_specs
 end
 
-function MasterDeclarator:named_specs()
-  return vim.tbl_extend("force", {}, self._named_plugin_specs)
-end
+local DeclaratorImpl = {}
 
--- Allows the following syntax:
---   Plug { spec for anonymous plugin }
-function MasterDeclarator:register_anon_plugin(plugin_spec)
+function DeclaratorImpl.register_anon_plugin(plugin_spec)
   vim.validate{ plugin_spec={plugin_spec, "table"} }
   -- TODO: validate spec is fully respected!
-  table.insert(self._anon_plugin_specs, plugin_spec)
+  table.insert(STATE._anon_plugin_specs, plugin_spec)
   return plugin_spec
 end
-function MasterDeclarator:get_anonymous_plugin_declarator()
-  return function(...)
-    self:register_anon_plugin(...)
+
+---Declares a named plugin
+---@param plugin_id string The plugin ID to declare
+---@return plugin_system.DeclaredPluginSpec
+function DeclaratorImpl.declare_named_plugin(plugin_id)
+  if STATE._named_plugin_specs[plugin_id] then
+    return STATE._named_plugin_specs[plugin_id]
   end
+  local placeholder_plugin_spec = {
+    id = plugin_id,
+    __is_placeholder_plugin_spec = true, -- will be set to nil when plugin gets defined!
+  }
+  -- Save named spec, so later references return this spec!
+  STATE._named_plugin_specs[plugin_id] = placeholder_plugin_spec
+  return placeholder_plugin_spec
 end
 
 local CallToRegisterPlugin_mt = {
-  ---@param self DeclaredPluginSpec
-  ---@param spec_fields PluginSpec
+  ---@param self plugin_system.DeclaredPluginSpec
+  ---@param spec_fields plugin_system.PluginSpec
   __call = function(self, spec_fields)
     if not self.__is_placeholder_plugin_spec then
-      error(_f("Cannot register the named plugin spec", _q(self.id), "twice"))
+      error(_f("Not a placeholder: Cannot register the named plugin spec", _q(self.id), "twice"))
     end
     self.__is_placeholder_plugin_spec = nil
     -- copy all spec fields to the existing/stored spec
@@ -94,54 +106,63 @@ local CallToRegisterPlugin_mt = {
   end,
 }
 
----Declares a named plugin
----@param plugin_id string The plugin ID to declare
----@return DeclaredPluginSpec
-function MasterDeclarator:declare_named_plugin(plugin_id)
-  if self._named_plugin_specs[plugin_id] then
-    return self._named_plugin_specs[plugin_id]
-  end
-  local initial_plugin_spec = {
-    id = plugin_id,
-    __is_placeholder_plugin_spec = true, -- will be set to nil when plugin gets defined!
-  }
-  -- Save named spec, so later references return this spec!
-  self._named_plugin_specs[plugin_id] = initial_plugin_spec
-  return initial_plugin_spec
-end
-
--- Allows the following syntax:
---   local NamedPlug = MasterDeclarator:get_named_plugin_declarator()
---   NamedPlug.foo { spec for plugin named foo }
--- And save to initial spec, so later references find it.
-function MasterDeclarator:get_named_plugin_declarator()
-  return setmetatable({}, {
+-- The magic table metadata that makes the following syntax possible:
+-- ```
+-- Plug { spec for anonymous plugin }
+--
+-- -- With forward plugin declaratioin: (Plug.bar isn't defined yet)
+-- Plug.foo { depends_on = { Plug.bar }, ... spec for plugin named 'foo' }
+--
+-- -- Now define Plug.bar, and use on-the-fly plugin spec for a config dependency
+-- Plug.bar { config_depends_on = { Plug { on-the-fly spec } }, ... spec for plugin named 'bar' }
+-- -- This saves the spec into original table, so earlier/later references can access everything
+-- ```
+function DeclaratorImpl.get_plugin_declarator()
+  return setmetatable({ _IS_PLUGIN_DECLARATOR = true }, {
+    ---@param plugin_spec plugin_system.PluginSpec
+    ---@return plugin_system.PluginSpec
+    __call = function(_, plugin_spec)
+      ---@diagnostic disable-next-line: undefined-field (Want to ensure weird case doesn't happen)
+      if plugin_spec._IS_PLUGIN_DECLARATOR then
+        error("!! Decl is passed to itself??")
+      end
+      return DeclaratorImpl.register_anon_plugin(plugin_spec)
+    end,
+    ---@return plugin_system.PluginSpec
     __index = function(_, plugin_id)
-      local plugin_shim = self:declare_named_plugin(plugin_id)
+      local plugin_shim = DeclaratorImpl.declare_named_plugin(plugin_id)
       return setmetatable(plugin_shim, CallToRegisterPlugin_mt)
     end,
     __newindex = function(...)
-      error("Assignements are forbidden, use `NamedPlug.foo { ... }` to declare/define named plugin")
+      error("Assignements are forbidden, use `Plug.foo { ... }` to define a named plugin")
     end,
   })
 end
 
+--- The Plugin declarator:
+--- * Use `Plug { ... }` to define an anonymous plugin
+--- * Use `Plug.foo` to refer to a named plugin (may be undefined at this point)
+--- * Use `Plug.foo { ... }` to define a named plugin
+M.PlugDeclarator = DeclaratorImpl.get_plugin_declarator()
+
 --------------------------------
+
+-- IDEA: attach plugin behavior / load pattern based on tags?
 
 ---@class PlugTagSpec
 ---@field name string
 ---@field desc string
 
--- IDEA: attach plugin behavior / load pattern based on tags?
 ---@type {[string]: PlugTagSpec}
-local predefined_tags = setmetatable({}, {
+M.tags = setmetatable({}, {
   __index = KeyRefMustExist_mt.__index,
   ---@param name string
   ---@param spec {name?: string, desc: string}
   __newindex = function(self, name, spec)
-    if type(name) ~= "string" or type(spec) ~= "table" then
-      error("Tag name must be string, value must be table")
-    end
+    vim.validate{
+      name={name, "string"},
+      value={spec, "table"},
+    }
     spec.name = name -- add name in spec
     rawset(self, name, spec)
   end,
@@ -161,10 +182,10 @@ local predefined_tags = setmetatable({}, {
 ---@field path string
 
 ---@type {[string]: fun(...): PlugSourceBase}
-local PlugSources = {}
+M.sources = {}
 ---@param owner_repo string The Github repo path, like `owner/repo`
 ---@return PlugSourceGithub
-function PlugSources.github(owner_repo)
+function M.sources.github(owner_repo)
   return setmetatable({
     type = "github",
     owner_repo = owner_repo,
@@ -174,7 +195,7 @@ function PlugSources.github(owner_repo)
 end
 ---@param spec {name: string, path: string}
 ---@return PlugSourceLocal
-function PlugSources.local_path(spec)
+function M.sources.local_path(spec)
   vim.validate{
     spec={spec, "table"},
     spec_name={spec.name, "string"},
@@ -191,15 +212,15 @@ end
 -- TODO(?): sort all_plugin_specs to have plugins that don't depend on anything first?
 -- TODO: Make a list of plugin spec with only those plugins?
 
-function MasterDeclarator:check_missing_plugins()
-  for _, plugin_spec in pairs(self._named_plugin_specs) do
+function M.check_missing_plugins()
+  for _, plugin_spec in pairs(STATE._named_plugin_specs) do
     if plugin_spec.__is_placeholder_plugin_spec then
       error(_f("Named plugin", _q(plugin_spec.id), "is not defined!!!"))
     end
   end
 end
 
-function MasterDeclarator:show_plugins_dependencies()
+function M.show_plugins_dependencies()
   local plugin_display_name = function(plugin_spec)
     if plugin_spec.id then
       return _f(plugin_spec.source.name, _s("(id: ", plugin_spec.id, ")"))
@@ -207,7 +228,7 @@ function MasterDeclarator:show_plugins_dependencies()
       return plugin_spec.source.name
     end
   end
-  for _, plugin_spec in pairs(self:all_specs()) do
+  for _, plugin_spec in pairs(M.all_plugin_specs()) do
     print("--- Plugins:", plugin_display_name(plugin_spec))
     if plugin_spec.depends_on then
       print("Depends on:")
@@ -225,12 +246,8 @@ function MasterDeclarator:show_plugins_dependencies()
     end
   end
 end
---MasterDeclarator:show_plugins_dependencies()
+-- M.show_plugins_dependencies()
 
 --------------------------------
 
-return {
-  MasterDeclarator = MasterDeclarator,
-  predefined_tags = predefined_tags,
-  sources = PlugSources,
-}
+return M

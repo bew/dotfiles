@@ -1,11 +1,10 @@
 local U = require"mylib.utils"
 
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
-local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
+local Plug = PluginSystem.PlugDeclarator
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
-local t = PluginSystem.predefined_tags
+local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
 --------------------------------
@@ -14,25 +13,25 @@ require"mycfg.diagnostics_and_lsp"
 
 local function cmp_source_dep(plug_spec)
   local spec = vim.tbl_extend("error", plug_spec, {
-    depends_on = U.concat_lists({ NamedPlug.cmp }, plug_spec.extra_depends_on),
+    depends_on = U.concat_lists({ Plug.cmp }, plug_spec.extra_depends_on),
     defer_load = { on_event = "VeryLazy" }, -- 🤔 (like cmp)
   })
   return Plug(spec)
 end
-NamedPlug.cmp {
+Plug.cmp {
   source = gh"hrsh7th/nvim-cmp",
   desc = "Auto-completion framework",
   -- IDEA: could enable plugins based on buffer roles?
-  tags = {t.insert, t.editing, t.careful_update, t.extensible},
+  tags = {t.insert, t.editing, t.careful_update},
   config_depends_on = {
     Plug { source = gh"onsails/lspkind.nvim", defer_load = { autodetect = true } },
     cmp_source_dep { source = gh"hrsh7th/cmp-nvim-lsp" },
     cmp_source_dep { source = gh"hrsh7th/cmp-buffer" },
     cmp_source_dep { source = gh"hrsh7th/cmp-path" },
-    NamedPlug.lazydev_lua,
+    Plug.lazydev_lua,
     cmp_source_dep { source = gh"andersevenrud/cmp-tmux" },
     cmp_source_dep { source = gh"hrsh7th/cmp-emoji" },
-    cmp_source_dep { source = gh"saadparwaiz1/cmp_luasnip", extra_depends_on = {NamedPlug.luasnip} },
+    cmp_source_dep { source = gh"saadparwaiz1/cmp_luasnip", extra_depends_on = {Plug.luasnip} },
   },
   defer_load = { on_event = "VeryLazy" }, -- 🤔 (seems to work 🤷)
   on_load = function()
@@ -307,14 +306,14 @@ NamedPlug.cmp {
   end,
 }
 
-NamedPlug.luasnip {
+Plug.luasnip {
   -- doc: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
   --
   -- Great intro to LuaSnip (~50min):
   -- https://www.youtube.com/watch?v=ub0REXjhpmk
   source = gh"L3MON4D3/LuaSnip",
   desc = "Hyper flexible snippet Engine for Neovim",
-  tags = {t.insert, t.editing, t.careful_update, t.extensible},
+  tags = {t.insert, t.editing, t.careful_update},
   rev = "v2.3.0", -- last release @2024-04
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
@@ -441,7 +440,7 @@ Plug {
   end,
 }
 
-NamedPlug.lib_textobj_user {
+Plug.lib_textobj_user {
   source = gh"kana/vim-textobj-user",
   tags = {t.vimscript, t.textobj, t.lib_only},
 }
@@ -451,7 +450,7 @@ Plug {
   source = gh"kana/vim-textobj-indent",
   desc = "Indent-based text object",
   tags = {t.vimscript, t.textobj},
-  depends_on = { NamedPlug.lib_textobj_user },
+  depends_on = { Plug.lib_textobj_user },
   defer_load = { on_event = "VeryLazy" },
 }
 
@@ -460,7 +459,7 @@ Plug {
   source = gh"glts/vim-textobj-comment",
   desc = "Comment text object",
   tags = {t.vimscript, t.textobj},
-  depends_on = { NamedPlug.lib_textobj_user },
+  depends_on = { Plug.lib_textobj_user },
   -- IDEA: when the comment is the last thing of the line,
   -- `Ac` could also take the spaces before it!
   -- Meaning that when I have:
@@ -479,7 +478,7 @@ Plug {
   source = gh"kana/vim-textobj-entire",
   desc = "Entire-buffer-content text object",
   tags = {t.vimscript, t.textobj},
-  depends_on = { NamedPlug.lib_textobj_user },
+  depends_on = { Plug.lib_textobj_user },
   defer_load = { on_event = "VeryLazy" },
 }
 
@@ -497,7 +496,7 @@ Plug {
   source = gh"kylechui/nvim-surround",
   desc = "Add/change/delete surrounding delimiter pairs with ease",
   -- Nice showcases at: https://github.com/kylechui/nvim-surround/discussions/53
-  tags = {t.editing, t.extensible},
+  tags = {t.editing},
   defer_load = { on_event = "VeryLazy" }, -- 🤔
   on_load = function()
     -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red)
@@ -649,7 +648,7 @@ Plug {
 Plug {
   source = gh"windwp/nvim-autopairs",
   desc = "auto insert of second ()''{}[]\"\" etc...",
-  tags = {t.editing, t.extensible, t.insert},
+  tags = {t.editing, t.insert},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     -- The plugin is _very_ configurable!

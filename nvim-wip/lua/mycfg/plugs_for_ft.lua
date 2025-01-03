@@ -1,9 +1,8 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
-local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
+local Plug = PluginSystem.PlugDeclarator
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
-local t = PluginSystem.predefined_tags
+local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
 --------------------------------
@@ -83,7 +82,7 @@ Plug {
   end,
 }
 
-NamedPlug.lazydev_lua {
+Plug.lazydev_lua {
   source = gh"folke/lazydev.nvim",
   desc = "Faster LuaLS setup for Lua & Neovim-specific files",
   tags = {t.ft_support},

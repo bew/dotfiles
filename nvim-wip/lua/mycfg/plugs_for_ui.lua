@@ -1,9 +1,8 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
-local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
+local Plug = PluginSystem.PlugDeclarator
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
-local t = PluginSystem.predefined_tags
+local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 local myplug = PluginSystem.sources.myplug
 
@@ -18,13 +17,13 @@ Plug {
   end,
 }
 
-NamedPlug.statusline {
+Plug.statusline {
   source = gh"rebelot/heirline.nvim",
   desc = "Heirline.nvim is a no-nonsense Neovim Statusline plugin",
   -- Very flexible, modular, declarative, dynamic & nicely customizable !!!
   -- Full doc is available at: https://github.com/rebelot/heirline.nvim/blob/master/cookbook.md
   -- (no vim doc for now)
-  tags = {t.ui, t.careful_update, t.extensible},
+  tags = {t.ui, t.careful_update},
   config_depends_on = {
     Plug {
       source = gh"Zeioth/heirline-components.nvim",
@@ -156,7 +155,7 @@ Plug {
   desc = "Neovim plugin to manage the file system and other tree like structures",
   tags = {t.ui, "filesystem", "nav"},
   version = { branch = "v3.x" },
-  depends_on = {NamedPlug.lib_plenary, NamedPlug.lib_nui, NamedPlug.lib_web_devicons},
+  depends_on = {Plug.lib_plenary, Plug.lib_nui, Plug.lib_web_devicons},
   defer_load = { on_cmd = "Neotree" },
   on_load = function()
     require("neo-tree").setup {
@@ -256,11 +255,11 @@ Plug {
   end
 }
 
-NamedPlug.startup_screen {
+Plug.startup_screen {
   source = gh"goolord/alpha-nvim",
   desc = "a lua powered greeter like vim-startify / dashboard-nvim",
-  tags = {t.ui, t.extensible},
-  depends_on = {NamedPlug.lib_web_devicons},
+  tags = {t.ui},
+  depends_on = {Plug.lib_web_devicons},
   defer_load = { on_event = "VimEnter" },
   on_load = function()
     -- the plugin is very versatile! ref: https://github.com/goolord/alpha-nvim/discussions/16
@@ -280,12 +279,12 @@ NamedPlug.startup_screen {
   end,
 }
 
-NamedPlug.telescope {
+Plug.telescope {
   source = gh"nvim-telescope/telescope.nvim",
   desc = "Find, Filter, Preview, Pick. All lua, all the time…",
   tags = {"nav"},
   -- FIXME: install native sorter!
-  depends_on = {NamedPlug.lib_plenary},
+  depends_on = {Plug.lib_plenary},
   config_depends_on = {
     Plug { source = gh"nvim-telescope/telescope-ui-select.nvim" },
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
@@ -685,7 +684,7 @@ Plug {
 
 --------------------------------
 
-NamedPlug.lib_web_devicons {
+Plug.lib_web_devicons {
   source = gh"kyazdani42/nvim-web-devicons",
   desc = "Find (colored) icons for file type",
   tags = {t.ui, t.lib_only},
@@ -696,7 +695,7 @@ NamedPlug.lib_web_devicons {
   end,
 }
 
-NamedPlug.lib_nui {
+Plug.lib_nui {
   source = gh"MunifTanjim/nui.nvim",
   desc = "UI Component Library for Neovim",
   tags = {t.ui, t.lib_only},

@@ -1,22 +1,22 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
-local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
+local Plug = PluginSystem.PlugDeclarator
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
-local t = PluginSystem.predefined_tags
+local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
 
-NamedPlug.fugitive {
+Plug.fugitive {
   source = gh"tpope/vim-fugitive",
   desc = "A Git wrapper so awesome, it should be illegal",
   tags = {t.vimscript, t.git},
   defer_load = { on_event = "VeryLazy" },
 }
+
 Plug {
   -- TODO: switch to https://github.com/rbong/vim-flog
   source = gh"junegunn/gv.vim",
-  depends_on = { NamedPlug.fugitive },
+  depends_on = { Plug.fugitive },
   desc = "Simple (<3) git commit browser, based on vim-fugitive",
   tags = {t.vimscript, t.git},
   defer_load = { on_event = "VeryLazy" },

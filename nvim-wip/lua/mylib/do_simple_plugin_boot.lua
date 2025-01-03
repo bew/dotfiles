@@ -13,15 +13,22 @@ local function need_field(field_name)
 end
 
 --- Returns the first plugin spec with id `pkg_manager` or errors if there is none.
+---@param plugin_specs plugin_system.PluginSpec[]
+---@return plugin_system.PluginSpecPkgManager
 local function find_pkg_manager(plugin_specs)
   for _, p in ipairs(plugin_specs) do
     if p.id == "pkg_manager" then
+      ---@cast p plugin_system.PluginSpecPkgManager
       return p
     end
   end
   error("No package loader/installer/manager found!")
 end
 
+---@class plugin_system.BootPlugContext
+---@field all_plugin_specs plugin_system.PluginSpec[]
+
+---@param ctx plugin_system.BootPlugContext
 local function boot_plugins(ctx)
   ctx = setmetatable(ctx, KeyRefMustExist_mt)
 
@@ -35,7 +42,7 @@ local function boot_plugins(ctx)
   if check_path_exists(pkg_manager.install_path) then
     vim.opt.rtp:prepend(pkg_manager.install_path)
   else
-    pkg_manager:bootstrap_fn(ctx)
+    pkg_manager:bootstrap_itself(ctx)
     if not check_path_exists(pkg_manager.install_path) then
       -- pkg manager still not bootstrapped, can't load plugins, bye
       -- (maybe a msg was printed to ask user to install it !shrug)
@@ -48,7 +55,7 @@ local function boot_plugins(ctx)
     type(pkg_manager.on_boot) == "function",
     _f("Field on_boot of pkg_manager plug spec", _q(pkg_manager_name), "is not a function")
   )
-  local success, error_msg = pcall(pkg_manager.on_boot, ctx)
+  local success, error_msg = pcall(pkg_manager.on_boot, pkg_manager, ctx)
   if not success or error_msg then
     print_err(_f("Package manager", _q(pkg_manager_name), "failed to boot, expect errors / lack of plugins / .."))
     print_err(_f("Reason:", error_msg))
