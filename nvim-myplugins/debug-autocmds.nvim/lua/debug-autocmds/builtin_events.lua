@@ -1,5 +1,6 @@
 local Utils = require"debug-autocmds.utils"
 
+---@type debug_aucmd.EventSpec[]
 local builtin_events = Utils.normalize_event_specs({
   "BufAdd",
   "BufDelete",

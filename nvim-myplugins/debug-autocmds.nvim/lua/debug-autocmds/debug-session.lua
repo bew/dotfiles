@@ -1,26 +1,27 @@
-local get_current_time = vim.loop.now
+local get_current_time = vim.uv.now
 
--- FIXME(typing): how to do multiline description / line continuation in @field docs?
--- FIXME(typing): where can I put the EventSpec dataclass declaration, to be used in other Lua files?
+---@class debug_aucmd.EventSpec
+---@field name string
+---@field tags string[]
 
----@class DebugSession
+---@class debug_aucmd.DebugSession
 ---@field active boolean Whether the session is currently active and recording events
 ---@field name string The name of the session
 ---@field time_on_start integer? Monotonic time in millisecond from session' first start
 ---@field event_nr integer The event number of the last recorded event (0 when never started)
 ---@field augroup integer Vim's augroup for all autocmds (used to clear them all at once by clearing the group)
----@field events_to_watch {[string]: EventSpec} Table of event specs to watch when starting the session
----@field recorded_events EventRecord[] List of recorded events in this session
+---@field events_to_watch {[string]: debug_aucmd.EventSpec} Table of event specs to watch when starting the session
+---@field recorded_events debug_aucmd.EventRecord[] List of recorded events in this session
 local DebugSession = {}
 
----@class EventRecord
+---@class debug_aucmd.EventRecord
 ---@field name string
 ---@field event_nr integer The number of the event in the session
 ---@field time_from_start integer The number of milliseconds from the start of session recording
 ---@field raw table The raw event data (without 'group')
----@field extra EventRecordExtraContext Additional extra context for each event
+---@field extra debug_aucmd.EventRecordExtraContext Additional extra context for each event
 
----@class EventRecordExtraContext
+---@class debug_aucmd.EventRecordExtraContext
 ---@field tabnr integer The tab number
 ---@field winnr integer The window number (unique in the tab)
 ---@field winid integer The window ID (unique)
@@ -28,7 +29,7 @@ local DebugSession = {}
 function DebugSession.new(opts)
   local opts = opts or {}
   vim.validate{ name = {opts.name, "string", false} }
-  ---@type DebugSession
+  ---@type debug_aucmd.DebugSession
   local instance = {
     active = false,
     name = opts.name,
@@ -44,10 +45,10 @@ function DebugSession.new(opts)
   })
 end
 
----@param event_or_events EventSpec[]|EventSpec
+---@param event_or_events debug_aucmd.EventSpec|debug_aucmd.EventSpec[]
 function DebugSession:add_events_to_watch(event_or_events)
   local event_specs = event_or_events
-  if not vim.tbl_islist(event_or_events) then event_specs = {event_or_events} end
+  if not vim.islist(event_or_events) then event_specs = {event_or_events} end
   for _, event_spec in ipairs(event_specs) do
     self.events_to_watch[event_spec.name] = event_spec
   end
@@ -78,6 +79,7 @@ function DebugSession:start()
   end
 end
 
+---@param event_specs debug_aucmd.EventSpec[]
 function DebugSession:start_with_events(event_specs)
   self:add_events_to_watch(event_specs)
   self:start()
@@ -100,7 +102,7 @@ function DebugSession:record_event(event_data)
   -- I'm thinking that actually removing things from event_data is wrong as we store it in the 'raw'
   -- key in the EventRecord.. It's not really 'raw' if we remove things...
 
-  ---@type EventRecord
+  ---@type debug_aucmd.EventRecord
   local event_record = {
     name = event_data.event --[[@as string]],
     event_nr = self.event_nr,
@@ -116,7 +118,7 @@ function DebugSession:record_event(event_data)
   table.insert(self.recorded_events, event_record)
 end
 
----@param display_fn fun(record: EventRecord): nil
+---@param display_fn fun(record: debug_aucmd.EventRecord): nil
 function DebugSession:dump_with(display_fn)
   for _, event_record in ipairs(self.recorded_events) do
     display_fn(event_record)
@@ -132,7 +134,7 @@ local function make_record_matcher_fn(matcher_spec)
       if event_name:match(spec) then
         return true
       end
-      if vim.startswith(spec, "file:") and file_name:match(spec) then
+      if vim.startswith(spec, "scope:") and file_name:match(spec) then
         return true
       end
     end
@@ -145,10 +147,10 @@ end
 ---
 ---    Syntax: comma-separated list of either:
 ---    `foo` to match any part of an event name
----    `file:foo` to match any part of the file name of an event
+---    `scope:foo` to match any part of the file name of an event
 ---
----    Example: buf,winenter,file:foo
----    This will match the events including 'buf', the events WinEnter, and the events with
+---    Example: buf,winenter,scope:foo
+---    This will match the events including 'buf', the WinEnter events, and the events with
 ---    file name including 'foo'
 ---@param display_fn fun(record: EventRecord): nil
 function DebugSession:dump_matching_with(matcher_spec, display_fn)

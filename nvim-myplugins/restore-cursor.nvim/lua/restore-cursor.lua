@@ -2,12 +2,23 @@
 -- https://github.com/neovim/neovim/issues/16339#issuecomment-1348133829
 -- https://github.com/farmergreg/vim-lastplace/issues/28#issuecomment-1336129506
 
-local buf_get_option = vim.api.nvim_buf_get_option -- (shorter)
-
 local M = {}
 
+---@class restore-cursor.ContextMinimal
+---@field buf integer
+---@field winid integer
+
+---@class restore-cursor.Context: restore-cursor.ContextMinimal
+---@field last_known {line1: integer, col0: integer}
+---@field restored boolean
+---@field out_of_bound boolean
+
+---@param cfg restore-cursor.Config
+---@param ctx restore-cursor.ContextMinimal
 local function restore_cursor(cfg, ctx)
   local last_known_pos = vim.api.nvim_buf_get_mark(ctx.buf, '"')
+  ---@cast ctx restore-cursor.Context
+  local ctx = ctx
   ctx.last_known = { line1 = last_known_pos[1], col0 = last_known_pos[2] }
   ctx.restored = false
   ctx.out_of_bound = false
@@ -40,14 +51,19 @@ local function restore_cursor(cfg, ctx)
   cfg.after_fn(ctx)
 end
 
+---@class restore-cursor.Config
+---@field enable_when? fun(ctx: restore-cursor.ContextMinimal): boolean
+---@field after_fn? fun(ctx: restore-cursor.Context)
 M.default_config = {
   enable_when = function(ctx)
-    local buftype = buf_get_option(ctx.buf, "buftype")
+    local buftype = vim.api.nvim_get_option_value("buftype", { buf = ctx.buf })
     if vim.tbl_contains({ "quickfix", "nofile", "help" }, buftype) then
       return false
     end
-    local filetypes = vim.split(buf_get_option(ctx.buf, "filetype"), ".", {plain=true})
-    for _, ft in ipairs(filetypes) do
+
+    ---@type string
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = ctx.buf })
+    for _, ft in ipairs(vim.split(filetype, ".", {plain=true})) do
       if vim.tbl_contains({ "gitcommit", "gitrebase" }, ft) then
         return false
       end
@@ -73,6 +89,7 @@ M.default_config = {
   end,
 }
 
+---@param given_cfg? restore-cursor.Config
 function M.setup(given_cfg)
   local cfg = vim.tbl_extend("force", M.default_config, given_cfg or {})
 
@@ -93,6 +110,7 @@ function M.setup(given_cfg)
         -- once = true, -- Ensure it's called ONCE (not everytime the buffer is displayed)
         buffer = event.buf,
         callback = function()
+          ---@type restore-cursor.ContextMinimal
           local ctx = {
             buf = event.buf,
             winid = vim.fn.win_getid(vim.fn.winnr(), vim.fn.tabpagenr()),

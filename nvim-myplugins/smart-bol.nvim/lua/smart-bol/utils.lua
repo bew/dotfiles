@@ -3,6 +3,8 @@ local M = {}
 ---@class NormalizedPos11
 ---@field line1 integer Line number (1-indexed)
 ---@field col1 integer Column number (1-indexed)
+---
+---@field with_col1 fun(self: NormalizedPos11, col1: integer): NormalizedPos11
 local meta_NormalizedPos11 = {
   __index = {
     with_col1 = function(self, col1)
