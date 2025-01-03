@@ -60,13 +60,10 @@ Plug {
       },
       attach_to_untracked = true,
       preview_config = { border = "none" },
+      diff_opts = {
+        algorithm = "histogram", -- matches my own git config
+      },
     }
-    vim.api.nvim_set_hl(0, "GitSignsAdd",          { link = "SignVcsAdd" })
-    vim.api.nvim_set_hl(0, "GitSignsChange",       { link = "SignVcsChange" })
-    vim.api.nvim_set_hl(0, "GitSignsDelete",       { link = "SignVcsDelete" })
-    vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = "SignVcsChange" })
-    vim.api.nvim_set_hl(0, "GitSignsTopdelete",    { link = "SignVcsDelete" })
-    vim.api.nvim_set_hl(0, "GitSignsUntracked",    { link = "SignVcsUntracked" })
 
     -- FIXME: use 'on_attach' to config keybinds?
 
@@ -113,7 +110,7 @@ Plug {
 
     -- toggles
     local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
-    local_leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
+    local_leader_map{mode={"v"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
     local_leader_map{mode={"n"}, key="htd", action=gs.toggle_deleted,            desc="toggle deleted lines"}
     local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
