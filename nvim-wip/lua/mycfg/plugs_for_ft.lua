@@ -102,6 +102,13 @@ NamedPlug.lazydev_lua {
 }
 
 Plug {
+  source = gh"mrcjkb/rustaceanvim",
+  desc = "🦀 Supercharge your Rust experience in Neovim!",
+  tags = {t.ft_support},
+  -- defer_load not needed, it's already lazy by design
+}
+
+Plug {
   source = gh"NoahTheDuke/vim-just",
   desc = "Just's justfile support",
   tags = {t.vimscript, t.ft_support},
