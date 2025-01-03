@@ -209,18 +209,24 @@ exe "HiResetTo WildMenu"   .s:fg_base02  .s:bg_base2
 exe "HiResetTo Folded"   .s:fg_base0  ." ctermbg=236"
 HiResetTo FoldColumn ctermfg=240 ctermbg=233
 
+HiResetTo SignColumn ctermbg=233
+
 " Diff Colors
 exe "HiResetTo DiffAdd"          .s:fmt_bold   .s:bg_base03_g
 exe "HiResetTo DiffChange cterm=none"
 HiResetTo DiffDelete ctermfg=240 ctermbg=52
 exe "HiResetTo DiffText"         .s:fmt_bold   .s:bg_base03_b
 
-" Signs
-exe "HiResetTo SignColumn ctermbg=233"
-exe "HiResetTo SignVcsAdd"      .s:fg_green
-exe "HiResetTo SignVcsChange"   .s:fg_yellow
-exe "HiResetTo SignVcsDelete"   .s:fg_red
-exe "HiResetTo SignVcsUntracked".s:fg_cyan
+" VCS
+HiResetTo VcsUntracked cterm=bold ctermfg=37
+" unstaged
+HiResetTo VcsAdd       ctermfg=70
+HiResetTo VcsChange    ctermfg=208
+HiResetTo VcsDelete    ctermfg=160
+HiResetTo VcsStagedAdd    ctermfg=28
+HiResetTo VcsStagedChange ctermfg=94
+" ctermfg=88 is too bright, ctermfg=52 is too dark.. pick something else..
+HiResetTo VcsStagedDelete ctermfg=53
 
 exe "HiResetTo Conceal"   .s:fg_blue
 exe "HiResetTo SpellBad"       .s:fmt_undr

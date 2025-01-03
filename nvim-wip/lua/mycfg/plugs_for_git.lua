@@ -54,9 +54,9 @@ Plug {
         add          = { text = "┃" },
         change       = { text = "┃" },
         delete       = { text = "▁" },
-        changedelete = { text = "▁" }, -- like delete, but with different highlight
+        changedelete = { text = "▁" }, -- like 'delete', but with 'change' highlight
         topdelete    = { text = "▔" },
-        untracked    = { text = '┆' },
+        untracked    = { text = '╏' },
       },
       attach_to_untracked = true,
       preview_config = { border = "none" },
@@ -118,6 +118,24 @@ Plug {
     toplevel_map{mode={"o", "v"}, key="ih", action=gs.select_hunk, desc="select hunk"}
     toplevel_map{mode={"o", "v"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
+  on_colorscheme_change = function()
+    -- untracked changes
+    vim.api.nvim_set_hl(0, "GitSignsUntracked",    { link = "VcsUntracked" })
+
+    -- unstaged changes
+    vim.api.nvim_set_hl(0, "GitSignsAdd",          { link = "VcsAdd" })
+    vim.api.nvim_set_hl(0, "GitSignsChange",       { link = "VcsChange" })
+    vim.api.nvim_set_hl(0, "GitSignsDelete",       { link = "VcsDelete" })
+    vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = "VcsChange" })
+    vim.api.nvim_set_hl(0, "GitSignsTopdelete",    { link = "VcsDelete" })
+
+    -- staged changes
+    vim.api.nvim_set_hl(0, "GitSignsStagedAdd",          { link = "VcsStagedAdd" })
+    vim.api.nvim_set_hl(0, "GitSignsStagedChange",       { link = "VcsStagedChange" })
+    vim.api.nvim_set_hl(0, "GitSignsStagedDelete",       { link = "VcsStagedDelete" })
+    vim.api.nvim_set_hl(0, "GitSignsStagedChangedelete", { link = "VcsStagedChange" })
+    vim.api.nvim_set_hl(0, "GitSignsStagedTopdelete",    { link = "VcsStagedDelete" })
+  end
 }
 
 Plug {
