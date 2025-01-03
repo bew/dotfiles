@@ -137,9 +137,9 @@ exe "HiResetTo Statement"   .s:fg_green
 "        Conditional     if, then, else, endif, switch, etc.
 "        Repeat          for, do, while, etc.
 "        Label           case, default, etc.
-"        Operator        "sizeof", "+", "*", etc.
 "        Keyword         any other keyword
 "        Exception       try, catch, throw
+HiResetTo Operator cterm=bold ctermfg=215
 
 exe "HiResetTo PreProc"   .s:fg_orange
 "       *PreProc         generic Preprocessor
@@ -256,6 +256,63 @@ exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
 exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_yellow_bright    .s:bg_base01
 
 hi NormalFloat ctermfg=248 ctermbg=236
+
+"}}}
+" Tree-sitter highlighting "{{{
+" ---------------------------------------------------------------------
+HiResetTo @type ctermfg=214
+HiResetTo @type.builtin ctermfg=131
+
+HiResetTo @function ctermfg=33
+HiResetTo @function.call ctermfg=208
+HiResetTo @function.macro ctermfg=208
+HiResetTo @function.builtin ctermfg=166 cterm=bold
+
+HiResetTo @variable.member ctermfg=32
+HiResetTo @variable.builtin ctermfg=253 cterm=italic
+HiResetTo @variable.parameter cterm=italic
+
+" the key in key/value pairs
+HiResetTo @property ctermfg=137
+
+"}}}
+" Tree-sitter highlighting (Language-specific overrides) "{{{
+
+" ...
+
+"}}}
+" LSP highlighting "{{{
+" ---------------------------------------------------------------------
+" By default @lsp.* hl groups link to treesitter groups, but let's override some of them..
+" HiResetTo @lsp.mod.deprecated
+" HiResetTo @lsp.type.class
+" HiResetTo @lsp.type.comment
+" HiResetTo @lsp.type.decorator
+" HiResetTo @lsp.type.enum
+" HiResetTo @lsp.type.enumMember
+" HiResetTo @lsp.type.event
+" HiResetTo @lsp.type.function
+" HiResetTo @lsp.type.interface
+" HiResetTo @lsp.type.keyword
+" HiResetTo @lsp.type.macro
+" HiResetTo @lsp.type.method
+" HiResetTo @lsp.type.modifier
+" HiResetTo @lsp.type.namespace
+" HiResetTo @lsp.type.number
+" HiResetTo @lsp.type.operator
+" HiResetTo @lsp.type.parameter
+" HiResetTo @lsp.type.property
+" HiResetTo @lsp.type.regexp
+" HiResetTo @lsp.type.string
+" HiResetTo @lsp.type.struct
+" HiResetTo @lsp.type.type
+" HiResetTo @lsp.type.typeParameter
+" HiResetTo @lsp.type.variable
+"}}}
+" LSP highlighting (Language-specific overrides) "{{{
+" ---------------------------------------------------------------------
+
+" ...
 
 "}}}
 " vim syntax highlighting "{{{
