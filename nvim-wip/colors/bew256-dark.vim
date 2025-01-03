@@ -21,7 +21,7 @@ function! s:reset_highlight(group, ...)
 
   " When using hi! or hi clear of syntax clear, the syntax groups uses the
   " nvim's default, and non-specified cterm* option will be nvim's default.
-  " BUT we want a compleately cleared group before setting our options so we
+  " BUT we want a completely cleared group before setting our options so we
   " first clear everything and 'paste' our options afterward.
   let hi_reset = " cterm=none ctermfg=none ctermbg=none "
   exe "hi! " . a:group . l:hi_reset . join(a:000, " ")
@@ -257,6 +257,12 @@ exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_yellow_bright    .s:bg_base01
 
 hi NormalFloat ctermfg=248 ctermbg=236
 
+"}}}
+" Diagnostic highlighting "{{{
+" ---------------------------------------------------------------------
+" Disable 'unnecessary' group, that completely dims the code by default and hides all colors
+" (makes code hard to work with when it is marked unused by LSPs!)
+HiResetTo DiagnosticUnnecessary
 "}}}
 " Tree-sitter highlighting "{{{
 " ---------------------------------------------------------------------
