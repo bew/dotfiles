@@ -42,8 +42,7 @@ NamedPlug.cmp {
     global_cfg.preselect = cmp.PreselectMode.None
     global_cfg.snippet = {
       expand = function(args)
-        -- TODO: enable when luasnip & LSP configured!
-        -- require'luasnip'.lsp_expand(args.body) -- enable soon?
+        require'luasnip'.lsp_expand(args.body)
       end
     }
     global_cfg.view = {
