@@ -7,11 +7,144 @@ local conds = require"mycfg.snippets_by_ft._conditions"
 local SNIPS = {}
 local snip = SU.get_snip_fn(SNIPS)
 
-local i = ls.insert_node
-local t = ls.text_node
+local i = ls.insert_node ---@diagnostic disable-line: unused-local
+local t = ls.text_node ---@diagnostic disable-line: unused-local
 local rep = ls_extras.rep
 
+-- Snip Resolvers, to tweak what will be removed exactly before snip expansion
+local SR = {}
+--- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
+SR.delete_spaces_after_trigger = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" }
+
 -- Start of snippets definitions
+
+-- NOTE: `---@foo` snips must be before others to have a chance to match instead of `@foo`
+snip("an", {desc = "LuaCATS @annotation"}, { t"---@" })
+-- must be first, ~necessary to avoid `---@` to expand to `------@` with `@` below
+snip("---@", {desc = "LuaCATS @annotation"}, { t"---@" })
+snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
+
+---@param trig string
+---@param context table
+---@param nodes_factory fun(): table
+local function snip_lua_annotation(trig, context, nodes_factory, ...)
+  assert(trig:sub(1, 1) == "@", "annotation trigger must start with '@'")
+  do
+    -- Allows `---@foo|` or `---foo|` => `---@foo_or_foobar |`
+    -- (must be first to have a chance to match before `@foo` below)
+    local trig_without_at = trig:sub(2)
+    local context = vim.tbl_extend("keep", context, { trigEngine = "pattern" })
+    snip("%-%-%-@?"..trig_without_at, context, nodes_factory(), ...)
+  end
+  do
+    -- Allows `@foo|` => `---@foo_or_foobar |`
+    snip(trig, context, nodes_factory(), ...)
+  end
+end
+
+snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line}, function()
+  return ls.choice_node(1, {
+    ls.snippet_node(nil, SU.myfmt {
+      [[---@class <name>]],
+      {
+        name = ls.restore_node(1, "class_name"),
+      }
+    }),
+    ls.snippet_node(nil, SU.myfmt {
+      [[---@class <name>: <inherit_from>]],
+      {
+        name = ls.restore_node(1, "class_name"),
+        inherit_from = i(2, "InheritFromClass")
+      }
+    }),
+  }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
+end, {
+  stored = { class_name = i(nil, "ClassName") },
+})
+
+snip_lua_annotation("@dd", {desc = "LuaCATS @diagnostic disable-for-x"}, function()
+  return SU.myfmt {
+    "---@diagnostic <action>: <diags><maybe_why>",
+    {
+      action = ls.choice_node(1, {
+        t"disable-for-next-line",
+        t"disable-line",
+      }),
+      -- IDEA: could default to the diag name of the first hint/warning on the line current/below
+      diags = i(2),
+      maybe_why = ls.choice_node(3, {
+        ls.snippet_node(nil, SU.myfmt {
+          "<space>(<why>)",
+          {
+            space = t" ", -- (putting it in fmt trims it automatically..)
+            why = i(1, "TODO: Reason 🤔"),
+          }
+        }),
+        t"",
+      }),
+    }
+  }
+end)
+
+snip_lua_annotation("@dt", {desc = "LuaCATS @diagnostic toggle-around-block"}, function()
+  return SU.myfmt {
+    [[
+    ---@diagnostic disable: <diags> (<why>)
+    <middle>
+    ---@diagnostic enable: <diags_again><after>
+    ]],
+    {
+      diags = i(1),
+      why = i(2, "TODO: Reason 🤔"),
+      middle = SU.insert_node_default_selection(3, "-- YOLO, do random things here!"),
+      diags_again = rep(1),
+      after = i(4), -- don't exit snip context too fast 😬
+    }
+  }
+end)
+
+snip("@as", {desc = "LuaCATS (inline) @as"}, SU.myfmt {
+  "--[[@as <type>]]",
+  { type = i(1, "Type") }
+})
+
+-- NOTE: must be last to allow custom annotation snips to be found before
+local function anno_from_capture(_args, snip)
+  local short_to_long = {
+    a = "alias",
+    c = "class",
+    d = "diagnostic",
+    e = "enum",
+    f = "field",
+    fi = "field private",
+    fo = "field protected",
+    g = "generic",
+    m = "module",
+    o = "overload",
+    p = "param",
+    pri = "private",
+    pro = "protected",
+    r = "return",
+    t = "type",
+  }
+  local given_anno = snip.env.LS_CAPTURE_1
+  return short_to_long[given_anno] or given_anno
+end
+snip_lua_annotation(
+  "@(%w+)",
+  {desc = "LuaCATS @annotation", trigEngine = "pattern", resolver = SR.delete_spaces_after_trigger},
+  function()
+    return SU.myfmt {
+      [[---@<anno> ]],
+      { anno = ls.function_node(anno_from_capture) }
+    }
+  end
+)
+
+--------------------------
+
+-- NOTE: must be after annotations, to avoid matching `---d|`
+snip("d", {desc = "Documentation prefix", resolver = SR.delete_spaces_after_trigger}, { t"--- " })
 
 snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   [[require"<module>"]],
@@ -161,9 +294,7 @@ snip(
   "r",
   {
     desc = "return ...",
-    -- Tweak what will be removed exactly before snip expansion
-    -- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
-    resolveExpandParams = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" },
+    resolver = SR.delete_spaces_after_trigger,
   },
   {
     t"return "

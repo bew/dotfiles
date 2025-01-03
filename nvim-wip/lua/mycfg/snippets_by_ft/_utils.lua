@@ -161,12 +161,15 @@ end
 SU.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
+    local maybe_after_node = nil ---@type table?
     if SU.has_stored_selection(snip) then
       -- override default text with last selection
-      default_text = snip.env.LS_SELECT_RAW
+      default_text = snip.env.LS_SELECT_DEDENT
+      maybe_after_node = ls.snippet_node(2) -- node after, to have a tabstop after injected selection
     end
     return ls.snippet_node(nil, {
       ls.insert_node(1, default_text),
+      maybe_after_node,
     })
   end)
 end
