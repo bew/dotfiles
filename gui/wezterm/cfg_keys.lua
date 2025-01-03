@@ -7,8 +7,22 @@ local callback = wezterm.action_callback
 
 local cfg = {}
 
+---@alias ActionT string|table
+
+---@class KeybindSpec
+---@field mods string
+---@field key string
+---@field action ActionT
+
+---@alias KeybindSpecsNested (KeybindSpec | KeybindSpec[])[]
+
 -- Helper for keybind definition
+---@param mods string
+---@param keys string|string[]
+---@param action ActionT
+---@return KeybindSpec[]
 local function keybind(mods, keys, action)
+  ---@type string[]
   local keys = (type(keys) == "table") and keys or {keys}
   local mods = mods
   local binds = {}
@@ -20,14 +34,21 @@ end
 
 cfg.disable_default_key_bindings = true
 
+---@class KeyTableSpec
+---@field name string
+---@field activation? {[string]: boolean}
+---@field keys KeybindSpecsNested
+
+---@type {[string]: KeybindSpec[]}
 cfg.key_tables = {}
+
+---@param spec KeyTableSpec
 local function define_and_activate_keytable(spec)
   -- Flatten keys, and define the Key Table
   cfg.key_tables[spec.name] = mytable.flatten_list(spec.keys)
 
   -- Setup & return activation key bind
-  local activation_opts = spec.activation or {}
-  activation_opts.name = spec.name
+  local activation_opts = mytable.merge_all({name = spec.name}, spec.activation or {})
   return act.ActivateKeyTable(activation_opts)
 end
 
@@ -76,6 +97,7 @@ end
 -- * For bindings with SHIFT and something else, mod should contain SHIFT,
 --   and key should be the shifted key that is going to reach the terminal.
 --   (based on the keyboard-layout)
+---@type KeybindSpecsNested[]
 cfg.keys = {
   -- Remap C-Backspace to C-w everywhere
   keybind(mods.C, "Backspace", act.SendKey{mods=mods.C, key="w"}),
@@ -240,6 +262,7 @@ end)
 -- To simplify config composability, `cfg.keys` is (initially) a
 -- nested list of (bind or list of (bind or ...)), so we must
 -- flatten the list to have a list of bind.
+---@type KeybindSpec[]
 cfg.keys = mytable.flatten_list(cfg.keys)
 
 return cfg

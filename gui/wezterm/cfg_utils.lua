@@ -10,6 +10,8 @@ local mods = setmetatable({
   }
 }, {
   -- Dynamically transform key access of 'CSA' to 'CTRL|SHIFT|ALT'
+  ---@param key string
+  ---@return string
   __index = function(self, key)
     local resolved_mods = self._SHORT_MOD_MAP[key:sub(1, 1)]
     for i = 2, #key do

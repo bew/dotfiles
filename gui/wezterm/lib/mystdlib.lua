@@ -1,6 +1,8 @@
 local mytable = {} -- my "table" stdlib
 
 --- Merge all the given tables into a single one and return it.
+---@param ... table
+---@return table
 function mytable.merge_all(...)
   local ret = {}
   for _, tbl in ipairs({...}) do
@@ -12,6 +14,8 @@ function mytable.merge_all(...)
 end
 
 --- Deep clone the given table.
+---@param original table
+---@return table
 function mytable.deepclone(original)
   local clone = {}
   for k, v in pairs(original) do
@@ -24,6 +28,8 @@ function mytable.deepclone(original)
   return clone
 end
 
+---@param t table|any
+---@return boolean
 local is_list = function(t)
   if type(t) ~= "table" then
     return false
@@ -33,7 +39,9 @@ local is_list = function(t)
 end
 
 --- Flatten the given list of (item or (list of (item or ...)) to a list of item.
--- (nested lists are supported)
+--- (nested lists are supported)
+---@param list table
+---@return table
 function mytable.flatten_list(list)
   local flattened_list = {}
   for _, item in ipairs(list) do

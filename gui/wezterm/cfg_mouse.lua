@@ -12,6 +12,16 @@ cfg.swallow_mouse_click_on_window_focus = true
 
 local mouse_bindings = {}
 
+---@class MouseActions
+---@field down_action ActionT
+---@field up_action ActionT
+---@field drag_action? ActionT
+
+---@param mods string
+---@param button string
+---@param streak integer
+---@param mouse_actions MouseActions
+---@param extra_opts? {[string]: any}
 local function binds_for_mouse_actions(mods, button, streak, mouse_actions, extra_opts)
   local function mouse_bind_for(event_kind, action)
     local bind = {
@@ -43,6 +53,10 @@ local function binds_for_mouse_actions(mods, button, streak, mouse_actions, extr
   return binds
 end
 
+---@alias SelectionModesT "Cell" | "Word" | "Line" | "Block"
+
+---@param selection_mode SelectionModesT
+---@return MouseActions
 local function initial_selection_mouse_actions(selection_mode)
   return {
     -- Select on Down event
@@ -63,6 +77,8 @@ table.insert(mouse_bindings, {
 })
 
 
+---@param selection_mode SelectionModesT
+---@return MouseActions
 local function extend_selection_mouse_actions(selection_mode)
   return {
     -- Extend the selection on Down & Drag events
