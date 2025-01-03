@@ -48,38 +48,17 @@ let s:violet      = "99"
 let s:blue        = "33"
 let s:cyan        = "37"
 let s:green       = "70"
-let s:back        = "233"
 
-let s:bg_base03_g  = ' ctermbg=22'
-let s:bg_base03_r  = ' ctermbg=52'
-let s:bg_base03_b  = ' ctermbg=24'
-
-let s:fg_yellow_bright = ' ctermfg=11' " Same as 220?
-
-let s:tab_current = s:base03   " dark_back
-let s:tab_contrast = s:base3   " light_back
-let s:tab_others = "239"
+let s:fg_bright_yellow = ' ctermfg=11' " Same as 220?
 
 " Highlighting primitives"{{{
 " ---------------------------------------------------------------------
 
-exe "let s:bg_back      = ' ctermbg=".s:back   ."'"
-exe "let s:bg_base03    = ' ctermbg=".s:base03 ."'"
 exe "let s:bg_base02    = ' ctermbg=".s:base02 ."'"
 exe "let s:bg_base01    = ' ctermbg=".s:base01 ."'"
 exe "let s:bg_base00    = ' ctermbg=".s:base00 ."'"
 exe "let s:bg_base0     = ' ctermbg=".s:base0  ."'"
-exe "let s:bg_base1     = ' ctermbg=".s:base1  ."'"
 exe "let s:bg_base2     = ' ctermbg=".s:base2  ."'"
-exe "let s:bg_base3     = ' ctermbg=".s:base3  ."'"
-exe "let s:bg_green     = ' ctermbg=".s:green  ."'"
-exe "let s:bg_yellow    = ' ctermbg=".s:yellow ."'"
-exe "let s:bg_orange    = ' ctermbg=".s:orange ."'"
-exe "let s:bg_red       = ' ctermbg=".s:red    ."'"
-exe "let s:bg_magenta   = ' ctermbg=".s:magenta."'"
-exe "let s:bg_violet    = ' ctermbg=".s:violet ."'"
-exe "let s:bg_blue      = ' ctermbg=".s:blue   ."'"
-exe "let s:bg_cyan      = ' ctermbg=".s:cyan   ."'"
 
 exe "let s:fg_base03    = ' ctermfg=".s:base03 ."'"
 exe "let s:fg_base02    = ' ctermfg=".s:base02 ."'"
@@ -87,8 +66,6 @@ exe "let s:fg_base01    = ' ctermfg=".s:base01 ."'"
 exe "let s:fg_base00    = ' ctermfg=".s:base00 ."'"
 exe "let s:fg_base0     = ' ctermfg=".s:base0  ."'"
 exe "let s:fg_base1     = ' ctermfg=".s:base1  ."'"
-exe "let s:fg_base2     = ' ctermfg=".s:base2  ."'"
-exe "let s:fg_base3     = ' ctermfg=".s:base3  ."'"
 exe "let s:fg_green     = ' ctermfg=".s:green  ."'"
 exe "let s:fg_yellow    = ' ctermfg=".s:yellow ."'"
 exe "let s:fg_orange    = ' ctermfg=".s:orange ."'"
@@ -99,10 +76,7 @@ exe "let s:fg_blue      = ' ctermfg=".s:blue   ."'"
 exe "let s:fg_cyan      = ' ctermfg=".s:cyan   ."'"
 
 exe "let s:fmt_bold     = ' cterm=bold'"
-exe "let s:fmt_bldi     = ' cterm=bold'"
 exe "let s:fmt_undr     = ' cterm=underline'"
-exe "let s:fmt_undb     = ' cterm=underline,bold'"
-exe "let s:fmt_curl     = ' cterm=none'"
 exe "let s:fmt_ital     = ' cterm=italic'"
 
 "}}}
@@ -111,7 +85,7 @@ exe "let s:fmt_ital     = ' cterm=italic'"
 " note that link syntax to avoid duplicate configuration doesn't work with the
 " exe compiled formats
 
-exe "HiResetTo Normal"   .s:fg_base0  .s:bg_back
+exe "HiResetTo Normal"   .s:fg_base0  .' ctermbg=233'
 " Darker background for non-current windows
 exe "HiResetTo NormalNC ctermbg=232"
 
@@ -171,7 +145,7 @@ exe "HiResetTo Ignore cterm=none"
 exe "HiResetTo Error"          .s:fmt_bold   .s:fg_red
 "       *Error           any erroneous construct
 
-exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_yellow_bright
+exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_bright_yellow
 "       *Todo            anything that needs extra attention; mostly the
 "                        keywords TODO FIXME and XXX
 "
@@ -183,15 +157,16 @@ exe "HiResetTo NonText ctermfg=237"
 exe "HiResetTo StatusLine"   .s:fg_base02  .s:bg_base0
 exe "HiResetTo StatusLineNC"   .s:fg_base02 .s:bg_base00
 exe "HiResetTo Directory"   .s:fg_blue
-exe "HiResetTo ErrorMsg"       .s:bg_red
-exe "HiResetTo IncSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
-exe "HiResetTo Search"         .s:fmt_bold   .s:fg_base03 .s:bg_yellow
-exe "HiResetTo CurSearch"      .s:fmt_bold   .s:fg_base03 .s:bg_orange
+HiResetTo ErrorMsg ctermbg=124
 exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
 exe "HiResetTo VertSplit"  .s:fg_base02 .s:bg_base00
 hi! link WinSeparator VertSplit
+
+HiResetTo IncSearch      cterm=bold ctermfg=233 ctermbg=166
+HiResetTo Search         cterm=bold ctermfg=233 ctermbg=136
+hi! link CurSearch IncSearch
 
 " 236 (grey)
 " 17 (dark blue) is nice BUT a bit too subtle
@@ -211,36 +186,41 @@ HiResetTo FoldColumn ctermfg=240 ctermbg=233
 
 HiResetTo SignColumn ctermbg=233
 
-" Diff Colors
-exe "HiResetTo DiffAdd"          .s:fmt_bold   .s:bg_base03_g
-exe "HiResetTo DiffChange cterm=none"
+" Diff & VCS
+HiResetTo DiffAdd    cterm=bold ctermbg=22
+HiResetTo DiffChange cterm=none
 HiResetTo DiffDelete ctermfg=240 ctermbg=52
-exe "HiResetTo DiffText"         .s:fmt_bold   .s:bg_base03_b
+HiResetTo DiffText   cterm=bold ctermbg=24
 
-" VCS
+" VCS Untracked
 HiResetTo VcsUntracked cterm=bold ctermfg=37
-" unstaged
+" VCS unstaged
 HiResetTo VcsAdd       ctermfg=70
 HiResetTo VcsChange    ctermfg=208
 HiResetTo VcsDelete    ctermfg=160
+" VCS staged (darker)
 HiResetTo VcsStagedAdd    ctermfg=28
 HiResetTo VcsStagedChange ctermfg=94
-" ctermfg=88 is too bright, ctermfg=52 is too dark.. pick something else..
 HiResetTo VcsStagedDelete ctermfg=53
+" ctermfg=88 is too bright, ctermfg=52 is too dark.. pick something else..
 
 exe "HiResetTo Conceal"   .s:fg_blue
-exe "HiResetTo SpellBad"       .s:fmt_undr
-exe "HiResetTo SpellCap"       .s:fmt_undr
-exe "HiResetTo SpellRare"      .s:fmt_undr
-exe "HiResetTo SpellLocal"     .s:fmt_undr
-exe "HiResetTo Pmenu"   .s:fg_base02  .s:bg_base0
-exe "HiResetTo PmenuSel"       .s:fmt_bold   .s:fg_base2 .s:bg_orange
+HiResetTo SpellBad     cterm=underline
+HiResetTo SpellCap     cterm=underline
+HiResetTo SpellRare    cterm=underline
+HiResetTo SpellLocal   cterm=underline
 
-" TODO: review the popup-menu' scrollbar highlight!
-exe "HiResetTo PmenuSbar"   .s:fg_base0  .s:bg_base2
-exe "HiResetTo PmenuThumb"   .s:fg_base03  .s:bg_base0
+" builtin popup-menu:
+HiResetTo Pmenu                 ctermfg=234 ctermbg=249
+HiResetTo PmenuSel  cterm=bold  ctermfg=187 ctermbg=166
+" builtin popup-menu scrollbar:
+HiResetTo PmenuSbar   ctermfg=249  ctermbg=187
+HiResetTo PmenuThumb  ctermfg=233  ctermbg=249
 
 " Tab Colors
+let s:tab_current = s:base03   " dark_back
+let s:tab_contrast = s:base3   " light_back
+let s:tab_others = "239"
 exe "HiResetTo TabLineSel  cterm=bold  ctermfg=".s:tab_contrast ." ctermbg=".s:tab_current
 exe "HiResetTo TabLine     ctermfg=".s:tab_contrast ." ctermbg=".s:tab_others
 
@@ -259,7 +239,7 @@ exe "HiResetTo CursorLineNr"   .s:fg_cyan   ." ctermbg=237 cterm=bold"
 hi! link ColorColumn CursorColumn
 exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
 
-exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_yellow_bright    .s:bg_base01
+exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_bright_yellow    .s:bg_base01
 
 hi NormalFloat ctermfg=248 ctermbg=236
 
@@ -284,7 +264,7 @@ HiResetTo @variable.member ctermfg=32
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
 
-" the key in key/value pairs
+" The key in a key/value pairs
 HiResetTo @property ctermfg=137
 
 "}}}
@@ -295,7 +275,7 @@ HiResetTo @property ctermfg=137
 "}}}
 " LSP highlighting "{{{
 " ---------------------------------------------------------------------
-" By default @lsp.* hl groups link to treesitter groups, but let's override some of them..
+" NOTE: By default @lsp.* hl groups link to treesitter groups
 " HiResetTo @lsp.mod.deprecated
 " HiResetTo @lsp.type.class
 " HiResetTo @lsp.type.comment
@@ -329,9 +309,6 @@ HiResetTo @property ctermfg=137
 "}}}
 " vim syntax highlighting "{{{
 " ---------------------------------------------------------------------
-"exe "HiResetTo vimLineComment" . s:fg_base01   .s:fmt_ital
-"hi! link vimComment Comment
-"hi! link vimLineComment Comment
 hi! link vimVar Identifier
 hi! link vimFunc Function
 hi! link vimUserFunc Function
@@ -352,37 +329,10 @@ exe "HiResetTo vimSynMtchOpt"    .s:fg_yellow
 exe "HiResetTo vimSynType"    .s:fg_cyan
 exe "HiResetTo vimHiLink"    .s:fg_blue
 exe "HiResetTo vimHiGroup"    .s:fg_blue
-exe "HiResetTo vimGroup"          .s:fmt_undb    .s:fg_blue
-"}}}
-" diff highlighting "{{{"{{{"}}}
-" ---------------------------------------------------------------------
-hi! link diffAdded DiffAdd
-hi! link diffRemoved DiffDelete
-hi! link diffLine Identifier
+exe "HiResetTo vimGroup  cterm=underline,bold"    .s:fg_blue
 "}}}
 " git & gitcommit highlighting "{{{
-"git
-"exe "HiResetTo gitDateHeader"
-"exe "HiResetTo gitIdentityHeader"
-"exe "HiResetTo gitIdentityKeyword"
-"exe "HiResetTo gitNotesHeader"
-"exe "HiResetTo gitReflogHeader"
-"exe "HiResetTo gitKeyword"
-"exe "HiResetTo gitIdentity"
-"exe "HiResetTo gitEmailDelimiter"
-"exe "HiResetTo gitEmail"
-"exe "HiResetTo gitDate"
-"exe "HiResetTo gitMode"
-"exe "HiResetTo gitHashAbbrev"
-"exe "HiResetTo gitHash"
-"exe "HiResetTo gitReflogMiddle"
-"exe "HiResetTo gitReference"
-"exe "HiResetTo gitStage"
-"exe "HiResetTo gitType"
-"exe "HiResetTo gitDiffAdded"
-"exe "HiResetTo gitDiffRemoved"
 "gitcommit
-"exe "HiResetTo gitcommitSummary"
 exe "HiResetTo gitcommitComment"      .s:fmt_ital     .s:fg_base01
 hi! link gitcommitUntracked gitcommitComment
 hi! link gitcommitDiscarded gitcommitComment
@@ -393,10 +343,6 @@ exe "HiResetTo gitcommitBranch"       .s:fmt_bold     .s:fg_magenta
 hi! link gitcommitNoBranch gitcommitBranch
 exe "HiResetTo gitcommitDiscardedType"     .s:fg_red
 exe "HiResetTo gitcommitSelectedType"     .s:fg_green
-"exe "HiResetTo gitcommitUnmergedType"
-"exe "HiResetTo gitcommitType"
-"exe "HiResetTo gitcommitNoChanges"
-"exe "HiResetTo gitcommitHeader"
 exe "HiResetTo gitcommitHeader"     .s:fg_base01
 exe "HiResetTo gitcommitUntrackedFile".s:fmt_bold     .s:fg_cyan
 exe "HiResetTo gitcommitDiscardedFile".s:fmt_bold     .s:fg_red
@@ -406,9 +352,6 @@ exe "HiResetTo gitcommitFile"         .s:fmt_bold     .s:fg_base0
 hi! link gitcommitDiscardedArrow gitcommitDiscardedFile
 hi! link gitcommitSelectedArrow  gitcommitSelectedFile
 hi! link gitcommitUnmergedArrow  gitcommitUnmergedFile
-"exe "HiResetTo gitcommitArrow"
-"exe "HiResetTo gitcommitOverflow"
-"exe "HiResetTo gitcommitBlank"
 " }}}
 " html highlighting "{{{
 " ---------------------------------------------------------------------
@@ -419,87 +362,6 @@ exe "HiResetTo htmlTagName"       .s:fmt_bold .s:fg_blue
 exe "HiResetTo htmlSpecialTagName".s:fmt_ital .s:fg_blue
 exe "HiResetTo htmlArg" .s:fg_base00
 exe "HiResetTo javaScript" .s:fg_yellow
-"}}}
-" perl highlighting "{{{
-" ---------------------------------------------------------------------
-exe "HiResetTo perlHereDoc"    . s:fg_base1  .s:bg_back
-exe "HiResetTo perlVarPlain"   . s:fg_yellow .s:bg_back
-exe "HiResetTo perlStatementFileDesc". s:fg_cyan.s:bg_back
-
-"}}}
-" tex highlighting "{{{
-" ---------------------------------------------------------------------
-exe "HiResetTo texStatement"   . s:fg_cyan   .s:bg_back
-exe "HiResetTo texMathZoneX"   . s:fg_yellow .s:bg_back
-exe "HiResetTo texMathMatcher" . s:fg_yellow .s:bg_back
-exe "HiResetTo texMathMatcher" . s:fg_yellow .s:bg_back
-exe "HiResetTo texRefLabel"    . s:fg_yellow .s:bg_back
-"}}}
-" ruby highlighting "{{{
-" ---------------------------------------------------------------------
-exe "HiResetTo rubyDefine"     . s:fg_base1  .s:bg_back   .s:fmt_bold
-"rubyInclude
-"rubySharpBang
-"rubyAccess
-"rubyPredefinedVariable
-"rubyBoolean
-"rubyClassVariable
-"rubyBeginEnd
-"rubyRepeatModifier
-"hi! link rubyArrayDelimiter    Special  " [ , , ]
-"rubyCurlyBlock  { , , }
-
-"hi! link rubyClass             Keyword
-"hi! link rubyModule            Keyword
-"hi! link rubyKeyword           Keyword
-"hi! link rubyOperator          Operator
-"hi! link rubyIdentifier        Identifier
-"hi! link rubyInstanceVariable  Identifier
-"hi! link rubyGlobalVariable    Identifier
-"hi! link rubyClassVariable     Identifier
-"hi! link rubyConstant          Type
-"}}}
-" haskell syntax highlighting"{{{
-" ---------------------------------------------------------------------
-" For use with syntax/haskell.vim : Haskell Syntax File
-" http://www.vim.org/scripts/script.php?script_id=3034
-" See also Steffen Siering's github repository:
-" http://github.com/urso/dotrc/blob/master/vim/syntax/haskell.vim
-" ---------------------------------------------------------------------
-"
-" Treat True and False specially, see the plugin referenced above
-let hs_highlight_boolean=1
-" highlight delims, see the plugin referenced above
-let hs_highlight_delimiters=1
-
-exe "HiResetTo cPreCondit". s:fg_orange
-
-exe "HiResetTo VarId"    . s:fg_blue
-exe "HiResetTo ConId"    . s:fg_yellow
-exe "HiResetTo hsImport" . s:fg_magenta
-exe "HiResetTo hsString" . s:fg_base00
-
-exe "HiResetTo hsStructure"        . s:fg_cyan
-exe "HiResetTo hs_hlFunctionName"  . s:fg_blue
-exe "HiResetTo hsStatement"        . s:fg_cyan
-exe "HiResetTo hsImportLabel"      . s:fg_cyan
-exe "HiResetTo hs_OpFunctionName"  . s:fg_yellow
-exe "HiResetTo hs_DeclareFunction" . s:fg_orange
-exe "HiResetTo hsVarSym"           . s:fg_cyan
-exe "HiResetTo hsType"             . s:fg_yellow
-exe "HiResetTo hsTypedef"          . s:fg_cyan
-exe "HiResetTo hsModuleName"       . s:fg_green   .s:fmt_undr
-exe "HiResetTo hsModuleStartLabel" . s:fg_magenta
-hi! link hsImportParams      Delimiter
-hi! link hsDelimTypeExport   Delimiter
-hi! link hsModuleStartLabel  hsStructure
-hi! link hsModuleWhereLabel  hsModuleStartLabel
-
-" following is for the haskell-conceal plugin
-" the first two items don't have an impact, but better safe
-exe "HiResetTo hsNiceOperator"     . s:fg_cyan
-exe "HiResetTo hsniceoperator"     . s:fg_cyan
-
 "}}}
 " License "{{{
 " ---------------------------------------------------------------------
