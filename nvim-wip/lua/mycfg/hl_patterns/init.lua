@@ -35,8 +35,8 @@ patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.vim_color
 -- TODO: move to per-filetype patterns? (use `vim.b.minihipatterns_config`?)
 patterns.emmylua_doc_kw = {
   -- note: Match `---@foo`
-  pattern = function(buf_id)
-    if vim.bo[buf_id].filetype ~= "lua" then return nil end
+  pattern = function(bufnr)
+    if vim.bo[bufnr].filetype ~= "lua" then return nil end
     return "^%s*%-%-%-()@%w+()"
   end,
   group = U.define_hl("emmylua_doc_kw", {

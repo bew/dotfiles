@@ -1,8 +1,3 @@
-local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _s = U.str_surround
-local _q = U.str_simple_quote_surround
-
 local PluginSystem = require"mylib.plugin_system"
 local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
 local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()

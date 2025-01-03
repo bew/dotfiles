@@ -1,7 +1,4 @@
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _s = U.str_surround
-local _q = U.str_simple_quote_surround
 
 local PluginSystem = require"mylib.plugin_system"
 local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
@@ -10,7 +7,6 @@ local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
 -- Shorter vars for easy/non-bloat use in pkg specs!
 local t = PluginSystem.predefined_tags
 local gh = PluginSystem.sources.github
-local myplug = PluginSystem.sources.myplug
 
 --------------------------------
 
@@ -204,10 +200,10 @@ NamedPlug.cmp {
               bufs[vim.api.nvim_win_get_buf(win)] = true
             end
             -- get loaded buffers of same filetype
-            local current_ft = vim.api.nvim_buf_get_option(0, "filetype")
+            local current_ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
             for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
               local is_loaded = vim.api.nvim_buf_is_loaded(bufnr)
-              local buf_ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+              local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
               if is_loaded and buf_ft == current_ft then
                 bufs[bufnr] = true
               end
@@ -733,6 +729,7 @@ Plug {
     local Rule = require"nvim-autopairs.rule"
     local cond = require"nvim-autopairs.conds"
     -- Rename some functions to have a more readable config (has many more!)
+    ---@diagnostic disable: inject-field
     Rule.insert_pair_when = Rule.with_pair
     Rule.end_pair_moves_right_when = Rule.with_move
     Rule.cr_expands_pair_when = Rule.with_cr
@@ -744,6 +741,7 @@ Plug {
     cond.preceded_by_regex = cond.before_regex
     cond.not_preceded_by_regex = cond.not_before_regex
     cond.not_followed_by_regex = cond.not_after_regex
+    ---@diagnostic enable: inject-field
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -872,6 +870,7 @@ Plug {
   tags = {t.editing, t.textobj},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
+    ---@diagnostic disable-next-line: missing-fields
     require("Comment").setup {
       mappings = false,
     }

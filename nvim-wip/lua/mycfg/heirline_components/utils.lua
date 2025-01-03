@@ -1,14 +1,19 @@
 local hline_conditions = require"heirline.conditions"
 
 local libU = require"mylib.utils"
-local _f = libU.str_space_concat
+local _f = libU.str_space_concat ---@diagnostic disable unused-local
 
 local U = {}
 
+---@param value string?
+---@return boolean
 function U.is_and_has_text(value)
   return type(value) == "string" and value ~= ""
 end
 
+---@param unicode_variant string
+---@param ascii_variant string
+---@return string
 function U.unicode_or(unicode_variant, ascii_variant)
   if not U.is_and_has_text(vim.env.ASCII_ONLY) then
     return unicode_variant
@@ -17,6 +22,9 @@ function U.unicode_or(unicode_variant, ascii_variant)
   end
 end
 
+---@param maybe_txt string
+---@param default string
+---@return string
 function U.some_text_or(maybe_txt, default)
   -- small helper to avoid checking nil or empty string
   if U.is_and_has_text(maybe_txt) then
@@ -26,6 +34,8 @@ function U.some_text_or(maybe_txt, default)
   end
 end
 
+---@param spec {active_ctermbg: integer, inactive_ctermbg: integer}
+---@return table
 function U.white_with_bg(spec)
   if hline_conditions.is_active() then
     return { ctermbg = spec.active_ctermbg, ctermfg = 255, cterm = {bold = true} }

@@ -31,7 +31,7 @@ local function boot_plugins(ctx)
 
   local pkg_manager = find_pkg_manager(ctx.all_plugin_specs)
 
-  local check_path_exists = vim.loop.fs_stat
+  local check_path_exists = vim.uv.fs_stat
   if check_path_exists(pkg_manager.install_path) then
     vim.opt.rtp:prepend(pkg_manager.install_path)
   else

@@ -100,10 +100,12 @@ toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 -- Search current word/selection (without moving the cursor)
 -- (initially inspired from https://github.com/neovim/neovim/discussions/24285)
 -- => IDEA(later): Package as a plugin (with optional action) for others?
+---@diagnostic disable-next-line: missing-fields
 my_actions.hlsearch_current = {
   default_desc = function(self)
     -- IDEA: could make a templating system to be able to write dynamic doc like:
     --   `Search current {x.mode==n:word}{x.mode==v:selection}` (+ if/else for extra)
+    local doc
     if self.ctx.mode == "n" then
       doc = "Search current word"
     end
@@ -198,15 +200,19 @@ my_actions.hlsearch_current = {
 --
 -- NOTE: For now I'm using direct functions, simulating a call by the action system
 toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
+  ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = true } })
 end}
 toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
+  ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = true } })
 end}
 toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
+  ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = false } })
 end}
 toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
+  ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
 end}
 
@@ -349,7 +355,7 @@ my_actions.duplicate_selection = mk_action_v2 {
       default = false,
     },
   },
-  v = function(self)
+  v = function(self) ---@diagnostic disable-line: redundant-parameter
     self = self or {}
     self.opts = self.opts or {}
     -- NOTE: initially I wanted to implement this using idiomatic Lua APIs..
@@ -392,6 +398,7 @@ my_actions.duplicate_selection = mk_action_v2 {
 toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
+  ---@diagnostic disable-next-line: undefined-field
   my_actions.duplicate_selection.mode_actions.v { opts = { stay_in_visual_mode = true } }
 end}
 -- IDEA: a mapping to duplicate and comment original selection

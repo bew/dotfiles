@@ -106,7 +106,7 @@ M.ModeOrWinNr = {
     condition = hline_conditions.is_active,
     M.Mode,
   },
-  WinNr,
+  M.WinNr,
 }
 
 -- few simple blocks (simple.. for now)

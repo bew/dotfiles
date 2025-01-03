@@ -5,9 +5,8 @@ local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local SNIPS = {}
 local snip = SU.get_snip_fn(SNIPS)
 
-local t = ls.text_node
-local i = ls.insert_node
-local c = ls.choice_node
+local i = ls.insert_node ---@diagnostic disable-line: unused-local
+local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- Start of snippets definitions
 
@@ -55,7 +54,7 @@ snip("if", {desc = "if ...; then ... fi"}, SU.myfmt {
     fi
   ]],
   {
-    cond = c(1, {
+    cond = ls.choice_node(1, {
       -- In a choiceNode, direct children nodes that normally expect an index don't need one;
       -- their jump-index is the same as the choiceNodes'.
       i(nil, "condition"),

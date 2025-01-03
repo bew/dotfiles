@@ -1,8 +1,3 @@
-local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _s = U.str_surround
-local _q = U.str_simple_quote_surround
-
 local PluginSystem = require"mylib.plugin_system"
 local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
 local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
@@ -527,7 +522,7 @@ NamedPlug.telescope {
     cols.TelescopeBorder = normal
     cols.TelescopePromptBorder = {
       ctermfg = 202,
-      ctermbg = normal.ctermbg,
+      ctermbg = normal.ctermbg, ---@diagnostic disable-line: undefined-field (fixed in v0.11.0)
     }
     -- Titles are the reverse of borders
     cols.TelescopeTitle = vim.tbl_extend("force", cols.TelescopeBorder, { reverse = true, bold = true })
@@ -588,7 +583,9 @@ Plug {
   on_load = function()
     require"visual-whitespace".setup {
       highlight = {
+        ---@diagnostic disable-next-line: undefined-field (fixed in v0.11.0)
         ctermfg = vim.api.nvim_get_hl(0, {name="Comment"}).ctermfg,
+        ---@diagnostic disable-next-line: undefined-field (fixed in v0.11.0)
         ctermbg = vim.api.nvim_get_hl(0, {name="VisualNormal"}).ctermbg,
       },
       space_char = " ", -- avoid noise
@@ -607,7 +604,8 @@ Plug {
   on_load = function()
     -- NOTE: to get nice color highlight my config requires need to have `ctermfg = number` text,
     -- but smear config wants a list of numbers, so I made these lists to have highlights ;)
-    local smear_palette_fire = {
+    local smear_palettes = {}
+    smear_palettes.fire = {
       { ctermfg = 179 },
       { ctermfg = 179 },
       { ctermfg = 136 },
@@ -615,7 +613,7 @@ Plug {
       { ctermfg = 166 },
       { ctermfg = 166 },
     }
-    local smear_palette_darkwhite = {
+    smear_palettes.black_and_white = {
       { ctermfg = 235 },
       { ctermfg = 240 },
       { ctermfg = 243 },
@@ -627,7 +625,7 @@ Plug {
       legacy_computing_symbols_support = true,
       distance_stop_animating = 3, -- don't animate when target is this close
 
-      cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palette_fire),
+      cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palettes.fire),
       -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
     }
   end,

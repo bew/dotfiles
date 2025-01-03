@@ -34,7 +34,9 @@ local _q = U.str_simple_quote_surround
 -- TODO: move them to a dedicated module!
 
 --- Define map group for which_key plugin
+---@diagnostic disable-next-line: lowercase-global
 wk_groups_lazy = {}
+---@diagnostic disable-next-line: lowercase-global
 function toplevel_map_define_group(spec)
   assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
@@ -53,6 +55,7 @@ function toplevel_map_define_group(spec)
   end
 end
 
+---@diagnostic disable-next-line: lowercase-global
 function toplevel_buf_map(map_spec)
   map_spec.opts = map_spec.opts or {}
   map_spec.opts.buffer = true
@@ -70,13 +73,18 @@ local function normalize_mode(mode)
   end
 end
 
+---@class MapSpec
+---@field mode string|string[] Mode(s) for which to map the key
+---@field key string Key to map
+---@field action ActionV2|ModeRawActionInput Action to assign to key
+---@field desc? string Keymap description
+---@field opts? table Keymap options (same as for `vim.keymap.set`).
+---    When action is an ActionV2 obj, opts must not conflict.
+---@field debug? boolean Whether to print debugging info about the keymap
+
 --- Create top level maps
----@param map_spec.mode string|{string} Mode(s) for which to map the key
----@param map_spec.key string Key to map
----@param map_spec.action ActionV2|ModeActionSpecInput|ModeRawActionInput Action to assign to key
----@param map_spec.opts table Keymap options (same as for `vim.keymap.set`). When map_spec.action is
----   an ActionV2 obj, opts must not conflict.
----@param map_spec.debug bool Whether to print debugging info about the keymap
+---@param map_spec MapSpec
+---@diagnostic disable-next-line: lowercase-global
 function toplevel_map(map_spec)
   vim.validate{
     mode={map_spec.mode, {"string", "table"}},
@@ -93,12 +101,12 @@ function toplevel_map(map_spec)
     opts={map_spec.opts, "table", true}, -- optional
     debug={map_spec.debug, "boolean", true}, -- optional
   }
-  local debug_keymap = map_spec.debug or false
 
   local map_modes = U.normalize_arg_one_or_more(map_spec.mode)
 
   -- When the action is not an action obj, transform it quickly to a cheap action v2:
   if type(map_spec.action) ~= "table" then
+    ---@diagnostic disable-next-line: missing-fields
     map_spec.action = mk_action_v2 {
       [map_modes] = map_spec.action,
     }
@@ -141,12 +149,14 @@ function toplevel_map(map_spec)
 end
 
 --- Create global leader key mapping
+---@diagnostic disable-next-line: lowercase-global
 function global_leader_map(spec)
   toplevel_map(vim.tbl_extend("force", spec, {
     key = "<Leader>"..spec.key,
   }))
 end
 --- Helper to create remap-enabled leader map, see `global_leader_map` for details
+---@diagnostic disable-next-line: lowercase-global
 function global_leader_remap(spec)
   if not spec.opts then
     spec.opts = {}
@@ -154,6 +164,7 @@ function global_leader_remap(spec)
   spec.opts.remap = true
   global_leader_map(spec)
 end
+---@diagnostic disable-next-line: lowercase-global
 function global_leader_map_define_group(spec)
   spec.prefix_key = "<Leader>"..spec.prefix_key
   toplevel_map_define_group(spec)
@@ -164,20 +175,24 @@ end
 --- Create local (content-related) leader key mapping
 -- FIXME: these should be probably only used with <buffer> local keymaps 👀
 --   But for that I'd need to setup my plugins to load content-related mappings on file init.. 🤔
+---@diagnostic disable-next-line: lowercase-global
 function local_leader_map(spec)
   toplevel_map(vim.tbl_extend("force", spec, {
     key = "<LocalLeader>"..spec.key,
   }))
 end
+---@diagnostic disable-next-line: lowercase-global
 function local_leader_remap(spec)
   spec.opts = spec.opts or {}
   spec.opts.remap = true
   local_leader_map(spec)
 end
+---@diagnostic disable-next-line: lowercase-global
 function local_leader_map_define_group(spec)
   spec.prefix_key = "<LocalLeader>"..spec.prefix_key
   toplevel_map_define_group(spec)
 end
+---@diagnostic disable-next-line: lowercase-global
 function local_leader_buf_map(spec)
   spec.opts = spec.opts or {}
   spec.opts.buffer = true
@@ -203,24 +218,26 @@ end
 ---@alias ModeRawActionInput string|(fun(): any)
 
 ---@class ModeActionSpecInput
----@field raw_action ModeRawActionInput The raw action to execute
+---@field raw_action? ModeRawActionInput The raw action to execute
 ---@field default_desc? string The default description for the keymap when this action is used
 ---@field map_opts? {string: any} The keymap options for that action
 ---@field debug? boolean Wheather to debug the effective keymap args on use
 
 ---@class ActionSpecInput: ModeActionSpecInput (used as defaults for each mode)
----@field n ModeRawActionInput|ModeActionSpecInput Action spec for normal mode
----@field i ModeRawActionInput|ModeActionSpecInput Action spec for insert mode
----@field v ModeRawActionInput|ModeActionSpecInput Action spec for visual mode
----@field o ModeRawActionInput|ModeActionSpecInput Action spec for operator mode
----@field c ModeRawActionInput|ModeActionSpecInput Action spec for command mode
+---@field n? ModeRawActionInput|ModeActionSpecInput Action spec for normal mode
+---@field i? ModeRawActionInput|ModeActionSpecInput Action spec for insert mode
+---@field v? ModeRawActionInput|ModeActionSpecInput Action spec for visual mode
+---@field o? ModeRawActionInput|ModeActionSpecInput Action spec for operator mode
+---@field c? ModeRawActionInput|ModeActionSpecInput Action spec for command mode
 --- + key like `{"n", "i"}` to set both `n` & `i` action spec.
 
----@class ActionV2
----@field meta Metadata about this action
----@field mode_actions {string: ModeAction} Action for each mode
-
 ---@class ModeAction: ModeActionSpecInput
+
+---@class ActionV2
+---@field meta table Metadata about this action
+---@field mode_actions {string: ModeAction} Action for each mode
+---
+---@field supports_mode fun(any, string):boolean Whether the action supports the given modes
 
 local ActionSpec_mt = {
   __index = setmetatable(
@@ -331,7 +348,10 @@ local SingleModeActionSpec_mt = {
   end,
 }
 
----@type {[string]: ActionSpec}
+---@alias ActionList {[string]: ActionV2|ActionList}
+
+---@type ActionList
+---@diagnostic disable-next-line: lowercase-global
 my_actions = {}
 
 -- Usage:
@@ -365,6 +385,8 @@ my_actions = {}
 --     map_opts = { silent = true },
 --   }
 -- }
+---@param global_spec ActionSpecInput
+---@diagnostic disable-next-line: lowercase-global
 function mk_action_v2(global_spec)
   -- For a given mode, I want these fields:
   -- - default_desc
@@ -430,17 +452,18 @@ function mk_action_v2(global_spec)
   end
   return setmetatable(action_obj, ActionSpec_mt)
 end
-function mk_configurable_action(spec)
-  -- NOTE: A configurable action has options (inspired from NixOS options, at a single level),
-  -- and can be configured where it's going to be used.
-
-  -- TODO: validate `spec` inputs!
-  assert(spec.options, "a configurable action must actually expose options to be configurable..")
-end
-function mk_action_opt(spec)
+---@diagnostic disable-next-line: lowercase-global
+function mk_action_opt(_spec)
   -- NOT IMPLEMENTED YET
   return false
 end
+-- function mk_configurable_action(spec)
+--   -- NOTE: A configurable action has options (inspired from NixOS options, at a single level),
+--   -- and can be configured where it's going to be used.
+--
+--   -- TODO: validate `spec` inputs!
+--   assert(spec.options, "a configurable action must actually expose options to be configurable..")
+-- end
 
 
 ----------------------------

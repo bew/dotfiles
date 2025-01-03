@@ -30,17 +30,20 @@ local mk_builtin_hooks_for_registers = function(registers_to_backup)
   }
 end
 
+---@class HooksOpts
+---@field save? HookT Hook called to save some context to given state
+---@field restore? HookT Hook called to restore some context from given state
+---@field save_registers? string[] List of registers to save/restore (builtin hooks)
+---@field save_cursor? boolean Whether to save/restore current cursor (builtin hooks)
+
 --- Save/Restore anything and run arbitrary function in-between
 ---   Allows the function to use registers, marks, move cursor around... given we write the
 ---   code to save/restore it.
 ---
 ---@generic T: any
 ---
----@param hooks.save HookT Hook called to save some context to given state
----@param hooks.restore HookT Hook called to restore some context from given state
----@param hooks.save_registers string[] List of registers to save/restore (builtin hooks)
----@param hooks.save_cursor bool Whether to save/restore current cursor (builtin hooks)
----@param fn (fun(): T) Function to execute in the middle
+---@param hooks HooksOpts
+---@param fn (fun(): T?) Function to execute in the middle
 ---@return T
 function SR.save_run_restore(hooks, fn)
   ---@type HooksT[]

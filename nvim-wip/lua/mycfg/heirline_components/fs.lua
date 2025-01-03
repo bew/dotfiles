@@ -2,6 +2,8 @@ local U = require"mycfg.heirline_components.utils"
 
 local M = {}
 
+---@param buf_name string
+---@return string
 local function transform_path_to_2_parts(buf_name)
   -- Transform to 2-parts file path: ~/foo or foo/bar
   local basename = vim.fn.fnamemodify(buf_name, ":t")

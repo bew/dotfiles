@@ -1,6 +1,5 @@
 local U = require"mylib.utils"
 local _f = U.str_space_concat
-local _s = U.str_surround
 local _q = U.str_simple_quote_surround
 
 local PluginSystem = require"mylib.plugin_system"
@@ -8,11 +7,12 @@ local Plug = PluginSystem.MasterDeclarator:get_anonymous_plugin_declarator()
 local NamedPlug = PluginSystem.MasterDeclarator:get_named_plugin_declarator()
 
 -- Define custom plugin source for my local plugins
-local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
-assert((
-  myplugins_path or not vim.fn.filereadable(myplugins_path)
-), "$NVIM_BEW_MYPLUGINS_PATH is not set or doesn't exist!!")
+---@param name string Name of my local plugin (found in $NVIM_BEW_MYPLUGINS_PATH)
 PluginSystem.sources.myplug = function(name)
+  local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
+  assert((
+    myplugins_path or vim.fn.filereadable(myplugins_path) == 1
+  ), "$NVIM_BEW_MYPLUGINS_PATH is not set or doesn't exist!!")
   return PluginSystem.sources.local_path {
     name = name,
     path = vim.fs.normalize(myplugins_path .. "/" .. name)
@@ -20,6 +20,9 @@ PluginSystem.sources.myplug = function(name)
 end
 
 local predefined_tags = PluginSystem.predefined_tags
+---@diagnostic disable: missing-fields
+-- Having different type for table & `__newindex` isn't supported nor easy to.. skip diags for this..
+--   REF: https://github.com/LuaLS/lua-language-server/issues/3020
 predefined_tags.careful_update = { desc = "Plugins I want to update carefully" }
 predefined_tags.vimscript = { desc = "Plugins in vimscript" }
 predefined_tags.ui = { desc = "Plugins for the global UI" }
@@ -32,6 +35,7 @@ predefined_tags.ft_support = { desc = "Plugins to support specific filetype(s)" 
 predefined_tags.lib_only = { desc = "Plugins that are only useful to other plugins" }
 predefined_tags.extensible = { desc = "Plugins that can be extended" } -- TODO: apply on all relevant!
 predefined_tags.need_better_plugin = { desc = "Plugins that are 'meh', need to find a better one" }
+---@diagnostic enable: missing-fields
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
 local t = predefined_tags
@@ -89,7 +93,7 @@ Plug {
     require"neorepl".config {
       startinsert = false, -- Don't start REPL in insert mode
       indent = 4, -- Indent outputs
-      on_init = function(bufnr)
+      on_init = function(_bufnr)
         -- Plugin comes with its own completion, so other auto-completion plugins must be disabled
         require"cmp".setup.buffer({ enabled = false })
 
@@ -177,7 +181,7 @@ NamedPlug.pkg_manager {
   desc = "A modern plugin manager for Neovim",
   tags = {"boot", t.careful_update},
   install_path = vim.fn.stdpath("data") .. "/pkg-manager--lazy",
-  bootstrap_fn = function(self, ctx)
+  bootstrap_fn = function(self, _ctx)
     local clone_cmd_parts = {
       "git",
       "clone",
@@ -288,7 +292,7 @@ NamedPlug.pkg_manager {
               end
               return nil -- skip
             end),
-            U.filter_map_list(U.reverse_list(xdg_config_dirs), function(path)
+            U.filter_map_list(vim.iter(xdg_config_dirs):rev():totable(), function(path)
               local cfg_after_path = vim.fs.joinpath(path, vim.env.NVIM_APPNAME or "nvim", "after")
               if vim.fn.isdirectory(cfg_after_path) == 1 then
                 -- print("config dir (after)", vim.inspect(cfg_after_path))

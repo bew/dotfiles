@@ -3,6 +3,8 @@ local make_cond_obj = require"luasnip.extras.conditions".make_condition
 local M = {}
 
 --- Get line before trigger
+---@param line_to_cursor string
+---@param matched_trigger string
 M._get_line_to_trigger = function(line_to_cursor, matched_trigger)
 	-- +1 because `string.sub("abcd", 1, -2)` -> abc
 	return line_to_cursor:sub(1, -(#matched_trigger + 1))

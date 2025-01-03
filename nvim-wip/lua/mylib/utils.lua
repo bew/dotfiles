@@ -9,30 +9,39 @@ local U = {}
 
 U.save_run_restore = require"mylib.save_restore_utils".save_run_restore
 
+---@param str string A string to iterate on
+---@return Iter
 function U.iter_chars(str)
   local i = 0
   local len = #str
-  return function()
+  return vim.iter(function()
     i = i + 1
     if i > len then return nil end
     return i, str:sub(i, i)
-  end
+  end)
 end
 
-function U.filter_list(list, filter_fn)
+---@generic T
+---@param list table<T>
+---@param fn fun(T): boolean
+function U.filter_list(list, fn)
   vim.validate{
     list={list, "table"},
-    filter_fn={filter_fn, "function"},
+    fn={fn, "function"},
   }
   local ret = {}
   for _, item in ipairs(list) do
-    if filter_fn(item) then
+    if fn(item) then
       table.insert(ret, item)
     end
   end
   return ret
 end
 
+---@generic T, U
+---@param list table<T>
+---@param fn fun(T): U?
+---@return table<U>
 function U.filter_map_list(list, fn)
   vim.validate{
     list={list, "table"},
@@ -48,20 +57,14 @@ function U.filter_map_list(list, fn)
   return ret
 end
 
+---@param ... any[]
+---@return any[]
 function U.concat_lists(...)
   local res = {}
   for _, list in ipairs(U.normalize_multi_args(...)) do
     for _, item in ipairs(list) do
       table.insert(res, item)
     end
-  end
-  return res
-end
-
-function U.reverse_list(list)
-  local res = {}
-  for _, item in ipairs(list) do
-    table.insert(res, 1, item)
   end
   return res
 end
@@ -83,7 +86,7 @@ end
 
 --- Normalizes received opts by filling the blanks (at toplevel, no deep merge) with given defaults
 ---@alias OptsT {[string]: any}
----@param given_opts? OptsT The given options
+---@param given_opts OptsT? The given options
 ---@param default_opts OptsT The default options
 ---@return OptsT
 function U.normalize_arg_opts_with_default(given_opts, default_opts)
@@ -111,6 +114,8 @@ end
 ---   "and", more,
 --- }
 --- ```
+---@param ... string|string[]
+---@return string
 function U.str_space_concat(...)
   local strs = U.normalize_multi_args(...)
   local final_str = ""
@@ -132,10 +137,12 @@ end
 ---   ")$",
 --- }
 --- ```
+---@param ... string|string[]
+---@return string
 function U.str_concat(...)
   local strs = U.normalize_multi_args(...)
   local final_str = ""
-  for idx, item in ipairs(strs) do
+  for _idx, item in ipairs(strs) do
     final_str = final_str .. tostring(item)
   end
   return final_str
@@ -149,16 +156,24 @@ end
 --- local _q = U.str_simple_quote_surround
 --- print("foo", _q(thing), "bar")
 --- ```
+---@param before string
+---@param str string
+---@param after string
+---@return string
 function U.str_surround(before, str, after)
-  return before .. tostring(str) .. after
+  return before .. str .. after
 end
+
+--- Helper function to surround given str (or tostring-able) with simple-quotes
+---@param str any
+---@return string
 function U.str_simple_quote_surround(str)
-  return U.str_surround("'", str, "'")
+  return U.str_surround("'", tostring(str), "'")
 end
 
 --- Checks if the given module is available
 ---@param module_name string The module to check
----@return bool
+---@return boolean
 function U.is_module_available(module_name)
   local module_available = pcall(require, module_name)
   return module_available
@@ -166,18 +181,21 @@ end
 
 --- Returns whether the given char is part of a keyword according to {option}'iskeyword'.
 ---@param char string Character to check
----@return bool
+---@return boolean
 function U.char_is_keyword(char)
   return vim.fn.match(char:sub(1, 1), [[^\k$]]) ~= -1
 end
+
+---@class CurrentSearchSetterOpts
+---@field escaped? boolean Whether the given text was already escaped
+---@field with_bounds? boolean|{before: boolean, after: boolean}
 
 --- Set current search with the given text but without moving the cursor,
 ---   as if we made a search and moved the cursor back to position.
 ---
 ---@param text string|string[] The text to search,
 ---  will be escaped if opts.escaped is false (the default)
----@param opts.escaped bool Whether the given text was already escaped
----@param opts.with_bounds boolean|{before: boolean, after: boolean}
+---@param opts? CurrentSearchSetterOpts
 ---  Whether to add word bounds before/after text (none by default)
 function U.set_current_search(text, opts)
   local text_lines = U.normalize_arg_one_or_more(text)
@@ -270,19 +288,34 @@ function U.get_visual_selection_as_lines()
   end)
 end
 
----@alias Pos0Like {row: integer, col: integer}
----
 ---@class Pos0
----@field row: integer
----@field col: integer
+---@field row integer
+---@field col integer
 local Pos0 = {}
----@param pos0 Pos0Like
+--- Create a new Pos0
+---@param pos0 {row: integer, col: integer}
 ---@return Pos0
 function Pos0.new(pos0)
   return setmetatable(pos0, { __index = Pos0 })
 end
----@param pos0_delta.row? integer
----@param pos0_delta.col? integer
+--- Create a new Pos0 from cursor position or given vim position str (like "v" or "'k")
+---@param kind "pos"|"cursor"
+function Pos0.from_vimpos(kind, ...)
+  if kind == "cursor" then
+    local cursor_pos10 = vim.api.nvim_win_get_cursor(#{...} == 0 and 0 or ...)
+    return Pos0.new{ row = cursor_pos10[1] -1, col = cursor_pos10[2] }
+  elseif kind == "pos" then
+    ---       <bufnr>  <lnum1>   <col1>  <offset>
+    ---@type [integer, integer, integer, integer]
+    local posinfo = vim.fn.getpos(...)
+    return Pos0.new{ row = posinfo[2] -1, col = posinfo[3] -1 }
+  end
+  local _f = U.str_space_concat
+  local _q = U.str_simple_quote_surround
+  error(_f("Pos0.from_vimpos: Unknown kind", _q(kind)))
+end
+--- Create a new Pos0 with applied delta
+---@param pos0_delta {row?: integer, col?: integer}
 ---@return Pos0
 function Pos0:with_delta(pos0_delta)
   return Pos0.new({
@@ -300,11 +333,9 @@ function U.get_visual_start_end_pos0()
   local visual_mode_kind = U.assert_visual_mode("get visual start/end", {"visualchar", "visualline"})
 
   -- get current cursor pos
-  local cursor_pos10 = vim.api.nvim_win_get_cursor(0)
-  local cursor_pos0 = Pos0.new{ row = cursor_pos10[1] -1, col = cursor_pos10[2] }
+  local cursor_pos0 = Pos0.from_vimpos"cursor"
   -- get other side of visual selection
-  local other_side_posinfo = vim.fn.getpos("v")
-  local other_side_pos0 = Pos0.new{ row = other_side_posinfo[2] -1, col = other_side_posinfo[3] -1 }
+  local other_side_pos0 = Pos0.from_vimpos("pos", "v")
 
   -- start_pos0 is the top-left corner
   local start_pos0 = Pos0.new{
@@ -349,11 +380,14 @@ function U.try_get_buf_char_at_pos0(pos0)
   return line:sub(pos0.col +1, pos0.col +1)
 end
 
+---@class FeedKeysOpts
+---@field remap? boolean Whether to use mappings if any
+---@field replace_termcodes? boolean Whether termcodes like `\<esc>` should be replaced
+
 --- Feed the given keys as if typed (sync call).
 ---   This is basically a nice wrapper around nvim_feedkeys
 ---@param keys string
----@param opts.remap bool Whether to use mappings if any
----@param opts.replace_termcodes bool Whether termcodes like `\<esc>` should be replaced
+---@param opts? FeedKeysOpts
 function U.feed_keys_sync(keys, opts)
   local opts = U.normalize_arg_opts_with_default(opts, {
     remap = false,

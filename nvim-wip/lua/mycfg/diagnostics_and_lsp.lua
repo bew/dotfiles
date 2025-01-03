@@ -15,20 +15,20 @@ local_leader_map{mode="n", key="dj", desc="Go to next error (!= line)", action=f
   vim.diagnostic.goto_next {
     severity = vim.diagnostic.severity.ERROR,
     -- Start searching from next line
-    cursor_position = { --[[ row ]] vim.fn.line('.') + 1, --[[ col ]] 0 },
+    cursor_position = { --[[ row1 ]] vim.fn.line('.') + 1, --[[ col0 ]] 0 },
   }
 end}
 local_leader_map{mode="n", key="dk", desc="Go to prev error (!= line)", action=function()
   vim.diagnostic.goto_prev {
     severity = vim.diagnostic.severity.ERROR,
     -- Start searching from previous line
-    cursor_position = { --[[ row ]] vim.fn.line('.') - 1, --[[ col ]] 0 },
+    cursor_position = { --[[ row1 ]] vim.fn.line('.') - 1, --[[ col0 ]] 0 },
   }
 end}
 
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
-  callback = function(event)
+  callback = function(_event)
     -- Trigger LSP completion
     --toplevel_map{mode="i", key="<C-Space>", opts=buf_opts, action="<C-x><C-o>"}
 

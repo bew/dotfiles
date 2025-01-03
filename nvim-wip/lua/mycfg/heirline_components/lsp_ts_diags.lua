@@ -10,7 +10,7 @@ M.LspActive = {
 
   provider = function()
     local maybe_nb_clients = ""
-    local nb_clients = #vim.tbl_keys(vim.lsp.get_active_clients({ bufnr = 0 }))
+    local nb_clients = #vim.tbl_keys(vim.lsp.get_clients({ bufnr = 0 }))
     if nb_clients > 1 then
       maybe_nb_clients = UC.superscript(tostring(nb_clients))
     end

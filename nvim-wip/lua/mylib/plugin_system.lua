@@ -17,34 +17,43 @@
 -- So `NamedPlug.foobar` must declare the named plugin on first reference, and always refer to the
 -- same object before and after it is defined.
 
+local U = require"mylib.utils"
+local _f = U.str_space_concat
+local _q = U.str_simple_quote_surround
+local _s = U.str_surround
+
 local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
 -- FIXME: avoid global state!
 -- FIXME: find a better name!
 local MasterDeclarator = {
   -- Contains anonymous plugin specs
+  ---@type PluginSpec[]
   _anon_plugin_specs = {},
   -- Contains named plugin specs
+  ---@type {[string]: PluginSpec}
   _named_plugin_specs = {},
 }
-local named_plugin_specs = {}
 
 ---@class DeclaredPluginSpec
----@field plugin_id string The plugin ID
----@field __is_placeholder_plugin_spec ...
+---@field id string The plugin ID
+---@field __is_placeholder_plugin_spec boolean?
 
 ---@class PluginSpec: DeclaredPluginSpec
----@field source
----@field desc
----@field tags
----@field enable
----@field version
----@field depends_on
----@field config_depends_on
----@field on_load
----@field on_pre_load
----@field on_colorscheme_change
----...
+---@field source PlugSourceBase
+---@field desc string
+---@field tags string[]
+---@field enabled boolean
+---@field version PluginVersionSpec
+---@field depends_on PluginSpec[]
+---@field config_depends_on PluginSpec[]
+---@field on_load fun()
+---@field on_pre_load fun()
+---@field on_colorscheme_change fun()
+
+---@class PluginVersionSpec
+---@field tag? string
+---@field branch? string
 
 function MasterDeclarator:all_specs()
   local all_specs = {}
@@ -92,10 +101,10 @@ function MasterDeclarator:declare_named_plugin(plugin_id)
   if self._named_plugin_specs[plugin_id] then
     return self._named_plugin_specs[plugin_id]
   end
-  local initial_plugin_spec = setmetatable({
+  local initial_plugin_spec = {
     id = plugin_id,
     __is_placeholder_plugin_spec = true, -- will be set to nil when plugin gets defined!
-  }, CallToRegisterPlugin_mt)
+  }
   -- Save named spec, so later references return this spec!
   self._named_plugin_specs[plugin_id] = initial_plugin_spec
   return initial_plugin_spec
@@ -108,7 +117,8 @@ end
 function MasterDeclarator:get_named_plugin_declarator()
   return setmetatable({}, {
     __index = function(_, plugin_id)
-      return self:declare_named_plugin(plugin_id)
+      local plugin_shim = self:declare_named_plugin(plugin_id)
+      return setmetatable(plugin_shim, CallToRegisterPlugin_mt)
     end,
     __newindex = function(...)
       error("Assignements are forbidden, use `NamedPlug.foo { ... }` to declare/define named plugin")
@@ -118,22 +128,43 @@ end
 
 --------------------------------
 
+---@class PlugTagSpec
+---@field name string
+---@field desc string
+
 -- IDEA: attach plugin behavior / load pattern based on tags?
+---@type {[string]: PlugTagSpec}
 local predefined_tags = setmetatable({}, {
   __index = KeyRefMustExist_mt.__index,
-  __newindex = function(self, tag_name, tag_spec)
-    if type(tag_name) ~= "string" or type(tag_spec) ~= "table" then
+  ---@param name string
+  ---@param spec {name?: string, desc: string}
+  __newindex = function(self, name, spec)
+    if type(name) ~= "string" or type(spec) ~= "table" then
       error("Tag name must be string, value must be table")
     end
-    tag_spec.name = tag_name -- add name in spec
-    rawset(self, tag_name, tag_spec)
+    spec.name = name -- add name in spec
+    rawset(self, name, spec)
   end,
 })
 
 --------------------------------
 
-local PlugSource = {}
-function PlugSource.github(owner_repo)
+---@class PlugSourceBase
+---@field type string
+---@field name string
+
+---@class PlugSourceGithub: PlugSourceBase
+---@field url string
+---@field owner_repo string
+
+---@class PlugSourceLocal: PlugSourceBase
+---@field path string
+
+---@type {[string]: fun(...): PlugSourceBase}
+local PlugSources = {}
+---@param owner_repo string The Github repo path, like `owner/repo`
+---@return PlugSourceGithub
+function PlugSources.github(owner_repo)
   return setmetatable({
     type = "github",
     owner_repo = owner_repo,
@@ -141,7 +172,9 @@ function PlugSource.github(owner_repo)
     url = "https://github.com/" .. owner_repo .. ".git",
   }, KeyRefMustExist_mt)
 end
-function PlugSource.local_path(spec)
+---@param spec {name: string, path: string}
+---@return PlugSourceLocal
+function PlugSources.local_path(spec)
   vim.validate{
     spec={spec, "table"},
     spec_name={spec.name, "string"},
@@ -199,5 +232,5 @@ end
 return {
   MasterDeclarator = MasterDeclarator,
   predefined_tags = predefined_tags,
-  sources = PlugSource,
+  sources = PlugSources,
 }
