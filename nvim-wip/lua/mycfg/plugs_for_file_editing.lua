@@ -619,6 +619,7 @@ Plug {
     -- (direct `s` would be nice, but eats a key I use too often (I tried...))
     local_leader_map{mode="n", key="s", action=my_actions.add_surround}
     local_leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
+    local_leader_map{mode="n", key="SS", action=my_actions.add_surround_around_line_on_newline}
     local_leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
     local_leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
 
