@@ -50,6 +50,9 @@ Plug {
     require("debug-autocmds").setup{
       global_tracking_on_start = true, -- switch to `true` to debug builtin events from start :)
     }
+    -- NOTE: Nice 'oneliner' to get some info about buffer/window/tab events
+    -- require"debug-autocmds".get"global":dump_matching_with("buf,win,tab", function(ev) print(("%-15s"):format(ev.name), vim.fs.basename(ev.raw.file), "   tab:", ev.extra.tabnr, "   win:", ev.extra.winid) end)
+    -- require"debug-autocmds".get"global":dump_matching_with("user", function(ev) print(("%-8s"):format(ev.name), ("%-15s"):format(ev.raw.file), "   data:", vim.inspect(ev.raw.data, { newline = "" })) end)
   end,
 }
 

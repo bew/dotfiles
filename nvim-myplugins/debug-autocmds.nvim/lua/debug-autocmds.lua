@@ -37,7 +37,12 @@ function M.create_session(opts)
   return session
 end
 
+function M.get_session(name)
+  return STATE.sessions[name]
+end
+M.get = M.get_session
+
 -- Nice 'oneliner' to get some info about buffer/window/tab events
--- require"debug-autocmds"._state.sessions.global:dump_matching_with("buf,win,tab", function(ev) print(("%-15s"):format(ev.name), vim.fs.basename(ev.raw.file), "   tab:", ev.extra.tabnr, "   win:", ev.extra.winid) end)
+-- require"debug-autocmds".get"global":dump_matching_with("buf,win,tab", function(ev) print(("%-15s"):format(ev.name), vim.fs.basename(ev.raw.file), "   tab:", ev.extra.tabnr, "   win:", ev.extra.winid) end)
 
 return M
