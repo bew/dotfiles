@@ -267,10 +267,45 @@ HiResetTo @variable.parameter cterm=italic
 " The key in a key/value pairs
 HiResetTo @property ctermfg=137
 
+" /!\ This is used for most delimiters in various languages (Lua, ...)
+" Make sure it stays properly visible!
+HiResetTo @punctuation.delimiter ctermfg=244
+
+hi! link @markup.quote Comment
+HiResetTo @markup.raw ctermfg=29 ctermbg=234
+
+" Give a progression/difference between H1, H2, H3.. headings
+" NOTE: hl groups shared between markdown & :help files (at least).
+" -- H1
+HiResetTo @markup.heading.1    cterm=bold ctermfg=160
+HiResetTo @markup.heading.1.bg cterm=bold ctermbg=237
+" -- H2
+HiResetTo @markup.heading.2    cterm=bold ctermfg=39
+HiResetTo @markup.heading.2.bg cterm=bold ctermbg=236
+" -- H3
+HiResetTo @markup.heading.3    cterm=bold ctermfg=208
+HiResetTo @markup.heading.3.bg cterm=bold ctermbg=235
+" -- H4
+HiResetTo @markup.heading.4    cterm=bold ctermfg=64
+HiResetTo @markup.heading.4.bg cterm=bold ctermbg=234
+" -- H5
+HiResetTo @markup.heading.5    cterm=bold ctermfg=126
+HiResetTo @markup.heading.5.bg cterm=bold ctermbg=234
+" -- H6
+HiResetTo @markup.heading.6    cterm=bold ctermfg=91
+HiResetTo @markup.heading.6.bg cterm=bold ctermbg=234
+
 "}}}
 " Tree-sitter highlighting (Language-specific overrides) "{{{
 
-" ...
+" [Markdown]
+HiResetTo @punctuation.delimiter.markdown ctermfg=239
+HiResetTo @markup.raw.delimiter.markdown ctermfg=239
+
+" [Markdown (inline)]
+HiResetTo @punctuation.delimiter.markdown_inline ctermfg=239
+HiResetTo @markup.italic.markdown_inline cterm=italic ctermfg=255 ctermbg=235
+HiResetTo @markup.strong.markdown_inline cterm=bold ctermfg=255 ctermbg=235
 
 "}}}
 " LSP highlighting "{{{

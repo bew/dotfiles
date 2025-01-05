@@ -15,6 +15,67 @@ Plug {
 }
 
 Plug {
+  source = gh"MeanderingProgrammer/render-markdown.nvim",
+  desc = "Plugin to improve viewing Markdown files in Neovim",
+  tags = {t.ft_support, t.content_ui},
+  defer_load = { on_event = "VeryLazy", on_ft = "markdown" },
+  depends_on = {
+    Plug.ts,
+    Plug.lib_web_devicons,
+  },
+  on_load = function()
+    require"render-markdown".setup {
+      sign = { enabled = false },
+      heading = {
+        sign = false,
+        position = "inline",
+        icons = {
+          "# 󰎤  ",
+          "## 󰎩  ",
+          "### 󰎪  ",
+          "#### 󰎮  ",
+          "##### 󰎱  ",
+          "###### 󰎵  ",
+        },
+        signs = {},
+        width = "block",
+        min_width = { 90, 70, 60, 50, 50, 50 },
+        right_pad = 2, -- at the very least
+        border = {true, true, true, false, false, false},
+        above = "▄", -- default: "▄"
+        below = "▀", -- default: "▀"
+        foregrounds = {
+          "@markup.heading.1",
+          "@markup.heading.2",
+          "@markup.heading.3",
+          "@markup.heading.4",
+          "@markup.heading.5",
+          "@markup.heading.6",
+        },
+        backgrounds = { -- for the borders + backgrounds all the way
+          "@markup.heading.1.bg",
+          "@markup.heading.2.bg",
+          "@markup.heading.3.bg",
+          "@markup.heading.4.bg",
+          "@markup.heading.5.bg",
+          "@markup.heading.6.bg",
+        },
+      },
+      dash = {
+        icon = "━",
+        width = 0.8,
+        left_margin = 0.3,
+        highlight = "@punctuation.delimiter.markdown",
+      },
+      bullet = { enabled = false },
+      html = {
+        comment = { conceal = false },
+      },
+    }
+  end,
+}
+
+Plug {
   source = gh"preservim/vim-markdown",
   desc = "Markdown Vim Mode",
   tags = {t.vimscript, t.ft_support},
