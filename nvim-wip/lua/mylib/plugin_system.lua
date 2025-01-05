@@ -22,16 +22,17 @@
 ---@field __is_placeholder_plugin_spec boolean?
 
 ---@class plugin_system.PluginSpec: plugin_system.DeclaredPluginSpec
----@field source PlugSourceBase
----@field desc string
+---@field enabled boolean Whether the plugin should be loaded by the pkg manager
+---@field source PlugSourceBase? Spec about the plugin's source location
+---@field INVALID_SOURCE boolean? True if the source is not valid (when it's set to nil)
+---@field desc string Rough single-line description
 ---@field tags string[]
----@field enabled boolean
 ---@field version plugin_system.PluginVersionSpec
 ---@field depends_on plugin_system.PluginSpec[]
 ---@field config_depends_on plugin_system.PluginSpec[]
----@field on_load fun()
----@field on_pre_load fun()
----@field on_colorscheme_change fun()
+---@field on_pre_load fun() Hook run before plugin is loaded
+---@field on_load fun() Hook run just after plugin is loaded
+---@field on_colorscheme_change fun() Hook run when colorscheme changes (used to re-define hl groups)
 
 ---@class plugin_system.PluginSpecPkgManager: plugin_system.PluginSpec
 ---@field install_path string Where the pkg manager is installed
@@ -69,9 +70,19 @@ end
 
 local DeclaratorImpl = {}
 
+---@param spec plugin_system.PluginSpec
+function DeclaratorImpl.check_plugin_declaration(spec)
+  -- TODO: validate spec is fully respected!
+  if not spec.source then
+    -- source isn't valid, disable the plugin
+    spec.enabled = false
+    spec.INVALID_SOURCE = true
+  end
+end
+
 function DeclaratorImpl.register_anon_plugin(plugin_spec)
   vim.validate{ plugin_spec={plugin_spec, "table"} }
-  -- TODO: validate spec is fully respected!
+  DeclaratorImpl.check_plugin_declaration(plugin_spec)
   table.insert(STATE._anon_plugin_specs, plugin_spec)
   return plugin_spec
 end
@@ -102,7 +113,7 @@ local CallToRegisterPlugin_mt = {
     self.__is_placeholder_plugin_spec = nil
     -- copy all spec fields to the existing/stored spec
     for k, v in pairs(spec_fields) do self[k] = v end
-    -- TODO: validate spec is fully respected!
+    DeclaratorImpl.check_plugin_declaration(self)
   end,
 }
 
@@ -181,8 +192,8 @@ M.tags = setmetatable({}, {
 ---@class PlugSourceLocal: PlugSourceBase
 ---@field path string
 
----@type {[string]: fun(...): PlugSourceBase}
 M.sources = {}
+--- A Github repo plugin, will be installed, managed & loaded by pkg manager
 ---@param owner_repo string The Github repo path, like `owner/repo`
 ---@return PlugSourceGithub
 function M.sources.github(owner_repo)
@@ -193,6 +204,8 @@ function M.sources.github(owner_repo)
     url = "https://github.com/" .. owner_repo .. ".git",
   }, KeyRefMustExist_mt)
 end
+
+--- A local path plugin, will not be managed by pkg manager, only loaded
 ---@param spec {name: string, path: string}
 ---@return PlugSourceLocal
 function M.sources.local_path(spec)
@@ -206,6 +219,23 @@ function M.sources.local_path(spec)
     name = spec.name,
     path = spec.path,
   }, KeyRefMustExist_mt)
+end
+
+--- A dist-managed plugin (e.g. by Nix 😉), will not be managed by pkg manager, only loaded
+---@param name string Name of a dist-managed opt plugin (found in packpath)
+---@return PlugSourceLocal?
+M.sources.dist_managed_opt_plug = function(name)
+  ---@type string[]
+  local dist_paths = vim.fn.globpath(vim.o.packpath, vim.fs.joinpath("pack", "*", "opt", name), --[[respect-wildstuff]]false, --[[aslist]]true)
+  if #dist_paths > 0 then
+    return M.sources.local_path {
+      name = name,
+      path = dist_paths[1],
+    }
+  else
+    vim.notify("Dist-managed opt plugin "..vim.inspect(name).." cannot be found in packpath", vim.log.levels.INFO)
+    return nil
+  end
 end
 
 -----------------------------------------------------------------

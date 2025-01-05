@@ -290,6 +290,7 @@ Plug.telescope {
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
     Plug { source = gh"OliverChao/telescope-picker-list.nvim" },
     Plug { source = gh"piersolenski/telescope-import.nvim" },
+    Plug { source = PluginSystem.sources.dist_managed_opt_plug"telescope-fzf-native" }
   },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
@@ -443,9 +444,9 @@ Plug.telescope {
     local extensions_cfg = {}
     local extensions_to_load = {}
 
-    -- Extension: fzf
+    -- Extension: fzf (fast native sorter implemented in C)
+    -- Plugin in named 'telescope-fzf-native'
     extensions_cfg.fzf = {} -- default config
-    vim.cmd.packadd"telescope-fzf-native" -- from Nix-managed plugins (has native pkg!)
     table.insert(extensions_to_load, "fzf")
 
     -- Extension: ui-select
