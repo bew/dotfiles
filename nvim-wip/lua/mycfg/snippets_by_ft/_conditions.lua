@@ -22,7 +22,8 @@ end)
 --- Trigger is starting line, after indent
 M.after_indent = make_cond_obj(function(line_to_cursor, matched_trigger)
   local line_to_trigger = M._get_line_to_trigger(line_to_cursor, matched_trigger or "")
-  return line_to_trigger:match("^(  )+$")
+  -- print("line_to_cursor:", vim.inspect(line_to_cursor), "line_to_trigger:", vim.inspect(line_to_trigger))
+  return line_to_trigger:match("^ +$")
 end)
 
 return M

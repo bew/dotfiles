@@ -1,6 +1,5 @@
 -- vim:set ft=lua.luasnip:
 local ls = require"luasnip"
-local ls_extras = require"luasnip.extras"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local conds = require"mycfg.snippets_by_ft._conditions"
 
