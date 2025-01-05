@@ -54,6 +54,12 @@ in {
 
     # rust
     rust-analyzer.pkg = pkgs.rust-analyzer;
+
+    # YAML
+    yaml-language-server.pkg = pkgs.yaml-language-server;
+
+    # Terraform
+    terraform-ls.pkg = pkgs.terraform-ls;
   };
   deps.bins = cfg.deps.lspServers;
 
