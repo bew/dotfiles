@@ -136,9 +136,11 @@ Plug {
         ["<C-p>"] = false,
         ["<C-l>"] = false,
 
-        ["<M-s>"] = { "actions.select", opts = { horizontal = true } },
-        ["<M-h>"] = { "actions.select", opts = { vertical = true } },
-        ["<M-t>"] = { "actions.select", opts = { tab = true } },
+        -- NOTE: Can't have them without Ctrl without breaking <M-s> to save buffer.. :/
+        -- => It's usually easier anyway to split in the direction I want then open wanted file..
+        ["<C-M-s>"] = { "actions.select", opts = { horizontal = true } },
+        ["<C-M-h>"] = { "actions.select", opts = { vertical = true } },
+        ["<C-M-t>"] = { "actions.select", opts = { tab = true } },
         ["<M-p>"] = "actions.preview",
         ["<M-r>"] = "actions.refresh",
         ["<BS>"] = "actions.parent",
