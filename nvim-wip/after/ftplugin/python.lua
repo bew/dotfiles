@@ -28,16 +28,7 @@ local function start_lsp_server()
     -- https://github.com/python-lsp/python-lsp-server
     name = "pylsp",
     cmd = {"pylsp"},
-    -- TODO: Move this in a central location in config (it's not specific to Rust!)
-    capabilities = vim.tbl_deep_extend(
-      "force",
-      vim.lsp.protocol.make_client_capabilities(),
-      require"cmp_nvim_lsp".default_capabilities(),
-      {
-        -- Disable snippets in completion candidates
-        textDocument = { completion = { completionItem = { snippetSupport = false } } }
-      }
-    ),
+    capabilities = require"mylib.lsp".get_default_capabilities(),
     settings = pylsp_settings,
     single_file_support = true,
 
