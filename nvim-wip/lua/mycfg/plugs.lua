@@ -7,6 +7,7 @@ local Plug = PluginSystem.PlugDeclarator
 
 -- Define custom plugin source for my local plugins
 ---@param name string Name of my local plugin (found in $NVIM_BEW_MYPLUGINS_PATH)
+---@return PlugSourceLocal
 PluginSystem.sources.myplug = function(name)
   local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
   assert((
@@ -27,6 +28,7 @@ PluginSystem.tags.ui = { desc = "Plugins for the global UI" }
 PluginSystem.tags.content_ui = { desc = "Plugins for content UI" }
 PluginSystem.tags.editing = { desc = "Plugins about code/content editing" }
 PluginSystem.tags.insert = { desc = "Plugins adding stuff in insert mode" }
+PluginSystem.tags.ts = { desc = "Plugins made to use Treesitter information" }
 PluginSystem.tags.git = { desc = "Plugins around git VCS" }
 PluginSystem.tags.textobj = { desc = "Plugins to add textobjects" }
 PluginSystem.tags.ft_support = { desc = "Plugins to support specific filetype(s)" }
@@ -309,8 +311,9 @@ Plug.pkg_manager {
 
 require"mycfg.plugs_for_ui"
 require"mycfg.plugs_for_ft"
-require"mycfg.plugs_for_file_editing"
 require"mycfg.plugs_for_git"
+require"mycfg.plugs_for_file_editing"
+require"mycfg.plugs_for_treesitter"
 
 PluginSystem.check_missing_plugins()
 return PluginSystem.all_plugin_specs()
