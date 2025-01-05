@@ -24,6 +24,7 @@ snip("an", {desc = "LuaCATS @annotation"}, { t"---@" })
 snip("---@", {desc = "LuaCATS @annotation"}, { t"---@" })
 snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
 
+--- Generate easy-to-use snippets for the given LuaCATS @annotation
 ---@param trig string
 ---@param context table
 ---@param nodes_factory fun(): table

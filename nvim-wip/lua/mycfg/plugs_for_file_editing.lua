@@ -86,7 +86,12 @@ Plug.cmp {
     --   (no completion window will be opened), so we protect it with a wrapper and a default.
     global_cfg.formatting.format = protected_formatter(function(entry, vim_item)
       -- Get symbol for LSP kind
-      vim_item.kind = " " .. lspkind.symbolic(vim_item.kind) .. " │"
+      local lsp_symbol = lspkind.symbolic(vim_item.kind)
+      if #lsp_symbol == 0 then
+        vim.notify("Something is wrong, lspkind symbol is empty??? kind: ".. vim.inspect(vim_item.kind), vim.log.levels.DEBUG)
+        lsp_symbol = "?"
+      end
+      vim_item.kind = " " .. lsp_symbol .. " │"
 
       -- Entry source name
       local src_name = entry.source.name
