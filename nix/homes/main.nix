@@ -22,11 +22,6 @@
 
   _module.args.mybuilders = pkgs.callPackage ./mylib/mybuilders.nix {};
 
-  # Flake inputs
-  _module.args.flakeInputs = flakeInputs;
-
-  _module.args.system = system;
-
   # -------- Global home setup --------
 
   home.username = username;
@@ -38,11 +33,11 @@
   dyndots.mode = "editable";
   dyndots.dotfilesRealPath = "${config.home.homeDirectory}/.dot";
   dyndots.dotfilesNixPath = flakeInputs.self;
-  home.file.".test-dyndots-link".source = config.dyndots.mkLink ../../git/config;
 
   # Link flake inputs to home
   # => Easy way to search/read/navigate in any of them
   linkFlakeInputs.directory = ".nix-home-current";
+  linkFlakeInputs.inputs = flakeInputs;
 
   # Restrict user nix/registry.json to the following indirect flakes:
   nixRegistry.indirectFlakes = {

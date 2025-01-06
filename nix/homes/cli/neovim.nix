@@ -1,4 +1,4 @@
-{ config, pkgsChannels, lib, mybuilders, flakeInputs, pkgs, myToolConfigs, ... }:
+{ pkgsChannels, lib, mybuilders, myToolConfigs, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;

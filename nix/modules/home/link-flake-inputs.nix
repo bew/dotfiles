@@ -1,4 +1,4 @@
-{ config, lib, pkgs, flakeInputs, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 
@@ -6,7 +6,7 @@ let
   cfg = config.linkFlakeInputs;
 
   inputsToRemove = if !cfg.includeSelf then ["self"] else [];
-  consideredInputs = builtins.removeAttrs flakeInputs inputsToRemove;
+  consideredInputs = builtins.removeAttrs cfg.inputs inputsToRemove;
 
   # note: entries for linkFarm must be a list of { name = "foo"; path = "/path"; }
   inputsFarm = pkgs.linkFarm "flake-inputs"
@@ -19,6 +19,11 @@ in {
       description = ''
         When enabled, store symlinks to all inputs in `linkFlakeInputs.directory` folder.
       '';
+    };
+    linkFlakeInputs.inputs = mkOption {
+      type = types.attrsOf types.package;
+      default = {};
+      description = "The inputs to link";
     };
     linkFlakeInputs.directory = mkOption {
       type = types.nullOr types.str;
