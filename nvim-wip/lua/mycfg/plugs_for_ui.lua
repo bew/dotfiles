@@ -640,6 +640,9 @@ Plug {
       -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
       legacy_computing_symbols_support = true,
       distance_stop_animating = 3, -- don't animate when target is this close
+      -- Disable trail when entering cmdline, as it prevents builtin behavior when I can write 2
+      -- commands and still see the result of the first command. (very useful when editing hl..)
+      smear_to_cmd = false,
 
       cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palettes.fire),
       -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
