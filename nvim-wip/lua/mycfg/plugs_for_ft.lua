@@ -25,6 +25,8 @@ Plug {
   },
   on_load = function()
     require"render-markdown".setup {
+      -- Don't disable all rendering (prevent layout disruption) when selecting un-related text
+      render_modes = { "n", "v", "c", "t" }, -- adds "v" compared to defaults
       sign = { enabled = false },
       heading = {
         sign = false,
@@ -37,7 +39,6 @@ Plug {
           "##### 󰎱  ",
           "###### 󰎵  ",
         },
-        signs = {},
         width = "block",
         min_width = { 90, 70, 60, 50, 50, 50 },
         right_pad = 2, -- at the very least
