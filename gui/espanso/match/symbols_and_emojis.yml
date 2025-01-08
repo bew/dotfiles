@@ -13,11 +13,50 @@ matches:
   - trigger: "!thk!" # thinking face
     replace: '🤔'
 
-  - trigger: "!blink!" # ;)
+  - trigger: "!D!" # :D
+    replace: '😀'
+
+  - trigger: "!;!" # ;)
     replace: '😉'
 
+  - trigger: "!sun!"
+    replace: '😎'
+
+  - triggers: ["!inno!", "!notme!"] # not me! I'm innocent! 😇
+    replace: '😇'
+
+  - trigger: "!yay!"
+    replace: '🥳'
+
+  - trigger: "!rok!"
+    replace: '🚀'
+
+  - trigger: "!ship!" # ship it!
+    replace: '🚢'
+
+  - trigger: "!wut!" # huh? wut?
+    replace: '🤨'
+
+  - trigger: "!meh!" # >< meh
+    replace: '😖'
+
+  - trigger: "!melt!" # melting face.........
+    replace: '🫠'
+
   - trigger: "!bad!" # :( (strong)
-    replace: '☹'
+    replace: '☹️'
+
+  - trigger: "!scr!" # scream!
+    replace: '😱'
+
+  - trigger: "!ohno!" # oh.. oh no..
+    replace: '😨'
+
+  - trigger: "!xpl!" # 'xploding head
+    replace: '🤯'
+
+  - trigger: "!fck!" # fuck!
+    replace: '🤬'
 
   - trigger: "!grim!" # grimacing
     replace: '😬'
@@ -28,6 +67,9 @@ matches:
   - trigger: "!pls!" # grimacing
     replace: '🙏'
 
+  - trigger: "!shr!" # shrug (short/emoji form)
+    replace: '🤷'
+
   - trigger: "!spk!" # sparkles
     replace: '✨'
 
@@ -35,10 +77,10 @@ matches:
     replace: '🎉'
 
   - trigger: "!hr!" # heart
-    replace: '❤'
+    replace: '❤️'
 
   - trigger: "!ok!"
-    replace: '✔'
+    replace: '✅'
 
   - trigger: "!x!"
     replace: '❌'
@@ -46,14 +88,35 @@ matches:
   - trigger: "!?!"
     replace: '❔'
 
-  - trigger: "!pr!" # point right
-    replace: '👉'
+  - trigger: "!??!"
+    replace: '⁉️'
 
-  - trigger: "!warn!" # point right
-    replace: '⚠'
+  - trigger: "!warn!" # warning!
+    replace: '⚠️'
 
   - trigger: "!/!" # start of /!\
     replace: "/!\\"
+
+  - trigger: "!wav!" # hiiii!
+    replace: '👋'
+
+  - trigger: "!clap!" # clap!
+    replace: '👏'
+
+  - trigger: "!claps!" # clap clap clap!
+    replace: '👏👏👏'
+
+  - trigger: "!pr!" # point right
+    replace: '👉'
+
+  - trigger: "!pu!" # point up
+    replace: '👆'
+
+  - trigger: "!pdw!" # point down
+    replace: '👇'
+
+  - trigger: "!freesk!" # freeskates
+    replace: '➿'
 
   - trigger: "!tm!" # trademark
     replace: '™'
