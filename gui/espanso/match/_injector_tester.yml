@@ -1,4 +1,4 @@
-# This file starts with a `_`, it will be auto-loaded.
+# This file starts with a `_`, it WON'T be auto-loaded.
 
 matches:
   - trigger: "!t!"

@@ -1,0 +1,6 @@
+# NOTE: This is an example file, since it starts with `_` it WON'T be auto-loaded.
+# TODO: Rename this file to `work.private.yml` and play with espanso ;)
+
+matches:
+  - trigger: "!mail!"
+    replace: my.work.email@foo.com
