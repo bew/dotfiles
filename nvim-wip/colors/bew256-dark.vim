@@ -273,6 +273,8 @@ HiResetTo @punctuation.delimiter ctermfg=244
 
 hi! link @markup.quote Comment
 HiResetTo @markup.raw ctermfg=29 ctermbg=234
+HiResetTo @markup.raw.block ctermfg=29
+" note: No bg for block, to avoid bg leaking in indent when raw block is indented
 
 " Give a progression/difference between H1, H2, H3.. headings
 " NOTE: hl groups shared between markdown & :help files (at least).
