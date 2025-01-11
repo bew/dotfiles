@@ -338,11 +338,12 @@ bind --mode=ex <Up> ex.prev_completion
 
 # URL based config
 
-# Quick go to notifications!
-bindurl github.com nn js tri.dom.simulateClick(document.querySelector("a.notification-indicator"))
-
 # Disable on OnShape's CAD which uses many bindings
 autocmd DocStart  cad.onshape.com  mode ignore
+
+# Disable some toplevel keys that are better handled by the website
+unbindurl read.readwise.io j
+unbindurl read.readwise.io k
 
 
 # --------------------------------------------------------
