@@ -313,9 +313,55 @@ Plug.telescope {
     local tel_actions = require"telescope.actions"
     local tel_actions_lay = require"telescope.actions.layout"
     local action_state = require"telescope.actions.state"
+
+    --- Wrap function to give it a name so it appears in :map as `telescope|<name>`
+    ---@param action_name string
+    ---@param fn fun(prompt_bufnr: integer): any
+    ---@return unknown Telescope action obj
     local wrap_tel_action_fn = function(action_name, fn)
       return require"telescope.actions.mt".transform_mod({[action_name] = fn})[action_name]
     end
+
+    --- Jump to next/previous selected entry
+    ---@param prompt_bufnr integer The prompt buffer id
+    ---@param direction "next"|"previous"
+    local function jump_to_selected(prompt_bufnr, direction)
+      -- /!\ Rows are 0-indexed, and `index` is 1 indexed (table index)
+      local picker = require"telescope.actions.state".get_current_picker(prompt_bufnr)
+      local selected_entries = picker:get_multi_selection()
+      -- For some reason the list we get is not in order..
+      table.sort(selected_entries, function(e1, e2) return e1.index < e2.index end)
+
+      if #selected_entries > 0 then
+        local current_index = picker:get_selection_row() + 1 -- (Row is 0-indexed!)
+        local target_entry = nil ---@type table?
+
+        if direction == "next" then
+          -- Search entry after current index
+          for _, entry in ipairs(selected_entries) do
+            if entry.index > current_index then
+              target_entry = entry
+              break
+            end
+          end
+        elseif direction == "previous" then
+          -- Search last entry before current index
+          for _, entry in ipairs(selected_entries) do
+            if entry.index < current_index then
+              target_entry = entry
+            else
+              break
+            end
+          end
+        end
+
+        if target_entry then
+          -- Set selection row
+          picker:set_selection(target_entry.index - 1) -- (Row is 0-indexed!)
+        end
+      end
+    end
+
     local default_cfg = {}
     -- DEFAULT (my) MAPPINGS
     default_cfg.default_mappings = {} -- disable all default mappings
@@ -329,7 +375,7 @@ Plug.telescope {
     -- so we'll add common mappings after all others.
     local both_n_i = {
       -- Close on empty prompt
-      ["<C-d>"] = wrap_tel_action_fn("close_on_empty_prompt", function(prompt_bufnr)
+      ["<C-d>"] = wrap_tel_action_fn("my-close-on-empty-prompt", function(prompt_bufnr)
         local prompt = action_state.get_current_line()
         -- print("DEBUG", "prompt text:", vim.inspect(prompt), "len:", #prompt)
         if #prompt == 0 then
@@ -351,20 +397,27 @@ Plug.telescope {
       -- N/I: Move selection
       ["<Down>"] = tel_actions.move_selection_next,
       ["<Up>"] = tel_actions.move_selection_previous,
+      ["<C-M-n>"] = function(prompt_bufnr)
+        jump_to_selected(prompt_bufnr, "next")
+      end,
+      ["<C-M-p>"] = function(prompt_bufnr)
+        jump_to_selected(prompt_bufnr, "previous")
+      end,
 
       -- N/I: Manage multi-selection
-      ["<C-a>"] = tel_actions.toggle_all,
+      ["<C-a>"] = tel_actions.select_all,
+      ["<C-M-a>"] = tel_actions.toggle_all,
       ["<C-c>"] = tel_actions.drop_all,
       ["<M-a>"] = tel_actions.toggle_selection + tel_actions.move_selection_worse,
       ["<M-Space>"] = tel_actions.toggle_selection,
 
       -- N/I: Results up/down scrolling
-      ["<M-K>"] = tel_actions.results_scrolling_up,
       ["<M-J>"] = tel_actions.results_scrolling_down,
+      ["<M-K>"] = tel_actions.results_scrolling_up,
 
       -- N/I: Preview up/down scrolling
-      ["<C-M-k>"] = tel_actions.preview_scrolling_up,
       ["<C-M-j>"] = tel_actions.preview_scrolling_down,
+      ["<C-M-k>"] = tel_actions.preview_scrolling_up,
 
       -- N/I: History nav
       ["<C-n>"] = tel_actions.cycle_history_next,
@@ -375,9 +428,13 @@ Plug.telescope {
       ["<C-M-q>"] = tel_actions.add_selected_to_qflist + tel_actions.open_qflist, -- (?)
 
       -- N/I: Layout actions
-      ["<C-M-P>"] = tel_actions_lay.toggle_preview,
-      ["<C-f>"] = wrap_tel_action_fn("toggle_fullscreen", function(prompt_bufnr)
+      ["<M-p>"] = tel_actions_lay.toggle_preview,
+      ["<C-f>"] = wrap_tel_action_fn("my-toggle-fullscreen", function(prompt_bufnr)
         local picker = action_state.get_current_picker(prompt_bufnr)
+        -- NOTE: don't know how to save state in the picker, so in the meantime we store the layout
+        --   in the prompt buffer..
+        -- /!\ Downside is that when 'resuming' a picker that was in fullscreen, the prompt buffer
+        --   is re-created and we don't have access to the previous layout config anymore..
         if vim.b[prompt_bufnr].telescope_last_layout_config then
           -- Restore layout config, out of fullscreen!
           picker.layout_config = vim.b[prompt_bufnr].telescope_last_layout_config
@@ -405,6 +462,11 @@ Plug.telescope {
       -- FIXME: <C-w> in insert mode in prompt buffer does NOT delete last word... /!\
       ["<Esc>"] = tel_actions.close, -- Quick exit
       ["<M-Esc>"] = { "<Esc>", type = "command" }, -- Insert to Normal mode (used less often)
+
+      -- Delete last word (yes, using <C-S-w> instead of <C-w>)
+      -- REF: https://github.com/nvim-telescope/telescope.nvim/issues/1579
+      ["<C-w>"] = { "<C-S-w>", type = "command" },
+      ["<M-BS>"] = { "<C-S-w>", type = "command" },
 
       -- Move selection
       ["<M-j>"] = tel_actions.move_selection_next,
