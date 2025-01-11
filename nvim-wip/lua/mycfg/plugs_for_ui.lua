@@ -302,11 +302,13 @@ Plug.telescope {
   -- FIXME: install native sorter!
   depends_on = {Plug.lib_plenary},
   config_depends_on = {
+    Plug { source = PluginSystem.sources.dist_managed_opt_plug"telescope-fzf-native" },
     Plug { source = gh"nvim-telescope/telescope-ui-select.nvim" },
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
     Plug { source = gh"OliverChao/telescope-picker-list.nvim" },
     Plug { source = gh"piersolenski/telescope-import.nvim" },
-    Plug { source = PluginSystem.sources.dist_managed_opt_plug"telescope-fzf-native" }
+    -- MANY symbols for the builtin `symbols` picker (emojis, kaomojis, gitmojis...)
+    Plug { source = gh"nvim-telescope/telescope-symbols.nvim" },
   },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
