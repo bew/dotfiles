@@ -10,7 +10,7 @@ matches:
   - trigger: "!okh!" # ok hand
     replace: '👌'
 
-  - trigger: "!thk!" # thinking face
+  - triggers: ["!thk!", "!tk!"] # thinking face
     replace: '🤔'
 
   - trigger: "!D!" # :D
@@ -19,7 +19,7 @@ matches:
   - trigger: "!;!" # ;)
     replace: '😉'
 
-  - trigger: "!sun!"
+  - trigger: "!sun!" # sunglasses
     replace: '😎'
 
   - triggers: ["!inno!", "!notme!"] # not me! I'm innocent! 😇
@@ -40,6 +40,9 @@ matches:
   - trigger: "!meh!" # >< meh
     replace: '😖'
 
+  - triggers: ["!'!", "!''!"] # ^^'
+    replace: '😅'
+
   - trigger: "!melt!" # melting face.........
     replace: '🫠'
 
@@ -55,13 +58,13 @@ matches:
   - trigger: "!xpl!" # 'xploding head
     replace: '🤯'
 
-  - trigger: "!fck!" # fuck!
+  - triggers: ["!fck!", "!fk!"] # fuck!
     replace: '🤬'
 
   - trigger: "!grim!" # grimacing
     replace: '😬'
 
-  - trigger: "!updown!" # upside-down
+  - triggers: ["!updown!", "!upd!"] # upside-down
     replace: '🙃'
 
   - trigger: "!pls!" # grimacing
@@ -91,7 +94,7 @@ matches:
   - trigger: "!??!"
     replace: '⁉️'
 
-  - trigger: "!warn!" # warning!
+  - triggers: ["!warn!", "!wr!"] # warning!
     replace: '⚠️'
 
   - trigger: "!/!" # start of /!\
