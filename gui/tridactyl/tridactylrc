@@ -112,6 +112,7 @@ unbind s
 unbind --mode=visual s
 unbind t
 unbind u
+unbind v
 unbind w
 unbind x
 
