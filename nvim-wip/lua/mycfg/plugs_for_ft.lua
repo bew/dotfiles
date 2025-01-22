@@ -26,7 +26,7 @@ Plug {
   on_load = function()
     require"render-markdown".setup {
       -- Don't disable all rendering (prevent layout disruption) when selecting un-related text
-      render_modes = { "n", "v", "c", "t" }, -- adds "v" compared to defaults
+      render_modes = { "n", "v", "V", "c", "t" }, -- adds visual modes compared to defaults
       sign = { enabled = false },
       heading = {
         sign = false,
@@ -64,14 +64,14 @@ Plug {
       },
       dash = {
         icon = "━",
-        width = 0.8,
-        left_margin = 0.3,
+        width = 80,
         highlight = "@punctuation.delimiter.markdown",
       },
       bullet = { enabled = false },
       html = {
         comment = { conceal = false },
       },
+      latex = { enabled = false },
     }
   end,
 }
