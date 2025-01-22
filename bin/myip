@@ -7,10 +7,26 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
+function show_ip()
+{
+  local json="$1"
+  local success=$(echo "$json" | jq -r .success)
+  if [[ "$success" == "true" ]]; then
+    echo -n $(echo "$json" | jq -r .ip)
+  else
+    echo -n "failed"
+  fi
+}
+
 function myip
 {
-  local ip=$(curl -s https://api.my-ip.io/ip.txt)
-  echo "My public IP address is: $ip"
+  echo "My public internet address(es):"
+
+  local ip4_json=$(curl -s https://api4.my-ip.io/v2/ip.json)
+  echo "IPv4: $(show_ip "$ip4_json")"
+
+  local ip6_json=$(curl -s https://api6.my-ip.io/v2/ip.json)
+  echo "IPv6: $(show_ip "$ip6_json")"
 }
 
 myip
