@@ -72,6 +72,11 @@ Plug {
         comment = { conceal = false },
       },
       latex = { enabled = false },
+      win_options = {
+        -- Force disable any concealment in non-rendered mode
+        -- REF: https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/303#issuecomment-2608156758
+        conceallevel = { default = 0, rendered = 3 },
+      },
     }
   end,
 }
