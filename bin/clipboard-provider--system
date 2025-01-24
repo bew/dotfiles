@@ -13,9 +13,13 @@ set -euo pipefail
 if [[ -n ${SSH_TTY:-} ]]; then
   # We are under SSH, we NEED osc52 to set system's clipboard
   copy_provider=osc52
+elif [[ -d /Library ]]; then
+  # We are local, this is MacOS
+  copy_provider=pbmacos
 else
-  # We are local, use xclip!
+  # We are local, this is Linux
   copy_provider=xclip
+  # TODO: handle wayland 👀
 fi
 
 action="$1"

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail # Safe, strict script execution
+
+# Clipboard provider using pbcopy/pbpaste.
+
+command -v pbcopy >/dev/null || exit 1
+
+action="$1"
+case "$action" in
+  copy)
+    # stdin will be sent to this program
+    pbcopy
+    ;;
+  paste)
+    # will output to stdout
+    pbpaste
+    ;;
+  *)
+    >&2 echo "ERROR: invalid action '$action', must be copy or paste"
+    exit 1
+    ;;
+esac
+
+# vim:set sw=2:
