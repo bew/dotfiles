@@ -10,6 +10,18 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- Start of snippets definitions
 
+snip("safe", { desc = "Safe, strict script execution" }, ls.choice_node(1, {
+  t[[set -euo pipefail # Safe, strict script execution]],
+  t {
+    "# Safer shell script with these options",
+    "# -e          : exit if a command exits with non-zero status",
+    "# -u          : exit if an expanded variable does not exist",
+    "# -o pipefail : if a command in a pipeline fail, fail the pipeline",
+    "#               (e.g this now fails: false | true)",
+    "set -euo pipefail",
+  },
+}))
+
 snip("fn", { desc = "function foo() { ... }" }, SU.myfmt {
   [[
     function <name>()
@@ -61,6 +73,17 @@ snip("if", {desc = "if ...; then ... fi"}, SU.myfmt {
       (SU.myfmt {"[[ <test> ]]", { test = i(1) }}),
     }),
     body_true = i(2),
+  },
+})
+
+snip("th", {desc = "then ... fi"}, SU.myfmt {
+  [[
+    then
+      <body>
+    fi
+  ]],
+  {
+    body = i(1),
   },
 })
 
