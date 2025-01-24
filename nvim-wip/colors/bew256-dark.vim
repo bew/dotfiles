@@ -258,11 +258,13 @@ HiResetTo @type.builtin ctermfg=131
 HiResetTo @function ctermfg=33
 HiResetTo @function.call ctermfg=208
 HiResetTo @function.macro ctermfg=208
-HiResetTo @function.builtin ctermfg=166 cterm=bold
+HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
 
-HiResetTo @variable.member ctermfg=32
+HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
+
+HiResetTo @string.regexp ctermfg=36
 
 " The key in a key/value pairs
 HiResetTo @property ctermfg=137
@@ -308,6 +310,15 @@ HiResetTo @markup.raw.delimiter.markdown ctermfg=239
 HiResetTo @punctuation.delimiter.markdown_inline ctermfg=239
 HiResetTo @markup.italic.markdown_inline cterm=italic ctermfg=255 ctermbg=235
 HiResetTo @markup.strong.markdown_inline cterm=bold ctermfg=255 ctermbg=235
+
+" [Bash]
+" Ensure variable / constant / special vars do stand out from strings
+HiResetTo @variable.bash       ctermfg=39
+HiResetTo @variable.short.bash ctermfg=39 cterm=bold
+HiResetTo @variable.special.bash ctermfg=222
+HiResetTo @constant.bash ctermfg=171
+" Show '-o' / '--option' parameter differently
+HiResetTo @variable.option_parameter ctermfg=77 cterm=italic
 
 "}}}
 " LSP highlighting "{{{
