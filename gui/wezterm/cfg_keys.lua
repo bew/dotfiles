@@ -167,10 +167,30 @@ cfg.keys = {
   end)),
 
   -- Tabs
-  keybind(mods.CS, "t", act.SpawnTab("DefaultDomain")),
   keybind(mods.C,  "Tab", act.ActivateTabRelative(1)),
   keybind(mods.CS, "Tab", act.ActivateTabRelative(-1)),
-  -- keybind(mods.CS, "w", act.CloseCurrentTab{confirm=false}),
+  keybind(mods.CS, "t", define_and_activate_keytable {
+    name = "Tab actions",
+    -- Make this layer volatile, easily dismissed
+    activation = {one_shot=true, until_unknown=true},
+    keys = {
+      -- Safe key table exit
+      keybind(mods._, "Escape", act.PopKeyTable),
+      -- Trigger repeated!
+      keybind(mods.CS, "t", act.SpawnTab("DefaultDomain")),
+
+      -- keybind(mods.CS, "x", act.CloseCurrentTab{confirm=false}),
+
+      keybind(mods.CS, "r", act.PromptInputLine {
+        description = "Rename tab",
+        -- prompt = "Rename tab:", -- For next release in 2025
+        action = callback(function(win, _pane, line)
+          if not line then return end
+          win:active_tab():set_title(line)
+        end)
+      }),
+    }
+  }),
 
   keybind(mods.CS, "x", act.ShowLauncher),
   keybind(mods.CS, "p", act.ActivateCommandPalette),
