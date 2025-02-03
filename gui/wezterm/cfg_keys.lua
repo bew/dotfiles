@@ -74,13 +74,19 @@ end
 -- Raw key codes are hardware & OS/WM dependent, so they're not really portable..
 -- https://wezfurlong.org/wezterm/config/keys.html#raw-key-assignments
 local known_raw_keys_by_os = {
-  ["^"] = { linux = "raw:34", win = nil },
-  ["²"] = { linux = "raw:49", win = nil },
+  ["^"] = { linux = "raw:34", darwin = "raw:33" },
+  -- NOTE: This key MUST be the DEAD key that triggers compose mode.
+  --   It's used to help fast navigation when using a standard keyboard (e.g. laptop builtin one).
+  --   Don't try to detect this using my custom keyboard, it's the wrong key!
+
+  ["²"] = { linux = "raw:49", darwin = "raw:10" },
+
 }
 local function get_raw_key(keysym)
   local target_triple_to_os = {
     ["x86_64-pc-windows-msvc"] = "windows",
     ["x86_64-unknown-linux-gnu"] = "linux",
+    ["aarch64-apple-darwin"] = "darwin",
   }
   local os = target_triple_to_os[wezterm.target_triple]
   assert(os, "Unknown os for getting raw key keysym:"..tostring(keysym) .." (target_triple:"..tostring(wezterm.target_triple)..")")
@@ -90,6 +96,9 @@ local function get_raw_key(keysym)
   assert(key_raw, "Unknown raw key for keysym:"..tostring(keysym) .." os:"..tostring(os))
   return key_raw
 end
+
+-- Debug ALL key events!
+-- cfg.debug_key_events = true
 
 -- NOTE: About SHIFT and the keybind definition:
 -- * For bindings with SHIFT and a letter, the `key` field (the letter)
@@ -103,6 +112,8 @@ cfg.keys = {
   keybind(mods.C, "Backspace", act.SendKey{mods=mods.C, key="w"}),
 
   -- Remap A-^/$ to Home/End globally
+  -- It's used to help fast navigation when using a standard keyboard (e.g. laptop builtin one).
+  --
   -- NOTE: Mapped via raw key code to bypass waiting for dead key handling (like ^e -> ê)
   -- (could also be done at system/desktop level, but this is a good level for all terminal apps)
   keybind(mods.A, get_raw_key"^", act.SendKey{key="Home"}),
