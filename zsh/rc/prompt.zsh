@@ -63,10 +63,12 @@ function segmt::tiny_vim_mode
 
 # === common-cli-specific segments
 
+PROMPT_NO_GIT_INFO=${PROMPT_NO_GIT_INFO:-}
+
 # Segment git branch
 function segmt::git_branch_slow
 {
-  [ -n "$SEGMT_DISABLE_GIT_BRANCH" ] && return
+  [ -n "$PROMPT_NO_GIT_INFO" ] && return
 
   local branchName=$(__git_ps1 "%s")
   if [ -z "${branchName}" ]; then
@@ -80,7 +82,10 @@ function segmt::git_branch_slow
 # Segment git branch (fast! complete! responsive!)
 function segmt::git_branch_fast
 {
-  [ -n "$SEGMT_DISABLE_GIT_BRANCH" ] && return
+  [ -n "$PROMPT_NO_GIT_INFO" ] && {
+    echo -n "(git segmt disabled)"
+    return
+  }
 
   emulate -L zsh
   typeset -g GITSTATUS_PROMPT=""
@@ -188,7 +193,7 @@ function segmt::in_sudo
 VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
 
 # Set to anything to show a short venv segment
-PROMPT_SEGMT_VENV_SHORT="${PROMPT_SEGMT_VENV_SHORT:-}"
+PROMPT_VENV_SHORT="${PROMPT_VENV_SHORT:-}"
 
 # Segment with the current active venv directory if any
 function segmt::python_venv
@@ -206,7 +211,7 @@ function segmt::python_venv
   else
     # Add venv name if not 'venv'
     if [[ "$venv_dir" != "venv" ]]; then
-      if [[ -n "$PROMPT_SEGMT_VENV_SHORT" ]]; then
+      if [[ -n "$PROMPT_VENV_SHORT" ]]; then
         # For $venv_dir == `Py3.9.7-231c4f5db9de5be7df4255ec41a3139b`
         # -> prints `'Py3.9.7-231c~'`
         venv_display+=" '${venv_dir[0,12]}~'"
@@ -225,7 +230,7 @@ function segmt::python_venv
       venv_display+=" here"
     else
       # venv is not in $PWD, show the venv parent dir name to avoid ambiguity.
-      if [[ -n "$PROMPT_SEGMT_VENV_SHORT" ]]; then
+      if [[ -n "$PROMPT_VENV_SHORT" ]]; then
         venv_display+=" not here"
       else
         local venv_parent_dir_relative_path="$(realpath --relative-to="$PWD" "$venv_parent_dir_path")"
