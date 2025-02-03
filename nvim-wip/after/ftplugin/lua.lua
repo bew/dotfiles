@@ -24,6 +24,7 @@ local function lsp_setup()
         ["diagnostics.disable"] = {
           "redefined-local",
           "unused-vararg",
+          "trailing-space",
         },
         diagnostics = {
           -- Ignore unused local variable starting with _ (e.g. `_ctx`)
