@@ -64,6 +64,7 @@ function segmt::tiny_vim_mode
 # === common-cli-specific segments
 
 PROMPT_NO_GIT_INFO=${PROMPT_NO_GIT_INFO:-}
+PROMPT_NO_SLOW_GIT_MSG=${PROMPT_NO_SLOW_GIT_MSG:-}
 
 # Segment git branch
 function segmt::git_branch_slow
@@ -90,10 +91,21 @@ function segmt::git_branch_fast
   emulate -L zsh
   typeset -g GITSTATUS_PROMPT=""
 
+  local query_start_time=$EPOCHSECONDS
   # Call gitstatus_query synchronously. Note that gitstatus_query can also be called
   # asynchronously; see documentation in gitstatus.plugin.zsh.
-  gitstatus_query MY                  || return 1  # error
+  gitstatus_query MY || {
+    echo -n "[GITSTATUS ERROR]"
+    return 1  # error
+  }
   [[ $VCS_STATUS_RESULT == ok-sync ]] || return 0  # not a git repo
+
+  local query_duration=$(( $EPOCHSECONDS - $query_start_time ))
+  if (( $query_duration > 2 )) && [[ -z "$PROMPT_NO_SLOW_GIT_MSG" ]]; then
+    # Queries for git state via gitstatusd should be really fast, otherwise shell prompt easily
+    # feels exceedingly slow as this segment is called EVERY TIME the prompt is re-calculated!
+    echo -n "[${query_duration}s.. try PROMPT_NO_GIT_INFO=yes]"
+  fi
 
   # colors used below
   local      col_background="black"
