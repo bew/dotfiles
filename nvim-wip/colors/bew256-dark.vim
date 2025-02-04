@@ -89,7 +89,7 @@ exe "HiResetTo Normal"   .s:fg_base0  .' ctermbg=233'
 " Darker background for non-current windows
 exe "HiResetTo NormalNC ctermbg=232"
 
-exe "HiResetTo Comment cterm=italic ctermfg=241"
+HiResetTo Comment cterm=italic ctermfg=241
 "       *Comment         any comment
 
 exe "HiResetTo Constant"   .s:fg_cyan
@@ -255,6 +255,9 @@ HiResetTo DiagnosticUnnecessary
 HiResetTo @type ctermfg=214
 HiResetTo @type.builtin ctermfg=131
 
+HiResetTo @keyword ctermfg=70
+HiResetTo @keyword.exception ctermfg=160 cterm=bold
+
 HiResetTo @function ctermfg=33
 HiResetTo @function.call ctermfg=208
 HiResetTo @function.macro ctermfg=208
@@ -264,7 +267,18 @@ HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
 
+HiResetTo @string ctermfg=37
 HiResetTo @string.regexp ctermfg=36
+
+HiResetTo @comment.documentation ctermfg=243 cterm=nocombine
+" This is used for strings that are considered as docs, like Python docstrings
+hi! link @string.documentation @comment.documentation
+
+" note: _emphasis_ certain documentation sections
+" (used _at least_ in python docstrings thx to my hl_patterns)
+HiResetTo @comment.documentation.emph ctermfg=246
+HiResetTo @comment.documentation.emph.return ctermfg=70
+HiResetTo @comment.documentation.emph.exception ctermfg=160
 
 " The key in a key/value pairs
 HiResetTo @property ctermfg=137
@@ -352,7 +366,9 @@ HiResetTo @variable.option_parameter ctermfg=77 cterm=italic
 " LSP highlighting (Language-specific overrides) "{{{
 " ---------------------------------------------------------------------
 
-" ...
+" [Lua]
+" Disable forced LSP comments, as they overwrite @comment.documentation
+HiResetTo @lsp.type.comment
 
 "}}}
 " vim syntax highlighting "{{{

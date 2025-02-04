@@ -28,6 +28,7 @@ local patterns = {}
 -- Import patterns from other files
 patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.keywords")
 patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.vim_colors")
+patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.tech_python")
 
 
 ------- Filetype: Lua

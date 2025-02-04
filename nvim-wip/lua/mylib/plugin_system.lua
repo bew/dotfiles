@@ -51,10 +51,11 @@ local _s = U.str_surround
 local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 
 local STATE = {
-  -- Contains anonymous plugin specs
+  -- test
+  --- Contains anonymous plugin specs
   ---@type plugin_system.PluginSpec[]
   _anon_plugin_specs = {},
-  -- Contains named plugin specs
+  --- Contains named plugin specs
   ---@type {[string]: plugin_system.PluginSpec}
   _named_plugin_specs = {},
 }
