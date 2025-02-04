@@ -73,4 +73,10 @@
   # ref: https://blog.gitbutler.com/git-tips-3-really-large-repositories/#commit-graph
   writeCommitGraph = true
 
+[blame]
+  # The file where to look for low-signal large-changes revisions to ignore in `git blame`
+  # This is a common convention now, but not the default (for backward compat)
+  # REF: Https://www.perplexity.ai/search/git-blame-ignore-revs-B4FBGbCLQxqDQ1wGTLz8Yg
+  ignoreRevsFile = .git-blame-ignore-revs
+
 # vim:set ft=gitconfig:
