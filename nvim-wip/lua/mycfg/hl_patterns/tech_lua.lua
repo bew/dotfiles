@@ -1,5 +1,6 @@
 local _U = require"mycfg.hl_patterns.utils"
 
+---@type {[string]: mycfg.hl_patterns.Pattern}
 local patterns = {}
 
 patterns.lua_LuaCATS_attr = {

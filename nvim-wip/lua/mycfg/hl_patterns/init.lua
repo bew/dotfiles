@@ -21,6 +21,29 @@
 -- Nice example of usage:
 -- https://github.com/ahmedelgabri/dotfiles/blob/59adb82540492781/config/nvim/lua/plugins/mini.lua#L140
 
+-- TODO: upstream pattern type hints!
+
+---@class mycfg.hl_patterns.GroupFnData
+---@field full_match string String with full pattern match
+---@field line integer match line number (1-indexed)
+---@field from_col integer match starting byte column (1-indexed)
+---@field to_col integer match ending byte column (1-indexed, inclusive)
+
+---@class mycfg.hl_patterns.ExtmarkFnData: mycfg.hl_patterns.GroupFnData
+---@field hl_group string The highlight group
+
+---@alias mycfg.hl_patterns.PatternFn fun(buf_id: integer): string|string[]?
+---@alias mycfg.hl_patterns.GroupFn fun(buf_id: integer, match: string, data: mycfg.hl_patterns.GroupFnData): string?
+---@alias mycfg.hl_patterns.ExtmarkFn fun(buf_id: integer, match: string, data: mycfg.hl_patterns.ExtmarkFnData): vim.api.keyset.set_extmark?
+
+---@class mycfg.hl_patterns.Pattern
+---@field pattern string|string[]|mycfg.hl_patterns.PatternFn
+---    Lua pattern(s) for this highlighter
+---@field group string|mycfg.hl_patterns.GroupFn
+---    The highlight group to use (set as empty string for extmark-only)
+---@field extmark_opts? vim.api.keyset.set_extmark|mycfg.hl_patterns.ExtmarkFn
+---    Optional extmark to attach to the match
+
 -- Import patterns from other files
 return vim.tbl_extend(
   "error",

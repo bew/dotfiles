@@ -2,6 +2,7 @@
 local U = require"mylib.utils"
 local _U = require"mycfg.hl_patterns.utils"
 
+---@type {[string]: mycfg.hl_patterns.Pattern}
 local patterns = {}
 
 --- Give keyword variants for FOO:
