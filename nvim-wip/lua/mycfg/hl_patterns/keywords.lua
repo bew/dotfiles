@@ -33,6 +33,13 @@ patterns.big_note = {
   }),
 }
 
+patterns.small_note = {
+  pattern = "note:",
+  group = _U.define_hl("small_note", {
+    ctermfg = 32,
+  }),
+}
+
 patterns.big_fixme = {
   pattern = _big_word_variants"FIXME",
   group = _U.define_hl("big_fixme", {
