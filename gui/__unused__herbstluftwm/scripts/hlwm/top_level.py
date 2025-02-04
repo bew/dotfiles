@@ -1,5 +1,5 @@
 import subprocess
-from typing import Iterator, List, Union
+from typing import Any, Iterator, List, Union
 
 from hlwm.events import RawEvent
 from hlwm.tag import Tag
@@ -8,8 +8,8 @@ from hlwm.tag import Tag
 class Hlwm:
     @staticmethod
     def hc(*args, default=...):
-        args = [str(arg) for arg in args]
-        cmd = ["herbstclient", "--no-newline"] + args
+        args_strs = [str(arg) for arg in args]
+        cmd = ["herbstclient", "--no-newline", *args_strs]
         # print(f"<-> HC: {cmd}")
         proc = subprocess.run(
             cmd,
@@ -31,7 +31,7 @@ class Hlwm:
             stdout=subprocess.PIPE,
             universal_newlines=True,
         )
-        for event_str in hc_idle.stdout:
+        for event_str in hc_idle.stdout:  # type: ignore[union-attr]
             yield RawEvent.from_event_str(event_str.strip())
 
     @staticmethod
@@ -42,6 +42,16 @@ class Hlwm:
 
     @staticmethod
     def get_focused_tag(monitor: str) -> Tag:
+        """
+        Get the focused tag on the given monitor.
+
+        :param monitor: The monitor scope.
+        :param foo_bar: hello
+        :param other: hello
+        :return: The focused tag
+
+        :raises Exception: When no focused tag found (shouldn't happen..)
+        """
         for tag in Hlwm.get_tags(monitor=monitor):
             if tag.state.focused:
                 return tag
@@ -50,21 +60,32 @@ class Hlwm:
         raise Exception(f"UNREACHABLE: No focused tag found for monitor '{monitor}'")
 
     @staticmethod
-    def rename_tag(tag: Tag, new_name: str):
+    def rename_tag(tag: Tag, new_name: str) -> None:
+        """
+        Rename the given tag with a new name.
+
+        :param tag: Tag to rename
+        :param new_name: The new name to set
+        """
         Hlwm.hc("rename", tag.name, new_name)
 
     @staticmethod
-    def add_tag(tag_name: str):
+    def add_tag(tag_name: str) -> None:
+        """
+        Add a new tag
+
+        :param tag_name: Name of the new tag to add
+        """
         Hlwm.hc("add", tag_name)
 
     @staticmethod
-    def use_tag(tag: Union[Tag, str]):
+    def use_tag(tag: Union[Tag, str]) -> None:
         if isinstance(tag, Tag):
             tag = tag.name
         Hlwm.hc("use", tag)
 
     @staticmethod
-    def set_attr(attr: str, value):
+    def set_attr(attr: str, value: Any) -> None:
         Hlwm.hc("attr", attr, value)
 
     @staticmethod
