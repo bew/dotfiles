@@ -21,28 +21,16 @@
 -- Nice example of usage:
 -- https://github.com/ahmedelgabri/dotfiles/blob/59adb82540492781/config/nvim/lua/plugins/mini.lua#L140
 
-local U = require"mycfg.hl_patterns.utils"
-
-local patterns = {}
-
 -- Import patterns from other files
-patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.keywords")
-patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.vim_colors")
-patterns = vim.tbl_extend("error", patterns, require"mycfg.hl_patterns.tech_python")
+return vim.tbl_extend(
+  "error",
+  require"mycfg.hl_patterns.keywords",
+  require"mycfg.hl_patterns.vim_colors",
 
-
-------- Filetype: Lua
-
--- TODO: move to per-filetype patterns? (use `vim.b.minihipatterns_config`?)
-patterns.emmylua_doc_kw = {
-  -- note: Match `---@foo`
-  pattern = function(bufnr)
-    if vim.bo[bufnr].filetype ~= "lua" then return nil end
-    return "^%s*%-%-%-()@%w+()"
-  end,
-  group = U.define_hl("emmylua_doc_kw", {
-    ctermfg = 202,
-  }),
-}
-
-return patterns
+  -- Tech-specific patterns
+  -- TODO: use `vim.b.minihipatterns_config` instead of global patterns 🤔
+  --   Find a nice way to define a pattern or group of patterns for 1+ filetype(s)
+  require"mycfg.hl_patterns.tech_python",
+  require"mycfg.hl_patterns.tech_lua",
+  {} -- (for trailing commas)
+)
