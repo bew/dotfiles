@@ -432,8 +432,17 @@ Plug {
         char = {"¦", "│"},
       },
       scope = {
-        char = "┃",
+        char = {"▎"}, -- line smashed to the left, for nicer rendering
         show_exact_scope = true, -- Don't mark whole lines at start/end of the scope
+        -- include = {
+        --   -- Additional TS node types that are considered as a scope (by language)
+        --   -- note: it's a bit too much, and I loose the _real_ scope, would be nice to have two
+        --   --   scoping lines: the current (real) scope + table/dict/object scope 🤔
+        --   node_type = {
+        --     lua = {"table_constructor"},
+        --     nix = {"attrset_expression"},
+        --   }
+        -- }
       },
     }
     -- NOTE: Once scope is setup, see doc for hooks.builtin.scope_highlight_from_extmark to use
@@ -442,6 +451,11 @@ Plug {
     -- Replaces the first indentation guide for space/tab indentation with a normal space
     hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_space_indent_level)
     hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_tab_indent_level)
+  end,
+  on_colorscheme_change = function()
+    vim.api.nvim_set_hl(0, "IblIndent", { ctermfg = 237 })
+    -- note: `fg` necessary because it is used for the underline color of first/last line of scope
+    vim.api.nvim_set_hl(0, "IblScope",  { ctermfg = 239, fg = "#4f5258" })
   end,
 }
 
