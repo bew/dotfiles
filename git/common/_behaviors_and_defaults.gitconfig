@@ -77,6 +77,8 @@
   # The file where to look for low-signal large-changes revisions to ignore in `git blame`
   # This is a common convention now, but not the default (for backward compat)
   # REF: Https://www.perplexity.ai/search/git-blame-ignore-revs-B4FBGbCLQxqDQ1wGTLz8Yg
-  ignoreRevsFile = .git-blame-ignore-revs
+  # ignoreRevsFile = .git-blame-ignore-revs
+  # NOTE: We cannot set this globally, or we get a hard error when the file is missing.. ☹️
+  #   REF: https://stackoverflow.com/q/70435937/5655255
 
 # vim:set ft=gitconfig:
