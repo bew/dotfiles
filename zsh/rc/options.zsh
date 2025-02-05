@@ -54,6 +54,12 @@ setopt hist_reduce_blanks
 # Remove duplicated history entries on history save (usually at end of shell session)
 setopt hist_save_no_dups
 
+# Disable shared history between shells
+#
+# For some reason this is enabled by default with nix-darwin
+# SEE: https://github.com/LnL7/nix-darwin/issues/983
+setopt NO_sharehistory
+
 # OTHERS
 #-------------------------------------------------------------
 
