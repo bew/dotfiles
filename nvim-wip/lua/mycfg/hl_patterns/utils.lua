@@ -21,7 +21,7 @@ end
 ---@param hl_spec table The hl spec for the highlight (see `:h nvim_set_hl`)
 ---@return string The full highlight group name
 function U.define_hl(name, hl_spec)
-  local full_name = "PatternHL." .. name
+  local full_name = "hl_pattern." .. name
   vim.api.nvim_set_hl(0, full_name, hl_spec)
   return full_name
 end

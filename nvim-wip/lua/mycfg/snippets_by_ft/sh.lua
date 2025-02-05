@@ -22,6 +22,14 @@ snip("safe", { desc = "Safe, strict script execution" }, ls.choice_node(1, {
   },
 }))
 
+snip("l", { desc = "local var decl/def" }, SU.myfmt_braces {
+  "local {var}={after}",
+  {
+    var = i(1, "var"),
+    after = i(2),
+  },
+})
+
 snip("fn", { desc = "function foo() { ... }" }, SU.myfmt {
   [[
     function <name>()

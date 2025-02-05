@@ -15,6 +15,10 @@ local function _big_word_variants(big_word)
   }
 end
 
+-- FIXME: groups are NOT re-created after a colorscheme is applied
+-- (IDEA: replace all group defs with function that DO the def, will be re-run on colorscheme change)
+-- (IDEA: in `define_hl`, register that hl in a global table that get's re-applied 🤔)
+
 ------- Group: General keywords
 
 patterns.big_todo = {
@@ -44,7 +48,7 @@ patterns.big_fixme = {
   pattern = _big_word_variants"FIXME",
   group = _U.define_hl("big_fixme", {
     ctermfg = 160,
-    underline = true,
+    underdashed = true,
     bold = true,
   }),
 }
@@ -69,6 +73,8 @@ patterns.big_fail_bad = {
   pattern = U.concat_lists {
     _big_word_variants"FAIL",
     _big_word_variants"BAD",
+    _big_word_variants"BAD%+%+", -- BAD++:
+    _big_word_variants"BLOCKED",
   },
   group = _U.define_hl("big_fail_bad", {
     ctermfg = 124,
@@ -84,6 +90,17 @@ patterns.big_warning = {
   group = _U.define_hl("big_warning", {
     ctermfg = 11,
     italic = true,
+  }),
+}
+
+patterns.big_tbd = {
+  pattern = {
+    _U.keywordize"TBD:",
+    _U.keywordize"TO BE DEFINED:",
+  },
+  group = _U.define_hl("big_tbd", {
+    ctermfg = 162,
+    bold = true,
   }),
 }
 
@@ -105,6 +122,7 @@ patterns.sym_warn = {
     ctermfg = 11,
     bold = true,
     underline = true,
+    nocombine = true, -- nicer render when it's not italic (this opt ensures that)
   }),
 }
 
@@ -119,17 +137,26 @@ patterns.sym_excl = {
 
 ------- Group: Misc keywords
 
+patterns.misc_light_words = {
+  pattern = {
+    -- _U.keywordize"DEBUG",
+    _U.keywordize"DEBUG:?",
+    _U.keywordize"RELATED:?",
+    _U.keywordize"SEE:?",
+    _U.keywordize"REF:",
+  },
+  group = _U.define_hl("big_debug", {
+    ctermfg = 253,
+  }),
+}
 
-patterns.misc_big_words = {
+patterns.misc_heavy_words = {
   pattern = {
     _U.keywordize"DOC:",
-    _U.keywordize"REF:",
-    _U.keywordize"RELATED:",
-    _U.keywordize"SEE:",
     _U.keywordize"TOTRY:",
   },
   group = _U.define_hl("misc_big_words", {
-    ctermfg = 255,
+    ctermfg = 253,
     bold = true,
   }),
 }
@@ -156,5 +183,10 @@ patterns.QnA_A = {
     bold = true,
   })
 }
+patterns.big_why = {
+  pattern = _U.keywordize"WHY:",
+  group = patterns.QnA_Q.group,
+}
+
 
 return patterns
