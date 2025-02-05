@@ -292,8 +292,6 @@ snip(
 -- TODO: mainsimple  =>  basic main fn
 -- TODO: for  =>  for loop
 -- TODO: try  =>  try except block
--- TODO: doc  =>  """Doc"""
--- TODO: :p  =>  :param …: doc
 -- TODO: pp  =>  pretty print (inline import)
 -- TODO: f  =>  f"blabla"
 -- TODO: s  =>  self.X = X
@@ -308,6 +306,27 @@ snip(
 -- TODO: pytp  =>  pytest parametrize
 -- TODO: pyts  =>  pytest mark skip
 
+
+-- Docstrings-related snips
+snip("dd", {desc = [["""Doc…"""]]}, SU.myfmt {
+  [["""<doc>"""]],
+  { doc = i(1, "TODO: doc!") }
+})
+snip(":p", {desc = ":param <foo>: …"}, SU.myfmt {
+  [[:param <param>: <desc>]],
+  {
+    param = i(1, "my_param"),
+    desc = i(2, "TODO: describe!"),
+  }
+})
+snip(":x", {desc = ":raises <Error>: …"}, SU.myfmt {
+  [[:raises <errors>: <desc>]],
+  {
+    errors = i(1, "my_param"),
+    desc = i(2, "TODO: describe!"),
+  }
+})
+snip(":r", {desc = ":return: …"}, t":return: ")
 
 -------------------
 
