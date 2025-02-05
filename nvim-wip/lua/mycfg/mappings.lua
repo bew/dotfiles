@@ -256,11 +256,15 @@ vim.cmd[[nnoremap <C-l> <C-w>l]]
 -- Goto tabs Alt-a/z
 my_actions.go_prev_tab = mk_action_v2 {
   default_desc = "Go to prev tab",
-  [{"n", "i"}] = "<esc>gT",
+  -- NOTE: We cannot use the same action for both mode, to avoid cancelling v:count.
+  n = "gT",
+  i = "<esc>gT",
 }
 my_actions.go_next_tab = mk_action_v2 {
   default_desc = "Go to next tab",
-  [{"n", "i"}] = "<esc>gt",
+  -- NOTE: We cannot use the same action for both mode, to avoid cancelling v:count.
+  n = "gt",
+  i = "<esc>gt",
 }
 toplevel_map{mode={"n", "i"}, key=[[<M-a>]], action=my_actions.go_prev_tab}
 toplevel_map{mode={"n", "i"}, key=[[<M-z>]], action=my_actions.go_next_tab}
