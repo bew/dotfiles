@@ -241,7 +241,7 @@ exe "HiResetTo Cursor"   .s:fg_base03 .s:bg_base0
 
 exe "HiResetTo MatchParen"     .s:fmt_bold   .s:fg_bright_yellow    .s:bg_base01
 
-hi NormalFloat ctermfg=248 ctermbg=236
+hi NormalFloat ctermfg=248 ctermbg=235
 
 "}}}
 " Diagnostic highlighting "{{{
