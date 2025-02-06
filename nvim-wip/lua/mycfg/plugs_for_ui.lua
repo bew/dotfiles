@@ -305,7 +305,8 @@ Plug.telescope {
     Plug { source = PluginSystem.sources.dist_managed_opt_plug"telescope-fzf-native" },
     Plug { source = gh"nvim-telescope/telescope-ui-select.nvim" },
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
-    Plug { source = gh"OliverChao/telescope-picker-list.nvim" },
+    -- Plug { source = gh"OliverChao/telescope-picker-list.nvim" }, -- See https://github.com/OliverChao/telescope-picker-list.nvim/pull/3
+    Plug { source = gh"bew/telescope-picker-list.nvim", version = { branch = "fix-lsp-no-client-attached" } },
     Plug { source = gh"piersolenski/telescope-import.nvim" },
     -- MANY symbols for the builtin `symbols` picker (emojis, kaomojis, gitmojis...)
     Plug { source = gh"nvim-telescope/telescope-symbols.nvim" },
