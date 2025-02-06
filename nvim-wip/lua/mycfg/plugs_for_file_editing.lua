@@ -311,6 +311,138 @@ Plug.cmp {
   end,
 }
 
+Plug {
+  source = gh"SmiteshP/nvim-navbuddy",
+  desc = "A simple ranger-like popup to navigate LSP document symbols",
+  tags = {t.ui, "lsp"}, -- note: Does NOT support Treesitter navigation
+  defer_load = { on_event = "VeryLazy" },
+  depends_on = {
+    Plug { source = gh"SmiteshP/nvim-navic" }, -- NOTE: not auto-enabled, used as a lib
+    Plug.lib_nui
+  },
+  -- NOTE: the plugin supports a bit more than navigation, for example:
+  -- - `a` will insert a new thing after/before item
+  -- - `c` will comment item
+  -- - `r` will rename item
+  -- - `J/K` will move node above/below prev/next item
+  -- - ...
+  on_load = function()
+    -- Open with :Navbuddy
+    -- FIXME: I want to hide variables, and only focus on structural symbols (fn, class, modules, ..)
+    require"nvim-navbuddy".setup {
+      lsp = { auto_attach = true },
+      icons = {
+        File = " ",
+        Module = "{}",
+        Namespace = "{}",
+        Package = " ",
+        Class = " ",
+        Method = "󰊕 ",
+        Property = " ",
+        Field = " ",
+        Constructor = " ",
+        Enum = " ",
+        Interface = " ",
+        Function = "󰊕 ",
+        Variable = " ",
+        Constant = " ",
+        String = " ",
+        Number = " ",
+        Boolean = " ",
+        Array = "[]",
+        Object = "{}",
+        Key = " ",
+        Null = "∅ ",
+        EnumMember = " ",
+        Struct = " ",
+        Event = " ",
+        Operator = " ",
+        TypeParameter = " ",
+      }
+    }
+
+    local_leader_map{mode="n", key="cN", desc="Code LSP Navigation", action=require"nvim-navbuddy".open}
+
+    -- TODO: define type highlights
+    -- NavbuddyFunction, ...
+  end,
+}
+
+Plug {
+  source = gh"stevearc/aerial.nvim",
+  desc = "TS/LSP-based code outline window",
+  tags = {t.ui, "nav", "lsp", "ts"},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"aerial".setup {
+      -- NOTE: for python, lsp backend doesn't give any hierarchy :/
+      --   (any shows many useless items like imports)
+      backends = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
+      show_guides = true,
+      highlight_on_hover = true, -- FIXME: not respected in Aerial's Nav popup 😬
+      -- TODO: 👆 Ideally I'd like to highlight the whole node (like with navbuddy) 🤔
+      highlight_on_jump = false,
+      layout = {
+        default_direction = "prefer_left",
+        min_width = 35,
+      },
+      keymaps = {
+        -- Disable few default keymaps
+        ["<C-j>"] = false, -- clashes with my win nav
+        ["<C-k>"] = false, -- clashes with my win nav
+
+        -- FIXME: I want a simple way to preview whole node for the current item (like navbuddy),
+        --   and a simple way to go back to where I was before all the navigation..
+        --   (like the navbuddy popup)
+        --   (note: `gi` seems to be broken for this 🤬)
+        -- IDEA: Make `scroll` & `x_and_scroll` actions _not_ add to jumplist,
+        --   so I'm always a <C-O> away from my original position in the buffer
+        ["<M-o>"] = "actions.scroll",
+        ["<M-v>"] = "actions.jump_vsplit",
+        ["<M-s>"] = "actions.jump_split",
+        ["<M-j>"] = "actions.down_and_scroll",
+        ["<M-k>"] = "actions.up_and_scroll",
+        ["l"] = "actions.up_and_scroll",
+        -- TODO: I want `h` to select parent (without closing current tree)
+        -- TODO: I want `J`/`K` to jump to next/prev at same level
+      },
+      nav = {
+        preview = true,
+        min_height = { 20, 0.5 },
+        win_opts = { winblend = 0 },
+        keymaps = {
+          -- Disable few default keymaps
+          ["<C-j>"] = false, -- clashes with my win nav
+          ["<C-k>"] = false, -- clashes with my win nav
+
+          ["q"] = "actions.close",
+          ["<M-v>"] = "actions.jump_vsplit",
+          ["<M-s>"] = "actions.jump_split",
+        },
+      },
+      icons = {
+        -- aerial always adds a space after icon
+        Module = "{}",
+        Namespace = "{}",
+        Package = "",
+        Interface = "",
+        Struct = "",
+        Class = "",
+        Constructor = "",
+        Method = "󰊕",
+        Property = "",
+        Function = "󰊕",
+        Enum = "",
+      },
+    }
+    local_leader_map{mode="n", key="cn", desc="Code Nav popup", action=require"aerial".nav_toggle}
+    local_leader_map{mode="n", key="cp", desc="Code Nav panel", action=require"aerial".toggle}
+  end,
+  on_colorscheme_change = function()
+    vim.api.nvim_set_hl(0, "AerialLine", { link = "Visual" })
+  end,
+}
+
 Plug.luasnip {
   -- doc: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
   --
