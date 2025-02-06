@@ -401,11 +401,19 @@ Plug.telescope {
       ["<Down>"] = tel_actions.move_selection_next,
       ["<Up>"] = tel_actions.move_selection_previous,
       ["<C-M-n>"] = function(prompt_bufnr)
+        -- jump to next selected entry (useful if multi-selected entries)
         jump_to_selected(prompt_bufnr, "next")
       end,
       ["<C-M-p>"] = function(prompt_bufnr)
+        -- jump to previous selected entry (useful if multi-selected entries)
         jump_to_selected(prompt_bufnr, "previous")
       end,
+
+      -- Move selection
+      ["<M-j>"] = tel_actions.move_selection_next,
+      ["<M-k>"] = tel_actions.move_selection_previous,
+      ["<M-g>"] = tel_actions.move_to_top,
+      ["<M-G>"] = tel_actions.move_to_bottom,
 
       -- N/I: Manage multi-selection
       ["<C-a>"] = tel_actions.select_all,
@@ -470,12 +478,6 @@ Plug.telescope {
       -- REF: https://github.com/nvim-telescope/telescope.nvim/issues/1579
       ["<C-w>"] = { "<C-S-w>", type = "command" },
       ["<M-BS>"] = { "<C-S-w>", type = "command" },
-
-      -- Move selection
-      ["<M-j>"] = tel_actions.move_selection_next,
-      ["<M-k>"] = tel_actions.move_selection_previous,
-      ["<M-g>"] = tel_actions.move_to_top,
-      ["<M-G>"] = tel_actions.move_to_bottom,
 
       -- Insert file/line/cword
       ["<C-r><C-f>"] = tel_actions.insert_original_cfile,
