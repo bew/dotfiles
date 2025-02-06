@@ -60,7 +60,12 @@ cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
 cfg.unicode_version = 15
 
 cfg.strikethrough_position = "0.6cell"
-cfg.underline_position = -6
+
+-- Right so that the underline touches the cell below
+cfg.underline_position = "-0.14cell"
+-- /!\ Cannot change underline thickness without changing the stroke size of custom glyphs
+--   (note: I'm working on a PR..)
+-- cfg.underline_thickness = "0.1cell"
 
 -- Enable various OpenType features
 -- See https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
