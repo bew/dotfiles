@@ -395,16 +395,33 @@ Plug {
         --   and a simple way to go back to where I was before all the navigation..
         --   (like the navbuddy popup)
         --   (note: `gi` seems to be broken for this 🤬)
+        --
         -- IDEA: Make `scroll` & `x_and_scroll` actions _not_ add to jumplist,
         --   so I'm always a <C-O> away from my original position in the buffer
         ["<M-o>"] = "actions.scroll",
         ["<M-v>"] = "actions.jump_vsplit",
         ["<M-s>"] = "actions.jump_split",
+        ["<M-t>"] = function()
+          -- NOTE: `actions.jump_tab` is missing
+          -- .. tracked in https://github.com/stevearc/aerial.nvim/issues/442
+          require"aerial".select { split = "tab split" }
+        end,
         ["<M-j>"] = "actions.down_and_scroll",
         ["<M-k>"] = "actions.up_and_scroll",
-        ["l"] = "actions.up_and_scroll",
-        -- TODO: I want `h` to select parent (without closing current tree)
+        ["h"] = "actions.prev_up", -- select parent item
+        -- BUG: 👆 `prev_up` is relative to the last `scroll`, not relative to the cursor ☹️
+        -- .. tracked in https://github.com/stevearc/aerial.nvim/issues/444
+        ["l"] = function()
+          -- toggle tree, do not attempt to toggle parent
+          require"aerial".tree_toggle { bubble = false }
+        end,
+        ["o"] = function()
+          -- toggle tree, do not attempt to toggle parent
+          require"aerial".tree_toggle { bubble = false }
+        end,
         -- TODO: I want `J`/`K` to jump to next/prev at same level
+        -- NOTE: Not possible with the API we have.
+        -- .. tracked in https://github.com/stevearc/aerial.nvim/issues/443
       },
       nav = {
         preview = true,
@@ -416,8 +433,25 @@ Plug {
           ["<C-k>"] = false, -- clashes with my win nav
 
           ["q"] = "actions.close",
+          ["<esc>"] = "actions.close",
+
           ["<M-v>"] = "actions.jump_vsplit",
           ["<M-s>"] = "actions.jump_split",
+          ["<M-t>"] = function(nav)
+            -- impl inspired from aerial's builtin nav actions to `jump_split`.
+            -- NOTE: `actions.jump_tab` is missing
+            -- .. tracked in https://github.com/stevearc/aerial.nvim/issues/442
+            local symbol = nav:get_current_symbol()
+            nav:close()
+            if symbol then
+              require("aerial.navigation").select_symbol(
+                symbol,
+                nav.winid,
+                nav.bufnr,
+                { jump = true, split = "tab split" }
+              )
+            end
+          end,
         },
       },
       icons = {
