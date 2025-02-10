@@ -182,7 +182,9 @@
           env = stablePkgs.buildEnv {
             name = "cli-base-env";
             paths = [
-              myPkgs.zsh-bew
+              # note: cannot use `myPkgs.zsh-bew`, otherwise my fzf-bew custom pkg isn't used
+              #   (packages in myPkgs are not cross-referenced yet..)
+              (mk-zsh-bew-config { fewBinsFromPATH = true; }).outputs.toolPkg.standalone
               myPkgs.nvim-minimal
               myPkgs.nvim-bew
               myPkgs.fzf-bew
