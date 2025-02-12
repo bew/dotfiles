@@ -61,7 +61,7 @@ matches:
   - triggers: ["!fck!", "!fk!"] # fuck!
     replace: '🤬'
 
-  - trigger: "!grim!" # grimacing
+  - triggers: ["!grim!", "!gr!"] # grimacing
     replace: '😬'
 
   - triggers: ["!updown!", "!upd!"] # upside-down
