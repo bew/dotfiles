@@ -20,7 +20,7 @@ let
     # suggestions nav (short movement)
     alt-j = "down"; alt-k     = "up";
     # suggestions nav (long movement)
-    ctrl-alt-j = "next-selected"; ctrl-alt-k = "prev-selected";
+    ctrl-alt-n = "next-selected"; ctrl-alt-p = "prev-selected";
     alt-g = "first"; alt-G = "last";
     alt-J = "half-page-down"; alt-K = "half-page-up";
     alt-z = "jump"; # easymotion-like 1/2-keystroke movement!
@@ -35,8 +35,8 @@ let
 
     # preview nav
     alt-p = "toggle-preview";
-    pgup       = "preview-page-up"; pgdn       = "preview-page-down";
-    ctrl-alt-p = "preview-page-up"; ctrl-alt-n = "preview-page-down";
+    pgdn       = "preview-page-down"; pgup       = "preview-page-up";
+    ctrl-alt-j = "preview-page-down"; ctrl-alt-k = "preview-page-up";
 
     # history
     ctrl-n = "next-history"; ctrl-p = "prev-history";
