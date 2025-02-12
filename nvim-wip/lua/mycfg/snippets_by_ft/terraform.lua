@@ -43,9 +43,7 @@ snip("dyn", { desc = "dynamic block" }, SU.myfmt {
 
 snip("d", { desc = "datasource block" }, SU.myfmt {
   [[
-    data "<type>" "<name>" {
-      <params>
-    }
+    data "<type>" "<name>" {<params>}
   ]],
   {
     type = i(1),
@@ -117,6 +115,19 @@ snip("pr", { desc = "provider block" }, SU.myfmt {
   {
     name = i(1),
     params = i(2),
+  }
+})
+
+snip("mod", { desc = "module call" }, SU.myfmt {
+  [[
+    module "<name>" {
+      source = "<source>"<rest>
+    }
+  ]],
+  {
+    name = i(1),
+    source = i(2),
+    rest = i(3),
   }
 })
 
