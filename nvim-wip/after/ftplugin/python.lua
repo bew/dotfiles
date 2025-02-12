@@ -9,7 +9,6 @@ local function start_lsp_server()
     overrides = {
       true, -- special value to add plugin's default params for mypy
       "--check-untyped-defs", -- ensure all functions are checked!
-      "--disallow-incomplete-defs"
     },
   }
   -- WHen python-lsp-ruff is installed
