@@ -139,10 +139,10 @@ patterns.sym_excl = {
 
 patterns.misc_light_words = {
   pattern = {
-    -- _U.keywordize"DEBUG",
-    _U.keywordize"DEBUG:?",
-    _U.keywordize"RELATED:?",
-    _U.keywordize"SEE:?",
+    _U.keywordize"DEBUG",
+    _U.keywordize"DEBUG:",
+    _U.keywordize"RELATED:",
+    _U.keywordize"SEE:",
     _U.keywordize"REF:",
   },
   group = _U.define_hl("big_debug", {
