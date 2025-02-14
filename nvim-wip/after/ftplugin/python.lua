@@ -1,5 +1,10 @@
 
 local function start_lsp_server()
+  local venv_py_exec
+  if vim.env.VIRTUAL_ENV and vim.uv.fs_stat(vim.env.VIRTUAL_ENV .. "/bin/python") then
+    venv_py_exec = vim.env.VIRTUAL_ENV .. "/bin/python"
+  end
+
   local pylsp_settings = { pylsp = { plugins = {} } }
   -- When pylsp-mypy is installed
   pylsp_settings.pylsp.plugins.pylsp_mypy = {
@@ -11,7 +16,16 @@ local function start_lsp_server()
       "--check-untyped-defs", -- ensure all functions are checked!
     },
   }
-  -- WHen python-lsp-ruff is installed
+  if venv_py_exec then
+    -- Ensure mypy can find imports in the currently activated venv
+    -- ref: https://github.com/python/mypy/issues/17214
+    vim.list_extend(pylsp_settings.pylsp.plugins.pylsp_mypy.overrides, {
+      "--python-executable",
+      venv_py_exec,
+    })
+  end
+
+  -- When python-lsp-ruff is installed
   pylsp_settings.pylsp.plugins.ruff = {
     enabled = true,
     extendSelect = {"RUF"}, -- Ensure these rules are always checked
