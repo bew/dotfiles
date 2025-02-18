@@ -19,10 +19,10 @@ local function font_with_fallback(font_spec)
   -- family names, not file names
   return wezterm.font_with_fallback({
     font_spec,
-    -- FIXME: I'd like to use this emoji font, but currently it doesn't seem to work :/
-    --   Related: https://github.com/wez/wezterm/issues/4713 & https://github.com/wez/wezterm/issues/5460
-    -- Preview: https://jdecked.github.io/twemoji/v/latest/preview-svg.html 👀
-    -- "Twitter Color Emoji",
+    -- Nice emoji font from Microsoft ✨
+    -- (TTF files can be downloaded from <https://github.com/tetunori/fluent-emoji-webfont>)
+    -- (Read more at <brain2:20220604T2030#fluent-emoji>)
+    "Fluent Emoji Color",
     "Font Awesome 6 Free Solid", -- nice double-spaced symbols!
   })
 end
@@ -54,7 +54,7 @@ end
 -- Some ligatures: != <-> <-  -> ----> => ==> ===> -- --- /../;;/ #{}
 --  <> <!-- --> ->> --> <= >= ++ == === := a::b::c a&&b a||b
 --
--- Some emojis: ☹ 🔎 😇 🤷 🙃 🖐 ❤ ⚠ ✨ 👋
+-- Some emojis: ☹️ 🔎 😇 🤷 🙃 🖐 ❤️⚠️ ✨ 👋
 
 cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
 cfg.unicode_version = 15
