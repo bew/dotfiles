@@ -138,12 +138,11 @@ patterns.sym_excl = {
 ------- Group: Misc keywords
 
 patterns.misc_light_words = {
-  pattern = {
-    _U.keywordize"DEBUG",
-    _U.keywordize"DEBUG:",
-    _U.keywordize"RELATED:",
-    _U.keywordize"SEE:",
-    _U.keywordize"REF:",
+  pattern = U.concat_lists {
+    _big_word_variants"DEBUG",
+    _big_word_variants"RELATED",
+    _big_word_variants"SEE",
+    _big_word_variants"REF",
   },
   group = _U.define_hl("big_debug", {
     ctermfg = 253,
