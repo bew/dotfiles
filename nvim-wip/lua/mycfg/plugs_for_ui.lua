@@ -704,11 +704,19 @@ Plug {
       { ctermfg = 255 },
     }
     require"smear_cursor".setup {
-      -- config: https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
+      -- REF for config options:
+      -- https://github.com/sphamba/smear-cursor.nvim/blob/main/lua/smear_cursor/config.lua
       legacy_computing_symbols_support = true,
-      distance_stop_animating = 3, -- don't animate when target is this close
-      -- Disable trail when entering cmdline, as it prevents builtin behavior when I can write 2
-      -- commands and still see the result of the first command. (very useful when editing hl..)
+
+      -- Disable trail in some cases:
+      -- .. for tiny horizontal/vertical movements
+      min_horizontal_distance_smear = 4,
+      min_vertical_distance_smear = 3,
+      -- .. in insert mode, it looks pretty bad :/
+      smear_insert_mode = false,
+      -- .. in cmdline, as it prevents builtin behavior where I can write 2
+      -- commands and still see the result of the first command.
+      -- (which is very useful when editing hl or exploring options)
       smear_to_cmd = false,
 
       cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palettes.fire),

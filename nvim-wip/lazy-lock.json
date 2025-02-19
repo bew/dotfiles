@@ -39,7 +39,7 @@
   "render-markdown.nvim": { "branch": "main", "commit": "bab0663ecdb06b0ff846969764d6c67719ab0fcb" },
   "rustaceanvim": { "branch": "master", "commit": "10efd4d48fb241b2530062090dd84fd4f9717584" },
   "screenkey.nvim": { "branch": "main", "commit": "16390931d847b1d5d77098daccac4e55654ac9e2" },
-  "smear-cursor.nvim": { "branch": "main", "commit": "005b50b891d662bdd3160dc2a143939066b5cc17" },
+  "smear-cursor.nvim": { "branch": "main", "commit": "4b7334a09cd2434e73588cc0ea63e71177251249" },
   "telescope-frecency.nvim": { "branch": "master", "commit": "0c43bc7ea4bcd3941f14974a39f2d7f6058b55a5" },
   "telescope-import.nvim": { "branch": "main", "commit": "6fd69447679a99b463025e7f2f787e8b185dd740" },
   "telescope-picker-list.nvim": { "branch": "master", "commit": "5a5189068131a43f802721ddb07a25279d98272e" },
