@@ -4,17 +4,23 @@ matches:
   - trigger: "!+!"
     replace: '👍'
 
+  - trigger: "!-!"
+    replace: '👎'
+
   - trigger: "!ey!"
     replace: '👀'
 
   - trigger: "!okh!" # ok hand
     replace: '👌'
 
-  - triggers: ["!thk!", "!tk!"] # thinking face
+  - trigger: "!tk!" # thinking
     replace: '🤔'
 
   - trigger: "!D!" # :D
     replace: '😀'
+
+  - trigger: "!rofl!"
+    replace: '🤣'
 
   - trigger: "!;!" # ;)
     replace: '😉'
@@ -49,6 +55,9 @@ matches:
   - trigger: "!bad!" # :( (strong)
     replace: '☹️'
 
+  - trigger: "!:/!" # confused.. (!/! already used 🤷)
+    replace: '😕'
+
   - trigger: "!scr!" # scream!
     replace: '😱'
 
@@ -73,7 +82,7 @@ matches:
   - trigger: "!shr!" # shrug (short/emoji form)
     replace: '🤷'
 
-  - trigger: "!spk!" # sparkles
+  - trigger: "!sk!" # sparkles
     replace: '✨'
 
   - trigger: "!tada!"
@@ -97,10 +106,10 @@ matches:
   - triggers: ["!warn!", "!wr!"] # warning!
     replace: '⚠️'
 
-  - trigger: "!/!" # start of /!\
+  - trigger: "!/!" # ASCII Warning
     replace: "/!\\"
 
-  - trigger: "!wav!" # hiiii!
+  - trigger: "!wav!" # hi!
     replace: '👋'
 
   - trigger: "!clap!" # clap!
