@@ -42,7 +42,7 @@
   "smear-cursor.nvim": { "branch": "main", "commit": "4b7334a09cd2434e73588cc0ea63e71177251249" },
   "telescope-frecency.nvim": { "branch": "master", "commit": "0c43bc7ea4bcd3941f14974a39f2d7f6058b55a5" },
   "telescope-import.nvim": { "branch": "main", "commit": "6fd69447679a99b463025e7f2f787e8b185dd740" },
-  "telescope-picker-list.nvim": { "branch": "master", "commit": "5a5189068131a43f802721ddb07a25279d98272e" },
+  "telescope-picker-list.nvim": { "branch": "master", "commit": "205f0525f1cf3e5988d792e2ed1a4b347e770c4f" },
   "telescope-ui-select.nvim": { "branch": "master", "commit": "6e51d7da30bd139a6950adf2a47fda6df9fa06d2" },
   "telescope.nvim": { "branch": "master", "commit": "2eca9ba22002184ac05eddbe47a7fe2d5a384dfc" },
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
