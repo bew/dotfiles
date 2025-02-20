@@ -53,7 +53,8 @@ matches:
     replace: '🫠'
 
   - trigger: "!bad!" # :( (strong)
-    replace: '☹️'
+    # replace: '☹️' # stronger version, composed of 2 chars doesn't work well in nvim 0.10 🙁
+    replace: '🙁'
 
   - trigger: "!:/!" # confused.. (!/! already used 🤷)
     replace: '😕'
