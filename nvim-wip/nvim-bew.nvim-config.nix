@@ -27,14 +27,14 @@ in {
           p.rust p.sql p.terraform p.toml p.tsx p.yaml
           # p.nu # (not found 🤔)
 
-          # # Grammars - nice to have
-          # p.c p.css p.desktop p.dockerfile p.dot p.editorconfig p.gitattributes p.go p.helm p.http
-          # p.jq p.json5 p.jsonnet p.kdl p.make p.nickel p.regex p.rst p.tmux p.typescript p.typst
-          # p.xml
-          #
+          # Grammars - nice to have
+          p.c p.css p.dot p.editorconfig p.gitattributes p.go p.helm p.http
+          p.jq p.json5 p.make p.regex p.tmux p.typescript p.typst p.xml
+          # p.dockerfile (very broken 🙁)
+
           # # Grammars - for maybe some day, maybe not..
-          # p.cue p.gleam p.graphql p.norg p.rego p.roc p.ron p.strace p.sxhkdrc p.teal p.unison
-          # p.vue p.wit p.yuck p.zig
+          # p.cue p.gleam p.graphql p.jsonnet p.kdl p.nickel p.norg p.rego p.roc p.ron p.rst
+          # p.strace p.sxhkdrc p.teal p.unison p.vue p.wit p.yuck p.zig
         ])).dependencies;
       in [ tsPackage tsParsersPackage ];
     };
