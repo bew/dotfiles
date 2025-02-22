@@ -19,6 +19,7 @@ in {
       name = "config-${config.ID}-treesitter-parsers";
       paths = let
         tsPackage = pkgs.vimPlugins.nvim-treesitter;
+        # REF: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/nvim-treesitter/generated.nix
         # REF: https://github.com/nixos/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/nvim-treesitter/overrides.nix
         tsParsersPackage = (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
           # Grammars - important to have
@@ -29,8 +30,11 @@ in {
 
           # Grammars - nice to have
           p.c p.css p.dot p.editorconfig p.gitattributes p.go p.helm p.http
-          p.jq p.json5 p.make p.regex p.tmux p.typescript p.typst p.xml
+          p.jq p.json5 p.make p.regex p.typescript p.typst p.xml
           # p.dockerfile (very broken 🙁)
+          # p.tmux (very broken.. 🙁)
+          #   https://github.com/Freed-Wu/tree-sitter-tmux/issues/2
+          #   https://github.com/Freed-Wu/tree-sitter-tmux/issues/6
 
           # # Grammars - for maybe some day, maybe not..
           # p.cue p.gleam p.graphql p.jsonnet p.kdl p.nickel p.norg p.rego p.roc p.ron p.rst
