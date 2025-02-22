@@ -266,6 +266,8 @@ HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
 HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
+" E.g for bash: Show '-o' / '--option' parameter differently
+HiResetTo @variable.option_parameter ctermfg=77 cterm=italic
 
 HiResetTo @string ctermfg=37
 HiResetTo @string.regexp ctermfg=36
@@ -282,6 +284,10 @@ HiResetTo @comment.documentation.emph.exception ctermfg=160
 
 " The key in a key/value pairs
 HiResetTo @property ctermfg=137
+
+HiResetTo @tag ctermfg=33 cterm=bold
+HiResetTo @tag.delimiter ctermfg=25
+hi! link @tag.attribute @property
 
 " /!\ This is used for most delimiters in various languages (Lua, ...)
 " Make sure it stays properly visible!
@@ -331,8 +337,6 @@ HiResetTo @variable.bash       ctermfg=39
 HiResetTo @variable.short.bash ctermfg=39 cterm=bold
 HiResetTo @variable.special.bash ctermfg=222
 HiResetTo @constant.bash ctermfg=171
-" Show '-o' / '--option' parameter differently
-HiResetTo @variable.option_parameter ctermfg=77 cterm=italic
 
 "}}}
 " LSP highlighting "{{{
