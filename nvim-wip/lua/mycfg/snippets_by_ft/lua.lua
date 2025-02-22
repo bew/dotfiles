@@ -385,7 +385,7 @@ snip("mod", {desc = "Module init M = {}; ret M", when = conds.very_start_of_line
   ]],
   {
     mod_name = i(1, "M"),
-    content = i(0),
+    content = SU.insert_node_default_selection(2),
     mod_name_ret = rep(1)
   },
 })
