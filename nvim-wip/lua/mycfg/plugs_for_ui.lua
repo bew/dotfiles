@@ -307,8 +307,6 @@ Plug.telescope {
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
     Plug { source = gh"OliverChao/telescope-picker-list.nvim" },
     Plug { source = gh"piersolenski/telescope-import.nvim" },
-    -- MANY symbols for the builtin `symbols` picker (emojis, kaomojis, gitmojis...)
-    Plug { source = gh"nvim-telescope/telescope-symbols.nvim" },
   },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
@@ -557,6 +555,7 @@ Plug.telescope {
         "grep_string", -- live_grep is better
         "tags", "current_buffer_tags", -- never use tags now..
         "git_files", -- find_files is basically the same.. (with fd-based finder)
+        "symbols", -- useless with telescope-symbols catalog, and not useful for me..
       },
     }
     table.insert(extensions_to_load, "picker_list")
