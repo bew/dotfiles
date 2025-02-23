@@ -18,7 +18,7 @@ end
 
 --- Define highlight for a pattern
 ---@param name string The ID for the pattern highlight (will be used as suffix for full hl group)
----@param hl_spec table The hl spec for the highlight (see `:h nvim_set_hl`)
+---@param hl_spec vim.api.keyset.highlight The hl spec for the highlight (see `:h nvim_set_hl`)
 ---@return string The full highlight group name
 function U.define_hl(name, hl_spec)
   local full_name = "hl_pattern." .. name

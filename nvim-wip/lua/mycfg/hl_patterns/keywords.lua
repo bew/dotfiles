@@ -29,6 +29,7 @@ patterns.big_todo = {
   }),
 }
 
+-- e.g. NOTE: an important note!
 patterns.big_note = {
   pattern = _big_word_variants"NOTE",
   group = _U.define_hl("big_note", {
@@ -37,6 +38,7 @@ patterns.big_note = {
   }),
 }
 
+-- e.g. note: a small note..
 patterns.small_note = {
   pattern = "note:",
   group = _U.define_hl("small_note", {
@@ -53,19 +55,16 @@ patterns.big_fixme = {
   }),
 }
 
+-- e.g. MAYBE this thing is a good IDEA?
 patterns.big_idea = {
-  pattern = _big_word_variants"IDEA",
+  pattern = U.concat_lists {
+    _big_word_variants"IDEA",
+    _big_word_variants"MAYBE",
+  },
   group = _U.define_hl("big_idea", {
     ctermfg = 128,
     bold = true,
-  }),
-}
-
-patterns.big_maybe = {
-  pattern = _big_word_variants"MAYBE",
-  group = _U.define_hl("big_maybe", {
-    ctermfg = 128,
-    bold = true,
+    underdotted = true,
   }),
 }
 
@@ -73,8 +72,11 @@ patterns.big_fail_bad = {
   pattern = U.concat_lists {
     _big_word_variants"FAIL",
     _big_word_variants"BAD",
-    _big_word_variants"BAD%+%+", -- BAD++:
+    _big_word_variants"BAD%+%+", -- BAD++
     _big_word_variants"BLOCKED",
+    _big_word_variants"BLOCKER",
+    _big_word_variants"PROBLEM",
+    _big_word_variants"MISSING",
   },
   group = _U.define_hl("big_fail_bad", {
     ctermfg = 124,
@@ -104,10 +106,92 @@ patterns.big_tbd = {
   }),
 }
 
+-- e.g. GOAL: get some RESULTs..
+patterns.big_goal = {
+  pattern = U.concat_lists {
+    _big_word_variants"GOAL",
+    _big_word_variants"RESULT",
+    _big_word_variants"RESULTS",
+    _big_word_variants"RESULTs",
+  },
+  group = _U.define_hl("big_goal", {
+    ctermfg = 202,
+    bold = true,
+  }),
+}
+
+-- e.g. Start with WHY 🤔
+patterns.big_why = {
+  pattern = _big_word_variants"WHY",
+  group = _U.define_hl("big_why", {
+    ctermfg = 202,
+  }),
+}
+
+------- Group: Tech usage notes keywords
+
+patterns.big_good = {
+  pattern = _big_word_variants"GOOD",
+  group = _U.define_hl("big_good", {
+    ctermfg = 34,
+  }),
+}
+
+-- e.g. GRR, MEH, WEIRD, WTF, WHYY??
+patterns.big_grr_wat = {
+  pattern = U.concat_lists {
+    _big_word_variants"GRR",
+    _big_word_variants"MEH",
+    _big_word_variants"WEIRD",
+    _big_word_variants"WTF",
+    _big_word_variants"WHYY%?%?",
+  },
+  group = _U.define_hl("big_grr_wat", {
+    ctermfg = 166,
+  }),
+}
+
+-- e.g. GOTCHA, FIXED
+patterns.big_gotcha = {
+  pattern = U.concat_lists {
+    _big_word_variants"GOTCHA",
+    _big_word_variants"FIXED",
+  },
+  group = _U.define_hl("big_gotcha", {
+    ctermfg = 32,
+    bold = true,
+  }),
+}
+
+-- e.g. HINT, SEE, RELATED, USAGE, TRACKING-ISSUE, ISSUE
+patterns.big_hint_usage_tracking = {
+  pattern = U.concat_lists {
+    _big_word_variants"HINT",
+    _big_word_variants"SEE",
+    _big_word_variants"RELATED",
+    _big_word_variants"USAGE",
+    _big_word_variants"TRACKING%-ISSUE",
+    _big_word_variants"ISSUE",
+  },
+  group = _U.define_hl("big_hint_usage_tracking", {
+    ctermfg = 36,
+  }),
+}
+
+-- note: TICKET != ISSUE:
+-- - TICKET is something I made for work, which I will be working on
+-- - ISSUE is a tracking info, potentially out of my control
+patterns.big_ticket = {
+  pattern = _big_word_variants"TICKET",
+  group = _U.define_hl("misc_ticket", {
+    ctermfg = 166,
+  }),
+}
+
 ------- Group: General symbols
 
+-- e.g. Or this thing(?)
 patterns.sym_question = {
-  -- note: Match `BLA(?)`
   pattern = "%(%?%)",
   group = _U.define_hl("sym_question", {
     ctermfg = 128,
@@ -115,8 +199,8 @@ patterns.sym_question = {
   }),
 }
 
+-- e.g. /!\ This is a warning!
 patterns.sym_warn = {
-  -- note: Match `BLA /!\`
   pattern = "/!\\",
   group = _U.define_hl("sym_warn", {
     ctermfg = 11,
@@ -126,11 +210,20 @@ patterns.sym_warn = {
   }),
 }
 
+-- e.g. Crazy stuff(!!)
 patterns.sym_excl = {
-  -- note: Match `BLA(!!)`
   pattern = "%(!!%)",
   group = _U.define_hl("sym_excl", {
     ctermfg = 124,
+    bold = true,
+  }),
+}
+
+-- e.g. oh yeah <3
+patterns.sym_heart = {
+  pattern = "<3",
+  group = _U.define_hl("sym_heart", {
+    ctermfg = 204,
     bold = true,
   }),
 }
@@ -140,19 +233,39 @@ patterns.sym_excl = {
 patterns.misc_light_words = {
   pattern = U.concat_lists {
     _big_word_variants"DEBUG",
-    _big_word_variants"RELATED",
-    _big_word_variants"SEE",
+    _big_word_variants"HACK",
+    _big_word_variants"WANT",
     _big_word_variants"REF",
+    _big_word_variants"REFs",
   },
-  group = _U.define_hl("big_debug", {
+  group = _U.define_hl("misc_light_words", {
     ctermfg = 253,
   }),
 }
 
+-- e.g. (ref: this is a light ref)
+patterns.misc_lighter_words = {
+  pattern = U.concat_lists {
+    _big_word_variants"ref:",
+    _big_word_variants"refs:",
+    _big_word_variants"EXAMPLE:",
+    _big_word_variants"Example:",
+  },
+  group = _U.define_hl("misc_lighter_words", {
+    ctermfg = 249,
+  }),
+}
+
 patterns.misc_heavy_words = {
-  pattern = {
-    _U.keywordize"DOC:",
-    _U.keywordize"TOTRY:",
+  pattern = U.concat_lists {
+    _big_word_variants"DOC",
+    _big_word_variants"TOTRY",
+    _big_word_variants"TOTHINK",
+    _big_word_variants"TOCHECK",
+    _big_word_variants"IMPORTANT",
+    _big_word_variants"ASK",
+    _big_word_variants"FEEDBACK",
+    _big_word_variants"WIP",
   },
   group = _U.define_hl("misc_big_words", {
     ctermfg = 253,
@@ -160,32 +273,65 @@ patterns.misc_heavy_words = {
   }),
 }
 
-patterns.faq = {
-  pattern = _big_word_variants"FAQ",
-  group = _U.define_hl("faq", {
-    ctermfg = 129,
+patterns.misc_done = {
+  pattern = U.concat_lists {
+    _big_word_variants"DONE",
+    _big_word_variants"SOLUTION",
+  },
+  group = _U.define_hl("misc_done", {
+    ctermfg = 34,
+  }),
+}
+
+patterns.misc_tldr = {
+  pattern = U.concat_lists {
+    _big_word_variants"TL;DR",
+    _big_word_variants"tl;dr",
+  },
+  group = _U.define_hl("misc_tldr", {
+    ctermfg = 45,
     bold = true,
   }),
 }
 
-patterns.QnA_Q = {
+patterns.misc_meta = {
+  pattern = _big_word_variants"META",
+  group = _U.define_hl("misc_meta", {
+    ctermfg = 99,
+    bold = true,
+    underdashed = true,
+  }),
+}
+
+-- e.g. some example
+patterns.misc_e_g = {
+  pattern = _big_word_variants"e%.g%.",
+  group = _U.define_hl("misc_e_g", {
+    ctermfg = 99,
+  }),
+}
+
+patterns.misc_faq = {
+  pattern = _big_word_variants"FAQ",
+  group = _U.define_hl("faq", {
+    ctermfg = 128,
+    bold = true,
+  }),
+}
+
+patterns.misc_QnA_Q = {
   pattern = _U.keywordize"Q:",
   group = _U.define_hl("QnA_Q", {
     ctermfg = 202,
     bold = true,
   })
 }
-patterns.QnA_A = {
+patterns.misc_QnA_A = {
   pattern = _U.keywordize"A:",
   group = _U.define_hl("QnA_A", {
     ctermfg = 34,
     bold = true,
   })
 }
-patterns.big_why = {
-  pattern = _U.keywordize"WHY:",
-  group = patterns.QnA_Q.group,
-}
-
 
 return patterns
