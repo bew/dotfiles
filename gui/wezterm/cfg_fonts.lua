@@ -59,7 +59,7 @@ end
 cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
 cfg.unicode_version = 15
 
-cfg.strikethrough_position = "0.6cell"
+cfg.strikethrough_position = "0.555cell"
 
 -- Right so that the underline touches the cell below
 cfg.underline_position = "-0.14cell"
