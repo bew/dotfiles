@@ -68,8 +68,7 @@
 
   # repo manipulation
 
-  f = fetch --verbose
-  fa = f --all
+  f = fetch
 
   m = merge
   ch = checkout
