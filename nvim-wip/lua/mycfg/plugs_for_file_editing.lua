@@ -1153,6 +1153,27 @@ Plug {
 }
 
 Plug {
+  source = gh"andymass/vim-matchup",
+  desc = "even better % 👊",
+  tags = {t.content_ui, t.editing},
+  on_load = function()
+    -- Disable showing off-screen matches (alt: { method = "popup" })
+    vim.g.matchup_matchparen_offscreen = {}
+    -- In insert mode, after changing text inside a word, matching words will be automatically
+    -- changed (if they are supposed to go in pairs).
+    -- (experimental @2025-02)
+    vim.g.matchup_transmute_enabled = 1
+    -- DO NOT map double-click to select the whole current scope (`va%` works well instead)
+    vim.g.matchup_mouse_enabled = 0
+  end,
+  on_colorscheme_change = function()
+    -- parenthesis matches still use the vim standard `MatchParen`
+    -- word matches uses `MatchWord` (using `MatchParen` for words is too flashy!)
+    vim.api.nvim_set_hl(0, "MatchWord", { underline = true })
+  end
+}
+
+Plug {
   source = gh"tommcdo/vim-exchange",
   desc = "Arbitrarily exchange(swap) blocks of code!",
   tags = {t.vimscript, t.editing},

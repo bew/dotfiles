@@ -20,6 +20,9 @@ Plug.ts {
       -- Enable TS modules
       highlight = { enable = true },
       indent = { enable = true },
+
+      -- Module for matchup (https://github.com/andymass/vim-matchup)
+      matchup = { enable = true },
     }
   end,
 }
