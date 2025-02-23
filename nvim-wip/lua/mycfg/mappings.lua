@@ -150,10 +150,7 @@ my_actions.hlsearch_current = {
       local current_word = vim.fn.expand("<cword>")
       U.set_current_search(current_word, { with_bounds = self.opts.word_bounds })
     end,
-    -- IDEA(later): make searching `with` by selecting it in `withFoo` NOT match `without` NOR `with-you`
     -- IDEA(even later): make searching TS-aware, only match positions that have the same TS note type 👀
-    --   (would need neovim changes to integrate well with other search builtin actions and plugins
-    --   based on them; need to find compelling use-cases to attempt a neovim core change..)
     v = function(self)
       if vim.fn.mode() == "" then
         -- FIXME: what else could I do here? 🤔
@@ -621,6 +618,12 @@ toplevel_map{
   action=[[<Del>]],
 }
 
+-- N: Reformat to textwidth
+-- note: `gw` does the same as `gq` but DOES NOT use `formatexpr`
+--   (`formatexpr` might be set by lsp, and does not support textwidth text reformatting)
+toplevel_map{mode={"n", "v"}, key=[[<M-q>]], desc="Reformat motion/selection to textwidth", action="gw"}
+toplevel_map{mode="n", key=[[<M-q><M-q>]], desc="Reformat current line to textwidth", action="gww"}
+-- `gq` DOES use `formatexpr`, and can be used to reformat some code via LSP if supported
 
 
 --------------------------------
@@ -674,6 +677,7 @@ global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function() d
 do
   for i = 1, 9 do
     vim.keymap.set("n", "<C-w>"..i, i.."<C-w>w")
+    global_leader_map{mode="n", key=tostring(i), action=(i .. "<C-w>w")}
   end
 end
 -- TODO: 'jump-to-last' window
@@ -690,6 +694,8 @@ local function smart_split()
   end
 end
 vim.keymap.set("n", "<C-w><C-s>", smart_split)
+global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_split}
+
 
 -- Full-width/height window splits
 -- FIXME: Do I need this? Would I use this?
@@ -713,46 +719,18 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 -- -> Keys to move current buffer around in the visible (non-float, non-special) windows
 -- -> (??) Keys to create a full-width/height BUT do not switch to it
 
+-- % IDEAS: (from vscode)
+-- M-Up/Down -> Move current line (or range) up/down, following indentations
+-- M-S-Up/Down -> Copy current line Up/Down
+-- M-S-Left/Right -> Shrink/Expand (char-)selection (can be simulated in vim?
+--     even without proper language support/detection?)
+
 --------------------------------
-
--- Start interactive EasyAlign in visual mode (e.g. vipgea)
---xmap gea <Plug>(EasyAlign)
-
--- Start interactive EasyAlign for a motion/text object (e.g. geaip)
---nmap gea <Plug>(EasyAlign)
-
--- Toggle terminal
---nnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
---tnoremap <silent> <C-t> <cmd>FloatermToggle<cr>
--- New/next/prev terminal
--- NOTE: I don't plan to use these much, tmux is prefered if I need 2+ terminals
---nnoremap <silent> <C-M-t><C-M-t> <cmd>FloatermNew<cr>
---tnoremap <silent> <C-M-t><C-M-t> <cmd>FloatermNew<cr>
---nnoremap <silent> <C-M-t><C-M-n> <cmd>FloatermNext<cr>
---tnoremap <silent> <C-M-t><C-M-n> <cmd>FloatermNext<cr>
---nnoremap <silent> <C-M-t><C-M-p> <cmd>FloatermPrev<cr>
---tnoremap <silent> <C-M-t><C-M-p> <cmd>FloatermPrev<cr>
 
 ---- Navigation
 --------------------------------------------------------------------
 
 -- CrazyIDEA: Map Alt-MouseClick to resize a window by finding nearest edge??
-
--- Close tab Alt-d (with confirmation)
---nnoremap <silent> <M-d> :call <SID>TabCloseWithConfirmation()<cr>
---function! s:TabCloseWithConfirmation()
---  if len(gettabinfo()) == 1
---    echo "Cannot close last tab"
---    return
---  endif
---  let choice = confirm("Close tab?", "&Yes\n&Cancel", 0)
---  redraw " clear cmdline, remove the confirm prompt
---  if choice == 1   " Yes
---    tabclose
---  else
---    echo "Close tab cancelled"
---  endif
---endf
 
 -- V: Move a selection of text
 -- Indent/Dedent
@@ -764,20 +742,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --vnoremap <silent> <Down> :move '>+1<cr>gv
 
 
--- Exit the terminal grabber
---tnoremap <M-Esc> <C-\><C-n>
---tmap  <M-Esc>
-
--- Indent/Format lines/file
--- I: Indent line, stay in insert mode (default, see :h i_CTRL-F)
---inoremap <C-f> <C-f>
--- V: Indent visual selection, back to normal mode
---vnoremap <C-f> =
--- N: Indent current line
---nnoremap <C-f> mi==`i
--- N: Format the entire file
---nnoremap <M-C-f> gg=G``
-
 -- Vim eval-and-replace:
 -- Evaluate the current selection as a vimscript expression and replace
 -- the selection with the result
@@ -786,45 +750,13 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --   (whereas <C-r> inserts the register content as if typed)
 --vnoremap <Plug>(my-EvalAndReplaceVimExpr-visual) c<C-r>=<C-r><C-r>"<cr><esc>
 --
--- Vim eval-as-ex:
--- Run the current line/selection as an EX command
--- NOTE: changes the unnamed register
---function! ExecuteAsExFromUnnamed(what)
---  let l:splitted_reg = split(@", "\n")
---  execute @"
---  let num_lines = len(l:splitted_reg)
---  if num_lines <= 1
---    let lines_text = num_lines . " line"
---  else
---    let lines_text = num_lines . " lines"
---  endif
---  echom "Sourced " . a:what . "! (" . lines_text . ")"
---endf
---nnoremap <Plug>(my-ExecuteAsVimEx-normal) yy:call ExecuteAsExFromUnnamed("current line")<cr>
---vnoremap <Plug>(my-ExecuteAsVimEx-visual) y:call ExecuteAsExFromUnnamed("visual selection")<cr>gv
---nnoremap <Plug>(my-ExecuteAsVimEx-full-file) <cmd>source % <bar> echo "Sourced current file! (" . line("$") . " lines)"<cr>
---
---nmap <leader>vs <Plug>(my-ExecuteAsVimEx-full-file)
---nmap <leader>vx <Plug>(my-ExecuteAsVimEx-normal)
---vmap <leader>vx <Plug>(my-ExecuteAsVimEx-visual)
 --lua wk_leader_n_maps.v = {name = "+vim"}
 --lua wk_leader_v_maps.v = {name = "+vim"}
---lua wk_leader_n_maps.v.s = "source current file"
---lua wk_leader_n_maps.v.x = "exec current line as VimEx"
---lua wk_leader_v_maps.v.x = "exec selection as VimEx"
 --nmap <leader>ve gv<Plug>(my-EvalAndReplaceVimExpr-visual)
 --vmap <leader>ve   <Plug>(my-EvalAndReplaceVimExpr-visual)
 --lua wk_leader_n_maps.v.e = "eval-n-replace selection as vim expr"
 --lua wk_leader_v_maps.v.e = "eval-n-replace selection as vim expr"
 
-
--- Search with{,out} word boundaries
--- V: search selection with word boundaries
---vmap * <Plug>(visualstar-*)
--- V: search selection without word boundaries
---vmap <M-*> <Plug>(visualstar-g*)
--- N: search current word without word boundaries
---nnoremap <M-*> g*
 
 -- Inspired from visual-at.vim from Practical Vim 2nd Edition
 --vnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
@@ -841,81 +773,6 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --  execute ":'<,'>normal! " . column_code . "@" . register
 --endfunction
 
--- V: Record a macro on first line, and repeat it on all other selected lines
--- This is the poor-man multiselection... (not even interactive)
--- NOTE: Maybe I'll never use it as I can also record macro then apply with @reg..
---       I don't know, but it was interesting to do!
---vnoremap qq :<C-u>call <SID>StartRecordMacroForVisualRange()<cr>
---function! <SID>StartRecordMacroForVisualRange()
---  " Save visual selection, in case the macro makes use of visual selection
---  " return format is [_bufnum, lnum, col, _off]
---  let b:macro_visual_start = getpos("'<")
---  let b:macro_visual_end = getpos("'>")
---  let b:macro_visual_is_vblock = visualmode() == ""  " this is the ^V char
---  call setpos(".", b:macro_visual_start)
---  " TODO: Highlight saved visual selection (in IncSearch hi for example?)
---  "       while recording the macro.
---  nnoremap <buffer> q  <cmd>call <SID>ExecutePendingMacroOverSavedVisualRange()<cr>
---  " Start recording...
---  normal! qq
---endf
---function! <SID>ExecutePendingMacroOverSavedVisualRange()
---  " Unmap q, was <buffer> mapped in StartRecordMacroForVisualRange
---  nunmap <buffer> q
---  " End recording, started in StartRecordMacroForVisualRange
---  normal! q
---
---  if getreg("q") == ""
---    return
---  endif
---
---  let start_next_line = b:macro_visual_start[1] + 1
---  let end_line = b:macro_visual_end[1]
---  if b:macro_visual_is_vblock
---    let column_code = b:macro_visual_start[2] . "|"
---  else
---    let column_code = ""
---  endif
---
---  " Format as `:START,END normal! COL|@q`
---  let cmd = ":" . start_next_line . "," . end_line . "normal! " . column_code . "@q"
---  " echom cmd
---  execute cmd
---
---  let save_final_pos = getpos(".")
---
---  " Restore visual selection to be same as before batch action (including vblock)
---  call setpos("'<", b:macro_visual_start)
---  call setpos("'>", b:macro_visual_end)
---  if b:macro_visual_is_vblock
---    " Re-enter visual block temporarily to mark this visual selection as block..
---    " FIXME: is there a better way?
---    execute "normal! gv"
---  endif
---  call setpos(".", save_final_pos)
---
---  unlet b:macro_visual_start
---  unlet b:macro_visual_end
---  unlet b:macro_visual_is_vblock
---endf
-
--- Save the file as sudo
---cnoremap w!! w !env SUDO_ASKPASS=$HOME/.bin-gui/zenity_passwd.sh sudo tee % >/dev/null
-
-
--- code/content context (using context.vim plugin)
---nmap <Leader>cx   <cmd>MyContextPeek<cr>
---lua wk_leader_n_maps.c.x = "context peek (until move)"
-
--- -- Quickfix / Location lists
---lua wk_leader_n_maps["!"] = {name = "+qf-loc-list"}
---nmap <leader>!c   <cmd>lclose \| copen<cr>
---nmap <leader>!l   <cmd>cclose \| lopen<cr>
---nmap <leader>!!   <cmd>call <SID>OnLastQfLocListDoTryNextOrFirst()<cr>
---lua wk_leader_n_maps["!"].c = "open qf list (global)"
---lua wk_leader_n_maps["!"].l = "open loc list (local)"
---lua wk_leader_n_maps["!"]["!"] = "jump to next/first in last list"
-
 -- -- Edit
 -- Use this to make a few nice mappings
 -- Taken from: http://vimcasts.org/episodes/the-edit-command/
@@ -927,10 +784,3 @@ vim.keymap.set("n", "<C-w><C-s>", smart_split)
 --local_leader_remap{mode={"n"}, key="ev", action=":vsplit %/", desc="in v' split"}
 --local_leader_remap{mode={"n"}, key="et", action=":tabe %/",   desc="in tab"}
 --LUA
-
--- -----------------
--- IDEAS: (from vscode)
--- M-Up/Down -> Move current line (or range) up/down, following indentations
--- M-S-Up/Down -> Copy current line Up/Down
--- M-S-Left/Right -> Shrink/Expand (char-)selection (can be simulated in vim?
---     even without proper language support/detection?)
