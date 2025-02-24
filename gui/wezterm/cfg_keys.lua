@@ -52,25 +52,6 @@ local function define_and_activate_keytable(spec)
   return act.ActivateKeyTable(activation_opts)
 end
 
-local function action_unless_fullscreen(action, key_or_key_spec)
-  if type(key_or_key_spec) == "string" then
-    key_or_key_spec = { key = key_or_key_spec }
-  end
-  local key_spec = {
-    key = key_or_key_spec.key,
-    mods = key_or_key_spec.mods or "NONE",
-  }
-  return wezterm.action_callback(function(win, pane)
-    if pane:is_alt_screen_active() then
-      -- a program is full screen, passthrough
-      win:perform_action(act.SendKey(key_spec), pane)
-    else
-      -- do the action
-      win:perform_action(action, pane)
-    end
-  end)
-end
-
 -- Raw key codes are hardware & OS/WM dependent, so they're not really portable..
 -- https://wezfurlong.org/wezterm/config/keys.html#raw-key-assignments
 local known_raw_keys_by_os = {
@@ -134,9 +115,6 @@ cfg.keys = {
 
   keybind(mods.S, "PageUp",   act.ScrollByPage(-1)),
   keybind(mods.S, "PageDown", act.ScrollByPage( 1)),
-  -- TRY: Also bind without shift
-  keybind(mods._, "PageUp",   action_unless_fullscreen(act.ScrollByPage(-1), "PageUp")),
-  keybind(mods._, "PageDown", action_unless_fullscreen(act.ScrollByPage( 1), "PageDown")),
 
   -- keybind(mods.CS, "r", act.ReloadConfiguration),
   keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
