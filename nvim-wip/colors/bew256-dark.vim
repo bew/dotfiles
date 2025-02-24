@@ -266,6 +266,7 @@ HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
 HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
+HiResetTo @variable.parameter.argument ctermfg=137
 " E.g for bash: Show '-o' / '--option' parameter differently
 HiResetTo @variable.option_parameter ctermfg=77 cterm=italic
 
