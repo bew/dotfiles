@@ -1089,6 +1089,31 @@ Plug {
         :end_pair_moves_right_when(cond.never)
         :cr_expands_pair_when(cond.never)
     )
+    -- Test cases for above rule:
+    -- * fields that are `true` should have an `auto-;` behavior when typing their `=`
+    -- * fields that are `false` should NOT have `auto-;` behavior when typing their `=`
+    -- ```nix
+    -- let
+    --   let_bind = true;
+    --   let_bind_other = true;
+    --
+    --   inline = {packed_attr=true;};
+    --   inline2 = { attr = true;};
+    --   # For this case, we're adding a new attr before `already_present`
+    --   inline3 = { before_attr = false; already_present = "foo"; };
+    --
+    --   string_inline = "{foo=false}";
+    --   string_multi = ''
+    --     echo -- something
+    --     foo = false
+    --     foo=false
+    --   '';
+    --   string_injected = /*sh*/ "{foo=false}";
+    -- in {
+    --   attr = true;
+    --   attr_other = true;
+    -- }
+    -- ```
 
     -- [Rust] Override S-quote to avoid pairing when writing fn/type signatures
     -- NOTE: Autopairs plugin do not have an override system, need to disable the global pairing
