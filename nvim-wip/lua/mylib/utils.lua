@@ -179,6 +179,11 @@ function U.is_module_available(module_name)
   return module_available
 end
 
+function U.is_treesitter_available_here()
+  local success, _parser = pcall(vim.treesitter.get_parser)
+  return success
+end
+
 --- Returns whether the given char is part of a keyword according to {option}'iskeyword'.
 ---@param char string Character to check
 ---@return boolean

@@ -912,19 +912,51 @@ Plug {
     -- See: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
     local Rule = require"nvim-autopairs.rule"
     local cond = require"nvim-autopairs.conds"
+    local ts_cond = require"nvim-autopairs.ts-conds"
     -- Rename some functions to have a more readable config (has many more!)
     ---@diagnostic disable: inject-field
     Rule.insert_pair_when = Rule.with_pair
     Rule.end_pair_moves_right_when = Rule.with_move
     Rule.cr_expands_pair_when = Rule.with_cr
     Rule.bs_deletes_pair_when = Rule.with_del
+    Rule.trigger_on_key = Rule.use_key
     cond.never = cond.none()
     cond.always = cond.done()
     cond.smart_move_right = cond.move_right
-    cond.not_preceded_by_char = cond.not_before_char
+    cond.preceded_by_text = cond.before_text
+    cond.followed_by_text = cond.after_text
+    cond.not_preceded_by_text = cond.not_before_text
     cond.preceded_by_regex = cond.before_regex
+    cond.followed_by_regex = cond.after_regex
     cond.not_preceded_by_regex = cond.not_before_regex
     cond.not_followed_by_regex = cond.not_after_regex
+
+    --- Returns fn that is true when cursor is surrounded by given before/after strings,
+    --- or nil to fallback to other checks.
+    ---
+    ---@param before_spec autopair-cond.SurroundingSpec Text/Regex that should match before cursor
+    ---@param after_spec autopair-cond.SurroundingSpec Text/Regex that should match after cursor
+    ---
+    ---@alias autopair-cond.SurroundingSpec string|{text:string}|{rx:string}
+    function cond.try_surrounded_by(before_spec, after_spec)
+      return function(opts)
+        if type(before_spec) == "string" then before_spec = { text = before_spec } end
+        if type(after_spec) == "string" then after_spec = { text = after_spec } end
+        print("pairing check for `=;`, surrounding before", vim.inspect(before_spec), "after", vim.inspect(after_spec))
+        local match_before = (
+          (before_spec.text and cond.preceded_by_text(before_spec.text)(opts))
+          or (before_spec.rx and cond.preceded_by_regex(before_spec.rx)(opts))
+        )
+        local match_after = (
+          (after_spec.text and cond.followed_by_text(after_spec.text)(opts))
+          or (after_spec.rx and cond.followed_by_regex(after_spec.rx)(opts))
+        )
+        if match_before and match_after then
+          return true
+        end
+        return nil -- fallback to other checks
+      end
+    end
     ---@diagnostic enable: inject-field
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
@@ -1029,11 +1061,34 @@ Plug {
           -- builtin behavior is normally using cond.smart_move_right()
       )
 
-      -- Use <M-THEQUOTE> to get a single quote if needed
+      -- Use <M-THEQUOTE> to get a single THEQUOTE if needed
       toplevel_map{mode="i", key=[[<M-'>]], action=[[']], desc="insert single S-quote"}
       toplevel_map{mode="i", key=[[<M-">]], action=[["]], desc="insert single D-quote"}
       toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
     end
+
+    -- [Nix] Auto `;` after `=` (in `let … in` block or `{ … }` attrset)
+    npairs.add_rule(
+      Rule{start_pair = [[=]], end_pair = [[;]], filetypes = {"nix"}}
+        :insert_pair_when(function()
+          if not U.is_treesitter_available_here() then return end -- disable this check
+          vim.treesitter.get_parser():parse()
+          local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
+          print("pairing check for `=;`, ts node type:", node:type())
+          if node:type() == "string_fragment" then
+            -- Never pair in a string (it is reserved to Nix, and nested strings are never Nix code)
+            return false
+          end
+          return nil -- fallback to other checks
+        end)
+        -- quickly check if we're in a simple case (current line check)
+        :insert_pair_when(cond.try_surrounded_by(" ", {rx="^$"})) -- `foo =|` (at eol)
+        :insert_pair_when(cond.try_surrounded_by(" ", " }")) -- `{ foo =| }`
+        :insert_pair_when(cond.try_surrounded_by({rx="%w$"}, "}")) -- `foo=|}`
+        :insert_pair_when(cond.never) -- last fallback
+        :end_pair_moves_right_when(cond.never)
+        :cr_expands_pair_when(cond.never)
+    )
 
     -- [Rust] Override S-quote to avoid pairing when writing fn/type signatures
     -- NOTE: Autopairs plugin do not have an override system, need to disable the global pairing
@@ -1044,6 +1099,7 @@ Plug {
         :insert_pair_when(cond.not_preceded_by_regex"[&<]") -- to write `<'a, Foo>` or `&'a Foo`
         :insert_pair_when(cond.not_followed_by_regex"[>]") -- when going from `<Foo>` to `<Foo, 'a>`
         :end_pair_moves_right_when(cond.never)
+        :cr_expands_pair_when(cond.never)
     )
   end,
 }
