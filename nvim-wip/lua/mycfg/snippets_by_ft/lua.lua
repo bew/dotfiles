@@ -222,6 +222,11 @@ snip("th", {desc = "then ... end"}, SU.myfmt {
   { body = SU.insert_node_default_selection(1) },
 })
 
+snip("thi", {desc = "then … end (inline)"}, SU.myfmt {
+  [[then <body> end]],
+  { body = i(1) },
+})
+
 snip("forn", {desc = "for n in incl-range", when = conds.start_of_line}, SU.myfmt {
   [[
     for <idx> = <range> do

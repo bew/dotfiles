@@ -1,5 +1,6 @@
 local hline_conditions = require"heirline.conditions"
 
+local U = require"mylib.utils"
 local UC = require"mylib.unicode"
 
 local M = {}
@@ -24,10 +25,7 @@ M.LspActive = {
 
 M.TreesitterStatus = {
   condition = function()
-    -- GRR: There is no (@v0.9) builtin/simple way to check if the current buffer has a parser
-    -- without triggering an error.
-    local success = pcall(vim.treesitter.get_parser)
-    return success
+    U.is_treesitter_available_here()
   end,
 
   provider = function()
