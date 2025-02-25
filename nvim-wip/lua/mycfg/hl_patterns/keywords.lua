@@ -172,6 +172,10 @@ patterns.big_hint_usage_tracking = {
     _big_word_variants"USAGE",
     _big_word_variants"TRACKING%-ISSUE",
     _big_word_variants"ISSUE",
+    {
+      _U.keywordize"hint:",
+      _U.keywordize"see:",
+    },
   },
   group = _U.define_hl("big_hint_usage_tracking", {
     ctermfg = 36,
