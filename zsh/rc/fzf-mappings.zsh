@@ -226,9 +226,11 @@ function zwidget::fzf::zoxide
   local preview_cmd="${FZF_PREVIEW_CMD_FOR_DIR//$_braces/$_braces_skip_first}"
 
   # --tiebreak=index  | when score are tied, prefer line that appeared first in input stream
-  # --no-sort         | Don't pre-sort the input
+  # --no-sort         | Don't fuzzy sort, use the frecency order
   # --nth 2..         | ignore first field (the popularity of the dir) when matching
-  local fzf_cmd=($FZF_BASE_CMD --no-sort --tiebreak=index --nth 2..)
+  #
+  # => use ctrl-r to enable fuzzy sorting and get better result for non-frecent dirs
+  local fzf_cmd=($FZF_BASE_CMD --no-sort --tiebreak=index --nth 2.. --bind=ctrl-r:toggle-sort)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
   fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
   fzf_cmd+=(
