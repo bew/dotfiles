@@ -83,6 +83,5 @@ OS:bind({"cmd"}, "space", actions.wm.centerOnScreen)
 OS:bind({}, "m", actions.wm.toggleMaximized)
 
 -- TODO: block any key that is not bound to the OS layer 👀
--- TODO: have a callback where there is an error with the config?
 
 config_reloaded() -- should be last!
