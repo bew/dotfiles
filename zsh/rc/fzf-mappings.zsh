@@ -191,9 +191,9 @@ zle -N zwidget::fzf::find_directory
 # --scheme=history  | Scoring scheme for command history (no additional bonus points)
 #                   | (prefer lines that are first in the input)
 # --nth 2..         | Ignore first field when matching (history entry number)
-# --no-sort         | Do not sort the results (keep history order)
-#                   | => use ctrl-r for better matches if needed
-FZF_HISTORY_OPTIONS=(--scheme=history --nth 2.. --no-sort --no-multi --bind=ctrl-r:toggle-sort)
+#
+# => use ctrl-r to disable sorting and get the original history order
+FZF_HISTORY_OPTIONS=(--scheme=history --nth 2.. --no-multi --bind=ctrl-r:toggle-sort)
 
 function zwidget::fzf::history
 {
