@@ -26,7 +26,6 @@ OS_layer.entered = function()
     hs.mouse.getCurrentScreen(),
     60 -- seconds (non-number is supposed to be infinite but it's broken…)
   )
-  print("OS_layer has", #OS_layer.keys, "keys")
 end
 
 OS_layer.exited = function()
