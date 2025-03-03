@@ -1,0 +1,9 @@
+# This partial config forces interactions with gitlab to use a specific ssh key
+
+[example]
+  what = gitlab
+
+[core]
+  sshCommand = ssh -i ~/.ssh/id_gitlab_perso
+
+# vim:set ft=gitconfig:

@@ -1,0 +1,9 @@
+
+# Default to always have the github one
+[include]
+  path = ./explicit_ssh_for_github.gitconfig
+
+[includeIf "hasconfig:remote.*.url:https://gitlab.com/**"]
+  path = ./explicit_ssh_for_gitlab.gitconfig
+
+# vim:set ft=gitconfig:
