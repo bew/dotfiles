@@ -373,7 +373,11 @@ HiResetTo @constant.bash ctermfg=171
 
 " [Lua]
 " Disable forced LSP comments, as they overwrite @comment.documentation
-HiResetTo @lsp.type.comment
+HiResetTo @lsp.type.comment.lua
+
+" [Terraform]
+" Disable forced LSP strings, as they hide any language injections in heredoc multiline strings
+HiResetTo @lsp.type.string.terraform
 
 "}}}
 " vim syntax highlighting "{{{
