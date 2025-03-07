@@ -139,12 +139,23 @@ alias rename="rename -v"
 
 # rm/trash
 
+alias rmpermanantly="command rm -vI"
 function rm
 {
-  echo "ERROR: 'rm' is discouraged, use 'trash …' (or 'rmtrash …') instead"
-  echo "  For immediate permanant deletion use 'rmpermanantly …'"
+  local rm_confirmation
+  echo
+  echo -n "👉 Are you sure? [yes/…] "
+  read rm_confirmation
+  if [[ "$rm_confirmation" == "yes" ]]; then
+    echo '=> ⚠️ `rm …` CONFIRMED'
+    echo
+    rmpermanantly "$@"
+  else
+    echo '=> ❌ `rm …` CANCELLED'
+    echo
+    return 1
+  fi
 }
-alias rmpermanantly="command rm -vI"
 if command -v trashy; then
   # For once https://github.com/oberblastmeister/trashy/pull/106 is released
   alias trash=trashy
