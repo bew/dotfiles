@@ -141,8 +141,19 @@ alias rename="rename -v"
 
 function rm
 {
-  echo "ERROR: 'rm' is discouraged, use 'trash …' (or 'rmtrash …') instead"
-  echo "  For immediate permanant deletion use 'rmpermanantly …'"
+  local rm_confirmation
+  echo
+  echo -n "👉 Are you sure? [yes/…] "
+  read rm_confirmation
+  if [[ "$rm_confirmation" == "yes" ]]; then
+    echo '=> ⚠️ `rm …` CONFIRMED'
+    echo
+    rmpermanantly "$@"
+  else
+    echo '=> ❌ `rm …` CANCELLED'
+    echo
+    return 1
+  fi
 }
 alias rmpermanantly="command rm -vI"
 if command -v trashy; then
