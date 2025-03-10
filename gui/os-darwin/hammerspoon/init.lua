@@ -79,6 +79,7 @@ OS:bind({}, "k", actions.wm.focusUp)
 OS:bind({}, "l", actions.wm.focusRight)
 
 OS:bind({"cmd"}, "space", actions.wm.centerOnScreen)
+OS:bind({"ctrl"}, "space", actions.wm.centerOnScreen)
 
 OS:bind({}, "m", actions.wm.toggleMaximized)
 
