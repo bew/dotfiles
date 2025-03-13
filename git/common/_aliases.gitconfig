@@ -149,6 +149,9 @@
   last-log = !git --no-pager pretty-log-verbose -n1
   ll = last-log
 
+  stat-last-log = stat @^..@
+  sll = stat-last-log
+
   pretty-log-next-push = pretty-log @{u}..
   lp = pretty-log-next-push
 
@@ -163,6 +166,7 @@
   ds  = !git -c delta.features=split-layout d
 
   stat = !git --no-pager diff --stat --summary
+
   show-with-stat = !git show --patch-with-stat --summary
 
   repo-info = !onefetch
