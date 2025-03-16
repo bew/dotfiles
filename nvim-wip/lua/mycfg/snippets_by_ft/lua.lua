@@ -110,6 +110,7 @@ snip("@as", {desc = "LuaCATS (inline) @as"}, SU.myfmt {
 })
 
 -- NOTE: must be last to allow custom annotation snips to be found before
+---@param snip SnipT
 local function anno_from_capture(_args, snip)
   local short_to_long = {
     a = "alias",
@@ -152,7 +153,7 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   { module = i(1, "module") },
 })
 
-snip("l", {desc = "local var = ..."}, SU.myfmt {
+snip("l", {desc = "local var = …"}, SU.myfmt {
   [[local <var> = <value>]],
   {
     var = i(1, "var"),
@@ -310,6 +311,7 @@ snip(
 snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 
 -- TODO(treesitter): only when cursor is at a 'statement' scope
+--   (or NOT in a table def nor in an fn arguments list)
 snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
   [[
     function<maybe_name>(<args>)
@@ -325,7 +327,26 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
     body = SU.insert_node_default_selection(3),
   },
 })
--- NOTE: condition is reversed with `-` before condition obj,
+-- A snippet for the function type, must be on a `---@something` line (after).
+-- NOTE: Must be before anon fn def to have a chance to match
+snip("fn", {desc = "annotation for function type", when = conds.line_before_matches"%-%-%-@"}, SU.myfmt {
+  [[(fun(<args>): <ret>)]],
+  {
+    args = ls.choice_node(1, {
+      i(nil),
+      ls.snippet_node(nil, SU.myfmt {
+        [[<param>: <ty><maybe_more>]],
+        {
+          param = i(1, "param"),
+          ty = i(2, "any"),
+          maybe_more = i(3),
+        },
+      }),
+    }),
+    ret = i(2, "any"),
+  }
+})
+-- NOTE: condition is reversed (with `-` before condition obj),
 --   to activate when the usual snippet (with name) is not active.
 snip("fn", {desc = "function def (anon)", when = -conds.start_of_line}, SU.myfmt {
   [[

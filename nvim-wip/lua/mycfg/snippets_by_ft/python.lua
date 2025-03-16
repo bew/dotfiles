@@ -53,6 +53,8 @@ snip("fromd", {desc = "import for @dataclass", when = conds.very_start_of_line},
 -------------------
 
 --- Returns method def snippet for given *opts*
+---@param opts any
+---@return SnipNodeT
 local function make_def_snip(opts)
   opts = opts or {}
 

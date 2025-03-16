@@ -26,4 +26,12 @@ M.after_indent = make_cond_obj(function(line_to_cursor, matched_trigger)
   return line_to_trigger:match("^ +$")
 end)
 
+---@param lua_pattern string Lua Pattern that the line before trigger should match
+M.line_before_matches = function(lua_pattern)
+  return make_cond_obj(function(line_to_cursor, matched_trigger)
+    local line_to_trigger = M._get_line_to_trigger(line_to_cursor, matched_trigger or "")
+    return line_to_trigger:match(lua_pattern)
+  end)
+end
+
 return M

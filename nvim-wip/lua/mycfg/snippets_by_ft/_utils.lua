@@ -4,7 +4,7 @@ local U = require"mylib.utils"
 
 local SU = {}
 
----@alias NodeT table
+---@alias SnipNodeT table
 ---...
 
 ---@class SnipT
@@ -157,7 +157,7 @@ end
 --- Insert node that default to last visual (saved) selection if any, else given text
 ---@param index integer Snip node index
 ---@param default_text? string Default text if no stored selection to use
----@return NodeT
+---@return SnipNodeT
 SU.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
