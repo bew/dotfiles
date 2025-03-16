@@ -242,6 +242,9 @@ my_actions.go_prev_search_result = mk_action_v2 {
 toplevel_map{mode="n", key="n", action=my_actions.go_next_search_result}
 toplevel_map{mode="n", key="N", action=my_actions.go_prev_search_result}
 
+toplevel_map{mode="n", key="<F2>", action=[[:Inspect<cr>]], desc="Show current HL & extmarks at current pos"}
+toplevel_map{mode="n", key="<F3>", action=[[:InspectTree<cr>]], desc="Show TreeSitter node tree"}
+
 -- Windows navigation
 vim.cmd[[nnoremap <C-h> <C-w>h]]
 vim.cmd[[nnoremap <C-j> <C-w>j]]
@@ -461,11 +464,19 @@ my_actions.c_expand_file_dir = mk_action_v2 {
 -- C: Expand %% to dir of current file
 toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
 
+--- Return action to toggle the given option
+---@param opt_name string Option name to toggle
+---@return ModeRawActionInput
+local function action_to_toggle_option(opt_name)
+  return function()
+    -- e.g. `set foo! foo?`
+    vim.api.nvim_exec2("set "..opt_name.."! "..opt_name.."?", {})
+  end
+end
 -- N: toggle wrap
-vim.cmd[[nnoremap <silent> <M-w> :set wrap! wrap?<cr>]]
+toplevel_map{mode="n", key=[[<M-w>]], action=action_to_toggle_option"wrap", opts = { silent = true }}
 -- N: toggle relativenumber
-vim.cmd[[nnoremap <silent> <M-r> :set relativenumber! relativenumber?<cr>]]
-
+toplevel_map{mode="n", key=[[<M-r>]], action=action_to_toggle_option"relativenumber", opts = { silent = true }}
 
 -- Copy/Paste with session/system clipboard
 -- Register '+' is session clipboard (e.g: tmux)
@@ -521,16 +532,12 @@ toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
 my_actions.select_last_inserted_region = mk_action_v2 {
   default_desc = "select last inserted region",
   n = "`[v`]",
-}
--- FIXME: how to merge the two normal/operator actions?
-my_actions.o_select_last_inserted_region = mk_action_v2 {
-  default_desc = "select last inserted region",
   o = [[<cmd>normal! `[v`]<cr>]],
 }
 -- N: Select last inserted region
-toplevel_map{mode="n", key="gV", action=my_actions.select_last_inserted_region}
 -- O: Textobj for the last inserted region
-toplevel_map{mode="o", key="gV", action=my_actions.o_select_last_inserted_region}
+toplevel_map{mode={"n", "o"}, key="gV", action=my_actions.select_last_inserted_region}
+-- toplevel_map{mode="o", key="gV", action=my_actions.select_last_inserted_region}
 
 -- TODO: omap `A)` to allow `dA)` to delete parentheses and surrounding spaces.
 --   (FIXME: On `foo (bar) baz`, should remove space or after or both? 🤔)
@@ -550,6 +557,7 @@ toplevel_map{mode="v", key="P", desc="paste (swaps register)", action="p"}
 vim.cmd[[vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>]]
 -- close all manually opened folds in range
 vim.cmd[[vnoremap <silent> zc  zx]]
+-- TODO: action to close all function folds in current scope (may be the top scope)
 
 --------------------------------
 -- Insert helpers
