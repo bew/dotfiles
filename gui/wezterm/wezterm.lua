@@ -1,6 +1,9 @@
 -- WezTerm configuration
 ---------------------------------------------------------------
 
+local wezterm = require"wezterm"
+local mytable = require "lib/mystdlib".mytable
+
 local cfg_misc = {
   window_close_confirmation = "NeverPrompt",
   check_for_updates = false,
@@ -22,12 +25,21 @@ local cfg_misc = {
 
   -- Disable all noises
   audible_bell = "Disabled",
+
+  hyperlink_rules = mytable.flatten_list {
+    wezterm.default_hyperlink_rules(),
+    {
+      -- Match `gh"foo/bar"` as a github user/repo URL
+      -- (this the syntax I use for declaring Neovim plugins in my config)
+      regex = [[gh"([\w\d]{1}[-\w\d]+)(/){1}([-\w\d\.]+)"]],
+      format = 'https://www.github.com/$1/$3',
+    }
+  }
 }
 
 -- Merge configs and return!
 ------------------------------------------
 
-local mytable = require "lib/mystdlib".mytable
 local full_config = mytable.merge_all(
   cfg_misc,
   require("cfg_appearance"),
