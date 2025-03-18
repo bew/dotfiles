@@ -320,6 +320,10 @@ HiResetTo @markup.heading.5.bg cterm=bold ctermbg=234
 HiResetTo @markup.heading.6    cterm=bold ctermfg=91
 HiResetTo @markup.heading.6.bg cterm=bold ctermbg=234
 
+" This is used by some languages queries to cancel surrounding highlighting
+" (e.g. python's f-string interpolations)
+hi! link @none Normal
+
 "}}}
 " Tree-sitter highlighting (Language-specific overrides) "{{{
 
