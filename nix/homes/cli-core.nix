@@ -51,6 +51,7 @@ in {
     stable.ripgrep
     stable.tree
     stable.just
+    stable.eva # nice calculator
 
     stable.less
 
