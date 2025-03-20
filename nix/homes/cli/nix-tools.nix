@@ -12,7 +12,6 @@ in {
       nix-diff-drv = "${lib.getExe stable.nix-diff}";
     })
     stable.nixfmt # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
-    # stable.nix-update # Swiss-knife for updating nix packages
-    # TODO: add nix-index!
+    bleedingedge.nix-output-monitor # great build tracking ✨
   ];
 }

@@ -1,16 +1,20 @@
 _default:
   @{{ just_executable() }} --list
 
-_build-only *ARGS:
+rebuild *ARGS:
   #!/usr/bin/env bash
   set -e
-  nix build '.#homeConfig.activationPackage' {{ ARGS }}
+  function show_and_run {
+    echo "=>> $*"
+    "$@"
+  }
+  show_and_run nom build '.#homeConfig.activationPackage' {{ ARGS }}
   echo
   echo "Home config successfully build!"
   echo
 
 # Build the current home config WITHOUT switching to it
-build-and-diff *ARGS: (_build-only ARGS)
+rebuild-and-diff *ARGS: (rebuild ARGS)
   #!/usr/bin/env bash
   set -euo pipefail
   cd {{ justfile_directory() }}
@@ -31,14 +35,6 @@ build-and-diff *ARGS: (_build-only ARGS)
   ./bin/nix-diff-closures.sh $CURRENT_HOME_MANAGER_PATH $BUILT_HOME_MANAGER_PATH -o $DIFF_FILE
 
 # Build the current home config AND switch to it
-switch *ARGS: (_build-only ARGS)
+reswitch *ARGS: (rebuild ARGS)
   cd {{ justfile_directory() }}
-  @./result/activate
-
-upgrade-multiuser-nix:
-  @# Ref: https://nixos.org/manual/nix/stable/installation/upgrading.html
-  sudo nix-channel --update
-  sudo nix-env -iA nixpkgs.nix nixpkgs.cacert
-  sudo systemctl daemon-reload
-  sudo systemctl restart nix-daemon
-  sudo -k
+  ./result/activate
