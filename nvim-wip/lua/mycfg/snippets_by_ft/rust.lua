@@ -10,6 +10,16 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- Start of snippets definitions
 
+snip("l", {desc = "let var = …"}, SU.myfmt {
+  [[let <var> = <value>]],
+  {
+    var = i(1, "var"),
+    value = SU.insert_node_default_selection(2),
+  },
+})
+
+-- Annotations
+
 snip("an", {desc = "Annotation #[…]"}, SU.myfmt {
   "#[<annotation>]",
   { annotation = i(1, "annotation") },
@@ -36,8 +46,7 @@ snip("opt", {desc = "Option<…>"}, SU.myfmt_braces {
 
 snip("ok", {desc = "Ok(…)"}, SU.myfmt {
   "Ok(<value>)",
-  { value = i(1, "()") },
-  -- FIXME: default to last selected expr if any
+  { value = SU.insert_node_default_selection(1, "()") },
 })
 
 snip("vec", {desc = "vec![…] literal"}, SU.myfmt {
@@ -92,6 +101,46 @@ snip("fnt", {desc = "Unit test function"}, SU.myfmt {
   {
     name = i(1, "name_of_the_test"),
     body = i(2),
+  },
+})
+
+
+--- Returns a LuaSnip node for eventual
+---@param idx integer? Index for the top node
+---@return SnipNodeT
+local function node_for_maybe_fmt_msg(idx)
+  return ls.choice_node(idx, {
+    i(nil), -- for manual entry if wanted, or as a stoppoint for the choice node
+    ls.snippet_node(nil, SU.myfmt {
+      [[, "<msg>"<fmt_args>]],
+      { msg = i(1, "TODO: custom msg!"), fmt_args = i(2) }
+    }),
+  })
+end
+
+snip("ass", {desc = "assert!(…);"}, SU.myfmt {
+  [[assert!(<expr><maybe_msg>);]],
+  {
+    expr = SU.insert_node_default_selection(1, [[expr]]),
+    maybe_msg = node_for_maybe_fmt_msg(2),
+  },
+})
+
+snip("assq", {desc = "assert_eq!(…);"}, SU.myfmt {
+  [[assert_eq!(<expr>, <expected><maybe_msg>);]],
+  {
+    expr = SU.insert_node_default_selection(1, [[expr]]),
+    expected = i(2, [["EXPECTED"]]),
+    maybe_msg = node_for_maybe_fmt_msg(3),
+  },
+})
+
+snip("assm", {desc = "assert!(matches!(…));"}, SU.myfmt {
+  [[assert!(matches!(<expr>, <pattern>)<maybe_msg>);]],
+  {
+    expr = SU.insert_node_default_selection(1, [[expr]]),
+    pattern = i(2, [[Pattern]]),
+    maybe_msg = node_for_maybe_fmt_msg(3),
   },
 })
 
