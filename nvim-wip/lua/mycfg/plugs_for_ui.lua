@@ -150,6 +150,8 @@ Plug {
         ["<C-p>"] = false,
         ["<C-l>"] = false,
 
+        ["<2-LeftMouse>"] = "actions.select",
+
         -- NOTE: Can't have them without Ctrl without breaking <M-s> to save buffer.. :/
         -- => It's usually easier anyway to split in the direction I want then open wanted file..
         ["<C-M-s>"] = { "actions.select", opts = { horizontal = true } },
