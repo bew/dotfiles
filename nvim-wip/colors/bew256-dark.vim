@@ -122,7 +122,7 @@ exe "HiResetTo PreProc"   .s:fg_orange
 "        Macro           same as Define
 "        PreCondit       preprocessor #if, #else, #endif, etc.
 
-exe "HiResetTo Type"   .s:fg_yellow
+hi! link Type @type
 "       *Type            int, long, char, etc.
 "        StorageClass    static, register, volatile, etc.
 "        Structure       struct, union, enum, etc.
@@ -343,6 +343,14 @@ HiResetTo @variable.short.bash ctermfg=39 cterm=bold
 HiResetTo @variable.special.bash ctermfg=222
 HiResetTo @constant.bash ctermfg=171
 
+" [Rust]
+" Show `super`/`self` in dedicated color (not keyword or path item)
+HiResetTo @module.builtin.rust cterm=italic ctermfg=180
+" Same but at crate-level (larger scope)
+HiResetTo @module.builtin.crate.rust cterm=italic,underdotted ctermfg=180
+" TODO
+HiResetTo @keyword.public cterm=bold ctermfg=70
+
 "}}}
 " LSP highlighting "{{{
 " ---------------------------------------------------------------------
@@ -382,6 +390,17 @@ HiResetTo @lsp.type.comment.lua
 " [Terraform]
 " Disable forced LSP strings, as they hide any language injections in heredoc multiline strings
 HiResetTo @lsp.type.string.terraform
+
+" [Rust]
+" Disable forced function call the same as function def 😬
+HiResetTo @lsp.type.function.rust
+HiResetTo @lsp.type.method.rust
+" Ensure properties are highlighted as members
+hi! link @lsp.type.property.rust @variable.member.rust
+" Disable forced non-obvious keywords
+HiResetTo @lsp.type.keyword.rust
+" Show mutable variables
+" HiResetTo @lsp.typemod.variable.mutable.rust cterm=underdotted
 
 "}}}
 " vim syntax highlighting "{{{
