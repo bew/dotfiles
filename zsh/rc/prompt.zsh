@@ -84,7 +84,7 @@ function segmt::git_branch_slow
 function segmt::git_branch_fast
 {
   [ -n "$PROMPT_NO_GIT_INFO" ] && {
-    echo -n "(git segmt disabled)"
+    echo -n "(git segmt off)"
     return
   }
 
