@@ -10,8 +10,49 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- Start of snippets definitions
 
-snip("#!", { desc = "Generic shebang" }, {
-  t"#!/usr/bin/env ", i(1, "bash"),
+local CUSTOM_INTERPRETERS_BY_FILETYPE = {
+  python = "python3",
+  rust = "cargo-script",
+  nix = {"nix eval -f", "nix eval --raw -f"},
+  ps1 = "pwsh", -- powershell
+  -- TODO: add more as needed 😉
+}
+snip("#!", { desc = "Interpreter shebang!" }, SU.myfmt {
+  [[#!/usr/bin/env<env_arg> <interpreter>]],
+  {
+    interpreter = ls.dynamic_node(1, function()
+      local filetype = vim.api.nvim_get_option_value("filetype", {})
+      local interpreter
+      if not filetype or filetype == "" then
+        interpreter = "bash"
+      else
+        filetype = vim.split(filetype, "%.")[1] -- only first ft is useful
+        interpreter = CUSTOM_INTERPRETERS_BY_FILETYPE[filetype] or filetype
+      end
+      local node
+      if type(interpreter) == "string" then
+        node = i(1, interpreter)
+      elseif type(interpreter) == "table" then
+        local nodes = vim.iter(interpreter):map(function(interpreter_item)
+          return i(nil, interpreter_item)
+        end):totable()
+        node = ls.choice_node(1, nodes)
+      else
+        node = t"unreacheable?"
+      end
+      return ls.snippet_node(nil, node)
+    end),
+    env_arg = ls.function_node(function(args)
+      local interpreter_node_text = args[1][1] ---@type string
+      if interpreter_node_text:find(" ") then
+        -- This is necessary for `env` to split interpreter line by spaces
+        -- (otherwise whole rest of the line is considered as the binary name)
+        return " -S"
+      else
+        return ""
+      end
+    end, {SU.node_ref(1)}),
+  }
 })
 
 snip("modeline", { desc = "vim modeline" }, SU.myfmt{
