@@ -27,6 +27,9 @@ __auto_bins__/
 # (name I usually use for this..)
 out.dot
 
+# Aider chat files (AI)
+.aider*
+
 # -------- Platform-specific common ignores
 
 # MacOS
