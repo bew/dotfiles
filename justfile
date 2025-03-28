@@ -8,7 +8,16 @@ rebuild *ARGS:
     echo "=>> $*"
     "$@"
   }
-  show_and_run nom build '.#homeConfig.activationPackage' {{ ARGS }}
+  nix_bin=nom
+  if ! command -v nom >/dev/null 2>&1; then
+    echo '!!! `nom` (nix-output-monitor) is not in $PATH, using native `nix`'
+    nix_bin=nix
+  fi
+  if [[ -n "${NIX_NOT_NOM:-}" ]]; then
+    echo '$NIX_NOT_NOM is set, using native `nix`'
+    nix_bin=nix
+  fi
+  show_and_run $nix_bin build '.#homeConfig.activationPackage' {{ ARGS }}
   echo
   echo "Home config successfully build!"
   echo
