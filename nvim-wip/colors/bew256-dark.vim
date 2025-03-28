@@ -262,6 +262,7 @@ HiResetTo @function ctermfg=33
 HiResetTo @function.call ctermfg=208
 HiResetTo @function.macro ctermfg=208
 HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
+HiResetTo @constructor ctermfg=166 cterm=bold
 
 HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
@@ -280,8 +281,8 @@ hi! link @string.documentation @comment.documentation
 " note: _emphasis_ certain documentation sections
 " (used _at least_ in python docstrings thx to my hl_patterns)
 HiResetTo @comment.documentation.emph ctermfg=246
-HiResetTo @comment.documentation.emph.return ctermfg=70
-HiResetTo @comment.documentation.emph.exception ctermfg=160
+HiResetTo @comment.documentation.emph.return ctermfg=28
+HiResetTo @comment.documentation.emph.exception ctermfg=124
 
 " The key in a key/value pairs
 HiResetTo @property ctermfg=137
