@@ -34,7 +34,7 @@ matches:
   - trigger: "!yay!"
     replace: '🥳'
 
-  - trigger: "!rok!"
+  - trigger: "!rk!"
     replace: '🚀'
 
   - trigger: "!ship!" # ship it!
