@@ -1,9 +1,9 @@
 { pkgsChannels, lib, mybuilders, myToolConfigs, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge myPkgs;
+  inherit (pkgsChannels) stable;
 
-  nvim-base = bleedingedge.neovim.override {
+  nvim-base = stable.neovim.override {
     # python3 & ruby providers are enabled by default..
     # => I won't need them, I want to have vimscript or Lua based plugins ONLY
     withPython3 = false;

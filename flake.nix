@@ -66,7 +66,7 @@
       nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
       mk-nvim-config = {nvimConfig, asDefault ? false}: (
         nvim-configs.lib.evalNvimConfig {
-          pkgs = bleedingedgePkgs;
+          pkgs = stablePkgs;
           configuration = {
             imports = [
               nvimConfig
@@ -153,20 +153,20 @@
       zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolPkg.standalone);
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
-        fzf = bleedingedgePkgs.fzf;
+        fzf = stablePkgs.fzf;
         replaceBinsInPkg = mybuilders.replaceBinsInPkg;
       };
       fzf-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.fzf-bew);
 
       nvim-minimal = let
         cfg = nvim-configs.lib.evalNvimConfig {
-          pkgs = bleedingedgePkgs;
+          pkgs = stablePkgs;
           configuration = nvim-configs.nvimConfigModule.nvim-minimal;
         };
       in cfg.outputs.toolPkg.standalone;
       nvim-bew = let
         cfg = nvim-configs.lib.evalNvimConfig {
-          pkgs = bleedingedgePkgs;
+          pkgs = stablePkgs;
           configuration = nvim-configs.nvimConfigModule.nvim-bew;
         };
       in cfg.outputs.toolPkg.standalone;
