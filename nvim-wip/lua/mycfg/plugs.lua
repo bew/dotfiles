@@ -242,6 +242,9 @@ Plug.pkg_manager {
         if plug.version.tag then
           lazy_single_spec.tag = plug.version.tag
         end
+        if plug.version.rev then
+          lazy_single_spec.rev = plug.version.rev
+        end
       end
       if plug.depends_on then
         local direct_deps = {}
@@ -278,6 +281,7 @@ Plug.pkg_manager {
       return nil
     end
     -- print("Loading lazy plugins:", vim.inspect(plug_names)) -- DEBUG
+    ---@diagnostic disable-next-line: missing-fields (lazy config has all options as 'required'..)
     require("lazy").setup(lazy_plugin_specs, {
       root = ctx.install_dir,
       git = {

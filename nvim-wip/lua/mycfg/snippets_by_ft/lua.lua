@@ -228,7 +228,7 @@ snip("thi", {desc = "then … end (inline)"}, SU.myfmt {
   { body = i(1) },
 })
 
-snip("forn", {desc = "for n in incl-range", when = conds.start_of_line}, SU.myfmt {
+snip("forn", {desc = "for n in range (including end)", when = conds.start_of_line}, SU.myfmt {
   [[
     for <idx> = <range> do
       <body>

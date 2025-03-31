@@ -485,7 +485,12 @@ Plug.luasnip {
   source = gh"L3MON4D3/LuaSnip",
   desc = "Hyper flexible snippet Engine for Neovim",
   tags = {t.insert, t.editing, t.careful_update},
-  rev = "v2.3.0", -- last release @2024-04
+  version = {
+    rev = "v2.3.0", -- last release @2024-04
+    -- This is a WIP branch, aiming to fix various limitation around restore node
+    -- REF: https://github.com/L3MON4D3/LuaSnip/discussions/1194#discussioncomment-11725813
+    -- branch = "self-dependent-dNode", -- From PR: https://github.com/L3MON4D3/LuaSnip/pull/1137
+  },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local ls = require"luasnip"
@@ -546,6 +551,10 @@ Plug.luasnip {
         end),
       },
     })
+
+    -- EXAMPLE setting up a snippet in the official syntax (not using my DSL)
+    -- (to be used to reproduce stuff / errors / .. to write an issue with example snip)
+    -- ls.add_snippets("all", { ls.snippet({ trig="bad" }, { ls.insert_node(1, "é") }) })
 
     -- I: Expand snippet if any
     -- IDEA(alternative?): <C-x><C-x> (in insert, maybe also visual?)

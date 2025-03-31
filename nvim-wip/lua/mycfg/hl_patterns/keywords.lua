@@ -67,6 +67,13 @@ patterns.big_idea = {
     underdotted = true,
   }),
 }
+patterns.small_idea = {
+  pattern = _big_word_variants"idea:",
+  group = _U.define_hl("small_idea", {
+    ctermfg = 134,
+    underdotted = true,
+  }),
+}
 
 patterns.big_fail_bad = {
   pattern = U.concat_lists {
@@ -250,10 +257,12 @@ patterns.misc_light_words = {
 -- e.g. (ref: this is a light ref)
 patterns.misc_lighter_words = {
   pattern = U.concat_lists {
-    _big_word_variants"ref:",
-    _big_word_variants"refs:",
-    _big_word_variants"EXAMPLE:",
-    _big_word_variants"Example:",
+    {
+      _U.keywordize"ref:",
+      _U.keywordize"refs:",
+    },
+    _big_word_variants"EXAMPLE",
+    _big_word_variants"Example",
   },
   group = _U.define_hl("misc_lighter_words", {
     ctermfg = 249,
@@ -262,7 +271,9 @@ patterns.misc_lighter_words = {
 
 patterns.misc_heavy_words = {
   pattern = U.concat_lists {
-    _big_word_variants"DOC",
+    {
+      _U.keywordize"DOC",
+    },
     _big_word_variants"TOTRY",
     _big_word_variants"TOTHINK",
     _big_word_variants"TOCHECK",
@@ -311,7 +322,7 @@ patterns.misc_meta = {
 patterns.misc_e_g = {
   pattern = _big_word_variants"e%.g%.",
   group = _U.define_hl("misc_e_g", {
-    ctermfg = 99,
+    ctermfg = 105,
   }),
 }
 
