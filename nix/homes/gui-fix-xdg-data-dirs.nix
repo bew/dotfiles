@@ -9,7 +9,7 @@ in {
     stable.hicolor-icon-theme
 
     # adwaita-icon-theme contains the standard icons for Gnome / GTK apps.
-    stable.gnome.adwaita-icon-theme
+    stable.adwaita-icon-theme
 
     # breeze-icons is a freedesktop compatible icon theme. It’s developed by the KDE Community
     # as part of KDE Frameworks 5 and it’s used by default in KDE Plasma 5 and KDE Applications.

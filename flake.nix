@@ -15,13 +15,13 @@
 
   # We use specific branches to get most/all packages from the official cache.
   inputs = {
-    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-24.11";
     nixpkgsBleedingEdge.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     flakeTemplates.url = "github:nixos/templates";
 
-    homeManager.url = "github:nix-community/home-manager/release-23.11";
-    homeManager.inputs.nixpkgs.follows = "nixpkgsBleedingEdge";
+    homeManager.url = "github:nix-community/home-manager/release-24.11";
+    homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
 
     systems.url = "github:nix-systems/default";
   };

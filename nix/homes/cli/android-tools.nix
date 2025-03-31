@@ -4,10 +4,9 @@ let
   inherit (pkgsChannels) stable;
 in {
   home.packages = [
-    (let androidPkgs = stable.androidenv.androidPkgs_9_0;
-    in mybuilders.linkBins "android-tools-bins" [
-      "${androidPkgs.platform-tools}/bin/adb"
-      "${androidPkgs.platform-tools}/bin/fastboot"
+    (mybuilders.linkBins "android-tools-bins" [
+      "${stable.android-tools}/bin/adb"
+      "${stable.android-tools}/bin/fastboot"
     ])
   ];
 }
