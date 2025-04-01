@@ -1,14 +1,17 @@
 local _U = require"mycfg.hl_patterns.utils"
 
----@type {[string]: mycfg.hl_patterns.Pattern}
+---@type {[string]: mycfg.hl_patterns.PatternSpec}
 local patterns = {}
 
-patterns.lua_LuaCATS_attr = {
+---@param pattern_spec mycfg.hl_patterns.PatternSpec
+---@return mycfg.hl_patterns.PatternSpec
+local ft_only = function(pattern_spec)
+  return _U.pattern_for_ft_only({"lua"}, pattern_spec)
+end
+
+patterns.lua_LuaCATS_attr = ft_only {
   -- note: Match `---@foo`
-  pattern = function(bufnr)
-    if vim.bo[bufnr].filetype ~= "lua" then return nil end
-    return "%-%-%-()@%w+()"
-  end,
+  pattern = "%-%-%-()@%w+()",
   group = _U.define_hl("lua_LuaCATS_attr", {
     ctermfg = 202,
   }),

@@ -3,7 +3,7 @@
 
 local _U = require"mycfg.hl_patterns.utils"
 
----@type {[string]: mycfg.hl_patterns.Pattern}
+---@type {[string]: mycfg.hl_patterns.PatternSpec}
 local patterns = {}
 
 patterns.cterm_color = {

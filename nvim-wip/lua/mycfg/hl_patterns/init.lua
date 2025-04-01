@@ -36,7 +36,7 @@
 ---@alias mycfg.hl_patterns.GroupFn fun(buf_id: integer, match: string, data: mycfg.hl_patterns.GroupFnData): string?
 ---@alias mycfg.hl_patterns.ExtmarkFn fun(buf_id: integer, match: string, data: mycfg.hl_patterns.ExtmarkFnData): vim.api.keyset.set_extmark?
 
----@class mycfg.hl_patterns.Pattern
+---@class mycfg.hl_patterns.PatternSpec
 ---@field pattern string|string[]|mycfg.hl_patterns.PatternFn
 ---    Lua pattern(s) for this highlighter
 ---@field group string|mycfg.hl_patterns.GroupFn
@@ -53,7 +53,7 @@ return vim.tbl_extend(
   -- Tech-specific patterns
   -- TODO: use `vim.b.minihipatterns_config` instead of global patterns 🤔
   --   Find a nice way to define a pattern or group of patterns for 1+ filetype(s)
-  require"mycfg.hl_patterns.tech_python",
   require"mycfg.hl_patterns.tech_lua",
+  require"mycfg.hl_patterns.tech_python",
   {} -- (for trailing commas)
 )
