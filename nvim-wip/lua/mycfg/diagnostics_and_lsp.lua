@@ -34,7 +34,7 @@ my_actions.goto_next_diag = mk_action_v2 {
   default_desc = "Go to next diagnostic (by severity)",
   n = function()
     goto_diag_by_severity_layers {
-      get_diag_pos_fn = vim.diagnostic.get_next_os,
+      get_diag_pos_fn = vim.diagnostic.get_next_pos,
       goto_diag_fn = vim.diagnostic.goto_next,
       goto_opts = {}, -- defaults
     }
@@ -45,7 +45,7 @@ my_actions.goto_prev_diag = mk_action_v2 {
   default_desc = "Go to prev diagnostic (by severity)",
   n = function()
     goto_diag_by_severity_layers {
-      get_diag_pos_fn = vim.diagnostic.get_prev_os,
+      get_diag_pos_fn = vim.diagnostic.get_prev_pos,
       goto_diag_fn = vim.diagnostic.goto_prev,
       goto_opts = {}, -- defaults
     }
@@ -56,7 +56,7 @@ my_actions.goto_next_diag_diff_line = mk_action_v2 {
   default_desc = "Go to next diagnostic (by severity, != line)",
   n = function()
     goto_diag_by_severity_layers {
-      get_diag_pos_fn = vim.diagnostic.get_next_os,
+      get_diag_pos_fn = vim.diagnostic.get_next_pos,
       goto_diag_fn = vim.diagnostic.goto_next,
       goto_opts = {
         -- Start searching from next line
