@@ -53,6 +53,7 @@ return vim.tbl_extend(
   -- Tech-specific patterns
   -- TODO: use `vim.b.minihipatterns_config` instead of global patterns 🤔
   --   Find a nice way to define a pattern or group of patterns for 1+ filetype(s)
+  require"mycfg.hl_patterns.tech_shell",
   require"mycfg.hl_patterns.tech_lua",
   require"mycfg.hl_patterns.tech_python",
   {} -- (for trailing commas)
