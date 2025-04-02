@@ -1,0 +1,506 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
+<!-- vim:set ft=xml.macos-keylayout sw=4: -->
+<!--Last edited by Ukelele version 396 on 2025-04-02 at 19:49 (CEST)-->
+<keyboard group="126" id="-17056" name="French – PC, actually sane ✨" maxout="1">
+    <layouts>
+        <layout first="0" last="0" mapSet="the-keymaps" modifiers="the-mods"/>
+    </layouts>
+    <modifierMap id="the-mods" defaultIndex="0">
+        <!-- note: keyMapSelect's `mapIndex` is a number, should be contiguous -->
+        <!-- note: modifier's key:
+            A string specifying one or more combinations of modifier keys, space-separated.
+            Multiple modifier keys means that they must all be pressed at the same time.
+            Multiple modifier elements is a logic OR for the current keyMapSelect.
+
+            % Recognized mods:
+            - shift/rightShift/anyShift: The left/right/any Shift key
+            - option/rightOption/anyOption: The left/right/any Option key
+            - control/rightControl/anyControl: The left/right/any Control key
+            - command: The Command key
+            - caps: the Caps Lock key
+
+            % Presence and `?`:
+            The presence of a modifier: the modifier must be pressed.
+            The absence of a modifier: the modifier must not be pressed.
+            A modifier followed by `?`: the modifier state is irrelevant
+            .. (it may be either pressed or not pressed)
+        -->
+        <keyMapSelect mapIndex="0">
+            <!-- note: DEFAULT (with maybe: CMD, CTRL) -->
+            <modifier keys="command? anyControl?"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="1">
+            <!-- note: SHIFT (with maybe: CMD, ALT) -->
+            <modifier keys="anyShift command? anyOption?"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="2">
+            <!-- note: ALT (left or right) -->
+            <modifier keys="anyOption"/>
+        </keyMapSelect>
+    </modifierMap>
+    <keyMapSet id="the-keymaps">
+        <!-- note: keyMap's `index` relates to keyMapSelect's `mapIndex` -->
+        <keyMap index="0">
+            <!-- note: DEFAULT keymap (with maybe: CMD, CTRL) -->
+            <key code="0" output="q"/>
+            <key code="1" output="s"/>
+            <key code="2" output="d"/>
+            <key code="3" output="f"/>
+            <key code="4" output="h"/>
+            <key code="5" output="g"/>
+            <key code="6" output="w"/>
+            <key code="7" output="x"/>
+            <key code="8" output="c"/>
+            <key code="9" output="v"/>
+            <key code="10" output="²"/>
+            <key code="11" output="b"/>
+            <key code="12" action="a-or-a-accents"/>
+            <key code="13" output="z"/>
+            <key code="14" action="e-or-e-accents"/>
+            <key code="15" output="r"/>
+            <key code="16" action="y-or-y-accents"/>
+            <key code="17" output="t"/>
+            <key code="18" output="&#x0026;"/>
+            <key code="19" output="é"/>
+            <key code="20" output="&#x0022;"/>
+            <key code="21" output="&#x0027;"/>
+            <key code="22" output="-"/>
+            <key code="23" output="("/>
+            <key code="24" output="="/>
+            <key code="25" output="ç"/>
+            <key code="26" output="è"/>
+            <key code="27" output=")"/>
+            <key code="28" output="_"/>
+            <key code="29" output="à"/>
+            <key code="30" output="$"/>
+            <key code="31" action="o-or-o-accents"/>
+            <key code="32" action="u-or-u-accents"/>
+            <key code="33" action="state-setter:carret-deadkey"/>
+            <key code="34" action="i-or-i-accents"/>
+            <key code="35" output="p"/>
+            <key code="36" output="&#x000D;"/>
+            <key code="37" output="l"/>
+            <key code="38" output="j"/>
+            <key code="39" output="ù"/>
+            <key code="40" output="k"/>
+            <key code="41" output="m"/>
+            <key code="42" output="*"/>
+            <key code="43" output=";"/>
+            <key code="44" output="!"/>
+            <key code="45" action="n-or-n-accents"/>
+            <key code="46" output=","/>
+            <key code="47" output=":"/>
+            <key code="48" output="&#x0009;"/>
+            <key code="49" action="space"/>
+            <key code="50" output="&#x003C;"/>
+            <key code="51" output="&#x0008;"/>
+            <key code="52" output="&#x0003;"/>
+            <key code="53" output="&#x001B;"/>
+            <key code="65" output=","/>
+            <key code="66" output="&#x001D;"/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="70" output="&#x001C;"/>
+            <key code="71" output="&#x001B;"/>
+            <key code="72" output="&#x001F;"/>
+            <key code="75" output="/"/>
+            <key code="76" output="&#x0003;"/>
+            <key code="77" output="&#x001E;"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
+            <key code="93" output="²"/>
+            <key code="94" output="&#x003C;"/>
+            <key code="96" output="&#x0010;"/>
+            <key code="97" output="&#x0010;"/>
+            <key code="98" output="&#x0010;"/>
+            <key code="99" output="&#x0010;"/>
+            <key code="100" output="&#x0010;"/>
+            <key code="101" output="&#x0010;"/>
+            <key code="102" output="&#x0010;"/>
+            <key code="103" output="&#x0010;"/>
+            <key code="104" output="&#x0010;"/>
+            <key code="105" output="&#x0010;"/>
+            <key code="106" output="&#x0010;"/>
+            <key code="107" output="&#x0010;"/>
+            <key code="108" output="&#x0010;"/>
+            <key code="109" output="&#x0010;"/>
+            <key code="110" output="&#x0010;"/>
+            <key code="111" output="&#x0010;"/>
+            <key code="112" output="&#x0010;"/>
+            <key code="113" output="&#x0010;"/>
+            <key code="114" output="&#x0005;"/>
+            <key code="115" output="&#x0001;"/>
+            <key code="116" output="&#x000B;"/>
+            <key code="117" output="&#x007F;"/>
+            <key code="118" output="&#x0010;"/>
+            <key code="119" output="&#x0004;"/>
+            <key code="120" output="&#x0010;"/>
+            <key code="121" output="&#x000C;"/>
+            <key code="122" output="&#x0010;"/>
+            <key code="123" output="&#x001C;"/>
+            <key code="124" output="&#x001D;"/>
+            <key code="125" output="&#x001F;"/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+        <keyMap index="1">
+            <!-- note: SHIFT keymap (with maybe: CMD, ALT) -->
+            <key code="0" output="Q"/>
+            <key code="1" output="S"/>
+            <key code="2" output="D"/>
+            <key code="3" output="F"/>
+            <key code="4" output="H"/>
+            <key code="5" output="G"/>
+            <key code="6" output="W"/>
+            <key code="7" output="X"/>
+            <key code="8" output="C"/>
+            <key code="9" output="V"/>
+            <key code="10" output="~"/>
+            <key code="11" output="B"/>
+            <key code="12" action="A-or-A-accents"/>
+            <key code="13" output="Z"/>
+            <key code="14" action="E-or-E-accents"/>
+            <key code="15" output="R"/>
+            <key code="16" action="Y-or-Y-accents"/>
+            <key code="17" output="T"/>
+            <key code="18" output="1"/>
+            <key code="19" output="2"/>
+            <key code="20" output="3"/>
+            <key code="21" output="4"/>
+            <key code="22" output="6"/>
+            <key code="23" output="5"/>
+            <key code="24" output="+"/>
+            <key code="25" output="9"/>
+            <key code="26" output="7"/>
+            <key code="27" output="°"/>
+            <key code="28" output="8"/>
+            <key code="29" output="0"/>
+            <key code="30" output="£"/>
+            <key code="31" action="O-or-O-accents"/>
+            <key code="32" action="U-or-U-accents"/>
+            <key code="33" action="state-setter:trema-deadkey"/>
+            <key code="34" action="I-or-I-accents"/>
+            <key code="35" output="P"/>
+            <key code="36" output="&#x000D;"/>
+            <key code="37" output="L"/>
+            <key code="38" output="J"/>
+            <key code="39" output="%"/>
+            <key code="40" output="K"/>
+            <key code="41" output="M"/>
+            <key code="42" output="μ"/>
+            <key code="43" output="."/>
+            <key code="44" output="§"/>
+            <key code="45" action="N-or-N-accents"/>
+            <key code="46" output="?"/>
+            <key code="47" output="/"/>
+            <key code="48" output="&#x0009;"/>
+            <key code="49" action="space"/>
+            <key code="50" output="&#x003E;"/>
+            <key code="51" output="&#x0008;"/>
+            <key code="52" output="&#x0003;"/>
+            <key code="53" output="&#x001B;"/>
+            <key code="65" output="."/>
+            <key code="66" output="*"/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="70" output="+"/>
+            <key code="71" output="&#x001B;"/>
+            <key code="72" output="="/>
+            <key code="75" output="/"/>
+            <key code="76" output="&#x0003;"/>
+            <key code="77" output="/"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
+            <key code="93" output="&#x003E;"/>
+            <key code="94" output="&#x003E;"/>
+            <key code="96" output="&#x0010;"/>
+            <key code="97" output="&#x0010;"/>
+            <key code="98" output="&#x0010;"/>
+            <key code="99" output="&#x0010;"/>
+            <key code="100" output="&#x0010;"/>
+            <key code="101" output="&#x0010;"/>
+            <key code="102" output="&#x0010;"/>
+            <key code="103" output="&#x0010;"/>
+            <key code="104" output="&#x0010;"/>
+            <key code="105" output="&#x0010;"/>
+            <key code="106" output="&#x0010;"/>
+            <key code="107" output="&#x0010;"/>
+            <key code="108" output="&#x0010;"/>
+            <key code="109" output="&#x0010;"/>
+            <key code="110" output="&#x0010;"/>
+            <key code="111" output="&#x0010;"/>
+            <key code="112" output="&#x0010;"/>
+            <key code="113" output="&#x0010;"/>
+            <key code="114" output="&#x0005;"/>
+            <key code="115" output="&#x0001;"/>
+            <key code="116" output="&#x000B;"/>
+            <key code="117" output="&#x007F;"/>
+            <key code="118" output="&#x0010;"/>
+            <key code="119" output="&#x0004;"/>
+            <key code="120" output="&#x0010;"/>
+            <key code="121" output="&#x000C;"/>
+            <key code="122" output="&#x0010;"/>
+            <key code="123" output="&#x001C;"/>
+            <key code="124" output="&#x001D;"/>
+            <key code="125" output="&#x001F;"/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+        <keyMap index="2">
+            <!-- note: ALT keymap -->
+            <key code="0" output=""/>
+            <key code="1" output=""/>
+            <key code="2" output=""/>
+            <key code="3" output=""/>
+            <key code="4" output=""/>
+            <key code="5" output=""/>
+            <key code="6" output=""/>
+            <key code="7" output=""/>
+            <key code="8" output=""/>
+            <key code="9" output=""/>
+            <key code="10" output=""/>
+            <key code="11" output=""/>
+            <key code="12" output=""/>
+            <key code="13" output=""/>
+            <key code="14" output=""/>
+            <key code="15" output=""/>
+            <key code="16" output=""/>
+            <key code="17" output=""/>
+            <key code="18" output="€"/>
+            <key code="19" action="state-setter:tilde-deadkey"/>
+            <key code="20" output="#"/>
+            <key code="21" output="{"/>
+            <key code="22" output="|"/>
+            <key code="23" output="["/>
+            <key code="24" output="}"/>
+            <key code="25" output="^"/>
+            <key code="26" action="state-setter:bquote-deadkey"/>
+            <key code="27" output="]"/>
+            <key code="28" output="\"/>
+            <key code="29" output="@"/>
+            <key code="30" output=""/>
+            <key code="31" output=""/>
+            <key code="32" output=""/>
+            <key code="33" output=""/>
+            <key code="34" output=""/>
+            <key code="35" output=""/>
+            <key code="36" output="&#x000D;"/>
+            <key code="37" output=""/>
+            <key code="38" output=""/>
+            <key code="39" output=""/>
+            <key code="40" output=""/>
+            <key code="41" output=""/>
+            <key code="42" output=""/>
+            <key code="43" output=""/>
+            <key code="44" output=""/>
+            <key code="45" output=""/>
+            <key code="46" output=""/>
+            <key code="47" output=""/>
+            <key code="48" output="&#x0009;"/>
+            <key code="49" output=" "/>
+            <key code="50" output=""/>
+            <key code="51" output="&#x0008;"/>
+            <key code="52" output="&#x0003;"/>
+            <key code="53" output="&#x001B;"/>
+            <key code="65" output=","/>
+            <key code="66" output="&#x001D;"/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="70" output="&#x001C;"/>
+            <key code="71" output="&#x001B;"/>
+            <key code="72" output="&#x001F;"/>
+            <key code="75" output="/"/>
+            <key code="76" output="&#x0003;"/>
+            <key code="77" output="&#x001E;"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
+            <key code="93" output="≤"/>
+            <key code="94" output="«"/>
+            <key code="96" output="&#x0010;"/>
+            <key code="97" output="&#x0010;"/>
+            <key code="98" output="&#x0010;"/>
+            <key code="99" output="&#x0010;"/>
+            <key code="100" output="&#x0010;"/>
+            <key code="101" output="&#x0010;"/>
+            <key code="102" output="&#x0010;"/>
+            <key code="103" output="&#x0010;"/>
+            <key code="104" output="&#x0010;"/>
+            <key code="105" output="&#x0010;"/>
+            <key code="106" output="&#x0010;"/>
+            <key code="107" output="&#x0010;"/>
+            <key code="108" output="&#x0010;"/>
+            <key code="109" output="&#x0010;"/>
+            <key code="110" output="&#x0010;"/>
+            <key code="111" output="&#x0010;"/>
+            <key code="112" output="&#x0010;"/>
+            <key code="113" output="&#x0010;"/>
+            <key code="114" output="&#x0005;"/>
+            <key code="115" output="&#x0001;"/>
+            <key code="116" output="&#x000B;"/>
+            <key code="117" output="&#x007F;"/>
+            <key code="118" output="&#x0010;"/>
+            <key code="119" output="&#x0004;"/>
+            <key code="120" output="&#x0010;"/>
+            <key code="121" output="&#x000C;"/>
+            <key code="122" output="&#x0010;"/>
+            <key code="123" output="&#x001C;"/>
+            <key code="124" output="&#x001D;"/>
+            <key code="125" output="&#x001F;"/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+    </keyMapSet>
+    <actions>
+        <!-- note: `id` is an arbitrary string -->
+        <action id="state-setter:carret-deadkey">
+            <when state="none" next="carret-deadkey"/>
+        </action>
+        <action id="state-setter:bquote-deadkey">
+            <when state="none" next="bquote-deadkey"/>
+        </action>
+        <action id="state-setter:trema-deadkey">
+            <when state="none" next="trema-deadkey"/>
+        </action>
+        <action id="state-setter:tilde-deadkey">
+            <when state="none" next="tilde-deadkey"/>
+        </action>
+        <action id="state-setter:fquote-deadkey">
+            <when state="none" next="fquote-deadkey"/>
+        </action>
+        <action id="space">
+            <when state="none" output=" "/>
+            <!-- note: This is how these symbols are inserted with deadkey+space! -->
+            <when state="carret-deadkey" output="^"/>
+            <when state="bquote-deadkey" output="`"/>
+            <when state="trema-deadkey" output="¨"/>
+            <when state="tilde-deadkey" output="~"/>
+            <when state="fquote-deadkey" output="´"/>
+        </action>
+        <action id="a-or-a-accents">
+            <when state="none" output="a"/>
+            <when state="carret-deadkey" output="â"/>
+            <when state="bquote-deadkey" output="à"/>
+            <when state="trema-deadkey" output="ä"/>
+            <when state="tilde-deadkey" output="ã"/>
+            <when state="fquote-deadkey" output="á"/>
+        </action>
+        <action id="A-or-A-accents">
+            <when state="none" output="A"/>
+            <when state="carret-deadkey" output="Â"/>
+            <when state="bquote-deadkey" output="À"/>
+            <when state="trema-deadkey" output="Ä"/>
+            <when state="tilde-deadkey" output="Ã"/>
+            <when state="fquote-deadkey" output="Á"/>
+        </action>
+        <action id="e-or-e-accents">
+            <when state="none" output="e"/>
+            <when state="carret-deadkey" output="ê"/>
+            <when state="bquote-deadkey" output="è"/>
+            <when state="trema-deadkey" output="ë"/>
+            <when state="fquote-deadkey" output="é"/>
+        </action>
+        <action id="E-or-E-accents">
+            <when state="none" output="E"/>
+            <when state="carret-deadkey" output="Ê"/>
+            <when state="bquote-deadkey" output="È"/>
+            <when state="trema-deadkey" output="Ë"/>
+            <when state="fquote-deadkey" output="É"/>
+        </action>
+        <action id="i-or-i-accents">
+            <when state="none" output="i"/>
+            <when state="carret-deadkey" output="î"/>
+            <when state="bquote-deadkey" output="ì"/>
+            <when state="trema-deadkey" output="ï"/>
+            <when state="fquote-deadkey" output="í"/>
+        </action>
+        <action id="I-or-I-accents">
+            <when state="none" output="I"/>
+            <when state="carret-deadkey" output="Î"/>
+            <when state="bquote-deadkey" output="Ì"/>
+            <when state="trema-deadkey" output="Ï"/>
+            <when state="fquote-deadkey" output="Í"/>
+        </action>
+        <action id="n-or-n-accents">
+            <when state="none" output="n"/>
+            <when state="tilde-deadkey" output="ñ"/>
+        </action>
+        <action id="N-or-N-accents">
+            <when state="none" output="N"/>
+            <when state="tilde-deadkey" output="Ñ"/>
+        </action>
+        <action id="o-or-o-accents">
+            <when state="none" output="o"/>
+            <when state="carret-deadkey" output="ô"/>
+            <when state="bquote-deadkey" output="ò"/>
+            <when state="trema-deadkey" output="ö"/>
+            <when state="tilde-deadkey" output="õ"/>
+            <when state="fquote-deadkey" output="ó"/>
+        </action>
+        <action id="O-or-O-accents">
+            <when state="none" output="O"/>
+            <when state="carret-deadkey" output="Ô"/>
+            <when state="bquote-deadkey" output="Ò"/>
+            <when state="trema-deadkey" output="Ö"/>
+            <when state="tilde-deadkey" output="Õ"/>
+            <when state="fquote-deadkey" output="Ó"/>
+        </action>
+        <action id="u-or-u-accents">
+            <when state="none" output="u"/>
+            <when state="carret-deadkey" output="û"/>
+            <when state="bquote-deadkey" output="ù"/>
+            <when state="trema-deadkey" output="ü"/>
+            <when state="fquote-deadkey" output="ú"/>
+        </action>
+        <action id="U-or-U-accents">
+            <when state="none" output="U"/>
+            <when state="carret-deadkey" output="Û"/>
+            <when state="bquote-deadkey" output="Ù"/>
+            <when state="trema-deadkey" output="Ü"/>
+            <when state="fquote-deadkey" output="Ú"/>
+        </action>
+        <action id="y-or-y-accents">
+            <when state="none" output="y"/>
+            <when state="trema-deadkey" output="ÿ"/>
+        </action>
+        <action id="Y-or-Y-accents">
+            <when state="none" output="Y"/>
+            <when state="trema-deadkey" output="Ÿ"/>
+        </action>
+    </actions>
+    <terminators>
+        <!-- note: These are used when in `^`+`z` so it sends `^z` -->
+        <when state="carret-deadkey" output="^"/>
+        <when state="bquote-deadkey" output="`"/>
+        <when state="trema-deadkey" output="¨"/>
+        <when state="tilde-deadkey" output="~"/>
+        <when state="fquote-deadkey" output="e"/>
+    </terminators>
+</keyboard>
