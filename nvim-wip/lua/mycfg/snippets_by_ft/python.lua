@@ -370,25 +370,40 @@ snip("ppj", {desc = "debug pretty print data as json", when = conds.start_of_lin
   { expr = SU.insert_node_default_selection(1, "data") }
 })
 
-snip("s", {desc = "self.X = X", when = conds.start_of_line}, SU.myfmt {
-  [[self.<name> = <name_again>]],
+snip("s", {desc = "self.X = …", when = conds.start_of_line}, SU.myfmt {
+  [[self.<name> = <value>]],
   {
-    name = i(1, "name"),
-    name_again = ls.choice_node(2, {
-      ls_extras.repeat_node(1), -- same name by default
-      i(nil),
-    }),
+    name = ls.choice_node(1, {
+      { t"_", ls.restore_node(1, "name") },
+      { ls.restore_node(1, "name") },
+    }, { restore_cursor = true }),
+    value = SU.insert_node_default_selection(2, "")
   },
+}, {
+  stored = {
+    name = i(nil, "name")
+  }
 })
 
-snip("s_", {desc = "self._X = X", when = conds.start_of_line}, SU.myfmt {
-  [[self._<name> = <name_again>]],
-  {
-    name = i(1, "name"),
-    name_again = ls.choice_node(2, {
-      ls_extras.repeat_node(1), -- same name by default
-      i(nil),
-    }),
+snip("ss", {desc = "self._?X = X (~repeated)", when = conds.start_of_line}, ls.choice_node(1, {
+  SU.myfmt {
+    [[self._<name_again> = <name>]],
+    {
+      name = ls.restore_node(1, "name"),
+      name_again = ls_extras.repeat_node(1), -- same as written node
+    },
+  },
+  SU.myfmt {
+    [[self.<name_again> = <name>]],
+    {
+      name = ls.restore_node(1, "name"),
+      name_again = ls_extras.repeat_node(1), -- same as written node
+    },
+  },
+}, { restore_cursor = true }), {
+  stored = {
+    -- Keys for ls.restore_node
+    name = i(nil, "name")
   },
 })
 
