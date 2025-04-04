@@ -221,8 +221,8 @@ function segmt::python_venv
   elif [[ "${POETRY_ACTIVE}" == 1 ]]; then
     venv_display+=" poetry"
   else
-    # Add venv name if not 'venv'
-    if [[ "$venv_dir" != "venv" ]]; then
+    # Add venv name if it's not 'venv' nor '.venv'
+    if [[ "$venv_dir" != "venv" ]] && [[ "$venv_dir" != ".venv" ]]; then
       if [[ -n "$PROMPT_VENV_SHORT" ]]; then
         # For $venv_dir == `Py3.9.7-231c4f5db9de5be7df4255ec41a3139b`
         # -> prints `'Py3.9.7-231c~'`

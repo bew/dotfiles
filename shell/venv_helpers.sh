@@ -64,7 +64,7 @@ function _venv__echo2
   >&2 echo
 }
 
-VENV_DEFAULT_DIR="${VENV_DEFAULT_DIR:-venv}"
+VENV_DEFAULT_DIR="${VENV_DEFAULT_DIR:-.venv}"
 
 function _venv__ensure_exists
 {
