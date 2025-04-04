@@ -45,19 +45,19 @@ end
 
 snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line}, function()
   return ls.choice_node(1, {
-    ls.snippet_node(nil, SU.myfmt {
+    SU.myfmt {
       [[---@class <name>]],
       {
         name = ls.restore_node(1, "class_name"),
       }
-    }),
-    ls.snippet_node(nil, SU.myfmt {
+    },
+    SU.myfmt {
       [[---@class <name>: <inherit_from>]],
       {
         name = ls.restore_node(1, "class_name"),
         inherit_from = i(2, "InheritFromClass")
       }
-    }),
+    },
   }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
 end, {
   stored = { class_name = i(nil, "ClassName") },
@@ -74,13 +74,13 @@ snip_lua_annotation("@dd", {desc = "LuaCATS @diagnostic disable-for-x"}, functio
       -- IDEA: could default to the diag name of the first hint/warning on the line current/below
       diags = i(2),
       maybe_why = ls.choice_node(3, {
-        ls.snippet_node(nil, SU.myfmt {
+        SU.myfmt {
           "<space>(<why>)",
           {
             space = t" ", -- (putting it in fmt trims it automatically..)
             why = i(1, "TODO: Reason 🤔"),
           }
-        }),
+        },
         t"",
       }),
     }
@@ -237,21 +237,21 @@ snip("forn", {desc = "for n in range (including end)", when = conds.start_of_lin
   {
     idx = i(1, "n"),
     range = ls.choice_node(2, {
-      ls.snippet_node(nil, SU.myfmt {
+      SU.myfmt {
         "<start>, <end_>",
         {
           start = ls.restore_node(1, "start"),
           end_ = ls.restore_node(2, "end_"),
         }
-      }),
-      ls.snippet_node(nil, SU.myfmt {
+      },
+      SU.myfmt {
         "<start>, <end_>, <step>",
         {
           start = ls.restore_node(1, "start"),
           end_ = ls.restore_node(2, "end_"),
           step = i(3, "-1"),
         },
-      }),
+      },
     }, {
       -- Seemlessly keep cursor pos across choice branches ✨
       restore_cursor = true
@@ -320,7 +320,7 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
   ]],
   {
     maybe_name = ls.choice_node(1, {
-      ls.snippet_node(nil, {t" ", i(1, "function_name")}),
+      { t" ", i(1, "function_name") },
       t"",
     }),
     args = i(2),
@@ -334,14 +334,14 @@ snip("fn", {desc = "annotation for function type", when = conds.line_before_matc
   {
     args = ls.choice_node(1, {
       i(nil),
-      ls.snippet_node(nil, SU.myfmt {
+      SU.myfmt {
         [[<param>: <ty><maybe_more>]],
         {
           param = i(1, "param"),
           ty = i(2, "any"),
           maybe_more = i(3),
         },
-      }),
+      },
     }),
     ret = i(2, "any"),
   }

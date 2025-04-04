@@ -111,10 +111,10 @@ snip("fnt", {desc = "Unit test function"}, SU.myfmt {
 local function node_for_maybe_fmt_msg(idx)
   return ls.choice_node(idx, {
     i(nil), -- for manual entry if wanted, or as a stoppoint for the choice node
-    ls.snippet_node(nil, SU.myfmt {
+    SU.myfmt {
       [[, "<msg>"<fmt_args>]],
       { msg = i(1, "TODO: custom msg!"), fmt_args = i(2) }
-    }),
+    },
   })
 end
 

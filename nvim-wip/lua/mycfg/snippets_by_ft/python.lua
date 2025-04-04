@@ -25,7 +25,7 @@ snip("cl", {desc = "class def", when = conds.very_start_of_line}, SU.myfmt {
     name = i(1, "MyClass"),
     maybe_parents = ls.choice_node(2, {
       t"",
-      ls.snippet_node(nil, {t"(", i(1, "object"), t")"})
+      { t"(", i(1, "object"), t")" },
     }),
     body = SU.insert_node_default_selection(3, "pass"),
   }
@@ -41,11 +41,11 @@ snip("da", {desc = "dataclass def", when = conds.very_start_of_line}, SU.myfmt {
     name = i(1, "MyData"),
     maybe_decor_params = ls.choice_node(2, {
       t"",
-      ls.snippet_node(nil, {t"(", i(1), t")"}),
+      { t"(", i(1), t")" },
     }),
     maybe_parents = ls.choice_node(3, {
       t"",
-      ls.snippet_node(nil, {t"(", i(1, "object"), t")"}),
+      { t"(", i(1, "object"), t")" },
     }),
     body = SU.insert_node_default_selection(4, "pass"),
   }
@@ -110,14 +110,14 @@ local function make_def_snip(opts)
       ),
       maybe_arg = (
         opts.maybe_arg and ls.choice_node(next_insert_idx(), {
-          ls.snippet_node(nil, { (opts.first_arg_name and t", " or t""), i(1, "arg") }),
+          { (opts.first_arg_name and t", " or t""), i(1, "arg") },
           t"",
         })
         or t"" -- nothing
       ),
       maybe_return_type = (
         opts.maybe_return_type and ls.choice_node(next_insert_idx(), {
-          ls.snippet_node(nil, {t" -> ", i(1, "Any")}),
+          { t" -> ", i(1, "Any") },
           t"",
         })
         or opts.needs_return_type and ls.snippet_node(next_insert_idx(), {t" -> ", i(1, "Any")})
@@ -420,7 +420,7 @@ snip("try", {desc = "try … except …", when = conds.start_of_line}, SU.myfmt 
     body = SU.insert_node_default_selection(1, "# do something useful.."),
     ex_type = i(2, "SomeException"),
     maybe_ex_name = ls.choice_node(3, {
-      ls.snippet_node(nil, {t" as ", i(1, "err")}),
+      { t" as ", i(1, "err") },
       t"",
     }),
     handler = i(4, "pass"),
@@ -435,7 +435,7 @@ snip("ex", {desc = "except …", when = conds.start_of_line}, SU.myfmt {
   {
     ex_type = i(1, "SomeException"),
     maybe_ex_name = ls.choice_node(2, {
-      ls.snippet_node(nil, {t" as ", i(1, "err")}),
+      { t" as ", i(1, "err") },
       t"",
     }),
     handler = i(3, "pass"),
@@ -464,21 +464,21 @@ snip("forn", {desc = "for n in range", when = conds.start_of_line}, SU.myfmt {
     item = i(1, "item"),
     range_args = ls.choice_node(2, {
       i(nil, "num_iterations"),
-      ls.snippet_node(nil, SU.myfmt {
+      SU.myfmt {
         "<start>, <end_>",
         {
           start = ls.restore_node(1, "start"),
           end_ = ls.restore_node(2, "end_"),
         }
-      }),
-      ls.snippet_node(nil, SU.myfmt {
+      },
+      SU.myfmt {
         "<start>, <end_>, <step>",
         {
           start = ls.restore_node(1, "start"),
           end_ = ls.restore_node(2, "end_"),
           step = i(3, "-1"),
         },
-      }),
+      },
     }, {
       -- Seemlessly keep cursor pos across choice branches
       restore_cursor = true
