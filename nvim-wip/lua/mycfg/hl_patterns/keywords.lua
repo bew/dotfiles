@@ -40,7 +40,7 @@ patterns.big_note = {
 
 -- e.g. note: a small note..
 patterns.small_note = {
-  pattern = "note:",
+  pattern = _U.keywordize"note:",
   group = _U.define_hl("small_note", {
     ctermfg = 32,
   }),
@@ -68,7 +68,7 @@ patterns.big_idea = {
   }),
 }
 patterns.small_idea = {
-  pattern = _big_word_variants"idea:",
+  pattern = _U.keywordize"idea:",
   group = _U.define_hl("small_idea", {
     ctermfg = 134,
     underdotted = true,
@@ -95,6 +95,9 @@ patterns.big_warning = {
   pattern = U.concat_lists {
     _big_word_variants"WARN",
     _big_word_variants"WARNING",
+    {
+      _U.keywordize"warn:",
+    },
   },
   group = _U.define_hl("big_warning", {
     ctermfg = 11,
@@ -120,6 +123,10 @@ patterns.big_goal = {
     _big_word_variants"RESULT",
     _big_word_variants"RESULTS",
     _big_word_variants"RESULTs",
+    {
+      _U.keywordize"goal:",
+      _U.keywordize"results?:",
+    },
   },
   group = _U.define_hl("big_goal", {
     ctermfg = 202,
