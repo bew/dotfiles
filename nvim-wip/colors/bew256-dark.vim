@@ -303,7 +303,7 @@ HiResetTo @markup.raw.block ctermfg=29
 " Give a progression/difference between H1, H2, H3.. headings
 " NOTE: hl groups shared between markdown & :help files (at least).
 " -- H1
-HiResetTo @markup.heading.1    cterm=bold ctermfg=160
+HiResetTo @markup.heading.1    cterm=bold ctermfg=196
 HiResetTo @markup.heading.1.bg cterm=bold ctermbg=237
 " -- H2
 HiResetTo @markup.heading.2    cterm=bold ctermfg=39
