@@ -26,16 +26,17 @@ snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
 
 --- Generate easy-to-use snippets for the given LuaCATS @annotation
 ---@param trig string
----@param context table
----@param nodes_factory fun(): table
+---@param context mysnips.Context
+---@param nodes_factory (fun(): SnipNodeT)
 local function snip_lua_annotation(trig, context, nodes_factory, ...)
-  assert(trig:sub(1, 1) == "@", "annotation trigger must start with '@'")
+  assert(trig:sub(1, 1) == "@", "annotation's trigger must start with '@'")
+  assert(type(nodes_factory) == "function", "annotation's nodes factory must be a function, got: "..type(nodes_factory))
+  local trig_without_at = trig:sub(2)
   do
     -- Allows `---@foo|` or `---foo|` => `---@foo_or_foobar |`
     -- (must be first to have a chance to match before `@foo` below)
-    local trig_without_at = trig:sub(2)
-    local context = vim.tbl_extend("keep", context, { trigEngine = "pattern" })
-    snip("%-%-%-@?"..trig_without_at, context, nodes_factory(), ...)
+    local context_rx = vim.tbl_extend("keep", context, { trigEngine = "pattern" })
+    snip("%-%-%-@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
     -- Allows `@foo|` => `---@foo_or_foobar |`

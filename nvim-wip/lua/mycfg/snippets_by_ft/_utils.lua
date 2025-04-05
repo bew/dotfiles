@@ -1,10 +1,10 @@
 local ls = require"luasnip"
-local fmt = require"luasnip.extras.fmt".format_nodes
+local ls_fmt = require"luasnip.extras.fmt".format_nodes
 local U = require"mylib.utils"
 
 local SU = {}
 
----@alias SnipNodeT table
+---@class SnipNodeT
 ---...
 
 ---@class SnipT
@@ -14,6 +14,21 @@ local SU = {}
 ---@class mysnips.FileTypeSetupArgs
 ---@field filetype string The filetype to extend
 ---@field inherits_from string[] The additional collections of snippets to use for `ft`
+
+---@alias mysnips.ContextCondition
+---| (fun(line_to_cursor: string, matched_trigger: string, captures): boolean)
+---| any (for the magic condition objects, since LuaLS does not support metamethod checks..)
+
+-- TMP, Until it is impl in LuaSnip!
+---@class LS.SnipContext: table
+---@field trig string
+---@field condition? mysnips.ContextCondition
+---@field resolveExpandParams? any
+
+---@class mysnips.Context: LS.SnipContext
+---@field desc? string
+---@field when? mysnips.ContextCondition
+---@field resolver? any
 
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
 ---@param args mysnips.FileTypeSetupArgs Args table
@@ -44,10 +59,16 @@ end
 --
 -- FIXME: support multiple triggers
 --   !!! luasnip doesn't seem to support to assign the same 'context' to 2 snippets :/
+---@param list_of_snippets SnipT[]
 SU.get_snip_fn = function(list_of_snippets)
-  return function(trigger, context, ...)
+  --- Define snippet!
+  ---@param trigger string
+  ---@param context mysnips.Context
+  ---@param nodes SnipNodeT|SnipNodeT[]
+  ---@param opts? table
+  return function(trigger, context, nodes, opts)
     context.trig = trigger
-    context.condition = context.cond or context.when or nil
+    context.condition = context.when or nil
     context.resolveExpandParams = context.resolveExpandParams or context.resolver or nil
     -- IDEA: add feature system, to compose context features like resolveExpandParams 🤔
     -- I want to be able to define a snip like:
@@ -66,7 +87,7 @@ SU.get_snip_fn = function(list_of_snippets)
     --     {"other-trig!", feats = {weird_stuff_fn}},
     --     common = {desc = ..., when = common_condition_fn}
     --   }, ...)
-    table.insert(list_of_snippets, ls.snippet(context, ...))
+    table.insert(list_of_snippets, ls.snippet(context, nodes, opts))
   end
 end
 
@@ -88,13 +109,13 @@ SU.myfmt = function(args)
     -- Use `<foo>` by default for placeholders instead of `{foo}`
     args[3].delimiters = "<>"
   end
-  return fmt(unpack(args))
+  return ls_fmt(unpack(args))
 end
 
 -- Same as the builtin luasnip fmt, using `{}` delimiters
 ---@param args [string, table, table?]
 SU.myfmt_braces = function(args)
-  return fmt(unpack(args))
+  return ls_fmt(unpack(args))
 end
 
 ---@return {row: integer, col: integer}
