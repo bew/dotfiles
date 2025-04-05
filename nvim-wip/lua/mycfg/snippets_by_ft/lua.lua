@@ -39,12 +39,28 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
     snip("%-%-%-@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
+    -- [EXPERIMENT]: let's see if it's better to use `anfoo` or `dfoo`
+    -- Allows `anfoo|` => `---@foo_or_foobar |`
+    -- This is nicer to type on my external split keyboard,
+    -- as the snip-trigger finger is also used for `@`
+    local context_copy = vim.tbl_extend("keep", context, {})
+    snip("an"..trig_without_at, context_copy, nodes_factory(), ...)
+  end
+  do
+    -- [EXPERIMENT]: let's see if it's better to use `anfoo` or `dfoo`
+    -- Allows `dfoo|` => `---@foo_or_foobar |`
+    -- This is nicer to type on my external split keyboard,
+    -- as the snip-trigger finger is also used for `@`
+    local context_copy = vim.tbl_extend("keep", context, {})
+    snip("d"..trig_without_at, context_copy, nodes_factory(), ...)
+  end
+  do
     -- Allows `@foo|` => `---@foo_or_foobar |`
     snip(trig, context, nodes_factory(), ...)
   end
 end
 
-snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line}, function()
+local function get_class_annotation_nodes()
   return ls.choice_node(1, {
     SU.myfmt {
       [[---@class <name>]],
@@ -60,7 +76,11 @@ snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line},
       }
     },
   }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
-end, {
+end
+snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes, {
+  stored = { class_name = i(nil, "ClassName") },
+})
+snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes(), {
   stored = { class_name = i(nil, "ClassName") },
 })
 
@@ -123,7 +143,7 @@ local function anno_from_capture(_args, snip)
     fo = "field protected",
     g = "generic",
     m = "module",
-    o = "overload",
+    ol = "overload",
     p = "param",
     pri = "private",
     pro = "protected",
