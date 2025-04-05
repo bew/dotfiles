@@ -16,7 +16,7 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- TODO: Split snips in multiple files for **large** topics 🤔
 
-snip("cl", {desc = "class def", when = conds.very_start_of_line}, SU.myfmt {
+snip("cl", {desc = "class def", when = conds.start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
         <body>
@@ -31,7 +31,7 @@ snip("cl", {desc = "class def", when = conds.very_start_of_line}, SU.myfmt {
   }
 })
 
-snip("da", {desc = "dataclass def", when = conds.very_start_of_line}, SU.myfmt {
+snip("dc", {desc = "data-only class", when = conds.start_of_line}, SU.myfmt {
   [[
     @dataclass<maybe_decor_params>
     class <name><maybe_parents>:
@@ -51,9 +51,10 @@ snip("da", {desc = "dataclass def", when = conds.very_start_of_line}, SU.myfmt {
   }
 })
 
-snip("fda", {desc = "import for @dataclass", when = conds.very_start_of_line}, {
-  t[[from dataclasses import dataclass]]
-})
+snip("fdc", {desc = "import for @dataclass", when = conds.start_of_line}, ls.choice_node(1, {
+  t[[from dataclasses import dataclass]],
+  t[[from pydantic.dataclasses import dataclass]],
+}))
 
 -------------------
 
@@ -272,7 +273,7 @@ snip(
 snip(
   "defp", { desc = "property def", when = conds.after_indent },
   make_def_snip {
-    decor_name = "property",
+    decor_name = "property", -- TODO: allow choice_node with `property` / `cached_property`
     default_name = "prop_name",
     first_arg_name = "self",
     return_type = true, -- not optional
