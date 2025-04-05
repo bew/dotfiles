@@ -47,7 +47,10 @@ patterns.small_note = {
 }
 
 patterns.big_fixme = {
-  pattern = _big_word_variants"FIXME",
+  pattern = U.concat_lists {
+    _big_word_variants"FIXME",
+    _big_word_variants"TMP!",
+  },
   group = _U.define_hl("big_fixme", {
     ctermfg = 160,
     underdashed = true,
@@ -238,8 +241,13 @@ patterns.sym_excl = {
 }
 
 -- e.g. oh yeah <3
+-- e.g. (or in a note <3)
+-- But not `<3.0`
 patterns.sym_heart = {
-  pattern = "<3",
+  pattern = {
+    "()<3()$",
+    "()<3()[^%.]",
+  },
   group = _U.define_hl("sym_heart", {
     ctermfg = 204,
     bold = true,
@@ -255,6 +263,9 @@ patterns.misc_light_words = {
     _big_word_variants"WANT",
     _big_word_variants"REF",
     _big_word_variants"REFs",
+    {
+      _U.keywordize"tmp:",
+    },
   },
   group = _U.define_hl("misc_light_words", {
     ctermfg = 253,
@@ -276,18 +287,26 @@ patterns.misc_lighter_words = {
   }),
 }
 
+local function heavy_word_variants(word)
+  return U.concat_lists {
+    _big_word_variants(word),
+    -- This one is useful to make kind of sections of that word
+    { "%[" .. word .. "%]:?" },
+  }
+end
 patterns.misc_heavy_words = {
   pattern = U.concat_lists {
-    {
-      _U.keywordize"DOC",
-    },
-    _big_word_variants"TOTRY",
-    _big_word_variants"TOTHINK",
-    _big_word_variants"TOCHECK",
-    _big_word_variants"IMPORTANT",
-    _big_word_variants"ASK",
-    _big_word_variants"FEEDBACK",
-    _big_word_variants"WIP",
+    heavy_word_variants"DOC",
+    heavy_word_variants"TOTRY",
+    heavy_word_variants"TOTHINK",
+    heavy_word_variants"TOCHECK",
+    heavy_word_variants"IMPORTANT",
+    heavy_word_variants"ASK",
+    heavy_word_variants"FEEDBACK",
+    heavy_word_variants"WIP",
+    heavy_word_variants"EXPERIMENT",
+    -- note: TMP != TMP! (tmp! is shorter tmp potentially has no end date 😬)
+    heavy_word_variants"TMP:",
   },
   group = _U.define_hl("misc_big_words", {
     ctermfg = 253,
