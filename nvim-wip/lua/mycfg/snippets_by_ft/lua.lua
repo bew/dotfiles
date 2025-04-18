@@ -184,10 +184,16 @@ snip("l", {desc = "local var = …"}, ls.dynamic_node(1, function()
     return ls.snippet_node(nil, t"local ")
   else
     return ls.snippet_node(nil, SU.myfmt {
-      [[local <var> = <value>]],
+      [[local <var><assignment>]],
       {
         var = i(1, "var"),
-        value = SU.insert_node_default_selection(2),
+        assignment = ls.choice_node(2, {
+          SU.myfmt_no_strip {
+            [[ = <value>]],
+            { value = SU.insert_node_default_selection(1) }
+          },
+          t"",
+        }),
       },
     })
   end

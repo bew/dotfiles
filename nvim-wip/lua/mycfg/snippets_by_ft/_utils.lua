@@ -122,7 +122,16 @@ SU.myfmt = function(args)
   return ls_fmt(unpack(args))
 end
 
--- Same as the builtin luasnip fmt, using `{}` delimiters
+--- Same as `myfmt`, disabling trim & dedent for the format string
+---@param args mysnips.MyFmtArgs
+SU.myfmt_no_strip = function(args)
+  args.opts = args.opts or {}
+  args.opts.trim_empty = false
+  args.opts.dedent = false
+  return SU.myfmt(args)
+end
+
+--- Same as `myfmt`, using `{}` delimiters (like the builtin luasnip fmt)
 ---@param args mysnips.MyFmtArgs
 SU.myfmt_braces = function(args)
   args.opts = args.opts or {}
