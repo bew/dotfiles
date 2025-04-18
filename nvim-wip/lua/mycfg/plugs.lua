@@ -124,6 +124,8 @@ Plug {
         -- navigate in history
         toplevel_buf_map{mode="i", key="<M-j>", action="<Plug>(neorepl-hist-next)"}
         toplevel_buf_map{mode="i", key="<M-k>", action="<Plug>(neorepl-hist-prev)"}
+        toplevel_buf_map{mode="i", key="<Down>", action="<Plug>(neorepl-hist-next)"}
+        toplevel_buf_map{mode="i", key="<Up>", action="<Plug>(neorepl-hist-prev)"}
         -- toplevel_buf_map{mode="i", key="<M-k>", opts={expr=true}, action=function()
         --   -- FIXME: if cursor is at top line of editable region
         --   return "<Plug>(neorepl-hist-prev)"
