@@ -276,7 +276,26 @@ alias e="nvim"
 alias v="nvim -R"
 # e: edit | v: view
 
-alias ewip="nvim-original -u ~/.dot/nvim-wip/init.lua"
+# Edit scratch buffer with given file extension (immediate insert mode!)
+function ef
+{
+  local extension="$1"
+  local script="
+    vim.cmd'filetype on'
+    local ft = vim.filetype.match { filename = 'foo.$extension' }
+    io.write(tostring(ft))
+  "
+  local filetype=$(echo "$script" | nvim --headless -l -)
+  # echo "filetype=$filetype" # DEBUG
+  if [[ -z "$filetype" ]] || [[ "$filetype" == "nil" ]]; then
+    >&2 echo "/!\\ Unknown extension, using filetype=$extension"
+    filetype="$extension"
+  else
+    >&2 echo "Deduced filetype=$filetype"
+  fi
+
+  nvim +enew +"setf $filetype" +"set buftype=nofile" +startinsert
+}
 
 
 # rg
