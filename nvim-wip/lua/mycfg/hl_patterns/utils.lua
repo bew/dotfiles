@@ -7,11 +7,11 @@ local U = {}
 function U.keywordize(pattern)
   if pattern:match("^%w") then
     -- Start of pattern is a word, add frontier
-    pattern = "%f[%w]()" .. pattern
+    pattern = "%f[%w_-]()" .. pattern
   end
   if pattern:match("%w$") then
     -- End of pattern is a word, add frontier
-    pattern = pattern .. "()%f[%W]"
+    pattern = pattern .. "()%f[%W_-]"
   end
   return pattern
 end
