@@ -174,13 +174,24 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   { module = i(1, "module") },
 })
 
-snip("l", {desc = "local var = …"}, SU.myfmt {
-  [[local <var> = <value>]],
-  {
-    var = i(1, "var"),
-    value = SU.insert_node_default_selection(2),
-  },
-})
+snip("l", {desc = "local var = …"}, ls.dynamic_node(1, function()
+  local line = vim.api.nvim_get_current_line()
+  local _row, col0 = unpack(vim.api.nvim_win_get_cursor(0))
+  local rest_of_line = line:sub(col0 +1)
+  if rest_of_line:match("^[^ ]+ =") then
+    -- rest_of_line looks like `|foo = ...`
+    -- only add `local`
+    return ls.snippet_node(nil, t"local ")
+  else
+    return ls.snippet_node(nil, SU.myfmt {
+      [[local <var> = <value>]],
+      {
+        var = i(1, "var"),
+        value = SU.insert_node_default_selection(2),
+      },
+    })
+  end
+end))
 
 -- NOTE: By default, use custom name for <var>.
 -- But I want choice to auto-set <var> as the last part of <modulepath>.

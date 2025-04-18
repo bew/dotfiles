@@ -194,6 +194,13 @@ end
 SU.insert_node_default_selection = function(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, snip)
+    -- Find top-level snippet (only one with non-nil `env`!)
+    -- FIXME: For some reason `ls.get_active_snip()` returns None 👀
+    -- local top_snip = ls.get_active_snip()
+    while snip.parent do
+      snip = snip.parent
+    end
+
     local maybe_after_node = ls.text_node""
     if SU.has_stored_selection(snip) then
       -- override default text with last selection
