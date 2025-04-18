@@ -678,6 +678,34 @@ global_leader_map{mode="n", key="<C-j>", desc="Split down", action=function() di
 global_leader_map{mode="n", key="<C-k>", desc="Split up", action=function() directional_split("up") end}
 global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function() directional_split("right") end}
 
+-- New file by directional split (or current)
+-- TODO: Make configurable action!
+--
+---@param new_win "current"|"left"|"down"|"up"|"right" Direction to split for, or current win
+local function make_new_file_action(new_win)
+  local desc
+  if new_win == "current" then
+    desc = "in current win"
+  else
+    desc = new_win .. " split"
+  end
+  return mk_action_v2 {
+    default_desc = "New file ("..desc..")",
+    n = function()
+      if new_win ~= "current" then
+        directional_split(new_win)
+      end
+      vim.cmd.enew()
+    end,
+  }
+end
+global_leader_map_define_group{mode="n", prefix_key="<C-n>", name="+new-file"}
+global_leader_map{mode="n", key="<C-n><C-n>", action=make_new_file_action("current")}
+global_leader_map{mode="n", key="<C-n><C-h>", action=make_new_file_action("left")}
+global_leader_map{mode="n", key="<C-n><C-j>", action=make_new_file_action("down")}
+global_leader_map{mode="n", key="<C-n><C-k>", action=make_new_file_action("up")}
+global_leader_map{mode="n", key="<C-n><C-l>", action=make_new_file_action("right")}
+
 -- Focus windows by WinNr
 -- <C-w>N   -> N<C-w>w
 --
