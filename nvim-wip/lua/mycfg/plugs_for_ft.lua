@@ -160,8 +160,8 @@ Plug.lazydev_lua {
   on_load = function()
     require"lazydev".setup {
       library = {
-        -- Only load luvit types when the `vim.uv` word is found
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
+        -- Only load luvit types when the `vim.uv` or `vim.loop` word is found
+        { path = "luvit-meta/library", words = { "vim%.uv", "vim%.loop" } },
       }
     }
   end,
