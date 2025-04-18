@@ -43,8 +43,11 @@ Plug.codecompanion {
 
     -- NOTE: `ca` mode is a special mode to create Commandline Abbreviations
     -- SEE: `:h nvim_set_keymap()`
-    -- > Use "ia", "ca" or "!a" for abbreviation in Insert, Cmdline, or both (respectively)
+    -- > Use "ia", "ca" for abbreviation in Insert, Cmdline mode (respectively)
     -- TODO: make a toplevel_abbr("c", ...) helper function or similar
     vim.keymap.set("ca", "cc", "CodeCompanion")
+    vim.keymap.set("ca", "ccx", "CodeCompanion explain:")
+    vim.keymap.set("ca", "ccc", "CodeCompanionChat")
+    vim.keymap.set("ca", "ccb", "CodeCompanionChat #buffer")
   end,
 }
