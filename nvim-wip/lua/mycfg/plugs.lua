@@ -338,6 +338,7 @@ require"mycfg.plugs_for_ft"
 require"mycfg.plugs_for_git"
 require"mycfg.plugs_for_file_editing"
 require"mycfg.plugs_for_treesitter"
+require"mycfg.plugs_for_ai_llm"
 
 PluginSystem.check_missing_plugins()
 return PluginSystem.all_plugin_specs()

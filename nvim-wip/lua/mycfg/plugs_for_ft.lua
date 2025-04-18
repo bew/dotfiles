@@ -18,7 +18,10 @@ Plug {
   source = gh"MeanderingProgrammer/render-markdown.nvim",
   desc = "Plugin to improve viewing Markdown files in Neovim",
   tags = {t.ft_support, t.content_ui},
-  defer_load = { on_event = "VeryLazy", on_ft = "markdown" },
+  defer_load = {
+    on_event = "VeryLazy",
+    on_ft = { "markdown", "codecompanion" },
+  },
   depends_on = {
     Plug.ts,
     Plug.lib_web_devicons,
