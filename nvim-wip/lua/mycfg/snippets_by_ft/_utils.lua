@@ -30,6 +30,15 @@ local SU = {}
 ---@field when? mysnips.ContextCondition
 ---@field resolver? any
 
+---@class LS.FmtOpts
+---@field trim_empty boolean
+---@field dedent boolean
+---@field delimiters string
+
+---@class mysnips.FmtOpts: LS.FmtOpts
+
+---@alias mysnips.MyFmtArgs {[1]: string, [2]: table, [3]: mysnips.FmtOpts?, opts: mysnips.FmtOpts?}
+
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
 ---@param args mysnips.FileTypeSetupArgs Args table
 SU.filetype_setup = function(args)
@@ -99,23 +108,26 @@ end
 -- NOTE: fmt already returns a list of nodes and we can't nest thoses, so we need to pass
 --   fmt(...) directly to snip (or as a choiceNode item).
 --   ref: https://github.com/L3MON4D3/LuaSnip/issues/828#issuecomment-1472643275
----@param args [string, table, table?]
+---@param args mysnips.MyFmtArgs
 SU.myfmt = function(args)
   -- args[1] is the fmt string,
   -- args[2] is the set of nodes,
   -- args[3] is the set of options,
-  args[3] = args[3] or {}
-  if args[3].delimiters == nil then
+  local opts = args.opts or args[3] or {}
+  if opts.delimiters == nil then
     -- Use `<foo>` by default for placeholders instead of `{foo}`
-    args[3].delimiters = "<>"
+    opts.delimiters = "<>"
   end
+  args[3] = opts
   return ls_fmt(unpack(args))
 end
 
 -- Same as the builtin luasnip fmt, using `{}` delimiters
----@param args [string, table, table?]
+---@param args mysnips.MyFmtArgs
 SU.myfmt_braces = function(args)
-  return ls_fmt(unpack(args))
+  args.opts = args.opts or {}
+  args.opts.delimiters = "{}"
+  return SU.myfmt(args)
 end
 
 ---@return {row: integer, col: integer}
