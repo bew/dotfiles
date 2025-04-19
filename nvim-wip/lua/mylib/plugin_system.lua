@@ -114,9 +114,13 @@ local CallToRegisterPlugin_mt = {
     self.__is_placeholder_plugin_spec = nil
     -- copy all spec fields to the existing/stored spec
     for k, v in pairs(spec_fields) do self[k] = v end
+    ---@diagnostic disable-next-line: param-type-mismatch (self is augmented now)
     DeclaratorImpl.check_plugin_declaration(self)
   end,
 }
+
+---@class plugin_system.DeclaratorDefaults
+---@field default_tags? (string|plugin_system.PlugTagSpec)[]
 
 -- The magic table metadata that makes the following syntax possible:
 -- ```
@@ -129,7 +133,12 @@ local CallToRegisterPlugin_mt = {
 -- Plug.bar { config_depends_on = { Plug { on-the-fly spec } }, ... spec for plugin named 'bar' }
 -- -- This saves the spec into original table, so earlier/later references can access everything
 -- ```
-function DeclaratorImpl.get_plugin_declarator()
+---@param defaults? plugin_system.DeclaratorDefaults
+function DeclaratorImpl.get_plugin_declarator(defaults)
+  ---@type plugin_system.DeclaratorDefaults
+  local plugin_defaults = vim.tbl_extend("keep", defaults or {}, {
+    default_tags = {}
+  })
   return setmetatable({ _IS_PLUGIN_DECLARATOR = true }, {
     ---@param plugin_spec plugin_system.PluginSpec
     ---@return plugin_system.PluginSpec
@@ -138,6 +147,7 @@ function DeclaratorImpl.get_plugin_declarator()
       if plugin_spec._IS_PLUGIN_DECLARATOR then
         error("!! Decl is passed to itself??")
       end
+      plugin_spec.tags = vim.list_extend(plugin_spec.tags or {}, plugin_defaults.default_tags)
       return DeclaratorImpl.register_anon_plugin(plugin_spec)
     end,
     ---@return plugin_system.PluginSpec
@@ -156,16 +166,17 @@ end
 --- * Use `Plug.foo` to refer to a named plugin (may be undefined at this point)
 --- * Use `Plug.foo { ... }` to define a named plugin
 M.PlugDeclarator = DeclaratorImpl.get_plugin_declarator()
+M.get_plugin_declarator = DeclaratorImpl.get_plugin_declarator
 
 --------------------------------
 
 -- IDEA: attach plugin behavior / load pattern based on tags?
 
----@class PlugTagSpec
+---@class plugin_system.PlugTagSpec
 ---@field name string
 ---@field desc string
 
----@type {[string]: PlugTagSpec}
+---@type {[string]: plugin_system.PlugTagSpec}
 M.tags = setmetatable({}, {
   __index = KeyRefMustExist_mt.__index,
   ---@param name string

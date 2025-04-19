@@ -1,0 +1,5 @@
+require"mycfg.plugs.for_ui.general_ui"
+require"mycfg.plugs.for_ui.libs"
+require"mycfg.plugs.for_ui.editor_ui"
+require"mycfg.plugs.for_ui.fuzzy"
+require"mycfg.plugs.for_ui.file_nav"
