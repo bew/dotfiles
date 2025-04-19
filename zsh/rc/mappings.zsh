@@ -9,13 +9,23 @@
 # => Where to put clipboard stuff? in a seperate plugin? (mostly specific to my setup then)
 
 
-# Checks if we are in a git repository, displays a ZLE message otherwize.
+# Checks if we are in a git repository, displays the error as a ZLE message otherwize.
 function zle::utils::check_git
 {
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    zle -M "Error: Not a git repository"
+  local out
+  out=$(git rev-parse --is-inside-work-tree 2>&1)
+  local ret=$?
+  if [[ $ret -ne 0 ]]; then
+    local err_summary
+    if [[ "$out" == "fatal: not a git repository"* ]]; then
+      err_summary="Not a git repository"
+    else
+      err_summary=$(head -n1 <<<$out)
+    fi
+    zle -M "git: $err_summary (code: $ret)"
     return 1
   fi
+  return 0
 }
 
 # Run the given command from a zle widget, as if it was written by the user
