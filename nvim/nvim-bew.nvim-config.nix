@@ -5,7 +5,7 @@ let
   cfg = config;
   outs = cfg.outputs;
 in {
-  ID = "nvim-wip";
+  ID = "nvim-bew";
   package = pkgs.neovim.override {
     withPython3 = false;
     withRuby = false;

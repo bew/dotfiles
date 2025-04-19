@@ -63,7 +63,7 @@
         };
       };
 
-      nvim-configs = stablePkgs.callPackage ./nvim-wip/tool-configs.nix {};
+      nvim-configs = stablePkgs.callPackage ./nvim/tool-configs.nix {};
       mk-nvim-config = {nvimConfig, asDefault ? false}: (
         nvim-configs.lib.evalNvimConfig {
           pkgs = stablePkgs;
