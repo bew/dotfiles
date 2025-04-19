@@ -33,10 +33,11 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
   assert(type(nodes_factory) == "function", "annotation's nodes factory must be a function, got: "..type(nodes_factory))
   local trig_without_at = trig:sub(2)
   do
-    -- Allows `---@foo|` or `---foo|` => `---@foo_or_foobar |`
+    -- Allows `---@foo|` or `---foo|` or `--- foo|`
+    --   => `---@foo_or_foobar |`
     -- (must be first to have a chance to match before `@foo` below)
     local context_rx = vim.tbl_extend("keep", context, { trigEngine = "pattern" })
-    snip("%-%-%-@?"..trig_without_at, context_rx, nodes_factory(), ...)
+    snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
     -- [EXPERIMENT]: let's see if it's better to use `anfoo` or `dfoo`
@@ -108,7 +109,7 @@ snip_lua_annotation("@dd", {desc = "LuaCATS @diagnostic disable-for-x"}, functio
   }
 end)
 
-snip_lua_annotation("@dt", {desc = "LuaCATS @diagnostic toggle-around-block"}, function()
+snip_lua_annotation("@db", {desc = "LuaCATS @diagnostic toggle-around-block"}, function()
   return SU.myfmt {
     [[
     ---@diagnostic disable: <diags> (<why>)
@@ -190,7 +191,8 @@ snip("l", {desc = "local var = …"}, ls.dynamic_node(1, function()
         assignment = ls.choice_node(2, {
           SU.myfmt_no_strip {
             [[ = <value>]],
-            { value = SU.insert_node_default_selection(1) }
+            -- note: default value is important to avoid _breaking_ syntax highlight
+            { value = SU.insert_node_default_selection(1, "nil") }
           },
           t"",
         }),
