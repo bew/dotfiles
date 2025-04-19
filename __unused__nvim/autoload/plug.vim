@@ -1,1 +1,0 @@
-/home/lesell_b/.local/share/nvim/managed-plugins/vim-plug/plug.vim
