@@ -60,6 +60,12 @@
   # NOTE: changes the index only (the staging area)
   unstage = reset HEAD
 
+  # Restore from rev
+  restore-from = "!f() { \
+    local source=\"$1\"; shift; \
+    git restore --source=\"$source\" \"$@\"; \
+  }; f"
+
   # Stage the deletion of a file
   # NOTE: changes the index only (the staging area),
   #   the working tree isn't touched at all
@@ -166,6 +172,7 @@
   ds  = !git -c delta.features=split-layout d
 
   stat = !git --no-pager diff --stat --summary
+  stat-staged = stat --cached
 
   show-with-stat = !git show --patch-with-stat --summary
 
