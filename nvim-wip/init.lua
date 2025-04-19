@@ -480,6 +480,7 @@ require"mylib.do_simple_plugin_boot" {
 -- maybe even under a kind of 'plugin' in my declared_plugins tree!
 -- (see ~/.dot/nvim-myplugins/ & PlugSource.myplug ?)
 
+require"mycfg.diagnostics_and_lsp"
 require"mycfg.mappings"
 
 

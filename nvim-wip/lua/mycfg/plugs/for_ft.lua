@@ -71,6 +71,10 @@ Plug {
         highlight = "@punctuation.delimiter.markdown",
       },
       bullet = { enabled = false },
+      code = {
+        -- language_pad = 1,
+        -- language_position = "left",
+      },
       html = {
         comment = { conceal = false },
       },
@@ -175,6 +179,22 @@ Plug {
   desc = "🦀 Supercharge your Rust experience in Neovim!",
   tags = {t.ft_support},
   -- defer_load not needed, it's already lazy by design
+  on_load = function()
+    vim.g.rustaceanvim = {
+      server = {
+        capabilities = {
+          textDocument = {
+            completion = {
+              -- Disable snippets in completion
+              -- (@2025-03 it doesn't really work, auto-completing the item as I go through items
+              -- even-though I didn't accept the snippet..)
+              completionItem = { snippetSupport = false },
+            }
+          },
+        },
+      },
+    }
+  end,
 }
 
 Plug {

@@ -1,5 +1,7 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.PlugDeclarator
+local Plug = PluginSystem.get_plugin_declarator {
+  default_tags = { "ai" }
+}
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
 local t = PluginSystem.tags
@@ -12,7 +14,6 @@ Plug {
   --   local file, which will be accessed by the CodeCompanion plugin later.
   enabled = false,
   source = gh"zbirenbaum/copilot.lua",
-  tags = {"ai"},
   defer_load = { on_cmd = "Copilot" },
   on_load = function()
     -- Run `:Copilot auth` for first use.
@@ -28,7 +29,7 @@ Plug {
 Plug.codecompanion {
   source = gh"olimorris/codecompanion.nvim",
   desc = "✨ AI-powered coding, seamlessly in Neovim",
-  tags = {t.ui, t.editing, t.careful_update, "ai"},
+  tags = {t.ui, t.editing, t.careful_update},
   depends_on = { Plug.lib_plenary, Plug.ts },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
