@@ -90,18 +90,15 @@ snip_lua_annotation("@dd", {desc = "LuaCATS @diagnostic disable-for-x"}, functio
     "---@diagnostic <action>: <diags><maybe_why>",
     {
       action = ls.choice_node(1, {
-        t"disable-for-next-line",
+        t"disable-next-line",
         t"disable-line",
       }),
       -- IDEA: could default to the diag name of the first hint/warning on the line current/below
       diags = i(2),
       maybe_why = ls.choice_node(3, {
-        SU.myfmt {
-          "<space>(<why>)",
-          {
-            space = t" ", -- (putting it in fmt trims it automatically..)
-            why = i(1, "TODO: Reason 🤔"),
-          }
+        SU.myfmt_no_strip {
+          [[ (<why>)]],
+          { why = i(1, "TODO: Reason 🤔") }
         },
         t"",
       }),
