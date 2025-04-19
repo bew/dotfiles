@@ -245,13 +245,12 @@ toplevel_map{mode="n", key="N", action=my_actions.go_prev_search_result}
 toplevel_map{mode="n", key="<F2>", action=[[:Inspect<cr>]], desc="Show current HL & extmarks at current pos"}
 toplevel_map{mode="n", key="<F3>", action=[[:InspectTree<cr>]], desc="Show TreeSitter node tree"}
 
--- Windows navigation
-vim.cmd[[nnoremap <C-h> <C-w>h]]
-vim.cmd[[nnoremap <C-j> <C-w>j]]
-vim.cmd[[nnoremap <C-k> <C-w>k]]
-vim.cmd[[nnoremap <C-l> <C-w>l]]
---vim.cmd[[nmap <cr> <C-j>]] -- When mapping <C-j> has no effect
---vim.cmd[[nmap <BS> <C-h>]] -- When mapping <C-h> has no effect
+-- Focus Windows
+toplevel_map{mode="n", key="<C-h>", action=[[<C-w>h]], desc="Focus left win"}
+toplevel_map{mode="n", key="<C-j>", action=[[<C-w>j]], desc="Focus down win"}
+toplevel_map{mode="n", key="<C-k>", action=[[<C-w>k]], desc="Focus up win"}
+toplevel_map{mode="n", key="<C-l>", action=[[<C-w>l]], desc="Focus right win"}
+global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus previous win"}
 
 -- Goto tabs Alt-a/z
 my_actions.go_prev_tab = mk_action_v2 {
