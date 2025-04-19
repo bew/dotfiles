@@ -81,6 +81,10 @@ Plug {
       -- (which is very useful when editing hl or exploring options)
       smear_to_cmd = false,
 
+      -- New default (false) looks pretty bad
+      -- ISSUE: https://github.com/sphamba/smear-cursor.nvim/issues/125
+      never_draw_over_target = true,
+
       cterm_cursor_colors = vim.tbl_map(function(it) return it.ctermfg end, smear_palettes.fire),
       -- trailing_stiffness = 0.02, -- DEBUG: much slower trail (0.02-0.05)
     }
