@@ -33,17 +33,33 @@ local _q = U.str_simple_quote_surround
 -- Mapping helpers
 -- TODO: move them to a dedicated module!
 
+--- Normalize mode `v` to always mean `x` (visual mode ONLY instead of both visual/select)
+---@param mode string
+-- 👉 Always replace `v` by `x`, so `v` is ONLY visual mode instead of both visual/select
+-- (ref: `:h mapmode-x`)
+local function normalize_mode(mode)
+  if mode == "v" then
+    return "x"
+  else
+    return mode
+  end
+end
+
 --- Define map group for which_key plugin
 ---@diagnostic disable-next-line: lowercase-global
 wk_groups_lazy = {}
+
+--- Define a (global) <leader> map group
+---@param spec MapGroupSpec
 ---@diagnostic disable-next-line: lowercase-global
 function toplevel_map_define_group(spec)
   assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
+  local modes = U.normalize_arg_one_or_more(spec.mode)
   local group_wk_spec = {
     spec.prefix_key,
     group = spec.name,
-    mode = spec.mode,
+    mode = vim.tbl_map(normalize_mode, modes),
     hidden = spec.name == "__hide__",
   }
   -- NOTE: if which-key can be loaded, use it, otherwise register the group spec for later
@@ -62,17 +78,6 @@ function toplevel_buf_map(map_spec)
   toplevel_map(map_spec)
 end
 
--- Normalize mode `v` to always mean `x` (visual mode ONLY instead of both visual/select)
--- 👉 Always replace `v` by `x`, so `v` is ONLY visual mode instead of both visual/select
--- (ref: `:h mapmode-x`)
-local function normalize_mode(mode)
-  if mode == "v" then
-    return "x"
-  else
-    return mode
-  end
-end
-
 ---@class MapSpec
 ---@field mode string|string[] Mode(s) for which to map the key
 ---@field key string Key to map
@@ -82,7 +87,12 @@ end
 ---    When action is an ActionV2 obj, opts must not conflict.
 ---@field debug? boolean Whether to print debugging info about the keymap
 
---- Create top level maps
+---@class MapGroupSpec
+---@field name string Group name (e.g. prefixed with `+`)
+---@field mode string|string[] Mode(s) the group is for
+---@field prefix_key string Common group prefix key
+
+--- Create (top-level) key mapping
 ---@param map_spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function toplevel_map(map_spec)
@@ -147,15 +157,34 @@ function toplevel_map(map_spec)
     vim.keymap.set(normalized_mode, map_spec.key, action_for_mode.raw_action, map_opts)
   end
 end
+--- Create remap-enabled (top-level) map
+---@param spec MapSpec
+---@diagnostic disable-next-line: lowercase-global
+function local_leader_remap(spec)
+  spec.opts = spec.opts or {}
+  spec.opts.remap = true
+  toplevel_map(spec)
+end
+--- Create buf-specific (top-level) map
+---@param spec MapSpec
+---@diagnostic disable-next-line: lowercase-global
+function local_leader_buf_map(spec)
+  spec.opts = spec.opts or {}
+  spec.opts.buffer = true
+  toplevel_map(spec)
+end
 
---- Create global leader key mapping
+
+--- Create (global) <leader> key mapping
+---@param spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function global_leader_map(spec)
   toplevel_map(vim.tbl_extend("force", spec, {
     key = "<Leader>"..spec.key,
   }))
 end
---- Helper to create remap-enabled leader map, see `global_leader_map` for details
+--- Create remap-enabled (global) <leader> map
+---@param spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function global_leader_remap(spec)
   if not spec.opts then
@@ -164,6 +193,8 @@ function global_leader_remap(spec)
   spec.opts.remap = true
   global_leader_map(spec)
 end
+--- Define a (global) <leader> map group
+---@param spec MapGroupSpec
 ---@diagnostic disable-next-line: lowercase-global
 function global_leader_map_define_group(spec)
   spec.prefix_key = "<Leader>"..spec.prefix_key
@@ -172,31 +203,36 @@ end
 
 ----
 
---- Create local (content-related) leader key mapping
--- FIXME: these should be probably only used with <buffer> local keymaps 👀
---   But for that I'd need to setup my plugins to load content-related mappings on file init.. 🤔
+--- Create (content-related) <localleader> key mapping
+---@param spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function local_leader_map(spec)
   toplevel_map(vim.tbl_extend("force", spec, {
     key = "<LocalLeader>"..spec.key,
   }))
 end
+--- Create remap-enabled (content-related) <localleader> map
+---@param spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function local_leader_remap(spec)
   spec.opts = spec.opts or {}
   spec.opts.remap = true
   local_leader_map(spec)
 end
----@diagnostic disable-next-line: lowercase-global
-function local_leader_map_define_group(spec)
-  spec.prefix_key = "<LocalLeader>"..spec.prefix_key
-  toplevel_map_define_group(spec)
-end
+--- Create buf-specific (content-related) <localleader> map
+---@param spec MapSpec
 ---@diagnostic disable-next-line: lowercase-global
 function local_leader_buf_map(spec)
   spec.opts = spec.opts or {}
   spec.opts.buffer = true
   local_leader_map(spec)
+end
+--- Define a (content-related) <localleader> map group
+---@param spec MapGroupSpec
+---@diagnostic disable-next-line: lowercase-global
+function local_leader_map_define_group(spec)
+  spec.prefix_key = "<LocalLeader>"..spec.prefix_key
+  toplevel_map_define_group(spec)
 end
 
 -- Minimal action system
