@@ -1,4 +1,6 @@
 -- vim:set ft=lua.luasnip:
+local U = require"mylib.utils"
+
 local ls = require"luasnip"
 local ls_extras = require"luasnip.extras"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
@@ -48,14 +50,6 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
     snip("an"..trig_without_at, context_copy, nodes_factory(), ...)
   end
   do
-    -- [EXPERIMENT]: let's see if it's better to use `anfoo` or `dfoo`
-    -- Allows `dfoo|` => `---@foo_or_foobar |`
-    -- This is nicer to type on my external split keyboard,
-    -- as the snip-trigger finger is also used for `@`
-    local context_copy = vim.tbl_extend("keep", context, {})
-    snip("d"..trig_without_at, context_copy, nodes_factory(), ...)
-  end
-  do
     -- Allows `@foo|` => `---@foo_or_foobar |`
     snip(trig, context, nodes_factory(), ...)
   end
@@ -64,9 +58,10 @@ end
 local function get_class_annotation_nodes()
   return ls.choice_node(1, {
     SU.myfmt {
-      [[---@class <name>]],
+      [[---@class <name><after>]],
       {
         name = ls.restore_node(1, "class_name"),
+        after = i(2), -- avoid exiting too early
       }
     },
     SU.myfmt {
@@ -78,14 +73,14 @@ local function get_class_annotation_nodes()
     },
   }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
 end
-snip_lua_annotation("@c", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes, {
+snip_lua_annotation("@cl?", {desc = "LuaCATS @class", rx = true, when = conds.start_of_line}, get_class_annotation_nodes, {
   stored = { class_name = i(nil, "ClassName") },
 })
 snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes(), {
   stored = { class_name = i(nil, "ClassName") },
 })
 
-snip_lua_annotation("@dd", {desc = "LuaCATS @diagnostic disable-for-x"}, function()
+snip_lua_annotation("@d", {desc = "LuaCATS @diagnostic disable-for-x"}, function()
   return SU.myfmt {
     "---@diagnostic <action>: <diags><maybe_why>",
     {
@@ -129,38 +124,32 @@ snip("@as", {desc = "LuaCATS (inline) @as"}, SU.myfmt {
 })
 
 -- NOTE: must be last to allow custom annotation snips to be found before
----@param snip SnipT
-local function anno_from_capture(_args, snip)
-  local short_to_long = {
+do
+  local short_to_long_annotation = {
     a = "alias",
-    c = "class",
-    d = "diagnostic",
     e = "enum",
     f = "field",
     fi = "field private",
     fo = "field protected",
     g = "generic",
     m = "module",
-    ol = "overload",
+    o = "overload",
     p = "param",
     pri = "private",
     pro = "protected",
     r = "return",
     t = "type",
   }
-  local given_anno = snip.env.LS_CAPTURE_1
-  return short_to_long[given_anno] or given_anno
-end
-snip_lua_annotation(
-  "@(%w+)",
-  {desc = "LuaCATS @annotation", trigEngine = "pattern", resolver = SR.delete_spaces_after_trigger},
-  function()
-    return SU.myfmt {
-      [[---@<anno> ]],
-      { anno = ls.function_node(anno_from_capture) }
-    }
+  for short, long in pairs(short_to_long_annotation) do
+    snip_lua_annotation(
+      "@"..short,
+      {desc = "LuaCATS @"..long, resolver = SR.delete_spaces_after_trigger},
+      function()
+        return t("---@"..long.." ")
+      end
+    )
   end
-)
+end
 
 --------------------------
 
@@ -172,30 +161,42 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   { module = i(1, "module") },
 })
 
-snip("l", {desc = "local var = …"}, ls.dynamic_node(1, function()
-  local line = vim.api.nvim_get_current_line()
-  local _row, col0 = unpack(vim.api.nvim_win_get_cursor(0))
-  local rest_of_line = line:sub(col0 +1)
-  if rest_of_line:match("^[^ ]+ =") then
+-- Add local var, can only declare on demand
+-- Handles many cases:
+-- - `|foo = ...`
+-- - `| = ...`
+-- - (nothing after)
+snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger}, ls.dynamic_node(1, function()
+  local rest_of_line = U.get_rest_of_line()
+  if rest_of_line:match"^[^ ]+ =" then
     -- rest_of_line looks like `|foo = ...`
     -- only add `local`
     return ls.snippet_node(nil, t"local ")
+  end
+  local assignment_node
+  if rest_of_line:match"^= " then
+    -- rest_of_line looks like `|= ...`
+    -- (e.g. after we've replaced a var name to put a local var instead)
+    -- We don't need the assignment
+    assignment_node = t" "
   else
-    return ls.snippet_node(nil, SU.myfmt {
-      [[local <var><assignment>]],
-      {
-        var = i(1, "var"),
-        assignment = ls.choice_node(2, {
-          SU.myfmt_no_strip {
-            [[ = <value>]],
-            -- note: default value is important to avoid _breaking_ syntax highlight
-            { value = SU.insert_node_default_selection(1, "nil") }
-          },
-          t"",
-        }),
+    local has_text_after = not not rest_of_line:match"^[^ ]"
+    assignment_node = ls.choice_node(2, {
+      SU.myfmt_no_strip {
+        [[ = <value>]],
+        -- note: default value is important to avoid _breaking_ syntax highlight
+        { value = SU.insert_node_default_selection(1, has_text_after and "" or "nil") }
       },
+      t"",
     })
   end
+  return ls.snippet_node(nil, SU.myfmt {
+    [[local <var><assignment>]],
+    {
+      var = i(1, "var"),
+      assignment = assignment_node,
+    },
+  })
 end))
 
 -- NOTE: By default, use custom name for <var>.

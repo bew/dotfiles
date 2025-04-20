@@ -416,4 +416,12 @@ function U.feed_keys_sync(keys, opts)
   vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
 end
 
+--- Get rest of the line after cursor in current win
+---@return string
+function U.get_rest_of_line()
+  local line = vim.api.nvim_get_current_line()
+  local _row, col0 = unpack(vim.api.nvim_win_get_cursor(0))
+  return line:sub(col0 +1)
+end
+
 return U
