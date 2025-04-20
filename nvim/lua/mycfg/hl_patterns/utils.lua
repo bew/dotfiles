@@ -5,16 +5,27 @@ local U = {}
 ---@param pattern string The pattern to wrap
 ---@return string
 function U.keywordize(pattern)
-  if pattern:match("^%w") then
+  if pattern:match("^[%a]") then
     -- Start of pattern is a word, add frontier
-    pattern = "%f[%w_-]()" .. pattern
+    -- note: frontier means:
+    --   from `not in set 'letters'` to `in set 'letters'`
+    pattern = "%f[%a_-]()" .. pattern
   end
-  if pattern:match("%w$") then
+  if pattern:match("%a$") then
     -- End of pattern is a word, add frontier
-    pattern = pattern .. "()%f[%W_-]"
+    -- note: frontier means:
+    --   from `not in set 'not letters'` to `in set 'not letters'`
+    pattern = pattern .. "()%f[^%a_-]"
   end
   return pattern
 end
+-- Test cases:
+--   should match `META`
+--   should match `META`
+--   should match `(META)`
+--   should fail  `_META`
+--   should fail  `META_`
+--   should fail  `_META_`
 
 --- Define & return highlight for a pattern
 ---@param name string The ID for the pattern highlight (will be used as suffix for full hl group)

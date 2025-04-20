@@ -305,7 +305,7 @@ patterns.misc_heavy_words = {
     heavy_word_variants"FEEDBACK",
     heavy_word_variants"WIP",
     heavy_word_variants"EXPERIMENT",
-    -- note: TMP != TMP! (tmp! is shorter tmp potentially has no end date 😬)
+    -- note: TMP != TMP! (`tmp!` has short lifespan; tmp potentially has no end date 😬)
     heavy_word_variants"TMP:",
   },
   group = _U.define_hl("misc_big_words", {
