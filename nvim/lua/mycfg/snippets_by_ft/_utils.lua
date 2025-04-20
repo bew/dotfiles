@@ -22,12 +22,14 @@ local SU = {}
 -- TMP, Until it is impl in LuaSnip!
 ---@class LS.SnipContext: table
 ---@field trig string
+---@field trigEngine string
 ---@field condition? mysnips.ContextCondition
 ---@field resolveExpandParams? any
 
 ---@class mysnips.Context: LS.SnipContext
----@field desc? string
+---@field desc? string Description of the snippet
 ---@field when? mysnips.ContextCondition
+---@field rx? boolean Whether the trigger is a pattern
 ---@field resolver? any
 
 ---@class LS.FmtOpts
@@ -77,6 +79,9 @@ SU.get_snip_fn = function(list_of_snippets)
   ---@param opts? table
   return function(trigger, context, nodes, opts)
     context.trig = trigger
+    if context.rx then
+      context.trigEngine = "pattern"
+    end
     context.condition = context.when or nil
     context.resolveExpandParams = context.resolveExpandParams or context.resolver or nil
     -- IDEA: add feature system, to compose context features like resolveExpandParams 🤔
