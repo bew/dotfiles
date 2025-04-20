@@ -1,7 +1,7 @@
 # Default config copied from https://github.com/nushell/nushell/blob/main/crates/nu-utils/src/sample_config/default_config.nu
 # vim:set sw=4:
 
-export def get_default_config [] {
+export def get_default_config []: nothing -> record {
     # Nushell Config File
     #
     # version = "0.87.2"

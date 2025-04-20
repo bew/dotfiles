@@ -1,7 +1,7 @@
 use bewcfg_theme.nu
 use default_config.nu get_default_config
 
-export def get_config [] {
+export def get_config []: nothing -> record {
   let default_cfg = get_default_config
 
   mut cfg = {}

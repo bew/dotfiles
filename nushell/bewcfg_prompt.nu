@@ -5,7 +5,7 @@ const named_paths = [
   { name: "~"       dir: $home }
 ]
 
-def shorten_path [path: string] {
+def shorten_path [path: string]: nothing -> string {
   for $repl in $named_paths {
     if ($path | str starts-with $repl.dir) {
       return ($path | str replace $repl.dir $repl.name)
@@ -14,14 +14,14 @@ def shorten_path [path: string] {
   $path
 }
 
-def color_surround [color: any text: closure] {
+def color_surround [color: any text: closure]: nothing -> string {
   [(ansi $color) (do $text) (ansi reset)] | str join
 }
 
 # IDEA: alt call signature:
 #   maybe_space __space__ { something }   # maybe space before
 #   maybe_space { something } __space__   # maybe space after
-def maybe_space [where: string text: closure] -> string {
+def maybe_space [where: string text: closure]: nothing -> string {
   if $where not-in [after before] {
     error make {
       msg: "$where must be one of: after, before"
@@ -41,7 +41,7 @@ def maybe_space [where: string text: closure] -> string {
   }
 }
 
-def "segment path" [--old-prompt] {
+def "segment path" [--old-prompt]: nothing -> string {
   let style = if $old_prompt {
     {
       special: ((ansi reset) + (ansi attr_bold) + (ansi springgreen4))
@@ -73,19 +73,19 @@ def "segment path" [--old-prompt] {
   $path_start_styled + ($path_rest | str join $sep_styled)
 }
 
-def "segment exit_code" [] {
+def "segment exit_code" []: nothing -> string {
   if $env.LAST_EXIT_CODE == 0 {
     return ""
   }
   color_surround red_bold { $env.LAST_EXIT_CODE }
 }
 
-def exits_successfully [cmd: closure] -> bool {
+def exits_successfully [cmd: closure]: nothing -> bool {
   # NOTE: `complete` eats up all input & errors
   (do $cmd | complete | get exit_code) == 0
 }
 
-def "segment git-status-slow" [] {
+def "segment git-status-slow" []: nothing -> string {
   # FIXME: A faster alternative would be to use nushell_plugin_gstat
   #   https://github.com/nushell/nushell/tree/main/crates/nu_plugin_gstat
   #   (it's in nixpkgs already)
@@ -121,7 +121,7 @@ def "segment git-status-slow" [] {
 
 # -------------------------------------------------------------
 
-def create_current_left_prompt [] {
+def create_current_left_prompt []: nothing -> string {
   let segments = [
     (
       # to differenciate my nu prompt vs zsh prompt
@@ -133,14 +133,14 @@ def create_current_left_prompt [] {
   $segments | str join
 }
 
-def create_current_right_prompt [] {
+def create_current_right_prompt []: nothing -> string {
   let segments = [
     (segment git-status-slow)
   ]
   $segments | str join
 }
 
-def create_old_left_prompt [] {
+def create_old_left_prompt []: nothing -> string {
   let segments = [
     (
       # to differenciate my nu prompt vs zsh prompt
@@ -152,7 +152,7 @@ def create_old_left_prompt [] {
   $segments | str join
 }
 
-def create_old_right_prompt [] {
+def create_old_right_prompt []: nothing -> string {
   create_current_right_prompt
 }
 

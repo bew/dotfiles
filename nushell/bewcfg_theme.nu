@@ -3,7 +3,7 @@
 # https://www.nushell.sh/book/coloring_and_theming.html
 # And here is the theme collection
 # https://github.com/nushell/nu_scripts/tree/main/themes
-export def get_my_theme [] {
+export def get_my_theme []: nothing -> record {
   {
     # color for nushell primitives
     separator: white

@@ -15,7 +15,7 @@ export def sort-by-closure [
 
 # FIXME: Currently broken @ v0.87.x (only works for list/tables)
 # See: https://discord.com/channels/601130461678272522/614593951969574961/1178454822991708240
-export def len [] -> int {
+export def len []: any -> int {
   let input_type = $in | describe --detailed | get type
   match ($input_type) {
     "string" => {
