@@ -64,8 +64,8 @@ local function boot_plugins(ctx)
 
   -- Setup custom highlight autocommands
   local function apply_custom_highlights()
-    local plugins_with_hl_updates = U.filter_list(ctx.all_plugin_specs, need_field"on_colorscheme_change")
-    for _, plug in pairs(plugins_with_hl_updates) do
+    local plugins_with_hl_updates = vim.iter(ctx.plugin_specs):filter(need_field"on_colorscheme_change")
+    for _, plug in plugins_with_hl_updates:enumerate() do
       plug.on_colorscheme_change()
     end
   end

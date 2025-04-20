@@ -21,23 +21,6 @@ function U.iter_chars(str)
   end)
 end
 
----@generic T
----@param list table<T>
----@param fn fun(T): boolean
-function U.filter_list(list, fn)
-  vim.validate{
-    list={list, "table"},
-    fn={fn, "function"},
-  }
-  local ret = {}
-  for _, item in ipairs(list) do
-    if fn(item) then
-      table.insert(ret, item)
-    end
-  end
-  return ret
-end
-
 ---@generic T, U
 ---@param list table<T>
 ---@param fn fun(T): U?

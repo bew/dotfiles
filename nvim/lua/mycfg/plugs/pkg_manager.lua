@@ -48,7 +48,7 @@ Plug.pkg_manager {
     end
 
     local lazy_plugin_specs = {}
-    for _, plug in pairs(U.filter_list(ctx.all_plugin_specs, enabled_plugins_filter)) do
+    for _, plug in vim.iter(ctx.plugin_specs):filter(enabled_plugins_filter):enumerate() do
       local lazy_single_spec = {
         -- Set the plugin name, so we can easily reference other plugins by name
         -- (e.g. for plugin dependencies)
