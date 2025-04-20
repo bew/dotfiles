@@ -13,42 +13,64 @@ local function need_field(field_name)
 end
 
 --- Returns the first plugin spec with id `pkg_manager` or errors if there is none.
----@param plugin_specs plugin_system.PluginSpec[]
----@return plugin_system.PluginSpecPkgManager
+---@param plugin_specs plugsys.PluginSpec[]
+---@return plugsys.PluginSpecPkgManager
 local function find_pkg_manager(plugin_specs)
   for _, p in ipairs(plugin_specs) do
     if p.id == "pkg_manager" then
-      ---@cast p plugin_system.PluginSpecPkgManager
-      return p
+      return p --[[@as plugsys.PluginSpecPkgManager]]
     end
   end
   error("No package loader/installer/manager found!")
 end
 
----@class plugin_system.BootPlugContext
----@field all_plugin_specs plugin_system.PluginSpec[]
+---@class plugsys.BootPlugContext
+---@field plugin_specs plugsys.PluginSpec[] All plugin specs
+---@field manager_install_path string Install path for the pkg manager
 
----@param ctx plugin_system.BootPlugContext
-local function boot_plugins(ctx)
-  ctx = setmetatable(ctx, KeyRefMustExist_mt)
+---@class plugsys.BootPlugOpts
+---@field install_dir string Where plugins should be installed if they aren't
 
-  if #ctx.all_plugin_specs == 0 then
+---@param plugin_specs plugsys.PluginSpec[] All plugin specs
+---@param opts plugsys.BootPlugOpts
+local function boot_plugins(plugin_specs, opts)
+  if #plugin_specs == 0 then
     return -- nothing to do!
   end
 
-  local pkg_manager = find_pkg_manager(ctx.all_plugin_specs)
+  local pkg_manager = find_pkg_manager(plugin_specs)
 
-  local check_path_exists = vim.uv.fs_stat
-  if check_path_exists(pkg_manager.install_path) then
-    vim.opt.rtp:prepend(pkg_manager.install_path)
+  local pkg_manager_install_path ---@type string
+  ---@diagnostic disable-next-line: undefined-field (We're only testing for a local_path source)
+  if pkg_manager.source.type == "local_path" and U.path_exists(pkg_manager.source.path) then
+    ---@diagnostic disable-next-line: undefined-field
+    pkg_manager_install_path = pkg_manager.source.path
+  elseif type(pkg_manager.install_path) == "function" then
+    pkg_manager_install_path = pkg_manager:install_path()
+  elseif type(pkg_manager.install_path) == "string" then
+    pkg_manager_install_path = pkg_manager.install_path --[[@as string]]
   else
+    vim.notify("Package manager is missing its 'install_path'", vim.log.levels.ERROR)
+  end
+
+  ---@type plugsys.BootPlugContext
+  local ctx = {
+    plugin_specs = plugin_specs,
+    install_dir = opts.install_dir,
+    manager_install_path = pkg_manager_install_path,
+  }
+  local ctx = setmetatable(ctx, KeyRefMustExist_mt)
+
+  if not U.path_exists(pkg_manager_install_path) then
+    vim.notify("Pkg manager not installed at " .. _q(pkg_manager_install_path) .. ", attempting bootstrap…")
     pkg_manager:bootstrap_itself(ctx)
-    if not check_path_exists(pkg_manager.install_path) then
-      -- pkg manager still not bootstrapped, can't load plugins, bye
-      -- (maybe a msg was printed to ask user to install it !shrug)
+    if not U.path_exists(pkg_manager_install_path) then
+      vim.notify("Pkg manager still not installed, cannot boot plugins", vim.log.levels.ERROR)
+      -- (maybe a msg was printed to ask user to install it 🤷)
       return
     end
   end
+  vim.opt.rtp:prepend(pkg_manager_install_path)
 
   local pkg_manager_name = pkg_manager.source.name
   assert(

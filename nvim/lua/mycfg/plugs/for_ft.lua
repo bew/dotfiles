@@ -1,5 +1,5 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.PlugDeclarator
+local Plug = PluginSystem.get_plugin_declarator()
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
 local t = PluginSystem.tags

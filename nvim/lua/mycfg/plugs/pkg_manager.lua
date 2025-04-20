@@ -3,10 +3,10 @@ local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 
 local PluginSystem = require"mylib.plugin_system"
--- local t = PluginSystem.tags
-local gh = PluginSystem.sources.github
--- local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator()
+local gh = PluginSystem.sources.github
+local dist_managed_opt_plug = PluginSystem.sources.dist_managed_opt_plug
+local fallback = PluginSystem.sources.fallback
 
 --------------------------------
 
@@ -24,21 +24,25 @@ local Plug = PluginSystem.get_plugin_declarator()
 -- TODO: Make a dedicated way to register a package manager,
 --   so we can enforce a set of fields / structure
 Plug.pkg_manager {
-  source = gh"folke/lazy.nvim",
+  -- Default to Github source if local one cannot be found.
+  source = fallback("lazy", dist_managed_opt_plug"lazy-nvim", gh"folke/lazy.nvim"),
   desc = "A modern plugin manager for Neovim",
   tags = {"boot"},
-  install_path = vim.fn.stdpath("data") .. "/pkg-manager--lazy",
-  bootstrap_itself = function(self, _ctx)
+  install_path = function()
+    -- note: called if pkg source has no (specified/existing) path
+    return vim.fn.stdpath("state") .. "/pkg-manager--lazy"
+  end,
+  bootstrap_itself = function(self, ctx)
     local clone_cmd_parts = {
       "git",
       "clone",
       "--filter=blob:none", -- don't fetch blobs until git needs them
       self.source.url,
-      self.install_path,
+      ctx.manager_install_path,
     }
     local clone_cmd = table.concat(clone_cmd_parts, " ")
     print("Package manager not found! Install with:")
-    print(clone_cmd) -- note: on separate line for easy copy/paste
+    print("  ", clone_cmd) -- note: on separate line for easy copy/paste
   end,
   on_boot = function(_self, ctx)
     if not U.is_module_available("lazy") then return false end

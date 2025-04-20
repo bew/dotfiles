@@ -502,12 +502,8 @@ end
 -- end
 
 
-----------------------------
-
 -- ------ PLUGINS
-local plugin_specs = require"mycfg.plugs"
-require"mylib.do_simple_plugin_boot" {
-  all_plugin_specs = plugin_specs,
+require"mycfg.plugs".boot_plugins {
   install_dir = vim.fn.stdpath"state" .. "/managed-plugins/start",
 }
 

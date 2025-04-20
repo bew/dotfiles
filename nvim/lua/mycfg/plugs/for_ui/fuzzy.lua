@@ -1,6 +1,8 @@
 local PluginSystem = require"mylib.plugin_system"
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
+local fallback = PluginSystem.sources.fallback
+local dist_managed_opt_plug = PluginSystem.sources.dist_managed_opt_plug
 local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui, "nav" },
 }
@@ -14,7 +16,7 @@ Plug.telescope {
   -- FIXME: install native sorter!
   depends_on = {Plug.lib_plenary},
   config_depends_on = {
-    Plug { source = PluginSystem.sources.dist_managed_opt_plug"telescope-fzf-native" },
+    Plug { source = fallback("telescope-fzf", dist_managed_opt_plug"telescope-fzf-native") },
     Plug { source = gh"nvim-telescope/telescope-ui-select.nvim" },
     Plug { source = gh"nvim-telescope/telescope-frecency.nvim" },
     Plug { source = gh"OliverChao/telescope-picker-list.nvim" },

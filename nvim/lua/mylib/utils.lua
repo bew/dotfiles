@@ -399,6 +399,13 @@ function U.feed_keys_sync(keys, opts)
   vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
 end
 
+--- Returns whether the given path is a local directory
+---@param path string
+---@return boolean
+function U.path_exists(path)
+  return vim.uv.fs_stat(path) ~= nil
+end
+
 --- Get rest of the line after cursor in current win
 ---@return string
 function U.get_rest_of_line()

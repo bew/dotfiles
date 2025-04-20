@@ -1,45 +1,59 @@
 -- THE IDEA:
 -- ```
 -- local Plug = ...
--- local NamedPlug = ...
+-- local Plug = ...
 --
--- NamedPlug.foobar {
+-- Plug.foobar {
 --   ...
 --   config_depends_on = {
 --     -- anonymous plugin that depends on foobar
---     Plug { ..., depends_on = {NamedPlug.foobar} }
+--     Plug { ..., depends_on = {Plug.foobar} }
 --   },
 -- }
 -- ```
--- note: 'NamedPlug' is a automagic proxy / setter for a named plugin spec
--- The tricky part is that the `NamedPlug.foobar` in `config_depends_on` is called _before_ the
+-- note: 'Plug' is a automagic proxy / setter for a named plugin spec
+-- The tricky part is that the `Plug.foobar` in `config_depends_on` is called _before_ the
 -- plugin is defined.
--- So `NamedPlug.foobar` must declare the named plugin on first reference, and always refer to the
+-- So `Plug.foobar` must declare the named plugin on first reference, and always refer to the
 -- same object before and after it is defined.
 
----@class plugin_system.DeclaredPluginSpec
+--- The Plugin declarator:
+--- * Use `Plug { ... }` to define an anonymous plugin
+--- * Use `Plug.foo` to refer to a named plugin (may be undefined at this point)
+--- * Use `Plug.foo { ... }` to define a named plugin
+---@class plugsys.PlugDeclarator
+---@overload fun(spec: plugsys.PluginSpec): plugsys.PluginSpecDeclared
+---@field [string] plugsys.PluginSpecDeclared
+
+---@class plugsys.PluginSpecDeclared
+---@overload fun(spec: plugsys.PluginSpec): plugsys.PluginSpecDeclared
 ---@field id string The plugin ID
 ---@field __is_placeholder_plugin_spec boolean?
 
----@class plugin_system.PluginSpec: plugin_system.DeclaredPluginSpec
----@field enabled boolean Whether the plugin should be loaded by the pkg manager
----@field source PlugSourceBase? Spec about the plugin's source location
----@field INVALID_SOURCE boolean? True if the source is not valid (when it's set to nil)
----@field desc string Rough single-line description
----@field tags string[]
----@field version plugin_system.PluginVersionSpec
----@field depends_on plugin_system.PluginSpec[]
----@field config_depends_on plugin_system.PluginSpec[]
----@field on_pre_load fun() Hook run before plugin is loaded
----@field on_load fun() Hook run just after plugin is loaded
----@field on_colorscheme_change fun() Hook run when colorscheme changes (used to re-define hl groups)
+-- note: avoid inherit from PluginSpecDeclared to avoid inheritting the callable overload
+---@class plugsys.PluginSpec
+---@field source plugsys.PlugSourceBase Spec about the plugin's source location
+---@field id? string The plugin ID
+---@field desc? string Rough single-line description
+---@field enabled? boolean Whether the plugin should be loaded by the pkg manager
+---@field tags? (string|plugsys.TagSpec)[]
+---@field version? plugsys.PluginVersionSpec
+---@field depends_on? plugsys.PluginSpecDeclared[]
+---@field config_depends_on? plugsys.PluginSpecDeclared[]
+---@field on_pre_load? fun() Hook run before plugin is loaded
+---@field on_load? fun() Hook run just after plugin is loaded
+---@field on_colorscheme_change? fun() Hook run when colorscheme changes
+---@field _INVALID_SOURCE? boolean? True if the source is not valid
 
----@class plugin_system.PluginSpecPkgManager: plugin_system.PluginSpec
----@field install_path string Where the pkg manager is installed
----@field bootstrap_itself? fun(self, ctx: plugin_system.BootPlugContext)
----@field on_boot fun(self, ctx: plugin_system.BootPlugContext)
+---@alias plugsys.PluginInstallPath string|(fun(): string)
 
----@class plugin_system.PluginVersionSpec
+---@class plugsys.PluginSpecPkgManager: plugsys.PluginSpec
+---@field install_path plugsys.PluginInstallPath Where the pkg is/should-be installed
+---    (as function, called if pkg source has no (specified/existing) path)
+---@field bootstrap_itself? fun(self, ctx: plugsys.BootPlugContext)
+---@field on_boot fun(self, ctx: plugsys.BootPlugContext)
+
+---@class plugsys.PluginVersionSpec
 ---@field tag? string
 ---@field branch? string
 
@@ -53,10 +67,10 @@ local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
 local STATE = {
   -- test
   --- Contains anonymous plugin specs
-  ---@type plugin_system.PluginSpec[]
+  ---@type plugsys.PluginSpec[]
   _anon_plugin_specs = {},
   --- Contains named plugin specs
-  ---@type {[string]: plugin_system.PluginSpec}
+  ---@type {[string]: plugsys.PluginSpec|plugsys.PluginSpecDeclared}
   _named_plugin_specs = {},
 }
 
@@ -71,30 +85,63 @@ end
 
 local DeclaratorImpl = {}
 
----@param spec plugin_system.PluginSpec
-function DeclaratorImpl.check_plugin_declaration(spec)
-  -- TODO: validate spec is fully respected!
-  if not spec.source then
+--- Checks if the given source is a valid plugin source
+---@param src any
+---@return boolean
+local function is_plugin_source_valid(src)
+  if type(src) ~= "table" then
+    return false
+  end
+  if not src.type or src.type == "BAD_SOURCE" then
+    return false
+  end
+  return type(src.type) == "string" and type(src.name) == "string"
+end
+
+---@param spec plugsys.PluginSpec
+local function check_plugin_source(spec)
+  if type(spec.source) == "function" then
+    spec.source = spec.source()
+  end
+  if not is_plugin_source_valid(spec.source) then
+    local plugin_info ---@type string
+    if spec.id then
+      plugin_info = "(id: "..spec.id..")"
+    elseif type(spec.source) == "table" and type(spec.source.name) == "string" then
+      plugin_info = "(name: "..spec.source.name..")"
+    else
+      plugin_info = "(unamed)"
+    end
+    vim.notify(_f("Source for plugin", plugin_info, "is invalid"), vim.log.levels.ERROR)
     -- source isn't valid, disable the plugin
     spec.enabled = false
-    spec.INVALID_SOURCE = true
+    spec._INVALID_SOURCE = true
   end
 end
 
-function DeclaratorImpl.register_anon_plugin(plugin_spec)
-  vim.validate{ plugin_spec={plugin_spec, "table"} }
-  DeclaratorImpl.check_plugin_declaration(plugin_spec)
-  table.insert(STATE._anon_plugin_specs, plugin_spec)
-  return plugin_spec
+---@param spec plugsys.PluginSpec
+function DeclaratorImpl.check_plugin_declaration(spec)
+  -- TODO: validate spec is fully respected!
+  check_plugin_source(spec)
 end
 
----Declares a named plugin
+---@param spec plugsys.PluginSpec
+---@return plugsys.PluginSpec
+function DeclaratorImpl.register_anon_plugin(spec)
+  vim.validate{ spec={spec, "table"} }
+  DeclaratorImpl.check_plugin_declaration(spec)
+  table.insert(STATE._anon_plugin_specs, spec)
+  return spec
+end
+
+--- Declares a named plugin
 ---@param plugin_id string The plugin ID to declare
----@return plugin_system.DeclaredPluginSpec
+---@return plugsys.PluginSpecDeclared|plugsys.PluginSpec
 function DeclaratorImpl.declare_named_plugin(plugin_id)
   if STATE._named_plugin_specs[plugin_id] then
     return STATE._named_plugin_specs[plugin_id]
   end
+  ---@type plugsys.PluginSpecDeclared
   local placeholder_plugin_spec = {
     id = plugin_id,
     __is_placeholder_plugin_spec = true, -- will be set to nil when plugin gets defined!
@@ -104,23 +151,8 @@ function DeclaratorImpl.declare_named_plugin(plugin_id)
   return placeholder_plugin_spec
 end
 
-local CallToRegisterPlugin_mt = {
-  ---@param self plugin_system.DeclaredPluginSpec
-  ---@param spec_fields plugin_system.PluginSpec
-  __call = function(self, spec_fields)
-    if not self.__is_placeholder_plugin_spec then
-      error(_f("Not a placeholder: Cannot register the named plugin spec", _q(self.id), "twice"))
-    end
-    self.__is_placeholder_plugin_spec = nil
-    -- copy all spec fields to the existing/stored spec
-    for k, v in pairs(spec_fields) do self[k] = v end
-    ---@diagnostic disable-next-line: param-type-mismatch (self is augmented now)
-    DeclaratorImpl.check_plugin_declaration(self)
-  end,
-}
-
----@class plugin_system.DeclaratorDefaults
----@field default_tags? (string|plugin_system.PlugTagSpec)[]
+---@class plugsys.DeclaratorDefaults
+---@field default_tags? (string|plugsys.TagSpec)[]
 
 -- The magic table metadata that makes the following syntax possible:
 -- ```
@@ -133,15 +165,16 @@ local CallToRegisterPlugin_mt = {
 -- Plug.bar { config_depends_on = { Plug { on-the-fly spec } }, ... spec for plugin named 'bar' }
 -- -- This saves the spec into original table, so earlier/later references can access everything
 -- ```
----@param defaults? plugin_system.DeclaratorDefaults
-function DeclaratorImpl.get_plugin_declarator(defaults)
-  ---@type plugin_system.DeclaratorDefaults
+---@param defaults? plugsys.DeclaratorDefaults
+---@return plugsys.PlugDeclarator
+function M.get_plugin_declarator(defaults)
+  ---@type plugsys.DeclaratorDefaults
   local plugin_defaults = vim.tbl_extend("keep", defaults or {}, {
     default_tags = {}
   })
-  return setmetatable({ _IS_PLUGIN_DECLARATOR = true }, {
-    ---@param plugin_spec plugin_system.PluginSpec
-    ---@return plugin_system.PluginSpec
+  return setmetatable({}, {
+    ---@param plugin_spec plugsys.PluginSpec
+    ---@return plugsys.PluginSpec
     __call = function(_, plugin_spec)
       ---@diagnostic disable-next-line: undefined-field (Want to ensure weird case doesn't happen)
       if plugin_spec._IS_PLUGIN_DECLARATOR then
@@ -150,10 +183,27 @@ function DeclaratorImpl.get_plugin_declarator(defaults)
       plugin_spec.tags = vim.list_extend(plugin_spec.tags or {}, plugin_defaults.default_tags)
       return DeclaratorImpl.register_anon_plugin(plugin_spec)
     end,
-    ---@return plugin_system.PluginSpec
+    ---@return plugsys.PluginSpec
     __index = function(_, plugin_id)
+      if plugin_id == "_IS_PLUGIN_DECLARATOR" then
+        -- Magic value, only for the declarator
+        return true
+      end
       local plugin_shim = DeclaratorImpl.declare_named_plugin(plugin_id)
-      return setmetatable(plugin_shim, CallToRegisterPlugin_mt)
+      return setmetatable(plugin_shim, {
+        ---@param self plugsys.PluginSpecDeclared
+        ---@param spec_fields plugsys.PluginSpec
+        __call = function(self, spec_fields)
+          if not self.__is_placeholder_plugin_spec then
+            error(_f("Not a placeholder: Cannot register the named plugin spec", _q(self.id), "twice"))
+          end
+          self.__is_placeholder_plugin_spec = nil
+          -- copy all spec fields to the existing/stored spec
+          for k, v in pairs(spec_fields) do self[k] = v end
+          ---@diagnostic disable-next-line: param-type-mismatch (self is augmented now)
+          DeclaratorImpl.check_plugin_declaration(self)
+        end,
+      })
     end,
     __newindex = function(...)
       error("Assignements are forbidden, use `Plug.foo { ... }` to define a named plugin")
@@ -161,22 +211,15 @@ function DeclaratorImpl.get_plugin_declarator(defaults)
   })
 end
 
---- The Plugin declarator:
---- * Use `Plug { ... }` to define an anonymous plugin
---- * Use `Plug.foo` to refer to a named plugin (may be undefined at this point)
---- * Use `Plug.foo { ... }` to define a named plugin
-M.PlugDeclarator = DeclaratorImpl.get_plugin_declarator()
-M.get_plugin_declarator = DeclaratorImpl.get_plugin_declarator
-
 --------------------------------
 
 -- IDEA: attach plugin behavior / load pattern based on tags?
 
----@class plugin_system.PlugTagSpec
+---@class plugsys.TagSpec
 ---@field name string
 ---@field desc string
 
----@type {[string]: plugin_system.PlugTagSpec}
+---@type {[string]: plugsys.TagSpec}
 M.tags = setmetatable({}, {
   __index = KeyRefMustExist_mt.__index,
   ---@param name string
@@ -193,22 +236,37 @@ M.tags = setmetatable({}, {
 
 --------------------------------
 
----@class PlugSourceBase
----@field type string
----@field name string
+---@class plugsys.PlugSourceBase
+---@field type string Source type
+---@field name string Name of the plugin
 
----@class PlugSourceGithub: PlugSourceBase
----@field url string
----@field owner_repo string
+---@alias plugsys.PlugSourceDefered (fun(): plugsys.PlugSourceBase)
 
----@class PlugSourceLocal: PlugSourceBase
----@field path string
+---@class plugsys.PlugSourceGithub: plugsys.PlugSourceBase
+---@field owner_repo string Repo address in format `owner/repo`
+---@field url string Full URL of the repo
+
+---@class plugsys.PlugSourceLocal: plugsys.PlugSourceBase
+---@field path string Static path of the plugin, if it's a function, it will be
+---    called when needed and the result will be saved to `self.resolved_local_path`.
 
 M.sources = {}
+
+--- Returns a BAD source for a plugin, used as a marker when the real source cannot be found.
+---@param name string Arbitrary name for the plugin
+---@return plugsys.PlugSourceBase
+function M.sources.BAD_SOURCE(name)
+  return {
+    type = "BAD_SOURCE",
+    name = name,
+  }
+end
+
 --- A Github repo plugin, will be installed, managed & loaded by pkg manager
 ---@param owner_repo string The Github repo path, like `owner/repo`
----@return PlugSourceGithub
+---@return plugsys.PlugSourceGithub
 function M.sources.github(owner_repo)
+  ---@type plugsys.PlugSourceGithub
   return setmetatable({
     type = "github",
     owner_repo = owner_repo,
@@ -218,8 +276,8 @@ function M.sources.github(owner_repo)
 end
 
 --- A local path plugin, will not be managed by pkg manager, only loaded
----@param spec {name: string, path: string}
----@return PlugSourceLocal
+---@param spec plugsys.PlugSourceLocal
+---@return plugsys.PlugSourceLocal
 function M.sources.local_path(spec)
   vim.validate{
     spec={spec, "table"},
@@ -235,24 +293,46 @@ end
 
 --- A dist-managed plugin (e.g. by Nix 😉), will not be managed by pkg manager, only loaded
 ---@param name string Name of a dist-managed opt plugin (found in packpath)
----@return PlugSourceLocal?
+---@return plugsys.PlugSourceDefered
 M.sources.dist_managed_opt_plug = function(name)
-  ---@type string[]
-  local dist_paths = vim.fn.globpath(vim.o.packpath, vim.fs.joinpath("pack", "*", "opt", name), --[[respect-wildstuff]]false, --[[aslist]]true)
-  if #dist_paths > 0 then
+  return function()
+    local glob_expr = vim.fs.joinpath("pack", "*", "opt", name)
+    local dist_paths = vim.fn.globpath(vim.o.packpath, glob_expr, --[[respect-wildstuff]]false, --[[aslist]]true)
+    if #dist_paths == 0 then
+      return M.sources.BAD_SOURCE(name)
+    end
+
     return M.sources.local_path {
       name = name,
       path = dist_paths[1],
     }
-  else
-    vim.notify("Dist-managed opt plugin "..vim.inspect(name).." cannot be found in packpath", vim.log.levels.INFO)
-    return nil
   end
 end
 
+--- Returns the first valid plugin source
+---@param name string Arbitrary name for the plugin, used if fallback can't find any viable source.
+---@param ... plugsys.PlugSourceBase|plugsys.PlugSourceDefered Sources to try
+---@return plugsys.PlugSourceBase
+M.sources.fallback = function(name, ...)
+  -- (note: `ipairs{...}` stops at first nil param)
+  for _, src in pairs({...}) do
+    if type(src) == "function" then
+      local resolved_src = src()
+      if is_plugin_source_valid(resolved_src) then
+        return resolved_src
+      end
+    end
+    if is_plugin_source_valid(src) then
+      return src --[[@as plugsys.PlugSourceBase]]
+    end
+  end
+  vim.notify("Unable to find a valid source for '"..name.."' plugin", vim.log.levels.ERROR)
+  return M.sources.BAD_SOURCE(name)
+end
+
 -----------------------------------------------------------------
--- TODO(?): sort all_plugin_specs to have plugins that don't depend on anything first?
--- TODO: Make a list of plugin spec with only those plugins?
+-- MAYBE: sort all_plugin_specs to have plugins that don't depend on anything first?
+-- MAYBE: Make a list of plugin spec with only those plugins?
 
 function M.check_missing_plugins()
   for _, plugin_spec in pairs(STATE._named_plugin_specs) do
@@ -288,8 +368,5 @@ function M.show_plugins_dependencies()
     end
   end
 end
--- M.show_plugins_dependencies()
-
---------------------------------
 
 return M

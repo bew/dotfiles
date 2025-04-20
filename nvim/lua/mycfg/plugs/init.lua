@@ -2,7 +2,7 @@ local PluginSystem = require"mylib.plugin_system"
 
 -- Define custom plugin source for my local plugins
 ---@param name string Name of my local plugin (found in $NVIM_BEW_MYPLUGINS_PATH)
----@return PlugSourceLocal
+---@return plugsys.PlugSourceLocal
 PluginSystem.sources.myplug = function(name)
   local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
   assert((
@@ -42,6 +42,14 @@ require"mycfg.plugs.for_treesitter"
 require"mycfg.plugs.for_ui"
 require"mycfg.plugs.general_libs"
 require"mycfg.plugs.pkg_manager"
+-- PluginSystem.show_plugins_dependencies() -- DEBUG
 
 PluginSystem.check_missing_plugins()
-return PluginSystem.all_plugin_specs()
+local all_plugs = PluginSystem.all_plugin_specs()
+
+return {
+  ---@param opts plugsys.BootPlugOpts
+  boot_plugins = function(opts)
+    require"mylib.do_simple_plugin_boot"(all_plugs, opts)
+  end,
+}
