@@ -73,11 +73,20 @@ Plug {
     -- NOTE: 'H' group exists to make 'HN' spam-able by holding shift
 
     local gs = require"gitsigns"
-    local_leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="preview hunk"}
-    local_leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="undo (reset) hunk"}
-    local_leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="diff file"}
+    local_leader_map{mode={"n"}, key="hi", action=gs.preview_hunk_inline, desc="Preview hunk (inline)"}
+    local_leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="Preview hunk"}
+    local_leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="Undo (reset) hunk"}
+    local_leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="Diff file"}
+    local_leader_map{mode={"n"}, key="hO", action=gs.show,         desc="Show original file"}
     -- FIXME: there is no action to toggle fold of everything that didn't change
     -- local_leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
+
+    local_leader_map{mode={"n"}, key="hq", desc="qf all hunks in file", action=function()
+      gs.setqflist(0)
+    end}
+    local_leader_map{mode={"n"}, key="hQ", desc="qf all hunks in repo", action=function()
+      gs.setqflist("all")
+    end}
 
     -- next/prev hunk that also work in vim's diff mode
     my_actions.go_next_changed_hunk = mk_action_v2 {
@@ -110,8 +119,7 @@ Plug {
 
     -- toggles
     local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
-    local_leader_map{mode={"v"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
-    local_leader_map{mode={"n"}, key="htd", action=gs.toggle_deleted,            desc="toggle deleted lines"}
+    local_leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
     local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
     -- define hunk text object & visual selector
