@@ -79,6 +79,7 @@ Plug.fileexplorer {
       default_source = "filesystem",
       use_popups_for_input = false, -- force use vim.input
       sort_case_insensitive = true,
+      ---@diagnostic disable-next-line: missing-fields
       source_selector = {
         winbar = true,
         -- BROKEN: opened issue: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/848
