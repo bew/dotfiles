@@ -15,13 +15,15 @@ in {
   deps.plugins = {
     telescope-fzf-native = pkgs.vimPlugins.telescope-fzf-native-nvim;
 
+    lazy-nvim = pkgs.vimPlugins.lazy-nvim;
+
     nvim-treesitter = pkgs.symlinkJoin {
       name = "config-${config.ID}-treesitter-parsers";
       paths = let
         tsPackage = pkgs.vimPlugins.nvim-treesitter;
         # REF: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/nvim-treesitter/generated.nix
         # REF: https://github.com/nixos/nixpkgs/blob/master/pkgs/applications/editors/vim/plugins/nvim-treesitter/overrides.nix
-        tsParsersPackage = (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+        tsParsersPackage = (tsPackage.withPlugins (p: [
           # Grammars - important to have
           p.bash p.diff p.git_config p.git_rebase p.gitcommit p.gitignore p.hcl p.html p.ini
           p.javascript p.json p.just p.markdown p.markdown_inline p.nix p.python p.requirements
