@@ -43,7 +43,7 @@
 ---@field on_pre_load? fun() Hook run before plugin is loaded
 ---@field on_load? fun() Hook run just after plugin is loaded
 ---@field on_colorscheme_change? fun() Hook run when colorscheme changes
----@field _INVALID_SOURCE? boolean? True if the source is not valid
+---@field _INVALID? string Message explaining what is invalid about this spec
 
 ---@alias plugsys.PluginInstallPath string|(fun(): string)
 
@@ -115,7 +115,7 @@ local function check_plugin_source(spec)
     vim.notify(_f("Source for plugin", plugin_info, "is invalid"), vim.log.levels.ERROR)
     -- source isn't valid, disable the plugin
     spec.enabled = false
-    spec._INVALID_SOURCE = true
+    spec._INVALID = "Invalid source"
   end
 end
 
