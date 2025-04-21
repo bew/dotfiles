@@ -36,6 +36,67 @@ SpecialBufStatuslines.Cmdwin = {
   my.nvim.RulerAndCursorPos,
 }
 
+---@class myst.ListlineInfo
+---@field get_list_info (fun(what: any): any)
+---@field condition (fun(wininfo: any): boolean)
+---@field name string
+---@field scope string
+
+local LIST = {
+  ---@type myst.ListlineInfo
+  qflist = {
+    get_list_info = vim.fn.getqflist,
+    condition = function(wininfo)
+      return wininfo.quickfix == 1 and wininfo.loclist == 0
+    end,
+    name = "QUICKFIX LIST",
+    scope = "global",
+  },
+  ---@type myst.ListlineInfo
+  loclist = {
+    get_list_info = function(what)
+      return vim.fn.getloclist(0, what)
+    end,
+    condition = function(wininfo)
+      return wininfo.quickfix == 1 and wininfo.loclist == 1
+    end,
+    name = "LOCATION LIST",
+    scope = "local",
+  },
+}
+---@param list myst.ListlineInfo
+local function make_list_line(list)
+  return {
+    condition = function()
+      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
+      return list.condition(wininfo)
+    end,
+
+    {
+      provider = list.name,
+      hl = { cterm = { bold = true } },
+    },
+    _,
+    { provider = "(" .. list.scope .. ")" },
+    __WIDE_SPACE__,
+    {
+      provider = function()
+        local current_entry_idx1 = list.get_list_info{ idx = 0 }.idx
+        local nb_entries = list.get_list_info{ size = true }.size
+        return _f("Entry", current_entry_idx1, "of", nb_entries)
+      end,
+    },
+    __WIDE_SPACE__,
+    {
+      provider = function()
+        local list_nr = list.get_list_info{ nr = 0 }.nr
+        local nb_lists = list.get_list_info{ nr = "$" }.nr
+        return libU.str_concat("List n°", list_nr, "/", nb_lists)
+      end
+    },
+    _,
+  }
+end
 SpecialBufStatuslines.QuickfixOrLoc = {
   condition = function()
     return hline_conditions.buffer_matches{ buftype = { "quickfix" } }
@@ -43,49 +104,8 @@ SpecialBufStatuslines.QuickfixOrLoc = {
 
   my.nvim.Mode,
   _,
-  {
-    condition = function()
-      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
-      return wininfo.quickfix == 1 and wininfo.loclist == 0
-    end,
-
-    {
-      provider = "QUICKFIX LIST",
-      hl = { cterm = { bold = true } },
-    },
-    _,
-    { provider = "(global)" },
-    __WIDE_SPACE__,
-    {
-      provider = function()
-        local current_entry_idx1 = vim.fn.getqflist{ idx = 0 }.idx
-        local nb_entries = vim.fn.getqflist{ size = true }.size
-        return _f("Entry", current_entry_idx1, "of", nb_entries)
-      end,
-    },
-  },
-  {
-    condition = function()
-      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
-      return wininfo.quickfix == 1 and wininfo.loclist == 1
-    end,
-
-    {
-      provider = "LOCATION LIST",
-      hl = { cterm = { bold = true } },
-    },
-    _,
-    { provider = "(local)" },
-    __WIDE_SPACE__,
-    {
-      provider = function()
-        local current_entry_idx1 = vim.fn.getloclist(0, { idx = 0 }).idx
-        local nb_entries = vim.fn.getloclist(0, { size = true }).size
-        return _f("Entry", current_entry_idx1, "of", nb_entries)
-      end,
-    },
-  },
-  __WIDE_SPACE__,
+  make_list_line(LIST.qflist),
+  make_list_line(LIST.loclist),
   my.nvim.RulerAndCursorPos,
 }
 
