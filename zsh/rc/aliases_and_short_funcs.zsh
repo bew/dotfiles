@@ -277,7 +277,7 @@ alias v="nvim -R"
 # e: edit | v: view
 
 # Edit scratch buffer with given file extension (immediate insert mode!)
-function ef
+function _nvim-guess-filetype()
 {
   local extension="$1"
   local script="
@@ -293,8 +293,16 @@ function ef
   else
     >&2 echo "Deduced filetype=$filetype"
   fi
-
-  nvim +enew +"setf $filetype" +"set buftype=nofile" +startinsert
+  echo -n "$filetype"
+}
+function ef
+{
+  local extension="$1"
+  local filetype=
+  if [[ -n "$extension" ]]; then
+    filetype=$(_nvim-guess-filetype "$extension")
+  fi
+  nvim +enew +"set ft=$filetype" +"set buftype=nofile" +startinsert
 }
 
 
