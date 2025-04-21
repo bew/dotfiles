@@ -82,12 +82,20 @@ my_actions.goto_prev_diag_diff_line = mk_action_v2 {
   end,
 }
 
+my_actions.diags_set_qf = mk_action_v2 {
+  default_desc = "Set qf with diagnostics",
+  n = function()
+    vim.diagnostic.setqflist()
+  end
+}
+
 local_leader_map_define_group{mode={"n"}, prefix_key="d", name="+diagnostics"}
 local_leader_map{mode="n", key="dd", desc="Show diagnostics in popup", action=vim.diagnostic.open_float}
 local_leader_map{mode="n", key="dn", action=my_actions.goto_next_diag}
 local_leader_map{mode="n", key="dp", action=my_actions.goto_prev_diag}
 local_leader_map{mode="n", key="dj", action=my_actions.goto_next_diag_diff_line}
 local_leader_map{mode="n", key="dk", action=my_actions.goto_prev_diag_diff_line}
+local_leader_map{mode="n", key="dq", action=my_actions.diags_set_qf}
 
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
