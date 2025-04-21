@@ -68,6 +68,24 @@ snip("selected_text_debug", { desc = "debug selected lines" }, ls.function_node(
   return res
 end, {}))
 
+snip("lorem", { desc = "Lorem paragraph", rx = true }, ls.function_node(function()
+  local lorem_paragraphs = require"myassets.lorem_paragraphs"
+  return lorem_paragraphs[1]
+end))
+
+snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true }, ls.function_node(function(_args, snip)
+  local lorem_paragraphs = require"myassets.lorem_paragraphs"
+  local count = tonumber(snip.env.LS_CAPTURE_1)
+  local lines = {}
+  -- note: starting at 0 makes it easier to use modulo operator to get valid table index
+  for n = 0, (count -1) do
+    table.insert(lines, "") -- blank line
+    table.insert(lines, lorem_paragraphs[(n % #lorem_paragraphs) +1])
+  end
+  table.remove(lines, 1) -- remove first blank line
+  vim.print(lines)
+  return lines
+end))
 
 -- End of snippets definitions
 

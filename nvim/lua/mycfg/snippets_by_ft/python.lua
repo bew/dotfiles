@@ -309,7 +309,7 @@ snip(
 -- TODO: pytp  =>  pytest parametrize
 -- TODO: pyts  =>  pytest mark skip
 
-snip("([%w_]+)=", {desc = "arg=arg auto-fill", trigEngine = "pattern", wordTrig = false}, SU.myfmt {
+snip("([%w_]+)=", {desc = "arg=arg auto-fill", rx = true, wordTrig = false}, SU.myfmt {
   [[<param>=<param>]],
   {
     param = ls.function_node(function(_args, snip)
