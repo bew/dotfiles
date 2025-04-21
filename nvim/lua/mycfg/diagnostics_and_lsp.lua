@@ -18,14 +18,16 @@ vim.diagnostic.config {
 local goto_diag_by_severity_layers = function(args)
   local goto_opts = args.goto_opts
   for _, severity in ipairs({"ERROR", "WARN", "HINT"}) do
+    -- note: need to copy opts before passing to vim functions, as their impl will overwrite the
+    --   cursor position, which gives wrong pos for next severity check.
     goto_opts.severity = vim.diagnostic.severity[severity]
-    if args.get_diag_pos_fn(goto_opts) then
+    if args.get_diag_pos_fn(vim.deepcopy(goto_opts)) then
       -- There is a diagnostic for this severity, jump to it
-      args.goto_diag_fn(goto_opts)
+      args.goto_diag_fn(vim.deepcopy(goto_opts))
       return
     end
     -- otherwise, check the next severity..
-    print("no more diag with severity "..severity..", checking next severity..", vim.log.levels.DEBUG)
+    -- vim.notify("no more diag with severity "..severity..", checking next..", vim.log.levels.DEBUG) -- DEBUG
   end
   vim.notify("Zero diagnostics left 👍", vim.log.levels.INFO)
 end
@@ -60,7 +62,7 @@ my_actions.goto_next_diag_diff_line = mk_action_v2 {
       goto_diag_fn = vim.diagnostic.goto_next,
       goto_opts = {
         -- Start searching from next line
-        cursor_position = { --[[ row1 ]] vim.fn.line('.') + 1, --[[ col0 ]] 0 },
+        cursor_position = { --[[ row1 ]] vim.fn.line"." +1, --[[ col0 ]] 0 },
       },
     }
   end,
@@ -74,7 +76,7 @@ my_actions.goto_prev_diag_diff_line = mk_action_v2 {
       goto_diag_fn = vim.diagnostic.goto_prev,
       goto_opts = {
         -- Start searching from prev line
-        cursor_position = { --[[ row1 ]] vim.fn.line('.') - 1, --[[ col0 ]] 0 },
+        cursor_position = { --[[ row1 ]] vim.fn.line"." -1, --[[ col0 ]] 0 },
       },
     }
   end,
