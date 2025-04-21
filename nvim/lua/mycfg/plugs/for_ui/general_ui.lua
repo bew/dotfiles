@@ -254,3 +254,34 @@ Plug {
     toplevel_map{mode="n", key=[[<C-w>O]], action=[[<C-w>o]]}
   end,
 }
+
+Plug {
+  source = gh"stevearc/quicker.nvim",
+  desc = "Improved UI and workflow for the Neovim quickfix",
+  tags = {},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"quicker".setup {
+      on_qf = function()
+        toplevel_buf_map{mode="n", key=[[zo]], desc="More context lines", action=function()
+          require"quicker".expand { before = 1, after = 1, add_to_existing = true }
+        end}
+        toplevel_buf_map{mode="n", key=[[zi]], desc="Less context lines", action=function()
+          require"quicker".collapse()
+        end}
+        toplevel_buf_map{mode="n", key=[[ze]], desc="Make editable ('till save)", action=function()
+          require"quicker.editor".setup_editor(0)
+        end}
+
+        toplevel_buf_map{mode="n", key="zf", action=function()
+          vim.cmd.Telescope("quickfix")
+        end}
+      end,
+      -- enable edits only on-demand (see keys)
+      edit = { enabled = false },
+      max_filename_width = function()
+        return math.floor(math.min(50, vim.o.columns / 3))
+      end,
+    }
+  end,
+}

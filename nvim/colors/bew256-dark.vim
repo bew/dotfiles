@@ -155,6 +155,7 @@ exe "HiResetTo Todo"           .s:fmt_bold   .s:fg_bright_yellow
 exe "HiResetTo SpecialKey" .s:fmt_bold   .s:fg_base00 .s:bg_base02
 exe "HiResetTo NonText ctermfg=237"
 exe "HiResetTo StatusLine"   .s:fg_base02  .s:bg_base0
+HiResetTo QuickFixLine cterm=bold ctermbg=236
 exe "HiResetTo StatusLineNC"   .s:fg_base02 .s:bg_base00
 exe "HiResetTo Directory"   .s:fg_blue
 HiResetTo ErrorMsg ctermbg=124

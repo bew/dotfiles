@@ -147,6 +147,7 @@ Plug.telescope {
 
       -- N/I: Integration with quickfix list (send/add)
       ["<M-q>"] = tel_actions.send_selected_to_qflist + tel_actions.open_qflist,
+      ["<C-q>"] = tel_actions.send_selected_to_qflist + tel_actions.open_qflist,
       ["<C-M-q>"] = tel_actions.add_selected_to_qflist + tel_actions.open_qflist, -- (?)
 
       -- N/I: Layout actions
