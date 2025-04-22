@@ -1,1 +1,1 @@
-nvim-wip/after/ftplugin/yaml.lua
+yaml.lua
