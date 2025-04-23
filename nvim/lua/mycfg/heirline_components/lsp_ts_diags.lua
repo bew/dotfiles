@@ -25,7 +25,7 @@ M.LspActive = {
 
 M.TreesitterStatus = {
   condition = function()
-    U.is_treesitter_available_here()
+    return U.is_treesitter_available_here()
   end,
 
   provider = function()
