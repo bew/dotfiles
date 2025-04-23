@@ -437,6 +437,13 @@ vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
 -- And if I make a custom mapping it wouldn't be repeatable :/ (FIXME<i-action-not-repeatable>)
 
 
+-- Quickfix
+
+local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}
+local_leader_map{mode="n", key="qq", desc="Open quickfix", action=vim.cmd.copen}
+-- Other keybinds are added by qf' ftplugin & qf-specific plugin
+
+
 -- Survival keybindings - Command mode
 
 -- C: Cursor movement

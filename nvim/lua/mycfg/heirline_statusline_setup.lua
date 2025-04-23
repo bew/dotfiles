@@ -79,6 +79,15 @@ local function make_list_line(list)
     _,
     { provider = "(" .. list.scope .. ")" },
     __WIDE_SPACE__,
+
+    {
+      provider = function()
+        return list.get_list_info{ title = 0 }.title
+      end,
+      hl = { cterm = { italic = true } },
+    },
+
+    __WIDE_SPACE__,
     {
       provider = function()
         local current_entry_idx1 = list.get_list_info{ idx = 0 }.idx
@@ -86,7 +95,7 @@ local function make_list_line(list)
         return _f("Entry", current_entry_idx1, "of", nb_entries)
       end,
     },
-    __WIDE_SPACE__,
+    { provider = " ¦ " },
     {
       provider = function()
         local list_nr = list.get_list_info{ nr = 0 }.nr
@@ -102,7 +111,7 @@ SpecialBufStatuslines.QuickfixOrLoc = {
     return hline_conditions.buffer_matches{ buftype = { "quickfix" } }
   end,
 
-  my.nvim.Mode,
+  my.nvim.ModeOrWinNr,
   _,
   make_list_line(LIST.qflist),
   make_list_line(LIST.loclist),

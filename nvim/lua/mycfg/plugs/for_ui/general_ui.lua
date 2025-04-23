@@ -269,12 +269,8 @@ Plug {
         toplevel_buf_map{mode="n", key=[[zi]], desc="Less context lines", action=function()
           require"quicker".collapse()
         end}
-        toplevel_buf_map{mode="n", key=[[ze]], desc="Make editable ('till save)", action=function()
+        local_leader_buf_map{mode="n", key=[[qe]], desc="Make editable ('till save)", action=function()
           require"quicker.editor".setup_editor(0)
-        end}
-
-        toplevel_buf_map{mode="n", key="zf", action=function()
-          vim.cmd.Telescope("quickfix")
         end}
       end,
       -- enable edits only on-demand (see keys)

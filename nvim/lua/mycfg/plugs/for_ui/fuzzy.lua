@@ -226,6 +226,9 @@ Plug.telescope {
     -- DEFAULT LAYOUT
     default_cfg.layout_config = {
       prompt_position = "top",
+      vertical = {
+        mirror = true,
+      }
     }
     default_cfg.sorting_strategy = "ascending" -- make sure results are from top-to-bottom
     default_cfg.scroll_strategy = "limit" -- (not cycle!)
