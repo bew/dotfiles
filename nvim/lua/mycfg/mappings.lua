@@ -267,6 +267,17 @@ toplevel_map{mode="n", key="<C-k>", action=[[<C-w>k]], desc="Focus up win"}
 toplevel_map{mode="n", key="<C-l>", action=[[<C-w>l]], desc="Focus right win"}
 global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus previous win"}
 
+-- Focus windows by WinNr
+-- <C-w>N   -> N<C-w>w
+--
+-- mycfg-feature:direct-win-focus
+do
+  for winnr = 1, 9 do
+    vim.keymap.set("n", "<C-w>"..winnr, winnr.."<C-w>w")
+    global_leader_map{mode="n", key=tostring(winnr), action=(winnr .. "<C-w>w")}
+  end
+end
+
 -- Goto tabs Alt-a/z
 my_actions.go_prev_tab = mk_action_v2 {
   default_desc = "Go to prev tab",
@@ -727,18 +738,31 @@ global_leader_map{mode="n", key="<C-n><C-j>", action=make_new_file_action("down"
 global_leader_map{mode="n", key="<C-n><C-k>", action=make_new_file_action("up")}
 global_leader_map{mode="n", key="<C-n><C-l>", action=make_new_file_action("right")}
 
--- Focus windows by WinNr
--- <C-w>N   -> N<C-w>w
---
--- mycfg-feature:direct-win-focus
+-- Exchange bufs
+global_leader_map_define_group{mode="n", prefix_key=[[<C-x>]], name="+buf-exchange"}
+-- Exchange bufs between the 2 windows of a split
+global_leader_map{mode="n", key="<C-x><C-x>", desc="Between splits", action=[[<C-w>x<C-w><C-p>]]}
+-- Exchange bufs between current and an arbitrary target WinNr
 do
-  for i = 1, 9 do
-    vim.keymap.set("n", "<C-w>"..i, i.."<C-w>w")
-    global_leader_map{mode="n", key=tostring(i), action=(i .. "<C-w>w")}
+  for winnr = 1, 9 do
+    global_leader_map{mode="n", key="<C-x>"..winnr, desc="With win nr", action=function()
+      local target_winid = vim.fn.win_getid(winnr)
+      local current_winid = vim.api.nvim_get_current_win()
+      if target_winid == current_winid then
+        return -- No-op
+      end
+
+      local current_bufnr = vim.api.nvim_win_get_buf(current_winid)
+      local other_bufnr = vim.api.nvim_win_get_buf(target_winid)
+
+      -- Exchange the buffers
+      vim.api.nvim_win_set_buf(current_winid, other_bufnr)
+      vim.api.nvim_win_set_buf(target_winid, current_bufnr)
+      -- Focus the buffer we on before the exchange (now in the target win)
+      vim.api.nvim_set_current_win(target_winid)
+    end}
   end
 end
--- TODO: 'jump-to-last' window
---   (keep history of ~10-15 windows to handle window deletions gracefully)
 
 -- Smart window split (based on current window size)
 local function smart_split()
