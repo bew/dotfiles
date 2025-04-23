@@ -61,10 +61,7 @@
   unstage = reset HEAD
 
   # Restore from rev
-  restore-from = "!f() { \
-    local source=\"$1\"; shift; \
-    git restore --source=\"$source\" \"$@\"; \
-  }; f"
+  restore-from = restore --source
 
   # Stage the deletion of a file
   # NOTE: changes the index only (the staging area),
@@ -96,8 +93,6 @@
 
   # branch manipulations
 
-  chb = checkout -b
-  swc = switch -c
   nb = switch -c
   # note: nb is 'new branch'
 
@@ -108,13 +103,14 @@
 
   br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
   brg = br-gone
+  # note: Use `git trim` if installed, it's nice ;)
 
 
   # remote interaction
   ph = push
   # ref: https://blog.gitbutler.com/git-tips-2-new-stuff-in-git/#safe-force-pushing
   ph-force-safe = push --force-with-lease
-  phF = ph-force-safe
+  phf = ph-force-safe
   pl = pull
   rem = remote -v
 
