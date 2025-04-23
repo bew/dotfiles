@@ -148,7 +148,14 @@ patterns.big_why = {
 ------- Group: Tech usage notes keywords
 
 patterns.big_good = {
-  pattern = _big_word_variants"GOOD",
+  pattern = U.concat_lists {
+    _big_word_variants"GOOD",
+    _big_word_variants"NICE",
+    {
+      _U.keywordize"good:",
+      _U.keywordize"nice:",
+    },
+  },
   group = _U.define_hl("big_good", {
     ctermfg = 34,
   }),
