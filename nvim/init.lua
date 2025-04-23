@@ -501,6 +501,7 @@ end
 --   assert(spec.options, "a configurable action must actually expose options to be configurable..")
 -- end
 
+require"mycfg.mappings"
 
 -- ------ PLUGINS
 require"mycfg.plugs".boot_plugins {
@@ -512,8 +513,8 @@ require"mycfg.plugs".boot_plugins {
 -- maybe even under a kind of 'plugin' in my declared_plugins tree!
 -- (see ~/.dot/nvim-myplugins/ & PlugSource.myplug ?)
 
-require"mycfg.diagnostics_and_lsp"
-require"mycfg.mappings"
+require"mycfg.diagnostics_setup"
+require"mycfg.lsp_setup"
 
 
 -- FIXME: I don't know where to put this...
