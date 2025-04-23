@@ -235,6 +235,49 @@ PluginStatuslines.XtermColorTable = {
   __WIDE_SPACE__,
 }
 
+PluginStatuslines.CodeCompanionAI = {
+  condition = function()
+    return hline_conditions.buffer_matches{ filetype = {"codecompanion"} }
+  end,
+
+  my.nvim.ModeOrWinNr,
+  {
+    provider = " CodeCompanion Chat ",
+    hl = function()
+      return U.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+    end,
+  },
+  _,
+  {
+    provider = function()
+      local chat = require"codecompanion".buf_get_chat(0)
+      local current_adapter = chat.adapter.name
+      -- note: `adapter.schema` is the set of parameters for this adapter, and `model` is a standard
+      --   parameter across all adapters in the plugin.
+      --   `default`
+      local current_model = chat.adapter.schema.model.default
+      return require"mylib.utils".str_concat(current_adapter, " (", current_model, ")")
+    end,
+    on_click = {
+      name = "heirline_codecompanion_adapter_on_click",
+      callback = function()
+        local chat = require"codecompanion".buf_get_chat(0)
+        require"codecompanion.strategies.chat.keymaps".change_adapter.callback(chat)
+      end,
+    },
+  },
+
+  __WIDE_SPACE__,
+  {
+    provider = function()
+      local chat = require"codecompanion".buf_get_chat(0)
+      return "Prompt n°".. chat.cycle
+    end
+  },
+  _,
+  my.nvim.RulerAndCursorPos,
+}
+
 local GeneralPurposeStatusline = {
   my.nvim.ModeOrWinNr,
   { -- File info block
@@ -287,6 +330,7 @@ local Statuslines = {
   PluginStatuslines.SplashStartup,
   PluginStatuslines.XtermColorTable,
   PluginStatuslines.Neotree,
+  PluginStatuslines.CodeCompanionAI,
   GeneralPurposeStatusline, -- last fallback
 }
 
