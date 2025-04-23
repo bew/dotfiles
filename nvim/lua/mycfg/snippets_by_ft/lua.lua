@@ -38,7 +38,7 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
     -- Allows `---@foo|` or `---foo|` or `--- foo|`
     --   => `---@foo_or_foobar |`
     -- (must be first to have a chance to match before `@foo` below)
-    local context_rx = vim.tbl_extend("keep", context, { trigEngine = "pattern" })
+    local context_rx = vim.tbl_extend("keep", context, { rx = true })
     snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
@@ -154,7 +154,14 @@ end
 --------------------------
 
 -- NOTE: must be after annotations, to avoid matching `---d|`
-snip("d", {desc = "Documentation prefix", resolver = SR.delete_spaces_after_trigger}, { t"--- " })
+-- note: Does not include the ending space, I can easily add it and it helps with LuaLS function doc
+--   generation (which would otherwise add a space before all generated annotations ><).
+snip("d", {desc = "Documentation prefix", resolver = SR.delete_spaces_after_trigger}, { t"---" })
+
+snip("%-%-", {desc = "--[[block comment]]", rx = true}, SU.myfmt {
+  "--[[<comment>]]",
+  { comment = i(1, "comment") }
+})
 
 snip("rq", {desc = [[require"…"]]}, SU.myfmt {
   [[require"<module>"]],
