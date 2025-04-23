@@ -35,6 +35,17 @@ local function start_lsp_server()
     lineLength = 100,
     -- ref: https://docs.astral.sh/ruff/rules/
     select = {"F", "E", "W", "N", "UP", "RUF"},
+
+    -- Edit severity for some rules.
+    -- By default "E999" and "F" rules are marked as errors, all other rules are marked as warnings.
+    severities = {
+      -- Warning
+      F401 = "W", -- {name} imported but unused
+      F541 = "W", -- f-string without any placeholders
+      -- Hints
+      F841 = "H", -- Local variable {name} is assigned to but never used
+      F842 = "H", -- Local variable {name} is annotated but never used
+    },
   }
 
   vim.lsp.start {
