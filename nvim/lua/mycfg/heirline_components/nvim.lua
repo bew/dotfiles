@@ -76,7 +76,11 @@ M.Mode = {
 local WinNr_only = {
   -- mycfg-feature:direct-win-focus
   provider = function()
-    return vim.fn.winnr()
+    local winnr = vim.fn.winnr()
+    local after = ""
+    -- local winid = vim.fn.win_getid(winnr) -- helps win DEBUG
+    -- after = " (ID:"..winid..")" -- helps win DEBUG
+    return winnr .. after
   end,
 }
 
