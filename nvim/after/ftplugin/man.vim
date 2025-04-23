@@ -27,11 +27,7 @@ noremap <buffer> J <C-d>
 noremap <buffer> K <C-u>
 
 " Quit
-" Always quit a man buffer with q (and its loc list if opened).
-" This is necessary to work in all cases
-" (when involked as manpager and when using :Man in existing vim session)
-" See: https://github.com/neovim/neovim/issues/15544
-nnoremap <buffer><silent> q <cmd>lclose <bar> q<cr>
+lua toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 nnoremap <buffer><silent> <M-q> q
 
 nnoremap <buffer>  <M-o>  :Man <Right>

@@ -43,15 +43,30 @@ my_actions.save_buffer = mk_action_v2 {
 toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
 
 -- N: Quit window
-my_actions.close_window = mk_action_v2 {
-  default_desc = "Close window",
-  n = [[<cmd>quit<cr>]],
+--
+-- NOTE: Need a custom function to _always_ go back to the _last_ window
+-- For some reason, quitting a win will return to _some_ win, not always the _LAST_ win.
+-- NICE: It even works for all windows, not just the last one
+--   (last win is remembered for all win it seems 🤔)
+my_actions.close_win_back_to_last = mk_action_v2 {
+  default_desc = "Close win, back to last",
+  n = function()
+    local last_winid = vim.fn.win_getid(vim.fn.winnr("#"))
+
+    -- NOTE: Not using `vim.api.nvim_win_close` to ensure the `QuitPre` autocmd is properly run
+    -- (`QuitPre` can be used to auto-close related win when a main win is closed; e.g. commitia)
+    vim.cmd.quit()
+
+    if vim.api.nvim_win_is_valid(last_winid) then
+      vim.api.nvim_set_current_win(last_winid)
+    end
+    -- else we're already on a win since the current one was closed
+  end,
   map_opts = { silent = true },
 }
-toplevel_map{mode="n", key="Q", action=my_actions.close_window}
+toplevel_map{mode="n", key="Q", action=my_actions.close_win_back_to_last}
 -- <wm-mappings>
-global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_window}
-
+global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_win_back_to_last}
 
 -- N: logical redo
 my_actions.undo = mk_action_v2 {

@@ -5,7 +5,7 @@ toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current, desc="Jump 
 
 toplevel_buf_map{mode="n", key="<M-o>", action="<cr>"}
 
-toplevel_buf_map{mode="n", key="q", action=vim.cmd.quit, desc="Quick quit qf"}
+toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
 
 my_actions.qf_switch_to_older = mk_action_v2 {
