@@ -273,8 +273,7 @@ global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus p
 -- mycfg-feature:direct-win-focus
 do
   for winnr = 1, 9 do
-    vim.keymap.set("n", "<C-w>"..winnr, winnr.."<C-w>w")
-    global_leader_map{mode="n", key=tostring(winnr), action=(winnr .. "<C-w>w")}
+    global_leader_map{mode="n", key=tostring(winnr), desc="Focus win nr "..winnr, action=(winnr .. "<C-w>w")}
   end
 end
 
@@ -745,7 +744,7 @@ global_leader_map{mode="n", key="<C-x><C-x>", desc="Between splits", action=[[<C
 -- Exchange bufs between current and an arbitrary target WinNr
 do
   for winnr = 1, 9 do
-    global_leader_map{mode="n", key="<C-x>"..winnr, desc="With win nr", action=function()
+    global_leader_map{mode="n", key="<C-x>"..winnr, desc="With win nr "..winnr, action=function()
       local target_winid = vim.fn.win_getid(winnr)
       local current_winid = vim.api.nvim_get_current_win()
       if target_winid == current_winid then
