@@ -3,6 +3,8 @@ local hline_conditions = require"heirline.conditions"
 local U = require"mylib.utils"
 local UC = require"mylib.unicode"
 
+local _ = { provider = " " }
+
 local M = {}
 
 M.LspActive = {
@@ -27,10 +29,7 @@ M.TreesitterStatus = {
   condition = function()
     return U.is_treesitter_available_here()
   end,
-
-  provider = function()
-    return "TS"
-  end,
+  provider = "TS",
   hl = function()
     if vim.o.syntax ~= "" then
       -- TS is NOT used for syntax highlighting
@@ -40,6 +39,51 @@ M.TreesitterStatus = {
       return { ctermfg = 34 }
     end
   end,
+}
+
+---@param opts {hl: vim.api.keyset.highlight, sev: vim.diagnostic.Severity, icon: string}
+local function single_diagnostic(opts)
+  return {
+    condition = function()
+      local diags = vim.diagnostic.get(0, {severity = opts.sev})
+      return #diags > 0
+    end,
+    _,
+    {
+      provider = function()
+        local diags = vim.diagnostic.get(0, {severity = opts.sev})
+        return opts.icon .. #diags
+      end,
+    },
+    _,
+    hl = function()
+      opts.hl.bold = true
+      return opts.hl
+    end
+  }
+end
+
+M.Diagnostics = {
+  condition = function()
+    local diags = vim.diagnostic.get(0, { severity = { "ERROR", "WARN", "HINT" } })
+    return #diags > 0
+  end,
+  update = "DiagnosticChanged",
+  single_diagnostic {
+    sev = "ERROR",
+    icon = "E",
+    hl = { ctermfg = 250, ctermbg = 88 },
+  },
+  single_diagnostic {
+    sev = "WARN",
+    icon = "W",
+    hl = { ctermfg = 235, ctermbg = 214 },
+  },
+  single_diagnostic {
+    sev = "HINT",
+    icon = "H",
+    hl = { ctermfg = 250, ctermbg = 24 },
+  },
 }
 
 return M

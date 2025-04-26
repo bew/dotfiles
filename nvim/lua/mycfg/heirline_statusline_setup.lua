@@ -303,7 +303,7 @@ local GeneralPurposeStatusline = {
       end
     end,
   },
-  external_components.diagnostics(),
+  my.lsp_ts_diags.Diagnostics,
   {
     condition = function()
       local mc = require"multicursor-nvim"
