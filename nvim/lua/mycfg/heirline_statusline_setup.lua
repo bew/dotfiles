@@ -18,12 +18,7 @@ local PluginStatuslines = {}
 
 -- Looks like this: `/ Search history /`
 SpecialBufStatuslines.Cmdwin = {
-  condition = function()
-    -- NOTE: using `nvim_buf_get_name` gives the same BUT preceded by CWD.
-    --   `expand` always gives only that name.
-    --   Also, `expand` gives that name only for the statusline of cmdwin.
-    return vim.fn.expand("%") == "[Command Line]"
-  end,
+  condition = U.is_cmdwin,
 
   my.nvim.Mode,
   _,

@@ -57,7 +57,7 @@ my_actions.close_win_back_to_last = mk_action_v2 {
     -- (`QuitPre` can be used to auto-close related win when a main win is closed; e.g. commitia)
     vim.cmd.quit()
 
-    if vim.api.nvim_win_is_valid(last_winid) then
+    if vim.api.nvim_win_is_valid(last_winid) and not U.is_cmdwin() then
       vim.api.nvim_set_current_win(last_winid)
     end
     -- else we're already on a win since the current one was closed

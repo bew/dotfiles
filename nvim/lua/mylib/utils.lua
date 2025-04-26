@@ -399,6 +399,12 @@ function U.feed_keys_sync(keys, opts)
   vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
 end
 
+--- Returns whether current window is the cmdline-window
+---@return boolean
+function U.is_cmdwin()
+  return vim.fn.getcmdwintype() ~= ""
+end
+
 --- Returns whether the given path is a local directory
 ---@param path string
 ---@return boolean
