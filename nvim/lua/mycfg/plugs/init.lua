@@ -20,6 +20,7 @@ end
 PluginSystem.tags.careful_update = { desc = "Plugins I want to update carefully" }
 PluginSystem.tags.vimscript = { desc = "Plugins in vimscript" }
 PluginSystem.tags.ui = { desc = "Plugins for the global UI" }
+PluginSystem.tags.wm = { desc = "Plugins around Window Management" }
 PluginSystem.tags.content_ui = { desc = "Plugins for content UI" }
 PluginSystem.tags.editing = { desc = "Plugins about code/content editing" }
 PluginSystem.tags.insert = { desc = "Plugins adding stuff in insert mode" }

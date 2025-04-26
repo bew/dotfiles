@@ -282,6 +282,14 @@ PluginStatuslines.CodeCompanionAI = {
   my.nvim.RulerAndCursorPos,
 }
 
+PluginStatuslines.NoNeckPain = {
+  condition = function()
+    return vim.o.filetype == "no-neck-pain"
+  end,
+  -- basically nothing ¯\_(ツ)_/¯
+  __WIDE_SPACE__,
+}
+
 local GeneralPurposeStatusline = {
   my.nvim.ModeOrWinNr,
   { -- File info block
@@ -363,6 +371,7 @@ local Statuslines = {
   PluginStatuslines.XtermColorTable,
   PluginStatuslines.Neotree,
   PluginStatuslines.CodeCompanionAI,
+  PluginStatuslines.NoNeckPain,
   GeneralPurposeStatusline, -- last fallback
 }
 

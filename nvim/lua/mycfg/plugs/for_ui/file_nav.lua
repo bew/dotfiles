@@ -65,7 +65,7 @@ Plug.fileexplorer {
   tags = {"filesystem"},
   version = { branch = "v3.x" },
   depends_on = {Plug.lib_plenary, Plug.lib_nui, Plug.lib_web_devicons},
-  defer_load = { on_cmd = "Neotree" },
+  defer_load = { on_event = "VeryLazy", on_cmd = "Neotree" },
   on_load = function()
     require"neo-tree".setup {
       -- Don't hijack nvim's file explorer, Oil is nicer for that!
@@ -164,6 +164,8 @@ Plug.fileexplorer {
         bind_to_cwd = false, -- don't change tab cwd when opening Neotree with a dir
       },
     }
+
+    global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=vim.cmd.Neotree}
   end,
   on_colorscheme_change = function()
     -- Necessary as I don't have 'termguicolor' => ~all default colors are not available
