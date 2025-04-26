@@ -178,6 +178,7 @@ Plug {
   source = gh"mrcjkb/rustaceanvim",
   desc = "🦀 Supercharge your Rust experience in Neovim!",
   tags = {t.ft_support},
+  version = { tag = "v5.26.0" }, -- just before nvim 0.10 support drop
   -- defer_load not needed, it's already lazy by design
   on_load = function()
     vim.g.rustaceanvim = {
