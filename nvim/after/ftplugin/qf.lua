@@ -16,7 +16,7 @@ my_actions.qf_switch_to_older = mk_action_v2 {
   default_desc = "Switch to older qf",
   n = function()
     local qf_current_nr = vim.fn.getqflist{nr=0}.nr
-    print("DEBUG", "current nr:", qf_current_nr)
+    -- print("DEBUG", "current nr:", qf_current_nr)
     if qf_current_nr == 1 then
       vim.notify("Already at oldest quickfix list!", vim.log.levels.INFO)
     else
@@ -29,7 +29,7 @@ my_actions.qf_switch_to_newer = mk_action_v2 {
   n = function()
     local qf_stack_size = vim.fn.getqflist{nr="$"}.nr
     local qf_current_nr = vim.fn.getqflist{nr=0}.nr
-    print("DEBUG", "stack size:", qf_stack_size, "current nr:", qf_current_nr)
+    -- print("DEBUG", "stack size:", qf_stack_size, "current nr:", qf_current_nr)
     if qf_current_nr == qf_stack_size then
       vim.notify("Already at newest quickfix list!", vim.log.levels.INFO)
     else
