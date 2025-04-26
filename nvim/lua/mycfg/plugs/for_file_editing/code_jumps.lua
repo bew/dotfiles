@@ -95,6 +95,12 @@ Plug {
         ["<C-j>"] = false, -- clashes with my win nav
         ["<C-k>"] = false, -- clashes with my win nav
 
+        -- Jump & close win
+        ["<M-CR>"] = function()
+          require"aerial".select()
+          require"aerial".close()
+        end,
+
         -- FIXME: I want a simple way to preview whole node for the current item (like navbuddy),
         --   and a simple way to go back to where I was before all the navigation..
         --   (like the navbuddy popup)

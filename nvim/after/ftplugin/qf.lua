@@ -1,11 +1,16 @@
 local jump_to_current = [[<cr>zz<C-w>p]]
-toplevel_buf_map{mode="n", key="o",     action=jump_to_current, desc="Jump to current, stay in qf"}
+toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
 toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current, desc="Jump to current, stay in qf"}
 toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current, desc="Jump to next, stay in qf"}
 toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current, desc="Jump to prev, stay in qf"}
 
 toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
+
+toplevel_buf_map{mode="n", key="<M-CR>", desc="Jump to current, close qf", action=function()
+  require"mylib.utils".feed_keys_sync("<cr>", { replace_termcodes = true })
+  vim.cmd.cclose()
+end}
 
 my_actions.qf_switch_to_older = mk_action_v2 {
   default_desc = "Switch to older qf",

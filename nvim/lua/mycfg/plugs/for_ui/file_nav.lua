@@ -67,7 +67,7 @@ Plug.fileexplorer {
   depends_on = {Plug.lib_plenary, Plug.lib_nui, Plug.lib_web_devicons},
   defer_load = { on_cmd = "Neotree" },
   on_load = function()
-    require("neo-tree").setup {
+    require"neo-tree".setup {
       -- Don't hijack nvim's file explorer, Oil is nicer for that!
       hijack_netrw_behavior = "disabled",
 
@@ -105,6 +105,16 @@ Plug.fileexplorer {
           ["z"] = "noop",
           ["zC"] = "close_all_nodes",
           -- ["zA"] = "expand_all_nodes", -- BROKEN: crashes neovim :eyes:
+
+          ["<M-CR>"] = {
+            desc = "Open item and close Neo-tree",
+            function(state)
+              -- Use Neo-tree's built-in open action
+              require"neo-tree.sources.filesystem.commands".open(state)
+              -- Then close Neo-tree
+              require"neo-tree.command".execute({ action = "close" })
+            end,
+          },
         },
       },
       -- event_handlers = {},
