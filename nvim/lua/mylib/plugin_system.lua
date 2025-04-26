@@ -40,6 +40,7 @@
 ---@field version? plugsys.PluginVersionSpec
 ---@field depends_on? plugsys.PluginSpecDeclared[]
 ---@field config_depends_on? plugsys.PluginSpecDeclared[]
+---@field defer_load? plugsys.PluginDeferredLoadSpec
 ---@field on_pre_load? fun() Hook run before plugin is loaded
 ---@field on_load? fun() Hook run just after plugin is loaded
 ---@field on_colorscheme_change? fun() Hook run when colorscheme changes
@@ -52,6 +53,12 @@
 ---    (as function, called if pkg source has no (specified/existing) path)
 ---@field bootstrap_itself? fun(self, ctx: plugsys.BootPlugContext)
 ---@field on_boot fun(self, ctx: plugsys.BootPlugContext)
+
+---@class plugsys.PluginDeferredLoadSpec
+---@field autodetect? boolean When true, the plugin will only be loaded when needed
+---@field on_event? string|string[] Defer load on (builtin/user) event(s)
+---@field on_ft? string|string[] Defer load on filetype(s)
+---@field on_cmd? string|string[] Defer load on command(s)
 
 ---@class plugsys.PluginVersionSpec
 ---@field tag? string
