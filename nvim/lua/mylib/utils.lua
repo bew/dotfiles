@@ -97,7 +97,7 @@ end
 ---   "and", more,
 --- }
 --- ```
----@param ... string|string[]
+---@param ... string|any
 ---@return string
 function U.str_space_concat(...)
   local strs = U.normalize_multi_args(...)
@@ -120,7 +120,7 @@ end
 ---   ")$",
 --- }
 --- ```
----@param ... string|string[]
+---@param ... string|any
 ---@return string
 function U.str_concat(...)
   local strs = U.normalize_multi_args(...)

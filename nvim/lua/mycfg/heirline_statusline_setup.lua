@@ -304,6 +304,34 @@ local GeneralPurposeStatusline = {
     end,
   },
   external_components.diagnostics(),
+  {
+    condition = function()
+      local mc = require"multicursor-nvim"
+      return mc.hasCursors()
+    end,
+    _,
+    -- 5 cursors
+    -- 2 cursors (+5 off)
+    {
+      provider = function()
+        local mc = require"multicursor-nvim"
+        local num_disabled = mc.numDisabledCursors()
+        local num_enabled = mc.numEnabledCursors()
+        local ret = _f(num_enabled, "cursors")
+        if num_disabled > 0 then
+          ret = ret .. libU.str_concat(" (+", num_disabled, " off)")
+        end
+        return ret
+      end,
+      hl = function()
+        if require"multicursor-nvim".cursorsEnabled() then
+          return { ctermfg = 196, bold = true, italic = true }
+        else
+          return { ctermfg = 247, italic = true }
+        end
+      end,
+    },
+  },
   __WIDE_SPACE__,
   external_components.lsp({ lsp_client_names = false }), -- LSP progress messages
   {
