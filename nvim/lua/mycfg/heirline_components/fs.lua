@@ -1,4 +1,4 @@
-local U = require"mycfg.heirline_components.utils"
+local _U = require"mycfg.heirline_components.utils"
 
 local M = {}
 
@@ -24,7 +24,7 @@ M.FileOutOfCwd = {
   provider = function()
     local buf_name = vim.api.nvim_buf_get_name(0)
     if not vim.startswith(buf_name, vim.fn.getcwd()) then
-      return U.unicode_or(" ", "[EXT]")
+      return _U.unicode_or(" ", "[EXT]")
     end
   end,
 }
@@ -40,7 +40,7 @@ M.FilenameTwoParts = {
     else
       -- IDEA: Add a case when the buf_name is in pwd (color? front unicode char?),
       -- to not just have a big bufname just because it's not saved on disk yet.
-      return U.some_text_or(buf_name, "[No Name]")
+      return _U.some_text_or(buf_name, "[No Name]")
     end
   end,
   hl = function()

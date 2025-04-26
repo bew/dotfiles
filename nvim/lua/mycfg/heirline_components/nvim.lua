@@ -1,7 +1,7 @@
 local hline_conditions = require"heirline.conditions"
 
-local U = require"mycfg.heirline_components.utils"
-local _ = U.SPACE
+local _U = require"mycfg.heirline_components.utils"
+local _ = _U.SPACE
 
 local M = {}
 
@@ -13,7 +13,7 @@ end
 local ModeInnerText_only = {
   provider = function(self)
     -- MUST be under `Mode` to have the correct variable set!
-    return U.some_text_or(self.matching_mode_spec.text, "?!")
+    return _U.some_text_or(self.matching_mode_spec.text, "?!")
   end,
 }
 
@@ -116,7 +116,7 @@ M.ModeOrWinNr = {
 -- few simple blocks (simple.. for now)
 M.Changed = {
   provider = function()
-    return vim.bo.modified and U.unicode_or(" ", "[+]")
+    return vim.bo.modified and _U.unicode_or(" ", "[+]")
   end,
   hl = function()
     return { ctermfg = 208 }
@@ -138,7 +138,7 @@ M.ReadOnly = {
   condition = function() return vim.bo.readonly end,
 
   provider = function()
-    return U.unicode_or(" ", "[RO]")
+    return _U.unicode_or(" ", "[RO]")
   end,
   hl = function()
     if hline_conditions.is_active() then

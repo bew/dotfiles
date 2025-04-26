@@ -1,13 +1,13 @@
 local hline_conditions = require"heirline.conditions"
 local external_components = require"heirline-components.all".component
 
-local libU = require"mylib.utils"
-local _f = libU.str_space_concat
+local U = require"mylib.utils"
+local _f = U.str_space_concat
 
 local my = require"mycfg.heirline_components"
-local U = my.U
-local _ = U.SPACE
-local __WIDE_SPACE__ = U.__WIDE_SPACE__
+local _U = require"mycfg.heirline_components.utils"
+local _ = _U.SPACE
+local __WIDE_SPACE__ = _U.__WIDE_SPACE__
 
 --------------------------------------------------------------------------------
 -- Per-use statuslines
@@ -95,7 +95,7 @@ local function make_list_line(list)
       provider = function()
         local list_nr = list.get_list_info{ nr = 0 }.nr
         local nb_lists = list.get_list_info{ nr = "$" }.nr
-        return libU.str_concat("List n°", list_nr, "/", nb_lists)
+        return U.str_concat("List n°", list_nr, "/", nb_lists)
       end
     },
     _,
@@ -122,7 +122,7 @@ SpecialBufStatuslines.Help = {
   {
     provider = " HELP ",
     hl = function()
-      return U.white_with_bg{ active_ctermbg = 91, inactive_ctermbg = 54 }
+      return my.utils.white_with_bg{ active_ctermbg = 91, inactive_ctermbg = 54 }
     end,
   },
   _,
@@ -142,7 +142,7 @@ SpecialBufStatuslines.Man = {
   {
     provider = " Man ",
     hl = function()
-      return U.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+      return my.utils.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
     end,
   },
   {
@@ -195,7 +195,7 @@ PluginStatuslines.Neotree = {
   {
     provider = " Ntree ",
     hl = function()
-      return U.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+      return my.utils.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
     end,
   },
   {
@@ -233,7 +233,7 @@ PluginStatuslines.XtermColorTable = {
   {
     provider = " XTerm color table ",
     hl = function()
-      return U.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+      return my.utils.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
     end,
   },
   __WIDE_SPACE__,
@@ -248,7 +248,7 @@ PluginStatuslines.CodeCompanionAI = {
   {
     provider = " CodeCompanion Chat ",
     hl = function()
-      return U.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
+      return my.utils.white_with_bg{ active_ctermbg = 130, inactive_ctermbg = 94 }
     end,
   },
   _,
@@ -314,7 +314,7 @@ local GeneralPurposeStatusline = {
         local num_enabled = mc.numEnabledCursors()
         local ret = _f(num_enabled, "cursors")
         if num_disabled > 0 then
-          ret = ret .. libU.str_concat(" (+", num_disabled, " off)")
+          ret = ret .. U.str_concat(" (+", num_disabled, " off)")
         end
         return ret
       end,

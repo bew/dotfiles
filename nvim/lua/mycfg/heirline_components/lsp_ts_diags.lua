@@ -3,7 +3,8 @@ local hline_conditions = require"heirline.conditions"
 local U = require"mylib.utils"
 local UC = require"mylib.unicode"
 
-local _ = { provider = " " }
+local _U = require"mycfg.heirline_components.utils"
+local _ = _U.SPACE
 
 local M = {}
 
