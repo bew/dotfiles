@@ -175,8 +175,8 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
 -- - (nothing after)
 snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger}, ls.dynamic_node(1, function()
   local rest_of_line = U.get_rest_of_line()
-  if rest_of_line:match"^[^ ]+ =" then
-    -- rest_of_line looks like `|foo = ...`
+  if rest_of_line:match"^[^ ]+ =" or rest_of_line:match"^function " then
+    -- rest_of_line looks like `|foo = ...` or `|function foo...`
     -- only add `local`
     return ls.snippet_node(nil, t"local ")
   end
@@ -257,6 +257,11 @@ snip("then", {desc = "then ... end"}, SU.myfmt {
     end
   ]],
   { body = SU.insert_node_default_selection(1) },
+})
+
+snip("eli", {desc = "elseif ... then"}, SU.myfmt {
+  [[elseif <cond> then]],
+  { cond = i(1) },
 })
 
 snip("th", {desc = "then ... end"}, SU.myfmt {
@@ -359,7 +364,7 @@ snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 --   (or NOT in a table def nor in an fn arguments list)
 snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
   [[
-    function<maybe_name>(<args>)
+    <maybe_local>function<maybe_name>(<args>)
       <body>
     end
   ]],
@@ -368,8 +373,12 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
       { t" ", i(1, "function_name") },
       t"",
     }),
-    args = i(2),
-    body = SU.insert_node_default_selection(3),
+    maybe_local = ls.choice_node(2, {
+      t"local ",
+      t"",
+    }),
+    args = i(3),
+    body = SU.insert_node_default_selection(4),
   },
 })
 -- A snippet for the function type, must be on a `---@something` line (after).
