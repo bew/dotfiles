@@ -14,16 +14,18 @@ Plug {
   desc = "Multiple cursors in Neovim which work how you expect",
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
+    -- FIXME: Cursors are a bit too easy to hide
+    --   ISSUE: https://github.com/jake-stewart/multicursor.nvim/issues/117
     local mc = require"multicursor-nvim"
     mc.setup()
 
     K.toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space>", name="+multicursor"}
 
     -- Add or skip cursor above/below the main cursor.
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-j>", desc="Add cursor, jump down", action=function() mc.lineAddCursor(1) end}
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-k>", desc="Add cursor, jump up", action=function() mc.lineAddCursor(-1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-j>", desc="Add cursor, jump down",  action=function() mc.lineAddCursor(1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-k>", desc="Add cursor, jump up",    action=function() mc.lineAddCursor(-1) end}
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-J>", desc="Skip cursor, jump down", action=function() mc.lineSkipCursor(1) end}
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-K>", desc="Skip cursor, jump up", action=function() mc.lineSkipCursor(-1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-K>", desc="Skip cursor, jump up",   action=function() mc.lineSkipCursor(-1) end}
 
     --- Search/Match action around main cursor
     ---@param opts {dir?: "prev"|"next", match_fn: fun(dir?: integer), search_fn: fun(dir?: integer)}
@@ -33,6 +35,10 @@ Plug {
       if vim.v.hlsearch == 1 then
         -- We have an active search, use search results
         opts.search_fn(dir)
+        -- Make sure hlsearch isn't reset 👀
+        vim.v.hlsearch = 1
+        -- FIXME: DOES NOT WORK..
+        --   ISSUE: https://github.com/jake-stewart/multicursor.nvim/issues/118
       else
         -- Otherwise use current selection or current word to find matches
         opts.match_fn(dir)
@@ -80,8 +86,9 @@ Plug {
     -- Add cursors for all regex results within visual selection(s)
     K.toplevel_map{mode="v", key="<M-Space><M-/>", desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
     K.toplevel_map{mode="v", key="<M-Space>/",     desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
+    K.toplevel_map{mode="v", key="<M-Space><M-m>", desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
 
-    -- Add and remove cursors with Alt + left click.
+    -- Add and remove cursors with Alt + left click (note: drag seems to only work vertically)
     K.toplevel_map{mode="n", key="<M-LeftMouse>",   action=mc.handleMouse}
     K.toplevel_map{mode="n", key="<M-LeftDrag>",    action=mc.handleMouseDrag}
     K.toplevel_map{mode="n", key="<M-LeftRelease>", action=mc.handleMouseRelease}
@@ -104,24 +111,27 @@ Plug {
 
     -- Mappings defined in a keymap layer only apply when there are
     -- multiple cursors. This lets you have overlapping mappings.
-    mc.addKeymapLayer(function(mc_map)
-      -- Select a different cursor as the main one.
-      mc_map({"n", "v"}, "<left>", mc.prevCursor, { desc = "Select prev cursor" })
-      mc_map({"n", "v"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
-      mc_map({"n", "v"}, "<M-Space><M-c>", mc.nextCursor, { desc = "Select next cursor" })
+    mc.addKeymapLayer(function(layer_map)
+      -- Select a different cursor as the main one
+      layer_map({"n", "v"}, "<left>",  mc.prevCursor, { desc = "Select prev cursor" })
+      layer_map({"n", "v"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
+      layer_map({"n", "v"}, "<M-c>",   mc.nextCursor, { desc = "Cycle cursors" })
 
-      -- Delete the main cursor.
-      mc_map({"n", "v"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
+      layer_map({"n", "v"}, "<M-Space>1", mc.firstCursor, { desc = "Select first(top) cursor" })
+      layer_map({"n", "v"}, "<M-Space>9", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
 
-      mc_map("n", "<M-Space><M-Esc>", function()
+      -- Delete the main cursor
+      layer_map({"n", "v"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
+
+      layer_map("n", "<M-Space><M-Esc>", function()
         if mc.hasCursors() then
           mc.clearCursors()
         end
       end, { desc = "Clear cursors" })
 
-      -- Increment/decrement sequences, treating all cursors as one sequence.
-      mc_map({"n", "v"}, "g<C-a>", mc.sequenceIncrement)
-      mc_map({"n", "v"}, "g<C-x>", mc.sequenceDecrement)
+      -- Increment/decrement sequences, treating all cursors as one sequence
+      layer_map({"n", "v"}, "g<C-a>", mc.sequenceIncrement)
+      layer_map({"n", "v"}, "g<C-x>", mc.sequenceDecrement)
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
