@@ -167,7 +167,9 @@ Plug.fileexplorer {
       },
     }
 
-    K.global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=vim.cmd.Neotree}
+    K.global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=function()
+      vim.cmd.Neotree("toggle")
+    end}
   end,
   on_colorscheme_change = function()
     -- Necessary as I don't have 'termguicolor' => ~all default colors are not available
