@@ -34,11 +34,15 @@ Plug {
     local function search_or_match_cursor_action(opts)
       ---@type integer?
       local dir = ({next = 1, prev = -1})[opts.dir]
-      if vim.v.hlsearch == 1 then
+      local has_selection = vim.tbl_contains({"v", "V", ""}, vim.fn.mode())
+      if has_selection then
+        -- We have active visual selection, use it to find matches
+        opts.match_fn(dir)
+      elseif vim.v.hlsearch == 1 then
         -- We have an active search, use search results
         opts.search_fn(dir)
       else
-        -- Otherwise use current selection or current word to find matches
+        -- Otherwise use current word to find matches
         opts.match_fn(dir)
       end
     end
@@ -111,25 +115,25 @@ Plug {
     -- multiple cursors. This lets you have overlapping mappings.
     mc.addKeymapLayer(function(layer_map)
       -- Select a different cursor as the main one
-      layer_map({"n", "v"}, "<left>",  mc.prevCursor, { desc = "Select prev cursor" })
-      layer_map({"n", "v"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
-      layer_map({"n", "v"}, "<M-c>",   mc.nextCursor, { desc = "Cycle cursors" })
+      layer_map({"n", "x"}, "<left>",  mc.prevCursor, { desc = "Select prev cursor" })
+      layer_map({"n", "x"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
+      layer_map({"n", "x"}, "<M-c>",   mc.nextCursor, { desc = "Cycle cursors" })
 
-      layer_map({"n", "v"}, "<M-Space>1", mc.firstCursor, { desc = "Select first(top) cursor" })
-      layer_map({"n", "v"}, "<M-Space>9", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
+      layer_map({"n", "x"}, "<M-Space>1", mc.firstCursor, { desc = "Select first(top) cursor" })
+      layer_map({"n", "x"}, "<M-Space>9", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
 
       -- Delete the main cursor
-      layer_map({"n", "v"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
+      layer_map({"n", "x"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
 
-      layer_map("n", "<M-Space><M-Esc>", function()
+      layer_map({"n", "x"}, "<M-Space><M-Esc>", function()
         if mc.hasCursors() then
           mc.clearCursors()
         end
       end, { desc = "Clear cursors" })
 
       -- Increment/decrement sequences, treating all cursors as one sequence
-      layer_map({"n", "v"}, "g<C-a>", mc.sequenceIncrement)
-      layer_map({"n", "v"}, "g<C-x>", mc.sequenceDecrement)
+      layer_map({"n", "x"}, "g<C-a>", mc.sequenceIncrement)
+      layer_map({"n", "x"}, "g<C-x>", mc.sequenceDecrement)
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
