@@ -165,5 +165,7 @@ Plug {
       ctermfg = 238,
       ctermbg = 248,
     })
+    vim.api.nvim_set_hl(0, "MultiCursorVisual", { ctermbg = 52 })
+    vim.api.nvim_set_hl(0, "MultiCursorDisabledVisual", { ctermbg = 236 })
   end,
 }
