@@ -7,6 +7,8 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui, "nav" },
 }
 
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug.telescope {
@@ -296,21 +298,21 @@ Plug.telescope {
     local tel_builtin = require"telescope.builtin"
 
     -- Direct key for most used search!
-    toplevel_map{mode={"n"}, key="<M-f>", desc="Fuzzy search files", action=tel_builtin.find_files}
-    toplevel_map{mode={"n"}, key="<M-F>", desc="Fuzzy search _all_ files", action=function()
+    K.toplevel_map{mode={"n"}, key="<M-f>", desc="Fuzzy search files", action=tel_builtin.find_files}
+    K.toplevel_map{mode={"n"}, key="<M-F>", desc="Fuzzy search _all_ files", action=function()
       tel_builtin.find_files { no_ignore = true }
     end}
 
-    toplevel_map_define_group{mode={"n"}, prefix_key="<C-f>", name="+Fuzzy search"}
-    toplevel_map{mode={"n"}, key="<C-f><C-f>", desc="… Resume last", action=tel_builtin.resume} -- ✨
-    toplevel_map{mode={"n"}, key="<C-f><C-z>", desc="Pick a picker…", action=function() vim.cmd.Telescope("picker_list") end}
-    toplevel_map{mode={"n"}, key="<C-f><C-g>", desc="Live Grep", action=tel_builtin.live_grep} -- use C-Space to fuzzy refine
-    toplevel_map{mode={"n"}, key="<C-f><C-r>", desc="Frecency", action=function() vim.cmd.Telescope("frecency") end}
-    toplevel_map{mode={"n"}, key="<C-f><C-m>", desc="Commands", action=tel_builtin.commands} -- note: <C-f><C-c> broken 🤔
-    toplevel_map{mode={"n"}, key="<C-f><C-h>", desc="Help Tags", action=tel_builtin.help_tags}
-    toplevel_map{mode={"n"}, key="<C-f><C-j>", desc="Jumps", action=tel_builtin.jumplist}
-    toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="Buffer lines", action=tel_builtin.current_buffer_fuzzy_find}
-    toplevel_map{mode={"n"}, key="<C-f><C-Space>", desc="Buffers", action=tel_builtin.buffers}
+    K.toplevel_map_define_group{mode={"n"}, prefix_key="<C-f>", name="+Fuzzy search"}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-f>", desc="… Resume last", action=tel_builtin.resume} -- ✨
+    K.toplevel_map{mode={"n"}, key="<C-f><C-z>", desc="Pick a picker…", action=function() vim.cmd.Telescope("picker_list") end}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-g>", desc="Live Grep", action=tel_builtin.live_grep} -- use C-Space to fuzzy refine
+    K.toplevel_map{mode={"n"}, key="<C-f><C-r>", desc="Frecency", action=function() vim.cmd.Telescope("frecency") end}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-m>", desc="Commands", action=tel_builtin.commands} -- note: <C-f><C-c> broken 🤔
+    K.toplevel_map{mode={"n"}, key="<C-f><C-h>", desc="Help Tags", action=tel_builtin.help_tags}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-j>", desc="Jumps", action=tel_builtin.jumplist}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-l>", desc="Buffer lines", action=tel_builtin.current_buffer_fuzzy_find}
+    K.toplevel_map{mode={"n"}, key="<C-f><C-Space>", desc="Buffers", action=tel_builtin.buffers}
   end,
   on_colorscheme_change = function()
     local function get_hl(name)

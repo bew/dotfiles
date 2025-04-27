@@ -1,4 +1,7 @@
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 vim.diagnostic.config {
   -- Disable signs in the gutter
   -- They are annoying when a line has 2+ diagnostics as other signs (like git) are overwriten..
@@ -40,7 +43,7 @@ local goto_diag_by_severity_layers = function(args)
   vim.notify("Zero diagnostics left 👍", vim.log.levels.INFO)
 end
 
-my_actions.goto_next_diag = mk_action_v2 {
+my_actions.goto_next_diag = A.mk_action {
   default_desc = "Go to next diagnostic (by severity)",
   n = function()
     goto_diag_by_severity_layers {
@@ -51,7 +54,7 @@ my_actions.goto_next_diag = mk_action_v2 {
   end,
 }
 
-my_actions.goto_prev_diag = mk_action_v2 {
+my_actions.goto_prev_diag = A.mk_action {
   default_desc = "Go to prev diagnostic (by severity)",
   n = function()
     goto_diag_by_severity_layers {
@@ -62,7 +65,7 @@ my_actions.goto_prev_diag = mk_action_v2 {
   end,
 }
 
-my_actions.goto_next_diag_diff_line = mk_action_v2 {
+my_actions.goto_next_diag_diff_line = A.mk_action {
   default_desc = "Go to next diagnostic (by severity, != line)",
   n = function()
     goto_diag_by_severity_layers {
@@ -76,7 +79,7 @@ my_actions.goto_next_diag_diff_line = mk_action_v2 {
   end,
 }
 
-my_actions.goto_prev_diag_diff_line = mk_action_v2 {
+my_actions.goto_prev_diag_diff_line = A.mk_action {
   default_desc = "Go to prev diagnostic (by severity, != line)",
   n = function()
     goto_diag_by_severity_layers {
@@ -90,7 +93,7 @@ my_actions.goto_prev_diag_diff_line = mk_action_v2 {
   end,
 }
 
-my_actions.fuzzy_buf_diags = mk_action_v2 {
+my_actions.fuzzy_buf_diags = A.mk_action {
   default_desc = "Fuzzy buf diagnostics",
   n = function()
     require"telescope.builtin".diagnostics {
@@ -99,7 +102,7 @@ my_actions.fuzzy_buf_diags = mk_action_v2 {
     }
   end,
 }
-my_actions.fuzzy_all_diags = mk_action_v2 {
+my_actions.fuzzy_all_diags = A.mk_action {
   default_desc = "Fuzzy all diagnostics",
   n = function()
     require"telescope.builtin".diagnostics {
@@ -108,21 +111,21 @@ my_actions.fuzzy_all_diags = mk_action_v2 {
   end,
 }
 
-my_actions.qf_buf_diags = mk_action_v2 {
+my_actions.qf_buf_diags = A.mk_action {
   default_desc = "Set qf with buf diagnostics",
   n = function()
     vim.diagnostic.setloclist { title = "Buffer Diagnostics" }
   end,
 }
 
-my_actions.qf_all_diags = mk_action_v2 {
+my_actions.qf_all_diags = A.mk_action {
   default_desc = "Set qf with all diagnostics",
   n = function()
     vim.diagnostic.setqflist { title = "All Diagnostics" }
   end,
 }
 
-my_actions.qf_buf_diags_by_severity = mk_action_v2 {
+my_actions.qf_buf_diags_by_severity = A.mk_action {
   default_desc = "Set qf with buf diagnostics",
   n = function()
     local diags = {}
@@ -138,7 +141,7 @@ my_actions.qf_buf_diags_by_severity = mk_action_v2 {
   end,
 }
 
-my_actions.qf_all_diags_by_severity = mk_action_v2 {
+my_actions.qf_all_diags_by_severity = A.mk_action {
   default_desc = "Set qf with all diagnostics",
   n = function()
     local diags = {}
@@ -154,13 +157,13 @@ my_actions.qf_all_diags_by_severity = mk_action_v2 {
   end,
 }
 
-local_leader_map_define_group{mode={"n"}, prefix_key="d", name="+diagnostics"}
-local_leader_map{mode="n", key="dd", desc="Show diagnostics in popup", action=vim.diagnostic.open_float}
-local_leader_map{mode="n", key="dn", action=my_actions.goto_next_diag}
-local_leader_map{mode="n", key="dp", action=my_actions.goto_prev_diag}
-local_leader_map{mode="n", key="dj", action=my_actions.goto_next_diag_diff_line}
-local_leader_map{mode="n", key="dk", action=my_actions.goto_prev_diag_diff_line}
-local_leader_map{mode="n", key="df", action=my_actions.fuzzy_buf_diags}
-local_leader_map{mode="n", key="dF", action=my_actions.fuzzy_all_diags}
-local_leader_map{mode="n", key="dq", action=my_actions.qf_buf_diags_by_severity}
-local_leader_map{mode="n", key="dQ", action=my_actions.qf_all_diags_by_severity}
+K.local_leader_map_define_group{mode={"n"}, prefix_key="d", name="+diagnostics"}
+K.local_leader_map{mode="n", key="dd", desc="Show diagnostics in popup", action=vim.diagnostic.open_float}
+K.local_leader_map{mode="n", key="dn", action=my_actions.goto_next_diag}
+K.local_leader_map{mode="n", key="dp", action=my_actions.goto_prev_diag}
+K.local_leader_map{mode="n", key="dj", action=my_actions.goto_next_diag_diff_line}
+K.local_leader_map{mode="n", key="dk", action=my_actions.goto_prev_diag_diff_line}
+K.local_leader_map{mode="n", key="df", action=my_actions.fuzzy_buf_diags}
+K.local_leader_map{mode="n", key="dF", action=my_actions.fuzzy_all_diags}
+K.local_leader_map{mode="n", key="dq", action=my_actions.qf_buf_diags_by_severity}
+K.local_leader_map{mode="n", key="dQ", action=my_actions.qf_all_diags_by_severity}

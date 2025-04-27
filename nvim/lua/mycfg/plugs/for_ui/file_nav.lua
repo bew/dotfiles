@@ -6,6 +6,8 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui, "nav" },
 }
 
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug {
@@ -54,7 +56,7 @@ Plug {
       },
     }
 
-    toplevel_map{mode={"n"}, key="-", action=[[<cmd>Oil<cr>]], desc="Oil: Open parent dir"}
+    K.toplevel_map{mode={"n"}, key="-", action=[[<cmd>Oil<cr>]], desc="Oil: Open parent dir"}
   end,
 }
 
@@ -165,7 +167,7 @@ Plug.fileexplorer {
       },
     }
 
-    global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=vim.cmd.Neotree}
+    K.global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=vim.cmd.Neotree}
   end,
   on_colorscheme_change = function()
     -- Necessary as I don't have 'termguicolor' => ~all default colors are not available

@@ -1,3 +1,4 @@
+local K = require"mylib.keymap_system"
 
 local function start_lsp_server()
   local venv_py_exec
@@ -74,7 +75,7 @@ end
 -------------------------------------------------------------------------------
 
 -- I: <Alt-:> to insert a colon after cursor.
-toplevel_buf_map{mode="i", key=[[<M-:>]], action=[[: <C-g>U<Left><C-g>U<Left>]]}
+K.toplevel_buf_map{mode="i", key=[[<M-:>]], action=[[: <C-g>U<Left><C-g>U<Left>]]}
 
 -- I: <Alt-f> to toggle between `f"..."` and `"..."`
 -- NOTE: it is pretty dumb, searching the first '"' on left of cursor.
@@ -107,4 +108,4 @@ local function fstring_toggle()
     --FIXME: finish this! (move cursor)
   end
 end
-toplevel_buf_map{mode="i", key=[[<M-f>]], action=fstring_toggle}
+K.toplevel_buf_map{mode="i", key=[[<M-f>]], action=fstring_toggle}

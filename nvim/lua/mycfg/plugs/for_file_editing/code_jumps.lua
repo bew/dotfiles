@@ -6,6 +6,8 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { --[[ TODO: fill this! ]] },
 }
 
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug {
@@ -65,7 +67,7 @@ Plug {
       }
     }
 
-    local_leader_map{mode="n", key="cN", desc="Code LSP Navigation", action=require"nvim-navbuddy".open}
+    K.local_leader_map{mode="n", key="cN", desc="Code LSP Navigation", action=require"nvim-navbuddy".open}
 
     -- TODO: define type highlights
     -- NavbuddyFunction, ...
@@ -179,8 +181,8 @@ Plug {
         Enum = "",
       },
     }
-    local_leader_map{mode="n", key="cn", desc="Code Nav popup", action=require"aerial".nav_toggle}
-    local_leader_map{mode="n", key="cp", desc="Code Nav panel", action=require"aerial".toggle}
+    K.local_leader_map{mode="n", key="cn", desc="Code Nav popup", action=require"aerial".nav_toggle}
+    K.local_leader_map{mode="n", key="cp", desc="Code Nav panel", action=require"aerial".toggle}
   end,
   on_colorscheme_change = function()
     vim.api.nvim_set_hl(0, "AerialLine", { link = "Visual" })
@@ -204,9 +206,9 @@ Plug {
     -- (wezterm implemented this after my issue: https://github.com/wez/wezterm/issues/877)
     -- vim.cmd[[inoremap <M-^> <C-g>U<Home>]] -- BUT: <Home> moves like 0 not like ^
     local smart_bol_act = require"smart-bol.actions"
-    toplevel_map{mode={"n", "i"}, key=[[<M-^>]],  desc="smart bol", action=smart_bol_act.do_smart_bol}
-    toplevel_map{mode={"n", "i"}, key=[[<Home>]], desc="smart bol", action=smart_bol_act.do_smart_bol}
-    toplevel_map{mode={"n", "i"}, key=[[<M-$>]],  desc="eol", action=[[<End>]]}
+    K.toplevel_map{mode={"n", "i"}, key=[[<M-^>]],  desc="smart bol", action=smart_bol_act.do_smart_bol}
+    K.toplevel_map{mode={"n", "i"}, key=[[<Home>]], desc="smart bol", action=smart_bol_act.do_smart_bol}
+    K.toplevel_map{mode={"n", "i"}, key=[[<M-$>]],  desc="eol", action=[[<End>]]}
   end,
 }
 

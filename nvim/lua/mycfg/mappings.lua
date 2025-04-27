@@ -6,41 +6,44 @@ local U = require"mylib.utils"
 local _f = U.str_space_concat
 local _q = U.str_simple_quote_surround
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 -- TODO: Add tags! Define layers! (& group of related keys?)
 
 -- Disable keybindings
 
-my_actions.disabled = mk_action_v2 {
+my_actions.disabled = A.mk_action {
   [{"n", "i", "v", "c"}] = "<nop>"
 }
 
 -- <C-LeftMouse> default to <C-]>, which just give errors in most files..
 -- I may re-enable it in a smart way whenever I really want it!
-toplevel_map{mode="n", key="<C-LeftMouse>", action=my_actions.disabled}
+K.toplevel_map{mode="n", key="<C-LeftMouse>", action=my_actions.disabled}
 
 -- I: Disable up/down keys
 --
 -- This is required to disable scrolling in insert mode when running under tmux with scrolling
 -- emulation mouse bindings for the alternate screen, because it would move Up/Down N times based on
 -- the scrolling emulation config.
-toplevel_map{mode="i", key=[[<Up>]], action=my_actions.disabled}
-toplevel_map{mode="i", key=[[<Down>]], action=my_actions.disabled}
+K.toplevel_map{mode="i", key=[[<Up>]], action=my_actions.disabled}
+K.toplevel_map{mode="i", key=[[<Down>]], action=my_actions.disabled}
 
 -- N: Disable some builtin keys around goto def/decl (I use other mappings anyway)
-toplevel_map{mode="n", key="gd", action=my_actions.disabled}
-toplevel_map{mode="n", key="gD", action=my_actions.disabled}
+K.toplevel_map{mode="n", key="gd", action=my_actions.disabled}
+K.toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 
 ----- Survival keybindings..
 
 -- N,I,V: Save buffer
 -- NOTE: using lockmarks to avoid overwriting '[ & '] marks by the 'write'
 --   See: https://neovim.discourse.group/t/using-after-w/3608
-my_actions.save_buffer = mk_action_v2 {
+my_actions.save_buffer = A.mk_action {
   default_desc = "Save buffer",
   [{"n", "i", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
   map_opts = { silent = true },
 }
-toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
+K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
 
 -- N: Quit window
 --
@@ -48,7 +51,7 @@ toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_bu
 -- For some reason, quitting a win will return to _some_ win, not always the _LAST_ win.
 -- NICE: It even works for all windows, not just the last one
 --   (last win is remembered for all win it seems 🤔)
-my_actions.close_win_back_to_last = mk_action_v2 {
+my_actions.close_win_back_to_last = A.mk_action {
   default_desc = "Close win, back to last",
   n = function()
     local last_winid = vim.fn.win_getid(vim.fn.winnr("#"))
@@ -64,31 +67,31 @@ my_actions.close_win_back_to_last = mk_action_v2 {
   end,
   map_opts = { silent = true },
 }
-toplevel_map{mode="n", key="Q", action=my_actions.close_win_back_to_last}
+K.toplevel_map{mode="n", key="Q", action=my_actions.close_win_back_to_last}
 -- <wm-mappings>
-global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_win_back_to_last}
+K.global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_win_back_to_last}
 
 -- N: logical redo
-my_actions.undo = mk_action_v2 {
+my_actions.undo = A.mk_action {
   default_desc = "Undo",
   n = [[u]],
 }
-my_actions.redo = mk_action_v2 {
+my_actions.redo = A.mk_action {
   default_desc = "Redo",
   n = [[<C-r>]],
 }
-toplevel_map{mode="n", key="u", action=my_actions.undo}
-toplevel_map{mode="n", key="U", action=my_actions.redo}
+K.toplevel_map{mode="n", key="u", action=my_actions.undo}
+K.toplevel_map{mode="n", key="U", action=my_actions.redo}
 
 -- N: Y to copy whole line
-my_actions.copy_line = mk_action_v2 {
+my_actions.copy_line = A.mk_action {
   default_desc = "Copy line",
   n = "yy",
 }
-toplevel_map{mode="n", key="Y", action=my_actions.copy_line}
+K.toplevel_map{mode="n", key="Y", action=my_actions.copy_line}
 
 -- N: Discard last search highlight
-my_actions.hide_search_hl = mk_action_v2 {
+my_actions.hide_search_hl = A.mk_action {
   default_desc="Hide search highlight",
   n = function()
     vim.cmd.nohlsearch()
@@ -96,10 +99,10 @@ my_actions.hide_search_hl = mk_action_v2 {
     vim.notify "Search cleared"
   end,
 }
-toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}
+K.toplevel_map{mode="n", key="§",     action=my_actions.hide_search_hl}
 -- FIXME: Investigate why outside of tmux, nvim recognizes '§' as '<S-§>'..
 --   In the meantime let's bind both :shrug:
-toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
+K.toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 
 -- NOTE: Configurable actions are not ready yet at all..
 --   Let's still keep the spec written down, and use the functions directly in mappings
@@ -140,12 +143,12 @@ my_actions.hlsearch_current = {
   end,
   options = {
     -- IDEA for other names: word_bounds, with_bounds, with_word_bounds
-    word_bounds = mk_action_opt{
+    word_bounds = A.mk_action_opt{
       desc = [[Whether the search should be bounded (true) or anywhere (false) (in visual mode, bounds are guessed to best match selection)]],
       type = "boolean", -- nicer: `t.bool`
       default = false,
     },
-    embed_cursor_pos_in_search = mk_action_opt{ -- TODO: impl this!
+    embed_cursor_pos_in_search = A.mk_action_opt{ -- TODO: impl this!
       desc = [[Whether to embed cursor position in search, to keep the current offset for all matches]],
       type = "boolean", -- nicer: `t.bool`
       default = false,
@@ -211,19 +214,19 @@ my_actions.hlsearch_current = {
 --toplevel_map{mode={"n", "v"}, key="<M-*>", action=my_actions.hlsearch_current}
 --
 -- NOTE: For now I'm using direct functions, simulating a call by the action system
-toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
+K.toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
   ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = true } })
 end}
-toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
+K.toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
   ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = true } })
 end}
-toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
+K.toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
   ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = false } })
 end}
-toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
+K.toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
   ---@diagnostic disable-next-line: undefined-field
   my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
 end}
@@ -232,7 +235,7 @@ end}
 --
 -- `n` will always go forward (even after a backward search)
 -- `N` will always go backward (even after a forward search)
-my_actions.go_next_search_result = mk_action_v2 {
+my_actions.go_next_search_result = A.mk_action {
   default_desc = "Goto next search result (always forward)",
   map_opts = { expr = true },
   n = function()
@@ -243,7 +246,7 @@ my_actions.go_next_search_result = mk_action_v2 {
     end
   end,
 }
-my_actions.go_prev_search_result = mk_action_v2 {
+my_actions.go_prev_search_result = A.mk_action {
   default_desc = "Goto previous search result (always backward)",
   map_opts = { expr = true },
   n = function()
@@ -254,18 +257,18 @@ my_actions.go_prev_search_result = mk_action_v2 {
     end
   end,
 }
-toplevel_map{mode="n", key="n", action=my_actions.go_next_search_result}
-toplevel_map{mode="n", key="N", action=my_actions.go_prev_search_result}
+K.toplevel_map{mode="n", key="n", action=my_actions.go_next_search_result}
+K.toplevel_map{mode="n", key="N", action=my_actions.go_prev_search_result}
 
-toplevel_map{mode="n", key="<F2>", action=[[:Inspect<cr>]], desc="Show current HL & extmarks at current pos"}
-toplevel_map{mode="n", key="<F3>", action=[[:InspectTree<cr>]], desc="Show TreeSitter node tree"}
+K.toplevel_map{mode="n", key="<F2>", action=[[:Inspect<cr>]], desc="Show current HL & extmarks at current pos"}
+K.toplevel_map{mode="n", key="<F3>", action=[[:InspectTree<cr>]], desc="Show TreeSitter node tree"}
 
 -- Focus Windows
-toplevel_map{mode="n", key="<C-h>", action=[[<C-w>h]], desc="Focus left win"}
-toplevel_map{mode="n", key="<C-j>", action=[[<C-w>j]], desc="Focus down win"}
-toplevel_map{mode="n", key="<C-k>", action=[[<C-w>k]], desc="Focus up win"}
-toplevel_map{mode="n", key="<C-l>", action=[[<C-w>l]], desc="Focus right win"}
-global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus previous win"}
+K.toplevel_map{mode="n", key="<C-h>", action=[[<C-w>h]], desc="Focus left win"}
+K.toplevel_map{mode="n", key="<C-j>", action=[[<C-w>j]], desc="Focus down win"}
+K.toplevel_map{mode="n", key="<C-k>", action=[[<C-w>k]], desc="Focus up win"}
+K.toplevel_map{mode="n", key="<C-l>", action=[[<C-w>l]], desc="Focus right win"}
+K.global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus previous win"}
 
 -- Focus windows by WinNr
 -- <C-w>N   -> N<C-w>w
@@ -273,52 +276,52 @@ global_leader_map{mode="n", key="<leader>", action=[[<C-w><C-p>]], desc="Focus p
 -- mycfg-feature:direct-win-focus
 do
   for winnr = 1, 9 do
-    global_leader_map{mode="n", key=tostring(winnr), desc="Focus win nr "..winnr, action=(winnr .. "<C-w>w")}
+    K.global_leader_map{mode="n", key=tostring(winnr), desc="Focus win nr "..winnr, action=(winnr .. "<C-w>w")}
   end
 end
 
 -- Goto tabs Alt-a/z
-my_actions.go_prev_tab = mk_action_v2 {
+my_actions.go_prev_tab = A.mk_action {
   default_desc = "Go to prev tab",
   -- NOTE: We cannot use the same action for both mode, to avoid cancelling v:count.
   n = "gT",
   i = "<esc>gT",
 }
-my_actions.go_next_tab = mk_action_v2 {
+my_actions.go_next_tab = A.mk_action {
   default_desc = "Go to next tab",
   -- NOTE: We cannot use the same action for both mode, to avoid cancelling v:count.
   n = "gt",
   i = "<esc>gt",
 }
-toplevel_map{mode={"n", "i"}, key=[[<M-a>]], action=my_actions.go_prev_tab}
-toplevel_map{mode={"n", "i"}, key=[[<M-z>]], action=my_actions.go_next_tab}
+K.toplevel_map{mode={"n", "i"}, key=[[<M-a>]], action=my_actions.go_prev_tab}
+K.toplevel_map{mode={"n", "i"}, key=[[<M-z>]], action=my_actions.go_next_tab}
 
 -- Move tabs (with Shift + goto keys)
-my_actions.move_tab_left = mk_action_v2 {
+my_actions.move_tab_left = A.mk_action {
   default_desc = "Move tab left",
   [{"n", "i"}] = [[<esc><cmd>tabmove -1<cr>]],
   map_opts = { silent = true },
 }
-my_actions.move_tab_right = mk_action_v2 {
+my_actions.move_tab_right = A.mk_action {
   default_desc = "Move tab right",
   [{"n", "i"}] = [[<esc><cmd>tabmove +1<cr>]],
   map_opts = { silent = true },
 }
-toplevel_map{mode="n", key=[[<M-A>]], action=my_actions.move_tab_left}
-toplevel_map{mode="n", key=[[<M-Z>]], action=my_actions.move_tab_right}
+K.toplevel_map{mode="n", key=[[<M-A>]], action=my_actions.move_tab_left}
+K.toplevel_map{mode="n", key=[[<M-Z>]], action=my_actions.move_tab_right}
 
-my_actions.buf_view_in_new_tab = mk_action_v2 {
+my_actions.buf_view_in_new_tab = A.mk_action {
   default_desc = "Duplicate buf in new tab (in new win)",
   n = [[:tab split<cr>]],
   map_opts = { silent = true },
 }
-my_actions.win_move_to_new_tab = mk_action_v2 {
+my_actions.win_move_to_new_tab = A.mk_action {
   default_desc = "Move win to new tab",
   n = [[<C-w>T]],
   map_opts = { silent = true },
 }
-toplevel_map{mode="n", key="<M-t>", action=my_actions.buf_view_in_new_tab}
-toplevel_map{mode="n", key="<M-T>", action=my_actions.win_move_to_new_tab}
+K.toplevel_map{mode="n", key="<M-t>", action=my_actions.buf_view_in_new_tab}
+K.toplevel_map{mode="n", key="<M-T>", action=my_actions.win_move_to_new_tab}
 
 
 -- N,I: Insert empty lines below or above
@@ -375,9 +378,9 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- That would be a `move selection to same context above/below` (can be repeated)
 
 -- A: Duplicate visual selection
-my_actions.duplicate_selection = mk_action_v2 {
+my_actions.duplicate_selection = A.mk_action {
   options = {
-    stay_in_visual_mode = mk_action_opt{
+    stay_in_visual_mode = A.mk_action_opt{
       desc = [[Whether to stay in visual mode after the duplication (for easy repeat)]],
       type = "boolean",
       default = false,
@@ -423,9 +426,9 @@ my_actions.duplicate_selection = mk_action_v2 {
   end,
 }
 -- V: Duplicate visual selection
-toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
+K.toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
-toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
+K.toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
   ---@diagnostic disable-next-line: undefined-field
   my_actions.duplicate_selection.mode_actions.v { opts = { stay_in_visual_mode = true } }
 end}
@@ -449,32 +452,32 @@ vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
 
 -- Quickfix
 
-local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}
-local_leader_map{mode="n", key="qq", desc="Open quickfix", action=vim.cmd.copen}
+K.local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}
+K.local_leader_map{mode="n", key="qq", desc="Open quickfix", action=vim.cmd.copen}
 -- Other keybinds are added by qf' ftplugin & qf-specific plugin
 
 
 -- Survival keybindings - Command mode
 
 -- C: Cursor movement
-toplevel_map{mode="c", key="<M-h>", action="<Left>",    desc="move left"}
-toplevel_map{mode="c", key="<M-l>", action="<Right>",   desc="move right"}
-toplevel_map{mode="c", key="<M-w>", action="<S-Right>", desc="move to next word"}
-toplevel_map{mode="c", key="<M-b>", action="<S-Left>",  desc="move to prev word"}
-toplevel_map{mode="c", key="<M-$>", action="<End>",     desc="move to end"}
-toplevel_map{mode="c", key="<M-^>", action="<Home>",    desc="move to start"}
+K.toplevel_map{mode="c", key="<M-h>", action="<Left>",    desc="move left"}
+K.toplevel_map{mode="c", key="<M-l>", action="<Right>",   desc="move right"}
+K.toplevel_map{mode="c", key="<M-w>", action="<S-Right>", desc="move to next word"}
+K.toplevel_map{mode="c", key="<M-b>", action="<S-Left>",  desc="move to prev word"}
+K.toplevel_map{mode="c", key="<M-$>", action="<End>",     desc="move to end"}
+K.toplevel_map{mode="c", key="<M-^>", action="<Home>",    desc="move to start"}
 
 -- C: Command history by prefix
-toplevel_map{mode="c", key="<M-k>", action="<Up>",      desc="prev history byprefix"}
-toplevel_map{mode="c", key="<M-j>", action="<Down>",    desc="next history byprefix"}
+K.toplevel_map{mode="c", key="<M-k>", action="<Up>",      desc="prev history byprefix"}
+K.toplevel_map{mode="c", key="<M-j>", action="<Down>",    desc="next history byprefix"}
 -- Command history
-toplevel_map{mode="c", key="<M-K>", action="<S-Up>",    desc="prev history"}
-toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
+K.toplevel_map{mode="c", key="<M-K>", action="<S-Up>",    desc="prev history"}
+K.toplevel_map{mode="c", key="<M-J>", action="<S-Down>",  desc="next history"}
 
 -- TODO: Make <C-w> delete entire last arg (space separated?)
 --   and <M-BS> delete smaller parts (like builtin <C-w>)
 
-my_actions.c_expand_file_path = mk_action_v2 {
+my_actions.c_expand_file_path = A.mk_action {
   default_desc = "expand current file path",
   map_opts = { expr = true },
   c = function()
@@ -483,9 +486,9 @@ my_actions.c_expand_file_path = mk_action_v2 {
 }
 -- C: Expand %P to path of current file
 -- (using uppercase P because % also needs shift, so it's easy to 'spam')
-toplevel_map{mode="c", key="%P", action=my_actions.c_expand_file_path}
+K.toplevel_map{mode="c", key="%P", action=my_actions.c_expand_file_path}
 
-my_actions.c_expand_file_dir = mk_action_v2 {
+my_actions.c_expand_file_dir = A.mk_action {
   default_desc = "expand current file dir",
   map_opts = { expr = true },
   c = function()
@@ -493,11 +496,11 @@ my_actions.c_expand_file_dir = mk_action_v2 {
   end,
 }
 -- C: Expand %% to dir of current file
-toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
+K.toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
 
 --- Return action to toggle the given option
 ---@param opt_name string Option name to toggle
----@return ModeRawActionInput
+---@return act.ModeRawActionInput
 local function action_to_toggle_option(opt_name)
   return function()
     -- e.g. `set foo! foo?`
@@ -505,9 +508,9 @@ local function action_to_toggle_option(opt_name)
   end
 end
 -- N: toggle wrap
-toplevel_map{mode="n", key=[[<M-w>]], action=action_to_toggle_option"wrap", opts = { silent = true }}
+K.toplevel_map{mode="n", key=[[<M-w>]], action=action_to_toggle_option"wrap", opts = { silent = true }}
 -- N: toggle relativenumber
-toplevel_map{mode="n", key=[[<M-r>]], action=action_to_toggle_option"relativenumber", opts = { silent = true }}
+K.toplevel_map{mode="n", key=[[<M-r>]], action=action_to_toggle_option"relativenumber", opts = { silent = true }}
 
 -- Copy/Paste with session/system clipboard
 -- Register '+' is session clipboard (e.g: tmux)
@@ -547,7 +550,7 @@ vim.cmd[[inoremap <silent> <M-v> <C-g>u<C-r><C-o>+]]
 -- NOTE1: Repeating with '.' from normal mode doesn't work (it's not better without this mapping so..)
 -- NOTE2: Need to check the mode, as in visual block '$h' disables the smart 'to-the-end' selection.
 -- vim.cmd[[ vnoremap <expr> $ (mode() == "v" ? "$h" : "$") ]]
-my_actions.logical_visual_eol = mk_action_v2 {
+my_actions.logical_visual_eol = A.mk_action {
   default_desc = "logical EOL",
   map_opts = { expr = true }, -- inject keys!
   v = function()
@@ -558,16 +561,16 @@ my_actions.logical_visual_eol = mk_action_v2 {
     end
   end,
 }
-toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
+K.toplevel_map{mode="v", key="$", action=my_actions.logical_visual_eol}
 
-my_actions.select_last_inserted_region = mk_action_v2 {
+my_actions.select_last_inserted_region = A.mk_action {
   default_desc = "select last inserted region",
   n = "`[v`]",
   o = [[<cmd>normal! `[v`]<cr>]],
 }
 -- N: Select last inserted region
 -- O: Textobj for the last inserted region
-toplevel_map{mode={"n", "o"}, key="gV", action=my_actions.select_last_inserted_region}
+K.toplevel_map{mode={"n", "o"}, key="gV", action=my_actions.select_last_inserted_region}
 -- toplevel_map{mode="o", key="gV", action=my_actions.select_last_inserted_region}
 
 -- TODO: omap `A)` to allow `dA)` to delete parentheses and surrounding spaces.
@@ -576,9 +579,9 @@ toplevel_map{mode={"n", "o"}, key="gV", action=my_actions.select_last_inserted_r
 
 -- V: Clean paste (preserving the content of the current/unnamed register),
 --    so I can paste over multiple visual selections using the same text
-toplevel_map{mode="v", key="p", desc="paste (preserves register)", action="P"}
+K.toplevel_map{mode="v", key="p", desc="paste (preserves register)", action="P"}
 -- V: Vim's visual paste (replacing current/unnamed register)
-toplevel_map{mode="v", key="P", desc="paste (swaps register)", action="p"}
+K.toplevel_map{mode="v", key="P", desc="paste (swaps register)", action="p"}
 
 -- V: Ranged fold open/close
 -- NOTE1: this does not change the 'foldlevel'.
@@ -630,7 +633,7 @@ vim.cmd[[nnoremap <M-cr> A<cr>]]
 --
 -- => Useful for most languages so make it global!
 -- TODO: be smarter based on surrounding text! (even without treesitter)
-toplevel_map{
+K.toplevel_map{
   mode="i",
   key=[[<M-,>]],
   opts = { expr = true },
@@ -647,7 +650,7 @@ toplevel_map{
 
 -- I: <C-l> to easily delete the following char (not smart, by design)
 -- Can be useful to delete right-part of a pair if inserted by mistake
-toplevel_map{
+K.toplevel_map{
   mode="i",
   -- opposite to <C-h>:
   -- <C-h> deletes <-|
@@ -660,8 +663,8 @@ toplevel_map{
 -- N: Reformat to textwidth
 -- note: `gw` does the same as `gq` but DOES NOT use `formatexpr`
 --   (`formatexpr` might be set by lsp, and does not support textwidth text reformatting)
-toplevel_map{mode={"n", "v"}, key=[[<M-q>]], desc="Reformat motion/selection to textwidth", action="gw"}
-toplevel_map{mode="n", key=[[<M-q><M-q>]], desc="Reformat current line to textwidth", action="gww"}
+K.toplevel_map{mode={"n", "v"}, key=[[<M-q>]], desc="Reformat motion/selection to textwidth", action="gw"}
+K.toplevel_map{mode="n", key=[[<M-q><M-q>]], desc="Reformat current line to textwidth", action="gww"}
 -- `gq` DOES use `formatexpr`, and can be used to reformat some code via LSP if supported
 
 
@@ -704,10 +707,10 @@ vim.keymap.set("n", "<C-w><C-j>", function() directional_split("down") end)
 vim.keymap.set("n", "<C-w><C-k>", function() directional_split("up") end)
 vim.keymap.set("n", "<C-w><C-l>", function() directional_split("right") end)
 -- <wm-mappings>
-global_leader_map{mode="n", key="<C-h>", desc="Split left", action=function() directional_split("left") end}
-global_leader_map{mode="n", key="<C-j>", desc="Split down", action=function() directional_split("down") end}
-global_leader_map{mode="n", key="<C-k>", desc="Split up", action=function() directional_split("up") end}
-global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function() directional_split("right") end}
+K.global_leader_map{mode="n", key="<C-h>", desc="Split left", action=function() directional_split("left") end}
+K.global_leader_map{mode="n", key="<C-j>", desc="Split down", action=function() directional_split("down") end}
+K.global_leader_map{mode="n", key="<C-k>", desc="Split up", action=function() directional_split("up") end}
+K.global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function() directional_split("right") end}
 
 -- New file by directional split (or current)
 -- TODO: Make configurable action!
@@ -720,7 +723,7 @@ local function make_new_file_action(new_win)
   else
     desc = new_win .. " split"
   end
-  return mk_action_v2 {
+  return A.mk_action {
     default_desc = "New file ("..desc..")",
     n = function()
       if new_win ~= "current" then
@@ -730,21 +733,21 @@ local function make_new_file_action(new_win)
     end,
   }
 end
-global_leader_map_define_group{mode="n", prefix_key="<C-n>", name="+new-file"}
-global_leader_map{mode="n", key="<C-n><C-n>", action=make_new_file_action("current")}
-global_leader_map{mode="n", key="<C-n><C-h>", action=make_new_file_action("left")}
-global_leader_map{mode="n", key="<C-n><C-j>", action=make_new_file_action("down")}
-global_leader_map{mode="n", key="<C-n><C-k>", action=make_new_file_action("up")}
-global_leader_map{mode="n", key="<C-n><C-l>", action=make_new_file_action("right")}
+K.global_leader_map_define_group{mode="n", prefix_key="<C-n>", name="+new-file"}
+K.global_leader_map{mode="n", key="<C-n><C-n>", action=make_new_file_action("current")}
+K.global_leader_map{mode="n", key="<C-n><C-h>", action=make_new_file_action("left")}
+K.global_leader_map{mode="n", key="<C-n><C-j>", action=make_new_file_action("down")}
+K.global_leader_map{mode="n", key="<C-n><C-k>", action=make_new_file_action("up")}
+K.global_leader_map{mode="n", key="<C-n><C-l>", action=make_new_file_action("right")}
 
 -- Exchange bufs
-global_leader_map_define_group{mode="n", prefix_key=[[<C-x>]], name="+buf-exchange"}
+K.global_leader_map_define_group{mode="n", prefix_key=[[<C-x>]], name="+buf-exchange"}
 -- Exchange bufs between the 2 windows of a split
-global_leader_map{mode="n", key="<C-x><C-x>", desc="Between splits", action=[[<C-w>x<C-w><C-p>]]}
+K.global_leader_map{mode="n", key="<C-x><C-x>", desc="Between splits", action=[[<C-w>x<C-w><C-p>]]}
 -- Exchange bufs between current and an arbitrary target WinNr
 do
   for winnr = 1, 9 do
-    global_leader_map{mode="n", key="<C-x>"..winnr, desc="With win nr "..winnr, action=function()
+    K.global_leader_map{mode="n", key="<C-x>"..winnr, desc="With win nr "..winnr, action=function()
       local target_winid = vim.fn.win_getid(winnr)
       local current_winid = vim.api.nvim_get_current_win()
       if target_winid == current_winid then
@@ -774,7 +777,7 @@ local function smart_split()
   end
 end
 vim.keymap.set("n", "<C-w><C-s>", smart_split)
-global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_split}
+K.global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_split}
 
 
 -- Full-width/height window splits

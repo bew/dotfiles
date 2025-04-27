@@ -6,6 +6,9 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui, t.wm },
 }
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug {
@@ -14,17 +17,17 @@ Plug {
   tags = {t.wm},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    my_actions.tab_toggle_win_zoom = mk_action_v2 {
+    my_actions.tab_toggle_win_zoom = A.mk_action {
       default_desc = "Tab: Toggle window zoom",
       n = require"tab-zoom-win".toggle_zoom
     }
 
-    toplevel_map{mode="n", key="+", action=my_actions.tab_toggle_win_zoom}
+    K.toplevel_map{mode="n", key="+", action=my_actions.tab_toggle_win_zoom}
 
     -- Default <C-w>o is dangerous for the layout, make it zoom instead
-    toplevel_map{mode="n", key=[[<C-w>o]], action=my_actions.tab_toggle_win_zoom}
+    K.toplevel_map{mode="n", key=[[<C-w>o]], action=my_actions.tab_toggle_win_zoom}
     -- Still allow the 'dangerous' operation with `<C-w>O` (maj o)
-    toplevel_map{mode="n", key=[[<C-w>O]], action=[[<C-w>o]]}
+    K.toplevel_map{mode="n", key=[[<C-w>O]], action=[[<C-w>o]]}
   end,
 }
 
@@ -42,6 +45,6 @@ Plug {
       }
     }
 
-    global_leader_map{mode="n", key="<C-z>", desc="Zen/NoNeckPain", action=vim.cmd.NoNeckPain}
+    K.global_leader_map{mode="n", key="<C-z>", desc="Zen/NoNeckPain", action=vim.cmd.NoNeckPain}
   end,
 }

@@ -6,6 +6,9 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui },
 }
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug.statusline {
@@ -106,7 +109,7 @@ Plug {
     vim.g.undotree_SplitWidth = 42
   end,
   on_load = function()
-    toplevel_map{mode={"n"}, key="<F5>", action=[[:UndotreeToggle<cr>]], desc="Toggle undo tree"}
+    K.toplevel_map{mode={"n"}, key="<F5>", action=[[:UndotreeToggle<cr>]], desc="Toggle undo tree"}
   end,
 }
 
@@ -226,7 +229,7 @@ Plug {
       group_mappings = true,
     }
 
-    my_actions.screencast_toggle = mk_action_v2 {
+    my_actions.screencast_toggle = A.mk_action {
       default_desc = "Toggle keys screencast",
       n = function()
         vim.cmd.Screenkey("toggle")
@@ -243,13 +246,13 @@ Plug {
   on_load = function()
     require"quicker".setup {
       on_qf = function()
-        toplevel_buf_map{mode="n", key=[[zo]], desc="More context lines", action=function()
+        K.toplevel_buf_map{mode="n", key=[[zo]], desc="More context lines", action=function()
           require"quicker".expand { before = 1, after = 1, add_to_existing = true }
         end}
-        toplevel_buf_map{mode="n", key=[[zi]], desc="Less context lines", action=function()
+        K.toplevel_buf_map{mode="n", key=[[zi]], desc="Less context lines", action=function()
           require"quicker".collapse()
         end}
-        local_leader_buf_map{mode="n", key=[[qe]], desc="Make editable ('till save)", action=function()
+        K.local_leader_buf_map{mode="n", key=[[qe]], desc="Make editable ('till save)", action=function()
           require"quicker.editor".setup_editor(0)
         end}
       end,

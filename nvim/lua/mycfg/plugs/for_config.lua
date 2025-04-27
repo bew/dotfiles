@@ -6,6 +6,9 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { "config" },
 }
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug {
@@ -39,15 +42,15 @@ Plug {
         require"cmp".setup.buffer({ enabled = false })
 
         -- Map plugin's completion to usual completion key (Which is <Tab> here by default :/)
-        toplevel_buf_map{mode="i", key="<C-n>", opts={expr=true}, action=function()
+        K.toplevel_buf_map{mode="i", key="<C-n>", opts={expr=true}, action=function()
           return vim.fn.pumvisible() == 1 and "<C-n>" or "<Plug>(neorepl-complete)"
         end}
 
         -- navigate in history
-        toplevel_buf_map{mode="i", key="<M-j>", action="<Plug>(neorepl-hist-next)"}
-        toplevel_buf_map{mode="i", key="<M-k>", action="<Plug>(neorepl-hist-prev)"}
-        toplevel_buf_map{mode="i", key="<Down>", action="<Plug>(neorepl-hist-next)"}
-        toplevel_buf_map{mode="i", key="<Up>", action="<Plug>(neorepl-hist-prev)"}
+        K.toplevel_buf_map{mode="i", key="<M-j>", action="<Plug>(neorepl-hist-next)"}
+        K.toplevel_buf_map{mode="i", key="<M-k>", action="<Plug>(neorepl-hist-prev)"}
+        K.toplevel_buf_map{mode="i", key="<Down>", action="<Plug>(neorepl-hist-next)"}
+        K.toplevel_buf_map{mode="i", key="<Up>", action="<Plug>(neorepl-hist-prev)"}
         -- toplevel_buf_map{mode="i", key="<M-k>", opts={expr=true}, action=function()
         --   -- FIXME: if cursor is at top line of editable region
         --   return "<Plug>(neorepl-hist-prev)"
@@ -62,23 +65,23 @@ Plug {
         -- end}
 
         -- N: navigate from section to sections
-        toplevel_buf_map{mode="n", key="<M-j>", action="<Plug>(neorepl-]])"}
-        toplevel_buf_map{mode="n", key="<M-k>", action="<Plug>(neorepl-[[)"}
+        K.toplevel_buf_map{mode="n", key="<M-j>", action="<Plug>(neorepl-]])"}
+        K.toplevel_buf_map{mode="n", key="<M-k>", action="<Plug>(neorepl-[[)"}
 
         -- N,I: Eval line(s)
-        toplevel_buf_map{mode={"n", "i"}, key="<CR>", action="<Plug>(neorepl-eval-line)"}
-        toplevel_buf_map{mode="i", key="<C-j>", action="<Plug>(neorepl-eval-line)"}
+        K.toplevel_buf_map{mode={"n", "i"}, key="<CR>", action="<Plug>(neorepl-eval-line)"}
+        K.toplevel_buf_map{mode="i", key="<C-j>", action="<Plug>(neorepl-eval-line)"}
 
         -- N,I: multiline editing
-        toplevel_buf_map{mode="i", key="<M-CR>", action="<Plug>(neorepl-break-line)"}
-        toplevel_buf_map{mode="i", key="<M-o>", action="<End><Plug>(neorepl-break-line)"}
-        toplevel_buf_map{mode="n", key="o", action="A<Plug>(neorepl-break-line)"}
+        K.toplevel_buf_map{mode="i", key="<M-CR>", action="<Plug>(neorepl-break-line)"}
+        K.toplevel_buf_map{mode="i", key="<M-o>", action="<End><Plug>(neorepl-break-line)"}
+        K.toplevel_buf_map{mode="n", key="o", action="A<Plug>(neorepl-break-line)"}
         -- FIXME: Fix detection of start of line, going to BOL of non-first line of editable area should put cursor after initial `\`
         -- toplevel_buf_map{mode="i", key="<M-O>", action="<Home><Plug>(neorepl-break-line)<Up>"}
         -- toplevel_buf_map{mode="n", key="O", action="I<Plug>(neorepl-break-line)<Up>"}
 
         -- I: Ctrl-d exits
-        toplevel_buf_map{mode="i", key="<C-d>", action=function()
+        K.toplevel_buf_map{mode="i", key="<C-d>", action=function()
           if vim.api.nvim_get_current_line() == "" then
             vim.cmd.quit()
           else
@@ -88,11 +91,11 @@ Plug {
       end,
     }
 
-    my_actions.neovim_lua_repl = mk_action_v2 {
+    my_actions.neovim_lua_repl = A.mk_action {
       default_desc = "Neovim Lua Repl buffer",
       n = "<cmd>Repl lua<cr>",
     }
-    my_actions.neovim_vim_repl = mk_action_v2 {
+    my_actions.neovim_vim_repl = A.mk_action {
       default_desc = "Neovim VimScript Repl buffer",
       n = "<cmd>Repl vim<cr>",
     }

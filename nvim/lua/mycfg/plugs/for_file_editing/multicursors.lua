@@ -5,6 +5,8 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.editing },
 }
 
+local K = require"mylib.keymap_system"
+
 --------------------------------
 
 Plug {
@@ -15,13 +17,13 @@ Plug {
     local mc = require"multicursor-nvim"
     mc.setup()
 
-    toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space>", name="+multicursor"}
+    K.toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space>", name="+multicursor"}
 
     -- Add or skip cursor above/below the main cursor.
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-j>", desc="Add cursor, jump down", action=function() mc.lineAddCursor(1) end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-k>", desc="Add cursor, jump up", action=function() mc.lineAddCursor(-1) end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-J>", desc="Skip cursor, jump down", action=function() mc.lineSkipCursor(1) end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-K>", desc="Skip cursor, jump up", action=function() mc.lineSkipCursor(-1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-j>", desc="Add cursor, jump down", action=function() mc.lineAddCursor(1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-k>", desc="Add cursor, jump up", action=function() mc.lineAddCursor(-1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-J>", desc="Skip cursor, jump down", action=function() mc.lineSkipCursor(1) end}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-K>", desc="Skip cursor, jump up", action=function() mc.lineSkipCursor(-1) end}
 
     --- Search/Match action around main cursor
     ---@param opts {dir?: "prev"|"next", match_fn: fun(dir?: integer), search_fn: fun(dir?: integer)}
@@ -38,28 +40,28 @@ Plug {
     end
 
     -- Add or skip adding a new cursor by matching word/selection or search results
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-n>", desc="Add cursor, jump next match", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-n>", desc="Add cursor, jump next match", action=function()
       search_or_match_cursor_action {
         dir = "next",
         match_fn = mc.matchAddCursor,
         search_fn = mc.searchAddCursor,
       }
     end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-p>", desc="Add cursor, jump prev match", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-p>", desc="Add cursor, jump prev match", action=function()
       search_or_match_cursor_action {
         dir = "prev",
         match_fn = mc.matchAddCursor,
         search_fn = mc.searchAddCursor,
       }
     end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-N>", desc="Skip cursor, jump next match", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-N>", desc="Skip cursor, jump next match", action=function()
       search_or_match_cursor_action {
         dir = "next",
         match_fn = mc.matchSkipCursor,
         search_fn = mc.searchSkipCursor,
       }
     end}
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-P>", desc="Skip cursor, jump prev match", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-P>", desc="Skip cursor, jump prev match", action=function()
       search_or_match_cursor_action {
         dir = "prev",
         match_fn = mc.matchSkipCursor,
@@ -68,7 +70,7 @@ Plug {
     end}
 
     -- Add a cursor for all matches of cursor word/selection in the document.
-    toplevel_map{mode={"n", "v"}, key="<M-Space><C-a>", desc="Add cursors for all matches/search-results", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-a>", desc="Add cursors for all matches/search-results", action=function()
       search_or_match_cursor_action {
         match_fn = mc.matchAllAddCursors,
         search_fn = mc.searchAllAddCursors,
@@ -76,19 +78,19 @@ Plug {
     end}
 
     -- Add cursors for all regex results within visual selection(s)
-    toplevel_map{mode="v", key="<M-Space><M-/>", desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
-    toplevel_map{mode="v", key="<M-Space>/",     desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
+    K.toplevel_map{mode="v", key="<M-Space><M-/>", desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
+    K.toplevel_map{mode="v", key="<M-Space>/",     desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
 
     -- Add and remove cursors with Alt + left click.
-    toplevel_map{mode="n", key="<M-LeftMouse>",   action=mc.handleMouse}
-    toplevel_map{mode="n", key="<M-LeftDrag>",    action=mc.handleMouseDrag}
-    toplevel_map{mode="n", key="<M-LeftRelease>", action=mc.handleMouseRelease}
+    K.toplevel_map{mode="n", key="<M-LeftMouse>",   action=mc.handleMouse}
+    K.toplevel_map{mode="n", key="<M-LeftDrag>",    action=mc.handleMouseDrag}
+    K.toplevel_map{mode="n", key="<M-LeftRelease>", action=mc.handleMouseRelease}
 
     -- Disable cursors -> only the main cursor moves.
     -- When cursors are disabled, press again to add a cursor under the main cursor.
-    toplevel_map{mode="n", key="<M-Space><M-Space>", desc="Toggle cursor here", action=mc.toggleCursor}
+    K.toplevel_map{mode="n", key="<M-Space><M-Space>", desc="Toggle cursor here", action=mc.toggleCursor}
 
-    toplevel_map{mode={"n", "v"}, key="<M-Space><M-q>", desc="Enable/Disable cursors", action=function()
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-q>", desc="Enable/Disable cursors", action=function()
       if mc.cursorsEnabled() then
         mc.disableCursors()
       else
@@ -97,8 +99,8 @@ Plug {
     end}
 
     -- Same as visual block's I/A, but also works in visual line mode
-    toplevel_map{mode="v", key="<M-Space>I", desc="Insert for all lines of selection", action=mc.insertVisual}
-    toplevel_map{mode="v", key="<M-Space>A", desc="Append for all lines of selection", action=mc.appendVisual}
+    K.toplevel_map{mode="v", key="<M-Space>I", desc="Insert for all lines of selection", action=mc.insertVisual}
+    K.toplevel_map{mode="v", key="<M-Space>A", desc="Append for all lines of selection", action=mc.appendVisual}
 
     -- Mappings defined in a keymap layer only apply when there are
     -- multiple cursors. This lets you have overlapping mappings.
@@ -122,13 +124,13 @@ Plug {
       mc_map({"n", "v"}, "g<C-x>", mc.sequenceDecrement)
     end)
 
-    toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
-    toplevel_map{mode="n", key="<M-Space><M-u>", desc="Restore cursors (after clear)", action=mc.restoreCursors}
-    toplevel_map{mode="n", key="<M-Space><M-=>", desc="Align cursor columns", action=mc.alignCursors}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
+    K.toplevel_map{mode="n", key="<M-Space><M-u>", desc="Restore cursors (after clear)", action=mc.restoreCursors}
+    K.toplevel_map{mode="n", key="<M-Space><M-=>", desc="Align cursor columns", action=mc.alignCursors}
 
-    toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space><M-s>", name="+split"}
-    toplevel_map{mode="v", key="<M-Space><M-s><M-s>", desc="Split by lines", action=mc.visualToCursors}
-    toplevel_map{mode="v", key="<M-Space><M-s><M-x>", desc="Split by regex", action=mc.splitCursors}
+    K.toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space><M-s>", name="+split"}
+    K.toplevel_map{mode="v", key="<M-Space><M-s><M-s>", desc="Split by lines", action=mc.visualToCursors}
+    K.toplevel_map{mode="v", key="<M-Space><M-s><M-x>", desc="Split by regex", action=mc.splitCursors}
 
     -- -- Pressing `<leader>miwap` will create a cursor in every match of the
     -- -- string captured by `iw` inside range `ap`.

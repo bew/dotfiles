@@ -6,6 +6,8 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.ui, t.content_ui },
 }
 
+local A = require"mylib.action_system"
+
 --------------------------------
 
 Plug {
@@ -27,7 +29,7 @@ Plug {
     require"full_visual_line".setup()
 
     my_actions.full_visual_line = {}
-    my_actions.full_visual_line.toggle = mk_action_v2 {
+    my_actions.full_visual_line.toggle = A.mk_action {
       default_desc = "Full Visual Line - Toggle",
       [{"n", "v"}] = function()
         require"full_visual_line".toggle()

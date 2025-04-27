@@ -5,6 +5,10 @@ local Plug = PluginSystem.get_plugin_declarator()
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
+--------------------------------
 
 Plug.fugitive {
   source = gh"tpope/vim-fugitive",
@@ -68,28 +72,28 @@ Plug {
     -- FIXME: use 'on_attach' to config keybinds?
 
     -- define these globally for now.. (until good solution for per-buffer which_key helper)
-    local_leader_map_define_group{mode={"n"}, prefix_key="h", name="+hunks"}
-    local_leader_map_define_group{mode={"n"}, prefix_key="H", name="__hide__"}
+    K.local_leader_map_define_group{mode={"n"}, prefix_key="h", name="+hunks"}
+    K.local_leader_map_define_group{mode={"n"}, prefix_key="H", name="__hide__"}
     -- NOTE: 'H' group exists to make 'HN' spam-able by holding shift
 
     local gs = require"gitsigns"
-    local_leader_map{mode={"n"}, key="hi", action=gs.preview_hunk_inline, desc="Preview hunk (inline)"}
-    local_leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="Preview hunk"}
-    local_leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="Undo (reset) hunk"}
-    local_leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="Diff file"}
-    local_leader_map{mode={"n"}, key="hO", action=gs.show,         desc="Show original file"}
+    K.local_leader_map{mode={"n"}, key="hi", action=gs.preview_hunk_inline, desc="Preview hunk (inline)"}
+    K.local_leader_map{mode={"n"}, key="hp", action=gs.preview_hunk, desc="Preview hunk"}
+    K.local_leader_map{mode={"n"}, key="hu", action=gs.reset_hunk,   desc="Undo (reset) hunk"}
+    K.local_leader_map{mode={"n"}, key="hD", action=gs.diffthis,     desc="Diff file"}
+    K.local_leader_map{mode={"n"}, key="hO", action=gs.show,         desc="Show original file"}
     -- FIXME: there is no action to toggle fold of everything that didn't change
     -- local_leader_map{mode={"n"}, key="hf", action=gs.fold_unchanged, desc="fold unchanged lines"}
 
-    local_leader_map{mode={"n"}, key="hq", desc="qf all hunks in file", action=function()
+    K.local_leader_map{mode={"n"}, key="hq", desc="qf all hunks in file", action=function()
       gs.setqflist(0)
     end}
-    local_leader_map{mode={"n"}, key="hQ", desc="qf all hunks in repo", action=function()
+    K.local_leader_map{mode={"n"}, key="hQ", desc="qf all hunks in repo", action=function()
       gs.setqflist("all")
     end}
 
     -- next/prev hunk that also work in vim's diff mode
-    my_actions.go_next_changed_hunk = mk_action_v2 {
+    my_actions.go_next_changed_hunk = A.mk_action {
       default_desc = "Goto next changed hunk",
       n = function()
         if vim.wo.diff then
@@ -99,7 +103,7 @@ Plug {
         end
       end,
     }
-    my_actions.go_prev_changed_hunk = mk_action_v2 {
+    my_actions.go_prev_changed_hunk = A.mk_action {
       default_desc = "Goto prev changed hunk",
       n = function()
         if vim.wo.diff then
@@ -109,22 +113,22 @@ Plug {
         end
       end,
     }
-    local_leader_map{mode={"n"}, key="hn", action=my_actions.go_next_changed_hunk}
-    local_leader_map{mode={"n"}, key="hN", action=my_actions.go_prev_changed_hunk}
+    K.local_leader_map{mode={"n"}, key="hn", action=my_actions.go_next_changed_hunk}
+    K.local_leader_map{mode={"n"}, key="hN", action=my_actions.go_prev_changed_hunk}
     -- also map HN so I can 'spam' the letters easily :)
-    local_leader_map{mode={"n"}, key="HN", action=my_actions.go_prev_changed_hunk}
+    K.local_leader_map{mode={"n"}, key="HN", action=my_actions.go_prev_changed_hunk}
 
     -- TODO: move closer to git-messenger plugin? Should simply add to a 'git' keymap.
-    local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
+    K.local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
 
     -- toggles
-    local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
-    local_leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
-    local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
+    K.local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
+    K.local_leader_map{mode={"n"}, key="htw", action=gs.toggle_word_diff,          desc="toggle word diff"}
+    K.local_leader_map{mode={"n"}, key="htb", action=gs.toggle_current_line_blame, desc="toggle blame lens"}
 
     -- define hunk text object & visual selector
-    toplevel_map{mode={"o", "v"}, key="ih", action=gs.select_hunk, desc="select hunk"}
-    toplevel_map{mode={"o", "v"}, key="ah", action=gs.select_hunk, desc="select hunk"}
+    K.toplevel_map{mode={"o", "v"}, key="ih", action=gs.select_hunk, desc="select hunk"}
+    K.toplevel_map{mode={"o", "v"}, key="ah", action=gs.select_hunk, desc="select hunk"}
   end,
   on_colorscheme_change = function()
     -- untracked changes

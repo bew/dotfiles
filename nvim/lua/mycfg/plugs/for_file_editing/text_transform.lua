@@ -1,5 +1,3 @@
-local U = require"mylib.utils"
-
 local PluginSystem = require"mylib.plugin_system"
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
@@ -7,6 +5,10 @@ local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { --[[ TODO: fill this! ]] },
 }
+
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -91,18 +93,18 @@ Plug.luasnip {
 
     -- I: Expand snippet if any
     -- IDEA(alternative?): <C-x><C-x> (in insert, maybe also visual?)
-    toplevel_map{mode={"i"}, key=[[²]], desc="expand snippet!", action=function()
+    K.toplevel_map{mode={"i"}, key=[[²]], desc="expand snippet!", action=function()
       ls.expand()
     end}
-    toplevel_map{mode={"i", "s"}, key=[[<M-j>]], desc="snippet: jump to next placeholder", action=function()
+    K.toplevel_map{mode={"i", "s"}, key=[[<M-j>]], desc="snippet: jump to next placeholder", action=function()
       -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
       ls.jump( 1)
     end}
-    toplevel_map{mode={"i", "s"}, key=[[<M-k>]], desc="snippet: jump to previous placeholder", action=function()
+    K.toplevel_map{mode={"i", "s"}, key=[[<M-k>]], desc="snippet: jump to previous placeholder", action=function()
       -- not checking `ls.in_snippet()`, to be able to jump back to (very) recent snippet(s)
       ls.jump(-1)
     end}
-    my_actions.snip_cycle_choice = mk_action_v2 {
+    my_actions.snip_cycle_choice = A.mk_action {
       default_desc = "snippet: cycle choice node",
       [{"n", "i", "s"}] = function()
         if ls.in_snippet() and ls.choice_active() then
@@ -112,20 +114,20 @@ Plug.luasnip {
     }
     -- FIXME: On wezterm <M-²> sends <M-`> instead
     --   Opened issue at: https://github.com/wez/wezterm/issues/4259
-    toplevel_map{mode={"i", "s", "n"}, key=[[<M-²>]], action=my_actions.snip_cycle_choice}
+    K.toplevel_map{mode={"i", "s", "n"}, key=[[<M-²>]], action=my_actions.snip_cycle_choice}
     -- in the mean time use <M-c>
-    toplevel_map{mode={"i", "s", "n"}, key=[[<M-c>]], action=my_actions.snip_cycle_choice}
+    K.toplevel_map{mode={"i", "s", "n"}, key=[[<M-c>]], action=my_actions.snip_cycle_choice}
 
-    my_actions.snip_store_visual_selection = mk_action_v2 {
+    my_actions.snip_store_visual_selection = A.mk_action {
       default_desc = "snippet: store selection for later",
       v = require"luasnip.util.select".cut_keys,
       -- TODO: Display a short message like 'LuaSnip: selection stored' (via `vim.notify`?)
       map_opts = {silent = true},
     }
-    local_leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
+    K.local_leader_map{mode={"v"}, key=[[²]], action=my_actions.snip_store_visual_selection}
     -- NOTE: do not use direct `²` in visual mode, could be useful for context actions later..
 
-    toplevel_map{mode="s", key=[[<BS>]], action=[[<C-g>"_c]]}
+    K.toplevel_map{mode="s", key=[[<BS>]], action=[[<C-g>"_c]]}
   end,
 }
 
@@ -214,56 +216,56 @@ Plug {
       change = false, -- replace surround (default: `cs`)
       change_line = false, -- replace surround, delims on new lines (default: `cS`)
     }
-    my_actions.add_surround = mk_action_v2 {
+    my_actions.add_surround = A.mk_action {
       default_desc = "Add around <motion>",
       n = "<Plug>(nvim-surround-normal)",
     }
-    my_actions.add_surround_on_visual = mk_action_v2 {
+    my_actions.add_surround_on_visual = A.mk_action {
       default_desc = "Add around visual selection",
       v = "<Plug>(nvim-surround-visual)",
     }
-    my_actions.change_surround = mk_action_v2 {
+    my_actions.change_surround = A.mk_action {
       default_desc = "Change nearest <from-pair> <to-pair>",
       n = "<Plug>(nvim-surround-change)",
     }
-    my_actions.delete_surround = mk_action_v2 {
+    my_actions.delete_surround = A.mk_action {
       default_desc = "Delete nearest <pair>",
       n = "<Plug>(nvim-surround-delete)",
     }
     -- Extra surround actions (on current line, add delims on newlines)
-    my_actions.add_surround_on_newline = mk_action_v2 {
+    my_actions.add_surround_on_newline = A.mk_action {
       default_desc = "Add around <motion>, delims on newlines",
       n = "<Plug>(nvim-surround-normal-line)",
     }
-    my_actions.add_surround_around_line = mk_action_v2 {
+    my_actions.add_surround_around_line = A.mk_action {
       default_desc = "Add around current line",
       n = "<Plug>(nvim-surround-normal-cur)",
     }
-    my_actions.add_surround_around_line_on_newline = mk_action_v2 {
+    my_actions.add_surround_around_line_on_newline = A.mk_action {
       default_desc = "Add around current line, delims on newlines",
       n = "<Plug>(nvim-surround-normal-cur-line)",
     }
-    my_actions.add_surround_on_visual_on_newline = mk_action_v2 {
+    my_actions.add_surround_on_visual_on_newline = A.mk_action {
       default_desc = "Add around visual selection, delims on newlines",
       v = "<Plug>(nvim-surround-visual-line)",
     }
-    my_actions.change_surround_on_newline = mk_action_v2 {
+    my_actions.change_surround_on_newline = A.mk_action {
       default_desc = "Change surrounds, delims on newlines",
       n = "<Plug>(nvim-surround-change-line)",
     }
 
     -- Map to add surround
     -- (direct `s` would be nice, but eats a key I use too often (I tried...))
-    local_leader_map{mode="n", key="s", action=my_actions.add_surround}
-    local_leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
-    local_leader_map{mode="n", key="SS", action=my_actions.add_surround_around_line_on_newline}
-    local_leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
-    local_leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
+    K.local_leader_map{mode="n", key="s", action=my_actions.add_surround}
+    K.local_leader_map{mode="n", key="S", action=my_actions.add_surround_on_newline}
+    K.local_leader_map{mode="n", key="SS", action=my_actions.add_surround_around_line_on_newline}
+    K.local_leader_map{mode="v", key="s", action=my_actions.add_surround_on_visual}
+    K.local_leader_map{mode="v", key="S", action=my_actions.add_surround_on_visual_on_newline}
 
     -- Maps to change/delete surrounds
-    toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
-    toplevel_map{mode="n", key="cS", action=my_actions.change_surround_on_newline}
-    toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
+    K.toplevel_map{mode="n", key="cs", action=my_actions.change_surround}
+    K.toplevel_map{mode="n", key="cS", action=my_actions.change_surround_on_newline}
+    K.toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
 
     require"nvim-surround".setup {
       keymaps = disabled_keymaps,
@@ -515,9 +517,9 @@ Plug {
       )
 
       -- Use <M-THEQUOTE> to get a single THEQUOTE if needed
-      toplevel_map{mode="i", key=[[<M-'>]], action=[[']], desc="insert single S-quote"}
-      toplevel_map{mode="i", key=[[<M-">]], action=[["]], desc="insert single D-quote"}
-      toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
+      K.toplevel_map{mode="i", key=[[<M-'>]], action=[[']], desc="insert single S-quote"}
+      K.toplevel_map{mode="i", key=[[<M-">]], action=[["]], desc="insert single D-quote"}
+      K.toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
     end
 
     -- [Nix] Auto `;` after `=` (in `let … in` block or `{ … }` attrset)
@@ -604,9 +606,9 @@ Plug {
     --    around that region when possible.
     -- Tracking issue: https://github.com/numToStr/Comment.nvim/issues/39
 
-    local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
+    K.local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
 
-    my_actions.toggle_line_comment = mk_action_v2 {
+    my_actions.toggle_line_comment = A.mk_action {
       n = {
         default_desc = "toggle comment (linewise)",
         map_opts = {expr = true},
@@ -630,14 +632,14 @@ Plug {
     }
 
     -- note: C-/ is remapped to A-/ at terminal-level
-    toplevel_map{mode={"n", "v"}, key="<M-/>", action=my_actions.toggle_line_comment}
+    K.toplevel_map{mode={"n", "v"}, key="<M-/>", action=my_actions.toggle_line_comment}
 
-    local_leader_map{
+    K.local_leader_map{
       mode={"n", "v"},
       key="cc<Space>",
       action=my_actions.toggle_line_comment,
     }
-    local_leader_map{
+    K.local_leader_map{
       mode={"n"},
       key="ccb<Space>",
       action=function()
@@ -655,29 +657,29 @@ Plug {
     -- (e.g: '<leader> cct 3j' to toggle comment on 4 lines (linewise))
     -- (e.g: '<leader> cct ip' to toggle comment in-paragraph (linewise))
     -- (e.g: '<leader> cct e' to toggle comment next word (blockwise (it's a little smart!))
-    local_leader_map_define_group{mode={"n", "v"}, prefix_key="cct", name="+for-motion"}
-    local_leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
-    local_leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
+    K.local_leader_map_define_group{mode={"n", "v"}, prefix_key="cct", name="+for-motion"}
+    K.local_leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
+    K.local_leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
     --local_leader_map{mode={"n"}, key="ccmb", action="<Plug>(comment_toggle_blockwise)",        desc="toggle for motion (blockwise)"}
     --local_leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
 
     local comment_api = require"Comment.api"
-    local_leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
-    local_leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
-    local_leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
+    K.local_leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
+    K.local_leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
+    K.local_leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
 
     -- force comment/uncomment line
     -- (normal)
-    local_leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
-    local_leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
+    K.local_leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
+    K.local_leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
     -- (visual)
-    local_leader_map{
+    K.local_leader_map{
       mode={"v"},
       key="ccc",
       action=[[<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>]],
       desc="force (linewise)",
     }
-    local_leader_map{
+    K.local_leader_map{
       mode={"v"},
       key="ccu",
       action=[[<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>]],
@@ -742,29 +744,29 @@ Plug {
       { key = "t", fn_id = "to_title_case", desc = "To (Title) Sentence" },
     }
 
-    toplevel_map_define_group{mode={"n"}, prefix_key="cr", name="+coerce"}
-    toplevel_map_define_group{mode={"n"}, prefix_key="crr", name="+via-lsp-rename"}
-    toplevel_map_define_group{mode={"n"}, prefix_key="cro", name="+with-operator"}
+    K.toplevel_map_define_group{mode={"n"}, prefix_key="cr", name="+coerce"}
+    K.toplevel_map_define_group{mode={"n"}, prefix_key="crr", name="+via-lsp-rename"}
+    K.toplevel_map_define_group{mode={"n"}, prefix_key="cro", name="+with-operator"}
 
     for _, conv in pairs(key_conversions) do
       -- N: cr <action>  => coerce   current word
-      toplevel_map{mode={"n"}, key="cr"..conv.key, desc=conv.desc, action=function()
+      K.toplevel_map{mode={"n"}, key="cr"..conv.key, desc=conv.desc, action=function()
         textcase.current_word(conv.fn_id)
       end}
       -- N: cr r  <action>  => coerce   via lsp_rename
-      toplevel_map{mode={"n"}, key="crr"..conv.key, desc=conv.desc, action=function()
+      K.toplevel_map{mode={"n"}, key="crr"..conv.key, desc=conv.desc, action=function()
         textcase.lsp_rename(conv.fn_id)
       end}
       -- N: cr o  <action>  => coerce   with operator
-      toplevel_map{mode={"n"}, key="cro"..conv.key, desc=conv.desc, action=function()
+      K.toplevel_map{mode={"n"}, key="cro"..conv.key, desc=conv.desc, action=function()
         textcase.operator(conv.fn_id)
       end}
     end
 
-    local_leader_map_define_group{mode={"v"}, prefix_key="cr", name="+coerce"}
+    K.local_leader_map_define_group{mode={"v"}, prefix_key="cr", name="+coerce"}
     for _, conv in pairs(key_conversions) do
       -- V: <leader> cr <action>     => coerce   visual selection
-      local_leader_map{mode={"v"}, key="cr"..conv.key, desc=conv.desc, action=function()
+      K.local_leader_map{mode={"v"}, key="cr"..conv.key, desc=conv.desc, action=function()
         textcase.operator(conv.fn_id)
       end}
     end

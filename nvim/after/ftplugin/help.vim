@@ -5,7 +5,7 @@ if &buftype != "help"
 endif
 
 " Fast quit
-lua toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
+lua require"mylib.keymap_system".toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 
 " Fast more-help
 " NOTE: I use <right> to not have a trailing space in the config

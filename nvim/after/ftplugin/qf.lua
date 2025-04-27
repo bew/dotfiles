@@ -1,18 +1,21 @@
+local A = require"mylib.action_system"
+local K = require"mylib.keymap_system"
+
 local jump_to_current = [[<cr>zz<C-w>p]]
-toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
-toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current, desc="Jump to current, stay in qf"}
-toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current, desc="Jump to next, stay in qf"}
-toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current, desc="Jump to prev, stay in qf"}
+K.toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
+K.toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current, desc="Jump to current, stay in qf"}
+K.toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current, desc="Jump to next, stay in qf"}
+K.toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current, desc="Jump to prev, stay in qf"}
 
-toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
-toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
+K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
+K.toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
 
-toplevel_buf_map{mode="n", key="<M-CR>", desc="Jump to current, close qf", action=function()
+K.toplevel_buf_map{mode="n", key="<M-CR>", desc="Jump to current, close qf", action=function()
   require"mylib.utils".feed_keys_sync("<cr>", { replace_termcodes = true })
   vim.cmd.cclose()
 end}
 
-my_actions.qf_switch_to_older = mk_action_v2 {
+my_actions.qf_switch_to_older = A.mk_action {
   default_desc = "Switch to older qf",
   n = function()
     local qf_current_nr = vim.fn.getqflist{nr=0}.nr
@@ -24,7 +27,7 @@ my_actions.qf_switch_to_older = mk_action_v2 {
     end
   end,
 }
-my_actions.qf_switch_to_newer = mk_action_v2 {
+my_actions.qf_switch_to_newer = A.mk_action {
   default_desc = "Switch to newer qf",
   n = function()
     local qf_stack_size = vim.fn.getqflist{nr="$"}.nr
@@ -38,10 +41,10 @@ my_actions.qf_switch_to_newer = mk_action_v2 {
   end,
 }
 
-toplevel_buf_map{mode="n", key="<C-o>", action=my_actions.qf_switch_to_older}
-toplevel_buf_map{mode="n", key="<C-i>", action=my_actions.qf_switch_to_newer}
+K.toplevel_buf_map{mode="n", key="<C-o>", action=my_actions.qf_switch_to_older}
+K.toplevel_buf_map{mode="n", key="<C-i>", action=my_actions.qf_switch_to_newer}
 
-local_leader_buf_map{mode="n", key="qf", action=function()
+K.local_leader_buf_map{mode="n", key="qf", action=function()
   local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
   if wininfo.loclist == 1 then
     require"telescope.builtin".loclist { layout_strategy = "vertical" }
@@ -49,6 +52,6 @@ local_leader_buf_map{mode="n", key="qf", action=function()
     require"telescope.builtin".quickfix { layout_strategy = "vertical" }
   end
 end}
-local_leader_buf_map{mode="n", key="qh", action=function()
+K.local_leader_buf_map{mode="n", key="qh", action=function()
   require"telescope.builtin".quickfixhistory { layout_strategy = "vertical" }
 end}
