@@ -171,8 +171,7 @@ my_actions.hlsearch_current = {
     -- IDEA(even later): make searching TS-aware, only match positions that have the same TS note type 👀
     v = function(self)
       if vim.fn.mode() == "" then
-        -- FIXME: what else could I do here? 🤔
-        --   Neovim can't make disjoint text searches..
+        -- Neovim can't make disjoint text searches..
         error("search_current in visual mode does not support visual block")
       end
       local necessary_word_bounds = self.opts.word_bounds
@@ -446,7 +445,7 @@ vim.cmd[[inoremap <M-l>   <C-g>U<Right>]]
 -- cmdline!
 vim.cmd[[inoremap <M-b> <C-g>U<S-Left>]]
 vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
--- FIXME: there are no way to move to end-of-word from insert mode
+-- There are no way to move to end-of-word from insert mode
 -- And if I make a custom mapping it wouldn't be repeatable :/ (FIXME<i-action-not-repeatable>)
 
 
@@ -574,7 +573,7 @@ K.toplevel_map{mode={"n", "o"}, key="gV", action=my_actions.select_last_inserted
 -- toplevel_map{mode="o", key="gV", action=my_actions.select_last_inserted_region}
 
 -- TODO: omap `A)` to allow `dA)` to delete parentheses and surrounding spaces.
---   (FIXME: On `foo (bar) baz`, should remove space or after or both? 🤔)
+--   (FIXME: On `foo (bar) baz`, should remove space before/after/both? 🤔 After probably)
 -- TODO: omap `I}` to allow `cI}` to change `foo` on `bla { foo }` (inside braces and spaces)
 
 -- V: Clean paste (preserving the content of the current/unnamed register),
@@ -599,17 +598,6 @@ vim.cmd[[vnoremap <silent> zc  zx]]
 -- I,C: Alt-Backspace to delete last word (like in most other programs)
 vim.cmd[[imap <M-BS> <C-w>]] -- using imap, for autopairs' auto-delete behavior of <C-w>
 vim.cmd[[cnoremap <M-BS> <C-w>]]
-
--- N: Move cursor to begin/end of displayed line (useful when text wraps)
--- FIXME: conflicts with <M-^> used to smartly move to bol
--- vim.cmd[[nnoremap <M-$> g$]]
--- vim.cmd[[nnoremap <M-^> g^]]
-
--- I: Move cursor to begin/end of line
--- NOTE: moved to "smart-bol.nvim" plug definition (would prefer to have all here?)
--- Or define as virtual keys that are overriden in plugin definition?
-
--- TODO: Add <M-b> & <M-w> BUT the movement should stay on the same line! (or same treesitter 'logical line')
 
 -- I: Add space after cursor
 --
@@ -781,7 +769,7 @@ K.global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_spli
 
 
 -- Full-width/height window splits
--- FIXME: Do I need this? Would I use this?
+-- Q: Do I need this? Would I use this?
 -- FIXME: Since I use noequalalways, the created splits takes way too much space...
 --   => Maybe get current screen size and make the new one third of that?
 --   I'd like to keep the ratios of existing windows

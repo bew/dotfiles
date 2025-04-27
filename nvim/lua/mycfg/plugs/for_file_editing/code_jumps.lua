@@ -3,7 +3,7 @@ local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator {
-  default_tags = { --[[ TODO: fill this! ]] },
+  default_tags = { t.editing },
 }
 
 local K = require"mylib.keymap_system"
@@ -18,6 +18,7 @@ Plug {
 }
 
 Plug {
+  -- TODO: try https://github.com/bassamsdata/namu.nvim 🤔
   source = gh"SmiteshP/nvim-navbuddy",
   desc = "A simple ranger-like popup to navigate LSP document symbols",
   tags = {t.ui, "lsp"}, -- note: Does NOT support Treesitter navigation
@@ -68,9 +69,6 @@ Plug {
     }
 
     K.local_leader_map{mode="n", key="cN", desc="Code LSP Navigation", action=require"nvim-navbuddy".open}
-
-    -- TODO: define type highlights
-    -- NavbuddyFunction, ...
   end,
 }
 

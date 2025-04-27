@@ -18,10 +18,10 @@ vim.cmd[[ colorscheme bew256-dark ]]
 vim.opt.termguicolors = false -- TODO: convert my theme to RGB!
 
 -- Map leaders
--- NOTE: Special termcode (like `<foo>`) must be replaced to avoid _very_ unexpected behavior
---   See: https://github.com/neovim/neovim/issues/27826 😬
 vim.g.mapleader = vim.api.nvim_replace_termcodes([[<C-Space>]], true, true, true)
 vim.g.maplocalleader = vim.api.nvim_replace_termcodes([[<Space>]], true, true, true)
+-- NOTE: Special termcode (like `<foo>`) must be replaced to avoid _very_ unexpected behavior
+--   See: https://github.com/neovim/neovim/issues/27826 😬
 
 require"mycfg.mappings"
 
@@ -30,16 +30,9 @@ require"mycfg.plugs".boot_plugins {
   install_dir = vim.fn.stdpath"state" .. "/managed-plugins/start",
 }
 
--- This is my config here!
--- FIXME: I'd like to have a better place to put these,
--- maybe even under a kind of 'plugin' in my declared_plugins tree!
--- (see ~/.dot/nvim-myplugins/ & PlugSource.myplug ?)
-
 require"mycfg.diagnostics_setup"
 require"mycfg.lsp_setup"
 
-
--- FIXME: I don't know where to put this...
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Briefly highlight yanked text",
   callback = function()

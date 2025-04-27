@@ -20,9 +20,6 @@ M.LspActive = {
     end
     return "LSP" .. maybe_nb_clients
   end,
-  -- TODO: change color based on LSP status
-  --   Would need to track a number of progress messages 🤔
-  --   See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workDoneProgress and following objects
   hl = { ctermfg = 34, },
 }
 

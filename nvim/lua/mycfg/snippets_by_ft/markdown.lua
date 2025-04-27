@@ -59,17 +59,6 @@ local function get_nodes_gfm_panel(kind, restore_body)
     }
   }
 end
--- FIXME: broken..
--- snip("panel", { desc = "GFM panels (info/…)" }, ls.choice_node(1, {
---   get_nodes_gfm_panel("NOTE", true),
---   get_nodes_gfm_panel("TIP", true),
---   get_nodes_gfm_panel("IMPORTANT", true),
---   get_nodes_gfm_panel("WARNING", true),
---   get_nodes_gfm_panel("CAUTION", true),
---   get_nodes_gfm_panel("BUG", true),
--- }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] }), {
---     stored = { body = i(nil) }
--- })
 snip("panel", { desc = "GFM panels (info/…)" }, SU.myfmt_braces {
   [[
     > [!{kind}]

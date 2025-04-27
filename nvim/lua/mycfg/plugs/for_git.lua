@@ -69,8 +69,6 @@ Plug {
       },
     }
 
-    -- FIXME: use 'on_attach' to config keybinds?
-
     -- define these globally for now.. (until good solution for per-buffer which_key helper)
     K.local_leader_map_define_group{mode={"n"}, prefix_key="h", name="+hunks"}
     K.local_leader_map_define_group{mode={"n"}, prefix_key="H", name="__hide__"}
@@ -156,7 +154,6 @@ Plug {
   tags = {t.ui, t.git},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    -- FIXME: anything to do here?
     require"diffview".setup {
       default_args = {    -- Default args prepended to the arg-list for the listed commands
         DiffviewOpen = {"--untracked-files=false", "--imply-local"},

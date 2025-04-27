@@ -127,7 +127,6 @@ SpecialBufStatuslines.Help = {
   },
   _,
   my.fs.BufBasename,
-  -- TODO: insert local keybinding help! (note: generate it?)
   __WIDE_SPACE__,
   my.lsp_ts_diags.TreesitterStatus,
   _,
@@ -378,13 +377,9 @@ local Statuslines = {
 }
 
 local function get_heirline_setup_opts()
-  -- FIXME: doesn't behave well when no space to show whole statuline..
   return {
     statusline = Statuslines,
   }
-  -- TODO: I would like to setup the 'statusline' option myself, and only call heirline for
-  -- initialization. This would allow to setup local statuslines in some file / for some window,
-  -- without putting that config in the global statusline.
 end
 
 return {

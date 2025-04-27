@@ -3,7 +3,7 @@ local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 -- local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator {
-  default_tags = { --[[ TODO: fill this! ]] },
+  default_tags = { t.editing },
 }
 
 local A = require"mylib.action_system"
@@ -39,11 +39,6 @@ Plug.luasnip {
       -- https://github.com/L3MON4D3/LuaSnip/issues/170
       -- https://github.com/L3MON4D3/LuaSnip/issues/780
       region_check_events = { "CursorHold" }, -- shortly after (`:h 'updatetime'`)
-      -- FIXME: Make snippet expansion buffer-window-local, not buffer-local 👀
-      --   When I have 2 windows A & B opened on a buffer (at very different positions),
-      --   if I'm in snippet in win A, and I switch to win B to check something at a different part
-      --   of the buffer, waiting for region_check_events will exit me from the snippet in win A.
-      --
       -- The events used to update the active nodes' dependents (like replicate nodes)
       update_events = {"TextChanged", "TextChangedI"},
       -- The events used to check if a snippet was deleted (to avoid keeping placeholders)
@@ -138,9 +133,6 @@ Plug {
   tags = {t.editing},
   defer_load = { on_event = "VeryLazy" }, -- 🤔
   on_load = function()
-    -- FIXME: is there a way to add subtle add(green)/change(yellow)/delete(red)
-    --   highlights to the modified surrounds? (like with vim-sandwich)
-
     -- NOTE: Doc on Lua patterns: https://www.lua.org/pil/20.2.html
     --   gotcha: `%s` in patterns includes `\n`!
     local surround_utils = require"nvim-surround.config"
@@ -202,7 +194,6 @@ Plug {
         "$"
       )
     }
-    -- FIXME: [[ & ]] custom surrounds broken again?? /!\
 
     -- Disable all default keybinds to use my action system instead
     local disabled_keymaps = {
@@ -690,7 +681,6 @@ Plug {
   source = gh"tommcdo/vim-exchange",
   desc = "Arbitrarily exchange(swap) blocks of code!",
   tags = {t.vimscript, t.editing},
-  -- TODO(later): Explicit keybinds, so I can better control which normal keybinds are active.
   defer_load = { on_event = "VeryLazy" },
 }
 

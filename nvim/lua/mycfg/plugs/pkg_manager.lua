@@ -20,9 +20,6 @@ local fallback = PluginSystem.sources.fallback
 --
 -- TODO: Ask a way to disable the 'update' tab, which is potentially too dangerous,
 -- I want to review plugins updates before I actually update them!
---
--- TODO: Make a dedicated way to register a package manager,
---   so we can enforce a set of fields / structure
 Plug.pkg_manager {
   -- Default to Github source if local one cannot be found.
   source = fallback("lazy", dist_managed_opt_plug"lazy-nvim", gh"folke/lazy.nvim"),

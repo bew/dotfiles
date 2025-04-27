@@ -40,8 +40,7 @@ snip("and", {desc = "Derive annotation #[derive(…)]"}, SU.myfmt {
 
 snip("opt", {desc = "Option<…>"}, SU.myfmt_braces {
   "Option<{type}>",
-  { type = i(1, "type") },
-  -- FIXME: default to last selected type if any
+  { type = SU.insert_node_default_selection(1, "type") },
 })
 
 snip("ok", {desc = "Ok(…)"}, SU.myfmt {

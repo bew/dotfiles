@@ -160,8 +160,6 @@ Plug.cmp {
     --    require'cmp_buffer'.compare_locality, -- sort words by distance to cursor (for buffer & lsp* sources)
     --  }
     --},
-    -- FIXME: writing `thina` still does NOT match `thisisnotaword` :/ why not??
-    -- Opened issue: https://github.com/hrsh7th/nvim-cmp/issues/1443
     global_cfg.matching = {
       -- Allow fuzzy matching to not match from the beginning
       -- See: https://github.com/hrsh7th/nvim-cmp/issues/1422

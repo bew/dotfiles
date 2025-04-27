@@ -95,7 +95,6 @@ Plug.fileexplorer {
           -- Action names are found in:
           -- common actions: <plug>/lua/neo-tree/sources/common/commands.lua
           -- per-source actions, e.g: <plug>/lua/neo-tree/sources/filesystem/commands.lua
-          -- FIXME: how to define custom ad-hoc actions here in the config?
           -- FIXME: missing tree navigation actions to goto parent node, goto next/prev sibling node
           ["a"] = {"add", config = { show_path = "relative" }},
           ["o"] = "open",
@@ -138,24 +137,9 @@ Plug.fileexplorer {
         window = {
           mappings = {
             -- Disable neotree's fuzzy finder on `/`, it's annoying when I just want to jump to something I see
+            -- (Even with dedicated keys to invoke it I never use it anyway, so removed them as well)
             ["/"] = "noop",
             ["#"] = "noop",
-            -- Re-enable neotree's fuzzy finder using shifted letters so I can spam shift `/` + shift
-            -- `f` to activate it, but still do shift `/` + `bla` to search `bla` with vim's search.
-            ["/F"] = "fuzzy_finder",
-            ["//"] = "fuzzy_finder", -- alt mapping, nicer?
-            ["/D"] = "fuzzy_finder_directory", -- only directories
-            -- FIXME: how to make the fuzzy_finder NOT auto-open found file?
-            --   (when pressing <cr> after searching something to hide)
-            --   => Then, how to hide results? Maybe with an empty fuzzy search? (not great..)
-            -- NOTE: I'd expect the fuzzy finder thing to not be specific to filesystem view,
-            --   and to work over any sets of tree of nodes
-            -- FIXME: how to close the fuzzy_finder searchbox while keeping the filtered view of
-            --   results??
-          },
-          fuzzy_finder_mappings = {
-            ["<M-j>"] = "move_cursor_down",
-            ["<M-k>"] = "move_cursor_up",
           },
         },
       },

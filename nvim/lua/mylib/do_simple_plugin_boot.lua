@@ -100,7 +100,6 @@ local function boot_plugins(plugin_specs, opts)
     callback = apply_custom_highlights,
   })
   -- call once on boot (as new colorsheme might already be applied!)
-  -- FIXME: is there a way if colorscheme was already set?
   apply_custom_highlights()
 end
 

@@ -15,7 +15,6 @@ Plug.telescope {
   source = gh"nvim-telescope/telescope.nvim",
   desc = "Find, Filter, Preview, Pick. All lua, all the time…",
   tags = {},
-  -- FIXME: install native sorter!
   depends_on = {Plug.lib_plenary},
   config_depends_on = {
     Plug { source = fallback("telescope-fzf", dist_managed_opt_plug"telescope-fzf-native") },
@@ -104,13 +103,12 @@ Plug.telescope {
       -- N/I: Select actions
       ["<CR>"] = tel_actions.select_default,
       ["<C-j>"] = tel_actions.select_default,
-      -- FIXME: multi-selection not handled properly FIXME :/
+      -- FIXME: multi-selection not handled properly :/
       --   -> All builtin select_* actions use the selected entry instead of
       --   picker:get_multi_selection() 😖
       ["<M-s>"] = tel_actions.select_horizontal,
       ["<M-v>"] = tel_actions.select_vertical,
       ["<M-t>"] = tel_actions.select_tab,
-      -- FIXME: what's the diff between file_* & select_* actions?
 
       -- N/I: Move selection
       ["<Down>"] = tel_actions.move_selection_next,
@@ -186,7 +184,6 @@ Plug.telescope {
       },
     }
     default_cfg.mappings.i = {
-      -- FIXME: <C-w> in insert mode in prompt buffer does NOT delete last word... /!\
       ["<Esc>"] = tel_actions.close, -- Quick exit
       ["<M-Esc>"] = { "<Esc>", type = "command" }, -- Insert to Normal mode (used less often)
 

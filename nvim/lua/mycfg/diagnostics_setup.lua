@@ -7,8 +7,6 @@ vim.diagnostic.config {
   -- They are annoying when a line has 2+ diagnostics as other signs (like git) are overwriten..
   signs = false,
 }
--- TODO: hide diag virtual _TEXT_ most of the time, but show colored dots only (or types of diags),
---   and only show the current line diag text (in virtual text / in cmdline / in statusline 🤔)
 
 ---@class mycfg.diag.GotoDiagBySevArgs
 ---@field goto_diag_fn fun(opts?: vim.diagnostic.GotoOpts)

@@ -21,7 +21,7 @@
 -- Nice example of usage:
 -- https://github.com/ahmedelgabri/dotfiles/blob/59adb82540492781/config/nvim/lua/plugins/mini.lua#L140
 
--- TODO: upstream pattern type hints!
+-- TODO: upstream pattern type hints?
 
 ---@class mycfg.hl_patterns.GroupFnData
 ---@field full_match string String with full pattern match
@@ -51,8 +51,6 @@ return vim.tbl_extend(
   require"mycfg.hl_patterns.vim_colors",
 
   -- Tech-specific patterns
-  -- TODO: use `vim.b.minihipatterns_config` instead of global patterns 🤔
-  --   Find a nice way to define a pattern or group of patterns for 1+ filetype(s)
   require"mycfg.hl_patterns.tech_shell",
   require"mycfg.hl_patterns.tech_lua",
   require"mycfg.hl_patterns.tech_python",
