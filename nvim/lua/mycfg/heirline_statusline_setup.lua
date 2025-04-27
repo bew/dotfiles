@@ -129,6 +129,8 @@ SpecialBufStatuslines.Help = {
   my.fs.BufBasename,
   -- TODO: insert local keybinding help! (note: generate it?)
   __WIDE_SPACE__,
+  my.lsp_ts_diags.TreesitterStatus,
+  _,
   my.nvim.RulerAndCursorPos,
 }
 
