@@ -156,7 +156,7 @@ Plug {
             local symbol = nav:get_current_symbol()
             nav:close()
             if symbol then
-              require("aerial.navigation").select_symbol(
+              require"aerial.navigation".select_symbol(
                 symbol,
                 nav.winid,
                 nav.bufnr,

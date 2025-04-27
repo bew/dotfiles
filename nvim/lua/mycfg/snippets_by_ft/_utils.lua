@@ -228,8 +228,8 @@ SU.insert_node_default_selection = function(index, default_text)
   end)
 end
 
-local node_key_ref = require("luasnip.nodes.key_indexer").new_key -- to use key indexed node refs
-local node_absolute_ref = require("luasnip.nodes.absolute_indexer")
+local node_key_ref = require"luasnip.nodes.key_indexer".new_key -- to use key indexed node refs
+local node_absolute_ref = require"luasnip.nodes.absolute_indexer"
 ---@param ref string|table|integer
 SU.node_ref = function(ref)
   if type(ref) == "string" then

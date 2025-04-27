@@ -40,14 +40,14 @@ Plug.cmp {
     global_cfg.preselect = cmp.PreselectMode.None
     global_cfg.snippet = {
       expand = function(args)
-        require'luasnip'.lsp_expand(args.body)
+        require"luasnip".lsp_expand(args.body)
       end
     }
     global_cfg.view = {
       -- NOTE: 'custom' view works best at the moment @2024-02-25
       --   ('native' view has a number of issues with surrounding text editing,
       --   especially snippets from LuaSnip)
-      entries = {name = 'custom', selection_order = 'near_cursor' }
+      entries = {name = "custom", selection_order = "near_cursor" }
     }
     global_cfg.formatting = {}
     global_cfg.window = {
@@ -171,7 +171,7 @@ Plug.cmp {
       -- TODO(?): fork?
     }
     local common_sources = {
-      { name = 'nvim_lsp' },
+      { name = "nvim_lsp" },
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
       {

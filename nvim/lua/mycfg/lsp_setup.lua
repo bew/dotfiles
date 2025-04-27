@@ -1,7 +1,7 @@
 local K = require"mylib.keymap_system"
 
-vim.api.nvim_create_autocmd('LspAttach', {
-  desc = 'LSP actions',
+vim.api.nvim_create_autocmd("LspAttach", {
+  desc = "LSP actions",
   callback = function(_event)
     -- Trigger LSP completion
     --toplevel_map{mode="i", key="<C-Space>", opts=buf_opts, action="<C-x><C-o>"}

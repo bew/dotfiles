@@ -15,7 +15,7 @@ Plug {
   desc = "Restore cursor when opening file for first time, customizable :)",
   tags = {},
   on_load = function()
-    require("restore-cursor").setup()
+    require"restore-cursor".setup()
   end,
 }
 
@@ -66,7 +66,7 @@ Plug {
   tags = {t.content_ui},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    require("ibl").setup {
+    require"ibl".setup {
       indent = {
         char = {"¦", "│"},
       },

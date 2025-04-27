@@ -19,7 +19,7 @@ Plug.ts {
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     ---@diagnostic disable-next-line: missing-fields (don't care, it works)
-    require'nvim-treesitter.configs'.setup {
+    require"nvim-treesitter.configs".setup {
       auto_install = false,
 
       -- Enable TS modules

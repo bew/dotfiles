@@ -41,4 +41,4 @@ local plugin_specs_smearcursor = {
   }
 }
 
-require("lazy.minit").repro { spec = plugin_specs_smearcursor }
+require"lazy.minit".repro { spec = plugin_specs_smearcursor }

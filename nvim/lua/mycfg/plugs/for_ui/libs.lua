@@ -13,8 +13,8 @@ Plug.lib_web_devicons {
   desc = "Find (colored) icons for file type",
   defer_load = { autodetect = true },
   on_load = function()
-    require'nvim-web-devicons'.set_default_icon("", "#cccccc", 244)
-    require'nvim-web-devicons'.setup { default = true } -- give a default icon when nothing matches
+    require"nvim-web-devicons".set_default_icon("", "#cccccc", 244)
+    require"nvim-web-devicons".setup { default = true } -- give a default icon when nothing matches
   end,
 }
 

@@ -17,7 +17,7 @@ Plug {
   desc = "Tool to debug/understand autocmd flow while using neovim",
   tags = {"utils", "debug"},
   on_load = function()
-    require("debug-autocmds").setup{
+    require"debug-autocmds".setup{
       global_tracking_on_start = true, -- switch to `true` to debug builtin events from start :)
     }
     -- NOTE: Nice 'oneliner' to get some info about buffer/window/tab events

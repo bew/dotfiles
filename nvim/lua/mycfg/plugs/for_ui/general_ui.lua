@@ -39,7 +39,7 @@ Plug.statusline {
       end,
     })
 
-    local hline_mycfg = require("mycfg.heirline_statusline_setup")
+    local hline_mycfg = require"mycfg.heirline_statusline_setup"
     heirline.setup(hline_mycfg.get_heirline_setup_opts())
   end,
 }

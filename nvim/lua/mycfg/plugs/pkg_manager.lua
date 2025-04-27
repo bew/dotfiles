@@ -114,7 +114,7 @@ Plug.pkg_manager {
     end
     -- print("Loading lazy plugins:", vim.inspect(plug_names)) -- DEBUG
     ---@diagnostic disable-next-line: missing-fields (lazy config has all options as 'required'..)
-    require("lazy").setup(lazy_plugin_specs, {
+    require"lazy".setup(lazy_plugin_specs, {
       root = ctx.install_dir,
       git = {
         -- In the Logs UI, show commits that are 'pending'

@@ -105,6 +105,8 @@ Plug.telescope {
       ["<CR>"] = tel_actions.select_default,
       ["<C-j>"] = tel_actions.select_default,
       -- FIXME: multi-selection not handled properly FIXME :/
+      --   -> All builtin select_* actions use the selected entry instead of
+      --   picker:get_multi_selection() 😖
       ["<M-s>"] = tel_actions.select_horizontal,
       ["<M-v>"] = tel_actions.select_vertical,
       ["<M-t>"] = tel_actions.select_tab,
@@ -251,7 +253,7 @@ Plug.telescope {
 
     -- Extension: ui-select
     extensions_cfg["ui-select"] = {
-      require('telescope.themes').get_dropdown(),
+      require"telescope.themes".get_dropdown(),
     }
     table.insert(extensions_to_load, "ui-select")
 

@@ -1,7 +1,7 @@
 local PluginSystem = require"mylib.plugin_system"
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
-local myplug = PluginSystem.sources.myplug
+-- local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { --[[ TODO: fill this! ]] },
 }
@@ -73,7 +73,7 @@ Plug.luasnip {
     }
     -- Auto-(re)load snippets at this path
     local xdg_config_dirs = vim.env.XDG_CONFIG_DIRS ~= nil and vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}
-    require("luasnip.loaders.from_lua").load({
+    require"luasnip.loaders.from_lua".load({
       paths = U.concat_lists {
         { vim.fn.stdpath"config" .. "/lua/mycfg/snippets_by_ft" },
         U.filter_map_list(xdg_config_dirs, function(path)
@@ -367,7 +367,6 @@ Plug {
     -- See: https://github.com/windwp/nvim-autopairs/wiki/Rules-API
     local Rule = require"nvim-autopairs.rule"
     local cond = require"nvim-autopairs.conds"
-    local ts_cond = require"nvim-autopairs.ts-conds"
     -- Rename some functions to have a more readable config (has many more!)
     ---@diagnostic disable: inject-field
     Rule.insert_pair_when = Rule.with_pair
@@ -412,7 +411,6 @@ Plug {
         return nil -- fallback to other checks
       end
     end
-    ---@diagnostic enable: inject-field
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
     -- internals of Rule:
@@ -434,7 +432,7 @@ Plug {
     -- `(|)`   -> press `<space>`     => get: `( | )`
     -- `( | )` -> press `<backspace>` => get: `(|)`
     -- From: https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#alternative-version
-    local brackets = { {'(', ')'}, {'[', ']'}, {'{', '}'} }
+    local brackets = { {"(", ")"}, {"[", "]"}, {"{", "}"} }
     npairs.add_rule(
       Rule{start_pair = " ", end_pair = " "}
       :insert_pair_when(function(ctx)
@@ -452,9 +450,9 @@ Plug {
         local col0 = vim.api.nvim_win_get_cursor(0)[2]
         local context = ctx.line:sub(col0 - 1, col0 + 2) -- inclusive indexing
         return vim.tbl_contains({
-          brackets[1][1]..'  '..brackets[1][2],
-          brackets[2][1]..'  '..brackets[2][2],
-          brackets[3][1]..'  '..brackets[3][2],
+          brackets[1][1].."  "..brackets[1][2],
+          brackets[2][1].."  "..brackets[2][2],
+          brackets[3][1].."  "..brackets[3][2],
         }, context)
       end)
     )
@@ -591,7 +589,7 @@ Plug {
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     ---@diagnostic disable-next-line: missing-fields
-    require("Comment").setup {
+    require"Comment".setup {
       mappings = false,
     }
     -- FIXME: Allow `gcA` to be dot-repeated

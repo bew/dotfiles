@@ -60,7 +60,7 @@ Plug {
         delete       = { text = "▁" },
         changedelete = { text = "▁" }, -- like 'delete', but with 'change' highlight
         topdelete    = { text = "▔" },
-        untracked    = { text = '╏' },
+        untracked    = { text = "╏" },
       },
       attach_to_untracked = true,
       preview_config = { border = "none" },
@@ -97,9 +97,9 @@ Plug {
       default_desc = "Goto next changed hunk",
       n = function()
         if vim.wo.diff then
-          vim.cmd.normal({']c', bang = true})
+          vim.cmd.normal({"]c", bang = true})
         else
-          gs.nav_hunk('next')
+          gs.nav_hunk("next")
         end
       end,
     }
@@ -107,9 +107,9 @@ Plug {
       default_desc = "Goto prev changed hunk",
       n = function()
         if vim.wo.diff then
-          vim.cmd.normal({'[c', bang = true})
+          vim.cmd.normal({"[c", bang = true})
         else
-          gs.nav_hunk('prev')
+          gs.nav_hunk("prev")
         end
       end,
     }
