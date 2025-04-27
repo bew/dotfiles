@@ -78,34 +78,28 @@ end
 K.toplevel_buf_map{mode="i", key=[[<M-:>]], action=[[: <C-g>U<Left><C-g>U<Left>]]}
 
 -- I: <Alt-f> to toggle between `f"..."` and `"..."`
--- NOTE: it is pretty dumb, searching the first '"' on left of cursor.
--- TODO: check with tree-sitter if in string + add support for multiline string
 local function fstring_toggle()
-  local saved_cursor = vim.api.nvim_win_get_cursor(0) -- (1, 0)-indexed
-  local cur_row0, cur_col0 = saved_cursor[1] -1, saved_cursor[2]
-  local line_before = vim.api.nvim_get_current_line():sub(1, cur_col0 +1)
-  local quote_rel_idx1 = line_before:reverse():find('"')
-  if not quote_rel_idx1 then
-    vim.notify([[Cannot toggle f-string, not in string? 👀]])
-    return
-  end
-  local quote_idx1 = #line_before - quote_rel_idx1 + 1
-  local f_idx1 = quote_idx1 -1
-  local is_fstring = line_before:sub(f_idx1, f_idx1) == "f"
+  vim.treesitter.get_parser():parse() -- ensure tree is parsed
+  local node = vim.treesitter.get_node()
+  if not node then return end
+  -- Python string nodes looks like:
+  -- (string
+  --   (string_start)
+  --   (string_content)
+  --   (string_end))
+  -- So the parent _should_ be the `string` node
+  local string_node = node:parent()
+  if not string_node or string_node:type() ~= "string" then return end
 
+  local str = vim.treesitter.get_node_text(string_node, 0)
+  local start_row0, start_col0 = string_node:start()
+  local is_fstring = str:sub(1, 1) == "f"
   if is_fstring then
-    -- Delete `f`
-    local row0 = cur_row0
-    local col0 = f_idx1 -1
-    vim.api.nvim_buf_set_text(0, row0, col0, row0, col0 +1, {}) -- 0-indexed
-    --vim.api.nvim_win_set_cursor(0, cur_row0 +1, ) -- (1, 0)-indexed
-    --FIXME: finish this!
+    -- Remove `f` at node start
+    vim.api.nvim_buf_set_text(0, start_row0, start_col0, start_row0, start_col0 +1, {})
   else
-    -- Insert `f` at quote position
-    local row0 = cur_row0
-    local col0 = quote_idx1 -1
-    vim.api.nvim_buf_set_text(0, row0, col0, row0, col0, {"f"})
-    --FIXME: finish this! (move cursor)
+    -- Insert `f` at node start
+    vim.api.nvim_buf_set_text(0, start_row0, start_col0, start_row0, start_col0, {"f"})
   end
 end
 K.toplevel_buf_map{mode="i", key=[[<M-f>]], action=fstring_toggle}
