@@ -3,21 +3,34 @@ local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 -- local myplug = PluginSystem.sources.myplug
 local Plug = PluginSystem.get_plugin_declarator {
-  default_tags = { --[[ TODO: fill this! ]] },
+  default_tags = { t.textobj },
+}
+
+--------------------------------
+
+Plug {
+  source = gh"echasnovski/mini.ai",
+  desc = "Extend and create `a`/`i` textobjects",
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require"mini.ai".setup {
+      search_method = "cover_or_next",
+    }
+  end,
 }
 
 --------------------------------
 
 Plug.lib_textobj_user {
   source = gh"kana/vim-textobj-user",
-  tags = {t.vimscript, t.textobj, t.lib_only},
+  tags = {t.vimscript, t.lib_only},
 }
 
 -- textobj: ii ai iI aI
 Plug {
   source = gh"kana/vim-textobj-indent",
   desc = "Indent-based text object",
-  tags = {t.vimscript, t.textobj},
+  tags = {t.vimscript},
   depends_on = { Plug.lib_textobj_user },
   defer_load = { on_event = "VeryLazy" },
 }
@@ -26,7 +39,7 @@ Plug {
 Plug {
   source = gh"glts/vim-textobj-comment",
   desc = "Comment text object",
-  tags = {t.vimscript, t.textobj},
+  tags = {t.vimscript},
   depends_on = { Plug.lib_textobj_user },
   -- IDEA: when the comment is the last thing of the line,
   -- `Ac` could also take the spaces before it!
@@ -45,7 +58,7 @@ Plug {
 Plug {
   source = gh"kana/vim-textobj-entire",
   desc = "Entire-buffer-content text object",
-  tags = {t.vimscript, t.textobj},
+  tags = {t.vimscript},
   depends_on = { Plug.lib_textobj_user },
   defer_load = { on_event = "VeryLazy" },
 }
@@ -56,6 +69,6 @@ Plug {
 Plug {
   source = gh"vim-utils/vim-space",
   desc = "Whitespace text object",
-  tags = {t.vimscript, t.textobj},
+  tags = {t.vimscript},
   defer_load = { on_event = "VeryLazy" },
 }
