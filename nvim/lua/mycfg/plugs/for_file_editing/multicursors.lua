@@ -14,10 +14,12 @@ Plug {
   desc = "Multiple cursors in Neovim which work how you expect",
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    -- FIXME: Cursors are a bit too easy to hide
-    --   ISSUE: https://github.com/jake-stewart/multicursor.nvim/issues/117
     local mc = require"multicursor-nvim"
-    mc.setup()
+    mc.setup {
+      -- Don't disable hlsearch on cursor actions 🙏
+      -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/118
+      hlsearch = true,
+    }
 
     K.toplevel_map_define_group{mode={"n", "v"}, prefix_key="<M-Space>", name="+multicursor"}
 
@@ -35,10 +37,6 @@ Plug {
       if vim.v.hlsearch == 1 then
         -- We have an active search, use search results
         opts.search_fn(dir)
-        -- Make sure hlsearch isn't reset 👀
-        vim.v.hlsearch = 1
-        -- FIXME: DOES NOT WORK..
-        --   ISSUE: https://github.com/jake-stewart/multicursor.nvim/issues/118
       else
         -- Otherwise use current selection or current word to find matches
         opts.match_fn(dir)
@@ -149,13 +147,19 @@ Plug {
 
   end,
   on_colorscheme_change = function()
+    -- NOTE: Colors are _reversed_ to ensure the extmarks stay visible over search result highlights
+    -- ISSUE: https://github.com/neovim/neovim/issues/18756#issuecomment-2833479559
     vim.api.nvim_set_hl(0, "MultiCursorCursor", {
       bold = true,
-      ctermbg = 88,
+      reverse = true,
+      ctermfg = 88,
+      ctermbg = 248,
     })
     vim.api.nvim_set_hl(0, "MultiCursorDisabledCursor", {
       bold = true,
-      ctermbg = 238,
+      reverse = true,
+      ctermfg = 238,
+      ctermbg = 248,
     })
   end,
 }
