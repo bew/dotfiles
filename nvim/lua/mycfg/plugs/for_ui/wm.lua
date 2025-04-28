@@ -45,11 +45,20 @@ Plug {
       },
       buffers = {
         -- Disable right padding win
-        -- This ensures eol virtual text is fully visible and right panel opens without a hitch.
+        -- This ensures eol virtual text is always fully visible
         right = { enabled = false },
       },
     }
 
-    K.global_leader_map{mode="n", key="<C-z>", desc="Zen/NoNeckPain", action=vim.cmd.NoNeckPain}
+    K.global_leader_map{mode="n", key="<C-z>", desc="Toggle Zen/NoNeckPain mode", action=vim.cmd.NoNeckPain}
+
+    -- Fast quit padding windows with `q`
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("NoNeckPainFT", { clear = true }),
+      pattern = "no-neck-pain",
+      callback = function()
+        K.toplevel_buf_map{mode="n", key="q", action=vim.cmd.NoNeckPain}
+      end,
+    })
   end,
 }
