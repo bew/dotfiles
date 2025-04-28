@@ -70,7 +70,7 @@ M.Diagnostics = {
   single_diagnostic {
     sev = "ERROR",
     icon = "E",
-    hl = { ctermfg = 250, ctermbg = 88 },
+    hl = { ctermfg = 250, ctermbg = 124 },
   },
   single_diagnostic {
     sev = "WARN",
