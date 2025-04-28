@@ -78,6 +78,14 @@
   sw = switch
 
   sth = stash
+  sth-staged = stash push --staged
+  # note: `--index` ensures that the index is restored:
+  # - stashed   staged changes are restored as staged
+  # - stashed unstaged changes are restored as unstaged
+  sth-pop = stash pop --index
+  # https://stackoverflow.com/questions/7650797/how-to-stash-only-unstaged-changes-in-git/44824325#44824325
+  # Works by: stash staged + stash the rest + pop before-last stash (restore staged)
+  sth-unstaged = !git stash push --staged && git stash && git stash pop 'stash@{1}' --index
 
   reb  = rebase
   rebi = rebase -i
