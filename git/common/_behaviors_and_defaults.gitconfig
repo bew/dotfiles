@@ -1,3 +1,8 @@
+[core]
+  # Speeds up `git status` by storing cache in the index.
+  # nice: Works great on nixpkgs ✨
+  untrackedCache = true
+
 [help]
   autocorrect = immediate
 
