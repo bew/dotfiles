@@ -311,7 +311,7 @@ local GeneralPurposeStatusline = {
   {
     condition = function()
       local mc = require"multicursor-nvim"
-      return mc.hasCursors()
+      return hline_conditions.is_active() and mc.hasCursors()
     end,
     _,
     -- 5 cursors
