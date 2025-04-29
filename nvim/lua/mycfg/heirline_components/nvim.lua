@@ -129,8 +129,7 @@ M.Changed = {
         vim.cmd[[lockmarks write]]
       end)
     end,
-    -- Should be unique(?). Not 100% sure what it's used for, and how..
-    name = "statusline_buffer_write_action",
+    name = "statusline_on_click_buffer_write",
   },
 }
 

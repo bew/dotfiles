@@ -127,6 +127,29 @@ SpecialBufStatuslines.Help = {
   },
   _,
   my.fs.BufBasename,
+  _,
+  {
+    provider = function()
+      if not vim.o.readonly and vim.o.modifiable then
+        return "(editable)"
+      else
+        return _U.unicode_or(" ", "[RO]")
+      end
+    end,
+    on_click = {
+      name = "statusline_on_click_help_toggle_editable",
+      callback = function()
+        vim.cmd[[set ro! modifiable!]]
+      end,
+    },
+    hl = function()
+      if not vim.o.readonly and vim.o.modifiable then
+        return { ctermfg = 250 }
+      end
+    end,
+  },
+  _,
+  my.nvim.Changed,
   __WIDE_SPACE__,
   my.lsp_ts_diags.TreesitterStatus,
   _,
@@ -179,7 +202,7 @@ PluginStatuslines.SplashStartup = {
   {
     provider = "          Do something cool !          ",
     hl = {
-      ctermbg = 26,
+      ctermbg = 24,
       ctermfg = 254,
       cterm = { bold = true },
     },
@@ -264,7 +287,7 @@ PluginStatuslines.CodeCompanionAI = {
       return require"mylib.utils".str_concat(current_adapter, " (", current_model, ")")
     end,
     on_click = {
-      name = "heirline_codecompanion_adapter_on_click",
+      name = "statusline_on_click_codecompanion_adapter",
       callback = function()
         local chat = require"codecompanion".buf_get_chat(0)
         require"codecompanion.strategies.chat.keymaps".change_adapter.callback(chat)
