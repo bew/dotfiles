@@ -66,7 +66,14 @@ M.Diagnostics = {
     local diags = vim.diagnostic.get(0, { severity = { "ERROR", "WARN", "HINT" } })
     return #diags > 0
   end,
-  update = "DiagnosticChanged",
+  update = {
+    "DiagnosticChanged",
+    callback = function()
+      -- Ensure the component is redrawn on update
+      -- (otherwise it's only updated on cursor movement)
+      vim.cmd.redrawstatus()
+    end,
+  },
   single_diagnostic {
     sev = "ERROR",
     icon = "E",
