@@ -5,6 +5,7 @@
   path = ./common/_aliases.gitconfig
   path = ./common/_plugin_delta.gitconfig
   path = ./common/_plugin_absorb.gitconfig
+  path = ./common/_plugin_trim.gitconfig
 
 # Config when inside a git repo under my personal folder
 [includeIf "gitdir:~/self/**"]

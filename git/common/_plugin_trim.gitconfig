@@ -1,0 +1,8 @@
+# Config for plugin `git-trim` to help delete local merged branches
+#   https://github.com/foriequal0/git-trim
+
+[trim]
+  # Branches considered as base branches
+  bases = develop,dev,main,master
+
+# vim:set ft=gitconfig:
