@@ -232,7 +232,7 @@ function zwidget::fzf::zoxide
   # => use ctrl-r to enable fuzzy sorting and get better result for non-frecent dirs
   local fzf_cmd=($FZF_BASE_CMD --no-sort --tiebreak=index --nth 2.. --bind=ctrl-r:toggle-sort)
   fzf_cmd+=(--prompt "Fuzzy jump to: ")
-  fzf_cmd+=(--preview "$preview_cmd" --preview-window down:10)
+  fzf_cmd+=(--preview "$preview_cmd" --preview-window down:5)
   fzf_cmd+=(
     --bind='focus:transform-preview-label:echo [ {} ]'
     --color=preview-label:247:bold
