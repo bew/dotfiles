@@ -92,18 +92,24 @@ Plug.fileexplorer {
       window = {
         position = "right",
         mappings = {
+          -- disable some defaults
+          -- .. split/tab opening keys
+          t = "noop", s = "noop", S = "noop",
+          -- .. sorting modes
+          oc = "noop", od = "noop", og = "noop", om = "noop", on = "noop", os = "noop", ot = "noop",
+          -- .. close all nodes
+          z = "noop",
+
           -- Action names are found in:
           -- common actions: <plug>/lua/neo-tree/sources/common/commands.lua
           -- per-source actions, e.g: <plug>/lua/neo-tree/sources/filesystem/commands.lua
           -- FIXME: missing tree navigation actions to goto parent node, goto next/prev sibling node
           ["a"] = {"add", config = { show_path = "relative" }},
           ["o"] = "open",
-          ["t"] = "noop", ["s"] = "noop", ["S"] = "noop", -- disable default split/tab opening keys
           ["<M-t>"] = "open_tabnew",
           ["<M-s>"] = "open_split",
           ["<M-v>"] = "open_vsplit",
 
-          ["z"] = "noop",
           ["zC"] = "close_all_nodes",
           -- ["zA"] = "expand_all_nodes", -- BROKEN: crashes neovim :eyes:
 
@@ -122,7 +128,28 @@ Plug.fileexplorer {
       default_component_configs = {
         name = {
           trailing_slash = true,
-        }
+          use_git_status_colors = false,
+        },
+        git_status = {
+          symbols = {
+            -- Change type
+            added     = "+", -- NOTE: you can set any of these to an empty string to not show them
+            deleted   = "x",
+            modified  = "~",
+            renamed   = "",
+            -- Status type
+            untracked = "?",
+            ignored   = "",
+            unstaged  = "",
+            staged    = "++",
+            conflict  = "󰦒",
+          },
+          align = "right",
+        },
+        -- Disable some components, I never use them
+        file_size = { enabled = false },
+        type = { enabled = false },
+        last_modified = { enabled = false },
       },
 
       -- Per source configs
