@@ -64,18 +64,6 @@ function cfg::check-dependencies()
   unset _zsh_plugins_srcrefs
 }
 
-# Init `LS_COLORS`, colors for common binaries (ls, tree, etc..)
-if cfg::has-bin dircolors; then
-  eval `dircolors --sh`
-fi
-
-cfg::depends-on-bin direnv
-eval "$(direnv hook zsh)"
-
-cfg::depends-on-bin zoxide
-eval "$(zoxide init zsh --no-cmd)"
-# --no-cmd to skip `z` & `zi` aliases (`zi` conflicts with zinit's `zi` shortcut…)
-
 #-------------------------------------------------------------
 # Load and configure plugins
 
@@ -88,7 +76,7 @@ FAST_WORK_DIR=$ZSH_DATA_DIR/plugin--fast-syntax-highlighting
 mkdir -p "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.cache :/
 # | => to avoid the selected theme to be saved in ~/.cache (tmpfs => empty on boot)
 # \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
-zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
+zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 # Note: to activate/update my custom theme, run:
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
 # TODO: find a way to not have this manual action on first start?
@@ -96,18 +84,33 @@ zi light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
 # autopair all the things!
 # don't auto-init before setting my key bindings, init at the end (with 'autopair-init')
 AUTOPAIR_INHIBIT_INIT=1
-zi light $_ZSH_PLUGIN_SRCREF__autopair
+zinit light $_ZSH_PLUGIN_SRCREF__autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
 GITSTATUS_CACHE_DIR=$ZSH_DATA_DIR/plugin--gitstatus
 # \__ to avoid binary auto install in ~/.cache (tmpfs => empty on boot)
-zi light $_ZSH_PLUGIN_SRCREF__gitstatus
+zinit light $_ZSH_PLUGIN_SRCREF__gitstatus
 gitstatus_start MY
 
 # Ability to send command between shells :)
-zi ice wait"0" silent # load plugin async & silently
-zi light $_ZSH_PLUGIN_SRCREF__zconvey
+zinit ice wait"0" silent # load plugin async & silently
+zinit light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
+
+#-------------------------------------------------------------
+# Init additional 'external plugins'
+
+# Init `LS_COLORS`, colors for common binaries (ls, tree, etc..)
+if cfg::has-bin dircolors; then
+  eval `dircolors --sh`
+fi
+
+cfg::depends-on-bin direnv
+eval "$(direnv hook zsh)"
+
+cfg::depends-on-bin zoxide
+eval "$(zoxide init zsh)"
+# note: need to be run _after_ plugins, to override zinit's `zi` alias 👀
 
 #-------------------------------------------------------------
 # Setup Hooks
