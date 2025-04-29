@@ -163,7 +163,7 @@
   sll = stat-last-log
 
   pretty-log-next-push = pretty-log @{u}..
-  lp = pretty-log-next-push
+  lnp = pretty-log-next-push
 
   # diff
   dd  = diff
@@ -175,8 +175,14 @@
   dds = !git -c delta.features=split-layout dd
   ds  = !git -c delta.features=split-layout d
 
+  diff-next-push = d @{u}..@
+  dnp = diff-next-push
+
   stat = !git --no-pager diff --stat --summary
   stat-staged = stat --cached
+
+  stat-next-push = stat @{u}..@
+  snp = stat-next-push
 
   show-with-stat = !git show --patch-with-stat --summary
 
