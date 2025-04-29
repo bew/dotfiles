@@ -11,6 +11,23 @@ local K = require"mylib.keymap_system"
 
 --------------------------------
 
+Plug.lazydev_lua {
+  source = gh"folke/lazydev.nvim",
+  desc = "Faster LuaLS setup for Lua & Neovim-specific files",
+  defer_load = { on_event = "VeryLazy", on_ft = "lua" },
+  config_depends_on = {
+    Plug { source = gh"Bilal2453/luvit-meta", defer_load = { on_event = "VeryLazy", on_ft = "lua" } },
+  },
+  on_load = function()
+    require"lazydev".setup {
+      library = {
+        -- Only load luvit types when the `vim.uv` or `vim.loop` word is found
+        { path = "luvit-meta/library", words = { "vim%.uv", "vim%.loop" } },
+      }
+    }
+  end,
+}
+
 Plug {
   enabled = false, -- NOTE(DEBUG): Enable when exploring/debugging stuff
   source = myplug"debug-autocmds.nvim",
@@ -29,7 +46,6 @@ Plug {
 Plug {
   source = gh"ii14/neorepl.nvim",
   desc = "Neovim REPL for lua and vim script",
-  tags = {"config"},
   defer_load = { on_event = "VeryLazy" },
   -- NOTE: use `/h` to get help inside the repl buffer
   on_load = function()

@@ -156,24 +156,6 @@ Plug {
   end,
 }
 
-Plug.lazydev_lua {
-  source = gh"folke/lazydev.nvim",
-  desc = "Faster LuaLS setup for Lua & Neovim-specific files",
-  tags = {t.ft_support},
-  defer_load = { on_event = "VeryLazy", on_ft = "lua" },
-  config_depends_on = {
-    Plug { source = gh"Bilal2453/luvit-meta", defer_load = { on_event = "VeryLazy", on_ft = "lua" } },
-  },
-  on_load = function()
-    require"lazydev".setup {
-      library = {
-        -- Only load luvit types when the `vim.uv` or `vim.loop` word is found
-        { path = "luvit-meta/library", words = { "vim%.uv", "vim%.loop" } },
-      }
-    }
-  end,
-}
-
 Plug {
   source = gh"mrcjkb/rustaceanvim",
   desc = "🦀 Supercharge your Rust experience in Neovim!",
