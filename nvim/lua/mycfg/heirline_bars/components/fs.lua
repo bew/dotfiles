@@ -1,4 +1,4 @@
-local _U = require"mycfg.heirline_components.utils"
+local _U = require"mycfg.heirline_bars.components.utils"
 
 local M = {}
 

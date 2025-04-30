@@ -1,6 +1,6 @@
 local hline_conditions = require"heirline.conditions"
 
-local _U = require"mycfg.heirline_components.utils"
+local _U = require"mycfg.heirline_bars.components.utils"
 local _ = _U.SPACE
 
 local M = {}
@@ -222,32 +222,6 @@ M.RulerAndCursorPos = {
       return { ctermfg = 233, ctermbg = 242 }
     end
   end
-}
-
-M.CmdwinType = {
-  provider = function()
-    return vim.fn.getcmdwintype()
-  end,
-  hl = { ctermfg = "red", cterm = { bold = true } },
-}
-
-M.CmdwinTypeDescription = {
-  provider = function()
-    local cmdwin_type = vim.fn.getcmdwintype()
-    if cmdwin_type == ":" then
-      return "Command history"
-    elseif cmdwin_type == ">" then
-      return "Debug mode history"
-    elseif cmdwin_type == "/" or cmdwin_type == "?" then
-      return "Search history"
-    elseif cmdwin_type == "@" then
-      return "Input history"
-    elseif cmdwin_type == "-" then
-      return "Ex :insert :append history"
-    elseif cmdwin_type == "=" then
-      return "Expression history"
-    end
-  end,
 }
 
 return M
