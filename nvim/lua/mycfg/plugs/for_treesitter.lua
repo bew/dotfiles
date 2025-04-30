@@ -38,9 +38,22 @@ Plug {
   tags = {t.ts, t.editing},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
+    local lang_utils = require"treesj.langs.utils"
+    local langs = require"treesj.langs".presets
+    -- Override some language settings
+    -- ref: https://github.com/Wansmer/treesj/blob/main/README.md#basic-node
+    -- ref: https://github.com/Wansmer/treesj/blob/main/lua/treesj/langs/default_preset.lua
+    do
+      -- ref: https://github.com/Wansmer/treesj/blob/main/lua/treesj/langs/python.lua
+      langs.python.argument_list = lang_utils.set_preset_for_args({
+        split = { last_separator = true },
+      })
+    end
+
     local tsj = require"treesj"
     tsj.setup {
       use_default_keymaps = false,
+      langs = langs,
     }
 
     my_actions.treesj_toggle = A.mk_action {
