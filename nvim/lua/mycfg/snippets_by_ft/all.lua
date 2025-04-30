@@ -15,6 +15,7 @@ local CUSTOM_INTERPRETERS_BY_FILETYPE = {
   rust = "cargo-script",
   nix = {"nix eval -f", "nix eval --raw -f"},
   ps1 = "pwsh", -- powershell
+  just = "bash", -- used in a reciepe
   -- note: add more as needed 😉
 }
 snip("#!", { desc = "Interpreter shebang!" }, SU.myfmt {
