@@ -25,26 +25,7 @@ return {
   _,
   C.fs.BufBasename,
   _,
-  {
-    provider = function()
-      if not vim.o.readonly and vim.o.modifiable then
-        return "(editable)"
-      else
-        return _U.unicode_or(" ", "[RO]")
-      end
-    end,
-    on_click = {
-      name = "statusline_on_click_help_toggle_editable",
-      callback = function()
-        vim.cmd[[set ro! modifiable!]]
-      end,
-    },
-    hl = function()
-      if not vim.o.readonly and vim.o.modifiable then
-        return { ctermfg = 250 }
-      end
-    end,
-  },
+  C.nvim.ReadOnlyMaybeEditable,
   _,
   C.nvim.Changed,
 

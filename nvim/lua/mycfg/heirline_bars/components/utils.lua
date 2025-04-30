@@ -44,6 +44,19 @@ function U.white_with_bg(spec)
   end
 end
 
+--- Returns a function that executes the given callback in the context of the clicked window
+---@param callback fun(winid: integer)
+---@return fun()
+function U.on_click_in_win_context(callback)
+  return function()
+    local winid = vim.fn.getmousepos().winid
+    -- In the context of the clicked window
+    vim.api.nvim_win_call(winid, function()
+      callback(winid)
+    end)
+  end
+end
+
 U.SPACE = { provider = " " }
 U.__WIDE_SPACE__ = { provider = "%=" }
 

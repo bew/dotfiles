@@ -122,14 +122,10 @@ M.Changed = {
     return { ctermfg = 208 }
   end,
   on_click = {
-    callback = function()
-      local winid = vim.fn.getmousepos().winid
-      vim.api.nvim_win_call(winid, function()
-        -- Run 'write' in the context of the clicked window
-        vim.cmd[[lockmarks write]]
-      end)
-    end,
     name = "statusline_on_click_buffer_write",
+    callback = _U.on_click_in_win_context(function()
+      vim.cmd[[lockmarks write]]
+    end),
   },
 }
 
@@ -141,9 +137,43 @@ M.ReadOnly = {
   end,
   hl = function()
     if hline_conditions.is_active() then
-      return { ctermfg = 203 } -- red
+      return { ctermfg = 203 }
     else
-      return { ctermfg = 232 } -- black
+      return { ctermfg = 160 }
+    end
+  end,
+}
+
+-- IDEA: merge with `ReadOnly` component?
+M.ReadOnlyMaybeEditable = {
+  provider = function()
+    if not vim.o.readonly and vim.o.modifiable then
+      return "(editable)"
+    else
+      return _U.unicode_or(" ", "[RO]")
+    end
+  end,
+  on_click = {
+    name = "statusline_on_click_toggle_editable",
+    callback = _U.on_click_in_win_context(function()
+      if vim.o.readonly then
+        -- save options & make editable
+        vim.b._was_readonly = vim.o.readonly
+        vim.b._was_modifiable = vim.o.modifiable
+        vim.o.readonly = false
+        vim.o.modifiable = true
+      else
+        -- restore
+        vim.o.readonly = vim.b._was_readonly
+        vim.o.modifiable = vim.b._was_modifiable
+      end
+    end),
+  },
+  hl = function()
+    if not vim.o.readonly then
+      return { ctermfg = 250 }
+    else
+      return { ctermfg = 160 }
     end
   end,
 }
