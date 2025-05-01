@@ -18,8 +18,9 @@ vim.cmd[[ colorscheme bew256-dark ]]
 vim.opt.termguicolors = false -- TODO: convert my theme to RGB!
 
 -- Map leaders
-vim.g.mapleader = vim.api.nvim_replace_termcodes([[<C-Space>]], true, true, true)
-vim.g.maplocalleader = vim.api.nvim_replace_termcodes([[<Space>]], true, true, true)
+local TERM_CODES = require"mylib.term_codes"
+vim.g.mapleader = TERM_CODES.C_Space
+vim.g.maplocalleader = TERM_CODES.Space
 -- NOTE: Special termcode (like `<foo>`) must be replaced to avoid _very_ unexpected behavior
 --   See: https://github.com/neovim/neovim/issues/27826 😬
 
