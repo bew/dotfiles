@@ -36,11 +36,32 @@ K.toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 ----- Survival keybindings..
 
 -- N,I,V: Save buffer
--- NOTE: using lockmarks to avoid overwriting '[ & '] marks by the 'write'
+-- NOTE: `lockmarks` is used to avoid overwriting '[ & '] marks with `write`
 --   See: https://neovim.discourse.group/t/using-after-w/3608
 my_actions.save_buffer = A.mk_action {
   default_desc = "Save buffer",
-  [{"n", "i", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
+  [{"n", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
+  -- NOTE: Insert mode needs special handling when there are multicursors, otherwise the buffer is
+  --   saved before the current edit is propagated to other cursors.
+  i = {
+    map_opts = { silent = true, expr = true },
+    function()
+      if U.is_module_available"multicursor-nvim" then
+        local mc = require"multicursor-nvim"
+        if mc.hasCursors() then
+          -- There are multiple cursors
+          -- -> Save buffer only after multicursor edits propagated to other cursors
+          -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/122
+          mc.onSafeState(function() vim.cmd[[lockmarks write]] end, { once = true })
+          -- note: this is safe to do, the safe state will always occur
+          return [[<esc>]]
+        end
+      end
+      -- No multicursors
+      -- -> Save buffer immediately
+      return [[<esc><cmd>lockmarks write<cr>]]
+    end,
+  },
   map_opts = { silent = true },
 }
 K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
