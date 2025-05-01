@@ -47,7 +47,7 @@ local GeneralPurposeStatusline = {
       end,
       hl = function()
         if require"multicursor-nvim".cursorsEnabled() then
-          return { ctermfg = 196, bold = true, italic = true }
+          return { ctermfg = 202, bold = true, italic = true }
         else
           return { ctermfg = 247, italic = true }
         end

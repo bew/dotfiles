@@ -35,10 +35,14 @@ Plug {
       ---@type integer?
       local dir = ({next = 1, prev = -1})[opts.dir]
       local has_selection = vim.tbl_contains({"v", "V", ""}, vim.fn.mode())
+      local has_active_search = vim.v.hlsearch == 1 and vim.fn.searchcount().total > 0
+      -- FIXME: how to handle when there are non-visible matches?
+      --   (e.g. after switching to a different file and wishing to use current word matching..)
+
       if has_selection then
         -- We have active visual selection, use it to find matches
         opts.match_fn(dir)
-      elseif vim.v.hlsearch == 1 then
+      elseif has_active_search then
         -- We have an active search, use search results
         opts.search_fn(dir)
       else
@@ -84,6 +88,8 @@ Plug {
         search_fn = mc.searchAllAddCursors,
       }
     end}
+    -- (easy to spam!)
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-*>", desc="Add cursors for all matches", action=mc.matchAllAddCursors}
 
     -- Add cursors for all regex results within visual selection(s)
     K.toplevel_map{mode="v", key="<M-Space><M-/>", desc="Add cursors by regex in selection(s)", action=mc.matchCursors}
