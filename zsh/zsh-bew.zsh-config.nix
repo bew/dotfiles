@@ -130,19 +130,19 @@ in {
 
     >&2 echo "Patching config-specific env vars in .zshenv"
     substitute $src/zshenv $out/.zshenv \
-      --replace "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
-      --replace "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=${cfg.ID} #" \
+      --replace-fail "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
+      --replace-fail "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=${cfg.ID} #" \
       \
-      --replace "source ~/.dot/shell/env.sh" "source ${../shell/env.sh}"
+      --replace-fail "source ~/.dot/shell/env.sh" "source ${../shell/env.sh}"
     # NOTE(!!!): last one is _TEMPORARY_ until we find a better way to inject cross-shell env script..
 
     >&2 echo "Patching binaries and plugins in .zshrc"
     substitute $src/zshrc $out/.zshrc \
-      --replace "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
-      --replace "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"
+      --replace-fail "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"
   '';
 }
