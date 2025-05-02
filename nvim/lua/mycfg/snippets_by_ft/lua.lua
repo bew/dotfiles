@@ -364,21 +364,30 @@ snip("!=", {desc = "Lua's != operator"}, { t"~= " })
 --   (or NOT in a table def nor in an fn arguments list)
 snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
   [[
-    <maybe_local>function<maybe_name>(<args>)
+    <maybe_local_fn_name>(<args>)
       <body>
     end
   ]],
   {
-    maybe_name = ls.choice_node(1, {
-      { t" ", i(1, "function_name") },
-      t"",
-    }),
-    maybe_local = ls.choice_node(2, {
-      t"local ",
-      t"",
-    }),
-    args = i(3),
-    body = SU.insert_node_default_selection(4),
+    -- NOTE: Allow to switch local/global while writing the function name.
+    --   By default it's a local fn, but sometimes I use `M.foo` as name, which shouldn't be local:
+    --   -> It's nice to be able to switch on-the-fly.
+    maybe_local_fn_name = ls.choice_node(1, {
+      SU.myfmt {
+        [[local function <name>]],
+        { name = ls.restore_node(1, "name") }
+      },
+      SU.myfmt {
+        [[function <name>]],
+        { name = ls.restore_node(1, "name") }
+      },
+    }, { restore_cursor = true }),
+    args = i(2),
+    body = SU.insert_node_default_selection(3),
+  },
+}, {
+  stored = {
+    name = i(nil, "function_name"),
   },
 })
 -- A snippet for the function type, must be on a `---@something` line (after).
