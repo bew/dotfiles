@@ -52,13 +52,11 @@
       # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
       mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
         pkgs = stablePkgs;
-        configuration = {
-          imports = [
-            zsh-configs.zshConfigModule.zsh-bew
-          ];
-          config = lib.mkIf fewBinsFromPATH {
-            deps.bins.fzf.pkg = lib.mkForce "from-PATH";
-            deps.bins.eza.pkg = lib.mkForce "from-PATH";
+        config = zsh-configs.zshConfigModule.zsh-bew;
+        configOverride = {
+          deps.bins = lib.mkIf fewBinsFromPATH {
+            fzf.pkg = lib.mkForce "from-PATH";
+            eza.pkg = lib.mkForce "from-PATH";
           };
         };
       };
@@ -67,14 +65,12 @@
       mk-nvim-config = {nvimConfig, asDefault ? false}: (
         nvim-configs.lib.evalNvimConfig {
           pkgs = stablePkgs;
-          configuration = {
-            imports = [
-              nvimConfig
-            ];
+          config = nvimConfig;
+          configOverride = {
             # Is config supposed to be the default 🤔
-            config.useDefaultBinName = asDefault;
+            useDefaultBinName = asDefault;
             # Override the symlinker function, to point to editable paths
-            config.lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
+            lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
               nixStorePath = self;
               realPath = "/home/bew/.dot"; # FIXME: leak hardcoded $USER
             };
@@ -161,13 +157,13 @@
       nvim-minimal = let
         cfg = nvim-configs.lib.evalNvimConfig {
           pkgs = stablePkgs;
-          configuration = nvim-configs.nvimConfigModule.nvim-minimal;
+          config = nvim-configs.nvimConfigModule.nvim-minimal;
         };
       in cfg.outputs.toolPkg.standalone;
       nvim-bew = let
         cfg = nvim-configs.lib.evalNvimConfig {
           pkgs = stablePkgs;
-          configuration = nvim-configs.nvimConfigModule.nvim-bew;
+          config = nvim-configs.nvimConfigModule.nvim-bew;
         };
       in cfg.outputs.toolPkg.standalone;
 

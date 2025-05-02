@@ -5,7 +5,8 @@
   lib.evalToolConfig = {
     pkgs,
     toolName,
-    configuration,
+    config,
+    configOverride ? {},
     toolBaseModule,
   }: let
     resolved = lib.evalModules {
@@ -13,7 +14,8 @@
       modules = [
         ./baseModule.nix
         toolBaseModule
-        configuration
+        config
+        configOverride
       ];
       class = "toolConfig.${toolName}";
     };
