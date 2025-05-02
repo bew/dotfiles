@@ -8,7 +8,7 @@ let
   outs = cfg.outputs;
 
   makeNvimWrapperPkg =
-    { extraWrapperParams ? "" }:
+    { extraWrapperParams ? "", fyiExtraDirs ? {} }:
     let
       binName = if cfg.useDefaultBinName then "nvim" else outs.NVIM_APPNAME;
     in
@@ -24,6 +24,13 @@ let
             lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}") cfg.env
           )} \
           ${extraWrapperParams}
+        # FYI, extra dirs (for easy access in the built derivation)
+        ${if fyiExtraDirs != {} then "mkdir -p $out/fyi_extra_dirs" else ""}
+        ${
+          lib.concatLines (let
+            linker = name: dir_path: "ln -s ${lib.escapeShellArg dir_path} $out/fyi_extra_dirs/${lib.escapeShellArg name}";
+          in lib.mapAttrsToList linker fyiExtraDirs)
+        }
       '';
     };
 
@@ -142,6 +149,10 @@ in {
         ln -s ${outs.deps.pluginsDataSiteDir} $out/${outs.NVIM_APPNAME}/site
       '';
     in makeNvimWrapperPkg {
+      fyiExtraDirs = {
+        xdg_config = xdgConfigDir;
+        xdg_data = xdgDataDir;
+      };
       extraWrapperParams = ''
         --set NVIM_APPNAME ${outs.NVIM_APPNAME} \
         --prefix XDG_CONFIG_DIRS : ${xdgConfigDir} \
@@ -155,23 +166,26 @@ in {
       extraWrapperParams = ''--set NVIM_APPNAME ${outs.NVIM_APPNAME}'';
     };
 
-    outputs.homeModules.specific = {
-      xdg.configFile.${outs.NVIM_APPNAME}.source = outs.nvimDir;
-      # NOTE: linking to 'site' because ..xdgData../NVIM_APPNAME might already exist on workstation
-      xdg.dataFile."${outs.NVIM_APPNAME}/site".source = outs.deps.pluginsDataSiteDir;
-      home.packages = [
-        (makeNvimWrapperPkg {
-          extraWrapperParams = ''
-            --set NVIM_APPNAME ${outs.NVIM_APPNAME}
-          '';
-        })
-      ];
-    };
-    outputs.homeModules.withDefaults = {
-      xdg.configFile."nvim".source = outs.nvimDir;
-      # NOTE: linking to 'site' because ..xdgData../nvim might already exist on workstation
-      xdg.dataFile."nvim/site".source = outs.deps.pluginsDataSiteDir;
-      home.packages = [ (makeNvimWrapperPkg {}) ];
+    outputs.homeModules = let
+      mkHomeModule = nvim_appname: {
+        xdg.configFile.${nvim_appname}.source = outs.nvimDir;
+        # NOTE: linking to 'site' because ..xdgData../NVIM_APPNAME might already exist on workstation
+        xdg.dataFile."${nvim_appname}/site".source = outs.deps.pluginsDataSiteDir;
+        home.packages = [
+          (makeNvimWrapperPkg {
+            fyiExtraDirs = {
+              nvim_dir = outs.nvimDir;
+              plugins_data_dir = outs.deps.pluginsDataSiteDir;
+            };
+            extraWrapperParams = ''
+              --set NVIM_APPNAME ${nvim_appname}
+            '';
+          })
+        ];
+      };
+    in {
+      specific = mkHomeModule outs.NVIM_APPNAME;
+      withDefaults = mkHomeModule "nvim";
     };
   };
 
