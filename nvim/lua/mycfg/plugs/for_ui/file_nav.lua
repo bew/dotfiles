@@ -179,7 +179,13 @@ Plug.fileexplorer {
     }
 
     K.global_leader_map{mode="n", key="<C-t>", desc="Tree explorer", action=function()
-      vim.cmd.Neotree("toggle")
+      if vim.o.filetype == "neo-tree" then
+        -- Current win is the tree explorer, switch to previous win
+        vim.cmd.wincmd"p"
+      else
+        -- Otherwise, reveal tree explorer
+        vim.cmd.Neotree"reveal"
+      end
     end}
   end,
   on_colorscheme_change = function()
