@@ -251,6 +251,9 @@ Plug {
           require"quicker".expand { before = 1, after = 1, add_to_existing = true }
         end}
         K.toplevel_buf_map{mode="n", key=[[zi]], desc="Less context lines", action=function()
+          require"quicker".expand { before = -1, after = -1, add_to_existing = true }
+        end}
+        K.toplevel_buf_map{mode="n", key=[[zr]], desc="Zero context lines", action=function()
           require"quicker".collapse()
         end}
         K.local_leader_buf_map{mode="n", key=[[qe]], desc="Make editable ('till save)", action=function()
