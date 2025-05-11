@@ -16,7 +16,7 @@ local GeneralPurposeStatusline = {
     { C.fs.FileOutOfCwd, C.fs.FilenameTwoParts },
     _,
     C.nvim.Changed,
-    C.nvim.ReadOnly,
+    C.nvim.MaybeReadOnly,
     hl = function()
       if hline_conditions.is_active() then
         return { ctermfg = 253, ctermbg = 240 }

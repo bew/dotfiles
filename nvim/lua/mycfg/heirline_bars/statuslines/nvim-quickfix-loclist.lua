@@ -52,6 +52,8 @@ local function make_list_line(list)
     },
     _,
     { provider = "(" .. list.scope .. ")" },
+    _,
+    C.nvim.ReadOnlyMaybeEditable,
     __WIDE_SPACE__,
 
     {

@@ -129,7 +129,8 @@ M.Changed = {
   },
 }
 
-M.ReadOnly = {
+--- For use for buffers that are usually editable
+M.MaybeReadOnly = {
   condition = function() return vim.bo.readonly end,
 
   provider = function()
@@ -144,15 +145,27 @@ M.ReadOnly = {
   end,
 }
 
--- IDEA: merge with `ReadOnly` component?
+--- For use for buffers that are usually read-only, but may be editable
 M.ReadOnlyMaybeEditable = {
   provider = function()
     if not vim.o.readonly and vim.o.modifiable then
-      return "(editable)"
+      return "!editable!"
     else
       return _U.unicode_or(" ", "[RO]")
     end
   end,
+  hl = function()
+    if not vim.o.readonly then
+      return { ctermfg = 250, bold = true }
+    else
+      return { ctermfg = 160 }
+    end
+  end,
+}
+
+--- For use for buffers that are usually read-only, but may be editable on-demand with a click
+M.ReadOnlyMaybeEditableWithToggle = {
+  M.ReadOnlyMaybeEditable,
   on_click = {
     name = "statusline_on_click_toggle_editable",
     callback = _U.on_click_in_win_context(function()
@@ -169,13 +182,6 @@ M.ReadOnlyMaybeEditable = {
       end
     end),
   },
-  hl = function()
-    if not vim.o.readonly then
-      return { ctermfg = 250 }
-    else
-      return { ctermfg = 160 }
-    end
-  end,
 }
 
 local FileType_only = {
