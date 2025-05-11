@@ -43,6 +43,8 @@ Plug {
   tags = {t.vimscript, t.git, t.ui},
   on_pre_load = function()
     vim.g.git_messenger_no_default_mappings = true
+
+    K.local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
   end,
   defer_load = { on_event = "VeryLazy" },
 }
@@ -115,9 +117,6 @@ Plug {
     K.local_leader_map{mode={"n"}, key="hN", action=my_actions.go_prev_changed_hunk}
     -- also map HN so I can 'spam' the letters easily :)
     K.local_leader_map{mode={"n"}, key="HN", action=my_actions.go_prev_changed_hunk}
-
-    -- TODO: move closer to git-messenger plugin? Should simply add to a 'git' keymap.
-    K.local_leader_map{mode={"n"}, key="hb", action="<Plug>(git-messenger)", desc="blame someone"}
 
     -- toggles
     K.local_leader_map_define_group{mode={"n"}, prefix_key="ht", name="+toggle"}
