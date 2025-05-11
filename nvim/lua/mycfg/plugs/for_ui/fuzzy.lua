@@ -42,7 +42,7 @@ Plug.telescope {
     ---@param direction "next"|"previous"
     local function jump_to_selected(prompt_bufnr, direction)
       -- /!\ Rows are 0-indexed, and `index` is 1 indexed (table index)
-      local picker = require"telescope.actions.state".get_current_picker(prompt_bufnr)
+      local picker = action_state.get_current_picker(prompt_bufnr)
       local selected_entries = picker:get_multi_selection()
       -- For some reason the list we get is not in order..
       table.sort(selected_entries, function(e1, e2) return e1.index < e2.index end)
@@ -75,6 +75,19 @@ Plug.telescope {
           picker:set_selection(target_entry.index - 1) -- (Row is 0-indexed!)
         end
       end
+    end
+
+    local function send_all_or_selected_to_qflist(prompt_bufnr)
+      local picker = action_state.get_current_picker(prompt_bufnr)
+      local selected_entries = picker:get_multi_selection()
+      if #selected_entries == 0 then
+        -- send all entries
+        tel_actions.send_to_qflist(prompt_bufnr)
+      else
+        -- send only selected entries
+        tel_actions.send_selected_to_qflist(prompt_bufnr)
+      end
+      tel_actions.open_qflist(prompt_bufnr)
     end
 
     local default_cfg = {}
@@ -148,8 +161,8 @@ Plug.telescope {
       ["<C-p>"] = tel_actions.cycle_history_prev,
 
       -- N/I: Integration with quickfix list (send/add)
-      ["<M-q>"] = tel_actions.send_selected_to_qflist + tel_actions.open_qflist,
-      ["<C-q>"] = tel_actions.send_selected_to_qflist + tel_actions.open_qflist,
+      ["<M-q>"] = send_all_or_selected_to_qflist,
+      ["<C-q>"] = send_all_or_selected_to_qflist,
       ["<C-M-q>"] = tel_actions.add_selected_to_qflist + tel_actions.open_qflist, -- (?)
 
       -- N/I: Layout actions

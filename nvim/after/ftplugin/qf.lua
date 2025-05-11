@@ -44,14 +44,23 @@ my_actions.qf_switch_to_newer = A.mk_action {
 K.toplevel_buf_map{mode="n", key="<C-o>", action=my_actions.qf_switch_to_older}
 K.toplevel_buf_map{mode="n", key="<C-i>", action=my_actions.qf_switch_to_newer}
 
-K.local_leader_buf_map{mode="n", key="qf", action=function()
-  local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
-  if wininfo.loclist == 1 then
-    require"telescope.builtin".loclist { layout_strategy = "vertical" }
-  else
-    require"telescope.builtin".quickfix { layout_strategy = "vertical" }
-  end
-end}
-K.local_leader_buf_map{mode="n", key="qh", action=function()
-  require"telescope.builtin".quickfixhistory { layout_strategy = "vertical" }
-end}
+my_actions.qf_fuzzy_entries = A.mk_action {
+  default_desc = "Fuzzy qf/loc entries",
+  n = function()
+    local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
+    if wininfo.loclist == 1 then
+      require"telescope.builtin".loclist { layout_strategy = "vertical" }
+    else
+      require"telescope.builtin".quickfix { layout_strategy = "vertical" }
+    end
+  end,
+}
+my_actions.qf_fuzzy_old_lists = A.mk_action {
+  default_desc = "Fuzzy old qf lists",
+  n = function()
+    require"telescope.builtin".quickfixhistory { layout_strategy = "vertical" }
+  end,
+}
+K.toplevel_buf_map{mode="n", key="<M-/>", action=my_actions.qf_fuzzy_entries}
+K.local_leader_buf_map{mode="n", key="qf", action=my_actions.qf_fuzzy_entries}
+K.local_leader_buf_map{mode="n", key="qh", action=my_actions.qf_fuzzy_old_lists}
