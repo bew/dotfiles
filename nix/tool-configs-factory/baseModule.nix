@@ -80,7 +80,8 @@ in {
         options.homeModules.specific = lib.mkOption {
           description = ''
             Home Manager module that adds the tool and its config in config-ID-specific paths.
-            This module should be usable MULTIPLE in a Home Manager config.
+            This module should be usable MULTIPLE TIMES (for different tool configs) in a single
+            Home Manager config.
           '';
           # type = ty.package; # FIXME: how to type a Nix module (with class check?) ??
         };

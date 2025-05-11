@@ -1,3 +1,5 @@
+version: "1"
+
 # What protocol to use by default when performing git operations. Supported values: ssh, https
 git_protocol: https
 
@@ -15,4 +17,4 @@ browser: firefox
 
 # Aliases allow you to create nicknames for gh commands
 aliases:
-    prch: pr checkout
+    ch: pr checkout
