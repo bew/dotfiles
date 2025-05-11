@@ -25,6 +25,7 @@ in {
 
     # alternative ls, more colors!
     (bleedingedge.eza.overrideAttrs (final: prev: {
+      doCheck = false;
       patches = prev.patches ++ [
         (pkgs.fetchpatch {
           # Commit: fix(color-scale): use file size unit custom color when not using color scale

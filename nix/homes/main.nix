@@ -36,6 +36,7 @@
 
   # Link flake inputs to home
   # => Easy way to search/read/navigate in any of them
+  linkFlakeInputs.enable = false;
   linkFlakeInputs.directory = ".nix-home-current";
   linkFlakeInputs.inputs = flakeInputs;
 

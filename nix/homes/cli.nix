@@ -9,6 +9,7 @@ in {
 
     ./cli-core.nix
     ./cli/android-tools.nix
+    ./cli/nix-recent.nix
     ./cli/nix-tools.nix
     ./cli-tech-python-simple.nix
   ];
