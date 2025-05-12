@@ -287,6 +287,7 @@ patterns.misc_lighter_words = {
       _U.keywordize"refs:",
     },
     _big_word_variants"EXAMPLE",
+    _big_word_variants"EXAMPLES",
     _big_word_variants"Example",
   },
   group = _U.define_hl("misc_lighter_words", {
