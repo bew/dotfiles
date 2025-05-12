@@ -42,7 +42,7 @@ local function boot_plugins(plugin_specs, opts)
 
   local pkg_manager_install_path ---@type string
   ---@diagnostic disable-next-line: undefined-field (We're only testing for a local_path source)
-  if pkg_manager.source.type == "local_path" and U.path_exists(pkg_manager.source.path) then
+  if pkg_manager.source.type == "local_path" and U.fs.path_exists(pkg_manager.source.path) then
     ---@diagnostic disable-next-line: undefined-field
     pkg_manager_install_path = pkg_manager.source.path
   elseif type(pkg_manager.install_path) == "function" then
@@ -61,10 +61,10 @@ local function boot_plugins(plugin_specs, opts)
   }
   local ctx = setmetatable(ctx, KeyRefMustExist_mt)
 
-  if not U.path_exists(pkg_manager_install_path) then
+  if not U.fs.path_exists(pkg_manager_install_path) then
     vim.notify("Pkg manager not installed at " .. _q(pkg_manager_install_path) .. ", attempting bootstrap…")
     pkg_manager:bootstrap_itself(ctx)
-    if not U.path_exists(pkg_manager_install_path) then
+    if not U.fs.path_exists(pkg_manager_install_path) then
       vim.notify("Pkg manager still not installed, cannot boot plugins", vim.log.levels.ERROR)
       -- (maybe a msg was printed to ask user to install it 🤷)
       return
