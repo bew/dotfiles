@@ -49,9 +49,11 @@ my_actions.qf_fuzzy_entries = A.mk_action {
   n = function()
     local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
     if wininfo.loclist == 1 then
-      require"telescope.builtin".loclist { layout_strategy = "vertical" }
+      local list_nr = vim.fn.getloclist(0, { nr = true }).nr
+      require"mycfg.fuzzy_pickers".fancy_loclist { nr = list_nr }
     else
-      require"telescope.builtin".quickfix { layout_strategy = "vertical" }
+      local list_nr = vim.fn.getqflist({ nr = true }).nr
+      require"mycfg.fuzzy_pickers".fancy_quickfix { nr = list_nr }
     end
   end,
 }
