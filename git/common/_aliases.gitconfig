@@ -86,6 +86,14 @@
   # https://stackoverflow.com/questions/7650797/how-to-stash-only-unstaged-changes-in-git/44824325#44824325
   # Works by: stash staged + stash the rest + pop before-last stash (restore staged)
   sth-unstaged = !git stash push --staged && git stash && git stash pop 'stash@{1}' --index
+  # Force apply the stash, accepting the stash's version in all cases (zero conflict markers)
+  # (inspired from: https://stackoverflow.com/a/3733698/5655255)
+  sth-force-apply-last = !git stash show -p | git apply --3way --theirs
+
+  # Show git log with all stashes
+  # ref: https://stackoverflow.com/a/35993495/5655255
+  # (note: stashes don't have named reference on them though, only commit hash :/)
+  sth-log = !git pretty-log $(git stash list --format="%h")
 
   reb  = rebase
   rebi = rebase -i
