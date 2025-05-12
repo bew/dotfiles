@@ -77,9 +77,35 @@ my_actions.close_win_back_to_last = A.mk_action {
   n = function()
     local last_winid = vim.fn.win_getid(vim.fn.winnr("#"))
 
-    -- NOTE: Not using `vim.api.nvim_win_close` to ensure the `QuitPre` autocmd is properly run
+    -- NOTE: Not using `vim.api.nvim_win_close` to ensure the `QuitPre` autocmd is properly run.
     -- (`QuitPre` can be used to auto-close related win when a main win is closed; e.g. commitia)
-    vim.cmd.quit()
+    --
+    -- NOTE: `silent` <mod> is necessary to avoid the hit-enter prompt.
+    local ok, err = pcall(vim.cmd.quit, {mods = {silent = true}})
+    if not ok then
+      local hint_msg = "Failed to quit window: " .. err
+      if vim.startswith(err, "Vim:E37:") or vim.startswith(err, "Vim:E162:") then
+        -- We've hit the error `Vim:E37: No write since last change`
+        -- or `Vim:E162: No write since last change for buffer "…"`
+        hint_msg = "Buffer has unsaved changes"
+
+        local unsaved_bufs = vim.iter(vim.api.nvim_list_bufs()):filter(function(bufnr)
+          return vim.bo[bufnr].modifiable and vim.bo[bufnr].modified
+        end):totable()
+        if #unsaved_bufs > 1 then
+          hint_msg = hint_msg .. " (remaining bufs: "..#unsaved_bufs..")"
+        end
+
+        -- (note: for some reason sometimes the unsaved buf is auto-changed to before this point,
+        -- sometimes not 🤔 oh well, this handle all cases)
+        if not vim.list_contains(unsaved_bufs, vim.api.nvim_get_current_buf()) then
+          -- Current buffer is saved, switch to the next unsaved buf
+          vim.api.nvim_set_current_buf(unsaved_bufs[1])
+        end
+      end
+      vim.notify("  !! "..hint_msg.." !!  ", vim.log.levels.ERROR)
+      return
+    end
 
     if vim.api.nvim_win_is_valid(last_winid) and not U.is_cmdwin() then
       vim.api.nvim_set_current_win(last_winid)

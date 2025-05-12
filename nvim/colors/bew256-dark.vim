@@ -158,7 +158,7 @@ exe "HiResetTo StatusLine"   .s:fg_base02  .s:bg_base0
 HiResetTo QuickFixLine cterm=bold ctermbg=236
 exe "HiResetTo StatusLineNC"   .s:fg_base02 .s:bg_base00
 exe "HiResetTo Directory"   .s:fg_blue
-HiResetTo ErrorMsg ctermbg=124
+HiResetTo ErrorMsg ctermbg=124 ctermfg=255 cterm=bold
 exe "HiResetTo MoreMsg"   .s:fg_blue
 exe "HiResetTo ModeMsg"   .s:fg_blue
 exe "HiResetTo Question"       .s:fmt_bold   .s:fg_cyan
