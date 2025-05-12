@@ -187,6 +187,7 @@
               (mybuilders.linkBins "nvim-default" {
                 nvim = lib.getExe myPkgs.nvim-bew;
               })
+              stablePkgs.less # ensure modern pager
             ];
             meta.mainProgram = myPkgs.zsh-bew.meta.mainProgram;
           };

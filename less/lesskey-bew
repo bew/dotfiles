@@ -1,8 +1,10 @@
-# Configuration file for keys for the `less` program.
-# It must be compiled with `lesskey -o ./some-output.bin -- ./this-file`
-# And used like `less --lesskey ./some-output.bin ...`
-# See `man lesskey` for more details.
 # vim:set ft=conf:
+#
+# Configuration file for keys for the `less` program.
+# It can be used with: `less --lesskey-src ./this-file ...`
+# It can also be used with: `LESSKEYIN=./this-file less ...`
+#
+# See `man less` & `man lesskey` for more details.
 
 # NOTE on how to use `noaction` to give argument to command.
 # For example: There is no command that scrolls one character left or right.
