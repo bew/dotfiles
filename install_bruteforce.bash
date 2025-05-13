@@ -70,16 +70,16 @@ skip label "nvim link"
 skip make-link ~/.dot/nvim  ~/.config/nvim
 
 label "git links"
-make-link ~/.dot/git  ~/.config/git
+skip make-link ~/.dot/git  ~/.config/git
 make-link ~/.dot/gh   ~/.config/gh
 
 label "Nix stuff"
 make-link ~/.dot/nix/nix-self-config  ~/.config/nix
 
 label "other cli tools"
-make-link ~/.dot/gui/htop        ~/.config/htop
-make-link ~/.dot/tmux/tmux.conf  ~/.tmux.conf
-make-link ~/.dot/gdb             ~/.config/gdb
+make-link ~/.dot/gui/htop ~/.config/htop
+make-link ~/.dot/tmux     ~/.config/tmux
+make-link ~/.dot/gdb      ~/.config/gdb
 
 mkdir -vp ~/.ipython/profile_default/startup
 make-link ~/.dot/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
