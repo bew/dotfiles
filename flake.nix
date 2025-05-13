@@ -43,7 +43,7 @@
       inherit myPkgs stablePkgs bleedingedgePkgs;
 
       lib = stablePkgs.lib;
-      mybuilders = stablePkgs.callPackage ./nix/homes/mylib/mybuilders.nix {};
+      mybuilders = stablePkgs.callPackage ./nix/mylib/mybuilders.nix {};
       # IDEA: rename to `pkglib`?
       #   (to show it's a lib but about packages (so not system-agnostic))
 
@@ -70,9 +70,9 @@
             # Is config supposed to be the default 🤔
             useDefaultBinName = asDefault;
             # Override the symlinker function, to point to editable paths
-            lib.mkLink = stablePkgs.callPackage ./nix/homes/mylib/editable-symlinker.nix {
+            lib.mkLink = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {
               nixStorePath = self;
-              realPath = "/home/bew/.dot"; # FIXME: leak hardcoded $USER
+              realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
             };
             # FIXME(?): find a way to avoid having to do that for every config manually?
           };

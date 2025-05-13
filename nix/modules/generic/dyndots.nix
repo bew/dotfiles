@@ -32,7 +32,7 @@ in {
 
   config = let
     mkStoreLink = givenPath: givenPath; # nothing to do, will be converted by home-manager
-    mkEditableDirectLink = pkgs.callPackage ../../homes/mylib/editable-symlinker.nix {
+    mkEditableDirectLink = pkgs.callPackage ../../mylib/editable-symlinker.nix {
       nixStorePath = cfg.dotfilesNixPath;
       realPath = cfg.dotfilesRealPath;
     };

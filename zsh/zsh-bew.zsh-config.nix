@@ -6,7 +6,7 @@ let
     runCommandLocal
     stdenv
   ;
-  mybuilders = pkgs.callPackage ../nix/homes/mylib/mybuilders.nix {};
+  mybuilders = pkgs.callPackage ../nix/mylib/mybuilders.nix {};
   cfg = config;
 in {
   # Config ID, responsible for state & cache folders naming

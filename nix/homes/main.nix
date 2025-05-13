@@ -20,7 +20,7 @@
 
   # -------- Push custom args for any of my modules --------
 
-  _module.args.mybuilders = pkgs.callPackage ./mylib/mybuilders.nix {};
+  _module.args.mybuilders = pkgs.callPackage ../mylib/mybuilders.nix {};
 
   # -------- Global home setup --------
 
