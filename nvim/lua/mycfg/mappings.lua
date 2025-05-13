@@ -41,8 +41,8 @@ K.toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 my_actions.save_buffer = A.mk_action {
   default_desc = "Save buffer",
   [{"n", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
-  -- NOTE: Insert mode needs special handling when there are multicursors, otherwise the buffer is
-  --   saved before the current edit is propagated to other cursors.
+  -- NOTE: Insert mode needs special handling when there are multiple cursors, otherwise the buffer
+  --   would be saved before the current edit is propagated to other cursors.
   i = {
     map_opts = { silent = true, expr = true },
     function()

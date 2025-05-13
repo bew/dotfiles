@@ -6,6 +6,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 }
 
 local K = require"mylib.keymap_system"
+local A = require"mylib.action_system"
 
 --------------------------------
 
@@ -101,17 +102,32 @@ Plug {
     K.toplevel_map{mode="n", key="<M-LeftDrag>",    action=mc.handleMouseDrag}
     K.toplevel_map{mode="n", key="<M-LeftRelease>", action=mc.handleMouseRelease}
 
-    -- Disable cursors -> only the main cursor moves.
-    -- When cursors are disabled, press again to add a cursor under the main cursor.
+    -- Toggle actions
+    my_actions.mc_toggle_enable_cursors = A.mk_action {
+      default_desc = "Enable/Disable cursors",
+      [{"n", "v"}] = function()
+        if mc.cursorsEnabled() then
+          mc.disableCursors()
+        else
+          mc.enableCursors()
+        end
+      end,
+    }
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-t>",       action=my_actions.mc_toggle_enable_cursors}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-C-Space>", action=my_actions.mc_toggle_enable_cursors}
+    -- When cursors are disabled, toggle cursor under the main cursor.
+    -- Otherwise, disables all cursors (only the main cursor moves).
     K.toplevel_map{mode="n", key="<M-Space><M-Space>", desc="Toggle cursor here", action=mc.toggleCursor}
 
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-q>", desc="Enable/Disable cursors", action=function()
-      if mc.cursorsEnabled() then
-        mc.disableCursors()
-      else
-        mc.enableCursors()
-      end
-    end}
+    my_actions.mc_clear_all_cursors = A.mk_action {
+      default_desc = "Clear all cursors",
+      [{"n", "v"}] = function()
+        mc.clearCursors()
+      end,
+    }
+
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-q>",   action=my_actions.mc_clear_all_cursors}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-Esc>", action=my_actions.mc_clear_all_cursors}
 
     -- Same as visual block's I/A, but also works in visual line mode
     K.toplevel_map{mode="v", key="<M-Space>I", desc="Insert for all lines of selection", action=mc.insertVisual}
@@ -125,17 +141,11 @@ Plug {
       layer_map({"n", "x"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
       layer_map({"n", "x"}, "<M-c>",   mc.nextCursor, { desc = "Cycle cursors" })
 
-      layer_map({"n", "x"}, "<M-Space>1", mc.firstCursor, { desc = "Select first(top) cursor" })
-      layer_map({"n", "x"}, "<M-Space>9", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
+      layer_map({"n", "x"}, "<M-Space><M-g>", mc.firstCursor, { desc = "Select first(top) cursor" })
+      layer_map({"n", "x"}, "<M-Space><M-G>", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
 
       -- Delete the main cursor
       layer_map({"n", "x"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
-
-      layer_map({"n", "x"}, "<M-Space><M-Esc>", function()
-        if mc.hasCursors() then
-          mc.clearCursors()
-        end
-      end, { desc = "Clear cursors" })
 
       -- Increment/decrement sequences, treating all cursors as one sequence
       layer_map({"n", "x"}, "g<C-a>", mc.sequenceIncrement)
