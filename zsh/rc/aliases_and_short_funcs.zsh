@@ -232,7 +232,17 @@ alias ....="cd ../../..;"
 
 alias cdt="cd /tmp;"
 
-alias cddot="cd ~/.dot"
+function cddot()
+{
+  local dotfiles_path=$(readlink ~/.dot)
+  [[ -n "$dotfiles_path" ]] || {
+    echo "~/.dot does not exist???"
+    return
+  }
+  cd $dotfiles_path
+}
+# note: the function version ensures that the symlink is not registered in cd history / zoxide..
+# (avoids implicit duplication with the realpath of dotfiles repo)
 
 
 # git
