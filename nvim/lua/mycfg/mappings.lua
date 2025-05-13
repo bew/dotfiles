@@ -66,6 +66,11 @@ my_actions.save_buffer = A.mk_action {
 }
 K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
 
+-- I: Switch to normal mode with <M-q>
+-- This is to avoid the default behavior that goes to normal mode and initiates a macro recording
+-- (which usually mess-up my next few keys..)
+K.toplevel_map{mode="i", key=[[<M-q>]], action=[[<Esc>]]}
+
 -- N: Quit window
 --
 -- NOTE: Need a custom function to _always_ go back to the _last_ window
