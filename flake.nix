@@ -56,9 +56,9 @@
       # IDEA: rename to `pkglib`?
       #   (to show it's a lib but about packages (so not system-agnostic))
 
-      # NOTE: flake-parts would help with imports & auto-merging here.
+      kitsys = import ./nix/kit-system { inherit lib; };
+
       zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
-      # TODO: find a better place to configure & instantiate tool configs (in a flake-parts module?)
       mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
         pkgs = stablePkgs;
         config = zsh-configs.zshConfigModule.zsh-bew;
@@ -70,20 +70,15 @@
         };
       };
 
-      nvim-configs = stablePkgs.callPackage ./nvim/tool-configs.nix {};
-      mk-nvim-config = {nvimConfig, asDefault ? false}: (
-        nvim-configs.lib.evalNvimConfig {
-          pkgs = stablePkgs;
-          config = nvimConfig;
-          configOverride = {
-            # Is config supposed to be the default 🤔
-            useDefaultBinName = asDefault;
-            # Override the symlinker function, to point to editable paths
-            lib.mkLink = directSymlinker directSymlinkerConfig;
-            # FIXME(?): find a way to avoid having to do that for every config manually?
-          };
-        }
-      );
+      nvim-kit = kitsys.newKit (import ./nix/kits/nvim-toolkit/kit.nix);
+      toolConfigs.nvim-minimal = nvim-kit.eval {
+        pkgs = stablePkgs;
+        config = ./nvim/nvim-minimal.nvim-config.nix;
+      };
+      toolConfigs.nvim-bew = nvim-kit.eval {
+        pkgs = stablePkgs;
+        config = ./nvim/nvim-bew.nvim-config.nix;
+      };
     };
 
   in {
@@ -120,13 +115,15 @@
       # (but not exposed out of the dotfiles flake')
       #
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
-      extraSpecialArgs.myToolConfigs = {
-        zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
-        nvim-minimal = mk-nvim-config { nvimConfig = nvim-configs.nvimConfigModule.nvim-minimal; };
-        nvim-bew = mk-nvim-config {
-          nvimConfig = nvim-configs.nvimConfigModule.nvim-bew;
-          asDefault = true;
+      extraSpecialArgs.myToolConfigs = let
+        makeEditable = config: config.lib.evalWithOverride {
+          # Override the symlinker function, to point to editable paths
+          lib.mkLink = directSymlinker directSymlinkerConfig;
         };
+      in {
+        zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
+        nvim-minimal = makeEditable toolConfigs.nvim-minimal;
+        nvim-bew = makeEditable toolConfigs.nvim-bew;
       };
     };
 
@@ -149,8 +146,9 @@
     # - a `fzf` bin, for fzf with my config
     packages = eachSystem (system: with (forSys system); let
       zsh-bew-config = mk-zsh-bew-config {};
+      useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
-      zsh-bew = zsh-bew-config.outputs.toolPkg.standalone;
+      zsh-bew = useStandalonePkg zsh-bew-config;
       zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
       zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolPkg.standalone);
 
@@ -160,18 +158,8 @@
       };
       fzf-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.fzf-bew);
 
-      nvim-minimal = let
-        cfg = nvim-configs.lib.evalNvimConfig {
-          pkgs = stablePkgs;
-          config = nvim-configs.nvimConfigModule.nvim-minimal;
-        };
-      in cfg.outputs.toolPkg.standalone;
-      nvim-bew = let
-        cfg = nvim-configs.lib.evalNvimConfig {
-          pkgs = stablePkgs;
-          config = nvim-configs.nvimConfigModule.nvim-bew;
-        };
-      in cfg.outputs.toolPkg.standalone;
+      nvim-minimal = useStandalonePkg toolConfigs.nvim-minimal;
+      nvim-bew = useStandalonePkg toolConfigs.nvim-bew;
 
       #tmux-bew = ...
     });

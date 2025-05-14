@@ -24,15 +24,16 @@ let
   inherit (myToolConfigs) nvim-minimal nvim-bew;
 in {
   imports = [
-    # install my setup in HOME
+    # Install my setup in HOME, following specific NVIM_APPNAME (not default)
+    # Gives binary `nvim-bew`
     nvim-bew.outputs.homeModules.specific
   ];
 
   home.packages = [
+    # Also make a 'default' `nvim` binary pointing to the same specific NVIM_APPNAME
+    (nvim-bew.lib.evalWithOverride { useDefaultBinName = true; }).outputs.toolPkg.configured
+
     nvim-original
-
-    nvim-bew.outputs.toolPkg.configured
-
     (mybuilders.linkBins "extra-nvim-bins" {
       nvim-minimal = lib.getExe nvim-minimal.outputs.toolPkg.standalone;
     })

@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mybuilders = pkgs.callPackage ../nix/mylib/mybuilders.nix {};
+  mybuilders = pkgs.callPackage ../../mylib/mybuilders.nix {};
 
   ty = lib.types;
   cfg = config;
@@ -63,6 +63,7 @@ in {
         };
         # TODO: add `options.replacements`
       }));
+      default = {};
     };
     initFile = lib.mkOption {
       description = "Init file to use for standalone bin generation";
