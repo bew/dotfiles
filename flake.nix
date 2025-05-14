@@ -34,9 +34,11 @@
 
     # FIXME: This should be configured in each 'home' config,
     #   and injected in tool configs with an override 🤔
-    directSymlinkerConfig = {
-      nixStorePath = self;
-      realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
+    editableConfigOverride = {
+      editable.config = {
+        nixStorePath = self;
+        realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
+      };
     };
 
     pkgsForSys = system: {
@@ -74,10 +76,12 @@
       toolConfigs.nvim-minimal = nvim-kit.eval {
         pkgs = stablePkgs;
         config = ./nvim/nvim-minimal.nvim-config.nix;
+        configOverride = editableConfigOverride;
       };
       toolConfigs.nvim-bew = nvim-kit.eval {
         pkgs = stablePkgs;
         config = ./nvim/nvim-bew.nvim-config.nix;
+        configOverride = editableConfigOverride;
       };
     };
 
@@ -117,8 +121,8 @@
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
       extraSpecialArgs.myToolConfigs = let
         makeEditable = config: config.lib.evalWithOverride {
-          # Override the symlinker function, to point to editable paths
-          lib.mkLink = directSymlinker directSymlinkerConfig;
+          # Make the config editable if it's supported
+          editable.try_enable = true;
         };
       in {
         zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };

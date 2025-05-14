@@ -25,7 +25,7 @@ in {
   options = {
     ID = lib.mkOption {
       description = "Config ID (should be unique), usually used for state/cache folders naming";
-      type = ty.strMatching "[a-zA-Z_-]+";
+      type = ty.strMatching "[a-zA-Z0-9_-]+";
     };
     toolName = lib.mkOption {
       description = "Name of the tool, used to name some default pkg";
@@ -101,4 +101,6 @@ in {
       in lib.mapAttrsToList (_name: dep: dep.pkg) binsWithPkg;
     };
   };
+
+  imports = [ ./editable.tool-module.nix ];
 }

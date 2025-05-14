@@ -98,6 +98,8 @@ in {
     package = lib.mkDefault pkgs.neovim;
     toolName = "nvim";
 
+    editable.isSupported = true;
+
     outputs.NVIM_APPNAME = "nvim-${lib.removePrefix "nvim-" cfg.ID}";
 
     # TODO: this is mostly nvim-agnostic, could extract to a dir-builder module 🤔
