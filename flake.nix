@@ -32,6 +32,13 @@
     lib = flakeInputs.nixpkgsStable.lib;
     eachSystem = lib.genAttrs (import systems);
 
+    # FIXME: This should be configured in each 'home' config,
+    #   and injected in tool configs with an override 🤔
+    directSymlinkerConfig = {
+      nixStorePath = self;
+      realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
+    };
+
     pkgsForSys = system: {
       myPkgs = self.packages.${system};
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
@@ -41,6 +48,8 @@
       inherit (pkgsForSys system) myPkgs stablePkgs bleedingedgePkgs;
     in rec {
       inherit myPkgs stablePkgs bleedingedgePkgs;
+
+      directSymlinker = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {};
 
       lib = stablePkgs.lib;
       mybuilders = stablePkgs.callPackage ./nix/mylib/mybuilders.nix {};
@@ -70,10 +79,7 @@
             # Is config supposed to be the default 🤔
             useDefaultBinName = asDefault;
             # Override the symlinker function, to point to editable paths
-            lib.mkLink = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {
-              nixStorePath = self;
-              realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
-            };
+            lib.mkLink = directSymlinker directSymlinkerConfig;
             # FIXME(?): find a way to avoid having to do that for every config manually?
           };
         }

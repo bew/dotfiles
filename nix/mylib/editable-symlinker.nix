@@ -1,14 +1,15 @@
+{ lib, runCommandLocal }:
+
+
+# Configuration:
 {
   # Real path on the system, will be used as the base for editable links
   realPath,
   # Nix path to replace with real path
   nixStorePath,
-
-  lib,
-  runCommandLocal,
 }:
-# Returns a linker function that is configured to replace `nixStorePath` by `realPath` in `givenPath`
 
+# Returns a linker function that is configured to replace `nixStorePath` by `realPath` in `givenPath`
 givenPath:
 
 let
