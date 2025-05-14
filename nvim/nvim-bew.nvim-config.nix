@@ -48,16 +48,21 @@ in {
     };
   };
 
-  deps.lspServers = {
+  # LSP Servers
+  deps.bins = {
     # Lua
     lua-language-server.pkg = pkgs.lua-language-server;
 
     # python
-    python-lsp-server.pkg = pkgs.python3.withPackages (pp: [
+    # note: the python pkg is in a separate option to make it easy to replace/override.
+    python-lsp-server.extra.pyPkg = pkgs.python3;
+    python-lsp-server.pkg = let
+      pyPkg = cfg.deps.bins.python-lsp-server.extra.pyPkg;
+    in pyPkg.withPackages (pp: [
       pp.python-lsp-server
       pp.python-lsp-ruff
       pp.pylsp-mypy
-      # pp.python-lsp-isort (not in nixpkgs yet..)
+      # pp.python-lsp-isort (FIXME: not in nixpkgs yet..)
     ]);
 
     # rust
@@ -69,7 +74,6 @@ in {
     # Terraform
     terraform-ls.pkg = pkgs.terraform-ls;
   };
-  deps.bins = cfg.deps.lspServers;
 
   nvimDirSource = ./.;
   initFile = "init.lua";

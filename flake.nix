@@ -81,7 +81,12 @@
       toolConfigs.nvim-bew = nvim-kit.eval {
         pkgs = stablePkgs;
         config = ./nvim/nvim-bew.nvim-config.nix;
-        configOverride = editableConfigOverride;
+        configOverride = {
+          imports = [editableConfigOverride];
+          # Override python lsp to use more recent python
+          # (Attempting to fix FREQUENT crashes with dmypy 1.11.x)
+          deps.bins.python-lsp-server.extra.pyPkg = lib.mkForce bleedingedgePkgs.python313;
+        };
       };
     };
 

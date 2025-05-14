@@ -19,6 +19,11 @@ let
         type = ty.either (ty.strMatching "from-PATH") ty.package;
         default = "from-PATH";
       };
+      extra = lib.mkOption {
+        description = "Arbitrary extra data for that dependency";
+        type = ty.submodule { freeformType = ty.lazyAttrsOf (ty.uniq ty.anything); };
+        default = {};
+      };
     };
   });
 in {
