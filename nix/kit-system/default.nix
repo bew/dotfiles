@@ -42,6 +42,10 @@ in lib.fix (kitsys: {
     class ? null,
     # Extra arguments passed to specialArgs.
     extraSpecialArgs ? {},
+
+    # Set to `false` if `lib` option is already defined in `self.baseModules` to avoid conflicting
+    # definitions.
+    declareLibOption ? true,
   }: (
     {
       pkgs,
@@ -66,7 +70,7 @@ in lib.fix (kitsys: {
         inherit class;
         specialArgs = { inherit pkgs; } // extraSpecialArgs;
         modules = self.baseModules ++ [ config configOverride ] ++ moreModules ++ [
-          declareLibOptionModule
+          (if declareLibOption then declareLibOptionModule else {})
           (defineNestedEvalModule {
             inherit self;
             previousEvalParams = allEvalParams;
