@@ -5,6 +5,8 @@ let
   cfg = config;
   outs = cfg.outputs;
 in {
+  _class = "tool.nvim"; # type of nix module
+
   ID = "nvim-bew";
   package = pkgs.neovim.override {
     withPython3 = false;

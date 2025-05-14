@@ -3,6 +3,8 @@
 let
   cfg = config;
 in {
+  _class = "tool.nvim"; # type of nix module
+
   ID = "nvim-minimal";
   package = pkgs.neovim.override {
     withPython3 = false;

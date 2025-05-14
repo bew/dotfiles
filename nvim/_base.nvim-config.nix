@@ -35,7 +35,7 @@ let
     };
 
 in {
-  _class = "toolConfig.nvim"; # type of nix module
+  _class = "tool.nvim"; # type of nix module
 
   options = {
     nvimDirSource = lib.mkOption {

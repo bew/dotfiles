@@ -7,7 +7,7 @@ let
   cfg = config;
   outs = cfg.outputs;
 in {
-  _class = "toolConfig.zsh"; # type of nix module
+  _class = "tool.zsh"; # type of nix module
 
   options = {
     outputs.zdotdir = lib.mkOption {

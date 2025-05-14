@@ -17,7 +17,7 @@
         config
         configOverride
       ];
-      class = "toolConfig.${toolName}";
+      class = "tool.${toolName}";
     };
   in resolved.config;
 }
