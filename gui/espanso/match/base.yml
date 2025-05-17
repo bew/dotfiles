@@ -7,12 +7,20 @@
 
 matches:
   - trigger: "!date!"
-    replace: "{{mydate}}"
+    replace: "{{fulldate}}"
     vars:
-      - name: mydate
+      - name: fulldate
         type: date
         params:
           format: "%Y-%m-%d"
+
+  - trigger: "!dat!"
+    replace: "{{monthdate}}"
+    vars:
+      - name: monthdate
+        type: date
+        params:
+          format: "%Y-%m"
 
   - trigger: "!mkid!"
     replace: "{{brain2ID}}"
