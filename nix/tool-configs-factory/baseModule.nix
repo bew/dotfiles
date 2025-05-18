@@ -109,3 +109,21 @@ in {
 
   imports = [ ./editable.tool-module.nix ];
 }
+
+# ------------------------------------------------------------------------
+# 🤔 EDITABLE CONFIGS 🤔
+
+# -------------------
+# IDEA: Helper to make different config dir layout based on whether the config is editable or not.
+# -> I made a barebone impl for the tmux config, but it's kinda janky and would benefit from a more
+#    streamlined solution.
+#
+# Could have an alternate output structure that can do the condition and give a `resolved` value
+# with the effective output.
+#
+# Something like:
+#   config.maybeEditableOutputs.FOO = {
+#     editableVariant = BAR;
+#     nonEditableVariant = BAZ;
+#   };
+#   config.outputs.somefoo = config.maybeEditableOutputs.FOO.resolved;
