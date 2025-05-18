@@ -88,6 +88,13 @@
           deps.bins.python-lsp-server.extra.pyPkg = lib.mkForce bleedingedgePkgs.python313;
         };
       };
+
+      tmux-kit = kitsys.newKit (import ./nix/kits/tmux-toolkit/kit.nix);
+      toolConfigs.tmux-bew = tmux-kit.eval {
+        pkgs = stablePkgs;
+        config = ./tmux/bew.tmux-config.nix;
+        configOverride = editableConfigOverride;
+      };
     };
 
   in {
@@ -133,6 +140,7 @@
         zsh-bew = toolConfigs.zsh-bew-bins-from-PATH;
         nvim-minimal = makeEditable toolConfigs.nvim-minimal;
         nvim-bew = makeEditable toolConfigs.nvim-bew;
+        tmux-bew = makeEditable toolConfigs.tmux-bew;
       };
     };
 
@@ -168,7 +176,7 @@
       nvim-minimal = useStandalonePkg toolConfigs.nvim-minimal;
       nvim-bew = useStandalonePkg toolConfigs.nvim-bew;
 
-      #tmux-bew = ...
+      tmux-bew = useStandalonePkg toolConfigs.tmux-bew;
     });
 
     apps = eachSystem (system: with (forSys system); {
@@ -185,6 +193,7 @@
               myPkgs.nvim-minimal
               myPkgs.nvim-bew
               myPkgs.fzf-bew
+              myPkgs.tmux-bew
               (mybuilders.linkBins "nvim-default" {
                 nvim = lib.getExe myPkgs.nvim-bew;
               })

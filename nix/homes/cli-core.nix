@@ -14,6 +14,7 @@ let
 in {
   imports = [
     myToolConfigs.zsh-bew.outputs.homeModules.withDefaults
+    myToolConfigs.tmux-bew.outputs.homeModules.withDefaults
 
     ./cli/neovim.nix
     ./cli/direnv.nix
@@ -21,8 +22,6 @@ in {
   ];
 
   home.packages = [
-    stable.tmux
-
     # alternative ls, more colors!
     (bleedingedge.eza.overrideAttrs (final: prev: {
       doCheck = false;
