@@ -155,8 +155,8 @@ M.ReadOnlyMaybeEditable = {
     end
   end,
   hl = function()
-    if not vim.o.readonly then
-      return { ctermfg = 250, bold = true }
+    if not vim.o.readonly or not vim.o.modifiable then
+      return { ctermfg = 203, bold = true }
     else
       return { ctermfg = 160 }
     end
