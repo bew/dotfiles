@@ -7,6 +7,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 
 local K = require"mylib.keymap_system"
 local A = require"mylib.action_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -30,21 +31,25 @@ Plug {
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-J>", desc="Skip cursor, jump down", action=function() mc.lineSkipCursor(1) end}
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-K>", desc="Skip cursor, jump up",   action=function() mc.lineSkipCursor(-1) end}
 
+    -- IDEA: upstream?
+    --
     --- Search/Match action around main cursor
     ---@param opts {dir?: "prev"|"next", match_fn: fun(dir?: integer), search_fn: fun(dir?: integer)}
     local function search_or_match_cursor_action(opts)
       ---@type integer?
       local dir = ({next = 1, prev = -1})[opts.dir]
       local has_selection = vim.tbl_contains({"v", "V", ""}, vim.fn.mode())
-      local has_active_search = vim.v.hlsearch == 1 and vim.fn.searchcount().total > 0
-      -- FIXME: how to handle when there are non-visible matches?
-      --   (e.g. after switching to a different file and wishing to use current word matching..)
+
+      -- Only consider search results when main cursor is on a visible match ✨
+      local cur_on_search_result = vim.v.hlsearch == 1 and (
+        U.search.is_pos_on_search_match(U.Pos0.from_vimpos"cursor")
+      )
 
       if has_selection then
         -- We have active visual selection, use it to find matches
         opts.match_fn(dir)
-      elseif has_active_search then
-        -- We have an active search, use search results
+      elseif cur_on_search_result then
+        -- Cursor is on visibla search result, use search results
         opts.search_fn(dir)
       else
         -- Otherwise use current word to find matches
