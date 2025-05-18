@@ -1,0 +1,5 @@
+# Config for MacOS
+
+fillcmdline_tmp 1000 Should be MacOS only
+
+# vim:set ft=conf:

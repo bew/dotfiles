@@ -1,0 +1,5 @@
+# This file is used to quick test the source_cfg command (short to type!)
+
+composite js new Date().toISOString() | fillcmdline_tmp 2000 TEST! @
+
+# vim:set ft=conf:

@@ -1,0 +1,23 @@
+# PREFIX <A-f>: Do actions via hints on the page
+
+# Open target in current tab
+bind <A-f>               hint
+bind --mode=insert <A-f> hint
+# Open target in new tab, in background
+bind <A-F>               hint -b
+bind --mode=insert <A-F> hint -b
+# NOTE: There are MANY options for `hint`, see `:h hint` :)
+
+# --- hint mode bindings (to help selection / navigation)
+
+# Same as backspace, to remove a key in case of mistake
+bind --mode=hint <C-h> hint.popKey
+# Focus the hint!
+bind --mode=hint <A-h> hint.focusLeftHint
+bind --mode=hint <A-j> hint.focusBottomHint
+bind --mode=hint <A-k> hint.focusTopHint
+bind --mode=hint <A-l> hint.focusRightHint
+# Select the hint just after focusing it (Alt still pressed)
+bind --mode=hint <A-Space> hint.selectFocusedHint
+
+# vim:set ft=conf:

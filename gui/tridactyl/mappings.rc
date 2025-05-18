@@ -1,0 +1,198 @@
+# --------------------------------------------------------
+# Key bindings
+
+# A : Alt
+# CA : Ctrl-Alt
+#
+# A-d is Alt-d
+# A-D is Alt-Shift-d
+
+# Reload config file
+# NOTE: The config takes some time to load completely (~15s), because of a bug
+#       somewhere in Tridactyl that was loading only some parts of config file.
+#       Each line of the config is loaded with a delay to workaround that issue.
+#       Ref: https://matrix.to/#/!xmubtggllUtLrQiGyn:matrix.org/$1607877211548340BLAuN:matrix.org
+#            https://github.com/tridactyl/tridactyl/issues/1409
+#
+# NOTE: Tridactyl's native messenger is REQUIRED to be able to load the config from a file
+bind <C-R> source
+bind --mode=ignore <C-R> source
+bind --mode=insert <C-R> source
+
+# Toggle ignore mode
+bind --mode=normal <F9> mode ignore
+bind --mode=insert <F9> mode ignore
+bind --mode=ignore <F9> mode normal
+
+source_cfg ./mappings.unbind-many-builtins.rc
+
+# Open Tridactyl' cmdline from any mode
+bind --mode=insert <A-:> fillcmdline_notrail
+bind --mode=normal <A-:> fillcmdline_notrail
+bind --mode=hint   <A-:> fillcmdline_notrail
+bind --mode=visual <A-:> fillcmdline_notrail
+
+# Ignore next keybind
+# (don't use C-v for this, as this can prevent use of C-v in non-input context, like copying cells
+# in Excel/GithubProjects)
+unbind <C-v>
+bind <C-A-i>   nmode ignore 1 mode normal
+
+# --- Open bindings
+
+# open new tab (right after current tab)
+#
+# Opened issue for more positioning:
+# https://github.com/tridactyl/tridactyl/issues/4257
+bind <A-t> tabopen --focus-address-bar
+bind --mode=insert <A-t> tabopen --focus-address-bar
+
+source_cfg ./mappings.hints.rc
+
+# --- Tab bindings
+
+# tab goto & movement
+# TODO: Try with --mode=browser to set it everywhere at once
+#       ==> Does not seems to work :/
+bind <A-a> tabprev
+bind <A-z> tabnext
+bind --mode=insert <A-a> tabprev
+bind --mode=insert <A-z> tabnext
+bind --mode=ex     <A-a> tabprev
+bind --mode=ex     <A-z> tabnext
+bind <A-A> tabmove -1
+bind <A-Z> tabmove +1
+bind --mode=insert <A-A> tabmove -1
+bind --mode=insert <A-Z> tabmove +1
+bind --mode=ex     <A-A> tabmove -1
+bind --mode=ex     <A-Z> tabmove +1
+# NOTE: Those can also be mapped externally (e.g. via AutoHotkey), FF has many builtin keybinds:
+# https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
+
+# tab operations
+bind <CA-t> tabduplicate
+bind <CA-n> tabdetach
+
+# tab close
+
+command tabclose_safe jsb -r ./js-actions/tabclose_safe.js
+
+bind <A-d> tabclose_safe
+bind --mode=insert <A-d> tabclose_safe
+bind --mode=visual <A-d> tabclose_safe
+bind --mode=hint <A-d> tabclose_safe
+
+# tab pin
+bind <A-c> pin
+bind --mode=insert <A-c> pin
+
+# undo tab close (in current window only)
+bind <A-u> undo tab_strict
+# undo window close
+bind <A-U> undo window
+# note: other kind possible:
+# - 'recent' (can be tab or window)
+# - 'tab' (tab in any window)
+
+# history
+bind <CA-a> back
+bind <CA-z> forward
+bind --mode=insert <CA-a> back
+bind --mode=insert <CA-z> forward
+bind --mode=ex <CA-a> back
+bind --mode=ex <CA-z> forward
+# For some reason <CA-a> stopped working for now... (currently on FF 105)
+bind <CA-h> back
+bind <CA-l> forward
+
+# --- Page bindings
+
+# Find a likely next/previous link and follow it (in current tab)
+bind ]] followpage next
+bind [[ followpage prev
+
+# page movement
+# The default jump of 10 is a bit much.
+bind j scrollline 5
+bind k scrollline -5
+bind J scrollline 15
+bind K scrollline -15
+
+# page reload
+bind <A-r> reload
+bind <A-R> reloadhard
+bind --mode=insert <A-r> reload
+bind --mode=insert <A-R> reloadhard
+
+# rudimentary page search mode
+bind <A-/> fillcmdline find
+bind <A-?> fillcmdline find -?
+bind <A-n> findnext 1
+bind <A-N> findnext -1
+bind § nohlsearch
+
+source_cfg ./mappings.native-escape.rc
+
+# --- insert mode bindings
+
+# Try to remap some insert keys to help navigation
+# % Move by char
+# (using 'xdotool' to inject arrows, to be able to control autocompletions popups, like Github's emoji popup)
+#
+#   !!! NOTE !!!
+#   This keybind uses Alt-something, but xdotool will clear & re-apply Alt to properly
+#   send Escape to the window.
+#   If I do Alt+something-triggering-xdotool but release it after 1s (without other action),
+#   the browser will see a Alt press-release (the press comes from xdotool re-applying Alt after
+#   clearing it, the release is me), which by default opens the menubar (with File, View...).
+#
+#   % How to disable Alt press-release opening the menubar
+#   Open about:config and set `ui.key.menuAccessKeyFocuses` to `false`.
+#   Ref: https://support.mozilla.org/en-US/questions/1278533
+#   |
+#   ALTERNATIVE:
+#   Prepend `xdotool keyup Alt` and remove `--clearmodifiers` for the next xdotool. This will
+#   ensure Alt is not disabled then re-enabled. The main downside is that it's not possible to
+#   chain Alt-something keybinds because Alt is not pressed anymore after xdotool was called.
+bind --mode=insert <A-h>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Left ; mode insert
+bind --mode=insert <A-j>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Down ; mode insert
+bind --mode=insert <A-k>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Up   ; mode insert
+bind --mode=insert <A-l>      composite mode ignore ; exclaim_quiet xdotool key --clearmodifiers Right; mode insert
+# % Move by word
+bind --mode=insert <A-b>      text.backward_word
+bind --mode=insert <A-w>      text.forward_word
+# % Move to begin/end
+bind --mode=insert <A-$>      text.end_of_line
+bind --mode=insert <A-^>      text.beginning_of_line
+# % Delete to BOL
+bind --mode=insert <C-u>      text.backward_kill_line
+# % Delete to BOW
+# => doesn't work, still closes current tab
+#bind --mode=insert <C-w>      text.backward_kill_word
+
+# --- ex mode bindings
+
+# text actions (movement, changes)
+
+bind --mode=ex <A-h> text.backward_char
+bind --mode=ex <A-l> text.forward_char
+
+bind --mode=ex <A-w> text.forward_word
+bind --mode=ex <A-b> text.backward_word
+bind --mode=ex <A-g> text.beginning_of_line
+bind --mode=ex <A-G> text.end_of_line
+
+# FIXME: I want to kill to last / or the last word
+# bind --mode=ex <A-Backspace> 
+
+# cmdline actions
+
+bind --mode=ex <A-j> ex.next_history
+bind --mode=ex <A-k> ex.prev_history
+
+bind --mode=ex <A-n> ex.next_completion
+bind --mode=ex <A-p> ex.prev_completion
+bind --mode=ex <Down> ex.next_completion
+bind --mode=ex <Up> ex.prev_completion
+
+# vim:set ft=conf:

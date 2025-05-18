@@ -1,0 +1,20 @@
+# Make sure <Escape> isn't bound, so it is directly sent to the page in most cases.
+# (necessary for some popups like the Ctrl-k search popups, reddit post preview, ...)
+#
+# NOTE for insert mode: Since most websites that care about UX bind `Escape` only when an input is
+# focused, Tridactyl's default of going back to normal mode followed by me sending Escape to the
+# page itself would not invoke the website's handler to hide some UI/popups..
+# Use `<A-Escape>` in insert mode to go back to normal mode without sending `Escape` to the page.
+#
+# NOTE for visual mode: Tridactyl's default in visual mode is NOT disabled, use `Escape-Escape` to
+# go back to normal mode, followed by sending actual `Escape` to the page.
+unbind               <Escape>
+unbind --mode=insert <Escape>
+
+# Go back to normal mode in tridactyl (page itself doesn't receive `Escape`)
+bind               <A-Escape> mode normal
+bind --mode=insert <A-Escape> composite unfocus ; mode normal
+bind --mode=insert <A-q> composite unfocus ; mode normal
+# Also bind A-q in case A-Escape can't be mapped (like on Windows it seems)
+
+# vim:set ft=conf:

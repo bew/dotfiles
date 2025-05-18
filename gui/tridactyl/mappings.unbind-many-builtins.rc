@@ -1,0 +1,50 @@
+# --- Unbind many builtins I don't want...
+
+# vim' increment (here, for the url)
+unbind <C-a>
+unbind <C-x>
+# vim' up/down (by line & by page)
+unbind <C-u>
+unbind <C-d>
+unbind <C-f>
+unbind <C-b>
+# Edit textbox in favorite editor
+# (<C-i> is usually used in rich-textboxes to toggle italic styling)
+unbind --mode=insert <C-i>
+# All letters (except a selected few, like j/k)
+unbind A
+unbind B
+unbind D
+unbind F
+unbind H
+unbind J
+unbind K
+unbind L
+unbind M
+unbind O
+unbind P
+unbind R
+unbind S
+unbind --mode=visual S
+unbind T
+unbind U
+unbind W
+# dangerous! I can do :qall manually if needed!
+unbind ZZ
+unbind a
+unbind b
+unbind d
+unbind f
+unbind m
+unbind o
+unbind p
+unbind r
+unbind s
+unbind --mode=visual s
+unbind t
+unbind u
+unbind v
+unbind w
+unbind x
+
+# vim:set ft=conf:

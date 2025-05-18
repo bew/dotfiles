@@ -1,0 +1,13 @@
+# Config for Linux
+
+fillcmdline_tmp 1000 Should be Linux only
+
+# Edit textboxes in favorite editor <3
+# (will open file %f at line %l and column %c, centering the view if needed)
+set editorcmd flatpak run org.wezfurlong.wezterm start --always-new-process nvim %f -c 'normal! %lG%c|zz'
+# Ref: moz-extension://d4be4c81-b633-439c-8d53-744227c38bed/static/docs/modules/_src_excmds_.html#editor
+alias editor_then_rm composite editor | jsb -p tri.native.run(`rm -f '${JS_ARG[0]}'`)
+bind --mode=insert <A-i> editor_then_rm
+
+
+# vim:set ft=conf:
