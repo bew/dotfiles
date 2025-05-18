@@ -3,9 +3,10 @@
 let
   ty = lib.types;
   cfg = config.editable;
-  editableSymlinker = pkgs.callPackage ../mylib/editable-symlinker.nix {};
 
-  editableConfigType = ty.submodule {
+  directSymlinker = pkgs.callPackage ../mylib/editable-symlinker.nix {};
+
+  directSymlinkerConfigType = ty.submodule {
     options = {
       nixStorePath = lib.mkOption {
         type = ty.pathInStore;
@@ -42,7 +43,7 @@ in {
 
     editable.config = lib.mkOption {
       description = "The configuration passed to editable-symlinker helper";
-      type = editableConfigType;
+      type = directSymlinkerConfigType;
     };
 
     editable.isEffectivelyEnabled = lib.mkOption {
@@ -61,7 +62,7 @@ in {
 
   config = {
     lib.mkLink = lib.mkIf cfg.isEffectivelyEnabled (
-      editableSymlinker cfg.config
+      directSymlinker cfg.config
     );
   };
 }
