@@ -3,8 +3,8 @@
 -- 'I speak vim' - bew, 2021
 
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
@@ -218,7 +218,7 @@ my_actions.hlsearch_current = {
   mode_actions = {
     n = function(self)
       local current_word = vim.fn.expand("<cword>")
-      U.set_current_search(current_word, { with_bounds = self.opts.word_bounds })
+      U.search.set_current_search(current_word, { with_bounds = self.opts.word_bounds })
     end,
     -- IDEA(even later): make searching TS-aware, only match positions that have the same TS note type 👀
     v = function(self)
@@ -232,12 +232,12 @@ my_actions.hlsearch_current = {
         -- => This is necessary to ensure the search will AT LEAST match the selected text.
         -- NOTE: If we always add word bounds before/after, it can happen that the selection doesn't
         --   actually start/end on a word bound, and the resulting search doesn't match it..
-        local visual_bounds = U.get_visual_start_end_pos0()
+        local visual_bounds = U.visual.get_visual_start_end_pos0()
         local start_pos0, end_pos0 = visual_bounds.start_pos0, visual_bounds.end_pos0
-        local start_char = U.try_get_buf_char_at_pos0(start_pos0)
-        local before_start_char = U.try_get_buf_char_at_pos0(start_pos0:with_delta{col = -1})
-        local end_char = U.try_get_buf_char_at_pos0(end_pos0)
-        local after_end_char = U.try_get_buf_char_at_pos0(end_pos0:with_delta{col = 1})
+        local start_char = U.try_get_char_at_pos0(start_pos0)
+        local before_start_char = U.try_get_char_at_pos0(start_pos0:with_delta{col = -1})
+        local end_char = U.try_get_char_at_pos0(end_pos0)
+        local after_end_char = U.try_get_char_at_pos0(end_pos0:with_delta{col = 1})
         necessary_word_bounds = {
           -- A word bound is appropriate when the visual selection starts / ends a keyword
           -- NOTE: Some chars are out of bound in visual line mode
@@ -253,10 +253,10 @@ my_actions.hlsearch_current = {
         --   "word_bounds", vim.inspect{ necessary_word_bounds.before, necessary_word_bounds.after },
         -- })
       end
-      local selection_lines = U.get_visual_selection_as_lines()
+      local selection_lines = U.visual.get_visual_selection_as_lines()
       -- note: explicitely switch back to normal mode
       U.feed_keys_sync("<esc>", { replace_termcodes = true })
-      U.set_current_search(selection_lines, { with_bounds = necessary_word_bounds })
+      U.search.set_current_search(selection_lines, { with_bounds = necessary_word_bounds })
     end,
   },
 }

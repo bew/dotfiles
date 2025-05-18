@@ -2,7 +2,7 @@ local hline_conditions = require"heirline.conditions"
 local external_components = require"heirline-components.all".component
 
 local U = require"mylib.utils"
-local _f = U.str_space_concat
+local _f = U.fmt.str_space_concat
 
 local C = require"mycfg.heirline_bars.components"
 local _U = require"mycfg.heirline_bars.components.utils"
@@ -41,7 +41,7 @@ local GeneralPurposeStatusline = {
         local num_enabled = mc.numEnabledCursors()
         local ret = _f(num_enabled, "cursors")
         if num_disabled > 0 then
-          ret = ret .. U.str_concat(" (+", num_disabled, " off)")
+          ret = ret .. U.fmt.str_concat(" (+", num_disabled, " off)")
         end
         return ret
       end,

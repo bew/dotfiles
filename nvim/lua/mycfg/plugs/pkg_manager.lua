@@ -1,6 +1,6 @@
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 local PluginSystem = require"mylib.plugin_system"
 local Plug = PluginSystem.get_plugin_declarator()

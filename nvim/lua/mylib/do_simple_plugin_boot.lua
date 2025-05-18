@@ -1,7 +1,6 @@
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
-local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 local print_err = vim.api.nvim_err_writeln
 
@@ -59,7 +58,7 @@ local function boot_plugins(plugin_specs, opts)
     install_dir = opts.install_dir,
     manager_install_path = pkg_manager_install_path,
   }
-  local ctx = setmetatable(ctx, KeyRefMustExist_mt)
+  local ctx = setmetatable(ctx, U.mt.KeyRefMustExist_mt)
 
   if not U.fs.path_exists(pkg_manager_install_path) then
     vim.notify("Pkg manager not installed at " .. _q(pkg_manager_install_path) .. ", attempting bootstrap…")

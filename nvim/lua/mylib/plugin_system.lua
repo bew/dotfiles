@@ -65,11 +65,9 @@
 ---@field branch? string
 
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
-local _s = U.str_surround
-
-local KeyRefMustExist_mt = require"mylib.mt_utils".KeyRefMustExist_mt
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
+local _s = U.fmt.str_surround
 
 local STATE = {
   -- test
@@ -228,7 +226,7 @@ end
 
 ---@type {[string]: plugsys.TagSpec}
 M.tags = setmetatable({}, {
-  __index = KeyRefMustExist_mt.__index,
+  __index = U.mt.KeyRefMustExist_mt.__index,
   ---@param name string
   ---@param spec {name?: string, desc: string}
   __newindex = function(self, name, spec)
@@ -279,7 +277,7 @@ function M.sources.github(owner_repo)
     owner_repo = owner_repo,
     name = owner_repo:gsub("^.*/", ""), -- remove 'owner/' in 'owner/repo'
     url = "https://github.com/" .. owner_repo .. ".git",
-  }, KeyRefMustExist_mt)
+  }, U.mt.KeyRefMustExist_mt)
 end
 
 --- A local path plugin, will not be managed by pkg manager, only loaded
@@ -295,7 +293,7 @@ function M.sources.local_path(spec)
     type = "local_path",
     name = spec.name,
     path = spec.path,
-  }, KeyRefMustExist_mt)
+  }, U.mt.KeyRefMustExist_mt)
 end
 
 --- A dist-managed plugin (e.g. by Nix 😉), will not be managed by pkg manager, only loaded

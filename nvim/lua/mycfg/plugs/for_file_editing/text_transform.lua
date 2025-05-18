@@ -160,7 +160,7 @@ Plug {
         -- For `{`: "^({%s*)().-(%s*})()$",
         -- NOTE: the delete pattern will be applied on text returned by `find` above
         -- NOTE: the plugin requires `()` after opener/closer pattern-groups to remove it
-        delete = U.str_concat(
+        delete = U.fmt.str_concat(
           "^",
           "(", vim.pesc(opener.open), "%s*)()",
           ".-",
@@ -175,7 +175,7 @@ Plug {
     my_surrounds_by_ft.lua["<M-[>"] = {
       add = { "[[ ", " ]]" },
       find = vim.pesc"[[" .. ".-" .. vim.pesc"]]",
-      delete = U.str_concat(
+      delete = U.fmt.str_concat(
         "^",
         "(", vim.pesc"[[", "%s*)()",
         ".-",
@@ -186,7 +186,7 @@ Plug {
     my_surrounds_by_ft.lua["<M-]>"] = {
       add = { "[[", "]]" },
       find = vim.pesc"[[" .. ".-" .. vim.pesc"]]",
-      delete = U.str_concat(
+      delete = U.fmt.str_concat(
         "^",
         "(", vim.pesc"[[", ")()",
         ".-",
@@ -313,7 +313,7 @@ Plug {
         -- Add '`' char as a potential wrap position
         -- Default pattern: [=[[%'%"%)%>%]%)%}%,]]=]
         -- NOTE: That regex only has a charset, it matches only 1 char
-        pattern = U.str_concat(
+        pattern = U.fmt.str_concat(
           "[",
           "%'", [[%"]], "%`",
           "%)", "%>", "%]", "%}",

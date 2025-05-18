@@ -1,6 +1,6 @@
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 local A = {}
 
@@ -51,7 +51,7 @@ local ActionSpec_mt = {
       supports_mode = function(self, given_modes)
         vim.validate { mode={given_modes, {"string", "table"}} }
         local supported_modes = vim.tbl_keys(self.mode_actions)
-        for _, mode in ipairs(U.normalize_arg_one_or_more(given_modes)) do
+        for _, mode in ipairs(U.args.normalize_arg_one_or_more(given_modes)) do
           if not vim.tbl_contains(supported_modes, mode) then
             return false
           end
@@ -107,7 +107,7 @@ local ActionSpec_mt = {
       -- end,
     },
     -- FIXME: is there a better/simpler way to chain __index metamethods?
-    require"mylib.mt_utils".KeyRefMustExist_mt
+    U.mt.KeyRefMustExist_mt
   ),
   __call = function(self, ...)
     local nb_mode_actions = #vim.tbl_keys(self.mode_actions)

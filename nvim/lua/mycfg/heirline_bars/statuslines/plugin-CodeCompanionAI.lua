@@ -1,7 +1,7 @@
 local hline_conditions = require"heirline.conditions"
 
 local U = require"mylib.utils"
-local _f = U.str_space_concat
+local _f = U.fmt.str_space_concat
 
 local C = require"mycfg.heirline_bars.components"
 local _U = require"mycfg.heirline_bars.components.utils"
@@ -31,7 +31,7 @@ return {
       --   parameter across all adapters in the plugin.
       --   `default`
       local current_model = chat.adapter.schema.model.default
-      return require"mylib.utils".str_concat(current_adapter, " (", current_model, ")")
+      return U.fmt.str_concat(current_adapter, " (", current_model, ")")
     end,
     on_click = {
       name = "statusline_on_click_codecompanion_adapter",

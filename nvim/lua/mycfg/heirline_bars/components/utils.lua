@@ -1,21 +1,22 @@
 local hline_conditions = require"heirline.conditions"
 
-local libU = require"mylib.utils"
-local _f = libU.str_space_concat ---@diagnostic disable unused-local
+local U = require"mylib.utils"
+---@diagnostic disable-next-line unused-local (it's useful for debugs)
+local _f = U.fmt.str_space_concat
 
-local U = {}
+local _U = {}
 
 ---@param value string?
 ---@return boolean
-function U.is_and_has_text(value)
+function _U.is_and_has_text(value)
   return type(value) == "string" and value ~= ""
 end
 
 ---@param unicode_variant string
 ---@param ascii_variant string
 ---@return string
-function U.unicode_or(unicode_variant, ascii_variant)
-  if not U.is_and_has_text(vim.env.ASCII_ONLY) then
+function _U.unicode_or(unicode_variant, ascii_variant)
+  if not _U.is_and_has_text(vim.env.ASCII_ONLY) then
     return unicode_variant
   else
     return ascii_variant
@@ -25,9 +26,9 @@ end
 ---@param maybe_txt string
 ---@param default string
 ---@return string
-function U.some_text_or(maybe_txt, default)
+function _U.some_text_or(maybe_txt, default)
   -- small helper to avoid checking nil or empty string
-  if U.is_and_has_text(maybe_txt) then
+  if _U.is_and_has_text(maybe_txt) then
     return maybe_txt
   else
     return default
@@ -36,7 +37,7 @@ end
 
 ---@param spec {active_ctermbg: integer, inactive_ctermbg: integer}
 ---@return table
-function U.white_with_bg(spec)
+function _U.white_with_bg(spec)
   if hline_conditions.is_active() then
     return { ctermbg = spec.active_ctermbg, ctermfg = 255, cterm = {bold = true} }
   else
@@ -47,7 +48,7 @@ end
 --- Returns a function that executes the given callback in the context of the clicked window
 ---@param callback fun(winid: integer)
 ---@return fun()
-function U.on_click_in_win_context(callback)
+function _U.on_click_in_win_context(callback)
   return function()
     local winid = vim.fn.getmousepos().winid
     -- In the context of the clicked window
@@ -57,7 +58,7 @@ function U.on_click_in_win_context(callback)
   end
 end
 
-U.SPACE = { provider = " " }
-U.__WIDE_SPACE__ = { provider = "%=" }
+_U.SPACE = { provider = " " }
+_U.__WIDE_SPACE__ = { provider = "%=" }
 
-return U
+return _U

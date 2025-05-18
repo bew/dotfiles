@@ -1,7 +1,7 @@
 local hline_conditions = require"heirline.conditions"
 
 local U = require"mylib.utils"
-local _f = U.str_space_concat
+local _f = U.fmt.str_space_concat
 
 local C = require"mycfg.heirline_bars.components"
 local _U = require"mycfg.heirline_bars.components.utils"
@@ -76,7 +76,7 @@ local function make_list_line(list)
       provider = function()
         local list_nr = list.get_list_info{ nr = 0 }.nr
         local nb_lists = list.get_list_info{ nr = "$" }.nr
-        return U.str_concat("List n°", list_nr, "/", nb_lists)
+        return U.fmt.str_concat("List n°", list_nr, "/", nb_lists)
       end
     },
     _,

@@ -1,6 +1,6 @@
 local U = require"mylib.utils"
-local _f = U.str_space_concat
-local _q = U.str_simple_quote_surround
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 local A = require"mylib.action_system"
 
@@ -29,7 +29,7 @@ wk_groups_lazy = {}
 function K.toplevel_map_define_group(spec)
   assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
-  local modes = U.normalize_arg_one_or_more(spec.mode)
+  local modes = U.args.normalize_arg_one_or_more(spec.mode)
   local group_wk_spec = {
     spec.prefix_key,
     group = spec.name,
@@ -79,7 +79,7 @@ function K.toplevel_map(map_spec)
     debug={map_spec.debug, "boolean", true}, -- optional
   }
 
-  local map_modes = U.normalize_arg_one_or_more(map_spec.mode)
+  local map_modes = U.args.normalize_arg_one_or_more(map_spec.mode)
 
   -- When the action is not an action obj, transform it quickly to a cheap action v2:
   if type(map_spec.action) ~= "table" then
