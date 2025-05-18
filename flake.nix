@@ -60,15 +60,15 @@
 
       kitsys = import ./nix/kit-system { inherit lib; };
 
-      zsh-configs = stablePkgs.callPackage ./zsh/tool-configs.nix {};
-      mk-zsh-bew-config = {fewBinsFromPATH ? false}: zsh-configs.lib.evalZshConfig {
+      zsh-kit = kitsys.newKit (import ./nix/kits/zsh-toolkit/kit.nix);
+      toolConfigs.zsh-bew = zsh-kit.eval {
         pkgs = stablePkgs;
-        config = zsh-configs.zshConfigModule.zsh-bew;
-        configOverride = {
-          deps.bins = lib.mkIf fewBinsFromPATH {
-            fzf.pkg = lib.mkForce "from-PATH";
-            eza.pkg = lib.mkForce "from-PATH";
-          };
+        config = ./zsh/zsh-bew.zsh-config.nix;
+      };
+      toolConfigs.zsh-bew-bins-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
+        deps.bins = {
+          fzf.pkg = lib.mkForce "from-PATH";
+          eza.pkg = lib.mkForce "from-PATH";
         };
       };
 
@@ -130,14 +130,11 @@
           editable.try_enable = true;
         };
       in {
-        zsh-bew = mk-zsh-bew-config { fewBinsFromPATH = true; };
+        zsh-bew = toolConfigs.zsh-bew-bins-from-PATH;
         nvim-minimal = makeEditable toolConfigs.nvim-minimal;
         nvim-bew = makeEditable toolConfigs.nvim-bew;
       };
     };
-
-    # note: it's annoying w.r.t system (this is now a multi-system flake)
-    # zshConfig.zsh-bew = mk-zsh-bew-config {};
 
     # --- Stuff I want to be able to do with binaries & packages:
     # In my packages:
@@ -154,12 +151,13 @@
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
     packages = eachSystem (system: with (forSys system); let
-      zsh-bew-config = mk-zsh-bew-config {};
       useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
-      zsh-bew = useStandalonePkg zsh-bew-config;
-      zsh-bew-zdotdir = zsh-bew-config.outputs.zdotdir;
-      zsh-bew-bin = mybuilders.linkSingleBin (lib.getExe zsh-bew-config.outputs.toolPkg.standalone);
+      zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
+      zsh-bew-zdotdir = toolConfigs.zsh-bew.outputs.zdotdir;
+      zsh-bew-bin = mybuilders.linkSingleBin (
+        lib.getExe (useStandalonePkg toolConfigs.zsh-bew)
+      );
 
       fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
         fzf = stablePkgs.fzf;
@@ -181,9 +179,9 @@
           env = stablePkgs.buildEnv {
             name = "cli-base-env";
             paths = [
-              # note: cannot use `myPkgs.zsh-bew`, otherwise my fzf-bew custom pkg isn't used
+              # note: cannot use `toolConfigs.zsh-bew`, otherwise my fzf-bew custom pkg isn't used
               #   (packages in myPkgs are not cross-referenced yet..)
-              (mk-zsh-bew-config { fewBinsFromPATH = true; }).outputs.toolPkg.standalone
+              (useStandalonePkg toolConfigs.zsh-bew-bins-from-PATH)
               myPkgs.nvim-minimal
               myPkgs.nvim-bew
               myPkgs.fzf-bew
@@ -192,7 +190,7 @@
               })
               stablePkgs.less # ensure modern pager
             ];
-            meta.mainProgram = myPkgs.zsh-bew.meta.mainProgram;
+            meta.mainProgram = "zsh";
           };
           entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" ''
             export PATH=${env}/bin:$PATH

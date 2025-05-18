@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mybuilders = pkgs.callPackage ../nix/mylib/mybuilders.nix {};
+  mybuilders = pkgs.callPackage ../../mylib/mybuilders.nix {};
 
   ty = lib.types;
   cfg = config;
