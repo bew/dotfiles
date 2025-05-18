@@ -113,11 +113,15 @@ Plug {
         end
       end,
     }
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-t>",       action=my_actions.mc_toggle_enable_cursors}
-    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-C-Space>", action=my_actions.mc_toggle_enable_cursors}
     -- When cursors are disabled, toggle cursor under the main cursor.
     -- Otherwise, disables all cursors (only the main cursor moves).
+    -- They'll need to be re-enabled before doing any multi-cursors edits.
     K.toplevel_map{mode="n", key="<M-Space><M-Space>", desc="Toggle cursor here", action=mc.toggleCursor}
+    -- Disable / Re-enable cursors
+    -- (note: setting up few mappings, not sure which one I'll prefer in practice 🤔)
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><M-t>",     action=my_actions.mc_toggle_enable_cursors}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><Space>",   action=my_actions.mc_toggle_enable_cursors}
+    K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-Space>", action=my_actions.mc_toggle_enable_cursors}
 
     my_actions.mc_clear_all_cursors = A.mk_action {
       default_desc = "Clear all cursors",
