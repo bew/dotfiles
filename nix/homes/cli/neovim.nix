@@ -31,7 +31,7 @@ in {
 
   home.packages = [
     # Also make a 'default' `nvim` binary pointing to the same specific NVIM_APPNAME
-    (nvim-bew.lib.evalWithOverride { useDefaultBinName = true; }).outputs.toolPkg.configured
+    (nvim-bew.lib.extendWith { useDefaultBinName = true; }).outputs.toolPkg.configured
 
     nvim-original
     (mybuilders.linkBins "extra-nvim-bins" {

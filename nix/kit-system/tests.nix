@@ -12,13 +12,17 @@ let
     };
   };
 
-  secondEval = firstEval.lib.evalWithOverride ({lib, superConfig, ...}: {
-    foo = lib.mkForce "second-value (was ${superConfig.foo})";
+  secondEval = firstEval.lib.extendWithPrevConfig ({lib, prevConfig, ...}: {
+    foo = lib.mkForce "second-value (was ${prevConfig.foo})";
   });
 
-  thirdEval = secondEval.lib.evalWithOverride ({lib, superConfig, ...}: {
-    foo = lib.mkOverride 45 "third-value (was ${superConfig.foo})";
+  thirdEval = secondEval.lib.extendWithPrevConfig ({lib, prevConfig, ...}: {
+    foo = lib.mkOverride 45 "third-value (was ${prevConfig.foo})";
     # note: mkForce has priority 50, 45 has more priority
+  });
+
+  extendOnlyEval = thirdEval.lib.extendWith ({lib, ...}: {
+    foo = lib.mkOverride 40 "fourth-value (extend only)";
   });
 
   testResults = pkgs.lib.runTests {
@@ -33,6 +37,10 @@ let
     test-doubly-nested-eval = {
       expr = thirdEval.foo;
       expected = "third-value (was second-value (was first-value))";
+    };
+    test-extend-only-eval = {
+      expr = extendOnlyEval.foo;
+      expected = "fourth-value (extend only)";
     };
   };
 in (

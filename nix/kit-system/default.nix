@@ -1,6 +1,7 @@
 { lib }:
 
 let
+  MAX_NESTING_LEVEL = 1000;
 
   # A module that declares the _required_ `lib` option (needed for defining nested eval below)
   declareLibOptionModule = {lib, ...}: let ty = lib.types; in {
@@ -10,25 +11,38 @@ let
     };
   };
 
+  mkHigherPriority = prevEvalLevel: content: (
+    let
+      higherPriority = MAX_NESTING_LEVEL - prevEvalLevel - 1;
+    in lib.mkOverride higherPriority content
+  );
+
   # Returns a module defining the nested eval function.
   # 👉 Allows to take a full config and refine it later if needed.
-  defineNestedEvalModule = { self, previousEvalParams, superConfig }: {
-    config.lib.evalWithOverride = configMoreOverride: self.eval {
-      inherit (previousEvalParams) pkgs lib config configOverride;
-      moreModules = previousEvalParams.moreModules ++ [
+  mkModuleForNestedEval = { self, prevEvalParams, prevEval, ... }: {
+    # Extend current config with the given module.
+    config.lib.extendWith = module: (
+      let
+        evaluated = prevEval.extendModules {
+          modules = [ module ];
+        };
+      in evaluated.config
+    );
+
+    # Same as lib.extendWith, supports accessing prevConfig
+    config.lib.extendWithPrevConfig = configMoreOverride: self.eval {
+      inherit (prevEvalParams) pkgs lib config configOverride;
+      moreModules = prevEvalParams.moreModules ++ [
         configMoreOverride
         # Also allow the new config to access the previous config :P
-        ({ lib, ... }: {
+        {
           # NOTE: We need to set a higher priority (lower number is higher priority) here,
           # to make sure that 2+ nesting evals won't have conflicting `superConfig` definitions,
           # and the current one has access to the _previous_ config.
-          _module.args.superConfig = let
-            maxNestingLevel = 1000;
-            higherPriority = maxNestingLevel - previousEvalParams._nestedEvalLevel;
-          in lib.mkOverride higherPriority superConfig;
-        })
+          _module.args.prevConfig = mkHigherPriority prevEvalParams._nestedEvalLevel prevEval.config;
+        }
       ];
-      _nestedEvalLevel = previousEvalParams._nestedEvalLevel + 1;
+      _nestedEvalLevel = prevEvalParams._nestedEvalLevel + 1;
     };
   };
 
@@ -36,7 +50,7 @@ in lib.fix (kitsys: {
   newKit = kitDef: lib.fix (self: kitDef { inherit self kitsys; });
 
   defineEval = {
-    # The current kit, can be used to access extra fields
+    # The current kit definition, can be used to access extra fields
     self,
     # Module class
     class ? null,
@@ -51,7 +65,7 @@ in lib.fix (kitsys: {
       pkgs,
       lib ? pkgs.lib,
       config,
-      # FIXME: configOverride still useful since we have evalWithOverride?
+      # FIXME: configOverride still useful since we have lib.extendWith?
       configOverride ? {},
       moreModules ? [],
       _nestedEvalLevel ? 1,
@@ -71,10 +85,11 @@ in lib.fix (kitsys: {
         specialArgs = { inherit pkgs; } // extraSpecialArgs;
         modules = self.baseModules ++ [ config configOverride ] ++ moreModules ++ [
           (if declareLibOption then declareLibOptionModule else {})
-          (defineNestedEvalModule {
+          (mkModuleForNestedEval {
             inherit self;
-            previousEvalParams = allEvalParams;
-            superConfig = evaluated.config;
+            prevEvalParams = allEvalParams;
+            prevConfig = evaluated.config;
+            prevEval = evaluated;
           })
         ];
       };
