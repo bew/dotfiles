@@ -1,4 +1,4 @@
-{ pkgsChannels, lib, mybuilders, myToolConfigs, ... }:
+{ pkgsChannels, lib, mybuilders, kitConfigs, ... }:
 
 let
   inherit (pkgsChannels) stable;
@@ -21,7 +21,7 @@ let
     meta.mainProgram = "nvim-original";
   };
 
-  inherit (myToolConfigs) nvim-minimal nvim-bew;
+  inherit (kitConfigs) nvim-minimal nvim-bew;
 in {
   imports = [
     # Install my setup in HOME, following specific NVIM_APPNAME (not default)

@@ -131,7 +131,7 @@
       # (but not exposed out of the dotfiles flake')
       #
       # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
-      extraSpecialArgs.myToolConfigs = let
+      extraSpecialArgs.kitConfigs = let
         makeEditable = config: config.lib.extendWith {
           # Make the config editable if it's supported
           editable.try_enable = true;

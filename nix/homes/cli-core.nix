@@ -1,4 +1,4 @@
-{ pkgsChannels, lib, mybuilders, pkgs, myToolConfigs, ... }:
+{ pkgsChannels, lib, mybuilders, pkgs, kitConfigs, ... }:
 
 let
   inherit (pkgsChannels) stable bleedingedge myPkgs;
@@ -13,8 +13,8 @@ let
 
 in {
   imports = [
-    myToolConfigs.zsh-bew.outputs.homeModules.withDefaults
-    myToolConfigs.tmux-bew.outputs.homeModules.withDefaults
+    kitConfigs.zsh-bew.outputs.homeModules.withDefaults
+    kitConfigs.tmux-bew.outputs.homeModules.withDefaults
 
     ./cli/neovim.nix
     ./cli/direnv.nix
