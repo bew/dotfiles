@@ -18,6 +18,4 @@ in {
     root = ./.;
     fileset = fs.fileFilter (f: f.hasExt "conf") ./.;
   };
-
-  editable.enable = true;
 }

@@ -186,7 +186,9 @@
         program = let
           env = stablePkgs.buildEnv {
             name = "cli-base-env";
-            paths = [
+            paths = let
+              useStandalonePkg = config: config.outputs.toolPkg.standalone;
+            in [
               # note: cannot use `toolConfigs.zsh-bew`, otherwise my fzf-bew custom pkg isn't used
               #   (packages in myPkgs are not cross-referenced yet..)
               (useStandalonePkg toolConfigs.zsh-bew-bins-from-PATH)
