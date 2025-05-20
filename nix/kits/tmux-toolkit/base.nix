@@ -40,7 +40,8 @@ in {
       meta.mainProgram = binName;
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} \
-          --add-flags "-f ${outs.cfgDir}/tmux.conf"
+          --add-flags "-f ${outs.cfgDir}/tmux.conf" \
+          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgDir}/tmux.conf
       '';
     });
 
