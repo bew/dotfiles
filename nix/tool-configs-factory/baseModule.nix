@@ -80,7 +80,9 @@ in {
             Home Manager module that adds the tool and its primary config in tool's default config paths.
             This module can only be used ONCE in a Home Manager config.
           '';
-          # type = ty.package; # FIXME: how to type a Nix module (with class check?) ??
+          type = ty.nullOr ty.raw;
+          # note: a default must be set to avoid breaking some merging functions 👀
+          default = null;
         };
         options.homeModules.specific = lib.mkOption {
           description = ''
@@ -88,7 +90,9 @@ in {
             This module should be usable MULTIPLE TIMES (for different tool configs) in a single
             Home Manager config.
           '';
-          # type = ty.package; # FIXME: how to type a Nix module (with class check?) ??
+          type = ty.nullOr ty.raw;
+          # note: a default must be set to avoid breaking some merging functions 👀
+          default = null;
         };
       };
     };
