@@ -159,3 +159,6 @@ Plug.pkg_manager {
     })
   end,
 }
+
+-- note: Not sure where to setup this 👀
+vim.keymap.set("ca", "lazy", "Lazy")
