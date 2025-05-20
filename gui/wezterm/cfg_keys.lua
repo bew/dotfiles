@@ -145,8 +145,16 @@ cfg.keys = {
   end)),
 
   -- Tabs
-  keybind(mods.C,  "Tab", act.ActivateTabRelative(1)),
+  -- Ctrl-Shift-a/z for prev/next tab
+  keybind(mods.CS, "a", act.ActivateTabRelative(-1)),
+  keybind(mods.CS, "z", act.ActivateTabRelative(1)),
+  -- Add Alt to move (since Shift is already used 👀)
+  keybind(mods.CSA, "a", act.MoveTabRelative(-1)),
+  keybind(mods.CSA, "z", act.MoveTabRelative(1)),
+
+  -- Also add _standard_ tab movements
   keybind(mods.CS, "Tab", act.ActivateTabRelative(-1)),
+  keybind(mods.C,  "Tab", act.ActivateTabRelative(1)),
   keybind(mods.CS, "t", define_and_activate_keytable {
     name = "Tab actions",
     -- Make this layer volatile, easily dismissed
