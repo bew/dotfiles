@@ -76,6 +76,21 @@ actions.wm.toggleMaximized = function()
   end
 end
 
+actions.wm.moveWinToNextScreen = function()
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local current_screen = win:screen()
+  local next_screen = current_screen:next()
+  if next_screen then
+    win:moveToScreen(next_screen, --[[noResize]]true, --[[ensureInScreenBounds]]true, --[[duration]]0)
+    -- Move mouse cursor to center of new screen
+    local win_frame = win:frame()
+    local center = hs.geometry.rectMidPoint(win_frame)
+    hs.mouse.absolutePosition(center)
+  end
+end
+
 OS:bind({}, "h", actions.wm.focusLeft)
 OS:bind({}, "j", actions.wm.focusDown)
 OS:bind({}, "k", actions.wm.focusUp)
@@ -85,6 +100,8 @@ OS:bind({"cmd"}, "space", actions.wm.centerOnScreen)
 OS:bind({"ctrl"}, "space", actions.wm.centerOnScreen)
 
 OS:bind({}, "m", actions.wm.toggleMaximized)
+
+OS:bind({"shift"}, "s", actions.wm.moveWinToNextScreen)
 
 -- TODO: block any key that is not bound to the OS layer 👀
 
