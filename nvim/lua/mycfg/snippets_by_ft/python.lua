@@ -16,6 +16,10 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- TODO: Split snips in multiple files for **large** topics 🤔
 
+snip("ffa", {desc = "lazy annotation import", when = conds.very_start_of_line}, (
+  t"from __future__ import annotations"
+))
+
 snip("cl", {desc = "class def", when = conds.start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
@@ -533,7 +537,8 @@ snip("on", {desc = "Foo | None = None"}, SU.myfmt {
 })
 
 snip("rt", {desc = "reveal type", when = conds.start_of_line}, SU.myfmt {
-  [[reveal_type(<expr>)  # noqa: F821 # TODO: remove probe]],
+  -- note: `(!!)` allows to draw attention without eating too much editor space for the hint
+  [[reveal_type(<expr>)  # noqa: F821 (!!)]],
   { expr = SU.insert_node_default_selection(1) }
 })
 snip("rt", {desc = "reveal type (in expr)"}, SU.myfmt {
