@@ -1,5 +1,8 @@
 -- TODO: setup annotations for LuaLS
+---@diagnostic disable-next-line: undefined-global
 local hs = hs
+
+local OS = require"os_layer"
 
 -- Change default style of alerts (default has too much roundness..)
 hs.alert.defaultStyle.strokeWidth = 5
@@ -20,14 +23,14 @@ _G.actions = {}
 _G.lib = {}
 
 actions.reload = function()
+  print("reloading!")
   hs.reload()
 end
 
-actions.screenshot = function()
+actions.screenshot = OS.wrap_nopopup_action(function()
   os.execute("screencapture -iUc")
-end
+end)
 
-local OS = require"os_layer"
 OS.setup { key = "F17" }
 
 -- FIXME: need to bind both to ctrl & cmd since the key currently changes when Terminal in focus or not..
