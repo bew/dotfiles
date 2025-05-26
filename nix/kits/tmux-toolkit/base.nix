@@ -30,9 +30,11 @@ in {
       (lib.mkIf config.editable.isEffectivelyEnabled cfg.outputs.editable-cfgDir)
       (lib.mkIf (!config.editable.isEffectivelyEnabled) cfg.outputs.non-editable-cfgDir)
     ];
+    outputs.cfgEntrypoint = "${outs.cfgDir}/tmux.conf";
 
     outputs.toolPkg.standalone = mybuilders.replaceBinsInPkg (let
-      binName = "tmux-${config.ID}";
+      binName = "tmux"; # for now, until I fix my `tx` alias, when used in `nix run dots`… 👀
+      # binName = "tmux-${config.ID}";
     in {
       name = binName;
       copyFromPkg = config.package;
@@ -40,8 +42,8 @@ in {
       meta.mainProgram = binName;
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} \
-          --add-flags "-f ${outs.cfgDir}/tmux.conf" \
-          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgDir}/tmux.conf
+          --add-flags "-f ${outs.cfgEntrypoint}" \
+          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgEntrypoint}
       '';
     });
 

@@ -184,6 +184,7 @@
       default = {
         type = "app";
         program = let
+          tmux-config = toolConfigs.tmux-bew;
           env = stablePkgs.buildEnv {
             name = "cli-base-env";
             paths = let
@@ -195,7 +196,7 @@
               myPkgs.nvim-minimal
               myPkgs.nvim-bew
               myPkgs.fzf-bew
-              myPkgs.tmux-bew
+              (useStandalonePkg tmux-config)
               (mybuilders.linkBins "nvim-default" {
                 nvim = lib.getExe myPkgs.nvim-bew;
               })
@@ -203,8 +204,40 @@
             ];
             meta.mainProgram = "zsh";
           };
-          entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" ''
-            export PATH=${env}/bin:$PATH
+          entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" /* sh */ ''
+            if [[ -z "$PATH_BEFORE_MY_NIX_CLI_ENV" ]]; then
+              export PATH_BEFORE_MY_NIX_CLI_ENV=$PATH
+              # note: Do _not_ re-set it to ensure its content is not 'infected' by Nix paths
+            fi
+            export PATH=${env}/bin:$PATH_BEFORE_MY_NIX_CLI_ENV
+
+            # MAYBE: Move to tmux kit (?)
+            if [[ -n "$TMUX" ]]; then
+              # We are in TMUX!
+              echo
+              echo "--------------------------------------------------------------------------------"
+              echo '!! Tmux needs the new cli env !!'
+              echo "To ensure new tmux panes spawn apps from the NEW cli env, update tmux's \$PATH:"
+              echo
+              echo "👉 tmux set-environment -g PATH '$PATH'"
+              echo
+              echo "--------------------------------------------------------------------------------"
+              echo
+              previous_tmux_config_env=$(tmux show-environment -g TMUX_CONFIG_ENTRYPOINT)
+              new_tmux_config_env=TMUX_CONFIG_ENTRYPOINT=${tmux-config.outputs.cfgEntrypoint}
+              if [[ "$previous_tmux_config_env" != "$new_tmux_config_env" ]]; then
+                echo "!! Tmux config changed !!"
+                echo
+                echo "Update target config:"
+                echo "👉 tmux set-environment -g TMUX_CONFIG_ENTRYPOINT '${tmux-config.outputs.cfgEntrypoint}'"
+                echo
+                echo "Then reload the config"
+                echo
+                echo "--------------------------------------------------------------------------------"
+                echo
+              fi
+            fi
+
             exec ${lib.getExe env} "$@"
           '';
         in entrypoint.outPath;
