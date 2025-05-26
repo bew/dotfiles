@@ -782,7 +782,8 @@ vibindkey "${keysyms[C-Right]}" vi-forward-word
 
 vibindkey '^l' zwidget::clear-but-keep-scrollback
 
-vibindkey 's' zwidget::toggle-sudo-nosudo
+vibindkey 'S' zwidget::toggle-sudo-nosudo
+# note: binding Ctrl-Alt-s seems unsupported, zsh never receives it :/
 
 vibindkey 'q' zwidget::cycle-quoting
 vibindkey '^a' zwidget::insert_one_arg
@@ -795,6 +796,7 @@ vibindkey '^l' zwidget::force-scroll-window
 
 # fast git
 vibindkey 'g' zwidget::git-status
+vibindkey 's' zwidget::git-status # let's try..
 vibindkey 'd' zwidget::git-diff
 vibindkey 'D' zwidget::git-diff-cached
 #vibindkey 'l' zwidget::git-log # handled by zwidget::go-right_or_git-log
