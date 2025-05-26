@@ -535,9 +535,18 @@ my_actions.c_expand_file_path = A.mk_action {
     return vim.fn.expand("%:.")
   end,
 }
+my_actions.c_expand_file_fullpath = A.mk_action {
+  default_desc = "expand current file full path",
+  map_opts = { expr = true },
+  c = function()
+    return vim.fn.expand("%:p")
+  end,
+}
 -- C: Expand %P to path of current file
 -- (using uppercase P because % also needs shift, so it's easy to 'spam')
 K.toplevel_map{mode="c", key="%P", action=my_actions.c_expand_file_path}
+K.toplevel_map{mode="c", key="%f", action=my_actions.c_expand_file_path}
+K.toplevel_map{mode="c", key="%F", action=my_actions.c_expand_file_fullpath}
 
 my_actions.c_expand_file_dir = A.mk_action {
   default_desc = "expand current file dir",
