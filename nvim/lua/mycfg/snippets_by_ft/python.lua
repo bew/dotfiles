@@ -1,4 +1,6 @@
 -- vim:set ft=lua.luasnip:
+local U = require"mylib.utils"
+
 local ls = require"luasnip"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local conds = require"mycfg.snippets_by_ft._conditions"
@@ -630,6 +632,50 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
     body = SU.insert_node_default_selection(1, "pass"),
   }
 })
+
+-- FIXME: 🙁 FAILS in all of these cases:
+-- ```py
+-- class Fail1:
+--     def foo(self):
+--         | <- cursor
+--
+-- class Fail2:
+--     def foo(self):
+--         something before
+--         | <- cursor
+--
+-- class Fail3:
+--     def foo(self):
+--         | <- cursor
+--         something after
+-- ```
+-- Because at this point the direct TS parent is either of type 'class_definition' or 'block',
+-- instead of being the `foo` function node 🙁
+--
+-- 👉 TOTRY: Find immediate function node parent based on current indent
+snip("su", {desc = "super().samefunction(…)"}, ls.function_node(function()
+  local node = U.treesitter.try_get_node_at_cursor()
+  if not node then return end
+
+  local parents = U.treesitter.collect_node_parents(node, { until_node_type = "class_definition" })
+  if #parents == 0 or parents[1]:type() ~= "class_definition" then
+    vim.notify("!! Not in a class!", vim.log.levels.ERROR)
+    return
+  end
+
+  -- find first 'function_definition' node
+  ---@type TSNode?
+  local class_function_node = vim.iter(parents):find(function(p) return p:type() == "function_definition" end)
+  if not class_function_node then
+    vim.notify("!! Not in a class function node!", vim.log.levels.ERROR)
+    return
+  end
+
+  local fn_name_node = class_function_node:field("name")[1]
+  local fn_name = vim.treesitter.get_node_text(fn_name_node, 0)
+
+  return "super()." .. fn_name
+end))
 
 -- End of snippets definitions
 
