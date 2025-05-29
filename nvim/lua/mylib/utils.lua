@@ -13,6 +13,9 @@ U.visual = require"mylib.utils.visual_utils"
 U.fs = require"mylib.utils.fs_utils"
 --- Search-related utils
 U.search = require"mylib.utils.search_utils"
+--- Treesitter-related utils
+U.treesitter = require"mylib.utils.treesitter_utils"
+
 --- Metatable-related utils
 U.mt = require"mylib.utils.mt_utils"
 
@@ -71,6 +74,7 @@ function U.is_module_available(module_name)
   return module_available
 end
 
+-- FIXME: rename all usages to use `U.treesitter.is_available_here` instead
 function U.is_treesitter_available_here()
   local success, _parser = pcall(vim.treesitter.get_parser)
   return success
