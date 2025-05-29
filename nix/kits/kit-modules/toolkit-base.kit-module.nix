@@ -111,7 +111,7 @@ in {
     };
   };
 
-  imports = [ ./editable.tool-module.nix ];
+  imports = [ ./editable.kit-module.nix ];
 }
 
 # ------------------------------------------------------------------------

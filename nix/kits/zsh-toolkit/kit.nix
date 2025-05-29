@@ -3,7 +3,7 @@
 {
   meta.name = "Zsh tool kit";
   baseModules = [
-    ../../tool-configs-factory/baseModule.nix
+    ../kit-modules/toolkit-base.kit-module.nix
     ./base.nix
   ];
   eval = kitsys.defineEval {

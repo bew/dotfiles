@@ -4,7 +4,7 @@ let
   ty = lib.types;
   cfg = config.editable;
 
-  directSymlinker = pkgs.callPackage ../mylib/editable-symlinker.nix {};
+  directSymlinker = pkgs.callPackage ../../mylib/editable-symlinker.nix {};
 
   directSymlinkerConfigType = ty.submodule {
     options = {
