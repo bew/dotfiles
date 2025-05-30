@@ -202,6 +202,9 @@ cfg.keys = {
     win:set_config_overrides(overrides)
   end)),
 
+  ------------------------------------------------------------
+  -- Key tables
+
   keybind(mods.CS, "Space", define_and_activate_keytable{
     name = "Leader",
     -- Make this layer volatile, easily dismissed

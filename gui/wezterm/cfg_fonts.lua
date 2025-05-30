@@ -27,26 +27,27 @@ local function font_with_fallback(font_spec)
   })
 end
 
-local function font_and_rules_for_jetbrains()
-  -- Use a _very slightly_ lighter variant, so that regular bold really stand out
-  local font = font_with_fallback({family="JetBrains Mono", weight="Light"})
-  local font_rules = {
+local function setup_jetbrains_font()
+  cfg.font = font_with_fallback({family="JetBrains Mono", weight="Regular"})
+  -- note: Using ExtraBold for bold text, to better show the difference between normal & bold text
+  -- note: Using Light for normal text (and Bold for bold text) is too thin and doesn't
+  --   render/antialias very well on MacOS..
+  cfg.font_rules = {
     {
       intensity = "Normal",
       italic = true,
-      font = font_with_fallback({family="JetBrains Mono", weight="Light", italic=true}),
+      font = font_with_fallback({family="JetBrains Mono", weight="Regular", italic=true}),
     },
     {
       intensity = "Bold",
       italic = true,
-      font = font_with_fallback({family="JetBrains Mono", weight="Bold", italic=true}),
+      font = font_with_fallback({family="JetBrains Mono", weight="ExtraBold", italic=true}),
     },
     {
       intensity = "Bold",
-      font = font_with_fallback({family="JetBrains Mono", weight="Bold"}),
+      font = font_with_fallback({family="JetBrains Mono", weight="ExtraBold"}),
     },
   }
-  return font, font_rules
 end
 
 -- FIXME (<- this is an example of bolded text)
@@ -56,7 +57,7 @@ end
 --
 -- Some emojis: ☹️ 🔎 😇 🤷 🙃 🖐 ❤️⚠️ ✨ 👋
 
-cfg.font, cfg.font_rules = font_and_rules_for_jetbrains()
+setup_jetbrains_font()
 cfg.unicode_version = 15
 
 cfg.strikethrough_position = "0.555cell"
