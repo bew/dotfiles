@@ -3,11 +3,62 @@
 let
   MAX_NESTING_LEVEL = 1000;
 
+  # Impl copied from the very recent `lib.asserts.checkAssertWarn` (@2025-05)
+  checkAssertWarn = with lib;
+    assertions: warnings: val:
+    let
+      failedAssertions = map (x: x.message) (filter (x: !x.assertion) assertions);
+    in
+    if failedAssertions != [ ] then
+      throw "\nFailed assertions:\n${concatStringsSep "\n" (map (x: "- ${x}") failedAssertions)}"
+    else
+      showWarnings warnings val;
+
+  checkAssertsAndWarnings = config: (
+    # Check assertions & warnings: (returns the evaluated config if all good)
+    # - show all warnings
+    # - fail with messages for all false asserts
+    checkAssertWarn
+      config.assertions
+      config.warnings
+      config
+  );
+
   # A module that declares the _required_ `lib` option (needed for defining nested eval below)
   declareLibOptionModule = {lib, ...}: let ty = lib.types; in {
     options.lib = lib.mkOption {
       description = "Set of lib functions to help write configs";
       type = ty.attrsOf (ty.uniq ty.anything);
+    };
+  };
+
+  # Interesting related work, to follow:
+  # - Reusable assertions (aka, integrate them in the module system)
+  #   <https://github.com/NixOS/nixpkgs/pull/207187>
+  # - structured attrs for warnings/assertions
+  #   <https://github.com/NixOS/nixpkgs/pull/342372>
+  declareAssertWarnOptionsModule = {lib, ...}: let ty = lib.types; in {
+    options.assertions = lib.mkOption {
+      description = "List of assertions to check";
+      type = ty.listOf (ty.submodule {
+        options = {
+          assertion = lib.mkOption {
+            type = ty.bool;
+            description = "Assertion condition that must be true";
+          };
+          message = lib.mkOption {
+            type = ty.str;
+            description = "Error message to display when assertion fails";
+          };
+        };
+      });
+      default = [];
+    };
+
+    options.warnings = lib.mkOption {
+      description = "List of warning messages to display";
+      type = ty.listOf ty.str;
+      default = [];
     };
   };
 
@@ -26,7 +77,7 @@ let
         evaluated = prevEval.extendModules {
           modules = [ module ];
         };
-      in evaluated.config
+      in checkAssertsAndWarnings evaluated.config
     );
 
     # Same as lib.extendWith, supports accessing prevConfig
@@ -60,6 +111,10 @@ in lib.fix (kitsys: {
     # Set to `false` if `lib` option is already defined in `self.baseModules` to avoid conflicting
     # definitions.
     declareLibOption ? true,
+
+    # Set to `false` if `assertions`/`warnings` options are already defined in `self.baseModules` to
+    # avoid conflicting definitions.
+    declareAssertWarnOptions ? true,
   }: (
     {
       pkgs,
@@ -85,6 +140,7 @@ in lib.fix (kitsys: {
         specialArgs = { inherit pkgs; } // extraSpecialArgs;
         modules = self.baseModules ++ [ config configOverride ] ++ moreModules ++ [
           (if declareLibOption then declareLibOptionModule else {})
+          (if declareAssertWarnOptions then declareAssertWarnOptionsModule else {})
           (mkModuleForNestedEval {
             inherit self;
             prevEvalParams = allEvalParams;
@@ -93,6 +149,6 @@ in lib.fix (kitsys: {
           })
         ];
       };
-    in evaluated.config
+    in checkAssertsAndWarnings evaluated.config
   );
 })

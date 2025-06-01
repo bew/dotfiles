@@ -25,6 +25,10 @@ let
     foo = lib.mkOverride 40 "fourth-value (extend only)";
   });
 
+  evalWithWarn = thirdEval.lib.extendWith ({lib, ...}: {
+    warnings = [ "test warning is working" ];
+  });
+
   testResults = pkgs.lib.runTests {
     test-initial-eval = {
       expr = firstEval.foo;
@@ -42,11 +46,18 @@ let
       expr = extendOnlyEval.foo;
       expected = "fourth-value (extend only)";
     };
+    test-with-warning = {
+      expr = evalWithWarn.warnings;
+      # note: extensions are put before for list merges
+      expected = [ "test warning is working" ];
+    };
   };
+
 in (
   if testResults == []
   then "Tests successful ✨"
   else testResults
 )
+
 # Run with `nix eval -f $CURRENTFILE`
 # Add `--json | jq .` for better readability of test result failures
