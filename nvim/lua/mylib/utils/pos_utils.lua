@@ -1,3 +1,4 @@
+local U_mt = require"mylib.utils.mt_utils"
 local U_fmt = require"mylib.utils.fmt_utils"
 local _f = U_fmt.str_space_concat
 local _q = U_fmt.str_simple_quote_surround
@@ -8,16 +9,25 @@ local _q = U_fmt.str_simple_quote_surround
 ---@class mylib.Pos0
 ---@field row integer
 ---@field col integer
-local Pos0 = {}
+local Pos0 = U_mt.checked_table_index{}
+Pos0.mt = {}
+Pos0.mt.__index = Pos0
+
+---@param self mylib.Pos0
+---@param other mylib.Pos0
+---@return boolean
+function Pos0.mt:__eq(other)
+  if not type(other) == "table" then
+    return false
+  end
+  return self.row == other.row and self.col == other.col
+end
 
 --- Create a new Pos0
 ---@param pos0 {row: integer, col: integer}
 ---@return mylib.Pos0
 function Pos0.new(pos0)
-  return setmetatable(pos0, {
-    __index = Pos0,
-    __eq = Pos0.__eq,
-  })
+  return setmetatable(pos0, Pos0.mt)
 end
 
 ---@alias mylib.Pos0FromVimposKind
@@ -106,16 +116,6 @@ function Pos0:is_within_incl_range(range)
     (start_pos.row < self.row or (start_pos.row == self.row and start_pos.col <= self.col))
     and (self.row < end_pos.row or (self.row == end_pos.row and self.col <= end_pos.col))
   )
-end
-
-
----@param other mylib.Pos0
----@return boolean
-function Pos0:__eq(other)
-  if not type(other) == "table" then
-    return false
-  end
-  return self.row == other.row and self.col == other.col
 end
 
 return {

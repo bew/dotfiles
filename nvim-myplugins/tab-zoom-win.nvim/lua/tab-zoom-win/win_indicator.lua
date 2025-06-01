@@ -2,7 +2,8 @@
 ---@field winid integer
 ---@field bufnr integer
 local WinIndicator = {}
-WinIndicator.__index = WinIndicator
+WinIndicator.mt = {}
+WinIndicator.mt.__index = WinIndicator
 
 local ZOOMED_INDICATOR_HL = "TabWinZoomIndicator"
 local ZOOMED_INDICATOR_MSG = "  TAB: WIN ZOOMED  "
@@ -39,7 +40,7 @@ function WinIndicator.open_new()
     winid = winid,
     bufnr = bufnr,
   }
-  return setmetatable(win_indicator, WinIndicator)
+  return setmetatable(win_indicator, WinIndicator.mt)
 end
 
 function WinIndicator:cleanup()

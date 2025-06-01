@@ -10,4 +10,12 @@ U_mt.KeyRefMustExist_mt = {
   end,
 }
 
+--- Returns the given table, with metatable to error when accessing a key that doesn't exist
+---@generic T: table
+---@param tbl T
+---@return T
+function U_mt.checked_table_index(tbl)
+  return setmetatable(tbl, U_mt.KeyRefMustExist_mt)
+end
+
 return U_mt

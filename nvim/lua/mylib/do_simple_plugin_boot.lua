@@ -53,12 +53,11 @@ local function boot_plugins(plugin_specs, opts)
   end
 
   ---@type plugsys.BootPlugContext
-  local ctx = {
+  local ctx = U.mt.checked_table_index {
     plugin_specs = plugin_specs,
     install_dir = opts.install_dir,
     manager_install_path = pkg_manager_install_path,
   }
-  local ctx = setmetatable(ctx, U.mt.KeyRefMustExist_mt)
 
   if not U.fs.path_exists(pkg_manager_install_path) then
     vim.notify("Pkg manager not installed at " .. _q(pkg_manager_install_path) .. ", attempting bootstrap…")
