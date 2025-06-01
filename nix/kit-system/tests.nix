@@ -1,63 +1,82 @@
 let
   pkgs = builtins.getFlake "pkgs";
+  lib = pkgs.lib;
 
-  kitsys = import ./. { lib = pkgs.lib; };
+  kitsys = import ./. { inherit lib; };
 
   minikit = kitsys.newKit (import ./minikit/kit.nix);
 
-  firstEval = minikit.eval {
+  configInit = minikit.eval {
     inherit pkgs;
     config = {
-      foo = "first-value";
+      val = "first-value";
     };
   };
 
-  secondEval = firstEval.lib.extendWithPrevConfig ({lib, prevConfig, ...}: {
-    foo = lib.mkForce "second-value (was ${prevConfig.foo})";
+  configNested = configInit.lib.extendWith ({lib, ...}: {
+    val = lib.mkForce "second-value, prev not used";
   });
 
-  thirdEval = secondEval.lib.extendWithPrevConfig ({lib, prevConfig, ...}: {
-    foo = lib.mkOverride 45 "third-value (was ${prevConfig.foo})";
+  configNestedAgain = configNested.lib.extendWith ({lib, prevConfig, ...}: {
+    val = lib.mkOverride 45 "third-value (was ${prevConfig.val})";
     # note: mkForce has priority 50, 45 has more priority
   });
 
-  extendOnlyEval = thirdEval.lib.extendWith ({lib, ...}: {
-    foo = lib.mkOverride 40 "fourth-value (extend only)";
-  });
-
-  evalWithWarn = thirdEval.lib.extendWith ({lib, ...}: {
+  configWithWarn = configNestedAgain.lib.extendWith ({lib, ...}: {
     warnings = [ "test warning is working" ];
   });
 
-  testResults = pkgs.lib.runTests {
-    test-initial-eval = {
-      expr = firstEval.foo;
+  evals = {
+    inherit configInit configNested configNestedAgain configWithWarn;
+  };
+
+  # NOTE: Test names _must_ start with `test` to be considered by `runTests`.
+  # (note: numbers in test name used to ensure test ordering)
+  tests = {
+    # Test value propagation across config extensions
+    "test.0initial" = {
+      expr = configInit.val;
       expected = "first-value";
     };
-    test-nested-eval = {
-      expr = secondEval.foo;
-      expected = "second-value (was first-value)";
+    "test.1nested" = {
+      expr = configNested.val;
+      expected = "second-value, prev not used";
     };
-    test-doubly-nested-eval = {
-      expr = thirdEval.foo;
-      expected = "third-value (was second-value (was first-value))";
+    "test.2doubly-nested" = {
+      expr = configNestedAgain.val;
+      expected = "third-value (was second-value, prev not used)";
     };
-    test-extend-only-eval = {
-      expr = extendOnlyEval.foo;
-      expected = "fourth-value (extend only)";
+    # Test nesting level info in kit state
+    "test.0initial.level" = {
+      expr = configInit._kitState.nestingLevel;
+      expected = 0;
     };
-    test-with-warning = {
-      expr = evalWithWarn.warnings;
+    "test.1nested.level" = {
+      expr = configNested._kitState.nestingLevel;
+      expected = 1;
+    };
+    "test.2doubly-nested.level" = {
+      expr = configNestedAgain._kitState.nestingLevel;
+      expected = 2;
+    };
+    # Other tests
+    "test.with-warning" = {
+      expr = configWithWarn.warnings;
       # note: extensions are put before for list merges
       expected = [ "test warning is working" ];
     };
   };
+  nicer_testResults = let
+    testResults = pkgs.lib.runTests tests;
+    fmtTestNames = lib.concatStringsSep ", " (builtins.attrNames tests);
+  in (
+    if testResults == []
+    then "Tests successful ✨ (${fmtTestNames})"
+    else testResults
+  );
 
-in (
-  if testResults == []
-  then "Tests successful ✨"
-  else testResults
-)
+in nicer_testResults
+# in evals # for DEBUG in repl
 
 # Run with `nix eval -f $CURRENTFILE`
 # Add `--json | jq .` for better readability of test result failures

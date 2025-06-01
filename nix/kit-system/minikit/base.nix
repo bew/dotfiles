@@ -2,8 +2,9 @@
 
 {
   options = let ty = lib.types; in {
-    foo = lib.mkOption {
-      type = lib.types.singleLineStr;
+    val = lib.mkOption {
+      description = "Option to test nesting config with overriden value";
+      type = ty.anything;
     };
   };
 }

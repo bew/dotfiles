@@ -1,8 +1,6 @@
 { lib }:
 
 let
-  MAX_NESTING_LEVEL = 1000;
-
   # Impl copied from the very recent `lib.asserts.checkAssertWarn` (@2025-05)
   checkAssertWarn = with lib;
     assertions: warnings: val:
@@ -62,39 +60,53 @@ let
     };
   };
 
-  mkHigherPriority = prevEvalLevel: content: (
-    let
-      higherPriority = MAX_NESTING_LEVEL - prevEvalLevel - 1;
-    in lib.mkOverride higherPriority content
-  );
+  # A module defining the `config.lib.extendWith` function for multi-level config extension ✨
+  # 👉 Allows to take a full kit-based config and refine it later as needed.
+  declareConfigExtensionFunctionModule = {lib, config, ...}: {
+    options._kitState = let ty = lib.types; in {
+      # Not strictly necessary, but can be useful information.
+      nestingLevel = lib.mkOption {
+        description = "Nesting level of the current kitsys eval, overridden with each config extension";
+        type = ty.ints.unsigned;
+        default = 0;
+      };
+      # NOTE: This is needed to be able to access current eval in the impl of `lib.extendWith`
+      currentEval = lib.mkOption {
+        type = ty.raw; # zero smart, zero merging
+        # note: initial value is set in `kit.eval` with the option-default's priority
+      };
+    };
 
-  # Returns a module defining the nested eval function.
-  # 👉 Allows to take a full config and refine it later if needed.
-  mkModuleForNestedEval = { self, prevEvalParams, prevEval, ... }: {
     # Extend current config with the given module.
+    # Supports accessing `prevConfig` in module args if needed.
     config.lib.extendWith = module: (
       let
+        prev_kitState = config._kitState;
+        prevEval = prev_kitState.currentEval;
+        # NOTE: We need to set a higher priority (less is more) for options here, to make sure
+        # that 2+ nesting evals won't have conflicting option definitions when overriding value.
+        higherPrio = prevEval.options._kitState.nestingLevel.highestPrio - 1;
+
         evaluated = prevEval.extendModules {
-          modules = [ module ];
+          modules = [
+            module
+            {
+              _kitState.nestingLevel = lib.mkOverride higherPrio (prev_kitState.nestingLevel + 1);
+              # NOTE: Storing the eval in the config is necessary to be able to retrieve highestPrio of an
+              # option in prevEval.
+              #
+              # note: Due to Nix's lazyness its value should never actually be evaluated until I actually
+              # need a config value from a prev config
+              _kitState.currentEval = lib.mkOverride higherPrio evaluated;
+
+              # Expose the previous config if an extension module needs the before-extension value
+              # of something.
+              _module.args.prevConfig = lib.mkOverride higherPrio prevEval.config;
+            }
+          ];
         };
       in checkAssertsAndWarnings evaluated.config
     );
-
-    # Same as lib.extendWith, supports accessing prevConfig
-    config.lib.extendWithPrevConfig = configMoreOverride: self.eval {
-      inherit (prevEvalParams) pkgs lib config configOverride;
-      moreModules = prevEvalParams.moreModules ++ [
-        configMoreOverride
-        # Also allow the new config to access the previous config :P
-        {
-          # NOTE: We need to set a higher priority (lower number is higher priority) here,
-          # to make sure that 2+ nesting evals won't have conflicting `superConfig` definitions,
-          # and the current one has access to the _previous_ config.
-          _module.args.prevConfig = mkHigherPriority prevEvalParams._nestedEvalLevel prevEval.config;
-        }
-      ];
-      _nestedEvalLevel = prevEvalParams._nestedEvalLevel + 1;
-    };
   };
 
 in lib.fix (kitsys: {
@@ -123,30 +135,17 @@ in lib.fix (kitsys: {
       # FIXME: configOverride still useful since we have lib.extendWith?
       configOverride ? {},
       moreModules ? [],
-      _nestedEvalLevel ? 1,
       ...
-    }@givenEvalParams:
+    }:
     let
-      # note: cannot solely use `{..}@evalParams` above because it doesn't auto-fill defaults.
-      #   See in repl: `({ a, b ? "default"}@params: params) { a = 1; }`
-      #   .. which gives `{ a=1; }` instead of `{ a=1; b="default"; }`
-      # So we take what was explicitely given, and inject the optionals to make sure they are set.
-      allEvalParams = givenEvalParams // {
-        inherit lib configOverride moreModules _nestedEvalLevel;
-      };
-
       evaluated = lib.evalModules {
         inherit class;
         specialArgs = { inherit pkgs; } // extraSpecialArgs;
         modules = self.baseModules ++ [ config configOverride ] ++ moreModules ++ [
           (if declareLibOption then declareLibOptionModule else {})
           (if declareAssertWarnOptions then declareAssertWarnOptionsModule else {})
-          (mkModuleForNestedEval {
-            inherit self;
-            prevEvalParams = allEvalParams;
-            prevConfig = evaluated.config;
-            prevEval = evaluated;
-          })
+          declareConfigExtensionFunctionModule
+          { _kitState.currentEval = lib.mkOptionDefault evaluated; }
         ];
       };
     in checkAssertsAndWarnings evaluated.config
