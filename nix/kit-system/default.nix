@@ -62,7 +62,7 @@ let
 
   # A module defining the `config.lib.extendWith` function for multi-level config extension ✨
   # 👉 Allows to take a full kit-based config and refine it later as needed.
-  declareConfigExtensionFunctionModule = {lib, config, ...}: {
+  declareConfigExtensionHelperModule = {lib, config, ...}: {
     options._kitState = let ty = lib.types; in {
       # Not strictly necessary, but can be useful information.
       nestingLevel = lib.mkOption {
@@ -128,7 +128,13 @@ in lib.fix (kitsys: {
     # avoid conflicting definitions.
     declareAssertWarnOptions ? true,
   }: (
-    {
+    let
+      kitsysBaseModules = [
+        (if declareLibOption then declareLibOptionModule else {})
+        (if declareAssertWarnOptions then declareAssertWarnOptionsModule else {})
+        declareConfigExtensionHelperModule
+      ];
+    in {
       pkgs,
       lib ? pkgs.lib,
       config,
@@ -141,12 +147,17 @@ in lib.fix (kitsys: {
       evaluated = lib.evalModules {
         inherit class;
         specialArgs = { inherit pkgs; } // extraSpecialArgs;
-        modules = self.baseModules ++ [ config configOverride ] ++ moreModules ++ [
-          (if declareLibOption then declareLibOptionModule else {})
-          (if declareAssertWarnOptions then declareAssertWarnOptionsModule else {})
-          declareConfigExtensionFunctionModule
-          { _kitState.currentEval = lib.mkOptionDefault evaluated; }
-        ];
+        modules = (
+          kitsysBaseModules
+          ++ self.baseModules
+          ++ [ config configOverride ]
+          ++ moreModules
+          ++ [
+            # Initialize the state with the current eval, using option-default priority to ensure
+            # all _kitState options have the same priority.
+            { _kitState.currentEval = lib.mkOptionDefault evaluated; }
+          ]
+        );
       };
     in checkAssertsAndWarnings evaluated.config
   );
