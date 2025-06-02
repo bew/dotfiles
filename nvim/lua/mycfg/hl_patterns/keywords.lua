@@ -50,6 +50,9 @@ patterns.big_fixme = {
   pattern = U.concat_lists {
     _big_word_variants"FIXME",
     _big_word_variants"TMP!",
+    {
+      "%(%?%?%)", -- (??)
+    },
   },
   group = _U.define_hl("big_fixme", {
     ctermfg = 160,

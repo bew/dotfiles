@@ -28,8 +28,7 @@ Plug {
   on_load = function()
     require"full_visual_line".setup()
 
-    my_actions.full_visual_line = {}
-    my_actions.full_visual_line.toggle = A.mk_action {
+    my_actions.toggle_full_visual_line = A.mk_action {
       default_desc = "Full Visual Line - Toggle",
       [{"n", "v"}] = function()
         require"full_visual_line".toggle()

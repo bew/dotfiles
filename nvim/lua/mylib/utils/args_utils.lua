@@ -26,6 +26,8 @@ end
 --- Normalizes a single item or a list of items to a list of item(s).
 ---@param item_or_items any|any[] A single item (must not be a table) or a list of items
 ---@return any[]
+-- note: @overload doesn't support generics 😬
+-- ISSUE: https://github.com/LuaLS/lua-language-server/issues/723
 function U_args.normalize_arg_one_or_more(item_or_items)
   if type(item_or_items) == "table" then
     return item_or_items

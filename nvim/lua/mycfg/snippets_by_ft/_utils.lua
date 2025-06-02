@@ -166,6 +166,7 @@ end
 -- REF: https://github.com/L3MON4D3/LuaSnip/blob/33b06d72d220aa56/lua/luasnip/extras/postfix.lua#L13
 SU.mk_expand_params_resolver = function(spec)
   spec = spec or {}
+  ---@type string[]
   local delete_after_trig_pats = U.args.normalize_arg_one_or_more(spec.delete_after_trig or {})
 
   return function(_snip, _line_to_cursor, matched, _captures)

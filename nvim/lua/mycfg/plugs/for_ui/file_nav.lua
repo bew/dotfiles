@@ -25,7 +25,7 @@ Plug {
         return vim.fn.fnamemodify(dir, ":~")
       else
         -- If there is no current directory (e.g. over ssh), just show the buffer name
-        return vim.api.nvim_buf_get_name(0)
+        return vim.api.nvim_buf_get_name(bufnr)
       end
     end
     require"oil".setup {

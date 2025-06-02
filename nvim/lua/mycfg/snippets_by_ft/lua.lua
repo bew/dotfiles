@@ -376,7 +376,7 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
       ---@type string
       local fn_name = given_nodes_text[1][1]
       vim.notify("fn_name: " .. fn_name)
-      if fn_name:match"%." then
+      if fn_name:match"%." or fn_name:match":" then
         return ""
       else
         return "local "

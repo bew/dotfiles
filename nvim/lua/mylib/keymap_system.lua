@@ -29,6 +29,7 @@ wk_groups_lazy = {}
 function K.toplevel_map_define_group(spec)
   assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
+  ---@type string[]
   local modes = U.args.normalize_arg_one_or_more(spec.mode)
   local group_wk_spec = {
     spec.prefix_key,
@@ -79,6 +80,7 @@ function K.toplevel_map(map_spec)
     debug={map_spec.debug, "boolean", true}, -- optional
   }
 
+  ---@type string[]
   local map_modes = U.args.normalize_arg_one_or_more(map_spec.mode)
 
   -- When the action is not an action obj, transform it quickly to a cheap action v2:

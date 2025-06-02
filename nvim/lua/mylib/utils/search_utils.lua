@@ -15,6 +15,7 @@ local U_search = {}
 ---@param opts? mylib.CurrentSearchSetterOpts
 ---  Whether to add word bounds before/after text (none by default)
 function U_search.set_current_search(text, opts)
+  ---@type string[]
   local text_lines = U_args.normalize_arg_one_or_more(text)
   local opts = U_args.normalize_arg_opts_with_default(opts, {
     escaped = false, -- by default, assume it's not

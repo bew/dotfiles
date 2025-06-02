@@ -152,7 +152,7 @@ end
 ---    Example: buf,winenter,scope:foo
 ---    This will match the events including 'buf', the WinEnter events, and the events with
 ---    file name including 'foo'
----@param display_fn fun(record: EventRecord): nil
+---@param display_fn fun(record: debug_aucmd.EventRecord): nil
 function DebugSession:dump_matching_with(matcher_spec, display_fn)
   local matcher_fn = make_record_matcher_fn(matcher_spec)
   for _, event_record in ipairs(self.recorded_events) do
