@@ -1,6 +1,8 @@
 
 -- /!\ TODO: write tests for all utils!!
 
+local TERM_CODES = require"mylib.term_codes"
+
 local U = {}
 
 --- Args-related utils
@@ -106,6 +108,8 @@ end
 ---@field remap? boolean Whether to use mappings if any
 ---@field replace_termcodes? boolean Whether termcodes like `\<esc>` should be replaced
 ---@field as_if_typed? boolean Handle keys as if typed (matters for undo/folds/..)
+---@field immediately? boolean Run the keys immediately without waiting for more keys (fails in insert mode unless force_immediately_from_insert=true)
+---@field force_immediately_from_insert? boolean Force immediately=true even in insert mode (/!\)
 
 --- Feed the given keys as if typed (sync call).
 ---   This is basically a nice wrapper around nvim_feedkeys
@@ -117,10 +121,13 @@ function U.feed_keys_sync(keys, opts)
     remap = false,
     replace_termcodes = false,
     as_if_typed = false,
+    -- By default, run the keys immediately unless we're in insert mode
+    immediately = vim.fn.mode() ~= "i",
+    force_immediately = false,
   })
 
   if opts.replace_termcodes then
-    keys = vim.api.nvim_replace_termcodes(keys, true, false, true)
+    keys = TERM_CODES.replace(keys)
   end
 
   local feedkeys_mode = ""
@@ -133,8 +140,25 @@ function U.feed_keys_sync(keys, opts)
     feedkeys_mode = feedkeys_mode .. "t" -- handle keys as if typed
   end
 
+  if opts.immediately and vim.fn.mode() == "i" and not opts.force_immediately_from_insert then
+    -- ref: https://www.perplexity.ai/search/when-using-nvim-feedkeys-what-QXdsjNYfRraSFcECWkSlQw
+    error("feed_keys_sync: Passing `immediately=true` is disabled in insert mode to avoid weird behavior.. Use `force_immediately_from_insert=true` to force")
+  end
+
+  if opts.immediately then
+    feedkeys_mode = feedkeys_mode .. "x!"
+  end
+
   -- escape_ks=false : keys should have gone through nvim_replace_termcodes already
   vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
+end
+
+--- Switch to normal mode from any mode reliably
+function U.switch_to_normal_mode()
+  -- The best way to switch to normal mode according to `:h CTRL-\_CTRL-N` (in `:h mode-switching`):
+  --   The command <C-\><C-N> can be used to go to Normal mode from ANY other mode.
+  --   This can be used to make sure Vim is in Normal mode, without causing a beep like <Esc> would.
+  U.feed_keys_sync([[<C-\><C-n>]], { replace_termcodes = true })
 end
 
 --- Returns whether current window is the cmdline-window
