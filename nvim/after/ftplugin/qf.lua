@@ -1,5 +1,7 @@
+local TERM_CODES = require"mylib.term_codes"
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 local jump_to_current = [[<cr>zz<C-w>p]]
 K.toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
@@ -11,7 +13,7 @@ K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 K.toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
 
 K.toplevel_buf_map{mode="n", key="<M-CR>", desc="Jump to current, close qf", action=function()
-  require"mylib.utils".feed_keys_sync("<cr>", { replace_termcodes = true })
+  U.feed_keys_sync(TERM_CODES.CR)
   vim.cmd.cclose()
 end}
 

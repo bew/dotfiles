@@ -5,7 +5,6 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.editing },
 }
 
-local TERM_CODES = require"mylib.term_codes"
 local K = require"mylib.keymap_system"
 local A = require"mylib.action_system"
 local U = require"mylib.utils"
@@ -146,7 +145,7 @@ Plug {
     my_actions.mc_save_buf_n_clear_cursors = A.mk_action {
       default_desc = "Save buffer & clear cursors",
       [{"n", "v"}] = function()
-        U.feed_keys_sync(TERM_CODES.ESC) -- Back to normal mode
+        U.switch_to_normal_mode()
         my_actions.save_buffer.mode_actions.n()
         mc.clearCursors()
       end,
@@ -159,7 +158,7 @@ Plug {
         end, { once = true })
 
         -- Back to normal mode, this will trigger MC's SafeState callbacks
-        U.feed_keys_sync(TERM_CODES.ESC)
+        U.switch_to_normal_mode()
       end,
     }
 

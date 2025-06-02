@@ -612,7 +612,7 @@ Plug {
       v = {
         default_desc = "toggle comment on selection (linewise)",
         function()
-          U.feed_keys_sync("<esc>", { replace_termcodes = true })
+          U.switch_to_normal_mode()
           -- note: visualmode() must be called _after_ <esc> to be correct on first use
           require"Comment.api".locked("toggle.linewise")(vim.fn.visualmode())
           U.feed_keys_sync"gv" -- re-select
