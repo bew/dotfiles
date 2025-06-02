@@ -14,6 +14,7 @@ local K = require"mylib.keymap_system"
 -- Disable keybindings
 
 my_actions.disabled = A.mk_action {
+  default_desc = "…Do nothing…",
   [{"n", "i", "v", "c"}] = "<nop>"
 }
 
@@ -171,7 +172,7 @@ K.toplevel_map{mode="n", key="<S-§>", action=my_actions.hide_search_hl}
 -- (initially inspired from https://github.com/neovim/neovim/discussions/24285)
 -- => IDEA(later): Package as a plugin (with optional action) for others?
 ---@diagnostic disable-next-line: missing-fields
-my_actions.hlsearch_current = {
+local action_hlsearch_current = {
   default_desc = function(self)
     -- IDEA: could make a templating system to be able to write dynamic doc like:
     --   `Search current {x.mode==n:word}{x.mode==v:selection}` (+ if/else for extra)
@@ -267,19 +268,19 @@ my_actions.hlsearch_current = {
 -- NOTE: For now I'm using direct functions, simulating a call by the action system
 K.toplevel_map{mode="n", key="*", desc="Search current word (with bounds)", action=function()
   ---@diagnostic disable-next-line: undefined-field
-  my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = true } })
+  action_hlsearch_current.mode_actions.n({ opts = { word_bounds = true } })
 end}
 K.toplevel_map{mode="v", key="*", desc="Search current selection (with 'smart' bounds)", action=function()
   ---@diagnostic disable-next-line: undefined-field
-  my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = true } })
+  action_hlsearch_current.mode_actions.v({ opts = { word_bounds = true } })
 end}
 K.toplevel_map{mode="n", key="<M-*>", desc="Search current word (unbounded)", action=function()
   ---@diagnostic disable-next-line: undefined-field
-  my_actions.hlsearch_current.mode_actions.n({ opts = { word_bounds = false } })
+  action_hlsearch_current.mode_actions.n({ opts = { word_bounds = false } })
 end}
 K.toplevel_map{mode="v", key="<M-*>", desc="Search current selection (unbounded)", action=function()
   ---@diagnostic disable-next-line: undefined-field
-  my_actions.hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
+  action_hlsearch_current.mode_actions.v({ opts = { word_bounds = false } })
 end}
 
 -- N: Remap n/N to always move in a stable direction
@@ -430,6 +431,7 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 
 -- A: Duplicate visual selection
 my_actions.duplicate_selection = A.mk_action {
+  default_desc = "Duplicate selection",
   options = {
     stay_in_visual_mode = A.mk_action_opt{
       desc = [[Whether to stay in visual mode after the duplication (for easy repeat)]],
@@ -480,7 +482,6 @@ my_actions.duplicate_selection = A.mk_action {
 K.toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 K.toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
-  ---@diagnostic disable-next-line: undefined-field
   my_actions.duplicate_selection.mode_actions.v { opts = { stay_in_visual_mode = true } }
 end}
 -- IDEA: a mapping to duplicate and comment original selection
@@ -583,7 +584,7 @@ K.toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
 
 --- Return action to toggle the given option
 ---@param opt_name string Option name to toggle
----@return act.ModeRawActionInput
+---@return act.ModeActionSpecRawInput
 local function action_to_toggle_option(opt_name)
   return function()
     -- e.g. `set foo! foo?`

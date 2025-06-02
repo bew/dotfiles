@@ -49,7 +49,7 @@ end
 ---@class MapSpec
 ---@field mode string|string[] Mode(s) for which to map the key
 ---@field key string Key to map
----@field action act.Action|act.ModeRawActionInput Action to assign to key
+---@field action act.MultiModeAction|act.ModeActionSpecRawInput Action to assign to key
 ---@field desc? string Keymap description
 ---@field opts? table Keymap options (same as for `vim.keymap.set`).
 ---    When action is an Action obj, opts must not conflict.
@@ -84,46 +84,50 @@ function K.toplevel_map(map_spec)
   local map_modes = U.args.normalize_arg_one_or_more(map_spec.mode)
 
   -- When the action is not an action obj, transform it quickly to a cheap action v2:
+  local map_action ---@type act.MultiModeAction
   if type(map_spec.action) ~= "table" then
-    ---@diagnostic disable-next-line: missing-fields
-    map_spec.action = A.mk_action {
+    map_action = A.mk_action {
+      default_desc = tostring(map_spec.action),
       [map_modes] = map_spec.action,
     }
+  else
+    ---@diagnostic disable-next-line: assign-type-mismatch (we know the type is right)
+    map_action = map_spec.action ---@type act.MultiModeAction
   end
-  -- map_spec.action is now guaranteed to be an action object
+  -- map_action is now guaranteed to be an action object
 
   -- Check the action supports all requested modes
-  if not map_spec.action:supports_mode(map_modes) then
-    print(vim.inspect(map_spec.action))
+  if not map_action:supports_modes(map_modes) then
+    print(vim.inspect(map_action))
     error(_f("Action does not support all given modes:", vim.inspect(map_modes)))
   end
 
   for _, mode in ipairs(map_modes) do
-    local action_for_mode = map_spec.action.mode_actions[mode]
-    assert(action_for_mode, _f("action missing for mode", _q(mode)))
+    local mode_action = map_action:get_mode_action(mode)
+    assert(mode_action, _f("action missing for mode", _q(mode)))
 
     -- Options
     -- note: map_opts set at action-level are required, make sure the given opts don't conflict
-    local map_opts = vim.tbl_extend("error", map_spec.opts or {}, action_for_mode.map_opts or {})
+    local map_opts = vim.tbl_extend("error", map_spec.opts or {}, mode_action.map_opts or {})
     -- Description
-    local description = map_spec.desc or action_for_mode.default_desc
+    local description = map_spec.desc or mode_action.default_desc
     if description then
       map_opts.desc = description
     end
 
     -- ⚠️ Ensure `v` mode means visual ONLY (replace `v` with `x`)
     local normalized_mode = normalize_mode(mode)
-    if map_spec.debug or action_for_mode.debug or false then
+    if map_spec.debug or mode_action.debug or false then
       print(
         "Debugging keymap (action):",
         "mode:", vim.inspect(mode) .. " (normalized: " .. vim.inspect(normalized_mode) .. ")",
         "key:", vim.inspect(map_spec.key),
-        "raw-action:", vim.inspect(action_for_mode.raw_action),
+        "raw-action:", vim.inspect(mode_action.raw_action),
         "opts:", vim.inspect(map_opts, { newline = " ", indent = "" })
       )
     end
 
-    vim.keymap.set(normalized_mode, map_spec.key, action_for_mode.raw_action, map_opts)
+    vim.keymap.set(normalized_mode, map_spec.key, mode_action.raw_action, map_opts)
   end
 end
 --- Create remap-enabled (top-level) map
