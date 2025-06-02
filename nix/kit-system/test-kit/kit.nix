@@ -1,10 +1,10 @@
 { self, kitsys }:
 
 {
-  meta.name = "Mini example kit";
+  meta.name = "Mini test kit";
   baseModules = [ ./base.nix ];
   eval = kitsys.defineEval {
     inherit self;
-    class = "example-kit";
+    class = "test-kit";
   };
 }
