@@ -503,8 +503,31 @@ vim.cmd[[inoremap <M-w> <C-g>U<S-Right>]]
 
 -- Quickfix
 
+my_actions.qf_from_search_results = A.mk_action {
+  default_desc = "qf from search results",
+  n = function()
+    local search = vim.fn.getreg"/"
+    local escaped_search = U.search.escape_text_for_search(search)
+    if vim.fn.searchcount().total == 0 then
+      vim.notify("!! No match here for: "..search, vim.log.levels.ERROR)
+      return
+    end
+
+    local buf_name = vim.api.nvim_buf_get_name(0)
+    if buf_name == "" then
+      vim.notify("!! No file name 👀", vim.log.levels.ERROR)
+      return
+    end
+    -- `j` flag avoids jumping to next match
+    vim.cmd.vimgrep("/".. escaped_search .."/j", "%:.")
+
+    vim.cmd.copen()
+  end,
+}
+
 K.local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}
 K.local_leader_map{mode="n", key="qq", desc="Open quickfix", action=vim.cmd.copen}
+K.local_leader_map{mode="n", key="qs", action=my_actions.qf_from_search_results}
 -- Other keybinds are added by qf' ftplugin & qf-specific plugin
 
 
