@@ -272,12 +272,12 @@ end
 ---@return plugsys.PlugSourceGithub
 function M.sources.github(owner_repo)
   ---@type plugsys.PlugSourceGithub
-  return setmetatable({
+  return U.mt.checked_table_index {
     type = "github",
     owner_repo = owner_repo,
     name = owner_repo:gsub("^.*/", ""), -- remove 'owner/' in 'owner/repo'
     url = "https://github.com/" .. owner_repo .. ".git",
-  }, U.mt.KeyRefMustExist_mt)
+  }
 end
 
 --- A local path plugin, will not be managed by pkg manager, only loaded
@@ -289,11 +289,11 @@ function M.sources.local_path(spec)
     spec_name={spec.name, "string"},
     spec_path={spec.path, "string"},
   }
-  return setmetatable({
+  return U.mt.checked_table_index {
     type = "local_path",
     name = spec.name,
     path = spec.path,
-  }, U.mt.KeyRefMustExist_mt)
+  }
 end
 
 --- A dist-managed plugin (e.g. by Nix 😉), will not be managed by pkg manager, only loaded

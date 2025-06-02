@@ -1,0 +1,4 @@
+# vim:set ft=gitattributes:
+
+# Need ./common/_plugin_mergiraf.gitconfig
+* merge=mergiraf

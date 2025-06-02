@@ -1,0 +1,18 @@
+# Config for plugin `mergiraf`, a merge-conflict solver based on Treesitter
+#   https://codeberg.org/mergiraf/mergiraf
+#   https://mergiraf.org/
+
+# NOTE: configs taken from <https://mergiraf.org/usage.html>
+
+[merge]
+  # diff3 marks the base, remote & local in the file (instead of just remote/local)
+  # -> Necessary for mergiraf
+  conflictStyle = "diff3"
+
+# Register mergiraf as a Git merge driver
+# It is configured to be used in ../attributes with the line `* merge=mergiraf`
+[merge "mergiraf"]
+  name = mergiraf
+  driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
+
+# vim:set ft=gitconfig:
