@@ -688,7 +688,12 @@ vim.cmd[[cnoremap <M-BS> <C-w>]]
 -- The goal is to have: Space <- | -> M-Space
 -- <Space>   inserts space to the left of cursor:  `ab|cd` -> `ab |cd` (usual)
 -- <M-Space> inserts space to the right of cursor: `ab|cd` -> `ab| cd`
-vim.cmd[[inoremap <M-Space> <Space><C-g>U<Left>]]
+my_actions.insert_space_after_cursor = A.mk_action {
+  default_desc = "Insert space after cursor",
+  i = [[<Space><C-g>U<Left>]],
+  c = [[<Space><Left>]],
+}
+K.toplevel_map{mode={"i", "c"}, key=[[<M-Space>]], action=my_actions.insert_space_after_cursor}
 
 -- I: Insert a new line below using <cr> in same context, even when cursor not
 -- at eol, useful in comments!
