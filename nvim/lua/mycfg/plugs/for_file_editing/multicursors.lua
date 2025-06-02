@@ -5,6 +5,7 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.editing },
 }
 
+local TERM_CODES = require"mylib.term_codes"
 local K = require"mylib.keymap_system"
 local A = require"mylib.action_system"
 local U = require"mylib.utils"
@@ -142,6 +143,26 @@ Plug {
     K.toplevel_map{mode="v", key="<M-Space>I", desc="Insert for all lines of selection", action=mc.insertVisual}
     K.toplevel_map{mode="v", key="<M-Space>A", desc="Append for all lines of selection", action=mc.appendVisual}
 
+    my_actions.mc_save_buf_n_clear_cursors = A.mk_action {
+      default_desc = "Save buffer & clear cursors",
+      [{"n", "v"}] = function()
+        U.feed_keys_sync(TERM_CODES.ESC) -- Back to normal mode
+        my_actions.save_buffer.mode_actions.n()
+        mc.clearCursors()
+      end,
+      i = function()
+        -- Do action only after multicursor edits propagated to other cursors
+        -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/122
+        mc.onSafeState(function()
+          vim.cmd[[lockmarks write]]
+          mc.clearCursors()
+        end, { once = true })
+
+        -- Back to normal mode, this will trigger MC's SafeState callbacks
+        U.feed_keys_sync(TERM_CODES.ESC)
+      end,
+    }
+
     -- Mappings defined in a keymap layer only apply when there are
     -- multiple cursors. This lets you have overlapping mappings.
     mc.addKeymapLayer(function(layer_map)
@@ -159,6 +180,10 @@ Plug {
       -- Increment/decrement sequences, treating all cursors as one sequence
       layer_map({"n", "x"}, "g<C-a>", mc.sequenceIncrement)
       layer_map({"n", "x"}, "g<C-x>", mc.sequenceDecrement)
+
+      local save_n_clear = my_actions.mc_save_buf_n_clear_cursors
+      local save_n_clear_desc = save_n_clear.mode_actions.n.default_desc -- same desc for all mods
+      layer_map({"n", "x", "i"}, [[<C-M-S>]], save_n_clear:get_multimode_proxy_fn(), { desc = save_n_clear_desc })
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
