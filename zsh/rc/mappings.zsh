@@ -114,6 +114,14 @@ function zle::term-utils::hide-scrollback-by
 
 # --------
 
+# Insert space after cursor
+function zwidget::insert-space-after()
+{
+  RBUFFER=" $RBUFFER"
+  # Without moving the cursor, should add a space after
+}
+zle -N zwidget::insert-space-after
+
 # Toggle between "nosudo "/"sudo "/"" at <bol>
 function zwidget::toggle-sudo-nosudo # TODO: refactor to a re-usable function
 {
@@ -1030,6 +1038,8 @@ zle -N up-line-or-beginning-search; zle -N down-line-or-beginning-search
 bindkey "${keysyms[Up]}" up-line-or-beginning-search
 bindkey "${keysyms[Down]}" down-line-or-beginning-search
 
+# Alt-Space to insert space after cursor (like in nvim!)
+vibindkey " " zwidget::insert-space-after
 
 # Vi OPerator Pending keybindings (text objects)
 #-------------------------------------------------------------
@@ -1078,7 +1088,6 @@ bindkey -M menuselect "" send-break
 #    from the menu and pressing Space would insert the currently highlighted option, in
 #    addition to the one I wanted ><..
 bindkey -M menuselect " " send-break # (note: would be nice to add Space after exiting the menu..)
-vibindkey -s " " " " # Alt-Space => send Space (makes it easy to use Alt-Space to exit menu, then again to add space)
 
 # FIXME: When menuselect is in interactive mode and has filtering text,
 #        it should remove everything in that mode, else, send-break
