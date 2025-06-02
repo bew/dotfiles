@@ -116,6 +116,17 @@ function MultiModeAction:supports_modes(given_modes)
   return false
 end
 
+--- Returns a function to pass to `vim.keymap.set`, and that will select the correct action mode
+--- based on the current mode (or error if the current mode is not supported by the action)
+---@return (fun(): any)
+function MultiModeAction:get_multimode_proxy_fn()
+  return function()
+    local current_mode = vim.fn.mode()
+    local mode_action = self:get_mode_action(current_mode)
+    return mode_action()
+  end
+end
+
 -- WIP WIP WIP (and untested) functions to enable configurable actions
 --
 -- --- Returns true if the action has configuration options, false otherwise.
