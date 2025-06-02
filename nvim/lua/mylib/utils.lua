@@ -105,15 +105,18 @@ end
 ---@class mylib.FeedKeysOpts
 ---@field remap? boolean Whether to use mappings if any
 ---@field replace_termcodes? boolean Whether termcodes like `\<esc>` should be replaced
+---@field as_if_typed? boolean Handle keys as if typed (matters for undo/folds/..)
 
 --- Feed the given keys as if typed (sync call).
 ---   This is basically a nice wrapper around nvim_feedkeys
 ---@param keys string
 ---@param opts? mylib.FeedKeysOpts
 function U.feed_keys_sync(keys, opts)
+  ---@type mylib.FeedKeysOpts
   local opts = U.args.normalize_arg_opts_with_default(opts, {
     remap = false,
     replace_termcodes = false,
+    as_if_typed = false,
   })
 
   if opts.replace_termcodes then
@@ -126,8 +129,9 @@ function U.feed_keys_sync(keys, opts)
   else
     feedkeys_mode = feedkeys_mode .. "n" -- noremap
   end
-  feedkeys_mode = feedkeys_mode .. "x" -- execute right away
-  feedkeys_mode = feedkeys_mode .. "!" -- do not auto-end insert mode
+  if opts.as_if_typed then
+    feedkeys_mode = feedkeys_mode .. "t" -- handle keys as if typed
+  end
 
   -- escape_ks=false : keys should have gone through nvim_replace_termcodes already
   vim.api.nvim_feedkeys(keys, feedkeys_mode, false)
