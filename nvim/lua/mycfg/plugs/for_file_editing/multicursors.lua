@@ -164,25 +164,30 @@ Plug {
 
     -- Mappings defined in a keymap layer only apply when there are
     -- multiple cursors. This lets you have overlapping mappings.
-    mc.addKeymapLayer(function(layer_map)
-      -- Select a different cursor as the main one
-      layer_map({"n", "x"}, "<left>",  mc.prevCursor, { desc = "Select prev cursor" })
-      layer_map({"n", "x"}, "<right>", mc.nextCursor, { desc = "Select next cursor" })
-      layer_map({"n", "x"}, "<M-c>",   mc.nextCursor, { desc = "Cycle cursors" })
+    mc.addKeymapLayer(function(layer_mapper)
+      ---@param map_spec keysys.MapSpec
+      local function layer_map(map_spec)
+        K.register_map(map_spec, layer_mapper)
+      end
 
-      layer_map({"n", "x"}, "<M-Space><M-g>", mc.firstCursor, { desc = "Select first(top) cursor" })
-      layer_map({"n", "x"}, "<M-Space><M-G>", mc.lastCursor,  { desc = "Select last(bottom) cursor" })
+      -- Select a different cursor as the main one
+      layer_map{mode={"n", "x"}, key="<left>",  action=mc.prevCursor, desc="Select prev cursor"}
+      layer_map{mode={"n", "x"}, key="<right>", action=mc.nextCursor, desc="Select next cursor"}
+      layer_map{mode={"n", "x"}, key="<M-c>",   action=mc.nextCursor, desc="Cycle cursors"}
+
+      layer_map{mode={"n", "x"}, key="<M-Space><M-g>", action=mc.firstCursor, desc="Select first(top) cursor"}
+      layer_map{mode={"n", "x"}, key="<M-Space><M-G>", action=mc.lastCursor,  desc="Select last(bottom) cursor"}
 
       -- Delete the main cursor
-      layer_map({"n", "x"}, "<M-Space><M-x>", mc.deleteCursor, { desc = "Delete main cursor, jump to last" })
+      layer_map{mode={"n", "x"}, key="<M-Space><M-x>", action=mc.deleteCursor, desc="Delete main cursor, jump to last"}
 
       -- Increment/decrement sequences, treating all cursors as one sequence
-      layer_map({"n", "x"}, "g<C-a>", mc.sequenceIncrement)
-      layer_map({"n", "x"}, "g<C-x>", mc.sequenceDecrement)
+      layer_map{mode={"n", "x"}, key="g<C-a>", action=mc.sequenceIncrement}
+      layer_map{mode={"n", "x"}, key="g<C-x>", action=mc.sequenceDecrement}
 
       local save_n_clear = my_actions.mc_save_buf_n_clear_cursors
       local save_n_clear_desc = save_n_clear.mode_actions.n.default_desc -- same desc for all mods
-      layer_map({"n", "x", "i"}, [[<C-M-S>]], save_n_clear:get_multimode_proxy_fn(), { desc = save_n_clear_desc })
+      layer_map{mode={"n", "x", "i"}, key=[[<C-M-S>]], action=save_n_clear:get_multimode_proxy_fn(), desc=save_n_clear_desc}
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
