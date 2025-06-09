@@ -584,7 +584,7 @@ K.toplevel_map{mode="c", key="%%", action=my_actions.c_expand_file_dir}
 
 --- Return action to toggle the given option
 ---@param opt_name string Option name to toggle
----@return act.ModeActionSpecRawInput
+---@return act.RawModeAction
 local function action_to_toggle_option(opt_name)
   return function()
     -- e.g. `set foo! foo?`

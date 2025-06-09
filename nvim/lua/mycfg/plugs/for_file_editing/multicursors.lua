@@ -146,7 +146,7 @@ Plug {
       default_desc = "Save buffer & clear cursors",
       [{"n", "v"}] = function()
         U.switch_to_normal_mode()
-        my_actions.save_buffer.mode_actions.n()
+        my_actions.save_buffer.mode_actions.n:run()
         mc.clearCursors()
       end,
       i = function()

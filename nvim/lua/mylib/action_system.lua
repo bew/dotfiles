@@ -22,41 +22,60 @@ local A = {}
 --   * "executor"
 --   Nice ones!
 
----@alias act.ModeActionSpecRawInput string|(fun(...): string?)
+---@alias act.RawModeAction string|(fun(...): string?)
 
 ---@class act.ModeActionSpecObjInput
----@field raw_action? act.ModeActionSpecRawInput The raw action to execute
+---@field raw_action? act.RawModeAction The raw action to execute
 ---@field default_desc? string The default description for the keymap when this action is used
 ---@field map_opts? {[string]: any} The keymap options for that action
 ---@field debug? boolean Wheather to debug the effective keymap args on use
 
----@alias act.ModeActionSpecInput act.ModeActionSpecRawInput|act.ModeActionSpecObjInput
+---@alias act.ModeActionSpecInput act.RawModeAction|act.ModeActionSpecObjInput
 
----@class act.ActionSpecInput: act.ModeActionSpecObjInput (used as defaults for each mode)
+---@class act.ActionSpecModesInput
 ---@field n? act.ModeActionSpecInput Action spec for normal mode
 ---@field i? act.ModeActionSpecInput Action spec for insert mode
----@field v? act.ModeActionSpecInput Action spec for visual mode (not select)
+---@field v? act.ModeActionSpecInput Action spec for visual mode (only, not select)
 ---@field o? act.ModeActionSpecInput Action spec for operator mode
 ---@field c? act.ModeActionSpecInput Action spec for command mode
---- + key like `{"n", "i"}` to set both `n` & `i` action spec.
+---@field [string[]] act.ModeActionSpecInput Action spec for multiple modes
+---    This allows key like `{"n", "i"}` to set both `n` & `i` action specs in one go.
+
+---@class act.ActionOverrideSpecInput: act.ActionSpecModesInput
+---@field cond (fun(): boolean) When should the override be activated
+
+---@class act.ActionSpecInput: act.ModeActionSpecObjInput, act.ActionSpecModesInput
+---@field auto_overrides? {[string]: act.ActionOverrideSpecInput}
+
+---@class act.ModeActionOverride
+---@field name string Name of the override
+---@field cond (fun(): boolean) When should the override be activated?
+---@field raw_action act.RawModeAction The raw action to execute if the override is on
 
 ---@class act.ModeAction
 ---@overload fun(): string? (maybe expr fn)
----@field raw_action act.ModeActionSpecRawInput The raw action to execute
+---@field raw_action act.RawModeAction The raw action to execute
 ---@field default_desc string The default description for the keymap when this action is used
 ---@field map_opts {[string]: any} The keymap options for that action
 ---@field debug boolean Wheather to debug the effective keymap args on use
+---@field auto_overrides act.ModeActionOverride[]
 local ModeAction = U.mt.checked_table_index{}
 ModeAction.mt = {}
 ModeAction.mt.__index = ModeAction
 
---- Do the action via a function call
+--- Do the action (or its override) via a function call on-demand
 --- This is useful to run an action from another action / function..
----@param self act.ModeAction
 ---@param ... any
 ---@return string?
-function ModeAction.mt:__call(...)
+function ModeAction:run(...)
   local raw_action = self.raw_action
+
+  -- Go through any override, replace raw_action if override should be activated
+  local override = self:get_override_if_needed()
+  if override then
+    raw_action = override.raw_action
+  end
+
   if type(raw_action) == "function" then
     return raw_action(...)
   elseif type(raw_action) == "string" then
@@ -68,13 +87,40 @@ function ModeAction.mt:__call(...)
     if self.debug then
       print(_f{
         "Debugging ad-hoc feedkeys:",
-        "raw_action:", vim.inspect(self.raw_action),
+        "raw_action:", vim.inspect(raw_action),
         "feed_keys_opts:", vim.inspect(feed_keys_opts),
+        "override?:", (override and override.name or "no override")
       })
     end
     U.feed_keys_sync(raw_action, feed_keys_opts)
   else
     error(_f("Ad-hoc action call with raw action of type", _q(type(raw_action)), "is not supported"))
+  end
+end
+
+---@return act.ModeActionOverride?
+function ModeAction:get_override_if_needed()
+  for _, override in ipairs(self.auto_overrides or {}) do
+    if override.cond() then
+      return override
+    end
+  end
+  return nil
+end
+
+--- Returns what should be passed as the 'action' string/function for a `vim.keymap.set`-like config
+---@return act.RawModeAction
+function ModeAction:get_action_for_keymap()
+  local mode_action = self
+  if vim.tbl_isempty(mode_action.auto_overrides) then
+    -- no override, return the raw_action directly
+    return mode_action.raw_action
+  else
+    -- the action has override, return a wrapping function that executes the action while handling
+    -- overrides.
+    return function()
+      return mode_action:run()
+    end
   end
 end
 
@@ -123,7 +169,7 @@ function MultiModeAction:get_multimode_proxy_fn()
   return function()
     local current_mode = vim.fn.mode()
     local mode_action = self:get_mode_action(current_mode)
-    return mode_action()
+    return mode_action:run()
   end
 end
 
@@ -173,16 +219,6 @@ end
 --     end
 --   end
 -- end,
-
---- A set of actions
----@class act.ActionsSet: {[string]: act.MultiModeAction}
-
---- The main set of actions
----@class act.Actions: act.ActionsSet
----@diagnostic disable-next-line: lowercase-global
-my_actions = {}
--- NOTE: using a @class here makes LuaLS register all new fields as class fields
---   👉 Gives _GREAT_ completion for all actions ✨
 
 --- Usage:
 --- ```lua
@@ -256,38 +292,74 @@ function A.mk_action(global_spec)
       default_desc = default_desc,
       map_opts = mode_spec.map_opts or global_spec.map_opts or {},
       debug = mode_spec.debug or global_spec.debug or false,
+      auto_overrides = {}, -- will be filled later
     }
     return setmetatable(mode_action, ModeAction.mt)
   end
 
   local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "x", "o", "c", "s"}
 
-  -- Find all action specs for each valid mode
-  local spec_for_mode = {}
-  for maybe_mode, value in pairs(global_spec) do
-    if type(maybe_mode) == "string" then
-      if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, maybe_mode) then
-        spec_for_mode[maybe_mode] = value
+  --- Find all action specs for all valid modes
+  ---@param input_modes_spec act.ActionSpecModesInput
+  ---@return {[string]: act.ModeActionSpecInput}
+  local function collect_spec_for_mode(input_modes_spec)
+    local spec_for_mode = {}
+    for maybe_mode, value in pairs(input_modes_spec) do
+      if type(maybe_mode) == "string" then
+        if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, maybe_mode) then
+          spec_for_mode[maybe_mode] = value
+        end
       end
-    end
-    if type(maybe_mode) == "table" then
-      for _, mode in ipairs(maybe_mode) do
-        if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, mode) then
-          spec_for_mode[mode] = value
+      if type(maybe_mode) == "table" then
+        for _, mode in ipairs(maybe_mode) do
+          if vim.tbl_contains(VALID_MODES_FOR_ACTIONS, mode) then
+            spec_for_mode[mode] = value
+          end
         end
       end
     end
-  end
-  if vim.tbl_isempty(spec_for_mode) then
-    error("Action has no mode available")
+    if vim.tbl_isempty(spec_for_mode) then
+      error("Action has no mode available")
+    end
+    return spec_for_mode
   end
 
-  local mode_actions = vim.tbl_map(mk_action_single_mode, spec_for_mode)
+  ---@type {[string]: act.ModeActionOverride[]}
+  local overrides_for_mode = {}
+  for override_name, overrides_spec in pairs(global_spec.auto_overrides or {}) do
+    -- TODO: rename that!
+    local action_for = collect_spec_for_mode(overrides_spec)
+    for mode, spec_override in pairs(action_for) do
+      if not overrides_for_mode[mode] then
+        overrides_for_mode[mode] = {}
+      end
+      local override_mode_action = mk_action_single_mode(spec_override) -- to normalize raw_action
+      ---@type act.ModeActionOverride
+      local mode_override = {
+        name = override_name,
+        cond = overrides_spec.cond,
+        raw_action = override_mode_action.raw_action,
+      }
+      -- NOTE: The order of overrides here is important (currently not sorted in any way though)
+      table.insert(overrides_for_mode[mode], mode_override)
+    end
+  end
+
+  local action_spec_for_mode = collect_spec_for_mode(global_spec)
+  ---@type {[string]: act.ModeAction}
+  local mode_actions = vim.tbl_map(mk_action_single_mode, action_spec_for_mode)
+
+  for mode, mode_action in pairs(mode_actions) do
+    local mode_overrides = overrides_for_mode[mode]
+    if mode_overrides then
+      mode_action.auto_overrides = mode_overrides
+    end
+  end
 
   ---@type act.MultiModeAction
   local action_obj = {
     meta = { action_version = "v2" },
-    mode_actions = U.mt.checked_table_index(mode_actions)
+    mode_actions = U.mt.checked_table_index(mode_actions),
   }
   if global_spec.debug then
     print("Debugging action:", vim.inspect(action_obj))
@@ -307,5 +379,15 @@ end
 --   -- TODO: validate `spec` inputs!
 --   assert(spec.options, "a configurable action must actually expose options to be configurable..")
 -- end
+
+--- A set of actions
+---@class act.ActionsSet: {[string]: act.MultiModeAction}
+
+--- The main set of actions
+---@class act.Actions: act.ActionsSet
+---@diagnostic disable-next-line: lowercase-global
+my_actions = {}
+-- NOTE: using a @class here makes LuaLS register all new fields as class fields
+--   👉 Gives _GREAT_ completion for all actions ✨
 
 return A
