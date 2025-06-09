@@ -516,7 +516,7 @@ my_actions.qf_from_search_results = A.mk_action {
   default_desc = "qf from search results",
   n = function()
     local search = vim.fn.getreg"/"
-    local escaped_search = U.search.escape_text_for_search(search)
+    local escaped_search = U.search.escape_text_for_search(search, {allow_backslash = true})
     if vim.fn.searchcount().total == 0 then
       vim.notify("!! No match here for: "..search, vim.log.levels.ERROR)
       return
@@ -532,6 +532,32 @@ my_actions.qf_from_search_results = A.mk_action {
 
     vim.cmd.copen()
   end,
+  auto_overrides = {
+    -- When called from the quickfix buffer, it instead only keeps entries with match(es)
+    in_qf = {
+      cond = function() return U.qf.is_qf_buf() end,
+      n = function()
+        local search = vim.fn.getreg"/"
+        if vim.fn.searchcount().total == 0 then
+          vim.notify("!! No match here for: "..search, vim.log.levels.ERROR)
+          return
+        end
+
+        local qf_entries = U.qf.get_list_entries()
+        local matching_entries = {} ---@type mylib.QfEntry[]
+        for _, match_pos0 in ipairs(U.search.get_pos_for_all_search_results(search)) do
+          local entry_for_match = qf_entries[match_pos0.row +1]
+          table.insert(matching_entries, entry_for_match)
+        end
+        -- finally, build a new qf/loc list with the collected entries
+        local list_title = U.qf.get_list_fns().get_info{title = 0}.title
+        if not list_title:find"(filtered)" then
+          list_title = list_title .. " (filtered)"
+        end
+        U.qf.get_list_fns().create_new(matching_entries, { title = list_title })
+      end,
+    }
+  },
 }
 
 K.local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}

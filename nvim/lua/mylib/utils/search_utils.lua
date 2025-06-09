@@ -50,9 +50,14 @@ end
 --- Escape given text for (exact) search
 --- NOTE: since this is for exact search (nomagic), there is very little to escape (:
 ---@param text string The text to escape
+---@param opts {allow_backslash: boolean}
 ---@return string
-function U_search.escape_text_for_search(text)
-  return vim.fn.escape(text, [[/\]])
+function U_search.escape_text_for_search(text, opts)
+  local to_escape = [[/]]
+  if not (opts and opts.allow_backslash) then
+    to_escape = to_escape .. [[\]]
+  end
+  return vim.fn.escape(text, to_escape)
 end
 
 --- Find positions of match containing the cursor
@@ -116,6 +121,26 @@ function U_search.is_pos_on_search_match(pos)
 
   -- Check if pos is within match range
   return pos:is_within_incl_range(range)
+end
+
+---@param pattern string
+---@return mylib.Pos0[]
+function U_search.get_pos_for_all_search_results(pattern)
+  ---@type mylib.Pos0[]
+  local positions = {}
+  local saved_cursor = vim.api.nvim_win_get_cursor(0)
+  vim.api.nvim_win_set_cursor(0, Pos0.new{row=0, col=0}:to_1_0_indexed())
+  while true do
+    local pos = Pos0.try_from_vimpos("pos11", vim.fn.searchpos(pattern, 'W'))
+    if not pos then
+      break
+    end
+    table.insert(positions, pos)
+    -- Move cursor forward to avoid infinite loop
+    vim.api.nvim_win_set_cursor(0, pos:to_1_0_indexed())
+  end
+  vim.api.nvim_win_set_cursor(0, saved_cursor)
+  return positions
 end
 
 return U_search
