@@ -11,6 +11,8 @@ U.args = require"mylib.utils.args_utils"
 U.fmt = require"mylib.utils.fmt_utils"
 --- Visual-related utils
 U.visual = require"mylib.utils.visual_utils"
+--- {qf,loc}list-related utils
+U.qf = require"mylib.utils.qf_utils"
 --- FS-related utils
 U.fs = require"mylib.utils.fs_utils"
 --- Search-related utils

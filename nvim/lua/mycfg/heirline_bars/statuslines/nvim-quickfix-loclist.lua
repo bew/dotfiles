@@ -1,5 +1,3 @@
-local hline_conditions = require"heirline.conditions"
-
 local U = require"mylib.utils"
 local _f = U.fmt.str_space_concat
 
@@ -12,28 +10,22 @@ local __WIDE_SPACE__ = _U.__WIDE_SPACE__
 
 ---@class myst.QfLocListInfo
 ---@field get_list_info (fun(what: any): any)
----@field condition (fun(wininfo: any): boolean)
+---@field condition (fun(): boolean)
 ---@field name string
 ---@field scope string
 
 local LIST = {
   ---@type myst.QfLocListInfo
   qflist = {
-    get_list_info = vim.fn.getqflist,
-    condition = function(wininfo)
-      return wininfo.quickfix == 1 and wininfo.loclist == 0
-    end,
+    get_list_info = U.qf.get_list_fns"qf".get_info,
+    condition = U.qf.is_qflist,
     name = "QUICKFIX LIST",
     scope = "global",
   },
   ---@type myst.QfLocListInfo
   loclist = {
-    get_list_info = function(what)
-      return vim.fn.getloclist(0, what)
-    end,
-    condition = function(wininfo)
-      return wininfo.quickfix == 1 and wininfo.loclist == 1
-    end,
+    get_list_info = U.qf.get_list_fns"loc".get_info,
+    condition = U.qf.is_loclist,
     name = "LOCATION LIST",
     scope = "local",
   },
@@ -41,10 +33,7 @@ local LIST = {
 ---@param list myst.QfLocListInfo
 local function make_list_line(list)
   return {
-    condition = function()
-      local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1]
-      return list.condition(wininfo)
-    end,
+    condition = list.condition,
 
     {
       provider = list.name,
@@ -85,7 +74,7 @@ end
 
 return {
   condition = function()
-    return hline_conditions.buffer_matches{ buftype = { "quickfix" } }
+    return U.qf.is_qf_buf()
   end,
 
   C.nvim.ModeOrWinNr,

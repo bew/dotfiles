@@ -25,25 +25,10 @@ local U = require"mylib.utils"
 ---@field lnum? number Interpreted by the default action as a 'jump to this line'
 ---@field col? number Interpreted by the default action as a 'jump to this column'
 
----@class nvim.QfEntry
----@field bufnr number of buffer that has the file name, use bufname() to get the name
----@field module string Module name
----@field lnum number Line number in the buffer (first line is 1)
----@field end_lnum number End of line number if the item is multiline
----@field col number Column number (first column is 1)
----@field end_col number End of column number if the item has range
----@field vcol boolean If true: "col" is visual column; otherwise "col" is byte index
----@field nr number error number
----@field pattern string search pattern used to locate the error
----@field text string Description of the error
----@field type string Type of the error, 'E', '1', etc.
----@field valid boolean Whether the error message was recognized
----@field user_data any Custom data associated with the item
-
 
 local M = {}
 
----@param item nvim.QfEntry
+---@param item mylib.QfEntry
 ---@return string?
 local function get_qf_item_filename(item)
   if item.module and item.module ~= "" then
@@ -87,7 +72,7 @@ local function gen_qf_entry_maker(opts)
     }
   end
 
-  ---@param item nvim.QfEntry
+  ---@param item mylib.QfEntry
   ---@return telescope.Entry?
   return function(item)
     local filename = get_qf_item_filename(item)

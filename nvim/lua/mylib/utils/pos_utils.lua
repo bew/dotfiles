@@ -7,8 +7,8 @@ local _q = U_fmt.str_simple_quote_surround
 
 --- A (0, 0)-indexed normalized position, to simplify reasoning and comparisons
 ---@class mylib.Pos0
----@field row integer
----@field col integer
+---@field row integer Row (0-indexed)
+---@field col integer Column (0-indexed)
 local Pos0 = U_mt.checked_table_index{}
 Pos0.mt = {}
 Pos0.mt.__index = Pos0
@@ -31,7 +31,7 @@ function Pos0.new(pos0)
 end
 
 ---@alias mylib.Pos0FromVimposKind
---- | "pos" A vim position str (like "v", or "'k")
+--- | "getpos" A vim position str for `vim.fn.getpos` (like "v", or "'k")
 --- | "pos11" A vim position table (1,1)-indexed
 --- | "cursor" The current cursor position
 
