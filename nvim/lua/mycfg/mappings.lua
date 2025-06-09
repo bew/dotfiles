@@ -41,15 +41,25 @@ K.toplevel_map{mode="n", key="gD", action=my_actions.disabled}
 --   See: https://neovim.discourse.group/t/using-after-w/3608
 my_actions.save_buffer = A.mk_action {
   default_desc = "Save buffer",
-  [{"n", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
-  -- NOTE: Insert mode needs special handling when there are multiple cursors, otherwise the buffer
-  --   would be saved before the current edit is propagated to other cursors.
-  i = {
-    map_opts = { silent = true, expr = true },
-    function()
-      if U.is_module_available"multicursor-nvim" then
-        local mc = require"multicursor-nvim"
-        if mc.hasCursors() then
+  [{"n", "i", "v", "s"}] = [[<esc><cmd>lockmarks write<cr>]],
+  map_opts = { silent = true },
+
+  auto_overrides = {
+    -- NOTE: Insert mode needs special handling when there are multiple cursors, otherwise the buffer
+    --   would be saved before the current edit is propagated to other cursors.
+    has_multi_cursors = {
+      cond = function()
+        if not U.is_module_available"multicursor-nvim" then
+          return false
+        end
+        local mc = require"multicursor-nvim".hasCursors()
+        return mc
+      end,
+      i = {
+        -- NOTE(?): map_opts not really useful here? It'd never propagate to vim.keymap.set..
+        -- map_opts = { silent = true, expr = true },
+        function()
+          local mc = require"multicursor-nvim"
           -- There are multiple cursors
           -- -> Save buffer only after multicursor edits propagated to other cursors
           -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/122
@@ -57,15 +67,13 @@ my_actions.save_buffer = A.mk_action {
           -- note: this is safe to do, the safe state will always occur
           return [[<esc>]]
         end
-      end
-      -- No multicursors
-      -- -> Save buffer immediately
-      return [[<esc><cmd>lockmarks write<cr>]]
-    end,
+      },
+    },
   },
-  map_opts = { silent = true },
 }
 K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
+-- FIXME: this should really be a virtual key that is overriden when multi-cursors are active!
+K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<C-M-s>]], action=my_actions.save_buffer, desc="Save buffer, clear any edit state (e.g. multi-cursors)"}
 
 -- I: Switch to normal mode with <M-q>
 -- This is to avoid the default behavior that goes to normal mode and initiates a macro recording
