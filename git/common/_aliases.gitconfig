@@ -74,8 +74,11 @@
   f = fetch
 
   m = merge
-  ch = checkout
-  sw = switch
+  ch = "!f() { echo 'NOPE! use: g go … or g restore …'; return 1; }; f"
+  sw = "!f() { echo 'NOPE! use: g go …'; return 1; }; f"
+  go = switch
+  # Go home (main)
+  goh = switch main
 
   sth = stash
   sth-staged = stash push --staged
