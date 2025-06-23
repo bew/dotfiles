@@ -8,7 +8,6 @@ in {
     ../../bash_minimal/proxy_to_zsh.home-module.nix
 
     ./cli-core.nix
-    ./cli/android-tools.nix
     ./cli/nix-recent.nix
     ./cli/nix-tools.nix
     ./cli-tech-python-simple.nix
