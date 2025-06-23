@@ -52,22 +52,17 @@ my_actions.save_buffer = A.mk_action {
         if not U.is_module_available"multicursor-nvim" then
           return false
         end
-        local mc = require"multicursor-nvim".hasCursors()
-        return mc
+        return require"multicursor-nvim".hasCursors()
       end,
-      i = {
-        -- NOTE(?): map_opts not really useful here? It'd never propagate to vim.keymap.set..
-        -- map_opts = { silent = true, expr = true },
-        function()
-          local mc = require"multicursor-nvim"
-          -- There are multiple cursors
-          -- -> Save buffer only after multicursor edits propagated to other cursors
-          -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/122
-          mc.onSafeState(function() vim.cmd[[lockmarks write]] end, { once = true })
-          -- note: this is safe to do, the safe state will always occur
-          return [[<esc>]]
-        end
-      },
+      i = function()
+        local mc = require"multicursor-nvim"
+        -- There are multiple cursors
+        -- -> Save buffer only after multicursor edits propagated to other cursors
+        -- ref: https://github.com/jake-stewart/multicursor.nvim/issues/122
+        mc.onSafeState(function() vim.cmd[[lockmarks write]] end, { once = true })
+        -- note: this is safe to do, the safe state will always occur
+        U.switch_to_normal_mode()
+      end,
     },
   },
 }
