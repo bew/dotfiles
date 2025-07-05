@@ -379,7 +379,9 @@ function ffmpeg::keep-only-subs
     # '0:s' for subtitles streams
     # and with additional specifier 'm:language:<lang>'
     # to only match subtitles with metadata of <lang>
-    cmd+=(-map "0:s:m:language:$lang?")
+    cmd+=(-map "0:s:m:language:$lang")
+    # note: not using `?` to make the stream optional
+    #   it seems to raise Invalid argument errors, even with recent v7 :/
   done
   # output
   cmd+=("$output_path")
