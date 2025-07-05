@@ -142,16 +142,18 @@ local function make_record_matcher_fn(matcher_spec)
   end
 end
 
----@param matcher_spec string A string representing what event records to match and pass to `display_fn`.
----    Note that the event name or file name are lowercased before matching
+---@param matcher_spec string
+---  A string representing what event records to match and pass to `display_fn`.
+---  Note that the event name or file name are lowercased before matching
 ---
----    Syntax: comma-separated list of either:
----    `foo` to match any part of an event name
----    `scope:foo` to match any part of the file name of an event
+---  Syntax: comma-separated list of either:
+---  `foo` to match any part of an event name
+---  `scope:foo` to match any part of the file name of an event
 ---
----    Example: buf,winenter,scope:foo
----    This will match the events including 'buf', the WinEnter events, and the events with
----    file name including 'foo'
+---  Example: buf,winenter,scope:foo
+---  This will match the events including 'buf', the WinEnter events, and the events with
+---  file name including 'foo'
+---
 ---@param display_fn fun(record: debug_aucmd.EventRecord): nil
 function DebugSession:dump_matching_with(matcher_spec, display_fn)
   local matcher_fn = make_record_matcher_fn(matcher_spec)
