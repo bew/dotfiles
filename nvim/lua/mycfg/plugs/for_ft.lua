@@ -72,8 +72,11 @@ Plug {
       },
       bullet = { enabled = false },
       code = {
-        -- language_pad = 1,
-        -- language_position = "left",
+        language_border = "▄",
+        language_left = "▄█",
+        language_right = "█",
+        inline_left = "▐",
+        inline_right = "▌",
       },
       html = {
         comment = { conceal = false },
