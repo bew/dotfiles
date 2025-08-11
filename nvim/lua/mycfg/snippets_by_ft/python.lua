@@ -22,6 +22,10 @@ snip("ffa", {desc = "lazy annotation import", when = conds.very_start_of_line}, 
   t"from __future__ import annotations"
 ))
 
+snip("fy", {desc = "from typing import …", when = conds.very_start_of_line}, (
+  t"from typing import "
+))
+
 snip("cl", {desc = "class def", when = conds.start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
@@ -367,13 +371,16 @@ snip("pf", {desc = "print(f-string…)"}, SU.myfmt {
 })
 
 snip("pp", {desc = "debug pretty print (…)", when = conds.start_of_line}, SU.myfmt {
-  [[__import__("pprint").pprint(<expr>)  # FIXME: REMOVE DEBUG! # noqa]],
+  [[__import__("pprint").pprint(<expr>)  # (!!) REMOVE DEBUG!]],
   { expr = SU.insert_node_default_selection(1) }
 })
 
 -- GRR: it's reeaalllyyyy lloooonnnggg 😬
 snip("ppj", {desc = "debug pretty print data as json", when = conds.start_of_line}, SU.myfmt {
-  [[print(__import__("json").dumps(<expr>, indent=4, sort_keys=True))  # FIXME: REMOVE DEBUG! # noqa]],
+  [[
+    __debug_expr = <expr>  # (!!) REMOVE DEBUG!
+    print(__import__("json").dumps(__debug_expr, indent=4, sort_keys=True))  # (!!) REMOVE DEBUG!
+  ]],
   { expr = SU.insert_node_default_selection(1, "data") }
 })
 
@@ -653,14 +660,17 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
 -- instead of being the `foo` function node 🙁
 --
 -- 👉 TOTRY: Find immediate function node parent based on current indent
-snip("su", {desc = "super().samefunction(…)"}, ls.function_node(function()
+snip("su", {desc = "super().samefunction(…)"}, ls.dynamic_node(1, function()
+  -- IDEA: Suggest that returning nil in a `dynamic_node` be the same as returning an empty snippet node 🤔
+  local failure_sn = ls.snippet_node(nil, t"")
+
   local node = U.treesitter.try_get_node_at_cursor()
-  if not node then return end
+  if not node then return failure_sn end
 
   local parents = U.treesitter.collect_node_parents(node, { until_node_type = "class_definition" })
   if #parents == 0 or parents[1]:type() ~= "class_definition" then
     vim.notify("!! Not in a class!", vim.log.levels.ERROR)
-    return
+    return failure_sn
   end
 
   -- find first 'function_definition' node
@@ -668,13 +678,13 @@ snip("su", {desc = "super().samefunction(…)"}, ls.function_node(function()
   local class_function_node = vim.iter(parents):find(function(p) return p:type() == "function_definition" end)
   if not class_function_node then
     vim.notify("!! Not in a class function node!", vim.log.levels.ERROR)
-    return
+    return failure_sn
   end
 
   local fn_name_node = class_function_node:field("name")[1]
   local fn_name = vim.treesitter.get_node_text(fn_name_node, 0)
 
-  return "super()." .. fn_name
+  return ls.snippet_node(nil, { t("super()." .. fn_name .. "("), i(1), t")" })
 end))
 
 -- End of snippets definitions

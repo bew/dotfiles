@@ -19,6 +19,11 @@ vim.opt.iskeyword:append("-")
 -- Greatly increase max number of tab pages (default 50!..)
 vim.o.tabpagemax = 10000
 
+if vim.fn.has("nvim-0.11.0") == 1 then
+  -- Go to last used tab page if possible
+  vim.o.tabclose = "uselast"
+end
+
 -- always show the statusline
 vim.o.laststatus = 2
 

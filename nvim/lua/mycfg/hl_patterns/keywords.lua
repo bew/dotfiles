@@ -142,7 +142,12 @@ patterns.big_goal = {
 
 -- e.g. Start with WHY 🤔
 patterns.big_why = {
-  pattern = _big_word_variants"WHY",
+  pattern = U.concat_lists {
+    _big_word_variants"WHY",
+    {
+      _U.keywordize"safe:", -- safe because...
+    },
+  },
   group = _U.define_hl("big_why", {
     ctermfg = 202,
   }),
