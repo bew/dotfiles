@@ -51,7 +51,7 @@ Plug {
   tags = {"hint"},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    -- NOTE: to get nice color highlight my config requires need to have `ctermfg = number` text,
+    -- NOTE: to get nice color highlight my config requires to have `ctermfg = number` text,
     -- but smear config wants a list of numbers, so I made these lists to have highlights ;)
     local smear_palettes = {}
     smear_palettes.fire = {
@@ -84,6 +84,10 @@ Plug {
       -- commands and still see the result of the first command.
       -- (which is very useful when editing hl or exploring options)
       smear_to_cmd = false,
+
+      -- Disable 'bounciness'/'overshoot' of the trail
+      anticipation = 0,
+      damping = 0.9, -- (default: 0.65)
 
       -- New default (false) looks pretty bad when termguicolors is disabled..
       -- ref: https://github.com/sphamba/smear-cursor.nvim/issues/125
