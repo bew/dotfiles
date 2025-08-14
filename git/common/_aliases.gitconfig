@@ -235,6 +235,13 @@
   stat-last-merge = stat ORIG_HEAD..
   slm = stat-last-merge
 
+  # --- Miscellaneous aliases
+
+  # Like symlinks, but for refs
+  # (e.g to have `master` point to `main` and be able to use both interchangably)
+  symref = symbolic-ref
+  # note: mostly kept as an alias to avoid forgetting about this command (👀)
+
   # NOTE: autocompletion of complex aliases like `!f() { foo; bar "$@"; baz }; f` doesn't work on my
   # zsh config, but there seems to be support for that anyway in the provided contrib in git's git repo:
   #   https://github.com/git/git/blob/43c8a30d150ecede970/contrib/completion/git-completion.bash#L26-L30
