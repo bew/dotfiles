@@ -822,7 +822,7 @@ K.global_leader_map{mode="n", key="<C-l>", desc="Split right", action=function()
 -- New file by directional split (or current)
 -- TODO: Make configurable action!
 --
----@param new_win "current"|"left"|"down"|"up"|"right" Direction to split for, or current win
+---@param new_win "current"|"tab"|"left"|"down"|"up"|"right" Direction to split for, or current win
 local function make_new_file_action(new_win)
   local desc
   if new_win == "current" then
@@ -833,14 +833,17 @@ local function make_new_file_action(new_win)
   return A.mk_action {
     default_desc = "New file ("..desc..")",
     n = function()
-      if new_win ~= "current" then
+      if new_win == "tab" then
+        vim.cmd.tabnew()
+      elseif new_win ~= "current" then
         directional_split(new_win)
       end
-      vim.cmd.enew()
+      vim.cmd.enew() -- will replace buf in currently focused win
     end,
   }
 end
 K.global_leader_map_define_group{mode="n", prefix_key="<C-n>", name="+new-file"}
+K.global_leader_map{mode="n", key="<C-n><C-t>", action=make_new_file_action("tab")}
 K.global_leader_map{mode="n", key="<C-n><C-n>", action=make_new_file_action("current")}
 K.global_leader_map{mode="n", key="<C-n><C-h>", action=make_new_file_action("left")}
 K.global_leader_map{mode="n", key="<C-n><C-j>", action=make_new_file_action("down")}
