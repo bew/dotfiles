@@ -54,5 +54,6 @@ return vim.tbl_extend(
   require"mycfg.hl_patterns.tech_shell",
   require"mycfg.hl_patterns.tech_lua",
   require"mycfg.hl_patterns.tech_python",
+  require"mycfg.hl_patterns.tech_yaml",
   {} -- (for trailing commas)
 )
