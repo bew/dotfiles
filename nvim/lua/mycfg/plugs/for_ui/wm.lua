@@ -40,7 +40,6 @@ Plug {
       width = 110, -- default: 100
       minSideBufferWidth = 3,
       integrations = {
-        -- FIXME: the Neotree integration is pretty broken when opening Neotree after NoNeckPain..
         Neotree = { position = "right" },
       },
       buffers = {
@@ -48,6 +47,7 @@ Plug {
         -- This ensures eol virtual text is always fully visible
         right = { enabled = false },
       },
+      -- debug = true, -- for DEBUG
     }
 
     K.global_leader_map{mode="n", key="<C-z>", desc="Toggle Zen/NoNeckPain mode", action=vim.cmd.NoNeckPain}

@@ -89,7 +89,10 @@ Plug {
       layout = {
         default_direction = "prefer_left",
         min_width = 35,
+        placement = "edge", -- on the edge of the terminal
       },
+      attach_mode = "global", -- display symbols for the current win
+
       keymaps = {
         -- Disable few default keymaps
         ["<C-j>"] = false, -- clashes with my win nav

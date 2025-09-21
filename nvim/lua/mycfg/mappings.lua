@@ -555,6 +555,9 @@ my_actions.qf_from_search_results = A.mk_action {
   },
 }
 
+-- TODO: Add qf action to filter quickfix list and only keep a list of 1 entry per file
+--   (kinda like `:cfdo`, without the 'do')
+
 K.local_leader_map_define_group{mode="n", prefix_key="q", name="+quickfix"}
 K.local_leader_map{mode="n", key="qq", desc="Open quickfix", action=vim.cmd.copen}
 K.local_leader_map{mode="n", key="qs", action=my_actions.qf_from_search_results}
