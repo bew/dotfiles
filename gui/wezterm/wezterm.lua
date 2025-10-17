@@ -29,11 +29,17 @@ local cfg_misc = {
   hyperlink_rules = mytable.flatten_list {
     wezterm.default_hyperlink_rules(),
     {
-      -- Match `gh"foo/bar"` as a github user/repo URL
+      -- Match `gh"owner/repo"` as a github user/repo URL
       -- (this the syntax I use for declaring Neovim plugins in my config)
-      regex = [[gh"([\w\d]{1}[-\w\d]+)(/){1}([-\w\d\.]+)"]],
-      format = 'https://www.github.com/$1/$3',
-    }
+      regex = [[gh"([\w\d][-\w\d\._]+)/([-\w\d\._]+)"]],
+      format = 'https://www.github.com/$1/$2',
+    },
+    {
+      -- Match `uses: owner/repo@rev` as a github user/repo URL at rev/tag
+      -- (this the syntax used for using external Github actions)
+      regex = [[uses: ([\w\d][^/]+)/([^@]+)@([\w\d\._-]+)]],
+      format = 'https://www.github.com/$1/$2/tree/$3',
+    },
   }
 }
 
