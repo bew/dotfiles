@@ -29,6 +29,13 @@ patterns.big_todo = {
   }),
 }
 
+patterns.small_todo = {
+  pattern = _big_word_variants"todo",
+  group = _U.define_hl("small_todo", {
+    ctermfg = 178,
+  }),
+}
+
 -- e.g. NOTE: an important note!
 patterns.big_note = {
   pattern = _big_word_variants"NOTE",
@@ -217,10 +224,19 @@ patterns.big_hint_usage_tracking = {
 -- note: TICKET != ISSUE:
 -- - TICKET is something I made for work, which I will be working on
 -- - ISSUE is a tracking info, potentially out of my control
-patterns.big_ticket = {
+patterns.misc_ticket = {
   pattern = _big_word_variants"TICKET",
   group = _U.define_hl("misc_ticket", {
     ctermfg = 166,
+  }),
+}
+
+-- e.g. ESTIMATION
+patterns.misc_estimation = {
+  pattern = _big_word_variants"ESTIMATION",
+  group = _U.define_hl("misc_estimation", {
+    ctermfg = 173,
+    bold = true,
   }),
 }
 
@@ -310,6 +326,7 @@ local function heavy_word_variants(word)
     { "%[" .. word .. "%]:?" },
   }
 end
+-- e.g. WIP [TOTRY]
 patterns.misc_heavy_words = {
   pattern = U.concat_lists {
     heavy_word_variants"DOC",
@@ -334,6 +351,12 @@ patterns.misc_done = {
   pattern = U.concat_lists {
     _big_word_variants"DONE",
     _big_word_variants"SOLUTION",
+    _big_word_variants"SOLUTIONS",
+    {
+      _U.keywordize"done:",
+      _U.keywordize"solution:",
+      _U.keywordize"solutions:",
+    },
   },
   group = _U.define_hl("misc_done", {
     ctermfg = 34,
@@ -360,7 +383,7 @@ patterns.misc_meta = {
   }),
 }
 
--- e.g. some example
+-- e.g. <- example!
 patterns.misc_e_g = {
   pattern = _big_word_variants"e%.g%.",
   group = _U.define_hl("misc_e_g", {
