@@ -191,6 +191,13 @@ snip("im", { desc = "decl import" }, SU.myfmt {
   }
 })
 
+-- TODO: auto-add quotes if not in string 🤔
+-- note: `wordTrig = false` is necessary to be able to expand anywhere in a str, even in a word
+snip("$", { desc = "${…}", wordTrig = false }, SU.myfmt {
+  [[${<var>}]],
+  { var = i(1) }
+})
+
 -- End of snippets definitions
 
 return SNIPS, {} -- snippets, autosnippets
