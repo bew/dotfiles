@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail # Safe, strict script execution
+
+function splitted_path()
+{
+  echo "$PATH" | tr ":" "\n"
+}
+
+function hl_single_path()
+{
+  local p="$1"
+
+  case "$p" in
+    "$HOME"*|'~'*)
+      echo -ne "${BLUE}$p${NC}"
+      ;;
+    /nix/*|/run/current-system/*)
+      echo -ne "${CYAN}$p${NC}"
+      ;;
+    /usr/local/bin*|/bin*|/sbin*|/usr/bin*|/usr/sbin*)
+      echo -ne "${GREEN}$p${NC}"
+      ;;
+    *)
+      if [[ -d "$p" ]]; then
+        echo -ne "$p"
+      else
+        echo -ne "${RED}$p${NC} ${BOLD}[not found]${NC}"
+      fi
+      ;;
+  esac
+}
+
+# Color definitions
+RED=$'\e[31m'
+GREEN=$'\e[32m'
+BLUE=$'\e[34m'
+CYAN=$'\e[36m'
+BOLD=$'\e[1m'
+NC=$'\e[0m'
+
+nb_entries=$(splitted_path | wc -l | tr -d " ")
+echo
+echo "Pretty \$PATH, $nb_entries entries:"
+echo
+
+splitted_path | while read -r single_path; do
+  echo -n "  - "
+  hl_single_path "$single_path"
+  echo
+done
+
+echo
