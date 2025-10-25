@@ -8,6 +8,7 @@ use bewcfg_prompt.nu
 
 # Import aliases/utils in shell scope
 use bewcfg_aliases_and_short_funcs.nu *
+use bewcfg_shell_utils_for_job_control.nu *
 use bewcfg_cli_utils.nu *
 
 use bewcfg_config.nu

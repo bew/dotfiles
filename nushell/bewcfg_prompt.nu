@@ -119,6 +119,22 @@ def "segment git-status-slow" []: nothing -> string {
   "git: TODO"
 }
 
+def "segment shell_level" []: nothing -> string {
+  let lvl = $env.SHLVL
+  if $lvl == 0 {
+    return ""
+  }
+  color_surround {fg: white attr: b} {$"L($lvl)"}
+}
+
+def "segment jobs" []: nothing -> string {
+  let frozen_jobs = job list | where type == frozen
+  if ($frozen_jobs | is-empty) {
+    return ""
+  }
+  color_surround {fg: gold3b attr: b} {$"J($frozen_jobs | length)"}
+}
+
 # -------------------------------------------------------------
 
 def create_current_left_prompt []: nothing -> string {
@@ -127,6 +143,8 @@ def create_current_left_prompt []: nothing -> string {
       # to differenciate my nu prompt vs zsh prompt
       color_surround {fg: white attr: b} {"NU "}
     )
+    (maybe_space after { segment shell_level })
+    (maybe_space after { segment jobs })
     (maybe_space after { segment exit_code })
     (segment path)
   ]

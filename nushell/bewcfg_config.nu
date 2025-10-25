@@ -259,14 +259,35 @@ export def get_config []: nothing -> record {
     # ------------------------------------------------
 
     {
+      name: unfreeze_last_job
+      mode: [vi_insert vi_normal]
+      modifier: Control keycode: Char_z
+      event: {
+        send: ExecuteHostCommand
+        cmd: "if not (jobs any?) { print '' }; fg last"
+      }
+    }
+    {
+      name: unfreeze_before_last_job
+      mode: [vi_insert vi_normal]
+      modifier: Control_Alt keycode: Char_z
+      event: {
+        send: ExecuteHostCommand
+        cmd: "if not (jobs any?) { print '' }; fg before-last"
+      }
+    }
+
+    # ------------------------------------------------
+
+    {
       name: git_status
       mode: [vi_insert vi_normal]
       modifier: Alt keycode: Char_g
       event: {
         send: ExecuteHostCommand
-        # Need `echo` to ensure command starts on a fresh line
+        # Need that early `print` to ensure command starts on a fresh line
         # NOTE: a better solution would be a `commandline cursor --after-prompt`
-        cmd: "echo; git status"
+        cmd: "print ''; git status"
       }
     }
     {
