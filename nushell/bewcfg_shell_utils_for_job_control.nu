@@ -1,10 +1,13 @@
 # Shell utils for job control
 # 👉 `jobs *` & `fg *` commands
 
+# List running-but-frozen jobs / programs, to be resumed with `fg`
 export def "jobs" [] {
   job list | where type == frozen | reject type
 }
 
+# Returns whether there are any running-but-frozen jobs / programs.
+# Does NOT take other types of jobs into account (threads/..), use `job list` to see those.
 export def "jobs any?" []: nothing -> bool {
   not (jobs | is-empty)
 }
