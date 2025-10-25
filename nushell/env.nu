@@ -17,12 +17,12 @@ $env.NU_PLUGIN_DIRS = [
 # Note: The conversions happen *after* config.nu is loaded
 $env.ENV_CONVERSIONS = {
   "PATH": {
-    from_string: { |s| $s | split row (char esep) | path expand --no-symlink }
-    to_string: { |v| $v | path expand --no-symlink | str join (char esep) }
+    from_string: { |s| $s | split row (char esep) }
+    to_string: { |v| $v | str join (char esep) }
   }
   "Path": {
-    from_string: { |s| $s | split row (char esep) | path expand --no-symlink }
-    to_string: { |v| $v | path expand --no-symlink | str join (char esep) }
+    from_string: { |s| $s | split row (char esep) }
+    to_string: { |v| $v | str join (char esep) }
   }
 }
 

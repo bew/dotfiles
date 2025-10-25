@@ -1,53 +1,78 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nu
 
-set -euo pipefail # Safe, strict script execution
+const FHS_USUAL_BINS = [
+  "/bin",
+  "/sbin",
+  "/usr/bin",
+  "/usr/sbin",
+  "/usr/local/bin",
+]
+const NIX_USUAL_SYS_BIN_STARTERS = [
+  "/nix/",
+  "/run/current-system/",
+  "/run/wrappers/",
+  "/etc/profiles/per-user",
+]
+const NIX_USUAL_USER_BIN_STARTERS = [
+  "~/.nix-profile/",
+  "~/.local/state/nix",
+]
 
-function splitted_path()
-{
-  echo "$PATH" | tr ":" "\n"
+def "str starts-with-any?" [potentials: list<string>]: string -> bool {
+  let path = $in
+  $potentials | any {|potential| $path | str starts-with $potential}
 }
 
-function hl_single_path()
-{
-  local p="$1"
-
-  case "$p" in
-    "$HOME"*|'~'*)
-      echo -ne "${BLUE}$p${NC}"
-      ;;
-    /nix/*|/run/current-system/*)
-      echo -ne "${CYAN}$p${NC}"
-      ;;
-    /usr/local/bin*|/bin*|/sbin*|/usr/bin*|/usr/sbin*)
-      echo -ne "${GREEN}$p${NC}"
-      ;;
-    *)
-      if [[ -d "$p" ]]; then
-        echo -ne "$p"
-      else
-        echo -ne "${RED}$p${NC} ${BOLD}[not found]${NC}"
-      fi
-      ;;
-  esac
+# Color given text, reset styles after
+def color_surround [color, text: string]: nothing -> string {
+  $"(ansi $color)($text)(ansi reset)"
 }
 
-# Color definitions
-RED=$'\e[31m'
-GREEN=$'\e[32m'
-BLUE=$'\e[34m'
-CYAN=$'\e[36m'
-BOLD=$'\e[1m'
-NC=$'\e[0m'
+def hl_single_path [orig_path: string] {
+  let path_in_home = $orig_path | str starts-with $env.HOME
+  mut path = $orig_path
+  if $path_in_home {
+    $path = $orig_path | str replace $env.HOME "~"
+  }
+  let fancy_path = if ($path | str starts-with "~/.dot/") {
+    color_surround {fg: darkorange, attr: b} $path
+  } else if ($path | str starts-with-any? $NIX_USUAL_SYS_BIN_STARTERS) {
+    color_surround cyan $path
+  } else if ($path | str starts-with-any? $NIX_USUAL_USER_BIN_STARTERS) {
+    color_surround {fg: cyan, attr: b} $path
+  } else if $path_in_home {
+    color_surround {fg: blue, attr: b} $path
+  } else if ($path | str starts-with-any? $FHS_USUAL_BINS) {
+    color_surround green $path
+  } else {
+    $path
+  }
 
-nb_entries=$(splitted_path | wc -l | tr -d " ")
-echo
-echo "Pretty \$PATH, $nb_entries entries:"
-echo
+  let fancy_path_info = if ($path | path exists) {
+    let count = ls --long $orig_path | where mode =~ x | length
+    let count_info = if $count == 0 {
+      "[empty]"
+    } else {
+      "(" + ($count | into string) + ")"
+    }
+    color_surround black_bold $count_info
+  } else {
+    color_surround xterm_red3a "[not found]"
+  }
 
-splitted_path | while read -r single_path; do
-  echo -n "  - "
-  hl_single_path "$single_path"
-  echo
-done
+  { fancy_path: $fancy_path, fancy_path_info: $fancy_path_info }
+}
 
-echo
+let paths = $env.PATH | split row ":"
+
+print "" # blank line
+print -n $"Pretty (color_surround {fg: darkorange3a, attr: bi} "$PATH"), "
+print    $"(color_surround {attr: b} ($paths | length | into string)) entries in order of priority:"
+print "" # blank line
+
+for p in $paths {
+  let data = hl_single_path $p
+  print $"  - ($data.fancy_path) ($data.fancy_path_info)"
+}
+
+print "" # blank line
