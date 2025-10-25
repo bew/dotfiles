@@ -1,6 +1,8 @@
 use bewcfg_theme.nu
 use default_config.nu get_default_config
 
+# TODO: rewrite
+# SEE: https://www.nushell.sh/book/configuration.html
 export def get_config []: nothing -> record {
   let default_cfg = get_default_config
 
