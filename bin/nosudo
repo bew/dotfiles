@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+# Without args: close the current sudo session if any.
+# With args: run args _then_ close current sudo session.
+if [[ $# == 0 ]]; then
+  sudo -k # Close the current sudo session if any
+else
+  sudo "$@"
+  ret=$?
+  sudo -k # Close the current sudo session
+  exit $ret
+fi

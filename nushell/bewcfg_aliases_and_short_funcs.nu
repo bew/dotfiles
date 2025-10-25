@@ -43,21 +43,3 @@ export alias todo = rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:s
 # -f : full listing (show process name & args)
 # --forest : Show a processes hierarchy
 export alias pss = ^ps -f --forest
-
-# Without args: close the current sudo session if any.
-# With args: run args _then_ close current sudo session.
-#
-# NOTE: `def --wrapped` is used to make sure all args are passed as strings
-#   (avoiding the default auto-handling of `-h` & `--help`)
-#
-# FIXME: How to define the completion for `nosudo` as the same as for `sudo` ?
-export def --wrapped nosudo [...args] {
-  if ($args | length) == 0 {
-    sudo -k # Close the current sudo session if any
-  } else {
-    sudo $args
-    let exit_code = $env.LAST_EXIT_CODE
-    sudo -k # Close the current sudo session
-    # FIXME: how to forward the $exit_code to the outside world?
-  }
-}

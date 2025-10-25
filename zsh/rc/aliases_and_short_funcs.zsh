@@ -370,22 +370,8 @@ alias ssh-password-only='ssh -o PubkeyAuthentication=no'
 # Makes sudo work with alias (e.g. 'sudo pac' => 'sudo pacman')
 # Note: the trailing space is important (see the man for the zsh alias builtin)
 alias sudo="sudo "
-
-# Without args: close the current sudo session if any.
-# With args: run args _then_ close current sudo session.
-function nosudo
-{
-  if [[ $# == 0 ]]; then
-    sudo -k # Close the current sudo session if any
-  else
-    sudo "$@"
-    local ret=$?
-    sudo -k # Close the current sudo session
-    return $ret
-  fi
-}
+alias nosudo="nosudo "
 compdef _sudo nosudo
-alias nosudo="nosudo " # allow alias expansion after 'nosudo'
 
 
 # misc
