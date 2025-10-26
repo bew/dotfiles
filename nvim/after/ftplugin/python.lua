@@ -1,6 +1,6 @@
 local K = require"mylib.keymap_system"
 
-local function start_lsp_server()
+local function lsp_setup()
   local venv_py_exec
   if vim.env.VIRTUAL_ENV and vim.uv.fs_stat(vim.env.VIRTUAL_ENV .. "/bin/python") then
     venv_py_exec = vim.env.VIRTUAL_ENV .. "/bin/python"
@@ -67,7 +67,7 @@ local function start_lsp_server()
 end
 if vim.fn.executable("pylsp") == 1 then
   vim.notify("Starting LSP server..")
-  start_lsp_server()
+  lsp_setup()
 else
   vim.notify("LSP not found")
 end

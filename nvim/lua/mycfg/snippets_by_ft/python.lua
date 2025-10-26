@@ -313,11 +313,91 @@ snip(
 
 -------------------
 
--- TODO: deft  =>  test functionvim.split("foo", "%.")[1]
--- TODO: deftx  =>  pytest fixture function
--- TODO: pytr  =>  pytest check raise
--- TODO: pytp  =>  pytest parametrize
--- TODO: pyts  =>  pytest mark skip
+snip("deft", { desc = "def test function", when = conds.start_of_line }, SU.myfmt {
+  [[
+  <deco>def test_<name>(<args>):
+    <body>
+  ]],
+  {
+    deco = ls.choice_node(1, {
+      t{"@pytest.mark.unit", ""},
+      t"",
+    }),
+    name = i(2, "something_is_working"),
+    args = i(3),
+    body = i(4, [[assert False, "TODO: write a test!"]]),
+  }
+})
+
+snip("deftx", { desc = "pytest fixture function", when = conds.start_of_line }, SU.myfmt {
+  [[
+  @pytest.fixture<params>
+  def <name>(<args>) <arrow> <ret>:
+    <body>
+  ]],
+  {
+    params = ls.choice_node(1, {
+      -- @pytest.fixture${1:(scope="${2:function}"${3:, autouse=True})}
+      -- def ${10:some_prefilled_obj}($20) -> ${30:Any}:
+      SU.myfmt {
+        [[(scope="<scope>"<autouse>)]],
+        {
+          scope = i(1, "function"),
+          autouse = i(2, ", autouse=True"),
+          -- note: 'autouse' part is an insert node to avoid nested choice node,
+          --   and to be easy to delete in 1 backspace.
+        }
+      },
+      t"",
+    }),
+    name = i(2, "some_prefilled_obj"),
+    args = i(3),
+    arrow = t"->", -- to avoid bare `>` in fmt string conflicting with placeholders
+    ret = i(4, "Any"),
+    body = SU.insert_node_default_selection(5, "pass"),
+  }
+})
+
+snip("pytr", { desc = "pytest check raise" }, SU.myfmt {
+  [[
+  with pytest.raises(<ex><maybe_match><after_args>):
+    <body>
+  ]],
+  {
+    ex = i(1, "MyException"),
+    maybe_match = ls.choice_node(2, {
+      SU.myfmt {
+        [[, match=r"<txt>"]],
+        { txt = i(1, "matching text") }
+      },
+      t"",
+    }),
+    after_args = i(3),
+    body = SU.insert_node_default_selection(4, "pass"),
+  }
+})
+
+snip("pytm", { desc = "pytest mark decorator", when = conds.start_of_line }, {
+  t"@pytest.mark."
+})
+
+snip("pytp", { desc = "pytest parametrize" }, SU.myfmt {
+  [[
+  @pytest.mark.parametrize(
+    "<params>",
+    [
+      (<values>),<end_>
+    ],
+  )
+  ]],
+  {
+    params = i(1, "param1, param2"),
+    values = i(2, "value1, value2"),
+    end_ = i(3),
+  }
+})
+
+-------------------
 
 snip("([%w_]+)=", {desc = "arg=arg auto-fill", rx = true, wordTrig = false}, SU.myfmt {
   [[<param>=<param>]],
