@@ -43,8 +43,13 @@ in {
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} \
           --add-flags "-f ${outs.cfgEntrypoint}" \
-          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgEntrypoint}
+          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgEntrypoint} \
+          --prefix TERMINFO_DIRS : ${config.package.terminfo}/share/terminfo
       '';
+      # NOTE: we need to prepend terminfo to ensure the programs running in tmux find the correct
+      #   terminfo database for the running tmux. (and not an eventual outdated system version)
+      # -> This is necessary on MacOS to make colored underline work in Neovim under tmux.
+      #    ref: https://github.com/neovim/neovim/issues/29649
     });
 
     outputs.homeModules.withDefaults = {
