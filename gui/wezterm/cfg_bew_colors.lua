@@ -16,7 +16,7 @@ col.ansi = {
   "#eab93d", -- yellow
   "#5788FF", -- blue
   "#ce5c00", -- orange (magentas usually)
-  "#89b6e2", -- cyan
+  "#75ace2", -- cyan
   "#cccccc", -- white
 }
 

@@ -63,7 +63,7 @@ cfg.unicode_version = 15
 cfg.strikethrough_position = "0.555cell"
 
 -- Right so that the underline touches the cell below
-cfg.underline_position = "-0.14cell"
+cfg.underline_position = "-0.18cell"
 -- /!\ Cannot change underline thickness without changing the stroke size of custom glyphs
 --   (note: I'm working on a PR..)
 -- cfg.underline_thickness = "0.1cell"

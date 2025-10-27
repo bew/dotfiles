@@ -65,11 +65,17 @@ Plug {
   tags = {t.content_ui},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
+    -- Make sure the scope/indent-lines/.. highlights do NOT take precedence over diagnostics.
+    -- (e.g. when there's a diagnostic on a scope start/end line, this ensures the diagnostic'
+    -- underline color takes precendence)
+    local hl_priority = vim.highlight.priorities.diagnostics -1
     require"ibl".setup {
       indent = {
+        priority = hl_priority,
         char = {"¦", "│"},
       },
       scope = {
+        priority = hl_priority,
         char = {"▎"}, -- line smashed to the left, for nicer rendering
         show_exact_scope = true, -- Don't mark whole lines at start/end of the scope
         -- include = {

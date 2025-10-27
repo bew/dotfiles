@@ -250,6 +250,19 @@ hi NormalFloat ctermfg=248 ctermbg=235
 " Disable 'unnecessary' group, that completely dims the code by default and hides all colors
 " (makes code hard to work with when it is marked unused by LSPs!)
 HiResetTo DiagnosticUnnecessary
+
+HiResetTo DiagnosticInfo ctermfg=14
+HiResetTo DiagnosticUnderlineInfo cterm=underline gui=underline guisp=#75ace2
+
+HiResetTo DiagnosticHint ctermfg=12
+HiResetTo DiagnosticUnderlineHint cterm=underline gui=underline guisp=#89b6e2
+
+HiResetTo DiagnosticWarn ctermfg=11
+HiResetTo DiagnosticUnderlineWarn cterm=underline gui=underline guisp=#fad43d
+
+HiResetTo DiagnosticError ctermfg=9
+HiResetTo DiagnosticUnderlineError cterm=underline gui=underline guisp=#ff6565
+
 "}}}
 " Tree-sitter highlighting "{{{
 " ---------------------------------------------------------------------
