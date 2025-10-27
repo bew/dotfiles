@@ -27,7 +27,7 @@ snip("dyn", { desc = "dynamic block" }, SU.myfmt {
   [[
     dynamic "<name>" {
       for_each = <iterable>
-      iterator = <iterator_name>
+
       content {
         <params>
       }
@@ -36,8 +36,7 @@ snip("dyn", { desc = "dynamic block" }, SU.myfmt {
   {
     name = i(1),
     iterable = i(2),
-    iterator_name = i(3, "it"),
-    params = i(4),
+    params = i(3),
   }
 })
 
