@@ -48,31 +48,49 @@ def hl_single_path [orig_path: string] {
     $path
   }
 
+  mut binaries_count = 0
   let fancy_path_info = if ($path | path exists) {
-    let count = ls --long $orig_path | where mode =~ x | length
-    let count_info = if $count == 0 {
+    $binaries_count = ls --long $orig_path | where mode =~ x | length
+    let count_info = if $binaries_count == 0 {
       "[empty]"
     } else {
-      "(" + ($count | into string) + ")"
+      "(" + ($binaries_count | into string) + ")"
     }
     color_surround black_bold $count_info
   } else {
     color_surround xterm_red3a "[not found]"
   }
 
-  { fancy_path: $fancy_path, fancy_path_info: $fancy_path_info }
+  {
+    fancy_path: $fancy_path
+    fancy_path_info: $fancy_path_info
+    binaries_count: $binaries_count
+  }
 }
 
-let paths = $env.PATH | split row ":"
+# Pretty print the entries of $PATH or any given PATH-like, highlighting different kind of path
+# entries, whether they exist, and the number of binaries available.
+def main [
+  path_like?: string # PATH-like value to show entries of (defaults to $PATH)
+]: nothing -> nothing {
+  let path_data = if $path_like != null { $path_like } else { $env.PATH }
+  let path_literal = if $path_data == $env.PATH { "$PATH" } else { "given PATH-like" }
+  let path_entries = $path_data | split row ":"
 
-print "" # blank line
-print -n $"Pretty (color_surround {fg: darkorange3a, attr: bi} "$PATH"), "
-print    $"(color_surround {attr: b} ($paths | length | into string)) entries in order of priority:"
-print "" # blank line
+  print "" # blank line
+  print -n $"Pretty (color_surround {fg: darkorange3a, attr: bi} $path_literal), "
+  print    $"(color_surround {attr: b} ($path_entries | length | into string)) entries in order of priority:"
+  print "" # blank line
 
-for p in $paths {
-  let data = hl_single_path $p
-  print $"  - ($data.fancy_path) ($data.fancy_path_info)"
+  mut total_binaries = 0
+  for p in $path_entries {
+    let data = hl_single_path $p
+    $total_binaries += $data.binaries_count
+    print $"  - ($data.fancy_path) ($data.fancy_path_info)"
+  }
+
+  # IDEA: would be nice to see 'unique' bin names, to remove duplicates across path entries
+  print "" # blank line
+  print $"Total binaries: ($total_binaries)"
+  print "" # blank line
 }
-
-print "" # blank line
