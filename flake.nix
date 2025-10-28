@@ -205,14 +205,14 @@
             meta.mainProgram = "zsh";
           };
           entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" /* sh */ ''
-            if [[ -z "$PATH_BEFORE_MY_NIX_CLI_ENV" ]]; then
+            if [[ -z "''${PATH_BEFORE_MY_NIX_CLI_ENV:-}" ]]; then
               export PATH_BEFORE_MY_NIX_CLI_ENV=$PATH
               # note: Do _not_ re-set it to ensure its content is not 'infected' by Nix paths
             fi
             export PATH=${env}/bin:$PATH_BEFORE_MY_NIX_CLI_ENV
 
             # MAYBE: Move to tmux kit (?)
-            if [[ -n "$TMUX" ]]; then
+            if [[ -n "''${TMUX:-}" ]]; then
               # We are in TMUX!
               echo
               echo "--------------------------------------------------------------------------------"
@@ -223,7 +223,7 @@
               echo
               echo "--------------------------------------------------------------------------------"
               echo
-              previous_tmux_config_env=$(tmux show-environment -g TMUX_CONFIG_ENTRYPOINT)
+              previous_tmux_config_env=$(tmux show-environment -g TMUX_CONFIG_ENTRYPOINT 2>/dev/null)
               new_tmux_config_env=TMUX_CONFIG_ENTRYPOINT=${tmux-config.outputs.cfgEntrypoint}
               if [[ "$previous_tmux_config_env" != "$new_tmux_config_env" ]]; then
                 echo "!! Tmux config changed !!"
