@@ -12,9 +12,9 @@ in {
     stable.adwaita-icon-theme
 
     # breeze-icons is a freedesktop compatible icon theme. It’s developed by the KDE Community
-    # as part of KDE Frameworks 5 and it’s used by default in KDE Plasma 5 and KDE Applications.
-    # Ref: https://develop.kde.org/frameworks/breeze-icons/
-    stable.breeze-icons
+    # as part of KDE Frameworks and it’s used by default in KDE Plasma and KDE Applications.
+    # REF: https://develop.kde.org/frameworks/breeze-icons/
+    stable.kdePackages.breeze-icons
   ];
 
   # Tell home-manager to set XDG_DATA_DIRS var with the user's nix profile /share

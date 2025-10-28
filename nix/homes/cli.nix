@@ -24,7 +24,6 @@ in {
     #   Existing issue: https://github.com/ouch-org/ouch/issues/322
 
     stable.jless # less for JSON
-    stable.xsv # Fast toolkit to slice through CSV files (kinda sql-like)
 
     # Extra - system (?)
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
