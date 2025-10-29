@@ -30,25 +30,25 @@ Plug {
     require"render-markdown".setup {
       -- Don't disable all rendering (prevent layout disruption) when selecting un-related text
       render_modes = { "n", "v", "V", "c", "t" }, -- adds visual modes compared to defaults
+      nested = false, -- don't render nested markdown in code block
       sign = { enabled = false },
       heading = {
         sign = false,
-        position = "inline",
+        setext = false, -- disable dashes below text to define headers
         icons = {
-          "# 󰎤  ",
-          "## 󰎩  ",
-          "### 󰎪  ",
-          "#### 󰎮  ",
-          "##### 󰎱  ",
-          "###### 󰎵  ",
+          "# ",
+          "## ",
+          "### ",
+          "#4## ",
+          "#5### ",
+          "#6#### ",
         },
         width = "block",
-        min_width = { 90, 70, 60, 50, 50, 50 },
         right_pad = 2, -- at the very least
         border = {true, true, true, false, false, false},
-        above = "▄", -- default: "▄"
-        below = "▀", -- default: "▀"
-        foregrounds = {
+        above = "▃", -- default: "▄"
+        below = "🮃", -- default: "▀"
+        foregrounds = { -- for the icon & text
           "@markup.heading.1",
           "@markup.heading.2",
           "@markup.heading.3",
@@ -56,7 +56,7 @@ Plug {
           "@markup.heading.5",
           "@markup.heading.6",
         },
-        backgrounds = { -- for the borders + backgrounds all the way
+        backgrounds = { -- for the borders + text backgrounds all the way
           "@markup.heading.1.bg",
           "@markup.heading.2.bg",
           "@markup.heading.3.bg",
@@ -72,6 +72,8 @@ Plug {
       },
       bullet = { enabled = false },
       code = {
+        conceal_delimiters = false,
+        border = "thin",
         language_border = "▄",
         language_left = "▄█",
         language_right = "█",

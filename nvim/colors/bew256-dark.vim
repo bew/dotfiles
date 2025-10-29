@@ -315,25 +315,25 @@ HiResetTo @markup.raw.block ctermfg=29
 " note: No bg for block, to avoid bg leaking in indent when raw block is indented
 
 " Give a progression/difference between H1, H2, H3.. headings
-" NOTE: hl groups shared between markdown & :help files (at least).
+" NOTE: hl groups (not `..bg`) are shared between markdown & :help files (at least).
 " -- H1
-HiResetTo @markup.heading.1    cterm=bold ctermfg=196
-HiResetTo @markup.heading.1.bg cterm=bold ctermbg=237
+HiResetTo @markup.heading.1    ctermfg=50 cterm=bold
+HiResetTo @markup.heading.1.bg ctermbg=237
 " -- H2
-HiResetTo @markup.heading.2    cterm=bold ctermfg=39
-HiResetTo @markup.heading.2.bg cterm=bold ctermbg=236
+HiResetTo @markup.heading.2    ctermfg=39  cterm=bold
+HiResetTo @markup.heading.2.bg ctermbg=236
 " -- H3
-HiResetTo @markup.heading.3    cterm=bold ctermfg=208
-HiResetTo @markup.heading.3.bg cterm=bold ctermbg=235
+HiResetTo @markup.heading.3    ctermfg=208 cterm=bold
+HiResetTo @markup.heading.3.bg ctermbg=235
 " -- H4
-HiResetTo @markup.heading.4    cterm=bold ctermfg=64
-HiResetTo @markup.heading.4.bg cterm=bold ctermbg=234
+HiResetTo @markup.heading.4    ctermfg=64  cterm=bold
+HiResetTo @markup.heading.4.bg ctermbg=234
 " -- H5
-HiResetTo @markup.heading.5    cterm=bold ctermfg=126
-HiResetTo @markup.heading.5.bg cterm=bold ctermbg=234
+HiResetTo @markup.heading.5    ctermfg=126 cterm=bold
+HiResetTo @markup.heading.5.bg ctermbg=234
 " -- H6
-HiResetTo @markup.heading.6    cterm=bold ctermfg=91
-HiResetTo @markup.heading.6.bg cterm=bold ctermbg=234
+HiResetTo @markup.heading.6    ctermfg=91  cterm=bold
+HiResetTo @markup.heading.6.bg ctermbg=234
 
 " This is used by some languages queries to cancel surrounding highlighting
 " (e.g. python's f-string interpolations)
