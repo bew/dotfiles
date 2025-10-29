@@ -21,7 +21,6 @@ Plug.statusline {
   config_depends_on = {
     Plug {
       source = gh"Zeioth/heirline-components.nvim",
-      version = { tag = "v1.1.2" }, -- For support for nvim <0.10
       defer_load = { on_event = "UIEnter" }, -- same as heirline
     },
   },
@@ -147,9 +146,9 @@ Plug {
       layout = {
         -- align = "center", -- (!!) no alternative..
         spacing = 5, -- spacing between columns
-        -- Make better use of horizontal space
+        -- Specify `min` to make better use of horizontal space
         -- Ref: https://github.com/folke/which-key.nvim/issues/195
-        height = { min = 1 },
+        height = { min = 1, max = 25 },
       },
       icons = {
         separator = "->",
