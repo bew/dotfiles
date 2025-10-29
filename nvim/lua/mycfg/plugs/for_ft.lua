@@ -89,7 +89,42 @@ Plug {
         -- REF: https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/303#issuecomment-2608156758
         conceallevel = { default = 0, rendered = 3 },
       },
+      overrides = {
+        filetype = {
+          codecompanion = {
+            heading = {
+              width = "full",
+              custom = {
+                me = {
+                  pattern = "^## Me$",
+                  icon = " ",
+                  foreground = "@ai.heading.me",
+                  background = "@ai.heading.me",
+                },
+                cc = {
+                  pattern = "^## CodeCompanion.*",
+                  icon = " ✨ ",
+                  foreground = "@ai.heading.generated",
+                  background = "@ai.heading.generated",
+                },
+              },
+            },
+          },
+        },
+      },
     }
+  end,
+  on_colorscheme_change = function()
+    vim.api.nvim_set_hl(0, "@ai.heading.me", {
+      ctermbg = 94,
+      ctermfg = 255,
+      bold = true,
+    })
+    vim.api.nvim_set_hl(0, "@ai.heading.generated", {
+      ctermbg = 54,
+      ctermfg = 220,
+      italic = true,
+    })
   end,
 }
 

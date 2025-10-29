@@ -51,4 +51,10 @@ Plug.codecompanion {
     vim.keymap.set("ca", "ccc", "CodeCompanionChat")
     vim.keymap.set("ca", "ccb", "CodeCompanionChat #buffer")
   end,
+  on_colorscheme_change = function()
+    vim.api.nvim_set_hl(0, "CodeCompanionChatTokens", {
+      ctermfg = 174,
+      italic = true,
+    })
+  end
 }
