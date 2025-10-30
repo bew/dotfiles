@@ -218,14 +218,18 @@ Plug {
   desc = "even better % 👊",
   tags = {t.content_ui, t.editing},
   on_load = function()
-    -- Disable showing off-screen matches (alt: { method = "popup" })
+    -- DISABLE showing off-screen matches (alt: { method = "popup" })
     vim.g.matchup_matchparen_offscreen = {}
     -- In insert mode, after changing text inside a word, matching words will be automatically
     -- changed (if they are supposed to go in pairs).
     -- (experimental @2025-02)
     vim.g.matchup_transmute_enabled = 1
-    -- DO NOT map double-click to select the whole current scope (`va%` works well instead)
+    -- Disable double-click map to select the whole current scope (`va%` works well instead)
     vim.g.matchup_mouse_enabled = 0
+    -- DISABLE considering quotes (single/double) as possible matches
+    vim.g.matchup_treesitter_enable_quotes = false
+    -- DISABLE show virtual text at virtual end of a block
+    vim.g.matchup_treesitter_disable_virtual_text = true
   end,
   on_colorscheme_change = function()
     -- parenthesis matches still use the vim standard `MatchParen`
