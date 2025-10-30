@@ -251,6 +251,8 @@ hi NormalFloat ctermfg=248 ctermbg=235
 " (makes code hard to work with when it is marked unused by LSPs!)
 HiResetTo DiagnosticUnnecessary
 
+HiResetTo DiagnosticDeprecated cterm=strikethrough,underline guisp=#fad43d
+
 HiResetTo DiagnosticInfo ctermfg=14
 HiResetTo DiagnosticUnderlineInfo cterm=underline gui=underline guisp=#75ace2
 
