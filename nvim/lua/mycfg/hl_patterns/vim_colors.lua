@@ -30,4 +30,20 @@ patterns.cterm_color = {
   end,
 }
 
+patterns.underline_color = {
+  pattern = {
+    -- e.g. guisp=#02a724 (in a `hi FooGroup …` statement)
+    "guisp=()#%x%x%x%x%x%x()%f[%X]",
+    -- e.g. sp = "#008080" (in a `vim.api.nvim_set_hl(…)` call)
+    [[sp = "()#%x%x%x%x%x%x()%f[%X]"]],
+  },
+  group = function(_, match)
+    local hex = match:lower():sub(2)
+    return _U.define_hl("underline_rgb_"..hex, {
+      sp = "#"..hex,
+      underline = true,
+    })
+  end,
+}
+
 return patterns
