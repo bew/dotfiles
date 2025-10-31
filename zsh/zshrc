@@ -248,8 +248,11 @@ cfg::check-dependencies
 
 #-------------------------------------------------------------
 # Load local per-machine zsh config
-# TODO: rework to be more flexible?
 
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+LOCAL_ZSHRC_PATH=~/.zshrc.local
+if [[ -f "$LOCAL_ZSHRC_PATH" ]]; then
+  echo ":: NOTE: ${(D)LOCAL_ZSHRC_PATH} exists, sourcing.."
+  source "$LOCAL_ZSHRC_PATH"
+fi
 
 true # The config should always finish well!
