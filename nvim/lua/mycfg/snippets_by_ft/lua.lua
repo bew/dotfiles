@@ -28,8 +28,8 @@ snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
 
 --- Generate easy-to-use snippets for the given LuaCATS @annotation
 ---@param trig string
----@param context mysnips.Context
----@param nodes_factory (fun(): SnipNodeT)
+---@param context mysnips.SnipContext
+---@param nodes_factory (fun(): LuaSnip.Node)
 local function snip_lua_annotation(trig, context, nodes_factory, ...)
   assert(trig:sub(1, 1) == "@", "annotation's trigger must start with '@'")
   assert(type(nodes_factory) == "function", "annotation's nodes factory must be a function, got: "..type(nodes_factory))

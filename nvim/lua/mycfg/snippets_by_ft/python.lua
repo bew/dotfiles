@@ -79,13 +79,13 @@ snip("fdc", {desc = "import for @dataclass", when = conds.start_of_line}, ls.cho
 ---@field maybe_return_type boolean? Whether def may have return type (alt choice to remove it)
 ---@field needs_return_type boolean? Whether def must have return type
 ---@field maybe_no_cover boolean? Whether def may have `# pragma: no cover` (for abstract defs)
----@field simple_body_node (fun(idx_fn: (fun(): integer)): SnipNodeT)?
+---@field simple_body_node (fun(idx_fn: (fun(): integer)): LuaSnip.Node)?
 ---    Function that should return a snippet node for the body, takes an index factory function.
 ---    If not given, it'll default to `pass`.
 
 --- Returns method def snippet for given options
 ---@param opts mysnips.py.DefOpts
----@return SnipNodeT
+---@return LuaSnip.Node
 local function make_def_snip(opts)
   opts = opts or {}
 
@@ -403,7 +403,7 @@ snip("([%w_]+)=", {desc = "arg=arg auto-fill", rx = true, wordTrig = false}, SU.
   [[<param>=<param>]],
   {
     param = ls.function_node(function(_args, snip)
-      local snip = snip ---@type SnipT
+      ---@cast snip LuaSnip.Snippet (I know I have a snippet here!)
       return snip.env.LS_CAPTURE_1
     end),
   },

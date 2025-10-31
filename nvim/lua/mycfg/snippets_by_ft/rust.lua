@@ -105,8 +105,8 @@ snip("fnt", {desc = "Unit test function"}, SU.myfmt {
 
 
 --- Returns a LuaSnip node for eventual
----@param idx integer? Index for the top node
----@return SnipNodeT
+---@param idx integer Index for the top node
+---@return LuaSnip.Node
 local function node_for_maybe_fmt_msg(idx)
   return ls.choice_node(idx, {
     i(nil), -- for manual entry if wanted, or as a stoppoint for the choice node
