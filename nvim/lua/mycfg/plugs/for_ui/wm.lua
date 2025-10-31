@@ -41,6 +41,7 @@ Plug {
       minSideBufferWidth = 3,
       integrations = {
         Neotree = { position = "right" },
+        aerial = { position = "left" },
       },
       buffers = {
         -- Disable right padding win
