@@ -129,7 +129,7 @@ function U.feed_keys_sync(keys, opts)
   })
 
   if opts.replace_termcodes then
-    keys = TERM_CODES.replace(keys)
+    keys = vim.keycode(keys)
   end
 
   local feedkeys_mode = ""

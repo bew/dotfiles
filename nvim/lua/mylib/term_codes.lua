@@ -18,15 +18,8 @@ function mt.__index(self, given_key)
         :gsub("shift_", "s-")
         :gsub("os_", "d-")
         :gsub("_", "-")
-    self[given_key] = TERM_CODES.replace("<" .. key .. ">")
+    self[given_key] = vim.keycode("<" .. key .. ">")
     return self[given_key]
-end
-
---- Replace term codes for given keys
----@param keys string
----@return string
-function TERM_CODES.replace(keys)
-  return vim.api.nvim_replace_termcodes(keys, true, true, true)
 end
 
 return setmetatable(TERM_CODES, mt)
