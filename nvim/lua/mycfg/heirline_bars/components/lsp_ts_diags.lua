@@ -39,18 +39,18 @@ M.TreesitterStatus = {
   end,
 }
 
----@param opts {hl: vim.api.keyset.highlight, sev: vim.diagnostic.Severity, icon: string}
-local function single_diagnostic(opts)
+---@param opts {hl: vim.api.keyset.highlight, sev: vim.diagnostic.SeverityInt, icon: string}
+function M.mkDiagnosticForSeverity(opts)
   return {
     condition = function()
-      local diags = vim.diagnostic.get(0, {severity = opts.sev})
-      return #diags > 0
+      local nb_diags = vim.diagnostic.count(0, {severity = opts.sev})[opts.sev] or 0
+      return nb_diags > 0
     end,
     _,
     {
       provider = function()
-        local diags = vim.diagnostic.get(0, {severity = opts.sev})
-        return opts.icon .. #diags
+        local nb_diags = vim.diagnostic.count(0, {severity = opts.sev})[opts.sev] or 0
+        return opts.icon .. nb_diags
       end,
     },
     _,
@@ -61,11 +61,29 @@ local function single_diagnostic(opts)
   }
 end
 
-M.Diagnostics = {
+local DIAG_SEVERITIES = {
+  vim.diagnostic.severity.ERROR,
+  vim.diagnostic.severity.WARN,
+  vim.diagnostic.severity.HINT,
+  -- note: skipped INFO
+}
+
+-- Show a checkmark when there is an LSP available and there's ZERO diagnostics ✨
+M.ZeroDiagnosticsCheckmark = {
   condition = function()
-    local diags = vim.diagnostic.get(0, { severity = { "ERROR", "WARN", "HINT" } })
-    return #diags > 0
+    if not hline_conditions.lsp_attached() then return false end
+    -- Check that there are ZERO diagnostics we're interested in
+    local diags_by_sev = vim.diagnostic.count(0, {severity = DIAG_SEVERITIES})
+    local total_diags = vim.iter(diags_by_sev):fold(0, function(acc, it) return acc + it end)
+    return total_diags == 0
   end,
+  hl = { ctermfg = 35 },
+  _,
+  { provider = "󰄳 " },
+  _,
+}
+
+M.Diagnostics = {
   update = {
     "DiagnosticChanged",
     callback = function()
@@ -74,20 +92,29 @@ M.Diagnostics = {
       vim.cmd.redrawstatus()
     end,
   },
-  single_diagnostic {
-    sev = "ERROR",
-    icon = "E",
-    hl = { ctermfg = 250, ctermbg = 124 },
-  },
-  single_diagnostic {
-    sev = "WARN",
-    icon = "W",
-    hl = { ctermfg = 235, ctermbg = 214 },
-  },
-  single_diagnostic {
-    sev = "HINT",
-    icon = "H",
-    hl = { ctermfg = 250, ctermbg = 24 },
+  M.ZeroDiagnosticsCheckmark,
+  {
+    -- Only show this section if there is at least 1 diagnostic
+    condition = function()
+      local diags_by_sev = vim.diagnostic.count(0, {severity = DIAG_SEVERITIES})
+      local total_diags = vim.iter(diags_by_sev):fold(0, function(acc, it) return acc + it end)
+      return total_diags > 0
+    end,
+    M.mkDiagnosticForSeverity {
+      sev = vim.diagnostic.severity.ERROR,
+      icon = "E",
+      hl = { ctermfg = 250, ctermbg = 124 },
+    },
+    M.mkDiagnosticForSeverity {
+      sev = vim.diagnostic.severity.WARN,
+      icon = "W",
+      hl = { ctermfg = 235, ctermbg = 214 },
+    },
+    M.mkDiagnosticForSeverity {
+      sev = vim.diagnostic.severity.HINT,
+      icon = "H",
+      hl = { ctermfg = 250, ctermbg = 24 },
+    },
   },
 }
 
