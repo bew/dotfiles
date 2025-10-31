@@ -42,7 +42,6 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
     snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
-    -- [EXPERIMENT]: let's see if it's better to use `anfoo` or `dfoo`
     -- Allows `anfoo|` => `---@foo_or_foobar |`
     -- This is nicer to type on my external split keyboard,
     -- as the snip-trigger finger is also used for `@`
@@ -73,7 +72,7 @@ local function get_class_annotation_nodes()
     },
   }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
 end
-snip_lua_annotation("@cl?", {desc = "LuaCATS @class", rx = true, when = conds.start_of_line}, get_class_annotation_nodes, {
+snip_lua_annotation("@cl", {desc = "LuaCATS @class", rx = true, when = conds.start_of_line}, get_class_annotation_nodes, {
   stored = { class_name = i(nil, "ClassName") },
 })
 snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes(), {
@@ -127,6 +126,7 @@ snip("@as", {desc = "LuaCATS (inline) @as"}, SU.myfmt {
 do
   local short_to_long_annotation = {
     a = "alias",
+    c = "cast",
     e = "enum",
     f = "field",
     fi = "field private",
@@ -170,9 +170,9 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
 
 -- Add local var, can only declare on demand
 -- Handles many cases:
--- - `|foo = ...`
--- - `| = ...`
--- - (nothing after)
+-- - `|foo = ...` (will only add `local `)
+-- - `| = ...` (will only add `local <var>`)
+-- - `|` (will add `local <var> = <value>`)
 snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger}, ls.dynamic_node(1, function()
   local rest_of_line = U.get_rest_of_line()
   if rest_of_line:match"^[^ ]+ =" or rest_of_line:match"^function " then
