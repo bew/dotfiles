@@ -22,10 +22,8 @@ local SU = {}
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
 ---@param args mysnips.FileTypeSetupArgs Args table
 SU.filetype_setup = function(args)
-  vim.validate({
-    opt_filetype = { args.filetype, "string" },
-    opt_inherits_from = { args.inherits_from, "table" },
-  })
+  vim.validate("filetype", args.filetype, "string")
+  vim.validate("inherits_from", args.inherits_from, "table")
 
   local ft_snips_collections = {args.filetype}
   vim.list_extend(ft_snips_collections, args.inherits_from)

@@ -133,7 +133,7 @@ end
 ---@param spec plugsys.PluginSpec
 ---@return plugsys.PluginSpec
 function DeclaratorImpl.register_anon_plugin(spec)
-  vim.validate{ spec={spec, "table"} }
+  vim.validate("spec", spec, "table")
   DeclaratorImpl.check_plugin_declaration(spec)
   table.insert(STATE._anon_plugin_specs, spec)
   return spec
@@ -230,10 +230,8 @@ M.tags = setmetatable({}, {
   ---@param name string
   ---@param spec {name?: string, desc: string}
   __newindex = function(self, name, spec)
-    vim.validate{
-      name={name, "string"},
-      value={spec, "table"},
-    }
+    vim.validate("name", name, "string")
+    vim.validate("value", spec, "table")
     spec.name = name -- add name in spec
     rawset(self, name, spec)
   end,
@@ -252,8 +250,13 @@ M.tags = setmetatable({}, {
 ---@field url string Full URL of the repo
 
 ---@class plugsys.PlugSourceLocal: plugsys.PlugSourceBase
----@field path string Static path of the plugin, if it's a function, it will be
----    called when needed and the result will be saved to `self.resolved_local_path`.
+---@field path string Static path of the plugin
+---  IDEA: if it's a function, it will be called when needed and the result will be saved to
+---  `self.resolved_local_path`.
+
+---@class plugsys.Opts.PlugSourceLocal
+---@field name string Name of the plugin
+---@field path string Static path of the plugin
 
 M.sources = {}
 
@@ -281,14 +284,11 @@ function M.sources.github(owner_repo)
 end
 
 --- A local path plugin, will not be managed by pkg manager, only loaded
----@param spec plugsys.PlugSourceLocal
+---@param spec plugsys.Opts.PlugSourceLocal
 ---@return plugsys.PlugSourceLocal
 function M.sources.local_path(spec)
-  vim.validate{
-    spec={spec, "table"},
-    spec_name={spec.name, "string"},
-    spec_path={spec.path, "string"},
-  }
+  vim.validate("spec_name", spec.name, "string")
+  vim.validate("spec_path", spec.path, "string")
   return U.mt.checked_table_index {
     type = "local_path",
     name = spec.name,

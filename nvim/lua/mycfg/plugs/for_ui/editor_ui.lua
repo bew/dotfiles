@@ -68,7 +68,7 @@ Plug {
     -- Make sure the scope/indent-lines/.. highlights do NOT take precedence over diagnostics.
     -- (e.g. when there's a diagnostic on a scope start/end line, this ensures the diagnostic'
     -- underline color takes precendence)
-    local hl_priority = vim.highlight.priorities.diagnostics -1
+    local hl_priority = vim.hl.priorities.diagnostics -1
     require"ibl".setup {
       indent = {
         priority = hl_priority,

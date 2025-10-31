@@ -153,7 +153,7 @@ end
 ---@param given_modes string|string[]
 ---@return boolean
 function MultiModeAction:supports_modes(given_modes)
-  vim.validate { mode={given_modes, {"string", "table"}} }
+  vim.validate("mode", given_modes, {"string", "table"})
   for _, mode in ipairs(U.args.normalize_arg_one_or_more(given_modes)) do
     if self:try_get_mode_action(mode) then
       return true

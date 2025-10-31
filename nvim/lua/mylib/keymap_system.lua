@@ -38,21 +38,16 @@ end
 ---@param map_spec keysys.MapSpec
 ---@param mapper keysys.MapperFn
 function K.register_map(map_spec, mapper)
-  vim.validate{
-    mode={map_spec.mode, {"string", "table"}},
-    key={map_spec.key, "string"},
-    action={
-      map_spec.action,
-      function(a)
-        if vim.tbl_contains({"function", "string"}, type(a)) then
-          return true
-        end
-        return type(a) == "table" and a.meta.action_version == "v2"
-      end,
-    },
-    opts={map_spec.opts, "table", true}, -- optional
-    debug={map_spec.debug, "boolean", true}, -- optional
-  }
+  vim.validate("mode", map_spec.mode, {"string", "table"})
+  vim.validate("key", map_spec.key, "string")
+  vim.validate("action", map_spec.action, function(a)
+    if vim.tbl_contains({"function", "string"}, type(a)) then
+      return true
+    end
+    return type(a) == "table" and a.meta.action_version == "v2"
+  end)
+  vim.validate("opts", map_spec.opts, "table", true) -- optional
+  vim.validate("debug", map_spec.debug, "boolean", true) -- optional
 
   ---@type string[]
   local map_modes = U.args.normalize_arg_one_or_more(map_spec.mode)

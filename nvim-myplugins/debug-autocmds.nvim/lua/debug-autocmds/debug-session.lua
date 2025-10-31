@@ -28,7 +28,7 @@ local DebugSession = {}
 
 function DebugSession.new(opts)
   local opts = opts or {}
-  vim.validate{ name = {opts.name, "string", false} }
+  vim.validate("name", opts.name, "string", false)
   ---@type debug_aucmd.DebugSession
   local instance = {
     active = false,

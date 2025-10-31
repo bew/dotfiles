@@ -44,10 +44,8 @@ end
 ---@param fn fun(T): U?
 ---@return table<U>
 function U.filter_map_list(list, fn)
-  vim.validate{
-    list={list, "table"},
-    fn={fn, "function"},
-  }
+  vim.validate("list", list, "table")
+  vim.validate("fn", fn, "function")
   local ret = {}
   for _, item in ipairs(list) do
     local new_item = fn(item)
