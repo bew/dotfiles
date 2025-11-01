@@ -174,7 +174,7 @@ snip("rq", {desc = [[require"…"]]}, SU.myfmt {
 -- - `| = ...` (will only add `local <var>`)
 -- - `|` (will add `local <var> = <value>`)
 snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger}, ls.dynamic_node(1, function()
-  local rest_of_line = U.get_rest_of_line()
+  local _, rest_of_line = U.get_line_around_cursor()
   if rest_of_line:match"^[^ ]+ =" or rest_of_line:match"^function " then
     -- rest_of_line looks like `|foo = ...` or `|function foo...`
     -- only add `local`

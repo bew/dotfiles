@@ -1,8 +1,6 @@
 
 -- /!\ TODO: write tests for all utils!!
 
-local TERM_CODES = require"mylib.term_codes"
-
 local U = {}
 
 --- Args-related utils
@@ -167,12 +165,12 @@ function U.is_cmdwin()
   return vim.fn.getcmdwintype() ~= ""
 end
 
---- Get rest of the line after cursor in current win
----@return string
-function U.get_rest_of_line()
+--- Get line before & after the cursor
+---@return string, string
+function U.get_line_around_cursor()
   local line = vim.api.nvim_get_current_line()
   local _row, col0 = unpack(vim.api.nvim_win_get_cursor(0))
-  return line:sub(col0 +1)
+  return line:sub(1, col0), line:sub(col0 +1)
 end
 
 return U
