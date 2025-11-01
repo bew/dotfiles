@@ -86,6 +86,10 @@
           # Override python lsp to use more recent python
           # (Attempting to fix FREQUENT crashes with dmypy 1.11.x)
           deps.bins.python-lsp-server.extra.pyPkg = lib.mkForce bleedingedgePkgs.python313;
+          # Require v0.15.0+ to avoid this issue:
+          # ref: https://github.com/LuaLS/lua-language-server/issues/3175
+          # ref: https://github.com/LuaLS/lua-language-server/pull/3182 (PR)
+          deps.bins.lua-language-server.pkg = lib.mkForce bleedingedgePkgs.lua-language-server;
         };
       };
 
