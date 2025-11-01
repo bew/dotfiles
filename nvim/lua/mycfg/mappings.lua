@@ -485,7 +485,7 @@ my_actions.duplicate_selection = A.mk_action {
 K.toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 K.toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
-  my_actions.duplicate_selection.mode_actions.v { opts = { stay_in_visual_mode = true } }
+  my_actions.duplicate_selection.mode_actions.v:run { opts = { stay_in_visual_mode = true } }
 end}
 -- IDEA: a mapping to duplicate and comment original selection
 
@@ -806,7 +806,8 @@ local function directional_split(direction)
     vim.o.splitright = true
     vim.cmd.vsplit()
   else
-    vim.api.nvim_err_writeln(_f("Unknown split direction", _q(direction)))
+    local errmsg = _f("Unknown split direction", _q(direction))
+    vim.api.nvim_echo({ {errmsg} }, true, {err=true})
   end
 
   vim.o.splitright = saved_splitright
