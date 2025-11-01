@@ -34,6 +34,7 @@ my_actions.toggle_diag_virtual_text_mode = A.mk_action {
 local severity_layers = {
   vim.diagnostic.severity.ERROR,
   vim.diagnostic.severity.WARN,
+  vim.diagnostic.severity.INFO,
   vim.diagnostic.severity.HINT,
 }
 

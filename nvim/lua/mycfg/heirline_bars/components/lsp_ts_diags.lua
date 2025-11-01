@@ -61,19 +61,12 @@ function M.mkDiagnosticForSeverity(opts)
   }
 end
 
-local DIAG_SEVERITIES = {
-  vim.diagnostic.severity.ERROR,
-  vim.diagnostic.severity.WARN,
-  vim.diagnostic.severity.HINT,
-  -- note: skipped INFO
-}
-
 -- Show a checkmark when there is an LSP available and there's ZERO diagnostics ✨
 M.ZeroDiagnosticsCheckmark = {
   condition = function()
     if not hline_conditions.lsp_attached() then return false end
     -- Check that there are ZERO diagnostics we're interested in
-    local diags_by_sev = vim.diagnostic.count(0, {severity = DIAG_SEVERITIES})
+    local diags_by_sev = vim.diagnostic.count(0)
     local total_diags = vim.iter(diags_by_sev):fold(0, function(acc, it) return acc + it end)
     return total_diags == 0
   end,
@@ -98,7 +91,7 @@ M.Diagnostics = {
   {
     -- Only show this section if there is at least 1 diagnostic
     condition = function()
-      local diags_by_sev = vim.diagnostic.count(0, {severity = DIAG_SEVERITIES})
+      local diags_by_sev = vim.diagnostic.count(0)
       local total_diags = vim.iter(diags_by_sev):fold(0, function(acc, it) return acc + it end)
       return total_diags > 0
     end,
@@ -111,6 +104,11 @@ M.Diagnostics = {
       sev = vim.diagnostic.severity.WARN,
       icon = "W",
       hl = { ctermfg = 235, ctermbg = 214 },
+    },
+    M.mkDiagnosticForSeverity {
+      sev = vim.diagnostic.severity.INFO,
+      icon = "I",
+      hl = { ctermfg = 250, ctermbg = 24 }, -- (?)
     },
     M.mkDiagnosticForSeverity {
       sev = vim.diagnostic.severity.HINT,
