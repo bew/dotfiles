@@ -387,7 +387,7 @@ Plug {
       return function(opts)
         if type(before_spec) == "string" then before_spec = { text = before_spec } end
         if type(after_spec) == "string" then after_spec = { text = after_spec } end
-        print("pairing check for `=;`, surrounding before", vim.inspect(before_spec), "after", vim.inspect(after_spec))
+        -- print("pairing check for `=;`, surrounding before", vim.inspect(before_spec), "after", vim.inspect(after_spec))
         local match_before = (
           (before_spec.text and cond.preceded_by_text(before_spec.text)(opts))
           or (before_spec.rx and cond.preceded_by_regex(before_spec.rx)(opts))
