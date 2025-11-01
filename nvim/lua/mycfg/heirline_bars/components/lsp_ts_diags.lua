@@ -85,6 +85,8 @@ M.ZeroDiagnosticsCheckmark = {
 
 M.Diagnostics = {
   update = {
+    "LspAttach", -- to show checkmark early
+    "LspDetach",
     "DiagnosticChanged",
     callback = function()
       -- Ensure the component is redrawn on update
