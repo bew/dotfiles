@@ -29,8 +29,8 @@ in {
         (pkgs.fetchpatch {
           # Commit: fix(color-scale): use file size unit custom color when not using color scale
           # PR: https://github.com/eza-community/eza/pull/975
-          url = "https://github.com/eza-community/eza/commit/e52c367a421c7109e23a4d69b8c5ba7882c1b20b.patch";
-          hash = "sha256-kWR65F0LxqQp6LBP/TXLIzt1zFpgKT1jA3b4VvHfnUw=";
+          url = "https://github.com/eza-community/eza/commit/c7493753fbf8d572703a782941cf134357dd740a.patch";
+          hash = "sha256-lmXGt20l6o5tbNXDicq17sBCt36qckV8XX7EJ2Gi3vQ=";
         })
       ];
     }))
