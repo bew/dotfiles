@@ -526,6 +526,12 @@ Plug {
       K.toplevel_map{mode="i", key=[[<M-`>]], action=[[`]], desc="insert single B-quote"}
     end
 
+    -- Used as the surround prefix spec, to check we're _after_ an identifier.
+    -- NOTE: `insert_pair_when` checks are all `OR`, not `AND`.
+    --   So I cannot check the prefix once and only check multiple form of suffixes..
+    --   Instead I need to check the prefix for each `insert_pair_when` cases.
+    local _after_identifier = {rx="%w%s*$"} ---@type autopair-cond.SurroundingSpec
+
     -- [Nix] Auto `;` after `=` (in `let … in` block or `{ … }` attrset)
     npairs.add_rule(
       Rule{start_pair = [[=]], end_pair = [[;]], filetypes = {"nix"}}
@@ -541,9 +547,9 @@ Plug {
           return nil -- fallback to other checks
         end)
         -- quickly check if we're in a simple case (current line check)
-        :insert_pair_when(cond.try_surrounded_by(" ", {rx="^$"})) -- `foo =|` (at eol)
-        :insert_pair_when(cond.try_surrounded_by(" ", " }")) -- `{ foo =| }`
-        :insert_pair_when(cond.try_surrounded_by({rx="%w$"}, "}")) -- `foo=|}`
+        :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
+        :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*%}"})) -- e.g. `foo|}` or `foo | }`
+        :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*[%w_]+%s*="})) -- e.g. {foo|other="thing"}
         :insert_pair_when(cond.never) -- last fallback
         :end_pair_moves_right_when(cond.never)
         :cr_expands_pair_when(cond.never)
@@ -559,7 +565,7 @@ Plug {
     --   inline = {packed_attr=true;};
     --   inline2 = { attr = true;};
     --   # For this case, we're adding a new attr before `already_present`
-    --   inline3 = { before_attr = false; already_present = "foo"; };
+    --   inline3 = { before_attr = true; already_present = "foo"; };
     --
     --   string_inline = "{foo=false}";
     --   string_multi = ''
