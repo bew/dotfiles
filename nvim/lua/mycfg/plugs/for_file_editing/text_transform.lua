@@ -9,6 +9,8 @@ local Plug = PluginSystem.get_plugin_declarator {
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
 local U = require"mylib.utils"
+local _f = U.fmt.str_space_concat
+local _q = U.fmt.str_simple_quote_surround
 
 --------------------------------
 
@@ -381,21 +383,34 @@ Plug {
     ---
     ---@param before_spec autopair-cond.SurroundingSpec Text/Regex that should match before cursor
     ---@param after_spec autopair-cond.SurroundingSpec Text/Regex that should match after cursor
+    ---@param opts? {debug?: boolean}
     ---
     ---@alias autopair-cond.SurroundingSpec string|{text:string}|{rx:string}
-    function cond.try_surrounded_by(before_spec, after_spec)
-      return function(opts)
+    function cond.try_surrounded_by(before_spec, after_spec, opts)
+      opts = opts or {}
+      return function(plugin_opts)
         if type(before_spec) == "string" then before_spec = { text = before_spec } end
         if type(after_spec) == "string" then after_spec = { text = after_spec } end
-        -- print("pairing check for `=;`, surrounding before", vim.inspect(before_spec), "after", vim.inspect(after_spec))
         local match_before = (
-          (before_spec.text and cond.preceded_by_text(before_spec.text)(opts))
-          or (before_spec.rx and cond.preceded_by_regex(before_spec.rx)(opts))
+          (before_spec.text and cond.preceded_by_text(before_spec.text)(plugin_opts))
+          or (before_spec.rx and cond.preceded_by_regex(before_spec.rx, -1)(plugin_opts))
         )
         local match_after = (
-          (after_spec.text and cond.followed_by_text(after_spec.text)(opts))
-          or (after_spec.rx and cond.followed_by_regex(after_spec.rx)(opts))
+          (after_spec.text and cond.followed_by_text(after_spec.text)(plugin_opts))
+          or (after_spec.rx and cond.followed_by_regex(after_spec.rx, -1)(plugin_opts))
         )
+        if opts.debug then
+          local _line_before, _line_after = U.get_line_around_cursor()
+          print(_f(
+            "pairing check for `=;`,",
+            "with before_spec:",
+            vim.inspect(before_spec, {newline=""}),
+            "after_spec:",
+            vim.inspect(after_spec, {newline=""})
+          ))
+          print("  Line: " .. _line_before .. "|" .. _line_after)
+          print(_f("  Matching.. before:", match_before, "after:", match_after))
+        end
         if match_before and match_after then
           return true
         end
