@@ -800,24 +800,26 @@ K.toplevel_map{mode="n", key=[[<M-q><M-q>]], desc="Reformat current line to text
 --   similar to Hydra plugin in emacs: https://github.com/abo-abo/hydra
 --   See hydra.nvim plugin?: https://github.com/anuvyklack/hydra.nvim
 -- NOTE: To get original behavior of `<C-w>` do it and simply wait for `timeoutlen`.
-local function directional_split(direction)
+--- Split the current window directionally
+---@param dir "up"|"down"|"left"|"right" Split direction
+local function directional_split(dir)
   local saved_splitright = vim.o.splitright
   local saved_splitbelow = vim.o.splitbelow
 
-  if direction == "up" then
+  if dir == "up" then
     vim.o.splitbelow = false
     vim.cmd.split()
-  elseif direction == "down" then
+  elseif dir == "down" then
     vim.o.splitbelow = true
     vim.cmd.split()
-  elseif direction == "left" then
+  elseif dir == "left" then
     vim.o.splitright = false
     vim.cmd.vsplit()
-  elseif direction == "right" then
+  elseif dir == "right" then
     vim.o.splitright = true
     vim.cmd.vsplit()
   else
-    local errmsg = _f("Unknown split direction", _q(direction))
+    local errmsg = _f("Unknown split direction", _q(dir))
     vim.api.nvim_echo({ {errmsg} }, true, {err=true})
   end
 
@@ -851,6 +853,7 @@ local function make_new_file_action(new_win)
       if new_win == "tab" then
         vim.cmd.tabnew()
       elseif new_win ~= "current" then
+        ---@diagnostic disable-next-line: param-type-mismatch (luals not smart enough..)
         directional_split(new_win)
       end
       vim.cmd.enew() -- will replace buf in currently focused win
