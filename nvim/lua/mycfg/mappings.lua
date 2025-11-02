@@ -748,12 +748,26 @@ K.toplevel_map{mode={"i", "c"}, key=[[<M-Space>]], action=my_actions.insert_spac
 
 -- I: Insert a new line below using <cr> in same context, even when cursor not
 -- at eol, useful in comments!
--- NOTE: `formatoptions` needs to have `r`
---   (to auto-add comment start char on <cr>)
-vim.cmd[[inoremap <M-cr> <C-o>A<cr>]]
--- N: Same in normal mode, ends in insert mode
---   go in insert mode with a leading comment.
-vim.cmd[[nnoremap <M-cr> A<cr>]]
+-- Ends in insert mode on the new line.
+--
+-- Temporarily sets `formatoptions+=r` for the action, to auto-insert comment leader on {N}`<CR>`
+my_actions.new_line_below_same_ctx = A.mk_action {
+  default_desc = "Line below, same ctx (in comments only, for now)",
+  i = function()
+    U.save_run_restore({save_options = {"formatoptions"}}, function()
+      vim.opt.formatoptions:append"r"
+      U.feed_keys_sync([[<C-o>A<cr>]], { replace_termcodes = true })
+    end)
+  end,
+  n = function()
+    U.save_run_restore({save_options = {"formatoptions"}}, function()
+      vim.opt.formatoptions:append"r"
+      U.feed_keys_sync([[A<cr>]], { replace_termcodes = true })
+    end)
+  end,
+}
+K.toplevel_map{mode={"n", "i"}, key=[[<M-cr>]], action=my_actions.new_line_below_same_ctx}
+-- RELATED to <M-o>/<M-O> (see its IDEA block!)
 
 -- I: Alt-, to insert a comma after cursor.
 -- * When the cursor is at EOL, inserts only ','
