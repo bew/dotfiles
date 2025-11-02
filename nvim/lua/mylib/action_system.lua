@@ -38,14 +38,14 @@ local A = {}
 ---@field v? act.ModeActionSpecInput Action spec for visual mode (only, not select)
 ---@field o? act.ModeActionSpecInput Action spec for operator mode
 ---@field c? act.ModeActionSpecInput Action spec for command mode
----@field [string[]] act.ModeActionSpecInput Action spec for multiple modes
+---@field [act.Mode[]] act.ModeActionSpecInput Action spec for multiple modes
 ---    This allows key like `{"n", "i"}` to set both `n` & `i` action specs in one go.
 
 ---@class act.ActionOverrideSpecInput: act.ActionSpecModesInput
 ---@field cond (fun(): boolean) When should the override be activated
 
 ---@class act.ActionSpecInput: act.ModeActionSpecObjInput, act.ActionSpecModesInput
----@field auto_overrides? {[string]: act.ActionOverrideSpecInput}
+---@field auto_overrides? {[act.Mode]: act.ActionOverrideSpecInput}
 
 ---@class act.ModeActionOverride
 ---@field name string Name of the override
@@ -62,6 +62,51 @@ local A = {}
 local ModeAction = U.mt.checked_table_index{}
 ModeAction.mt = {}
 ModeAction.mt.__index = ModeAction
+
+---@alias act.Mode "n"|"o"|"i"|"v"|"c" Authorized mode for the action system
+
+--- (only supported modes are listed)
+---@type table<string, act.Mode>
+local VIM_TO_ACTION_MODE_MAPPING = {
+  n = "n",
+  no = "o",
+  v = "v",
+  V = "v",
+  [""] = "v",
+  i = "i",
+  c = "c",
+}
+
+--- Normalize the given vim mode to an action mode.
+---
+--- Raises an error for unsupported mode.
+---
+---@param vim_mode string See `:h mode()`
+---@return act.Mode
+function A.normalize_vim_to_action_mode(vim_mode)
+  -- Check first 2 chars of the mode (needed to have a chance to get `o` action mode)
+  local action_mode = VIM_TO_ACTION_MODE_MAPPING[vim_mode:sub(1, 2)]
+  if action_mode then return action_mode end
+  -- Check first char of the mode (must be checked last)
+  local action_mode = VIM_TO_ACTION_MODE_MAPPING[vim_mode:sub(1, 1)]
+  if action_mode then return action_mode end
+  error(_f("Cannot normalize vim mode", _q(vim_mode), "to action mode: UNSUPPORTED MODE"))
+end
+
+--- Normalize the given action mode to a vim mode
+---
+--- In practice we only change `v` to always mean `x`
+--- (visual mode ONLY, instead of both visual/select like vim's `v`)
+---
+---@param action_mode act.Mode
+---@return string _ The corresponding vim mode
+function A.normalize_action_to_vim_mode(action_mode)
+  if action_mode == "v" then
+    return "x"
+  else
+    return action_mode
+  end
+end
 
 --- Do the action (or its override) via a function call on-demand
 --- This is useful to run an action from another action / function..
@@ -126,20 +171,23 @@ end
 
 ---@class act.MultiModeAction
 ---@field meta table Metadata about this action
----@field mode_actions {[string]: act.ModeAction} Action for each mode
+---@field mode_actions {[act.Mode]: act.ModeAction} Action for each mode
 local MultiModeAction = U.mt.checked_table_index{}
 MultiModeAction.mt = {}
 MultiModeAction.mt.__index = MultiModeAction
 
 --- Try get the action for the given mode, returns nil if the mode is not supported by the action
----@param mode string
+---@param mode act.Mode
 ---@return act.ModeAction?
 function MultiModeAction:try_get_mode_action(mode)
   return rawget(self.mode_actions, mode)
 end
 
---- Get the action for the given mode, error if the mode is not supported by the action
----@param mode string
+--- Get the action for the given mode.
+---
+--- Raises an error if the mode is not supported by the action.
+---
+---@param mode act.Mode
 ---@return act.ModeAction
 function MultiModeAction:get_mode_action(mode)
   local mode_action = self:try_get_mode_action(mode)
@@ -164,13 +212,27 @@ end
 
 --- Returns a function to pass to `vim.keymap.set`, and that will select the correct action mode
 --- based on the current mode (or error if the current mode is not supported by the action)
----@return (fun(): any)
+---
+---@return (fun(...): any)
 function MultiModeAction:get_multimode_proxy_fn()
-  return function()
-    local current_mode = vim.fn.mode()
-    local mode_action = self:get_mode_action(current_mode)
-    return mode_action:run()
+  return function(...)
+    local vim_mode = vim.fn.mode()
+    local action_mode = A.normalize_vim_to_action_mode(vim_mode)
+    local mode_action = self:get_mode_action(action_mode)
+    return mode_action:run(...)
   end
+end
+
+--- Do the action (or its override) via a function call on-demand, this will use the correct action
+--- for the current vim mode as retrieved using `vim.fn.mode()`.
+---
+--- This is useful to run an action from another action / function.
+---
+---@param ... any
+---@return any
+function MultiModeAction:run(...)
+  local proxy_fn = self:get_multimode_proxy_fn()
+  return proxy_fn(...)
 end
 
 -- WIP WIP WIP (and untested) functions to enable configurable actions

@@ -491,7 +491,7 @@ my_actions.duplicate_selection = A.mk_action {
 K.toplevel_map{mode="v", key="<C-d>", desc="Duplicate selection", action=my_actions.duplicate_selection}
 -- V: Duplicate visual selection (stay in visual mode, can be 'spammed' for repeat)
 K.toplevel_map{mode="v", key="<C-M-d>", desc="Duplicate selection (keep selection)", action=function()
-  my_actions.duplicate_selection.mode_actions.v:run { opts = { stay_in_visual_mode = true } }
+  my_actions.duplicate_selection:run { opts = { stay_in_visual_mode = true } }
 end}
 -- IDEA: a mapping to duplicate and comment original selection
 

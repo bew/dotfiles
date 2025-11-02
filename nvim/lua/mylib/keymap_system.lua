@@ -22,19 +22,6 @@ local K = {}
 
 ---@alias keysys.MapperFn fun(mode: string|string[], key: string, action: act.RawModeAction, opts?: vim.keymap.set.Opts)
 
---- Normalize mode `v` to always mean `x` (visual mode ONLY instead of both visual/select)
----@param mode string
----@return string
--- 👉 Always replace `v` by `x`, so `v` is ONLY visual mode instead of both visual/select
--- (ref: `:h mapmode-x`)
-local function normalize_mode(mode)
-  if mode == "v" then
-    return "x"
-  else
-    return mode
-  end
-end
-
 ---@param map_spec keysys.MapSpec
 ---@param mapper keysys.MapperFn
 function K.register_map(map_spec, mapper)
@@ -87,11 +74,11 @@ function K.register_map(map_spec, mapper)
     end
 
     -- Ensure `v` mode means visual ONLY (replace `v` with `x`)
-    local normalized_mode = normalize_mode(mode)
+    local vim_mode = A.normalize_action_to_vim_mode(mode)
     if map_spec.debug or mode_action.debug or false then
       print(
         "Debugging keymap (action):",
-        "mode:", vim.inspect(mode) .. " (normalized: " .. vim.inspect(normalized_mode) .. ")",
+        "mode:", vim.inspect(mode) .. " (vim mode: " .. vim.inspect(vim_mode) .. ")",
         "key:", vim.inspect(map_spec.key),
         "raw-action:", vim.inspect(mode_action.raw_action),
         "auto-overrides:", vim.inspect(mode_action.auto_overrides),
@@ -99,7 +86,7 @@ function K.register_map(map_spec, mapper)
       )
     end
 
-    mapper(normalized_mode, map_spec.key, mode_action:get_action_for_keymap(), map_opts)
+    mapper(vim_mode, map_spec.key, mode_action:get_action_for_keymap(), map_opts)
   end
 end
 
@@ -117,7 +104,7 @@ function K.toplevel_map_define_group(spec)
   local group_wk_spec = {
     spec.prefix_key,
     group = spec.name,
-    mode = vim.tbl_map(normalize_mode, modes),
+    mode = vim.tbl_map(A.normalize_action_to_vim_mode, modes),
     hidden = spec.name == "__hide__",
   }
   -- NOTE: if which-key can be loaded, use it, otherwise register the group spec for later
