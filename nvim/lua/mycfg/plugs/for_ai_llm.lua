@@ -31,7 +31,11 @@ Plug.codecompanion {
   desc = "✨ AI-powered coding, seamlessly in Neovim",
   tags = {t.ui, t.editing, t.careful_update},
   depends_on = { Plug.lib_plenary, Plug.ts },
-  defer_load = { on_event = "VeryLazy" },
+  defer_load = {
+    on_event = "VeryLazy",
+    -- Necessary to be able to start it from cmdline via `nvim +cmd`
+    on_cmd = {"CodeCompanionChat"}
+  },
   on_load = function()
     local default_adapter = "copilot"
     require"codecompanion".setup {

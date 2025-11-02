@@ -315,6 +315,13 @@ function ef
   nvim +enew +"set ft=$filetype" +"set buftype=nofile" +startinsert
 }
 
+# Open nvim in 'AI' mode, ready to type ✨
+# Can also be called with an initial prompt that will immediately be answered 🚀
+function ei()
+{
+  nvim +"CodeCompanionChat $*" +only +startinsert
+}
+alias ei="nvim +CodeCompanionChat +only +startinsert"
 
 # rg
 
