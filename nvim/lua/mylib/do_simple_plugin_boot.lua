@@ -27,11 +27,11 @@ end
 ---@field plugin_specs plugsys.PluginSpec[] All plugin specs
 ---@field manager_install_path string Install path for the pkg manager
 
----@class plugsys.BootPlugOpts
+---@class plugsys.Opts.BootPlug
 ---@field install_dir string Where plugins should be installed if they aren't
 
 ---@param plugin_specs plugsys.PluginSpec[] All plugin specs
----@param opts plugsys.BootPlugOpts
+---@param opts plugsys.Opts.BootPlug
 local function boot_plugins(plugin_specs, opts)
   if #plugin_specs == 0 then
     return -- nothing to do!

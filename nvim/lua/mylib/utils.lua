@@ -102,7 +102,7 @@ function U.try_get_char_at_pos0(pos0)
   return line:sub(pos0.col +1, pos0.col +1)
 end
 
----@class mylib.FeedKeysOpts
+---@class mylib.Opts.FeedKeys
 ---@field remap? boolean Whether to use mappings if any
 ---@field replace_termcodes? boolean Whether termcodes like `\<esc>` should be replaced
 ---@field as_if_typed? boolean Handle keys as if typed (matters for undo/folds/..)
@@ -112,9 +112,9 @@ end
 --- Feed the given keys as if typed (sync call).
 ---   This is basically a nice wrapper around nvim_feedkeys
 ---@param keys string
----@param opts? mylib.FeedKeysOpts
+---@param opts? mylib.Opts.FeedKeys
 function U.feed_keys_sync(keys, opts)
-  ---@type mylib.FeedKeysOpts
+  ---@type mylib.Opts.FeedKeys
   local opts = U.args.normalize_arg_opts_with_default(opts, {
     remap = false,
     replace_termcodes = false,

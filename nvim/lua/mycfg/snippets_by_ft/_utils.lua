@@ -4,7 +4,7 @@ local U = require"mylib.utils"
 
 local SU = {}
 
----@class mysnips.FileTypeSetupArgs
+---@class mysnips.Opts.FileTypeSetup
 ---@field filetype string The filetype to extend
 ---@field inherits_from string[] The additional collections of snippets to use for `ft`
 
@@ -20,7 +20,7 @@ local SU = {}
 ---@alias mysnips.Opts.MyFmt {[1]: string, [2]: table, [3]: LuaSnip.Opts.Extra.Fmt?, opts: LuaSnip.Opts.Extra.Fmt?}
 
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
----@param args mysnips.FileTypeSetupArgs Args table
+---@param args mysnips.Opts.FileTypeSetup Args table
 SU.filetype_setup = function(args)
   vim.validate("filetype", args.filetype, "string")
   vim.validate("inherits_from", args.inherits_from, "table")

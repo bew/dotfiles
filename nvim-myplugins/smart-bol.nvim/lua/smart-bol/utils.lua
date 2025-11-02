@@ -1,10 +1,10 @@
 local M = {}
 
----@class NormalizedPos11
+---@class smartbol.NormalizedPos11
 ---@field line1 integer Line number (1-indexed)
 ---@field col1 integer Column number (1-indexed)
 ---
----@field with_col1 fun(self: NormalizedPos11, col1: integer): NormalizedPos11
+---@field with_col1 fun(self: smartbol.NormalizedPos11, col1: integer): smartbol.NormalizedPos11
 local meta_NormalizedPos11 = {
   __index = {
     with_col1 = function(self, col1)
@@ -14,7 +14,7 @@ local meta_NormalizedPos11 = {
 }
 
 --- Returns the normalized position of the cursor
----@return NormalizedPos11
+---@return smartbol.NormalizedPos11
 function M.get_cursor()
   local cursor_pos10 = vim.api.nvim_win_get_cursor(0) -- {1, 0}-indexted
   local normalized_pos = {
@@ -25,7 +25,7 @@ function M.get_cursor()
 end
 
 --- Set cursor to the given normalized position
----@param pos NormalizedPos11 Target position of the cursor
+---@param pos smartbol.NormalizedPos11 Target position of the cursor
 function M.set_cursor(pos)
   vim.api.nvim_win_set_cursor(0, {pos.line1, pos.col1 -1}) -- {1, 0}-indexted
 end

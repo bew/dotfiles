@@ -70,7 +70,7 @@ snip("fdc", {desc = "import for @dataclass", when = conds.start_of_line}, ls.cho
 
 -- MAYBE: contribute this snippet generator to LuaSnip's Wiki? 🤔
 
----@class mysnips.py.DefOpts
+---@class mysnips.Opts.py.Def
 ---@field decor_name string? Decorator name (if needed)
 ---@field name string? The def name (not editable)
 ---@field default_name string? The default def name (editable)
@@ -84,7 +84,7 @@ snip("fdc", {desc = "import for @dataclass", when = conds.start_of_line}, ls.cho
 ---    If not given, it'll default to `pass`.
 
 --- Returns method def snippet for given options
----@param opts mysnips.py.DefOpts
+---@param opts mysnips.Opts.py.Def
 ---@return LuaSnip.Node
 local function make_def_snip(opts)
   opts = opts or {}

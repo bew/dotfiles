@@ -1,10 +1,13 @@
 local U_args = {}
 
---- Normalizes received table-args or multi-args to a table.
----   Allows the caller to pass it a set of args or a table of args, and always get a table of args
----   back to manipulate.
----@param ... any|any[] Args or table of args
----@return any[]
+---@alias mylib.Ty.NotInteger (string|boolean|(fun(...): ...)|table)
+---@alias mylib.Ty.NotList<T> (string|number|boolean|(fun(...): ...)|{[mylib.Ty.NotInteger]: T})
+
+--- Normalizes received multiple args or a single list of args, into a list of args.
+---
+---@generic T
+---@param ... (T[])|mylib.Ty.NotList<T> Args or a single list of args
+---@return T[]
 function U_args.normalize_multi_args(...)
   local nargs = select("#", ...)
   local first_arg = ({...})[1] -- note: nil when no args
@@ -16,20 +19,24 @@ function U_args.normalize_multi_args(...)
 end
 
 --- Normalizes received opts by filling the blanks (at toplevel, no deep merge) with given defaults
----@param given_opts table? The given options
----@param default_opts table The default options
----@return table
+---
+---@generic T: table
+---@param given_opts T? The given options
+---@param default_opts T The default options
+---@return T
 function U_args.normalize_arg_opts_with_default(given_opts, default_opts)
   return vim.tbl_extend("force", default_opts, given_opts or {})
 end
 
 --- Normalizes a single item or a list of items to a list of item(s).
----@param item_or_items any|any[] A single item (must not be a table) or a list of items
----@return any[]
+---
+---@generic T
+---@param item_or_items (T[])|mylib.Ty.NotList<T> A single item (must not be a list) or a list of items
+---@return T[]
 -- note: @overload doesn't support generics 😬
 -- ISSUE: https://github.com/LuaLS/lua-language-server/issues/723
 function U_args.normalize_arg_one_or_more(item_or_items)
-  if type(item_or_items) == "table" then
+  if type(item_or_items) == "table" and vim.islist(item_or_items) then
     return item_or_items
   else
     return {item_or_items}

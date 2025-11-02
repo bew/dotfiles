@@ -25,7 +25,7 @@
 ---@overload fun(spec: plugsys.PluginSpec): plugsys.PluginSpecDeclared
 ---@field [string] plugsys.PluginSpecDeclared
 
----@class plugsys.PluginSpecDeclared
+---@class plugsys.PluginSpecDeclared (declared, not defined yet)
 ---@overload fun(spec: plugsys.PluginSpec): plugsys.PluginSpecDeclared
 ---@field id string The plugin ID
 ---@field __is_placeholder_plugin_spec boolean?

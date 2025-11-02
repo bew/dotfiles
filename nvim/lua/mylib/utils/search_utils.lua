@@ -3,7 +3,7 @@ local Pos0 = require"mylib.utils.pos_utils".Pos0
 
 local U_search = {}
 
----@class mylib.CurrentSearchSetterOpts
+---@class mylib.Opts.CurrentSearchSetter
 ---@field escaped? boolean Whether the given text was already escaped
 ---@field with_bounds? boolean|{before: boolean, after: boolean}
 
@@ -12,18 +12,18 @@ local U_search = {}
 ---
 ---@param text string|string[] The text to search,
 ---  will be escaped if opts.escaped is false (the default)
----@param opts? mylib.CurrentSearchSetterOpts
+---@param opts? mylib.Opts.CurrentSearchSetter
 ---  Whether to add word bounds before/after text (none by default)
 function U_search.set_current_search(text, opts)
-  ---@type string[]
   local text_lines = U_args.normalize_arg_one_or_more(text)
   local opts = U_args.normalize_arg_opts_with_default(opts, {
     escaped = false, -- by default, assume it's not
     with_bounds = false,
   })
   -- normalize opts.with_bounds to structured data
-  if type(opts.with_bounds) == "boolean" then
-    opts.with_bounds = { before = opts.with_bounds, after = opts.with_bounds }
+  local with_bounds_opt = opts.with_bounds -- (note: var necessary for type narrowing)
+  if type(with_bounds_opt) == "boolean" then
+    opts.with_bounds = { before = with_bounds_opt, after = with_bounds_opt }
   end
   local search_payload
   do -- process given text

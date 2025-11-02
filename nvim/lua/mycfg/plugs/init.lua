@@ -49,7 +49,7 @@ PluginSystem.check_missing_plugins()
 local all_plugs = PluginSystem.all_plugin_specs()
 
 return {
-  ---@param opts plugsys.BootPlugOpts
+  ---@param opts plugsys.Opts.BootPlug
   boot_plugins = function(opts)
     require"mylib.do_simple_plugin_boot"(all_plugs, opts)
   end,

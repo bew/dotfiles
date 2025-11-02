@@ -165,7 +165,7 @@ Plug {
     -- Mappings defined in a keymap layer only apply when there are
     -- multiple cursors. This lets you have overlapping mappings.
     mc.addKeymapLayer(function(layer_mapper)
-      ---@param map_spec keysys.MapSpec
+      ---@param map_spec keysys.Opts.Map
       local function layer_map(map_spec)
         K.register_map(map_spec, layer_mapper)
       end

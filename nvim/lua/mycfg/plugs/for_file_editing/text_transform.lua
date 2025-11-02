@@ -377,6 +377,7 @@ Plug {
     cond.followed_by_regex = cond.after_regex
     cond.not_preceded_by_regex = cond.not_before_regex
     cond.not_followed_by_regex = cond.not_after_regex
+    ---@alias autopair-cond.ExpectedFn (fun(opts: CondOpts): boolean?)
 
     --- Returns fn that is true when cursor is surrounded by given before/after strings,
     --- or nil to fallback to other checks.
@@ -384,6 +385,7 @@ Plug {
     ---@param before_spec autopair-cond.SurroundingSpec Text/Regex that should match before cursor
     ---@param after_spec autopair-cond.SurroundingSpec Text/Regex that should match after cursor
     ---@param opts? {debug?: boolean}
+    ---@return autopair-cond.ExpectedFn
     ---
     ---@alias autopair-cond.SurroundingSpec string|{text:string}|{rx:string}
     function cond.try_surrounded_by(before_spec, after_spec, opts)

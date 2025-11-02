@@ -24,28 +24,33 @@ local A = {}
 
 ---@alias act.RawModeAction string|(fun(...): string?)
 
----@class act.ModeActionSpecObjInput
----@field raw_action? act.RawModeAction The raw action to execute
+---@class act.Opts.ActionSpec.Common
+---  Opts fields that are common, both for the global action & a specific mode action.
+---  These fields are looked-up on the mode action, then on the global action if unset.
+---
 ---@field default_desc? string The default description for the keymap when this action is used
----@field map_opts? {[string]: any} The keymap options for that action
----@field debug? boolean Wheather to debug the effective keymap args on use
+---@field map_opts? vim.keymap.set.Opts The keymap options for that action
+---@field debug? boolean Whether to debug the effective keymap args on use
 
----@alias act.ModeActionSpecInput act.RawModeAction|act.ModeActionSpecObjInput
+---@class act.Opts.ModeActionSpec.Full: act.Opts.ActionSpec.Common
+---@field raw_action? act.RawModeAction The raw action to execute
 
----@class act.ActionSpecModesInput
----@field n? act.ModeActionSpecInput Action spec for normal mode
----@field i? act.ModeActionSpecInput Action spec for insert mode
----@field v? act.ModeActionSpecInput Action spec for visual mode (only, not select)
----@field o? act.ModeActionSpecInput Action spec for operator mode
----@field c? act.ModeActionSpecInput Action spec for command mode
----@field [act.Mode[]] act.ModeActionSpecInput Action spec for multiple modes
+---@alias act.Opts.ModeActionSpec act.RawModeAction|act.Opts.ModeActionSpec.Full
+
+---@class act.Opts.ActionSpecModes: {[act.Mode]: act.Opts.ModeActionSpec}
+---@field n? act.Opts.ModeActionSpec Action spec for normal mode
+---@field i? act.Opts.ModeActionSpec Action spec for insert mode
+---@field v? act.Opts.ModeActionSpec Action spec for visual mode (only, not select)
+---@field o? act.Opts.ModeActionSpec Action spec for operator mode
+---@field c? act.Opts.ModeActionSpec Action spec for command mode
+---@field [act.Mode[]] act.Opts.ModeActionSpec Action spec for multiple modes
 ---    This allows key like `{"n", "i"}` to set both `n` & `i` action specs in one go.
 
----@class act.ActionOverrideSpecInput: act.ActionSpecModesInput
+---@class act.Opts.ActionOverrideSpec: act.Opts.ActionSpecModes
 ---@field cond (fun(): boolean) When should the override be activated
 
----@class act.ActionSpecInput: act.ModeActionSpecObjInput, act.ActionSpecModesInput
----@field auto_overrides? {[act.Mode]: act.ActionOverrideSpecInput}
+---@class act.Opts.ActionSpec: act.Opts.ActionSpec.Common, act.Opts.ActionSpecModes
+---@field auto_overrides? {[act.Mode]: act.Opts.ActionOverrideSpec}
 
 ---@class act.ModeActionOverride
 ---@field name string Name of the override
@@ -56,14 +61,14 @@ local A = {}
 ---@overload fun(): string? (maybe expr fn)
 ---@field raw_action act.RawModeAction The raw action to execute
 ---@field default_desc string The default description for the keymap when this action is used
----@field map_opts {[string]: any} The keymap options for that action
+---@field map_opts vim.keymap.set.Opts The keymap options for that action
 ---@field debug boolean Wheather to debug the effective keymap args on use
 ---@field auto_overrides act.ModeActionOverride[]
 local ModeAction = U.mt.checked_table_index{}
 ModeAction.mt = {}
 ModeAction.mt.__index = ModeAction
 
----@alias act.Mode "n"|"o"|"i"|"v"|"c" Authorized mode for the action system
+---@alias act.Mode "n"|"o"|"i"|"v"|"s"|"c" Authorized mode for the action system
 
 --- (only supported modes are listed)
 ---@type table<string, act.Mode>
@@ -124,7 +129,7 @@ function ModeAction:run(...)
   if type(raw_action) == "function" then
     return raw_action(...)
   elseif type(raw_action) == "string" then
-    ---@type mylib.FeedKeysOpts
+    ---@type mylib.Opts.FeedKeys
     local feed_keys_opts = {
       remap = self.map_opts.remap ~= false, -- remap by default
       replace_termcodes = true,
@@ -156,15 +161,14 @@ end
 --- Returns what should be passed as the 'action' string/function for a `vim.keymap.set`-like config
 ---@return act.RawModeAction
 function ModeAction:get_action_for_keymap()
-  local mode_action = self
-  if vim.tbl_isempty(mode_action.auto_overrides) then
+  if vim.tbl_isempty(self.auto_overrides) then
     -- no override, return the raw_action directly
-    return mode_action.raw_action
+    return self.raw_action
   else
     -- the action has override, return a wrapping function that executes the action while handling
     -- overrides.
     return function()
-      return mode_action:run()
+      return self:run()
     end
   end
 end
@@ -213,7 +217,7 @@ end
 --- Returns a function to pass to `vim.keymap.set`, and that will select the correct action mode
 --- based on the current mode (or error if the current mode is not supported by the action)
 ---
----@return (fun(...): any)
+---@return (fun(...): ...)
 function MultiModeAction:get_multimode_proxy_fn()
   return function(...)
     local vim_mode = vim.fn.mode()
@@ -315,7 +319,7 @@ end
 ---   }
 --- }
 --- ```
----@param global_spec act.ActionSpecInput
+---@param global_spec act.Opts.ActionSpec
 ---@return act.MultiModeAction
 function A.mk_action(global_spec)
   -- For a given mode, I want these fields:
@@ -325,7 +329,7 @@ function A.mk_action(global_spec)
   -- - debug
   -- If field not given (except for `raw_action`), use the field at parent level (for all modes) if any
 
-  ---@param mode_spec act.ModeActionSpecInput
+  ---@param mode_spec act.Opts.ModeActionSpec
   ---@return act.ModeAction
   local function mk_action_single_mode(mode_spec)
     -- (note: uses upvalue 'global_spec')
@@ -362,8 +366,8 @@ function A.mk_action(global_spec)
   local VALID_MODES_FOR_ACTIONS = {"n", "i", "v", "x", "o", "c", "s"}
 
   --- Find all action specs for all valid modes
-  ---@param input_modes_spec act.ActionSpecModesInput
-  ---@return {[string]: act.ModeActionSpecInput}
+  ---@param input_modes_spec act.Opts.ActionSpecModes
+  ---@return {[act.Mode]: act.Opts.ModeActionSpec}
   local function collect_spec_for_mode(input_modes_spec)
     local spec_for_mode = {}
     for maybe_mode, value in pairs(input_modes_spec) do
@@ -386,7 +390,7 @@ function A.mk_action(global_spec)
     return spec_for_mode
   end
 
-  ---@type {[string]: act.ModeActionOverride[]}
+  ---@type {[act.Mode]: act.ModeActionOverride[]}
   local overrides_for_mode = {}
   for override_name, overrides_spec in pairs(global_spec.auto_overrides or {}) do
     -- TODO: rename that!
@@ -408,7 +412,7 @@ function A.mk_action(global_spec)
   end
 
   local action_spec_for_mode = collect_spec_for_mode(global_spec)
-  ---@type {[string]: act.ModeAction}
+  ---@type {[act.Mode]: act.ModeAction}
   local mode_actions = vim.tbl_map(mk_action_single_mode, action_spec_for_mode)
 
   for mode, mode_action in pairs(mode_actions) do

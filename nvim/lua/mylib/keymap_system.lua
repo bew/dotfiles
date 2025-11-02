@@ -6,24 +6,24 @@ local A = require"mylib.action_system"
 
 local K = {}
 
----@class keysys.MapSpec
----@field mode string|string[] Mode(s) for which to map the key
+---@class keysys.Opts.Map
+---@field mode act.Mode|act.Mode[] Mode(s) for which to map the key
 ---@field key string Key to map
 ---@field action act.MultiModeAction|act.RawModeAction Action to assign to key
 ---@field desc? string Keymap description
----@field opts? table Keymap options (same as for `vim.keymap.set`).
+---@field opts? vim.keymap.set.Opts Keymap options (same as for `vim.keymap.set`).
 ---    When action is an Action obj, opts must not conflict.
 ---@field debug? boolean Whether to print debugging info about the keymap
 
----@class keysys.MapGroupSpec
+---@class keysys.Opts.MapGroup
 ---@field name string Group name (e.g. prefixed with `+`)
----@field mode string|string[] Mode(s) the group is for
+---@field mode act.Mode|act.Mode[] Mode(s) the group is for
 ---@field prefix_key string Common group prefix key
 
----@alias keysys.MapperFn fun(mode: string|string[], key: string, action: act.RawModeAction, opts?: vim.keymap.set.Opts)
+---@alias keysys.Opts.MapperFn fun(mode: act.Mode|act.Mode[], key: string, action: act.RawModeAction, opts?: vim.keymap.set.Opts)
 
----@param map_spec keysys.MapSpec
----@param mapper keysys.MapperFn
+---@param map_spec keysys.Opts.Map
+---@param mapper keysys.Opts.MapperFn
 function K.register_map(map_spec, mapper)
   vim.validate("mode", map_spec.mode, {"string", "table"})
   vim.validate("key", map_spec.key, "string")
@@ -36,20 +36,19 @@ function K.register_map(map_spec, mapper)
   vim.validate("opts", map_spec.opts, "table", true) -- optional
   vim.validate("debug", map_spec.debug, "boolean", true) -- optional
 
-  ---@type string[]
   local map_modes = U.args.normalize_arg_one_or_more(map_spec.mode)
 
   -- When the action is not an action obj, transform it quickly to a cheap action v2:
+  local given_map_action = map_spec.action -- (note: var needed for type narrowing)
   local map_action ---@type act.MultiModeAction
-  if type(map_spec.action) ~= "table" then
+  if type(given_map_action) ~= "table" then
+    ---@cast given_map_action -act.MultiModeAction (note: we know it can't be anything else here)
     map_action = A.mk_action {
-      default_desc = tostring(map_spec.action),
-      ---@diagnostic disable-next-line: assign-type-mismatch (we know the type is right)
-      [map_modes] = map_spec.action, ---@type act.RawModeAction
+      default_desc = "Raw action: "..tostring(given_map_action),
+      [map_modes] = given_map_action,
     }
   else
-    ---@diagnostic disable-next-line: assign-type-mismatch (we know the type is right)
-    map_action = map_spec.action ---@type act.MultiModeAction
+    map_action = given_map_action
   end
   -- map_action is now guaranteed to be an action object
 
@@ -66,6 +65,7 @@ function K.register_map(map_spec, mapper)
 
     -- Options
     -- note: map_opts set at action-level are required, make sure the given opts don't conflict
+    ---@type vim.keymap.set.Opts
     local map_opts = vim.tbl_extend("error", map_spec.opts or {}, mode_action.map_opts or {})
     -- Description
     local description = map_spec.desc or mode_action.default_desc
@@ -73,7 +73,6 @@ function K.register_map(map_spec, mapper)
       map_opts.desc = description
     end
 
-    -- Ensure `v` mode means visual ONLY (replace `v` with `x`)
     local vim_mode = A.normalize_action_to_vim_mode(mode)
     if map_spec.debug or mode_action.debug or false then
       print(
@@ -95,11 +94,10 @@ end
 wk_groups_lazy = {}
 
 --- Define a (global) <leader> map group
----@param spec keysys.MapGroupSpec
+---@param spec keysys.Opts.MapGroup
 function K.toplevel_map_define_group(spec)
   assert(spec.name, "group name is required")
   assert(spec.mode, "mode is required")
-  ---@type string[]
   local modes = U.args.normalize_arg_one_or_more(spec.mode)
   local group_wk_spec = {
     spec.prefix_key,
@@ -117,19 +115,19 @@ function K.toplevel_map_define_group(spec)
 end
 
 --- Create (top-level) key mapping
----@param map_spec keysys.MapSpec
+---@param map_spec keysys.Opts.Map
 function K.toplevel_map(map_spec)
   K.register_map(map_spec, vim.keymap.set)
 end
 --- Create remap-enabled (top-level) map
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.toplevel_remap(spec)
   spec.opts = spec.opts or {}
   spec.opts.remap = true
   K.toplevel_map(spec)
 end
 --- Create buf-specific (top-level) map
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.toplevel_buf_map(spec)
   spec.opts = spec.opts or {}
   spec.opts.buffer = true
@@ -138,14 +136,14 @@ end
 
 
 --- Create (global) <leader> key mapping
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.global_leader_map(spec)
   K.toplevel_map(vim.tbl_extend("force", spec, {
     key = "<Leader>"..spec.key,
   }))
 end
 --- Create remap-enabled (global) <leader> map
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.global_leader_remap(spec)
   if not spec.opts then
     spec.opts = {}
@@ -154,7 +152,7 @@ function K.global_leader_remap(spec)
   K.global_leader_map(spec)
 end
 --- Define a (global) <leader> map group
----@param spec keysys.MapGroupSpec
+---@param spec keysys.Opts.MapGroup
 function K.global_leader_map_define_group(spec)
   spec.prefix_key = "<Leader>"..spec.prefix_key
   K.toplevel_map_define_group(spec)
@@ -163,28 +161,28 @@ end
 ----
 
 --- Create (content-related) <localleader> key mapping
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.local_leader_map(spec)
   K.toplevel_map(vim.tbl_extend("force", spec, {
     key = "<LocalLeader>"..spec.key,
   }))
 end
 --- Create remap-enabled (content-related) <localleader> map
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.local_leader_remap(spec)
   spec.opts = spec.opts or {}
   spec.opts.remap = true
   K.local_leader_map(spec)
 end
 --- Create buf-specific (content-related) <localleader> map
----@param spec keysys.MapSpec
+---@param spec keysys.Opts.Map
 function K.local_leader_buf_map(spec)
   spec.opts = spec.opts or {}
   spec.opts.buffer = true
   K.local_leader_map(spec)
 end
 --- Define a (content-related) <localleader> map group
----@param spec keysys.MapGroupSpec
+---@param spec keysys.Opts.MapGroup
 function K.local_leader_map_define_group(spec)
   spec.prefix_key = "<LocalLeader>"..spec.prefix_key
   K.toplevel_map_define_group(spec)

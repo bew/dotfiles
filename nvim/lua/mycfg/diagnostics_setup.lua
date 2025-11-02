@@ -17,7 +17,7 @@ my_actions.toggle_diag_virtual_text_mode = A.mk_action {
   default_desc = "Toggle diagnostic virtual_text mode: all lines / current line",
   n = function()
     local diag_config = vim.diagnostic.config()
-    ---@cast diag_config vim.diagnostic.Opts (known to be not nil!)
+    ---@cast diag_config -nil (known to be non-nil!)
     diag_config.virtual_text.current_line = not diag_config.virtual_text.current_line
     vim.diagnostic.config(diag_config)
     local new_mode_name = diag_config.virtual_text.current_line and "current line" or "all lines"
@@ -25,7 +25,7 @@ my_actions.toggle_diag_virtual_text_mode = A.mk_action {
   end
 }
 
----@class mycfg.diag.GotoDiagBySevArgs
+---@class mycfg.Opts.diag.GotoDiagBySev
 ---@field get_diag_pos_fn fun(opts?: vim.diagnostic.JumpOpts)
 ---@field jump_opts vim.diagnostic.JumpOpts
 
@@ -56,7 +56,7 @@ my_actions.toggle_diag_navigation_by_severity_layers = A.mk_action {
 
 --- Jump to next/prev diagnostic by layer of severity.
 --- Search for ERROR severity, if none search for WARN severity, if none search for HINT severity.
----@param args mycfg.diag.GotoDiagBySevArgs
+---@param args mycfg.Opts.diag.GotoDiagBySev
 local function goto_diag_by_severity_layers(args)
   local jump_opts = args.jump_opts
   for _, severity in ipairs(severity_layers) do
