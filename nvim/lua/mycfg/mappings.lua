@@ -127,6 +127,13 @@ K.toplevel_map{mode="n", key="Q", action=my_actions.close_win_back_to_last}
 -- <wm-mappings>
 K.global_leader_map{mode="n", key="<C-M-d>", action=my_actions.close_win_back_to_last}
 
+-- N: Save buffer & close win
+-- (note: I recently started to hit `X` a lot instead of `:x` or `Q`, so let's try 🤔)
+K.toplevel_map{mode="n", key="X", desc = "Save & close win", action=function()
+  my_actions.save_buffer:run()
+  my_actions.close_win_back_to_last:run()
+end}
+
 -- N: logical redo
 my_actions.undo = A.mk_action {
   default_desc = "Undo",
