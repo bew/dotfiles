@@ -539,7 +539,7 @@ Plug {
           if not U.is_treesitter_available_here() then return end -- disable this check
           vim.treesitter.get_parser():parse()
           local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
-          print("pairing check for `=;`, ts node type:", node:type())
+          -- print("pairing check for `=;`, ts node type:", node:type())
           if node:type() == "string_fragment" then
             -- Never pair in a string (it is reserved to Nix, and nested strings are never Nix code)
             return false
@@ -578,6 +578,50 @@ Plug {
     --   attr = true;
     --   attr_other = true;
     -- }
+    -- ```
+
+    -- [Lua] Auto `,` after `=` (in `{ … }` tables)
+    npairs.add_rule(
+      Rule{start_pair = [[=]], end_pair = [[,]], filetypes = {"lua"}}
+        :insert_pair_when(function()
+          if not U.is_treesitter_available_here() then return end -- disable this check
+          vim.treesitter.get_parser():parse()
+          local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
+          -- print("pairing check for `=;`, ts node type:", node:type())
+          if node:type() ~= "table_constructor" then
+            -- Never pair outside of a table constructor
+            return false
+          end
+          return nil -- fallback to other checks
+        end)
+        -- quickly check if we're in a simple case (current line check)
+        :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
+        :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*[%w_]+%s*="})) -- e.g. {foo|other="thing"}
+        :insert_pair_when(cond.never) -- last fallback
+        :end_pair_moves_right_when(cond.never)
+        :cr_expands_pair_when(cond.never)
+    )
+    -- Test cases for above rule:
+    -- * fields that are `true` should have an `auto-,` behavior when typing their `=`
+    -- * fields that are `false` should NOT have `auto-,` behavior when typing their `=`
+    -- ```lua
+    -- local _t = {
+    --   field = true,
+    --   field_other = true,
+    --
+    --   inline = {packed_field=false},
+    --   inline2 = { field = false },
+    --   -- For this case, we're adding a new field before `already_present`
+    --   inline3 = { before_field = true, already_present = "foo" },
+    -- }
+    --
+    -- ---@diagnostic disable-next-line: unused-function, unused-local
+    -- local function foo()
+    --   local _var = false
+    --   if "some-condition" then
+    --     local _var = false
+    --   end
+    -- end
     -- ```
 
     -- [Rust] Override S-quote to avoid pairing when writing fn/type signatures
