@@ -198,24 +198,23 @@ local action_hlsearch_current = {
     return doc
   end,
   options = {
-    -- IDEA for other names: word_bounds, with_bounds, with_word_bounds
     word_bounds = A.mk_action_opt{
       desc = [[Whether the search should be bounded (true) or anywhere (false) (in visual mode, bounds are guessed to best match selection)]],
-      type = "boolean", -- nicer: `t.bool`
+      type = "boolean", -- nicer: `A.ty.bool`
       default = false,
     },
-    embed_cursor_pos_in_search = A.mk_action_opt{ -- TODO: impl this!
+    keep_cursor_pos = A.mk_action_opt{ -- TODO: impl this!
       desc = [[Whether to embed cursor position in search, to keep the current offset for all matches]],
-      type = "boolean", -- nicer: `t.bool`
+      type = "boolean", -- nicer: `A.ty.bool`
       default = false,
     },
     -- TODO: currently always as if `true`, need to impl `false`
-    -- GOTCHA: if this is false, `embed_cursor_pos_in_search` cannot be `true` 👀
+    -- GOTCHA: if this is false, `keep_cursor_pos` cannot be `true` 👀
     -- FIXME: => does it even make sense to have a separate option for this?
-    --   => Might be better to merge `embed_cursor_pos_in_search` & `preserve_cursor_pos` ?
+    --   => Might be better to merge `keep_cursor_pos` & `preserve_cursor_pos` ?
     -- preserve_cursor_pos = mk_action_opt{
     --   desc = [[]],
-    --   type = "boolean", -- nicer: `t.bool`
+    --   type = "boolean", -- nicer: `A.ty.bool`
     --   default = false,
     -- },
   },

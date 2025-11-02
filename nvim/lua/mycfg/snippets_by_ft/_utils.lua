@@ -123,11 +123,11 @@ SU.myfmt_braces = function(args)
   return SU.myfmt(args)
 end
 
----@class mysnips.Opts.SpecForResolveExtandParams
+---@class mysnips.Opts.SpecForResolveExpandParams
 ---@field delete_after_trig string|string[] Text patterns to ignore (delete) before snip expansion
 
 --- Make fn for resolveExpandParams context option, following given spec
----@param spec mysnips.Opts.SpecForResolveExtandParams
+---@param spec mysnips.Opts.SpecForResolveExpandParams
 ---@return LuaSnip.ResolveExpandParamsFn
 --
 -- The `resolveExpandParams` snip ctx fn allows (among other things) to tweak what will be deleted
