@@ -1,3 +1,4 @@
+; This file defines custom queries for highlighting
 ;; extends
 
 ; Builtin module keywords in module path or visibility modifier

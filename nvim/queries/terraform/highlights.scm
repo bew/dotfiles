@@ -1,4 +1,5 @@
-; inherits: terraform
+; This file defines custom queries for highlighting
+;; extends
 
 ; Replicate the Terraform specific references,
 ; to be highlighted in conditions like `var.foo == "bar"`

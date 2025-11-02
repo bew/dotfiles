@@ -1,3 +1,4 @@
+; This file defines custom queries for language injection
 ;; extends
 
 ; For sql function call like `cur.execute("SELECT ...")`

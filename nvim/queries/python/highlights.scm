@@ -1,3 +1,4 @@
+; This file defines custom queries for highlighting
 ;; extends
 
 ; `None` in simple union type

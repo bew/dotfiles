@@ -1,3 +1,4 @@
+; This file defines custom queries for highlighting
 ;; extends
 
 ; Give higher priority to variable names, to ensure they stand out in a string.
