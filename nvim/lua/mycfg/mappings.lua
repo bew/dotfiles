@@ -698,6 +698,18 @@ K.toplevel_map{mode="v", key="p", desc="paste (preserves register)", action="P"}
 -- V: Vim's visual paste (replacing current/unnamed register)
 K.toplevel_map{mode="v", key="P", desc="paste (swaps register)", action="p"}
 
+-- V: Indent/Dedent (keep visual selection)
+my_actions.visual_indent = A.mk_action {
+  default_desc = "Indent (keep selection)",
+  v = ">gv",
+}
+my_actions.visual_dedent = A.mk_action {
+  default_desc = "Dedent (keep selection)",
+  v = "<gv",
+}
+K.toplevel_map{mode="v", key=">", action=my_actions.visual_indent}
+K.toplevel_map{mode="v", key="<", action=my_actions.visual_dedent}
+
 -- V: Ranged fold open/close
 -- NOTE1: this does not change the 'foldlevel'.
 -- NOTE2: these mappings must be typed fast, otherwise you get normal behavior.
@@ -927,16 +939,6 @@ K.global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_spli
 --------------------------------------------------------------------
 
 -- CrazyIDEA: Map Alt-MouseClick to resize a window by finding nearest edge??
-
--- V: Move a selection of text
--- Indent/Dedent
---vnoremap <Left>  <gv
---vnoremap <Right> >gv
--- Move Up/Down
--- TODO: make it work with v:count ?
---vnoremap <silent> <Up>   :move '<-2<cr>gv
---vnoremap <silent> <Down> :move '>+1<cr>gv
-
 
 -- Vim eval-and-replace:
 -- Evaluate the current selection as a vimscript expression and replace
