@@ -39,10 +39,29 @@ local function mk_builtin_hooks_for_registers(registers_to_backup)
   }
 end
 
+---@param options_to_backup string[]
+---@return mylib.save_restore.Hooks
+local function mk_builtin_hooks_for_options(options_to_backup)
+  return {
+    save = function(state)
+      state.saved_options = {}
+      for _, option_name in ipairs(options_to_backup) do
+        state.saved_options[option_name] = vim.o[option_name]
+      end
+    end,
+    restore = function(state)
+      for _, option_name in ipairs(options_to_backup) do
+        vim.o[option_name] = state.saved_options[option_name]
+      end
+    end
+  }
+end
+
 ---@class mylib.Opts.save_restore.Hooks
 ---@field save? mylib.save_restore.HookFn Hook called to save some context to given state
 ---@field restore? mylib.save_restore.HookFn Hook called to restore some context from given state
 ---@field save_registers? string[] List of registers to save/restore (builtin hooks)
+---@field save_options? string[] List of options to save/restore (builtin hooks)
 ---@field save_cursor? boolean Whether to save/restore current cursor (builtin hooks)
 
 --- Save/Restore anything and run arbitrary function in-between.
@@ -59,6 +78,9 @@ function SR.save_run_restore(hooks, fn)
   local sets_of_hooks = {}
   if hooks.save_registers then
     table.insert(sets_of_hooks, mk_builtin_hooks_for_registers(hooks.save_registers))
+  end
+  if hooks.save_options then
+    table.insert(sets_of_hooks, mk_builtin_hooks_for_options(hooks.save_options))
   end
   if hooks.save_cursor then
     table.insert(sets_of_hooks, builtin_hooks_for_cursor)
