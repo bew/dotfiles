@@ -120,7 +120,7 @@ vim.opt.fillchars = {
   vert = " ",    -- separator between vertical splits
 }
 
-vim.o.scrolloff = 3        -- minimum lines to keep above and below cursor
+vim.o.scrolloff = 5        -- minimum lines to keep above and below cursor
 vim.o.sidescrolloff = 10   -- minimum chars to keep on the left/right of the cursor
 
 --set sidescroll=1          -- side scroll chars one by one

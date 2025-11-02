@@ -1,11 +1,14 @@
 local PluginSystem = require"mylib.plugin_system"
-local Plug = PluginSystem.get_plugin_declarator()
 local dist_managed_opt_plug = PluginSystem.sources.dist_managed_opt_plug
 local fallback = PluginSystem.sources.fallback
 
 -- Shorter vars for easy/non-bloat use in pkg specs!
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
+
+local Plug = PluginSystem.get_plugin_declarator {
+  default_tags = {t.ts},
+}
 
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
@@ -15,7 +18,6 @@ local K = require"mylib.keymap_system"
 Plug.ts {
   source = fallback("treesitter", dist_managed_opt_plug"nvim-treesitter"),
   desc = "Nvim Treesitter configurations and abstraction layer",
-  tags = {t.ts},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     ---@diagnostic disable-next-line: missing-fields (don't care, it works)
@@ -35,7 +37,7 @@ Plug.ts {
 Plug {
   source = gh"Wansmer/treesj",
   desc = "Neovim plugin for splitting/joining blocks of code",
-  tags = {t.ts, t.editing},
+  tags = {t.editing},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     local lang_utils = require"treesj.langs.utils"
@@ -73,4 +75,53 @@ Plug {
     K.local_leader_map{mode={"n"}, key="js", action=my_actions.treesj_split}
     K.local_leader_map{mode={"n"}, key="jj", action=my_actions.treesj_join}
   end
+}
+
+Plug {
+  source = gh"nvim-treesitter/nvim-treesitter-context",
+  desc = "Show code context",
+  tags = {"ui"},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    local tsctx = require"treesitter-context"
+    tsctx.setup {
+      multiwindow = false, -- Enable multiwindow support. -- (?)
+      max_lines = "40%", -- How many lines the window should span. Values <= 0 mean no limit.
+      multiline_threshold = 5, -- Maximum number of lines to show for a SINGLE context item
+      mode = "topline",  -- Line used to calculate context. (Either "cursor" or "topline")
+      trim_scope = "inner",
+      -- Separator between context and content (must be single char).
+      separator = "🮃", -- "▀"
+    }
+
+    my_actions.ts_context_toggle = A.mk_action {
+      default_desc = "Toggle context",
+      n = tsctx.toggle,
+    }
+    my_actions.ts_context_jump_to = A.mk_action {
+      default_desc = "Jump to (count) context",
+      n = function()
+        local tsctx = require"treesitter-context"
+        if not tsctx.enabled() then
+          error("treesitter-context is not enabled for this buffer")
+        end
+        tsctx.go_to_context(vim.v.count1)
+      end,
+    }
+    K.local_leader_map_define_group{mode={"n"}, prefix_key="cx", name="+context"}
+    K.local_leader_map{mode="n", key=[[cx<Space>]], action=my_actions.ts_context_toggle}
+    K.local_leader_map{mode="n", key=[[cxx]], action=my_actions.ts_context_jump_to}
+  end,
+  on_colorscheme_change = function()
+    local ctermbg = 235
+    local ctermbg_darker = 233
+    vim.api.nvim_set_hl(0, "TreesitterContext", {
+      ctermfg = 248,
+      ctermbg = ctermbg,
+    })
+    vim.api.nvim_set_hl(0, "TreesitterContextSeparator", {
+      ctermfg = ctermbg, -- (border uses FG, should match context' BG)
+      ctermbg = ctermbg_darker,
+    })
+  end,
 }
