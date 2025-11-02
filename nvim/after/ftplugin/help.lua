@@ -9,18 +9,18 @@ local K = require"mylib.keymap_system"
 -- Fast quit
 K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 -- Backup for macro recording
-K.toplevel_buf_map{mode="n", key=[[<M-q>]], action="q"}
+K.toplevel_buf_map{mode="n", key=[[<C-M-q>]], desc="Record macro", action="q"}
 
 -- Fast more help
-K.toplevel_buf_map{mode="n", key=[[<M-h>]], action=":h "}
+K.toplevel_buf_map{mode="n", key=[[<M-h>]], desc="Quick open help", action=":h "}
 
 -- Fast vertical movement
-K.toplevel_buf_map{mode="n", key="J", action=[[<C-d>]]}
-K.toplevel_buf_map{mode="n", key="K", action=[[<C-u>]]}
+K.toplevel_buf_map{mode="n", key="J", desc="Scroll down", action=[[<C-d>]]}
+K.toplevel_buf_map{mode="n", key="K", desc="Scroll up",   action=[[<C-u>]]}
 
 -- Go to help hyper link
-K.toplevel_buf_map{mode="n", key="o",    action=[[<C-]>]]}
-K.toplevel_buf_map{mode="n", key="<CR>", action=[[<C-]>]]}
+K.toplevel_buf_map{mode="n", key="o",    desc="Open help link", action=[[<C-]>]]}
+K.toplevel_buf_map{mode="n", key="<CR>", desc="Open help link", action=[[<C-]>]]}
 
 --- Jump to next/prev link after/before cursor, wrapping around if needed
 ---@param dir "next"|"prev"
@@ -72,10 +72,10 @@ local function jump_to_link(dir)
   end
 end
 
-K.toplevel_buf_map{mode="n", key=[[<C-n>]], action=function()
+K.toplevel_buf_map{mode="n", key=[[<C-n>]], desc="Jump to next help link", action=function()
   jump_to_link("next")
 end}
-K.toplevel_buf_map{mode="n", key=[[<C-p>]], action=function()
+K.toplevel_buf_map{mode="n", key=[[<C-p>]], desc="Jump to prev help link", action=function()
   jump_to_link("prev")
 end}
 
