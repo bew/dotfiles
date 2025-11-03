@@ -29,23 +29,23 @@ snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
 --- Generate easy-to-use snippets for the given LuaCATS @annotation
 ---@param trig string
 ---@param context mysnips.SnipContext
----@param nodes_factory (fun(): LuaSnip.Node)
+---@param nodes_factory (fun(): LuaSnip.Node[]|LuaSnip.Node)
 local function snip_lua_annotation(trig, context, nodes_factory, ...)
   assert(trig:sub(1, 1) == "@", "annotation's trigger must start with '@'")
-  assert(type(nodes_factory) == "function", "annotation's nodes factory must be a function, got: "..type(nodes_factory))
+  vim.validate("annotation nodes", nodes_factory, "function")
   local trig_without_at = trig:sub(2)
   do
     -- Allows `---@foo|` or `---foo|` or `--- foo|`
     --   => `---@foo_or_foobar |`
     -- (must be first to have a chance to match before `@foo` below)
-    local context_rx = vim.tbl_extend("keep", context, { rx = true })
+    local context_rx = vim.tbl_extend("keep", context, { rx = true }) -- copy, add rx
     snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory(), ...)
   end
   do
     -- Allows `anfoo|` => `---@foo_or_foobar |`
     -- This is nicer to type on my external split keyboard,
     -- as the snip-trigger finger is also used for `@`
-    local context_copy = vim.tbl_extend("keep", context, {})
+    local context_copy = vim.tbl_extend("keep", context, {}) -- copy only
     snip("an"..trig_without_at, context_copy, nodes_factory(), ...)
   end
   do
@@ -72,7 +72,7 @@ local function get_class_annotation_nodes()
     },
   }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
 end
-snip_lua_annotation("@cl", {desc = "LuaCATS @class", rx = true, when = conds.start_of_line}, get_class_annotation_nodes, {
+snip_lua_annotation("@cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes, {
   stored = { class_name = i(nil, "ClassName") },
 })
 snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes(), {
@@ -129,23 +129,56 @@ do
     c = "cast",
     e = "enum",
     f = "field",
-    fi = "field private",
-    fo = "field protected",
-    g = "generic",
+    fp = {
+      name = "non-public field",
+      nodes_maker = function()
+        return SU.myfmt {
+          [[field <protection> ]],
+          {
+            protection = ls.choice_node(1, {
+              t"private",
+              t"protected",
+            }),
+          },
+        }
+      end,
+    },
+    g = {
+      name = "generic",
+      nodes_maker = function()
+        return SU.myfmt { [[generic <t>]], { t = i(1, "T") } }
+      end,
+    },
     m = "module",
     o = "overload",
     p = "param",
-    pri = "private",
-    pro = "protected",
+    pr = {
+      name = "non-public doc block",
+      nodes_maker = function()
+        return { ls.choice_node(1, { t"private ", t"protected " }) }
+      end,
+    },
     r = "return",
     t = "type",
   }
-  for short, long in pairs(short_to_long_annotation) do
+  ---@alias mysnips.lua.AnnSimpleData {name: string, nodes_maker: (fun(): LuaSnip.Node[])}
+  ---@return mysnips.lua.AnnSimpleData
+  local function make_long_data(long_name)
+    return { name = long_name, nodes_maker = function() return { t(long_name.." ") } end }
+  end
+  for short, long_data in pairs(short_to_long_annotation) do
+    if type(long_data) == "string" then
+      long_data = make_long_data(long_data)
+    end
+    local desc = "LuaCATS @"..long_data.name
+    if long_data.name:match" " then
+      desc = "LuaCATS "..long_data.name
+    end
     snip_lua_annotation(
       "@"..short,
-      {desc = "LuaCATS @"..long, resolver = SR.delete_spaces_after_trigger},
+      {desc = desc, resolver = SR.delete_spaces_after_trigger},
       function()
-        return t("---@"..long.." ")
+        return U.concat_lists({ t"---@" }, long_data.nodes_maker())
       end
     )
   end
