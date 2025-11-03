@@ -401,7 +401,7 @@ Plug {
           (after_spec.text and cond.followed_by_text(after_spec.text)(plugin_opts))
           or (after_spec.rx and cond.followed_by_regex(after_spec.rx, -1)(plugin_opts))
         )
-        if opts.debug then
+        if opts.debug then -- DEBUG
           local _line_before, _line_after = U.get_line_around_cursor()
           print(_f(
             "pairing check for `=;`,",
@@ -418,6 +418,20 @@ Plug {
         end
         return nil -- fallback to other checks
       end
+    end
+
+    --- Returns fn that runs the given checker function with the current TS node
+    ---@param node_checker (fun(node: TSNode): boolean?)
+    ---@return autopair-cond.ExpectedFn
+    function cond.ts_node_check(node_checker)
+      local fn = function(_opts)
+        if not U.is_treesitter_available_here() then return end -- disable this check
+        vim.treesitter.get_parser():parse()
+        local node = vim.treesitter.get_node { ignore_injections = true }
+        if not node then return end -- disable this check
+        return node_checker(node)
+      end
+      return fn
     end
 
     -- FIXME(?): It's not possible to make a SaneRule default without knowing the
@@ -537,17 +551,14 @@ Plug {
     -- [Nix] Auto `;` after `=` (in `let … in` block or `{ … }` attrset)
     npairs.add_rule(
       Rule{start_pair = [[=]], end_pair = [[;]], filetypes = {"nix"}}
-        :insert_pair_when(function()
-          if not U.is_treesitter_available_here() then return end -- disable this check
-          vim.treesitter.get_parser():parse()
-          local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
+        :insert_pair_when(cond.ts_node_check(function(node)
           -- print("pairing check for `=;`, ts node type:", nodes and node:type())
           if node:type() == "string_fragment" then
             -- Never pair in a string (it is reserved to Nix, and nested strings are never Nix code)
             return false
           end
           return nil -- fallback to other checks
-        end)
+        end))
         -- quickly check if we're in a simple case (current line check)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*%}"})) -- e.g. `foo|}` or `foo | }`
@@ -584,18 +595,15 @@ Plug {
 
     -- [Lua] Auto `,` after `=` (in `{ … }` tables)
     npairs.add_rule(
-      Rule{start_pair = [[=]], end_pair = [[,]], filetypes = {"lua"}}
-        :insert_pair_when(function()
-          if not U.is_treesitter_available_here() then return end -- disable this check
-          vim.treesitter.get_parser():parse()
-          local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
-          -- print("pairing check for `=;`, ts node type:", node:type())
+      Rule{start_pair = [[=]], end_pair = [[,]], filetypes = {"lua", "lua.luasnip"}}
+        :insert_pair_when(cond.ts_node_check(function(node)
+          -- print("pairing check for `=,`, ts node type:", node and node:type())
           if node:type() ~= "table_constructor" then
             -- Never pair outside of a table constructor
             return false
           end
           return nil -- fallback to other checks
-        end)
+        end))
         -- quickly check if we're in a simple case (current line check)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*[%w_]+%s*="})) -- e.g. {foo|other="thing"}
