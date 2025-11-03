@@ -5,6 +5,8 @@ local Plug = PluginSystem.get_plugin_declarator()
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
+local U = require"mylib.utils"
+
 --------------------------------
 
 Plug {
@@ -115,12 +117,12 @@ Plug {
     }
   end,
   on_colorscheme_change = function()
-    vim.api.nvim_set_hl(0, "@ai.heading.me", {
+    U.hl.set("@ai.heading.me", {
       ctermbg = 94,
       ctermfg = 255,
       bold = true,
     })
-    vim.api.nvim_set_hl(0, "@ai.heading.generated", {
+    U.hl.set("@ai.heading.generated", {
       ctermbg = 54,
       ctermfg = 220,
       italic = true,

@@ -303,7 +303,7 @@ Plug.cmp {
     cols.CmpWinBG = { ctermbg=235, ctermfg=252 }
     cols.CmpWinSelection = { ctermbg=238, bold = true }
     for hlgroup, hlspec in pairs(cols) do
-      vim.api.nvim_set_hl(0, hlgroup, hlspec)
+      U.hl.set(hlgroup, hlspec)
     end
   end,
 }

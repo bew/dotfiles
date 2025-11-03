@@ -7,6 +7,8 @@ local Plug = PluginSystem.get_plugin_declarator {
 local t = PluginSystem.tags
 local gh = PluginSystem.sources.github
 
+local U = require"mylib.utils"
+
 --------------------------------
 
 Plug {
@@ -56,7 +58,7 @@ Plug.codecompanion {
     vim.keymap.set("ca", "ccb", "CodeCompanionChat #buffer")
   end,
   on_colorscheme_change = function()
-    vim.api.nvim_set_hl(0, "CodeCompanionChatTokens", {
+    U.hl.set("CodeCompanionChatTokens", {
       ctermfg = 174,
       italic = true,
     })

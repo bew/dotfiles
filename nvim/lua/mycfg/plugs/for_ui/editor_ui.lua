@@ -96,9 +96,9 @@ Plug {
     hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_tab_indent_level)
   end,
   on_colorscheme_change = function()
-    vim.api.nvim_set_hl(0, "IblIndent", { ctermfg = 237 })
+    U.hl.set("IblIndent", { ctermfg = 237 })
     -- note: `fg` necessary because it is used for the underline color of first/last line of scope
-    vim.api.nvim_set_hl(0, "IblScope",  { ctermfg = 239, fg = "#4f5258" })
+    U.hl.set("IblScope",  { ctermfg = 239, fg = "#4f5258" })
   end,
 }
 

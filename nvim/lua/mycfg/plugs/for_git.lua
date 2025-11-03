@@ -7,6 +7,7 @@ local gh = PluginSystem.sources.github
 
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -129,21 +130,21 @@ Plug {
   end,
   on_colorscheme_change = function()
     -- untracked changes
-    vim.api.nvim_set_hl(0, "GitSignsUntracked",    { link = "VcsUntracked" })
+    U.hl.set("GitSignsUntracked",    { link = "VcsUntracked" })
 
     -- unstaged changes
-    vim.api.nvim_set_hl(0, "GitSignsAdd",          { link = "VcsAdd" })
-    vim.api.nvim_set_hl(0, "GitSignsChange",       { link = "VcsChange" })
-    vim.api.nvim_set_hl(0, "GitSignsDelete",       { link = "VcsDelete" })
-    vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = "VcsChange" })
-    vim.api.nvim_set_hl(0, "GitSignsTopdelete",    { link = "VcsDelete" })
+    U.hl.set("GitSignsAdd",          { link = "VcsAdd" })
+    U.hl.set("GitSignsChange",       { link = "VcsChange" })
+    U.hl.set("GitSignsDelete",       { link = "VcsDelete" })
+    U.hl.set("GitSignsChangedelete", { link = "VcsChange" })
+    U.hl.set("GitSignsTopdelete",    { link = "VcsDelete" })
 
     -- staged changes
-    vim.api.nvim_set_hl(0, "GitSignsStagedAdd",          { link = "VcsStagedAdd" })
-    vim.api.nvim_set_hl(0, "GitSignsStagedChange",       { link = "VcsStagedChange" })
-    vim.api.nvim_set_hl(0, "GitSignsStagedDelete",       { link = "VcsStagedDelete" })
-    vim.api.nvim_set_hl(0, "GitSignsStagedChangedelete", { link = "VcsStagedChange" })
-    vim.api.nvim_set_hl(0, "GitSignsStagedTopdelete",    { link = "VcsStagedDelete" })
+    U.hl.set("GitSignsStagedAdd",          { link = "VcsStagedAdd" })
+    U.hl.set("GitSignsStagedChange",       { link = "VcsStagedChange" })
+    U.hl.set("GitSignsStagedDelete",       { link = "VcsStagedDelete" })
+    U.hl.set("GitSignsStagedChangedelete", { link = "VcsStagedChange" })
+    U.hl.set("GitSignsStagedTopdelete",    { link = "VcsStagedDelete" })
   end
 }
 

@@ -12,6 +12,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -115,11 +116,11 @@ Plug {
   on_colorscheme_change = function()
     local ctermbg = 235
     local ctermbg_darker = 233
-    vim.api.nvim_set_hl(0, "TreesitterContext", {
+    U.hl.set("TreesitterContext", {
       ctermfg = 248,
       ctermbg = ctermbg,
     })
-    vim.api.nvim_set_hl(0, "TreesitterContextSeparator", {
+    U.hl.set("TreesitterContextSeparator", {
       ctermfg = ctermbg, -- (border uses FG, should match context' BG)
       ctermbg = ctermbg_darker,
     })

@@ -7,6 +7,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 }
 
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -186,7 +187,7 @@ Plug {
     K.local_leader_map{mode="n", key="cp", desc="Code Nav panel", action=require"aerial".toggle}
   end,
   on_colorscheme_change = function()
-    vim.api.nvim_set_hl(0, "AerialLine", { link = "Visual" })
+    U.hl.set("AerialLine", { link = "Visual" })
   end,
 }
 
@@ -234,6 +235,6 @@ Plug {
   on_colorscheme_change = function()
     -- parenthesis matches still use the vim standard `MatchParen`
     -- word matches uses `MatchWord` (using `MatchParen` for words is too flashy!)
-    vim.api.nvim_set_hl(0, "MatchWord", { underline = true })
+    U.hl.set("MatchWord", { underline = true })
   end
 }

@@ -171,23 +171,23 @@ Plug {
       end
 
       -- Select a different cursor as the main one
-      layer_map{mode={"n", "x"}, key="<left>",  action=mc.prevCursor, desc="Select prev cursor"}
-      layer_map{mode={"n", "x"}, key="<right>", action=mc.nextCursor, desc="Select next cursor"}
-      layer_map{mode={"n", "x"}, key="<M-c>",   action=mc.nextCursor, desc="Cycle cursors"}
+      layer_map{mode={"n", "v"}, key="<left>",  action=mc.prevCursor, desc="Select prev cursor"}
+      layer_map{mode={"n", "v"}, key="<right>", action=mc.nextCursor, desc="Select next cursor"}
+      layer_map{mode={"n", "v"}, key="<M-c>",   action=mc.nextCursor, desc="Cycle cursors"}
 
-      layer_map{mode={"n", "x"}, key="<M-Space><M-g>", action=mc.firstCursor, desc="Select first(top) cursor"}
-      layer_map{mode={"n", "x"}, key="<M-Space><M-G>", action=mc.lastCursor,  desc="Select last(bottom) cursor"}
+      layer_map{mode={"n", "v"}, key="<M-Space><M-g>", action=mc.firstCursor, desc="Select first(top) cursor"}
+      layer_map{mode={"n", "v"}, key="<M-Space><M-G>", action=mc.lastCursor,  desc="Select last(bottom) cursor"}
 
       -- Delete the main cursor
-      layer_map{mode={"n", "x"}, key="<M-Space><M-x>", action=mc.deleteCursor, desc="Delete main cursor, jump to last"}
+      layer_map{mode={"n", "v"}, key="<M-Space><M-x>", action=mc.deleteCursor, desc="Delete main cursor, jump to last"}
 
       -- Increment/decrement sequences, treating all cursors as one sequence
-      layer_map{mode={"n", "x"}, key="g<C-a>", action=mc.sequenceIncrement}
-      layer_map{mode={"n", "x"}, key="g<C-x>", action=mc.sequenceDecrement}
+      layer_map{mode={"n", "v"}, key="g<C-a>", action=mc.sequenceIncrement}
+      layer_map{mode={"n", "v"}, key="g<C-x>", action=mc.sequenceDecrement}
 
       local save_n_clear = my_actions.mc_save_buf_n_clear_cursors
       local save_n_clear_desc = save_n_clear.mode_actions.n.default_desc -- same desc for all mods
-      layer_map{mode={"n", "x", "i"}, key=[[<C-M-S>]], action=save_n_clear:get_multimode_proxy_fn(), desc=save_n_clear_desc}
+      layer_map{mode={"n", "v", "i"}, key=[[<C-M-S>]], action=save_n_clear:get_multimode_proxy_fn(), desc=save_n_clear_desc}
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
@@ -207,19 +207,16 @@ Plug {
   on_colorscheme_change = function()
     -- NOTE: Colors are _reversed_ to ensure the extmarks stay visible over search result highlights
     -- ISSUE: https://github.com/neovim/neovim/issues/18756#issuecomment-2833479559
-    vim.api.nvim_set_hl(0, "MultiCursorCursor", {
-      bold = true,
-      reverse = true,
+    local base_cursor_hl = U.hl.group { bold = true, reverse = true }
+    U.hl.set("MultiCursorCursor", base_cursor_hl:with {
       ctermfg = 88,
       ctermbg = 248,
     })
-    vim.api.nvim_set_hl(0, "MultiCursorDisabledCursor", {
-      bold = true,
-      reverse = true,
+    U.hl.set("MultiCursorDisabledCursor", base_cursor_hl:with {
       ctermfg = 238,
       ctermbg = 248,
     })
-    vim.api.nvim_set_hl(0, "MultiCursorVisual", { ctermbg = 52 })
-    vim.api.nvim_set_hl(0, "MultiCursorDisabledVisual", { ctermbg = 236 })
+    U.hl.set("MultiCursorVisual", { ctermbg = 52 })
+    U.hl.set("MultiCursorDisabledVisual", { ctermbg = 236 })
   end,
 }
