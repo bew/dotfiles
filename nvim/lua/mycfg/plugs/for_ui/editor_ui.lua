@@ -7,6 +7,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 }
 
 local A = require"mylib.action_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -46,10 +47,8 @@ Plug {
   on_load = function()
     require"visual-whitespace".setup {
       highlight = {
-        ---@diagnostic disable-next-line: undefined-field (fixed in v0.11.0)
-        ctermfg = vim.api.nvim_get_hl(0, {name="Comment"}).ctermfg,
-        ---@diagnostic disable-next-line: undefined-field (fixed in v0.11.0)
-        ctermbg = vim.api.nvim_get_hl(0, {name="VisualNormal"}).ctermbg,
+        ctermfg = U.hl.group"Comment".ctermfg,
+        ctermbg = U.hl.group"VisualNormal".ctermbg,
       },
       space_char = " ", -- avoid noise
       nl_char = "󰘌 ",

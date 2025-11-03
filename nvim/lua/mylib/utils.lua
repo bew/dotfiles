@@ -17,6 +17,8 @@ U.fs = require"mylib.utils.fs_utils"
 U.search = require"mylib.utils.search_utils"
 --- Treesitter-related utils
 U.treesitter = require"mylib.utils.treesitter_utils"
+--- HL-related utils
+U.hl = require"mylib.utils.hl_utils"
 
 --- Metatable-related utils
 U.mt = require"mylib.utils.mt_utils"

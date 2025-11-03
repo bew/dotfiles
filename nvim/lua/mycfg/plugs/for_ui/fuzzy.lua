@@ -8,6 +8,7 @@ local Plug = PluginSystem.get_plugin_declarator {
 }
 
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 --------------------------------
 
@@ -327,25 +328,24 @@ Plug.telescope {
     K.toplevel_map{mode={"n"}, key="<C-f><C-Space>", desc="Buffers", action=tel_builtin.buffers}
   end,
   on_colorscheme_change = function()
-    local function get_hl(name)
-      return vim.api.nvim_get_hl(0, { name = name })
-    end
-    local normal = get_hl"Normal"
+    local normal = U.hl.group"Normal"
+    ---@type {[string]: mylib.hl.HlGroup}
     local cols = {}
     cols.TelescopeBorder = normal
-    cols.TelescopePromptBorder = {
+    cols.TelescopePromptBorder = U.hl.group {
       ctermfg = 202,
-      ctermbg = normal.ctermbg, ---@diagnostic disable-line: undefined-field (fixed in v0.11.0)
+      ctermbg = normal.ctermbg,
     }
-    -- Titles are the reverse of borders
-    cols.TelescopeTitle = vim.tbl_extend("force", cols.TelescopeBorder, { reverse = true, bold = true })
-    cols.TelescopePromptTitle = vim.tbl_extend("force", cols.TelescopePromptBorder, { reverse = true, bold = true })
 
-    cols.TelescopeMatching = { ctermfg = 202 }
-    cols.TelescopeMultiSelection = { ctermbg = 22, bold = true }
+    -- Titles are the reverse of borders
+    cols.TelescopeTitle = cols.TelescopeBorder:with { reverse = true, bold = true }
+    cols.TelescopePromptTitle = cols.TelescopePromptBorder:with { reverse = true, bold = true }
+
+    cols.TelescopeMatching = U.hl.group { ctermfg = 202 }
+    cols.TelescopeMultiSelection = U.hl.group { ctermbg = 22, bold = true }
 
     for hlgroup, hlspec in pairs(cols) do
-      vim.api.nvim_set_hl(0, hlgroup, hlspec)
+      U.hl.set(hlgroup, hlspec)
     end
   end
 }
