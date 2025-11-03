@@ -1,0 +1,26 @@
+# This file will be auto-loaded.
+
+matches:
+  - trigger: "!ghdetails!"
+    replace: |
+      <details>
+      <summary>FILL_ME</summary>
+
+      DETAILS_HERE
+
+      </details>
+
+  - trigger: "!ghnote!"
+    replace: |
+      > [!NOTE]
+      > CONTENT
+
+  - trigger: "!ghwarn!"
+    replace: |
+      > [!WARNING]
+      > CONTENT
+
+  - trigger: "!ghtip!"
+    replace: |
+      > [!TIP]
+      > CONTENT
