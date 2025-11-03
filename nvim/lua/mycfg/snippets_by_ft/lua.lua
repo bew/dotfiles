@@ -422,20 +422,13 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
 -- A snippet for the function type, must be on a `---@something` line (after).
 -- NOTE: Must be before anon fn def to have a chance to match
 snip("fn", {desc = "annotation for function type", when = conds.line_before_matches"%-%-%-@"}, SU.myfmt {
-  [[(fun(<args>): <ret>)]],
+  [[(fun(<args>)<maybe_ret>)]],
   {
-    args = ls.choice_node(1, {
-      i(nil),
-      SU.myfmt {
-        [[<param>: <ty><maybe_more>]],
-        {
-          param = i(1, "param"),
-          ty = i(2, "any"),
-          maybe_more = i(3),
-        },
-      },
+    args = i(1),
+    maybe_ret = ls.choice_node(2, {
+      SU.myfmt { [[: <ret>]], { ret = i(1, "...") } },
+      t"",
     }),
-    ret = i(2, "any"),
   }
 })
 -- NOTE: condition is reversed (with `-` before condition obj),
