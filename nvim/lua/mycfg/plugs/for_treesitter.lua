@@ -86,8 +86,8 @@ Plug {
   on_load = function()
     local tsctx = require"treesitter-context"
     tsctx.setup {
-      multiwindow = false, -- Enable multiwindow support. -- (?)
-      max_lines = "40%", -- How many lines the window should span. Values <= 0 mean no limit.
+      multiwindow = true, -- When false, only enabled on current bufwin, everywhere when true.
+      max_lines = "35%", -- How many lines the window should span. Values <= 0 mean no limit.
       multiline_threshold = 5, -- Maximum number of lines to show for a SINGLE context item
       mode = "topline",  -- Line used to calculate context. (Either "cursor" or "topline")
       trim_scope = "inner",
