@@ -73,6 +73,10 @@ patterns.big_idea = {
   pattern = U.concat_lists {
     _big_word_variants"IDEA",
     _big_word_variants"MAYBE",
+    {
+      -- e.g. IDEA_something
+      _U.keywordize("()IDEA()_", {before=true}),
+    }
   },
   group = _U.define_hl("big_idea", {
     ctermfg = 128,

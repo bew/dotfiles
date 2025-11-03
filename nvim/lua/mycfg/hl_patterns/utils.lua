@@ -5,15 +5,23 @@ local _U = {}
 --- Wrap pattern with word bounds before/after as needed if it starts/ends as a word,
 ---   to prevent matching the pattern inside another word.
 ---@param pattern string The pattern to wrap
+---@param opts? {before?: boolean, after?: boolean}
 ---@return string
-function _U.keywordize(pattern)
-  if pattern:match("^[%a]") then
+function _U.keywordize(pattern, opts)
+  local add_before = not not pattern:match("^[%a]")
+  local add_after = not not pattern:match("%a$")
+  if opts then
+    -- if opts is given, only keywordize the wanted sides
+    if not opts.before then add_before = false end
+    if not opts.after then add_after = false end
+  end
+  if add_before then
     -- Start of pattern is a word, add frontier
     -- note: frontier means:
     --   from `not in set 'letters'` to `in set 'letters'`
     pattern = "%f[%a_-]()" .. pattern
   end
-  if pattern:match("%a$") then
+  if add_after then
     -- End of pattern is a word, add frontier
     -- note: frontier means:
     --   from `not in set 'not letters'` to `in set 'not letters'`
