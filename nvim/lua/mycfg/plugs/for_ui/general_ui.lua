@@ -105,7 +105,7 @@ Plug {
   source = gh"mbbill/undotree",
   desc = "Vim undo tree visualizer",
   tags = {t.vimscript, t.need_better_plugin},
-  defer_load = { on_cmd = "UndotreeToggle" },
+  defer_load = { on_event = "VeryLazy" },
   -- pre_load because it must be set before `plugin/` files are loaded!
   on_pre_load = function()
     -- (e.g) Use 'd' instead of 'days' to save some space.

@@ -541,7 +541,7 @@ Plug {
           if not U.is_treesitter_available_here() then return end -- disable this check
           vim.treesitter.get_parser():parse()
           local node = vim.treesitter.get_node { ignore_injections = true } ---@cast node TSNode
-          -- print("pairing check for `=;`, ts node type:", node:type())
+          -- print("pairing check for `=;`, ts node type:", nodes and node:type())
           if node:type() == "string_fragment" then
             -- Never pair in a string (it is reserved to Nix, and nested strings are never Nix code)
             return false

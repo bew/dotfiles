@@ -2,7 +2,9 @@ local U = require"mylib.utils"
 local _f = U.fmt.str_space_concat
 local _q = U.fmt.str_simple_quote_surround
 
-local print_err = vim.api.nvim_err_writeln
+local print_err = function(msg)
+  vim.api.nvim_echo({ {msg} }, true, {err=true})
+end
 
 -- Return a filter function that checks the given field is present
 local function need_field(field_name)

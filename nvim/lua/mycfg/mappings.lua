@@ -400,7 +400,13 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --   And I can already save from insert mode.. BUT if I just want to add few lines and then move
 --   around, i'll have to go back to normal mode myself before.. (acceptable?)
 --
--- And we could extend this further, o/O are for entire lines, what about inside a line?
+-- > /!\ BUT this doesn't take into account the difference between o & <M-o>:
+-- > - o ends in insert mode
+-- > - <M-o> ends in normal mode
+-- >
+-- > 🤔🤔🤔
+--
+-- IDEA(follow-up): And we could extend this further, o/O are for entire lines, what about inside a line?
 -- * M-i/a could add in same context (container?) before/after current node
 --   Like for a function call: foo(1, 2|, 3)
 --        `<M-i>new` could be: foo(1, new|, 2, 3)
@@ -412,8 +418,6 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 --        `<M-I>new` could be: foo(new|, 1, 2, 3)
 --        `<M-A>new` could be: foo(1, 2, 3, new|)
 --   But could also work for a multiline Lua table!
---
--- * M-n/p (?) could move to (begin? of) next/prev sibling nodes
 --
 -- And then there could be subtle highlights, or statusline segment
 -- to show the current inline/line contexts?
@@ -434,9 +438,6 @@ vim.cmd[[nnoremap <M-O> O<esc>]]
 -- |-- some comment
 -- some text
 -- ```
---
--- Could it be a special case of visual mode `<M-O>` ?
--- That would be a `move selection to same context above/below` (can be repeated)
 
 -- A: Duplicate visual selection
 my_actions.duplicate_selection = A.mk_action {

@@ -1,6 +1,6 @@
 local K = require"mylib.keymap_system"
 
-K.local_leader_map_define_group{mode="n", prefix_key="c", name="+code"}
+K.local_leader_map_define_group{mode="n", prefix_key="c", name="+code/content"}
 vim.api.nvim_create_autocmd("LspAttach", {
   desc = "LSP actions",
   callback = function(_event)
