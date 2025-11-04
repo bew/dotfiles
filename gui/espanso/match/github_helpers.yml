@@ -1,5 +1,7 @@
 # This file will be auto-loaded.
 
+# NOTE: `$|$` represents where the cursor will end after an expansion.
+
 matches:
   - trigger: "!ghdetails!"
     replace: |
@@ -13,14 +15,14 @@ matches:
   - trigger: "!ghnote!"
     replace: |
       > [!NOTE]
-      > CONTENT
+      > $|$
 
   - trigger: "!ghwarn!"
     replace: |
       > [!WARNING]
-      > CONTENT
+      > $|$
 
   - trigger: "!ghtip!"
     replace: |
       > [!TIP]
-      > CONTENT
+      > $|$
