@@ -13,13 +13,19 @@ set -euo pipefail
 if [[ -n ${SSH_TTY:-} ]]; then
   # We are under SSH, we NEED osc52 to set system's clipboard
   copy_provider=osc52
+  paste_provider=none
 elif [[ -d /Library ]]; then
   # We are local, this is MacOS
   copy_provider=pbmacos
-else
-  # We are local, this is Linux
+  paste_provider=pbmacos
+elif [[ -n ${WAYLAND_DISPLAY} ]]; then
+  # We are local, this is Linux Wayland
+  copy_provider=wayland
+  paste_provider=wayland
+elif [[ -n ${DISPLAY} ]]; then
+  # We are local, this is Linux X11
   copy_provider=xclip
-  # TODO: handle wayland 👀
+  paste_provider=xclip
 fi
 
 action="$1"
@@ -28,7 +34,7 @@ case "$action" in
     cli-clipboard-provider copy-to "$copy_provider"
     ;;
   paste)
-    cli-clipboard-provider paste-from xclip
+    cli-clipboard-provider paste-from "$paste_provider"
     ;;
   *)
     >&2 echo "ERROR: invalid action '$action', must be copy or paste"

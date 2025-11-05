@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail # Safe, strict script execution
+
+>&2 echo "ERROR: '$action' is not supported!"
+
+# vim:set sw=2:
