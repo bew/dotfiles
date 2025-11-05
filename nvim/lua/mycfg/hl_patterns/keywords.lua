@@ -11,7 +11,7 @@ local patterns = {}
 local function _big_word_variants(big_word)
   return {
     _U.keywordize(big_word),
-    _U.keywordize(big_word .. ":"),
+    _U.keywordize(big_word .. ":", {before=true}),
   }
 end
 
