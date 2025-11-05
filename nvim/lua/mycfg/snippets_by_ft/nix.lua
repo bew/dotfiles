@@ -22,6 +22,15 @@ snip("ih", { desc = "inherit ...;" }, SU.myfmt {
   }
 })
 
+snip("ls", { desc = "language string" }, SU.myfmt {
+  [[/* <lang> */ ''<code>''<end_>]],
+  {
+    lang = i(1, "lang"),
+    code = i(2),
+    end_ = i(3),
+  }
+})
+
 -- End of snippets definitions
 
 return SNIPS, {} -- snippets, autosnippets
