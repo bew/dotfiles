@@ -1,5 +1,12 @@
 # vim:set sw=2:
 
+# Returns (via status code) whether $PATH has the given entry
+function path_has_entry()
+{
+  local entry="$1"
+  echo ":$PATH:" | grep -q ":$entry:"
+}
+
 # Add the entry to PATH if it's not already present.
 function path_maybe_add_entry
 {
@@ -19,7 +26,7 @@ function path_maybe_add_entry
   else
     # For bash
     # Inspired from https://serverfault.com/a/192517 but simplified
-    if ! echo ":$PATH:" | grep -q ":$entry:"; then
+    if ! path_has_entry "$entry"; then
       # => The entry is not yet in $PATH, add it now
       case "$where" in
         priority) PATH="$entry:$PATH";;
@@ -60,10 +67,36 @@ if [[ -n "$ZSH_VERSION" ]] && [[ $- == *i* ]]; then # when in interactive zsh
   zstyle -e ':completion:*' command-path 'reply=( "$PWD/__auto_bins__" "${(@)path}" )'
 fi
 
-# OSX bins
-[[ -d "/usr/local/bin" ]] && path_maybe_add_entry "/usr/local/bin" fallback
+if [[ -d "/Users" && -d "/Applications" ]]; then
+  # We are on MacOS
+  # Check if it is managed by Nix 🤔
+  if path_has_entry /run/current-system/sw/bin; then
+    # When MacOS is updated, the env overrides set by nix-darwin are reset and the PATH is now
+    # _wrong_ where system paths take precedence on nix-managed paths.
+    # SEE <brain(tech):20251104T1605#env-reset-on-update> for full explanation.
+    # To avoid such issue for too long, we check if the PATH is _wrong_
+    nix_managed_path=/run/current-system/sw/bin
+    macos_system_path=/bin # (this is one of them anyway)
+    if echo ":$PATH:" | grep -q ":$macos_system_path:.*:$nix_managed_path"; then
+      col=$'\e[1;40;33m'
+      reset=$'\e[0m'
+      # NOTE: the spacing looks weird, but the rendering is actually good!
+      echo
+      echo "  +----:: ${col}  /!\\ The \$PATH is wrong!! /!\\  ${reset} ::-------------------------------------+"
+      echo "  |                                                                               |"
+      echo "  | Nix-managed '$nix_managed_path' is AFTER system paths like '$macos_system_path'... |"
+      echo "  | This is usually due to a recent MacOS update which disabled Nix-managed env   |"
+      echo "  | overrides and custom PATHs.                                                   |"
+      echo "  |                                                                               |"
+      echo "  | 👉 Re-Apply your nix-darwin system config to restore proper PATH & env        |"
+      echo "  |    overrides on the system.                                                   |"
+      echo "  +-------------------------------------------------------------------------------+"
+      echo
+    fi
+  fi
+fi
 
-# Make sure _this_ PATH is exported !shrug
+# Make sure _this_ PATH is exported ¯\_(ツ)_/¯
 export PATH
 
 # -----------------------
