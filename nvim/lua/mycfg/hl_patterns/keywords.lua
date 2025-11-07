@@ -22,7 +22,22 @@ end
 ------- Group: General keywords
 
 patterns.big_todo = {
-  pattern = _big_word_variants"TODO",
+  pattern = U.concat_lists {
+    _big_word_variants"TODO",
+    {
+      _U.keywordize"()TODO()s",
+    },
+    {
+      -- Highlight chains of TODOs
+      -- - TODO_TODO_something
+      -- - TODO_TODO_TODO_something
+      -- - TODO_TODO_TODO_TODO_something
+      -- BUT should NOT match for: _TODO_ nor FOO_TODO
+      -- ref: https://github.com/nvim-mini/mini.nvim/discussions/2105
+      "()TODO_()TODO_", -- a _TODO_ followed by (at least) another _TODO_
+      "TODO_()TODO()_[^T][^O]", -- the final _TODO_ of the chain (NOT followed by another _TODO_)
+    },
+  },
   group = _U.define_hl("big_todo", {
     ctermfg = 11,
     bold = true,
@@ -58,6 +73,7 @@ patterns.big_fixme = {
     _big_word_variants"FIXME",
     _big_word_variants"TMP!",
     {
+      _U.keywordize"()FIXME()s",
       "%(%?%?%)", -- (??)
     },
   },
@@ -216,6 +232,7 @@ patterns.big_hint_usage_tracking = {
     _big_word_variants"TRACKING%-ISSUE",
     _big_word_variants"ISSUE",
     {
+      _U.keywordize"OPENED:",
       _U.keywordize"hint:",
       _U.keywordize"see:",
     },
