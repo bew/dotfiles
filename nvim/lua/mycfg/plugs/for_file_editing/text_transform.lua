@@ -607,6 +607,8 @@ Plug {
         -- quickly check if we're in a simple case (current line check)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^%s*[%w_]+%s*="})) -- e.g. {foo|other="thing"}
+        :insert_pair_when(cond.try_surrounded_by({rx="^%s+%b[]%s*$"}, {rx="^$"})) -- e.g. `   ["foo"] |` (at eol)
+        -- note: {["complex.field"]=true, already_present="foo"} is _not_ supported, too annoying..
         :insert_pair_when(cond.never) -- last fallback
         :end_pair_moves_right_when(cond.never)
         :cr_expands_pair_when(cond.never)
@@ -618,6 +620,8 @@ Plug {
     -- local _t = {
     --   field = true,
     --   field_other = true,
+    --   ["complex.field"] = true,
+    --   [print] = true,
     --
     --   inline = {packed_field=false},
     --   inline2 = { field = false },
