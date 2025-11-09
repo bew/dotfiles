@@ -97,7 +97,7 @@ function Pos0:to_1_0_indexed()
   return {self.row +1, self.col}
 end
 
---- Check whether position is within an inclusive range (start pos -> end pos)
+--- Returns whether pos is within an inclusive range (start pos -> end pos)
 ---@param range mylib.RangePos0
 ---@return boolean
 function Pos0:is_within_incl_range(range)
@@ -112,10 +112,38 @@ function Pos0:is_within_incl_range(range)
   end
 
   -- Handle multi-line matches
-  return (
-    (start_pos.row < self.row or (start_pos.row == self.row and start_pos.col <= self.col))
-    and (self.row < end_pos.row or (self.row == end_pos.row and self.col <= end_pos.col))
-  )
+  local opts = {allow_same_pos=true}
+  return self:is_after(start_pos, opts) and self:is_before(end_pos, opts)
+end
+
+--- Returns whether pos is positioned _after_ the given reference pos.
+---@param reference_pos mylib.Pos0
+---@param opts? {allow_same_pos?: boolean}
+---@return boolean
+function Pos0:is_after(reference_pos, opts)
+  if self.row == reference_pos.row then
+    if opts and opts.allow_same_pos then
+      return reference_pos.col <= self.col
+    else
+      return reference_pos.col < self.col
+    end
+  end
+  return reference_pos.row < self.row
+end
+
+--- Returns whether pos is positioned _before_ the given reference pos.
+---@param reference_pos mylib.Pos0
+---@param opts? {allow_same_pos?: boolean}
+---@return boolean
+function Pos0:is_before(reference_pos, opts)
+  if self.row == reference_pos.row then
+    if opts and opts.allow_same_pos then
+      return self.col <= reference_pos.col
+    else
+      return self.col < reference_pos.col
+    end
+  end
+  return self.row < reference_pos.row
 end
 
 return {

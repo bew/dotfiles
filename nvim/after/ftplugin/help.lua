@@ -5,6 +5,7 @@ if vim.o.buftype ~= "help" then
 end
 
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 -- Fast quit
 K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
@@ -33,20 +34,23 @@ local function jump_to_link(dir)
     ] @link
   ]])
 
-  local cursor_row1, cursor_col0 = unpack(vim.api.nvim_win_get_cursor(0))
-  local cursor_row0 = cursor_row1 - 1 -- Convert to 0-indexed
+  local cursor_pos = U.Pos0.from_vimpos"cursor"
 
-  local target_node
+  local target_node ---@type TSNode
   for _id, node in link_query:iter_captures(tree:root(), 0) do
     local start_row0, start_col0, end_row0, end_col0 = node:range()
     if dir == "next" then
-      if (start_row0 > cursor_row0 or (start_row0 == cursor_row0 and start_col0 > cursor_col0)) then
+      local start_pos = U.Pos0.new{row=start_row0, col=start_col0}
+      if start_pos:is_after(cursor_pos) then
         target_node = node
         break
       end
     elseif dir == "prev" then
-      if (end_row0 < cursor_row0 or (end_row0 == cursor_row0 and end_col0 < cursor_col0)) then
+      local end_pos = U.Pos0.new{row=end_row0, col=end_col0}
+      if end_pos:is_before(cursor_pos) then
         target_node = node
+      else
+        break
       end
     end
   end
