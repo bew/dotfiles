@@ -65,7 +65,6 @@ Plug.fileexplorer {
   source = gh"nvim-neo-tree/neo-tree.nvim",
   desc = "Neovim plugin to manage the file system and other tree like structures",
   tags = {"filesystem"},
-  version = { branch = "v3.x" },
   depends_on = {Plug.lib_plenary, Plug.lib_nui, Plug.lib_web_devicons},
   defer_load = { on_event = "VeryLazy", on_cmd = "Neotree" },
   on_load = function()

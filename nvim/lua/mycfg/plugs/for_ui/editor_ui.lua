@@ -42,7 +42,6 @@ Plug {
   source = gh"mcauley-penney/visual-whitespace.nvim",
   desc = "Reveal whitespace characters in visual mode, like VSCode",
   tags = {},
-  version = { branch = "compat-v10" }, -- for nvim 0.10 support
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
     require"visual-whitespace".setup {
