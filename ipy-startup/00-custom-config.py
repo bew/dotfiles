@@ -3,7 +3,8 @@
 # Ref: https://ipython.readthedocs.io/en/stable/interactive/tutorial.html#configuration
 # Ref: https://ipython.readthedocs.io/en/stable/config/details.html#keyboard-shortcuts
 
-from typing import Any, Callable, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 from IPython import get_ipython
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
@@ -96,7 +97,7 @@ def setup_my_keys(key_registry):
         key_registry.add_binding(*keys, filter=(insert_cond))(action)
 
 
-def setup_config(shell: TerminalInteractiveShell) -> Any:
+def setup_config(shell: TerminalInteractiveShell):
     # Automatically add/delete open/close brackets or quote (<3)
     shell.auto_match = True
     # No confirm prompt when exiting (with e.g.: Ctrl-d)
