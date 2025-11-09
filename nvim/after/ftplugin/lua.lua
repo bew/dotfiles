@@ -32,6 +32,8 @@ local function lsp_setup()
         },
         ["format.enable"] = false,
         ["semantic.variable"] = false, -- TS does already a good job with code highlights
+        -- Don't expand aliases in Hover, to avoid potentially looong function signatures
+        ["hover.expandAlias"] = false,
       },
     },
   }
