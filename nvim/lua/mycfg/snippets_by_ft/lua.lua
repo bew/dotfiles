@@ -379,7 +379,7 @@ snip(
   }
 )
 
-snip("!=", {desc = "Lua's != operator"}, { t"~= " })
+snip("!=", {desc = "Lua's != operator", resolver = SR.delete_spaces_after_trigger}, { t"~= " })
 
 -- TODO(treesitter): only when cursor is at a 'statement' scope
 --   (or NOT in a table def nor in an fn arguments list)
@@ -396,7 +396,6 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
     maybe_local = ls.function_node(function(given_nodes_text)
       ---@type string
       local fn_name = given_nodes_text[1][1]
-      vim.notify("fn_name: " .. fn_name)
       if fn_name:match"%." or fn_name:match":" then
         return ""
       else
