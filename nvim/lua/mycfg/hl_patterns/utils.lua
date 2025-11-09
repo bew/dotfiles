@@ -31,7 +31,6 @@ function _U.keywordize(pattern, opts)
 end
 -- Test cases:
 --   should match `META`
---   should match `META`
 --   should match `(META)`
 --   should fail  `_META`
 --   should fail  `META_`
@@ -54,8 +53,7 @@ end
 function _U.pattern_for_ft_only(allowed_filetypes, pattern_spec)
   local original_patterns = pattern_spec.pattern
   pattern_spec.pattern = function(bufnr)
-    local ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
-    if vim.tbl_contains(allowed_filetypes, ft) then
+    if U.filetype_matches(allowed_filetypes, {buf=bufnr}) then
       -- Current buffer has an authorized filetype, return the patterns
       if type(original_patterns) == "function" then
         return original_patterns(bufnr)

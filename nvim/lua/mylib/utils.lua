@@ -169,4 +169,22 @@ function U.get_line_around_cursor()
   return line:sub(1, col0), line:sub(col0 +1)
 end
 
+--- Returns whether the given filetypes match with the current filetype (or filetype of given buf),
+--- with handling for `foo.bar` kind of filetypes.
+---
+---@param given_filetypes string[]
+---@param opts {buf?: integer}
+---@return boolean
+function U.filetype_matches(given_filetypes, opts)
+  local raw_ft_option = vim.api.nvim_get_option_value("filetype", { buf = opts.buf or 0 })
+  local filetypes = vim.split(raw_ft_option, ".", {plain=true})
+  -- note: this is needed to support `ft1.ft2`
+  for _, single_ft in ipairs(filetypes) do
+    if vim.tbl_contains(given_filetypes, single_ft) then
+      return true
+    end
+  end
+  return false
+end
+
 return U
