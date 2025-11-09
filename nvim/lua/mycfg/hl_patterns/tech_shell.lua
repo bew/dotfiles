@@ -23,18 +23,15 @@ patterns.shell_dashed_option_name = ft_only {
   --   it also prevents a few other symbols that can give wrong highlight in non-TS buffers
   pattern = "%f[%w|:-]()%-%-?%w[%w_-]*=?()",
   group = function(bufnr, _match, data)
-    local group = "@variable.parameter.argument"
-    if not U.is_treesitter_available_here() then
-      -- Don't attempt to introspect node types
-      return group
-    end
-
-    local node = vim.treesitter.get_node({ bufnr = bufnr, pos = { data.line -1, data.from_col -1 } })
+    local node = U.ts.try_get_node_at_cursor {
+      bufnr = bufnr,
+      pos = { data.line -1, data.from_col -1 },
+    }
     -- note: all relevant option nodes have TS node type `word`
     if node and node:type() ~= "word" then
       return nil
     end
-    return group
+    return "@variable.parameter.argument"
   end,
 }
 

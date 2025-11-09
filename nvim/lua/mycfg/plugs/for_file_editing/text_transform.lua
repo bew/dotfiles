@@ -425,9 +425,7 @@ Plug {
     ---@return autopair-cond.ExpectedFn
     function cond.ts_node_check(node_checker)
       local fn = function(_opts)
-        if not U.is_treesitter_available_here() then return end -- disable this check
-        vim.treesitter.get_parser():parse()
-        local node = vim.treesitter.get_node { ignore_injections = true }
+        local node = U.ts.try_get_node_at_cursor { ignore_injections = true }
         if not node then return end -- disable this check
         return node_checker(node)
       end

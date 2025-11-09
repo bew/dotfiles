@@ -6,18 +6,34 @@ function U_ts.is_available_here()
   return success
 end
 
+---@class mylib.Opts.try_get_ts_node: vim.treesitter.get_node.Opts
+---@field show_warning? boolean Show warning when no TS or no node
+
 --- Try get Treesitter node at cursor, after checking TS is available here & parsing the file
+---@param opts? mylib.Opts.try_get_ts_node
 ---@return TSNode?
-function U_ts.try_get_node_at_cursor()
+function U_ts.try_get_node_at_cursor(opts)
+  local opts = opts or {}
+  local show_warning = opts.show_warning
+  if opts.show_warning ~= nil then
+    -- remove custom field, to pass to TS' get_node
+    opts.show_warning = nil
+  end
+  ---@cast opts vim.treesitter.get_node.Opts
+
   if not U_ts.is_available_here() then
-    vim.notify("!! Treesitter not available here..", vim.log.levels.ERROR)
+    if show_warning then
+      vim.notify("!! Treesitter not available here..", vim.log.levels.ERROR)
+    end
     return
   end
 
   vim.treesitter.get_parser():parse() -- ensure tree is parsed
-  local node = vim.treesitter.get_node()
+  local node = vim.treesitter.get_node(opts)
   if not node then
-    vim.notify("!! No Treesitter node here 👀", vim.log.levels.ERROR)
+    if show_warning then
+      vim.notify("!! No Treesitter node here 👀", vim.log.levels.ERROR)
+    end
     return
   end
 

@@ -16,7 +16,7 @@ U.fs = require"mylib.utils.fs_utils"
 --- Search-related utils
 U.search = require"mylib.utils.search_utils"
 --- Treesitter-related utils
-U.treesitter = require"mylib.utils.treesitter_utils"
+U.ts = require"mylib.utils.treesitter_utils"
 --- HL-related utils
 U.hl = require"mylib.utils.hl_utils"
 
@@ -74,12 +74,6 @@ end
 function U.is_module_available(module_name)
   local module_available = pcall(require, module_name)
   return module_available
-end
-
--- FIXME: rename all usages to use `U.treesitter.is_available_here` instead
-function U.is_treesitter_available_here()
-  local success, _parser = pcall(vim.treesitter.get_parser)
-  return success
 end
 
 --- Returns whether the given char is part of a keyword according to {option}'iskeyword'.

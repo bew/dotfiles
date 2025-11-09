@@ -744,10 +744,10 @@ snip("su", {desc = "super().samefunction(…)"}, ls.dynamic_node(1, function()
   -- IDEA: Suggest that returning nil in a `dynamic_node` be the same as returning an empty snippet node 🤔
   local failure_sn = ls.snippet_node(nil, t"")
 
-  local node = U.treesitter.try_get_node_at_cursor()
+  local node = U.ts.try_get_node_at_cursor { show_warning = true }
   if not node then return failure_sn end
 
-  local parents = U.treesitter.collect_node_parents(node, { until_node_type = "class_definition" })
+  local parents = U.ts.collect_node_parents(node, { until_node_type = "class_definition" })
   if #parents == 0 or parents[1]:type() ~= "class_definition" then
     vim.notify("!! Not in a class!", vim.log.levels.ERROR)
     return failure_sn

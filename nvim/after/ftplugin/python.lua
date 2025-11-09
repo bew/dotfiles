@@ -1,4 +1,5 @@
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
 
 local function lsp_setup()
   local venv_py_exec
@@ -79,8 +80,7 @@ K.toplevel_buf_map{mode="i", key=[[<M-:>]], action=[[: <C-g>U<Left><C-g>U<Left>]
 
 -- I: <Alt-f> to toggle between `f"..."` and `"..."`
 local function fstring_toggle()
-  vim.treesitter.get_parser():parse() -- ensure tree is parsed
-  local node = vim.treesitter.get_node()
+  local node = U.ts.try_get_node_at_cursor()
   if not node then return end
   -- Python string nodes looks like:
   -- (string
