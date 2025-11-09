@@ -29,8 +29,8 @@ snip("@", {desc = "LuaCATS @annotation"}, { t"---@" })
 --- Generate easy-to-use snippets for the given LuaCATS @annotation
 ---@param trig string
 ---@param context mysnips.SnipContext
----@param nodes_factory (fun(): LuaSnip.Node[]|LuaSnip.Node)
-local function snip_lua_annotation(trig, context, nodes_factory, ...)
+---@param nodes_factory (fun(): LuaSnip.Node[])
+local function snip_lua_annotation(trig, context, nodes_factory)
   assert(trig:sub(1, 1) == "@", "annotation's trigger must start with '@'")
   vim.validate("annotation nodes", nodes_factory, "function")
   local trig_without_at = trig:sub(2)
@@ -39,45 +39,32 @@ local function snip_lua_annotation(trig, context, nodes_factory, ...)
     --   => `---@foo_or_foobar |`
     -- (must be first to have a chance to match before `@foo` below)
     local context_rx = vim.tbl_extend("keep", context, { rx = true }) -- copy, add rx
-    snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory(), ...)
+    snip("%-%-%- ?@?"..trig_without_at, context_rx, nodes_factory())
   end
   do
     -- Allows `anfoo|` => `---@foo_or_foobar |`
     -- This is nicer to type on my external split keyboard,
     -- as the snip-trigger finger is also used for `@`
     local context_copy = vim.tbl_extend("keep", context, {}) -- copy only
-    snip("an"..trig_without_at, context_copy, nodes_factory(), ...)
+    snip("an"..trig_without_at, context_copy, nodes_factory())
   end
   do
     -- Allows `@foo|` => `---@foo_or_foobar |`
-    snip(trig, context, nodes_factory(), ...)
+    snip(trig, context, nodes_factory())
   end
 end
 
 local function get_class_annotation_nodes()
-  return ls.choice_node(1, {
-    SU.myfmt {
-      [[---@class <name><after>]],
-      {
-        name = ls.restore_node(1, "class_name"),
-        after = i(2), -- avoid exiting too early
-      }
-    },
-    SU.myfmt {
-      [[---@class <name>: <inherit_from>]],
-      {
-        name = ls.restore_node(1, "class_name"),
-        inherit_from = i(2, "InheritFromClass")
-      }
-    },
-  }, { restore_cursor = true --[[ Seemlessly keep cursor pos across choice branches ]] })
+  return SU.myfmt {
+    [[---@class <name><after>]],
+    {
+      name = i(1, "ClassName"),
+      after = i(2), -- avoid exiting too early
+    }
+  }
 end
-snip_lua_annotation("@cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes, {
-  stored = { class_name = i(nil, "ClassName") },
-})
-snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes(), {
-  stored = { class_name = i(nil, "ClassName") },
-})
+snip_lua_annotation("@cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes)
+snip("cl", {desc = "LuaCATS @class", when = conds.start_of_line}, get_class_annotation_nodes())
 
 snip_lua_annotation("@d", {desc = "LuaCATS @diagnostic disable-for-x"}, function()
   return SU.myfmt {
@@ -124,6 +111,8 @@ snip("@as", {desc = "LuaCATS (inline) @as"}, SU.myfmt {
 
 -- NOTE: must be last to allow custom annotation snips to be found before
 do
+  ---@alias mysnips.lua.AnnSimpleData {name: string, nodes_maker: (fun(): LuaSnip.Node[])}
+  ---@type {[string]: string|mysnips.lua.AnnSimpleData}
   local short_to_long_annotation = {
     a = "alias",
     c = "cast",
@@ -161,7 +150,6 @@ do
     r = "return",
     t = "type",
   }
-  ---@alias mysnips.lua.AnnSimpleData {name: string, nodes_maker: (fun(): LuaSnip.Node[])}
   ---@return mysnips.lua.AnnSimpleData
   local function make_long_data(long_name)
     return { name = long_name, nodes_maker = function() return { t(long_name.." ") } end }
