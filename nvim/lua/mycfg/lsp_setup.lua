@@ -1,4 +1,37 @@
 local K = require"mylib.keymap_system"
+local U = require"mylib.utils"
+
+local function get_default_capabilities()
+  local completer_capabilities = {}
+  if U.is_module_available"cmp_nvim_lsp" then
+    completer_capabilities = require"cmp_nvim_lsp".default_capabilities {
+      -- Disable snippets in completion candidates
+      snippetSupport = false,
+    }
+  end
+  return vim.tbl_deep_extend(
+    "force",
+    vim.lsp.protocol.make_client_capabilities(),
+    completer_capabilities
+  )
+end
+
+-- Set defaults (can be completely overriding in other lsp configs)
+vim.lsp.config("*", {
+  capabilities = get_default_capabilities(),
+  root_markers = { ".git" },
+})
+
+-- Enable LSP for all my lsp configs
+vim.lsp.enable {
+  "lua_ls",
+  "nu-lsp",
+  "pylsp",
+  "tf-ls",
+  "yamlls",
+}
+
+------------------------------------------------------------
 
 K.local_leader_map_define_group{mode="n", prefix_key="c", name="+code/content"}
 vim.api.nvim_create_autocmd("LspAttach", {

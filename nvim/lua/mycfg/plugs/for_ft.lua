@@ -135,23 +135,7 @@ Plug {
   desc = "🦀 Supercharge your Rust experience in Neovim!",
   tags = {t.ft_support},
   version = { tag = "v5.26.0" }, -- just before nvim 0.10 support drop
-  -- defer_load not needed, it's already lazy by design
-  on_load = function()
-    vim.g.rustaceanvim = {
-      server = {
-        capabilities = {
-          textDocument = {
-            completion = {
-              -- Disable snippets in completion
-              -- (@2025-03 it doesn't really work, auto-completing the item as I go through items
-              -- even-though I didn't accept the snippet..)
-              completionItem = { snippetSupport = false },
-            }
-          },
-        },
-      },
-    }
-  end,
+  -- note: defer_load not needed, it's already lazy by design
 }
 
 Plug {
