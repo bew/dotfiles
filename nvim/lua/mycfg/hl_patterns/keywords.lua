@@ -117,6 +117,7 @@ patterns.big_fail_bad = {
     _big_word_variants"BLOCKER",
     _big_word_variants"PROBLEM",
     _big_word_variants"MISSING",
+    _big_word_variants"WRONG",
   },
   group = _U.define_hl("big_fail_bad", {
     ctermfg = 124,

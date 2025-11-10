@@ -782,8 +782,9 @@ K.toplevel_map{
   opts = { expr = true },
   action=function()
     local left = [[<C-g>U<Left>]]
-    local cursor_at_eol = vim.fn.col"." == vim.fn.col"$"
-    if cursor_at_eol then
+    -- FIXME: what other cases should it handle?
+    local _line_before, line_after = U.get_line_around_cursor()
+    if line_after:match"^$" then
       return "," .. left
     else
       return ", " .. left .. left

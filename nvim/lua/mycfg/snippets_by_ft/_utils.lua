@@ -141,9 +141,8 @@ SU.mk_expand_params_resolver = function(spec)
   local delete_after_trig_pats = U.args.normalize_arg_one_or_more(spec.delete_after_trig or {})
 
   return function(_snip, _line_to_cursor, matched, _captures)
-    local pos0 = U.Pos0.from_vimpos"cursor"
-    local line = vim.api.nvim_get_current_line()
-    local line_after_cursor = line:sub(vim.fn.col".")
+    local cursor_pos = U.Pos0.from_vimpos"cursor"
+    local _, line_after_cursor = U.get_line_around_cursor()
     local longest_after_match = ""
     for _, pattern in ipairs(delete_after_trig_pats) do
       local match = line_after_cursor:match(pattern)
@@ -154,8 +153,8 @@ SU.mk_expand_params_resolver = function(spec)
     ---@type LuaSnip.ExpandParams
     return {
       clear_region = {
-        from = {pos0.row, pos0.col - #matched}, -- from before snip match
-        to = {pos0.row, pos0.col + #longest_after_match}, -- to after spaces
+        from = {cursor_pos.row, cursor_pos.col - #matched}, -- from before snip match
+        to = {cursor_pos.row, cursor_pos.col + #longest_after_match}, -- to after spaces
       }
     }
   end
