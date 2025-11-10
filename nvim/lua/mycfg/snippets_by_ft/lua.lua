@@ -9,8 +9,8 @@ local conds = require"mycfg.snippets_by_ft._conditions"
 local SNIPS = {}
 local snip = SU.get_snip_fn(SNIPS)
 
-local i = ls.insert_node ---@diagnostic disable-line: unused-local
-local t = ls.text_node ---@diagnostic disable-line: unused-local
+local i = ls.insert_node
+local t = ls.text_node
 local rep = ls_extras.rep
 
 -- Snip Resolvers, to tweak what will be removed exactly before snip expansion
@@ -45,7 +45,8 @@ local function snip_lua_annotation(trig, context, nodes_factory)
     -- Allows `anfoo|` => `---@foo_or_foobar |`
     -- This is nicer to type on my external split keyboard,
     -- as the snip-trigger finger is also used for `@`
-    local context_copy = vim.tbl_extend("keep", context, {}) -- copy only
+    local context_copy = vim.deepcopy(context) -- copy only
+    context_copy.when = conds.start_of_line
     snip("an"..trig_without_at, context_copy, nodes_factory())
   end
   do
@@ -140,6 +141,7 @@ do
     },
     m = "module",
     o = "overload",
+    op = "operator",
     p = "param",
     pr = {
       name = "non-public doc block",
@@ -177,7 +179,11 @@ end
 -- NOTE: must be after annotations, to avoid matching `---d|`
 -- note: Does not include the ending space, I can easily add it and it helps with LuaLS function doc
 --   generation (which would otherwise add a space before all generated annotations ><).
-snip("d", {desc = "Documentation prefix", resolver = SR.delete_spaces_after_trigger}, { t"---" })
+snip("d", {
+  desc = "Documentation prefix",
+  resolver = SR.delete_spaces_after_trigger,
+  when = conds.start_of_line,
+}, { t"---" })
 
 snip("%-%-", {desc = "--[[block comment]]", rx = true}, SU.myfmt {
   "--[[<comment>]]",
@@ -259,7 +265,7 @@ snip("do", {desc = "do ... end"}, SU.myfmt {
   { body = SU.insert_node_default_selection(1) },
 })
 
-snip("if", {desc = "if ... then ... end"}, SU.myfmt {
+snip("if", {desc = "if ... then ... end", when = conds.start_of_line}, SU.myfmt {
   [[
     if <cond> then
       <body>
@@ -394,7 +400,6 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
     -- NOTE: Only add `local` for simple function names. When using `M.foo` (or more nesting) the
     --   `local` is hidden as it doesn't make sense as the function is in some table.
     maybe_local = ls.function_node(function(given_nodes_text)
-      ---@type string
       local fn_name = given_nodes_text[1][1]
       if fn_name:match"%." or fn_name:match":" then
         return ""
@@ -406,9 +411,9 @@ snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
     body = SU.insert_node_default_selection(3),
   },
 })
--- A snippet for the function type, must be on a `---@something` line (after).
--- NOTE: Must be before anon fn def to have a chance to match
-snip("fn", {desc = "annotation for function type", when = conds.line_before_matches"%-%-%-@"}, SU.myfmt {
+--- A snippet for the function type, must be on a `---@something` line (after).
+--- (NOTE: Must be before anon fn def to have a chance to match)
+snip("fn", {desc = "LuaCATS function type", when = conds.line_before_matches"%-%-%-@"}, SU.myfmt {
   [[(fun(<args>)<maybe_ret>)]],
   {
     args = i(1),
@@ -442,25 +447,12 @@ snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   },
 })
 
-snip("lfn", {desc = "local function def", when = conds.start_of_line}, SU.myfmt {
-  [[
-    local function <name>(<args>)
-      <body>
-    end
-  ]],
-  {
-    name = i(1, "function_name"),
-    args = i(2),
-    body = SU.insert_node_default_selection(3),
-  },
-})
-
 snip("p", {desc = "print(..)"}, SU.myfmt {
   [[print(<stuff>)]],
   { stuff = i(1) }
 })
 
-snip("pp", {desc = "pretty print / inspect"}, SU.myfmt {
+snip("pp", {desc = "pretty print + inspect"}, SU.myfmt {
   [[print("DEBUG", "<prompt>:", vim.inspect(<expr>))]],
   {
     prompt = i(1, "debug this thing"),
@@ -473,7 +465,7 @@ snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
   { expr = SU.insert_node_default_selection(1) }
 })
 
-snip("mod", {desc = "Module init M = {}; ret M", when = conds.very_start_of_line}, SU.myfmt {
+snip("mod", {desc = "Module init M = {}; ...; ret M", when = conds.very_start_of_line}, SU.myfmt {
   [[
     local <mod_name> = {}
 
