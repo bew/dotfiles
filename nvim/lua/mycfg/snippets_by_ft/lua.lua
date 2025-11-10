@@ -400,16 +400,18 @@ snip("fork", {desc = "for each pairs", when = conds.start_of_line}, SU.myfmt {
 
 -- NOTE: Adds the space after `return` only if needed,
 --   but _always_ leave the cursor after the space.
-snip(
-  "r",
-  {
-    desc = "return ...",
-    resolver = SR.delete_spaces_after_trigger,
-  },
-  {
-    t"return "
-  }
-)
+snip("r", {desc = "return ...", resolver = SR.delete_spaces_after_trigger}, ls.dynamic_node(1, function()
+  local _, line_after = U.get_line_around_cursor()
+  -- Handle case of `function() | end`, to keep a space after snip before `end`
+  -- (note: the space just before `end` is removed on snip trigger by the resolver above)
+  if line_after:match"^end" then
+    return ls.snippet_node(nil, SU.myfmt{
+      [[return <expr> ]],
+      {expr = i(1)},
+    })
+  end
+  return ls.snippet_node(nil, t"return ")
+end))
 
 snip("!=", {desc = "Lua's != operator", resolver = SR.delete_spaces_after_trigger}, { t"~= " })
 
