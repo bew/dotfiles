@@ -290,11 +290,6 @@ snip("then", {desc = "then ... end"}, SU.myfmt {
   { body = SU.insert_node_default_selection(1) },
 })
 
-snip("eli", {desc = "elseif ... then"}, SU.myfmt {
-  [[elseif <cond> then]],
-  { cond = i(1) },
-})
-
 snip("th", {desc = "then ... end"}, SU.myfmt {
   [[
     then
@@ -307,6 +302,33 @@ snip("th", {desc = "then ... end"}, SU.myfmt {
 snip("thi", {desc = "then … end (inline)"}, SU.myfmt {
   [[then <body> end]],
   { body = i(1) },
+})
+
+-- NOTE: Adds `elseif..then..else` in an if/elseif/else chain.
+-- (easy to use by adding `if<snip-trig!>` to an existing `else` at END of the chain)
+snip("elseif", {desc = "append elseif case at end of if chain", when = conds.start_of_line}, SU.myfmt {
+  [[
+    elseif <cond> then
+      <body>
+    else
+  ]],
+  {
+    cond = i(1),
+    body = SU.insert_node_default_selection(2),
+  },
+})
+
+-- NOTE: Adds `elseif..then..` (doesn't add `else`) in an if/elseif/else chain.
+-- (use on a blank line before a `elseif/else` line to add IN a chain)
+snip("elif", {desc = "insert elseif case in if chain", when = conds.start_of_line}, SU.myfmt {
+  [[
+    elseif <cond> then
+      <body>
+  ]],
+  {
+    cond = i(1),
+    body = SU.insert_node_default_selection(2),
+  },
 })
 
 snip("forn", {desc = "for n in range (including end)", when = conds.start_of_line}, SU.myfmt {
