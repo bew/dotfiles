@@ -6,6 +6,10 @@ local ls_extras = require"luasnip.extras"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local conds = require"mycfg.snippets_by_ft._conditions"
 
+local lua_conds = {}
+lua_conds.in_table_nor_args = conds.only_in_ts_node_type{"table_constructor", "arguments"}
+lua_conds.not_in_table_nor_args = lua_conds.in_table_nor_args:inverted()
+
 local SNIPS = {}
 local snip = SU.get_snip_fn(SNIPS)
 
@@ -387,9 +391,14 @@ snip(
 
 snip("!=", {desc = "Lua's != operator", resolver = SR.delete_spaces_after_trigger}, { t"~= " })
 
--- TODO(treesitter): only when cursor is at a 'statement' scope
---   (or NOT in a table def nor in an fn arguments list)
-snip("fn", {desc = "function def", when = conds.start_of_line}, SU.myfmt {
+--- A function with a name.
+--- Defaults to be local unless it's part of a module/class/.. (name includes `:` or `.)
+--- This snippet is only available when at start of line & not in a table/args TS node.
+snip("fn", {
+  desc = "function def (named, maybe local)",
+  -- start_of_line AND (ts_not_available OR not_in_table_nor_args)
+  when = conds.start_of_line:and_(conds.ts_not_available:or_(lua_conds.not_in_table_nor_args)),
+}, SU.myfmt {
   [[
     <maybe_local>function <name>(<args>)
       <body>
@@ -423,9 +432,13 @@ snip("fn", {desc = "LuaCATS function type", when = conds.line_before_matches"%-%
     }),
   }
 })
--- NOTE: condition is reversed (with `-` before condition obj),
---   to activate when the usual snippet (with name) is not active.
-snip("fn", {desc = "function def (anon)", when = -conds.start_of_line}, SU.myfmt {
+--- An anonymous function.
+--- This snippet is only available when NOT at start of line, or when in a table/args TS node.
+snip("fn", {
+  desc = "function def (anon)",
+  -- (NOT start_of_line) OR (ts_available AND in_table_nor_args)
+  when = conds.start_of_line:inverted():or_(conds.ts_available:and_(lua_conds.in_table_nor_args)),
+}, SU.myfmt {
   [[
     function(<args>)
       <body>
@@ -437,6 +450,7 @@ snip("fn", {desc = "function def (anon)", when = -conds.start_of_line}, SU.myfmt
   },
 })
 
+--- An anonymous function (inline).
 snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   [[
     function(<args>) <body> end
