@@ -9,7 +9,10 @@ local SU = {}
 ---@field inherits_from string[] The additional collections of snippets to use for `ft`
 
 ---@class mysnips.SnipContext: LuaSnip.SnipContext
----@field when? LuaSnip.SnipContext.Condition
+---@field when? LuaSnip.SnipContext.ConditionObj Sets both `condition` & `show_condition`
+---  (shouldn't depend on the trigger! Only on `line_to_cursor`!)
+---@field expand_when? LuaSnip.SnipContext.Condition Sets `condition` (overrides `when`)
+---@field show_when? LuaSnip.SnipContext.ShowCondition Sets `show_condition` (overrides `when`)
 ---@field rx? boolean Whether the trigger is a pattern
 ---@field resolver? LuaSnip.ResolveExpandParamsFn
 
@@ -54,7 +57,8 @@ SU.get_snip_fn = function(list_of_snippets)
     if context.rx then
       context.trigEngine = "pattern"
     end
-    context.condition = context.when or nil
+    context.condition = context.expand_when or context.when or nil
+    context.show_condition = context.show_when or context.when or nil
     context.resolveExpandParams = context.resolveExpandParams or context.resolver or nil
     -- IDEA: add feature system, to compose context features like resolveExpandParams 🤔
     -- I want to be able to define a snip like:
