@@ -8,12 +8,8 @@ local SU = {}
 ---@field filetype string The filetype to extend
 ---@field inherits_from string[] The additional collections of snippets to use for `ft`
 
----@alias mysnips.ContextCondition
----| LuaSnip.SnipContext.Condition
----| any (for the magic condition objects, since LuaLS does not support metamethod checks..)
-
 ---@class mysnips.SnipContext: LuaSnip.SnipContext
----@field when? mysnips.ContextCondition
+---@field when? LuaSnip.SnipContext.Condition
 ---@field rx? boolean Whether the trigger is a pattern
 ---@field resolver? LuaSnip.ResolveExpandParamsFn
 
