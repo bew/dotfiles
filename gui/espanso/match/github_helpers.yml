@@ -12,7 +12,10 @@ matches:
 
       </details>
 
-  - trigger: "!ghnote!"
+  # Github-Flavored Markdown's Alerts
+  # ref: https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#alerts
+
+  - triggers: ["!ghnote!", "!ghinfo!"]
     replace: |
       > [!NOTE]
       > $|$
@@ -25,4 +28,9 @@ matches:
   - trigger: "!ghtip!"
     replace: |
       > [!TIP]
+      > $|$
+
+  - trigger: "!ghimp!"
+    replace: |
+      > [!IMPORTANT]
       > $|$
