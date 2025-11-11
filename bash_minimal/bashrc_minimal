@@ -6,4 +6,7 @@ alias ls="ls --group-directories-first -F --color=auto"
 
 EDITOR=vim
 
+# Minimal prompt (with yellow cwd)
+PS1="\[\e[33m\]\w\[\e[0m\] > "
+
 # vim:set ft=bash:
