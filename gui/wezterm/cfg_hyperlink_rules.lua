@@ -35,4 +35,17 @@ add_rule {
   format = "https://www.github.com/$1/$2/tree/$3",
 }
 
+-- Match `github:owner/repo` & `github:owner/repo/branch` as a github URL
+-- (this is the syntax used for Nix flake github references)
+add_rule {
+  {
+    regex = [[github:([\w\d][^/"'`]+)/([^/"'`]+)]],
+    format = "https://www.github.com/$1/$2",
+  },
+  {
+    regex = [[github:([\w\d][^/"'`]+)/([^/"'`]+)/([^"'`]+)]],
+    format = "https://www.github.com/$1/$2/tree/$3",
+  },
+}
+
 return cfg
