@@ -232,7 +232,7 @@ alias ....="cd ../../..;"
 
 alias cdt="cd /tmp;"
 
-function dot()
+function cdot()
 {
   local dotfiles_path=$(readlink ~/.dot)
   [[ -n "$dotfiles_path" ]] || {
