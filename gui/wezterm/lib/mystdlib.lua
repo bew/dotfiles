@@ -30,7 +30,7 @@ end
 
 ---@param t table|any
 ---@return boolean
-local is_list = function(t)
+function mytable.is_list(t)
   if type(t) ~= "table" then
     return false
   end
@@ -45,7 +45,7 @@ end
 function mytable.flatten_list(list)
   local flattened_list = {}
   for _, item in ipairs(list) do
-    if is_list(item) then
+    if mytable.is_list(item) then
       for _, sub_item in ipairs(mytable.flatten_list(item)) do
         table.insert(flattened_list, sub_item)
       end

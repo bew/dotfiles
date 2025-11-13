@@ -25,22 +25,6 @@ local cfg_misc = {
 
   -- Disable all noises
   audible_bell = "Disabled",
-
-  hyperlink_rules = mytable.flatten_list {
-    wezterm.default_hyperlink_rules(),
-    {
-      -- Match `gh"owner/repo"` as a github user/repo URL
-      -- (this the syntax I use for declaring Neovim plugins in my config)
-      regex = [[gh"([\w\d][-\w\d\._]+)/([-\w\d\._]+)"]],
-      format = 'https://www.github.com/$1/$2',
-    },
-    {
-      -- Match `uses: owner/repo@rev` as a github user/repo URL at rev/tag
-      -- (this the syntax used for using external Github actions)
-      regex = [[uses: ([\w\d][^/]+)/([^@]+)@([\w\d\._-]+)]],
-      format = 'https://www.github.com/$1/$2/tree/$3',
-    },
-  }
 }
 
 -- Merge configs and return!
@@ -48,10 +32,11 @@ local cfg_misc = {
 
 local full_config = mytable.merge_all(
   cfg_misc,
-  require("cfg_appearance"),
-  require("cfg_fonts"),
-  require("cfg_keys"),
-  require("cfg_mouse"),
+  require"cfg_appearance",
+  require"cfg_fonts",
+  require"cfg_keys",
+  require"cfg_mouse",
+  require"cfg_hyperlink_rules",
   {} -- so the last table can have an ending comma for git diffs :)
 )
 
