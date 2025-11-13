@@ -1,20 +1,5 @@
 {
   "nodes": {
-    "flakeTemplates": {
-      "locked": {
-        "lastModified": 1637957362,
-        "narHash": "sha256-OfhmLR4Bkaz9CFh/p9Mom6BS0lnFDRJ6F4KofVX6JCU=",
-        "owner": "nixos",
-        "repo": "templates",
-        "rev": "16cd57c9c3f037eddddb57f87b65350ec59ed4f1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "templates",
-        "type": "github"
-      }
-    },
     "homeManager": {
       "inputs": {
         "nixpkgs": [
@@ -33,6 +18,39 @@
         "owner": "nix-community",
         "ref": "release-25.05",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "myTemplates": {
+      "inputs": {
+        "nixpkgs-lib-only": "nixpkgs-lib-only"
+      },
+      "locked": {
+        "lastModified": 1763124636,
+        "narHash": "sha256-gcN8LRmfAPbBQeP6DOIbR846l5V40aFnvxQk+gWjcwA=",
+        "owner": "bew",
+        "repo": "my-nix-templates",
+        "rev": "1df198f4ec7f74e85242ac954620bbaa0207f5c7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bew",
+        "repo": "my-nix-templates",
+        "type": "github"
+      }
+    },
+    "nixpkgs-lib-only": {
+      "locked": {
+        "lastModified": 1762650614,
+        "narHash": "sha256-tPIUJjNeNs3LMWH8w2nHLx0trZJdOJ54mN2UQhcjZ9g=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "91ea24e62ff55f95939f32432fa5def2d6d24d2a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
         "type": "github"
       }
     },
@@ -68,12 +86,28 @@
         "type": "github"
       }
     },
+    "officialTemplates": {
+      "locked": {
+        "lastModified": 1760444628,
+        "narHash": "sha256-wkIx1uPjYVOOcho0SAknX3tw2U8vswKwC/uZ3U0HAxE=",
+        "owner": "nixos",
+        "repo": "templates",
+        "rev": "2557dc639215476df149ae6842a1ae94d60a884c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "templates",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "flakeTemplates": "flakeTemplates",
         "homeManager": "homeManager",
+        "myTemplates": "myTemplates",
         "nixpkgsBleedingEdge": "nixpkgsBleedingEdge",
         "nixpkgsStable": "nixpkgsStable",
+        "officialTemplates": "officialTemplates",
         "systems": "systems"
       }
     },

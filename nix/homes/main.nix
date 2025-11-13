@@ -51,8 +51,10 @@
       repo = "nixpkgs";
       ref = "nixpkgs-unstable";
     };
-    # -> flake ref: "path:${flakeTemplates.outPath}"
-    templates = { type = "path"; path = flakeInputs.flakeTemplates.outPath; };
+    # -> flake ref: "path:${officialTemplates.outPath}"
+    official-templates = { type = "path"; path = flakeInputs.officialTemplates.outPath; };
+    # -> flake ref: "path:${myTemplates.outPath}"
+    mytpl = { type = "path"; path = flakeInputs.myTemplates.outPath; };
   };
 
   # Do not build home-manager's manual, it brings a number of useless dependencies and I don't need

@@ -18,7 +18,8 @@
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgsBleedingEdge.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-    flakeTemplates.url = "github:nixos/templates";
+    officialTemplates.url = "github:nixos/templates";
+    myTemplates.url = "github:bew/my-nix-templates";
 
     homeManager.url = "github:nix-community/home-manager/release-25.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
