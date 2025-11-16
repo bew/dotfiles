@@ -280,6 +280,9 @@ HiResetTo @function.macro ctermfg=208
 HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
 HiResetTo @constructor ctermfg=166 cterm=bold
 
+" `@variable` fg = `Normal` fg
+" This is necessary to take precedence in string interpolations
+HiResetTo @variable ctermfg=249
 HiResetTo @variable.member ctermfg=39
 HiResetTo @variable.builtin ctermfg=253 cterm=italic
 HiResetTo @variable.parameter cterm=italic
@@ -416,8 +419,8 @@ HiResetTo @lsp.type.method.rust
 hi! link @lsp.type.property.rust @variable.member.rust
 " Disable forced non-obvious keywords
 HiResetTo @lsp.type.keyword.rust
-" Show mutable variables
-" HiResetTo @lsp.typemod.variable.mutable.rust cterm=underdotted
+" Highlight fmt format modifiers like `{:?}` in `println!("{foo:?}");`
+HiResetTo @lsp.type.formatSpecifier.rust ctermfg=124
 
 "}}}
 " vim syntax highlighting "{{{
