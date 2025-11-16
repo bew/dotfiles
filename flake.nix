@@ -91,6 +91,9 @@
           # ref: https://github.com/LuaLS/lua-language-server/issues/3175
           # ref: https://github.com/LuaLS/lua-language-server/pull/3182 (PR)
           deps.bins.lua-language-server.pkg = lib.mkForce bleedingedgePkgs.lua-language-server;
+          # Always use latest to ensure editing my projects using Rust from unstable work well
+          # (e.g. when proc-macro-server is more recent in a project, generating errors)
+          deps.bins.rust-analyzer.pkg = lib.mkForce bleedingedgePkgs.rust-analyzer;
         };
       };
 
