@@ -4,6 +4,7 @@ local U = require"mylib.utils"
 local ls = require"luasnip"
 local ls_extras = require"luasnip.extras"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
+local SR = require"mycfg.snippets_by_ft._resolvers" -- Snip Resolvers
 local conds = require"mycfg.snippets_by_ft._conditions"
 
 local lua_conds = {}
@@ -16,11 +17,6 @@ local snip = SU.get_snip_fn(SNIPS)
 local i = ls.insert_node
 local t = ls.text_node
 local rep = ls_extras.rep
-
--- Snip Resolvers, to tweak what will be removed exactly before snip expansion
-local SR = {}
---- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
-SR.delete_spaces_after_trigger = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" }
 
 -- Start of snippets definitions
 
