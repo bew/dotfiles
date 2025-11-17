@@ -1,6 +1,3 @@
--- NOTE: this file is not under `tech_vim` because I want this to be available everywhere
--- (especially in vim & Lua files)
-
 local _U = require"mycfg.hl_patterns.utils"
 local hipatterns = require"mini.hipatterns"
 
