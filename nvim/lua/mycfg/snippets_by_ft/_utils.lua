@@ -16,7 +16,13 @@ local SU = {}
 ---@field rx? boolean Whether the trigger is a pattern
 ---@field resolver? LuaSnip.ResolveExpandParamsFn
 
----@alias mysnips.Opts.MyFmt {[1]: string, [2]: table, [3]: LuaSnip.Opts.Extra.Fmt?, opts: LuaSnip.Opts.Extra.Fmt?}
+---@class mysnips.Opts.MyFmt
+---@field [1] string
+---@field [2] {[string]: LuaSnip.Node}
+---@field [3] LuaSnip.Opts.Extra.Fmt?
+
+---@class mysnips.Opts.MyFmtInner: mysnips.Opts.MyFmt
+---@field opts LuaSnip.Opts.Extra.Fmt?
 
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
 ---@param args mysnips.Opts.FileTypeSetup Args table
@@ -89,12 +95,21 @@ end
 -- NOTE: fmt already returns a list of nodes and we can't nest thoses, so we need to pass
 --   fmt(...) directly to snip (or as a choiceNode item).
 --   ref: https://github.com/L3MON4D3/LuaSnip/issues/828#issuecomment-1472643275
----@param args mysnips.Opts.MyFmt
+--
+-- NOTE: This hidden myfmt impl allows to have explicit `opts` internally,
+--   without exposing it to the outside world.
+--
+---@param args mysnips.Opts.MyFmtInner
 ---@return LuaSnip.Node[]
-SU.myfmt = function(args)
-  -- args[1] is the fmt string,
-  -- args[2] is the set of nodes,
-  -- args[3] is the set of options,
+SU._myfmt_inner = function(args)
+  -- args[1] is the fmt string (required),
+  vim.validate("fmt-string", args[1], "string")
+  -- args[2] is the set of nodes (required),
+  vim.validate("nodes", args[2], "table")
+  -- args.opts or args[3] is the set of options (optional),
+  -- (NOTE: `args.opts` is used by `myfmt_*` helper functions)
+  vim.validate("fmt-options", args.opts or args[3], "table", true)
+
   local opts = args.opts or args[3] or {}
   if opts.delimiters == nil then
     -- Use `<foo>` by default for placeholders instead of `{foo}`
@@ -104,23 +119,45 @@ SU.myfmt = function(args)
   return ls_fmt(unpack(args))
 end
 
+--- Use a format string with placeholders to interpolate nodes.
+---@param args mysnips.Opts.MyFmt
+---@return LuaSnip.Node[]
+SU.myfmt = function(args)
+  ---@cast args mysnips.Opts.MyFmtInner
+  return SU._myfmt_inner(args)
+end
+
 --- Same as `myfmt`, disabling trim & dedent for the format string
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
 SU.myfmt_no_strip = function(args)
+  ---@cast args mysnips.Opts.MyFmtInner
   args.opts = args.opts or {}
   args.opts.trim_empty = false
   args.opts.dedent = false
-  return SU.myfmt(args)
+  return SU._myfmt_inner(args)
 end
 
 --- Same as `myfmt`, using `{}` delimiters (like the builtin luasnip fmt)
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
 SU.myfmt_braces = function(args)
+  ---@cast args mysnips.Opts.MyFmtInner
   args.opts = args.opts or {}
   args.opts.delimiters = "{}"
-  return SU.myfmt(args)
+  return SU._myfmt_inner(args)
+end
+
+--- Same as `myfmt`, using `{}` delimiters & disabling trim & dedent
+---@param args mysnips.Opts.MyFmt
+---@return LuaSnip.Node[]
+SU.myfmt_braces_no_strip = function(args)
+  ---@cast args mysnips.Opts.MyFmtInner
+  args.opts = args.opts or {}
+  args.opts.delimiters = "{}"
+  args.opts.trim_empty = false
+  args.opts.dedent = false
+  return SU._myfmt_inner(args)
 end
 
 ---@class mysnips.Opts.SpecForResolveExpandParams
