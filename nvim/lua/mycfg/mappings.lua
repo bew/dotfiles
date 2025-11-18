@@ -728,6 +728,21 @@ vim.cmd[[vnoremap <silent> zo  :<C-u>'<,'>foldopen!<cr>]]
 vim.cmd[[vnoremap <silent> zc  zx]]
 -- TODO: action to close all function folds in current scope (may be the top scope)
 
+my_actions.move_cursor_otherside_selection = A.mk_action {
+  default_desc = "Move cursor to the other side of the selection (works in visual/select mode)",
+  map_opts = { expr = true },
+  [{"s", "v"}] = function()
+    local mode = vim.fn.mode()
+    if mode == "s" or mode == "S" or mode == "" then
+      -- note: `<C-o>` in Select mode switches back to Visual mode for the next action
+      return "<C-o>o"
+    else
+      return "o"
+    end
+  end,
+}
+K.toplevel_map{mode={"s", "v"}, key="<M-o>", action=my_actions.move_cursor_otherside_selection}
+
 --------------------------------
 -- Insert helpers
 
