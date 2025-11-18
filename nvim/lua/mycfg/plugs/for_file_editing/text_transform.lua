@@ -33,8 +33,24 @@ Plug.luasnip {
     local ls = require"luasnip"
     local ls_types = require"luasnip.util.types"
     ls.setup {
-      -- Prevent ability to re-enter snippets that have been exited
-      history = false,
+      -- NOTE about child-snippets vs root-snippets:
+      -- - Child-snippets are nested inside other snippets, so when jumping through a snippet,
+      --   one may also traverse the child-snippets expanded inside it, more or less as if
+      --   the child just contains more nodes of the parent.
+      -- - Root-snippets are characterized by not being child-snippets.
+
+      -- Do not prevent ability to re-enter root-snippets that have been exited
+      exit_roots = false,
+      -- Delete old root-snippets once a new one is expanded
+      keep_roots = false,
+      -- Don't connect separately expanded root-snippets
+      -- Prevents jump from an outer snippet to another, potentially in a completely different part
+      -- of the buffer.
+      link_roots = false,
+
+      -- Allow jumping into/out of nested snippets
+      link_children = true,
+
       -- The events uses to check if we're out of a snippet
       -- Stuff to read around history and jumps
       -- https://github.com/L3MON4D3/LuaSnip/issues/91
