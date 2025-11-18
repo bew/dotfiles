@@ -5,4 +5,8 @@
   # Branches considered as base branches
   bases = develop,dev,main,master
 
+[alias]
+  trim = trim
+  trim-stray = trim --delete=stray
+
 # vim:set ft=gitconfig:
