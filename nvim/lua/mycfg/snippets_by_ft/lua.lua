@@ -221,6 +221,7 @@ snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger},
         -- note: default value is important to avoid _breaking_ syntax highlight
         { value = SU.insert_node_default_selection(1, has_text_after and "" or "nil") }
       },
+      {t" ---@type ", i(1)},
       t"",
     })
   end
@@ -272,7 +273,7 @@ snip("if", {desc = "if ... then ... end", when = conds.start_of_line}, SU.myfmt 
     end
   ]],
   {
-    cond = i(1),
+    cond = i(1, "false"),
     body = SU.insert_node_default_selection(2),
   },
 })
@@ -309,7 +310,7 @@ snip("elseif", {desc = "append elseif case at end of if chain", when = conds.sta
     else
   ]],
   {
-    cond = i(1),
+    cond = i(1, "false"),
     body = SU.insert_node_default_selection(2),
   },
 })
@@ -322,7 +323,7 @@ snip("elif", {desc = "insert elseif case in if chain", when = conds.start_of_lin
       <body>
   ]],
   {
-    cond = i(1),
+    cond = i(1, "false"),
     body = SU.insert_node_default_selection(2),
   },
 })
