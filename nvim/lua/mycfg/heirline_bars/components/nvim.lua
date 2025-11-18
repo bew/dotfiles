@@ -42,6 +42,15 @@ M.Mode = {
       ["?"] = {style="unknown", text="??"},
     },
   },
+  -- Update the component on ModeChanged only.
+  -- NOTE: This seems necessary to have proper mode update when going Select->Visual with Ctrl-g.
+  update = {
+    "ModeChanged",
+    pattern = "*:*",
+    callback = vim.schedule_wrap(function()
+      vim.cmd[[redrawstatus]]
+    end),
+  },
   -- NOTE: This function is called whenever a component is evaluated
   -- (right after condition but before hl and provider).
   init = function(self)
