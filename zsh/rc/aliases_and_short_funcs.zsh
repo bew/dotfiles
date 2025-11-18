@@ -243,6 +243,9 @@ function cdot()
 }
 # note: the function version ensures that the symlink is not registered in cd history / zoxide..
 # (avoids implicit duplication with the realpath of dotfiles repo)
+alias dot=cdot
+# note: `cdot` is more logical (think: `cd` then `dot`),
+#   but `dot` is easier to type on my ortholinear keyboard.. So I need both ¯\_(ツ)_/¯
 
 
 # git
