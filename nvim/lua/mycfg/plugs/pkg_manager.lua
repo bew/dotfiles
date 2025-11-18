@@ -125,6 +125,7 @@ Plug.pkg_manager {
       lockfile = try_find_lazy_lockfile(),
       -- Disable most automations
       install = { missing = false }, -- do not auto-install plugins
+      rocks = { enabled = false },
       custom_keys = false,
       change_detection = { enabled = false }, -- MAYBE: try it?
       performance = {
