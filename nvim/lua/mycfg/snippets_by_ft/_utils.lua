@@ -211,12 +211,12 @@ function SU.has_stored_selection(snip)
 end
 
 --- Insert node that default to last visual (saved) selection if any, else given text
----@param index integer Snip node index
+---@param pos? integer Node position
 ---@param default_text? string Default text if no stored selection to use
 ---@return LuaSnip.Node
-function SU.insert_node_default_selection(index, default_text)
+function SU.insert_node_default_selection(pos, default_text)
   local default_text = default_text or ""
-  return ls.dynamic_node(index, function(_, parent)
+  return ls.dynamic_node(pos, function(_, parent)
     -- Get the top-level snippet (the only one with `env`!)
     local snip = parent.snippet
 
