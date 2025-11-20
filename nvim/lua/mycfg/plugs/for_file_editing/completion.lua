@@ -10,8 +10,10 @@ local Plug = PluginSystem.get_plugin_declarator {
 
 --------------------------------
 
+---@param plug_spec plugsys.PluginSpec
 local function cmp_source_dep(plug_spec)
   local spec = vim.tbl_extend("error", plug_spec, {
+    ---@diagnostic disable-next-line: undefined-field (`extra_depends_on` is an extra!)
     depends_on = U.concat_lists({ Plug.cmp }, plug_spec.extra_depends_on),
     defer_load = { on_event = "VeryLazy" }, -- 🤔 (like cmp)
   })
@@ -31,6 +33,12 @@ Plug.cmp {
     cmp_source_dep { source = gh"andersevenrud/cmp-tmux" },
     cmp_source_dep { source = gh"hrsh7th/cmp-emoji" },
     cmp_source_dep { source = gh"saadparwaiz1/cmp_luasnip", extra_depends_on = {Plug.luasnip} },
+    -- Treesitter source isn't super useful for words, but it's really nice in some cases for string
+    -- literals, comments and some other nodes.
+    cmp_source_dep {
+      source = gh"bew/cmp-treesitter", -- my fork! 🚀
+      version = { branch = "bew-appropriation" },
+    },
   },
   defer_load = { on_event = "VeryLazy" }, -- 🤔 (seems to work 🤷)
   on_load = function()
@@ -80,6 +88,7 @@ Plug.cmp {
       lazydev  = "@LLua",
       path     = "@Path",
       tmux     = "@Tmux",
+      treesitter = "@TS",
     }
     -- WARNING: if this function fails, completion will NOT work
     --   (no completion window will be opened), so we protect it with a wrapper and a default.
@@ -87,7 +96,8 @@ Plug.cmp {
       -- Get symbol for LSP kind
       local lsp_symbol = lspkind.symbolic(vim_item.kind)
       if #lsp_symbol == 0 then
-        vim.notify("Something is wrong, lspkind symbol is empty??? kind: ".. vim.inspect(vim_item.kind), vim.log.levels.DEBUG)
+        -- NOTE: happens when kind is not an LSP kind
+        -- (e.g. treesitter source puts the highlight capture name)
         lsp_symbol = "?"
       end
       vim_item.kind = " " .. lsp_symbol .. " │"
@@ -214,6 +224,11 @@ Plug.cmp {
       },
       { name = "luasnip", keyword_length = 2 },
       { name = "path" }, -- By default, '.' is relative to the buffer
+      {
+        name = "treesitter",
+        -- Has lots of noise at 1 char (default), immediately toned down starting at 2.
+        keyword_length = 2,
+      },
       {
         name = "tmux",
         keyword_length = 4,
