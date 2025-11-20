@@ -62,10 +62,9 @@ Plug.cmp {
       documentation = {},
       completion = {
         scrolloff = 2,
+        max_height = 15,
       },
     }
-    -- Limit height of completion window
-    vim.opt.pumheight = 15
 
     local protected_formatter = function(custom_fmt_fn)
       return function(entry, original_vim_item)
