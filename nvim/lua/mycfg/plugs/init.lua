@@ -3,7 +3,7 @@ local PluginSystem = require"mylib.plugin_system"
 -- Define custom plugin source for my local plugins
 ---@param name string Name of my local plugin (found in $NVIM_BEW_MYPLUGINS_PATH)
 ---@return plugsys.PlugSourceLocal
-PluginSystem.sources.myplug = function(name)
+function PluginSystem.sources.myplug(name)
   local myplugins_path = vim.env.NVIM_BEW_MYPLUGINS_PATH
   assert((
     myplugins_path or vim.fn.filereadable(myplugins_path) == 1

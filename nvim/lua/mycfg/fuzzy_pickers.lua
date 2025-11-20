@@ -94,7 +94,7 @@ end
 -- Custom qf/loc list picker, with nicer entry display ✨
 -- The default is basically all white and doesn't columnize anything..
 ---@param opts {nr?: number}
-M.fancy_quickfix = function(opts)
+function M.fancy_quickfix(opts)
   opts = opts or {}
   tel_builtins.quickfix {
     nr = opts.nr,
@@ -103,7 +103,7 @@ M.fancy_quickfix = function(opts)
   }
 end
 ---@param opts {nr?: number}
-M.fancy_loclist = function(opts)
+function M.fancy_loclist(opts)
   opts = opts or {}
   tel_builtins.loclist {
     nr = opts.nr,

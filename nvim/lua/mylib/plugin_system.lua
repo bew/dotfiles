@@ -299,7 +299,7 @@ end
 --- A dist-managed plugin (e.g. by Nix 😉), will not be managed by pkg manager, only loaded
 ---@param name string Name of a dist-managed opt plugin (found in packpath)
 ---@return plugsys.PlugSourceDefered
-M.sources.dist_managed_opt_plug = function(name)
+function M.sources.dist_managed_opt_plug(name)
   return function()
     local glob_expr = vim.fs.joinpath("pack", "*", "opt", name)
     local dist_paths = vim.fn.globpath(vim.o.packpath, glob_expr, --[[respect-wildstuff]]false, --[[aslist]]true)
@@ -318,7 +318,7 @@ end
 ---@param name string Arbitrary name for the plugin, used if fallback can't find any viable source.
 ---@param ... plugsys.PlugSourceBase|plugsys.PlugSourceDefered Sources to try
 ---@return plugsys.PlugSourceBase
-M.sources.fallback = function(name, ...)
+function M.sources.fallback(name, ...)
   -- (note: `ipairs{...}` stops at first nil param)
   for _, src in pairs({...}) do
     if type(src) == "function" then

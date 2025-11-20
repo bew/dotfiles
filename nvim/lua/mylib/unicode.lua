@@ -22,7 +22,7 @@ local SUPERSCRIPT_CHARS = {
 --- (most uppercase letters, numbers & few symbols, unsupported chars will error out)
 ---@param text string Input text
 ---@return string
-UC.superscript = function(text)
+function UC.superscript(text)
   local result = ""
   for _, c in U.iter_chars(text) do
     if SUPERSCRIPT_CHARS[c] then
@@ -45,7 +45,7 @@ local SUBSCRIPT_CHARS = {
 --- (only numbers & few symbols, unsupported chars will error out)
 ---@param text string Input text
 ---@return string
-UC.subscript = function(text)
+function UC.subscript(text)
   local result = ""
   for _, c in U.iter_chars(text) do
     if SUBSCRIPT_CHARS[c] then

@@ -26,7 +26,7 @@ local SU = {}
 
 --- Set `filetype` as inheriting snippets from the given list of extra snippets collections.
 ---@param args mysnips.Opts.FileTypeSetup Args table
-SU.filetype_setup = function(args)
+function SU.filetype_setup(args)
   vim.validate("filetype", args.filetype, "string")
   vim.validate("inherits_from", args.inherits_from, "table")
 
@@ -52,7 +52,7 @@ end
 -- FIXME: support multiple triggers
 --   !!! luasnip doesn't seem to support to assign the same 'context' to 2 snippets :/
 ---@param list_of_snippets LuaSnip.Snippet[]
-SU.get_snip_fn = function(list_of_snippets)
+function SU.get_snip_fn(list_of_snippets)
   --- Define snippet!
   ---@param trigger string
   ---@param context mysnips.SnipContext
@@ -101,7 +101,7 @@ end
 --
 ---@param args mysnips.Opts.MyFmtInner
 ---@return LuaSnip.Node[]
-SU._myfmt_inner = function(args)
+function SU._myfmt_inner(args)
   -- args[1] is the fmt string (required),
   vim.validate("fmt-string", args[1], "string")
   -- args[2] is the set of nodes (required),
@@ -122,7 +122,7 @@ end
 --- Use a format string with placeholders to interpolate nodes.
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
-SU.myfmt = function(args)
+function SU.myfmt(args)
   ---@cast args mysnips.Opts.MyFmtInner
   return SU._myfmt_inner(args)
 end
@@ -130,7 +130,7 @@ end
 --- Same as `myfmt`, disabling trim & dedent for the format string
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
-SU.myfmt_no_strip = function(args)
+function SU.myfmt_no_strip(args)
   ---@cast args mysnips.Opts.MyFmtInner
   args.opts = args.opts or {}
   args.opts.trim_empty = false
@@ -141,7 +141,7 @@ end
 --- Same as `myfmt`, using `{}` delimiters (like the builtin luasnip fmt)
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
-SU.myfmt_braces = function(args)
+function SU.myfmt_braces(args)
   ---@cast args mysnips.Opts.MyFmtInner
   args.opts = args.opts or {}
   args.opts.delimiters = "{}"
@@ -151,7 +151,7 @@ end
 --- Same as `myfmt`, using `{}` delimiters & disabling trim & dedent
 ---@param args mysnips.Opts.MyFmt
 ---@return LuaSnip.Node[]
-SU.myfmt_braces_no_strip = function(args)
+function SU.myfmt_braces_no_strip(args)
   ---@cast args mysnips.Opts.MyFmtInner
   args.opts = args.opts or {}
   args.opts.delimiters = "{}"
@@ -172,7 +172,7 @@ end
 --
 -- SEE: https://github.com/L3MON4D3/LuaSnip/discussions/1271
 -- REF: https://github.com/L3MON4D3/LuaSnip/blob/33b06d72d220aa56/lua/luasnip/extras/postfix.lua#L13
-SU.mk_expand_params_resolver = function(spec)
+function SU.mk_expand_params_resolver(spec)
   spec = spec or {}
   ---@type string[]
   local delete_after_trig_pats = U.args.normalize_arg_one_or_more(spec.delete_after_trig or {})
@@ -205,7 +205,7 @@ end
 ---   to be used via snip.env.LS_SELECT_RAW and related snip env vars.
 ---@param snip LuaSnip.Snippet
 ---@return boolean
-SU.has_stored_selection = function(snip)
+function SU.has_stored_selection(snip)
   -- REF: https://github.com/L3MON4D3/LuaSnip/issues/1030
   return snip.env.LS_SELECT_RAW and #snip.env.LS_SELECT_RAW > 0
 end
@@ -214,7 +214,7 @@ end
 ---@param index integer Snip node index
 ---@param default_text? string Default text if no stored selection to use
 ---@return LuaSnip.Node
-SU.insert_node_default_selection = function(index, default_text)
+function SU.insert_node_default_selection(index, default_text)
   local default_text = default_text or ""
   return ls.dynamic_node(index, function(_, parent)
     -- Get the top-level snippet (the only one with `env`!)
@@ -237,7 +237,7 @@ local node_key_ref = require"luasnip.nodes.key_indexer".new_key -- to use key in
 local node_absolute_ref = require"luasnip.nodes.absolute_indexer"
 ---@param ref string|table|integer
 ---@return LuaSnip.NodeRef
-SU.node_ref = function(ref)
+function SU.node_ref(ref)
   if type(ref) == "string" then
     return node_key_ref(ref)
   elseif type(ref) == "table" then

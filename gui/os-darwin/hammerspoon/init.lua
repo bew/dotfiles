@@ -22,7 +22,7 @@ end
 _G.actions = {}
 _G.lib = {}
 
-actions.reload = function()
+function actions.reload()
   print("reloading!")
   hs.reload()
 end
@@ -49,19 +49,19 @@ hs.grid.setGrid(hs.geometry.size(7, 7))
 actions.wm = {}
 lib.wm = {}
 
-lib.wm.win_is_maximized = function(win)
+function lib.wm.win_is_maximized(win)
   local winFrame = win:frame()
   local screenFrame = win:screen():frame()
   return winFrame:equals(screenFrame)
 end
 
-actions.wm.focusLeft = function() hs.window.focusedWindow():focusWindowWest() end
-actions.wm.focusDown = function() hs.window.focusedWindow():focusWindowSouth() end
-actions.wm.focusUp = function() hs.window.focusedWindow():focusWindowNorth() end
-actions.wm.focusRight = function() hs.window.focusedWindow():focusWindowEast() end
+function actions.wm.focusLeft() hs.window.focusedWindow():focusWindowWest() end
+function actions.wm.focusDown() hs.window.focusedWindow():focusWindowSouth() end
+function actions.wm.focusUp() hs.window.focusedWindow():focusWindowNorth() end
+function actions.wm.focusRight() hs.window.focusedWindow():focusWindowEast() end
 
-actions.wm.centerOnScreen = function() hs.window.focusedWindow():centerOnScreen() end
-actions.wm.toggleMaximized = function()
+function actions.wm.centerOnScreen() hs.window.focusedWindow():centerOnScreen() end
+function actions.wm.toggleMaximized()
   local win = hs.window.focusedWindow()
   if not lib.wm.win_is_maximized(win) then
     -- NOTE: cannot use the `hs.grid.maximizeWindow(win)` because it's not a _true_ maximization
@@ -76,7 +76,7 @@ actions.wm.toggleMaximized = function()
   end
 end
 
-actions.wm.moveWinToNextScreen = function()
+function actions.wm.moveWinToNextScreen()
   local win = hs.window.focusedWindow()
   if not win then return end
 

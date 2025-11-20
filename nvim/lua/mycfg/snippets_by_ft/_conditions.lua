@@ -51,7 +51,7 @@ end
 ---
 ---@param lua_pattern string Lua Pattern that the line before trigger should match
 ---@return LuaSnip.SnipContext.ConditionObj
-M.line_before_matches = function(lua_pattern)
+function M.line_before_matches(lua_pattern)
   return make_cond_obj(function(line_to_cursor, matched_trigger)
     -- `matched_trigger` is NOT set for `show_condition` functions,
     -- we need to _guess_ the trigger to remove it for `line_to_trigger` to have a useful value.
@@ -92,7 +92,7 @@ M.ts_not_available = M.ts_available:inverted()
 ---
 ---@param node_types string[]
 ---@return LuaSnip.SnipContext.ConditionObj
-M.only_in_ts_node_type = function(node_types)
+function M.only_in_ts_node_type(node_types)
   return make_cond_obj(function()
     local node = U.ts.try_get_node_at_cursor()
     if not node then return false end
