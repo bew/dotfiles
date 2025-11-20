@@ -326,6 +326,12 @@ function ei()
 }
 alias ei="nvim +CodeCompanionChat +only +startinsert"
 
+# Search using `rg` & open the results in neovim via quickfix entries
+function erg()
+{
+  nvim -q =(rg --vimgrep "$@") +copen
+}
+
 # rg
 
 alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bold'
