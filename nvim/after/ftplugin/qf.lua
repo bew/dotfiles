@@ -3,11 +3,12 @@ local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
 local U = require"mylib.utils"
 
-local jump_to_current = [[<cr>zz<C-w>p]]
+-- FIXME: `jump to current` should use the _last_ window to show the qf entry (!!)
+local jump_to_current_stay_in_qf = [[<cr>zz<C-w>p]]
 K.toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
-K.toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current, desc="Jump to current, stay in qf"}
-K.toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current, desc="Jump to next, stay in qf"}
-K.toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current, desc="Jump to prev, stay in qf"}
+K.toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current_stay_in_qf, desc="Jump to current, stay in qf"}
+K.toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current_stay_in_qf, desc="Jump to next, stay in qf"}
+K.toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current_stay_in_qf, desc="Jump to prev, stay in qf"}
 
 K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 K.toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}
