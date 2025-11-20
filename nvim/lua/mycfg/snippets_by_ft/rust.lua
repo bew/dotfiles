@@ -185,7 +185,7 @@ end
 snip("fn", {desc = "fn def", when = conds.start_of_line}, SU.myfmt {
   [[
     <vis>fn <name>(<args>)<rtype><maybe_where>{
-    	<body><maybe_ret>
+    	<body_with_maybe_ret>
     }
   ]],
   {
@@ -202,39 +202,52 @@ snip("fn", {desc = "fn def", when = conds.start_of_line}, SU.myfmt {
       },
     }, {key="rtype"}),
     maybe_where = get_maybe_where_node(5, SU.node_ref"name"),
-    body = SU.insert_node_default_selection(6),
-    maybe_ret = ls.dynamic_node(7, function(args_texts)
-      local rtype = args_texts[1][1]
-      if #rtype == 0 then
-        return ls.snippet_node(nil, t"")
-      end
-      if rtype:match" %-> " then
-        rtype = rtype:sub(5) -- skip return syntax prefix
-      end
+    -- NOTE: the dynamically guessed default return value is entirely removable,
+    --   because sometimes the function body is a single line/expr!
+    body_with_maybe_ret = ls.choice_node(6, {
+      ls.dynamic_node(nil, function(args_texts)
+        local rtype = args_texts[1][1]
+        if #rtype == 0 then
+          return ls.snippet_node(nil, t"")
+        end
+        if rtype:match" %-> " then
+          rtype = rtype:sub(5) -- skip return syntax prefix
+        end
 
-      -- skip module prefix if any (like `anyhow::`)
-      local module_prefix = rtype:match"^[a-z_]+::"
-      if module_prefix then
-        rtype = rtype:sub(#module_prefix +1)
-      end
-      print("Choosing default return based on type:", _q(rtype))
+        -- skip module prefix if any (like `anyhow::`)
+        local module_prefix = rtype:match"^[a-z_]+::"
+        if module_prefix then
+          rtype = rtype:sub(#module_prefix +1)
+        end
+        print("Choosing default return based on type:", _q(rtype))
 
-      local ret_nodes ---@type LuaSnip.Node[]
-      if rtype:match"^Result<" then
-        local inner_ty = rtype:sub(#("Result<") +1) -- skip prefix
-        ret_nodes = SU.myfmt {
-          [[Ok(<inner>)]],
-          { inner = i(1, guess_default_value_for_type(inner_ty)) },
-        }
-      else
-        ret_nodes = { t(guess_default_value_for_type(rtype)) }
-      end
+        local ret_nodes ---@type LuaSnip.Node[]
+        if rtype:match"^Result<" then
+          local inner_ty = rtype:sub(#("Result<") +1) -- skip prefix
+          ret_nodes = SU.myfmt {
+            [[Ok(<inner>)]],
+            { inner = i(2, guess_default_value_for_type(inner_ty)) },
+          }
+        else
+          ret_nodes = { t(guess_default_value_for_type(rtype)) }
+        end
 
-      -- inject newline & indent to ensure the default return is on a separate line after body
-      table.insert(ret_nodes, 1, t{ "", "	" })
-      return ls.snippet_node(nil, ret_nodes)
-    end, {SU.node_ref"rtype"}),
+        return ls.snippet_node(nil, U.concat_lists {
+          {
+            ls.restore_node(1, "body"),
+            -- inject newline & indent to ensure the default return is on a separate line after body
+            t{ "", "	" },
+          },
+          ret_nodes,
+        })
+      end, {SU.node_ref"rtype"}),
+      ls.restore_node(nil, "body")
+    }),
   }
+}, {
+  stored = {
+    body = SU.insert_node_default_selection(nil),
+  },
 })
 
 -- Smart impl block snip ✨
