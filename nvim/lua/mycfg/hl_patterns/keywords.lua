@@ -113,6 +113,7 @@ patterns.big_fail_bad = {
     _big_word_variants"FAIL",
     _big_word_variants"BAD",
     _big_word_variants"BAD%+%+", -- BAD++
+    _big_word_variants"BUG",
     _big_word_variants"BLOCKED",
     _big_word_variants"BLOCKER",
     _big_word_variants"PROBLEM",
