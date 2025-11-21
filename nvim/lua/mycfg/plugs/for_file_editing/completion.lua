@@ -175,15 +175,24 @@ Plug.cmp {
       disallow_partial_fuzzy_matching = false,
       -- Fuzzy matching is mostly ok but still broken in some cases (wontfix :/)
       -- See my issue: https://github.com/hrsh7th/nvim-cmp/issues/1443
-      -- TODO(?): fork?
+      -- TODO(?): fork? Or switch to blink.cmp 👀
     }
+
+    -- warn: Source WITHOUT a priority seems to get a big buf
+    local prio = { high = 150, med = 100, low = 50 }
     local common_sources = {
-      { name = "nvim_lsp" },
+      { name = "nvim_lsp", priority = prio.high },
+      {
+        name = "luasnip",
+        priority = prio.high,
+        keyword_length = 2,
+      },
       -- IDEA?: make a separate source to search in buffer of same filetype
       --        (its priority should be higher than the 'buffer' source's priority)
       {
         -- Mainly used for long words, leveraging fuzzy search (:
         name = "buffer",
+        priority = prio.med,
         -- I really never need completion of short 2-3 letter words, but it's useful to kick the
         -- auto-completion early to be able to get completion when typing 2-chars with upper or
         -- number chars.
@@ -221,15 +230,33 @@ Plug.cmp {
           end,
         },
       },
-      { name = "luasnip", keyword_length = 2 },
-      { name = "path" }, -- By default, '.' is relative to the buffer
+      { name = "path", priority = prio.med }, -- note: By default, '.' is relative to the buffer
       {
+        -- FIXME: Had a weird case with a TS match bad prefix/grouping compared to an LSP match,
+        -- but for some reason that TS match was MORE prioritzed than the LSP with was lodged in
+        -- middle 👀
+        --
+        -- Example:
+        -- With `Err(anho|)` input (`|` is the cursor)
+        -- I got this completion list (without `priority` setting):
+        --    │ Err(anyhow!("{directive_n… (P)  @TS
+        --    │ anyhow!                         @Lsp
+        --
+        -- BUG:
+        -- I want to get to `anyhow!` but when I navigate to the first one (to got through it) the
+        -- completion menu closes immediately for some reason and I can't simply undo that wrong
+        -- inserted text ><
+        -- 👉 Seems to happen when a match (label? text?) has `{` or `}` 🤔
+        --   .. TODO: minimal repro!
         name = "treesitter",
-        -- Has lots of noise at 1 char (default), immediately toned down starting at 2.
-        keyword_length = 2,
+        priority = prio.low, -- it can easily match too much..
+        keyword_length = 4, -- Has lots of noise at 1 char (default)
+        -- FIXME: do NOT consider current word as a potentiol match 👀
+        -- (iirc it shouldn't but it still does sometimes..)
       },
       {
         name = "tmux",
+        priority = prio.low,
         keyword_length = 4,
         option = {
           label = "", -- remove label in 'menu', I put mine already
@@ -241,8 +268,9 @@ Plug.cmp {
     }
     local emoji_source = {
       name = "emoji",
+      priority = prio.med,
       keyword_length = 3,
-      trigger_characters = {}, -- don't trigger on ':'
+      trigger_characters = {}, -- don't trigger on ':', but only after chars prefixed by `:`
       option = {
         -- insert the emoji char, not the `:txt:`
         insert = true,
@@ -258,7 +286,7 @@ Plug.cmp {
 
     cmp.setup.filetype({"lua"}, {
       sources = vim.list_extend(
-        { { name = "lazydev" } },
+        { { name = "lazydev", priority = prio.high } },
         common_sources
       ),
     })
@@ -278,6 +306,7 @@ Plug.cmp {
         {
           {
             name = "buffer",
+            priority = prio.med,
             keyword_length = 2,
             option = {
               -- (Default fn searches words in current buffer only)
