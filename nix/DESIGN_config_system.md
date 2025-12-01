@@ -35,7 +35,7 @@ It is defined with an attrset, here is an example for the NixOS kit:
 }
 ```
 
-The _kit_'s `eval` function should output an attrset (the final config), with `lib.extendWith` and `lib.extendWithPrevConfig` functions to re-evaluate the current _kit_ with an additional module to
+The _kit_'s `eval` function should output an attrset (the final config), with the `lib.extendWith` function to re-evaluate the current _kit_ with an additional module to
 tweak/refine the config with more options/_presets_/_modules_ if needed (can be chained!).
 
 Exposed in a flake as `kit.forMYTECH` (e.g. `kit.forNixOS`)
@@ -92,7 +92,7 @@ It represents the final, concrete configuration ready for use.
 Unlike a _profile_, which is a reusable and composable definition, a _config_ is fully concrete, tailored to a specific environment, user, system..
 
 > [!NOTE]
-> Concrete _configs_ created from a _kit_ have `lib.extendWith` and `lib.extendWithPrevConfig` functions, allowing them to be re-evaluated with additional options if needed.
+> Concrete _configs_ created from a _kit_ have the `lib.extendWith` function, allowing them to be re-evaluated with additional options if needed.
 > This will output a new _config_. (can be chained)
 
 Examples:
