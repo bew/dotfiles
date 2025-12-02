@@ -10,16 +10,25 @@ local t = ls.text_node ---@diagnostic disable-line: unused-local
 
 -- Start of snippets definitions
 
--- NOTE: not using `inh` trigger, to avoid writting `in` to dedent text in..
+-- NOTE: not using `inh` trigger, because writing `in` would auto-dedented text in let blocks..
 snip("ih", { desc = "inherit ...;" }, SU.myfmt {
-  [[inherit<maybeFrom> <params>;]],
+  [[inherit <rest>;]],
   {
-    maybeFrom = ls.choice_node(1, {
-      SU.myfmt_no_strip {[[ (<attrset>)]], {attrset = i(1, "from")}},
-      t"",
+    rest = ls.choice_node(1, {
+      SU.myfmt {
+        [[(<attrset>) <fields>]],
+        {
+          attrset = i(1, "from"),
+          fields = ls.restore_node(2, "fields"),
+        },
+      },
+      ls.restore_node(nil, "fields"),
     }),
-    params = i(2, "field"),
   }
+}, {
+  stored = {
+    fields = i(nil, "field"),
+  },
 })
 
 snip("ls", { desc = "language string" }, SU.myfmt {
