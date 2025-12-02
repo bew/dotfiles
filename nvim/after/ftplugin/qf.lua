@@ -9,6 +9,11 @@ K.toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
 K.toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current_stay_in_qf, desc="Jump to current, stay in qf"}
 K.toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current_stay_in_qf, desc="Jump to next, stay in qf"}
 K.toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current_stay_in_qf, desc="Jump to prev, stay in qf"}
+-- TODO: jump to next/previous entry, skipping 'context' lines
+-- IDEA: Might be able to it in a plugin-agnostic way, by checking if entries have mixed provenance,
+--   and jump between entries that have a known provenance 🤔
+--   TODO: check how quicker.nvim reads its entries and differenciates between the 2 🤔
+-- Alternative: ask plugin to add actions for this 😬
 
 K.toplevel_buf_map{mode="n", key="q", action=my_actions.close_win_back_to_last}
 K.toplevel_buf_map{mode="n", key="<M-q>", action="q", desc="Record macro"}

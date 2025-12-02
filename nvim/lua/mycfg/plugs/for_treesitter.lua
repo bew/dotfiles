@@ -53,6 +53,12 @@ Plug {
       })
     end
 
+    -- TODO: impl treesj for Terraform's list/dict generator literals
+    --   e.g. [for foo in bar: value] or {for foo in bar: key => value}
+
+    -- TODO: change treesj for Nix's destructuring function argument
+    --   e.g. `{foo, bar ? 42}: bar` which currently gives ugly formatting on 'split' action..
+
     local tsj = require"treesj"
     tsj.setup {
       use_default_keymaps = false,
