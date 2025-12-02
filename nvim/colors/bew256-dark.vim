@@ -276,6 +276,7 @@ HiResetTo @keyword.exception ctermfg=160 cterm=bold
 
 HiResetTo @function ctermfg=33
 HiResetTo @function.call ctermfg=208
+HiResetTo @function.method.call ctermfg=208
 HiResetTo @function.macro ctermfg=208
 HiResetTo @function.builtin ctermfg=166 cterm=bold,italic
 HiResetTo @constructor ctermfg=166 cterm=bold
