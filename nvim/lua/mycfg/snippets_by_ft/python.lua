@@ -29,7 +29,7 @@ snip("fy", {desc = "from typing import …", when = conds.very_start_of_line}, (
 snip("cl", {desc = "class def", when = conds.start_of_line}, SU.myfmt {
   [[
     class <name><maybe_parents>:
-        <body>
+    	<body>
   ]],
   {
     name = i(1, "MyClass"),
@@ -45,7 +45,7 @@ snip("dc", {desc = "data-only class", when = conds.start_of_line}, SU.myfmt {
   [[
     @dataclass<maybe_decor_params>
     class <name><maybe_parents>:
-        <body>
+    	<body>
   ]],
   {
     name = i(1, "MyData"),
@@ -101,9 +101,10 @@ local function make_def_snip(opts)
     (
       (opts.decor_name and "<decor>\n" or "") ..
       "def <name>(<first_arg><maybe_arg>)<maybe_return_type>:<maybe_no_cover>\n" ..
-      "    <body>"
+      "	<body>"
     ),
     {
+      ---@diagnostic disable-next-line: assign-type-mismatch (see how `opts.decor_name` is used)
       decor = (
         opts.decor_name and t("@" .. opts.decor_name)
         or nil -- key should not be defined (fmt placeholder don't exist)
@@ -316,7 +317,7 @@ snip(
 snip("deft", { desc = "def test function", when = conds.start_of_line }, SU.myfmt {
   [[
   <deco>def test_<name>(<args>):
-    <body>
+  	<body>
   ]],
   {
     deco = ls.choice_node(1, {
@@ -333,7 +334,7 @@ snip("deftx", { desc = "pytest fixture function", when = conds.start_of_line }, 
   [[
   @pytest.fixture<params>
   def <name>(<args>) <arrow> <ret>:
-    <body>
+  	<body>
   ]],
   {
     params = ls.choice_node(1, {
@@ -361,7 +362,7 @@ snip("deftx", { desc = "pytest fixture function", when = conds.start_of_line }, 
 snip("pytr", { desc = "pytest check raise" }, SU.myfmt {
   [[
   with pytest.raises(<ex><maybe_match><after_args>):
-    <body>
+  	<body>
   ]],
   {
     ex = i(1, "MyException"),
@@ -384,10 +385,10 @@ snip("pytm", { desc = "pytest mark decorator", when = conds.start_of_line }, {
 snip("pytp", { desc = "pytest parametrize" }, SU.myfmt {
   [[
   @pytest.mark.parametrize(
-    "<params>",
-    [
-      (<values>),<end_>
-    ],
+  	"<params>",
+  	[
+  		(<values>),<end_>
+  	],
   )
   ]],
   {
@@ -521,9 +522,9 @@ snip("ld", {desc = "lambda"}, t"lambda")
 snip("try", {desc = "try … except …", when = conds.start_of_line}, SU.myfmt {
   [[
     try:
-        <body>
+    	<body>
     except <ex_type><maybe_ex_name>:
-        <handler>
+    	<handler>
   ]],
   {
     body = SU.insert_node_default_selection(1, "# do something useful.."),
@@ -539,7 +540,7 @@ snip("try", {desc = "try … except …", when = conds.start_of_line}, SU.myfmt 
 snip("ex", {desc = "except …", when = conds.start_of_line}, SU.myfmt {
   [[
     except <ex_type><maybe_ex_name>:
-        <handler>
+    	<handler>
   ]],
   {
     ex_type = i(1, "SomeException"),
@@ -554,7 +555,7 @@ snip("ex", {desc = "except …", when = conds.start_of_line}, SU.myfmt {
 snip("forkv", {desc = "for loop over keys", when = conds.start_of_line}, SU.myfmt {
   [[
     for <key>, <value> in <dict>.items():
-        <body>
+    	<body>
   ]],
   {
     dict = i(1, "somedict"),
@@ -567,7 +568,7 @@ snip("forkv", {desc = "for loop over keys", when = conds.start_of_line}, SU.myfm
 snip("forn", {desc = "for n in range", when = conds.start_of_line}, SU.myfmt {
   [[
     for <item> in range(<range_args>):
-        <body>
+    	<body>
   ]],
   {
     item = i(1, "item"),
@@ -606,7 +607,7 @@ snip("forn", {desc = "for n in range", when = conds.start_of_line}, SU.myfmt {
 snip("for", {desc = "for item in iterable", when = conds.start_of_line}, SU.myfmt {
   [[
     for <item> in <iterable>:
-        <body>
+    	<body>
   ]],
   {
     item = i(1, "item"),
@@ -664,25 +665,25 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
 
 
     class ScriptError(Exception):<move_to_top>
-        pass
+    	pass
 
 
     def parse_args(args) ->> argparse.Namespace:
-        parser = argparse.ArgumentParser()
-        return parser.parse_args(args)
+    	parser = argparse.ArgumentParser()
+    	return parser.parse_args(args)
 
 
     def main(args):
-        opts = parse_args(args)
-        <body>
+    	opts = parse_args(args)
+    	<body>
 
 
     if __name__ == "__main__":
-        try:
-            main(sys.argv[1:])
-        except ScriptError as err:
-            print(f"ERROR: {err}", file=sys.stderr)
-            sys.exit(1)<after>
+    	try:
+    		main(sys.argv[1:])
+    	except ScriptError as err:
+    		print(f"ERROR: {err}", file=sys.stderr)
+    		sys.exit(1)<after>
   ]],
   {
     move_to_top = ls.choice_node(1, {
@@ -698,11 +699,11 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
 snip("mainsimple", {desc = "simple main() script", when = conds.very_start_of_line}, SU.myfmt {
   [[
     def main():
-        <body>
+    	<body>
 
 
     if __name__ == "__main__":
-        main()<after>
+    	main()<after>
   ]],
   {
     body = SU.insert_node_default_selection(1, "pass"),
@@ -713,7 +714,7 @@ snip("mainsimple", {desc = "simple main() script", when = conds.very_start_of_li
 snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU.myfmt {
   [[
     if __name__ == "__main__":
-        <body>
+    	<body>
   ]],
   {
     body = SU.insert_node_default_selection(1, "pass"),
