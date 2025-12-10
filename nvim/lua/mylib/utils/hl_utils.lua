@@ -81,8 +81,8 @@ function M.group(group_spec)
     local get_hl_group_info = vim.api.nvim_get_hl(0, { name = group_spec })
     group = _get_hl_to_api_highlight(get_hl_group_info)
   else
-    group = group_spec
     name = rawget(group_spec, "name")
+    group = group_spec
   end
   -- note: Here we upcast the vim.api.keyset.highlight to a HlGroup (compatible!)
   ---@cast group mylib.hl.HlGroup
@@ -103,13 +103,15 @@ end
 function M.set(group_name, hlspec)
   if rawget(hlspec, "name") ~= group_name then
     -- note: nvim_set_hl _really_ doesn't like when we set "Foo" with another name in hlspec
-    --   So we make sure we get a fresh copy (un-named)
+    --   (this can happen when we use a group hlspec to set another group)
+    --   So we make sure we get a fresh copy, un-named.
     hlspec = vim.deepcopy(hlspec)
     ---@diagnostic disable-next-line: inject-field
     hlspec.name = nil
   end
   -- print("setting hl", group_name, "to", vim.inspect(hlspec)) -- DEBUG
   vim.api.nvim_set_hl(0, group_name, hlspec)
+  return M.group(group_name)
 end
 
 --- Apply the group

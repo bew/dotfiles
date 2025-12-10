@@ -124,15 +124,13 @@ Plug {
     K.local_leader_map{mode="n", key=[[cxx]], action=my_actions.ts_context_jump_to}
   end,
   on_colorscheme_change = function()
-    local ctermbg = 235
-    local ctermbg_darker = 233
-    U.hl.set("TreesitterContext", {
+    local hl_ctx = U.hl.set("TreesitterContext", {
       ctermfg = 248,
-      ctermbg = ctermbg,
+      ctermbg = 235,
     })
     U.hl.set("TreesitterContextSeparator", {
-      ctermfg = ctermbg, -- (border uses FG, should match context' BG)
-      ctermbg = ctermbg_darker,
+      ctermfg = hl_ctx.ctermbg, -- (border uses FG, should match context' BG)
+      ctermbg = hl_ctx.ctermbg -2, -- darker
     })
   end,
 }
