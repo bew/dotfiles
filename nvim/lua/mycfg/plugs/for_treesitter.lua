@@ -62,6 +62,9 @@ Plug {
     local tsj = require"treesj"
     tsj.setup {
       use_default_keymaps = false,
+      -- 'join' action doesn't execute if resulting line is longer than `max_join_length`.
+      -- It defaults to 120, but it's more annoying than anything else.. just disable it!
+      max_join_length = 999,
       langs = langs,
     }
 
@@ -95,10 +98,11 @@ Plug {
       multiwindow = true, -- When false, only enabled on current bufwin, everywhere when true.
       max_lines = "35%", -- How many lines the window should span. Values <= 0 mean no limit.
       multiline_threshold = 5, -- Maximum number of lines to show for a SINGLE context item
-      mode = "topline",  -- Line used to calculate context. (Either "cursor" or "topline")
-      trim_scope = "inner",
+      mode = "topline", -- Line used to calculate context. (Either "cursor" or "topline")
+      trim_scope = "inner", -- When scope is too big for win height, trim 'inner' context lines
       -- Separator between context and content (must be single char).
-      separator = "🮃", -- "▀"
+      -- (it's actually annoying as it's hiding a whole line below the context win)
+      -- separator = "🮃"
     }
 
     my_actions.ts_context_toggle = A.mk_action {
