@@ -11,10 +11,22 @@ local plugin_luasnip = {
   -- dir = "/full/path/to/local/plugin/clone", -- e.g. to target my own code instead of upstream
   version = "v2.*",
   config = function()
-    vim.keymap.set("i", [[<tab>]], function() require"luasnip".expand() end)
+    local ls = require"luasnip"
+    vim.keymap.set("i", [[<tab>]], function() ls.expand() end)
+    vim.keymap.set("i", [[<M-c>]], function()
+      if ls.in_snippet() and ls.choice_active() then
+        ls.change_choice(1)
+      end
+    end)
 
     -- Define snippets
-    local ls = require"luasnip"
+    ---@diagnostic disable: unused-local
+    local i = ls.insert_node
+    local t = ls.text_node
+    local fmt = require"luasnip.extras.fmt".fmt
+    local rep = require"luasnip.extras".rep
+    local k = require"luasnip.nodes.key_indexer".new_key
+    ---@diagnostic enable: unused-local
     ls.add_snippets("all", {
       ls.snippet({ trig="bad" }, { ls.insert_node(1, "é") }),
     })
@@ -67,6 +79,6 @@ local plugin_multicursor = {
 
 require"lazy.minit".repro {
   spec = {
-    plugin_multicursor,
+    plugin_luasnip,
   },
 }
