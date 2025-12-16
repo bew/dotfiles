@@ -195,7 +195,11 @@ M.ReadOnlyMaybeEditableWithToggle = {
 
 local FileType_only = {
   provider = function()
-    return vim.bo.filetype or "no ft"
+    -- no ft or ft set to ""
+    if not vim.bo.filetype or #vim.bo.filetype == 0 then
+      return "no ft"
+    end
+    return vim.bo.filetype
   end,
 }
 
