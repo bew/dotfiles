@@ -95,9 +95,10 @@
 [fetch]
   # Auto remove any remote-tracking refs that no longer exist on the remote
   prune = true
-  # Do not prune tags, otherwise it removes all tags when fetching in a repo with both upstream & fork remote:
+  # Do NOT prune tags, otherwise it removes all tags when fetching in a repo with both upstream & fork remote:
   # - when fetching upstreams: there are tags
   # - when fetching my fork: there are no tags, removing all existing ones
+  # (Can be nice to have in a work-specific config though!)
   # pruneTags = true
 
   # Always fetch all available remotes
