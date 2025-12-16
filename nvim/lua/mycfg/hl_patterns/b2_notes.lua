@@ -27,8 +27,9 @@ patterns.b2_id = {
 -- - <https://foo> or <file:///bla> (url)
 -- - <23:> (doesn't start with letter..)
 -- - <T: Random> (rust!)
+-- - foo::<bar::baz>
 patterns.b2_custom_links = {
-  pattern = [[<()[A-Za-z][A-Za-z0-9-]*():[^>/ ][^>]->]],
+  pattern = [[<()[A-Za-z][A-Za-z0-9-]*():[^:>/ ][^>]->]],
   group = _U.define_hl("b2_custom_links", {
     italic = true,
     underline = true,
