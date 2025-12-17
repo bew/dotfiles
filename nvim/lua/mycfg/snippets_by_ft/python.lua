@@ -629,10 +629,14 @@ snip("on", {desc = "Foo | None = None"}, SU.myfmt {
 snip("rt", {desc = "reveal type", when = conds.start_of_line}, SU.myfmt {
   -- note: `(!!)` allows to draw attention without eating too much editor space for the hint
   [[reveal_type(<expr>)  # noqa: F821 (!!)]],
+  -- note: When using `ty` lsp, using `reveal_type` without importing it first gives errors
+  -- [[__import__("typing").reveal_type(<expr>)  # (!!)]],
   { expr = SU.insert_node_default_selection(1) }
 })
 snip("rt", {desc = "reveal type (in expr)"}, SU.myfmt {
   [[reveal_type(<expr>)]],
+  -- note: When using `ty` lsp, using `reveal_type` without importing it first gives errors
+  -- [[__import__("typing").reveal_type(<expr>)]],
   { expr = SU.insert_node_default_selection(1) }
 })
 

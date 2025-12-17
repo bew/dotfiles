@@ -64,6 +64,10 @@ in {
       pp.pylsp-mypy
       # pp.python-lsp-isort (FIXME: not in nixpkgs yet..)
     ]);
+    # /!\ These as independent LSP are not ready yet!..
+    #     Let's continue with pylsp with ruff & mypy plugin for now..
+    # ty.pkg = pkgs.ty;
+    # ruff.pkg = pkgs.ruff;
 
     # rust
     rust-analyzer.pkg = pkgs.rust-analyzer;
