@@ -16,7 +16,9 @@ command -v wl-copy >/dev/null || exit 1
 action="$1"
 case "$action" in
   copy)
-    wl-copy
+    # NOTE: Ensure MIME type is set, to ensure wl-copy auto-detection doesn't do something weird
+    # that makes the text un-paste-able afterward..
+    wl-copy --type text/plain
     ;;
   paste)
     wl-paste
