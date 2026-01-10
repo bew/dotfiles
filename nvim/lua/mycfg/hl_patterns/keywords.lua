@@ -233,6 +233,7 @@ patterns.big_hint_usage_tracking = {
     _big_word_variants"USAGE",
     _big_word_variants"TRACKING%-ISSUE",
     _big_word_variants"ISSUE",
+    _big_word_variants"PR",
     {
       _U.keywordize"OPENED:",
       _U.keywordize"hint:",
