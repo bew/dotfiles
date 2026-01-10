@@ -21,6 +21,25 @@
         "type": "github"
       }
     },
+    "my-nix-commons": {
+      "inputs": {
+        "nixpkgsBase": "nixpkgsBase",
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1765335652,
+        "narHash": "sha256-+oEh+XEmE1VgXRHrh+LydjhwY1eIb1NPhi5LKfRVQmY=",
+        "owner": "bew",
+        "repo": "my-nix-commons",
+        "rev": "7f7fc47cd5d7b0b5fa9d7e72d2e2a1d6d138c537",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bew",
+        "repo": "my-nix-commons",
+        "type": "github"
+      }
+    },
     "myTemplates": {
       "inputs": {
         "nixpkgs-lib-only": "nixpkgs-lib-only"
@@ -51,6 +70,22 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixpkgsBase": {
+      "locked": {
+        "lastModified": 1764611609,
+        "narHash": "sha256-yU9BNcP0oadUKupw0UKmO9BKDOVIg9NStdJosEbXf8U=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "8c29968b3a942f2903f90797f9623737c215737c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -104,14 +139,30 @@
     "root": {
       "inputs": {
         "homeManager": "homeManager",
+        "my-nix-commons": "my-nix-commons",
         "myTemplates": "myTemplates",
         "nixpkgsBleedingEdge": "nixpkgsBleedingEdge",
         "nixpkgsStable": "nixpkgsStable",
         "officialTemplates": "officialTemplates",
-        "systems": "systems"
+        "systems": "systems_2"
       }
     },
     "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

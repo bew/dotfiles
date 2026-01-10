@@ -25,11 +25,13 @@
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
 
     systems.url = "github:nix-systems/default";
+
+    my-nix-commons.url = "github:bew/my-nix-commons";
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
   #   define my toplevel flake in multiples files & auto-merge packages, homeConfig, homeModules, {tool,…}ConfigModules...
-  outputs = { self, systems, ... }@flakeInputs: let
+  outputs = { self, systems, my-nix-commons, ... }@flakeInputs: let
     lib = flakeInputs.nixpkgsStable.lib;
     eachSystem = lib.genAttrs (import systems);
 
@@ -42,26 +44,20 @@
       };
     };
 
-    pkgsForSys = system: {
+    forSys = system: rec {
       myPkgs = self.packages.${system};
       stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
       bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
-    };
-    forSys = system: let
-      inherit (pkgsForSys system) myPkgs stablePkgs bleedingedgePkgs;
-    in rec {
-      inherit myPkgs stablePkgs bleedingedgePkgs;
 
-      directSymlinker = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {};
+      # FIXME: not used anywhere?? [TODO: REMOVE!]
+      # directSymlinker = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {};
 
       lib = stablePkgs.lib;
-      mybuilders = stablePkgs.callPackage ./nix/mylib/mybuilders.nix {};
-      # IDEA: rename to `pkglib`?
-      #   (to show it's a lib but about packages (so not system-agnostic))
+      mybuilders = my-nix-commons.mybuilders.${system};
 
-      kitsys = import ./nix/kit-system { inherit lib; };
+      kitsys = my-nix-commons.mylib.kitsys-v2;
 
-      zsh-kit = kitsys.newKit (import ./nix/kits/zsh-toolkit/kit.nix);
+      zsh-kit = kitsys.newToolkit (import ./nix/kits/zsh-toolkit/kit.nix);
       toolConfigs.zsh-bew = zsh-kit.eval {
         pkgs = stablePkgs;
         config = ./zsh/zsh-bew.zsh-config.nix;
@@ -73,7 +69,7 @@
         };
       };
 
-      nvim-kit = kitsys.newKit (import ./nix/kits/nvim-toolkit/kit.nix);
+      nvim-kit = kitsys.newToolkit (import ./nix/kits/nvim-toolkit/kit.nix);
       toolConfigs.nvim-minimal = nvim-kit.eval {
         pkgs = stablePkgs;
         config = ./nvim/nvim-minimal.nvim-config.nix;
@@ -97,7 +93,7 @@
         };
       };
 
-      tmux-kit = kitsys.newKit (import ./nix/kits/tmux-toolkit/kit.nix);
+      tmux-kit = kitsys.newToolkit (import ./nix/kits/tmux-toolkit/kit.nix);
       toolConfigs.tmux-bew = tmux-kit.eval {
         pkgs = stablePkgs;
         config = ./tmux/bew.tmux-config.nix;

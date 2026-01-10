@@ -9,6 +9,7 @@
 
 {
   imports = [
+    # FIXME: 'dyndots' should come from `my-nix-commons`!! (find its path in `_module.args`?)
     ../modules/generic/dyndots.nix
     ../modules/home/link-flake-inputs.nix
     ../modules/home/nix-registry.nix
