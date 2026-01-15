@@ -31,8 +31,14 @@ add_rule {
 -- Match `uses: owner/repo@rev` as a github user/repo URL at rev/tag
 -- (this the syntax used for using external Github actions)
 add_rule {
-  regex = [[uses: ([\w\d][^/]+)/([^@]+)@([\w\d\._-]+)]],
+  regex = [[uses: ([\w\d][^/]+)/([^@/]+)@([\w\d\._-]+)]],
   format = "https://www.github.com/$1/$2/tree/$3",
+}
+-- Match `uses: owner/repo/path/to/my-workflow.yml@rev` as a github user/repo URL at rev/tag
+-- (this the syntax used for using external Github actions)
+add_rule {
+  regex = [[uses: ([\w\d][^/]+)/([^@/]+)/([^@]+)@([\w\d\._-]+)]],
+  format = "https://www.github.com/$1/$2/tree/$4/$3",
 }
 
 -- Match `github:owner/repo` & `github:owner/repo/branch` as a github URL
