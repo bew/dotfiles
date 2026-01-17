@@ -2,18 +2,18 @@
 
 set -euo pipefail # Safe, strict script execution
 
-POPUP_SESSION_NAME="popup"
+POPUP_SESSION="popup"
 POPUP_SOCKET="${TMUX_POPUP_SOCKET:-/tmp/tmux-popup.sock}"
 
 
 function show_err()
 {
-  echo >&2 '!! ERROR:' "$@"
+  echo >&2 "ERROR:" "$@"
 }
 
 function show_info()
 {
-  echo >&2 '|' "$@"
+  echo >&2 "|" "$@"
 }
 
 function show_usage()
@@ -58,10 +58,9 @@ function ensure_running_inside_tmux()
 
 function ensure_not_in_popup_session()
 {
-  local session
-  session="$(current_session_name 2>/dev/null || true)"
-  if [ "$session" = "$POPUP_SESSION_NAME" ]; then
-    show_err "tmux-popup must not be run from inside the popup session '$POPUP_SESSION_NAME'."
+  local session="$(current_session_name 2>/dev/null || true)"
+  if [ "$session" = "$POPUP_SESSION" ]; then
+    show_err "tmux-popup must not be run from inside the popup session '$POPUP_SESSION'."
     show_err "Use the Alt-Escape keybinding inside the popup to detach instead."
     exit 1
   fi
@@ -94,7 +93,6 @@ function ensure_popup_server()
 
 function popup_display()
 {
-  # Usage: popup_display "attach-session -t '$POPUP_SESSION_NAME' \; select-window -t '$id'"
   local tmux_args="$1"
 
   tmux display-popup -d '#{pane_current_path}' -yS -w90% -h85% -E \
@@ -106,42 +104,30 @@ function popup_display()
 
 function popup_server_status()
 {
-  show_info "Popup socket: $POPUP_SOCKET"
+  echo "Popup socket: $POPUP_SOCKET"
 
   if ! popup_server_reachable; then
     if [ -S "$POPUP_SOCKET" ]; then
       show_err "Popup server not reachable; socket exists (likely stale)."
     else
-      show_info "No popup server; socket does not exist."
+      echo "No popup server; socket does not exist."
     fi
     return 1
   fi
 
-  show_info "Popup server is reachable."
+  echo "Popup server is reachable."
 
-  show_info "Sessions on popup server:"
-  popup_tmux list-sessions -F "  - #{session_name}" 2>/dev/null || true
+  if popup_tmux has-session -t "$POPUP_SESSION" 2>/dev/null; then
+    echo "Popup session '$POPUP_SESSION' exists."
 
-  if popup_tmux has-session -t "$POPUP_SESSION_NAME" 2>/dev/null; then
-    show_info "Popup session '$POPUP_SESSION_NAME' exists."
-
-    show_info "Windows in popup session '$POPUP_SESSION_NAME':"
-    popup_tmux list-windows -t "$POPUP_SESSION_NAME" \
-      -F "  - #{window_name}" 2>/dev/null || true
-
-    show_info "Clients attached to popup server:"
-    if ! popup_tmux list-clients -F "  - #{client_tty} (session: #{session_name})" \
-      2>/dev/null | grep -q .; then
-      show_info "  - none"
-    else
-      popup_tmux list-clients -F "  - #{client_tty} (session: #{session_name})" \
-        2>/dev/null || true
-    fi
+    echo "Windows in popup session '$POPUP_SESSION':"
+    popup_tmux list-windows -t "$POPUP_SESSION" \
+      -F "  - #{window_name}"
 
     return 0
   fi
 
-  show_err "Popup session '$POPUP_SESSION_NAME' does not exist yet."
+  show_err "Popup session '$POPUP_SESSION' does not exist yet."
   return 1
 }
 
@@ -149,21 +135,21 @@ function ensure_popup_session_exists()
 {
   ensure_popup_server
 
-  if ! popup_tmux has-session -t "$POPUP_SESSION_NAME" 2>/dev/null; then
-    show_info "Creating popup session '$POPUP_SESSION_NAME' on socket '$POPUP_SOCKET'"
-    popup_tmux new-session -d -s "$POPUP_SESSION_NAME" -n "shell" "${SHELL:-/bin/sh}"
+  if ! popup_tmux has-session -t "$POPUP_SESSION" 2>/dev/null; then
+    show_info "Creating popup session '$POPUP_SESSION' on socket '$POPUP_SOCKET'"
+    popup_tmux new-session -d -s "$POPUP_SESSION" -n "shell" "${SHELL:-/bin/sh}"
 
     # Inside the popup tmux server, make Alt-Escape detach the client.
     # This does not affect the main tmux server.
     popup_tmux bind-key -n M-Escape detach-client
   else
-    show_info "Session '$POPUP_SESSION_NAME' already exists on popup socket"
+    show_info "Session '$POPUP_SESSION' already exists on popup socket"
   fi
 }
 
 function popup_switch_window()
 {
-  local id="$1"; shift || true
+  local winid="$1"; shift || true
   local cmd=("$@")
 
   ensure_running_inside_tmux
@@ -174,22 +160,22 @@ function popup_switch_window()
     cmd=("${SHELL:-/bin/sh}")
   fi
 
-  show_info "Switch window id='$id' cmd='${cmd[*]}'"
+  show_info "Switch window winid='$winid' cmd='${cmd[*]}'"
 
   # Create window if it does not exist yet
-  if ! popup_tmux list-windows -t "$POPUP_SESSION_NAME" -F "#{window_name}" 2>/dev/null | grep -qx -- "$id"; then
-    show_info "Creating window '$id' in popup session '$POPUP_SESSION_NAME'"
-    popup_tmux new-window -t "$POPUP_SESSION_NAME" -n "$id" "${cmd[@]}"
+  if ! popup_tmux list-windows -t "$POPUP_SESSION" -F "#{window_name}" 2>/dev/null | grep -qx -- "$winid"; then
+    show_info "Creating window '$winid' in popup session"
+    popup_tmux new-window -t "$POPUP_SESSION" -n "$winid" "${cmd[@]}"
   else
-    show_info "Window '$id' already exists in popup session '$POPUP_SESSION_NAME'"
+    show_info "Window '$winid' already exists in popup session"
   fi
 
   # Ensure the popup session will start on this window
-  popup_tmux select-window -t "$POPUP_SESSION_NAME:$id"
+  popup_tmux select-window -t "$POPUP_SESSION_NAME:$winid"
 
-  show_info "Opening popup on session '$POPUP_SESSION_NAME' window '$id' via popup socket"
+  show_info "Opening popup session on window '$winid' via popup socket"
 
-  popup_display "attach-session -t '$POPUP_SESSION_NAME' \; select-window -t '$id'"
+  popup_display "attach-session -t '$POPUP_SESSION' \; select-window -t '$winid'"
 }
 
 function popup_toggle()
@@ -200,16 +186,16 @@ function popup_toggle()
   # If the popup tmux server has any attached clients,
   # treat this as "popup visible" and just detach them.
   if popup_tmux list-clients 2>/dev/null | grep -q .; then
-    show_info "Closing popup: detaching all clients from popup session '$POPUP_SESSION_NAME'"
+    show_info "Closing popup: detaching all clients from popup session"
     popup_tmux detach-client -a
     return
   fi
 
-  # No attached popup client -> reopen popup session on its last active window
+  # No attached popup client, reopen popup session on last active window
   ensure_popup_session_exists
 
-  show_info "Reopening popup session '$POPUP_SESSION_NAME' on last active window"
-  popup_display "attach-session -t '$POPUP_SESSION_NAME'"
+  show_info "Reopening popup session on last active window"
+  popup_display "attach-session -t '$POPUP_SESSION'"
 }
 
 function main()
@@ -231,24 +217,21 @@ function main()
       ;;
     toggle)
       shift || true
-      if [ "$#" -eq 0 ]; then
-        # No arguments: behave like close/reopen last popup
-        popup_toggle
-      else
+      if [ "$#" -ne 0 ]; then
         show_err "Usage: tmux-popup toggle"
         show_usage
         exit 1
       fi
+      popup_toggle
       ;;
     switch)
       shift || true
-      if [ "$#" -lt 1 ]; then
+      if [ "$#" -lt 2 ]; then
         show_err "Usage: tmux-popup switch ID COMMAND [ARGS...]"
         show_usage
         exit 1
       fi
-      local id="$1"; shift
-      popup_switch_window "$id" "$@"
+      popup_switch_window "$@"
       ;;
     shell|"")
       # Default shell popup, equivalent to: switch shell $SHELL
