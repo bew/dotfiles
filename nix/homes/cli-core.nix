@@ -23,7 +23,7 @@ in {
 
   home.packages = [
     # alternative ls, more colors!
-    (bleedingedge.eza.overrideAttrs (final: prev: {
+    (stable.eza.overrideAttrs (final: prev: {
       doCheck = false;
       patches = prev.patches ++ [
         (pkgs.fetchpatch {

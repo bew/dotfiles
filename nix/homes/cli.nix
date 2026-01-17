@@ -15,15 +15,8 @@ in {
 
   home.packages = [
 
-    # try some nu!
-    bleedingedge.nushell
+    stable.nushell
 
-    bleedingedge.ouch # ~universal {,de}compression utility
-    # NOTE: decompressing to a specific folder with `--dir` creates a subfolder if the archive
-    #   contains multiple files.. (can be annoying if I know what I'm doing)
-    #   Existing issue: https://github.com/ouch-org/ouch/issues/322
-
-    stable.jless # less for JSON
 
     # Extra - system (?)
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
@@ -31,12 +24,11 @@ in {
     stable.strace
 
     # Extra - one-of
+    stable.ouch # ~universal {,de}compression utility
+    stable.jless # less for JSON
     stable.pastel # generate, analyze, convert & manipulate RGB colors
     stable.moreutils # for ts, and other nice tools https://joeyh.name/code/moreutils/
-    stable.gron # to have grep-able json <3
-    stable.diffoscopeMinimal # In-depth comparison of files, archives, and directories.
-
-    stable.translate-shell
+    stable.translate-shell # cli for text translation & definition (via GTranslate)
 
     # Extra - terminal fun
     stable.asciiquarium # nice ASCII aquarium 'screen saver'

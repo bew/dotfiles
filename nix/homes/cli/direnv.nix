@@ -20,6 +20,6 @@ in {
   #
   # Ref: https://direnv.net/man/direnv.1.html
   # > You can also define your own extensions inside $XDG_CONFIG_HOME/direnv/direnvrc or $XDG_CONFIG_HOME/direnv/lib/*.sh files.
-  xdg.configFile."direnv/lib/nix-direnv.sh".source = "${bleedingedge.nix-direnv}/share/nix-direnv/direnvrc";
+  xdg.configFile."direnv/lib/nix-direnv.sh".source = "${stable.nix-direnv}/share/nix-direnv/direnvrc";
   # NOTE: bleedingedge needed to have latest Nix!
 }

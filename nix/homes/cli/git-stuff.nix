@@ -12,7 +12,7 @@ in {
         # config tools
         bleedingedge.delta # for nice git diffs
         stable.onefetch # repo global info
-        bleedingedge.mergiraf # Treesitter-based conflict solver
+        stable.mergiraf # Treesitter-based conflict solver
 
         # extra commands
         stable.git-lfs # store specific (large) files out-of-repo
