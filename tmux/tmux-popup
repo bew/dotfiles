@@ -38,6 +38,9 @@ function show_usage()
   show_info "  tmux-popup toggle"
   show_info "  -> If popup is visible: close it; otherwise reopen the last popup window"
   show_info
+  show_info "  tmux-popup status"
+  show_info "  -> Show popup server, session, window and client status"
+  show_info
 }
 
 function current_session_name()
@@ -69,9 +72,17 @@ function popup_tmux()
   tmux -S "$POPUP_SOCKET" "$@"
 }
 
-function ensure_popup_server()
+function popup_server_reachable()
 {
   if popup_tmux list-sessions >/dev/null 2>&1; then
+    return 0
+  fi
+  return 1
+}
+
+function ensure_popup_server()
+{
+  if popup_server_reachable; then
     return
   fi
 
@@ -91,6 +102,47 @@ function popup_display()
       show_err "Failed to open tmux popup; popup server may be unreachable."
       exit 1
     }
+}
+
+function popup_server_status()
+{
+  show_info "Popup socket: $POPUP_SOCKET"
+
+  if ! popup_server_reachable; then
+    if [ -S "$POPUP_SOCKET" ]; then
+      show_err "Popup server not reachable; socket exists (likely stale)."
+    else
+      show_info "No popup server; socket does not exist."
+    fi
+    return 1
+  fi
+
+  show_info "Popup server is reachable."
+
+  show_info "Sessions on popup server:"
+  popup_tmux list-sessions -F "  - #{session_name}" 2>/dev/null || true
+
+  if popup_tmux has-session -t "$POPUP_SESSION_NAME" 2>/dev/null; then
+    show_info "Popup session '$POPUP_SESSION_NAME' exists."
+
+    show_info "Windows in popup session '$POPUP_SESSION_NAME':"
+    popup_tmux list-windows -t "$POPUP_SESSION_NAME" \
+      -F "  - #{window_name}" 2>/dev/null || true
+
+    show_info "Clients attached to popup server:"
+    if ! popup_tmux list-clients -F "  - #{client_tty} (session: #{session_name})" \
+      2>/dev/null | grep -q .; then
+      show_info "  - none"
+    else
+      popup_tmux list-clients -F "  - #{client_tty} (session: #{session_name})" \
+        2>/dev/null || true
+    fi
+
+    return 0
+  fi
+
+  show_err "Popup session '$POPUP_SESSION_NAME' does not exist yet."
+  return 1
 }
 
 function ensure_popup_session_exists()
@@ -167,6 +219,15 @@ function main()
   case "${1-}" in
     -h|--help|help)
       show_usage
+      ;;
+    status)
+      shift || true
+      if [ "$#" -ne 0 ]; then
+        show_err "Usage: tmux-popup status"
+        show_usage
+        exit 1
+      fi
+      popup_server_status
       ;;
     toggle)
       shift || true
