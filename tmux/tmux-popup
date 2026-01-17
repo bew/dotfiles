@@ -32,8 +32,8 @@ function show_usage()
   show_info "  tmux-popup [shell]"
   show_info '  -> Same as `tmux-popup switch shell $SHELL`'
   show_info
-  show_info "  tmux-popup switch ID COMMAND [ARGS...]"
-  show_info "  -> Show a named popup window 'ID' running COMMAND [ARGS...]"
+  show_info "  tmux-popup switch [--id=ID] COMMAND [ARGS...]"
+  show_info "  -> Show a popup window named 'ID' (default: COMMAND's basename) running COMMAND [ARGS...]"
   show_info
   show_info "  tmux-popup toggle"
   show_info "  -> If popup is visible: close it; otherwise reopen the last popup window"
@@ -171,7 +171,7 @@ function popup_switch_window()
   fi
 
   # Ensure the popup session will start on this window
-  popup_tmux select-window -t "$POPUP_SESSION_NAME:$winid"
+  popup_tmux select-window -t "$POPUP_SESSION:$winid"
 
   show_info "Opening popup session on window '$winid' via popup socket"
 
@@ -226,13 +226,28 @@ function main()
       ;;
     switch)
       shift || true
-      if [ "$#" -lt 2 ]; then
-        show_err "Usage: tmux-popup switch ID COMMAND [ARGS...]"
+
+      local winid=""
+      if [[ "${1-}" == --id=* ]]; then
+        # Strip the "--id=" prefix to get the window id
+        winid="${1#--id=}"
+        shift || true
+      fi
+
+      if [ "$#" -lt 1 ]; then
+        show_err "Usage: tmux-popup switch [--id=ID] COMMAND [ARGS...]"
         show_usage
         exit 1
       fi
-      popup_switch_window "$@"
+
+      if [ -z "$winid" ]; then
+        # Use the basename of the command path as default window id
+        winid="${1##*/}"
+      fi
+
+      popup_switch_window "$winid" "$@"
       ;;
+
     shell|"")
       # Default shell popup, equivalent to: switch shell $SHELL
       shift || true
