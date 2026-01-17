@@ -53,9 +53,32 @@ function ensure_running_inside_tmux()
   fi
 }
 
+function ensure_not_in_popup_session()
+{
+  local session
+  session="$(current_session_name 2>/dev/null || true)"
+  if [ "$session" = "$POPUP_SESSION_NAME" ]; then
+    show_err "tmux-popup must not be run from inside the popup session '$POPUP_SESSION_NAME'."
+    show_err "Use the Alt-Escape keybinding inside the popup to detach instead."
+    exit 1
+  fi
+}
+
 function popup_tmux()
 {
   tmux -S "$POPUP_SOCKET" "$@"
+}
+
+function ensure_popup_server()
+{
+  if popup_tmux list-sessions >/dev/null 2>&1; then
+    return
+  fi
+
+  if [ -S "$POPUP_SOCKET" ]; then
+    show_err "Popup tmux server not responding, removing stale socket: $POPUP_SOCKET"
+    rm -f -- "$POPUP_SOCKET"
+  fi
 }
 
 function popup_display()
@@ -64,11 +87,16 @@ function popup_display()
   local tmux_args="$1"
 
   tmux display-popup -d '#{pane_current_path}' -yS -w90% -h85% -E \
-    "TMUX='' tmux -S '$POPUP_SOCKET' $tmux_args"
+    "TMUX='' tmux -S '$POPUP_SOCKET' $tmux_args" || {
+      show_err "Failed to open tmux popup; popup server may be unreachable."
+      exit 1
+    }
 }
 
 function ensure_popup_session_exists()
 {
+  ensure_popup_server
+
   if ! popup_tmux has-session -t "$POPUP_SESSION_NAME" 2>/dev/null; then
     show_info "Creating popup session '$POPUP_SESSION_NAME' on socket '$POPUP_SOCKET'"
     popup_tmux new-session -d -s "$POPUP_SESSION_NAME" -n "shell" "${SHELL:-/bin/sh}"
@@ -87,6 +115,7 @@ function popup_switch_window()
   local cmd=("$@")
 
   ensure_running_inside_tmux
+  ensure_not_in_popup_session
   ensure_popup_session_exists
 
   if [ "${#cmd[@]}" -eq 0 ]; then
@@ -114,6 +143,7 @@ function popup_switch_window()
 function popup_toggle()
 {
   ensure_running_inside_tmux
+  ensure_not_in_popup_session
 
   # If the popup tmux server has any attached clients,
   # treat this as "popup visible" and just detach them.
