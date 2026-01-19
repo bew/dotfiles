@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 
+# This script provides a long-running popup integration in tmux for running common tools
+# without cluttering the main tmux session.
+#
+# When asked to run a tool, it runs that tool (or switches to it if already running) in a dedicated
+# tmux server (on its own socket) in a window, and opens this window in the main tmux popup win.
+#
+# The script is meant to be controlled from the main tmux via key bindings that open, switch,
+# toggle, and inspect the popup session.
+
 set -euo pipefail # Safe, strict script execution
+
+# This var is used to change the role of the tmux server started from this script
+# (really used to change my config conditionally)
+export TMUX_SERVER_ROLE="popup"
 
 POPUP_SESSION="popup"
 POPUP_SOCKET="${TMUX_POPUP_SOCKET:-/tmp/tmux-popup.sock}"
-
+POPUP_DEFAULT_SHELL="zsh"
 
 function show_err()
 {
@@ -30,7 +43,7 @@ function show_usage()
   show_info "  -> Show this help"
   show_info
   show_info "  tmux-popup [shell]"
-  show_info '  -> Same as `tmux-popup switch shell $SHELL`'
+  show_info '  -> Same as `tmux-popup switch shell $POPUP_DEFAULT_SHELL`'
   show_info
   show_info "  tmux-popup switch [--id=ID] COMMAND [ARGS...]"
   show_info "  -> Show a popup window named 'ID' (default: COMMAND's basename) running COMMAND [ARGS...]"
@@ -56,14 +69,10 @@ function ensure_running_inside_tmux()
   fi
 }
 
-function ensure_not_in_popup_session()
+function check_not_in_popup_session()
 {
   local session="$(current_session_name 2>/dev/null || true)"
-  if [ "$session" = "$POPUP_SESSION" ]; then
-    show_err "tmux-popup must not be run from inside the popup session '$POPUP_SESSION'."
-    show_err "Use the Alt-Escape keybinding inside the popup to detach instead."
-    exit 1
-  fi
+  ! [[ "$session" == "$POPUP_SESSION" ]]
 }
 
 function popup_tmux()
@@ -137,7 +146,7 @@ function ensure_popup_session_exists()
 
   if ! popup_tmux has-session -t "$POPUP_SESSION" 2>/dev/null; then
     show_info "Creating popup session '$POPUP_SESSION' on socket '$POPUP_SOCKET'"
-    popup_tmux new-session -d -s "$POPUP_SESSION" -n "shell" "${SHELL:-/bin/sh}"
+    popup_tmux new-session -d -s "$POPUP_SESSION" -n "shell" "$POPUP_DEFAULT_SHELL"
 
     # Inside the popup tmux server, make Alt-Escape detach the client.
     # This does not affect the main tmux server.
@@ -151,14 +160,13 @@ function popup_switch_window()
 {
   local winid="$1"; shift || true
   local cmd=("$@")
+  if [ "${#cmd[@]}" -eq 0 ]; then
+    cmd=("$POPUP_DEFAULT_SHELL")
+  fi
 
   ensure_running_inside_tmux
-  ensure_not_in_popup_session
+  check_not_in_popup_session || exit 1
   ensure_popup_session_exists
-
-  if [ "${#cmd[@]}" -eq 0 ]; then
-    cmd=("${SHELL:-/bin/sh}")
-  fi
 
   show_info "Switch window winid='$winid' cmd='${cmd[*]}'"
 
@@ -181,12 +189,17 @@ function popup_switch_window()
 function popup_toggle()
 {
   ensure_running_inside_tmux
-  ensure_not_in_popup_session
+
+  check_not_in_popup_session || {
+    show_info "Toggle from inside the popup, detaching client!"
+    popup_tmux detach-client
+    return
+  }
 
   # If the popup tmux server has any attached clients,
   # treat this as "popup visible" and just detach them.
   if popup_tmux list-clients 2>/dev/null | grep -q .; then
-    show_info "Closing popup: detaching all clients from popup session"
+    show_info "Popup session has clients: detaching all clients!"
     popup_tmux detach-client -a
     return
   fi
@@ -249,9 +262,9 @@ function main()
       ;;
 
     shell|"")
-      # Default shell popup, equivalent to: switch shell $SHELL
+      # Default shell popup, equivalent to: switch shell $POPUP_DEFAULT_SHELL
       shift || true
-      popup_switch_window "shell" "${SHELL:-/bin/sh}"
+      popup_switch_window "shell" "$POPUP_DEFAULT_SHELL"
       ;;
     *)
       show_err "Unknown subcommand: $1"
