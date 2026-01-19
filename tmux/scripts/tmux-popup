@@ -61,6 +61,12 @@ function current_session_name()
   tmux display-message -p -F "#{session_name}"
 }
 
+# Path of the pane in the main tmux server
+function current_pane_path()
+{
+  tmux display-message -p -F "#{pane_current_path}"
+}
+
 function ensure_running_inside_tmux()
 {
   if ! current_session_name >/dev/null 2>&1; then
@@ -69,10 +75,16 @@ function ensure_running_inside_tmux()
   fi
 }
 
-function check_not_in_popup_session()
+function check_in_popup_session()
 {
   local session="$(current_session_name 2>/dev/null || true)"
-  ! [[ "$session" == "$POPUP_SESSION" ]]
+  [[ "$session" == "$POPUP_SESSION" ]]
+}
+
+function check_popup_win_exists()
+{
+  local winid="$1"
+  popup_tmux list-windows -t "$POPUP_SESSION" -F "#{window_name}" 2>/dev/null | grep -qx -- "$winid"
 }
 
 function popup_tmux()
@@ -165,32 +177,47 @@ function popup_switch_window()
   fi
 
   ensure_running_inside_tmux
-  check_not_in_popup_session || exit 1
-  ensure_popup_session_exists
+
+  local in_popup
+  if check_in_popup_session; then
+    in_popup=true
+  else
+    in_popup=false
+    ensure_popup_session_exists
+  fi
 
   show_info "Switch window winid='$winid' cmd='${cmd[*]}'"
 
   # Create window if it does not exist yet
-  if ! popup_tmux list-windows -t "$POPUP_SESSION" -F "#{window_name}" 2>/dev/null | grep -qx -- "$winid"; then
+  if ! check_popup_win_exists "$winid"; then
     show_info "Creating window '$winid' in popup session"
-    popup_tmux new-window -t "$POPUP_SESSION" -n "$winid" "${cmd[@]}"
+    # Use the current pane path as the starting directory.
+    # When called from the main tmux, this captures the main pane path.
+    # When called from inside the popup, this captures the popup pane path.
+    local pane_path="$(current_pane_path)"
+    popup_tmux new-window -t "$POPUP_SESSION" -n "$winid" -c "$pane_path" "${cmd[@]}"
   else
     show_info "Window '$winid' already exists in popup session"
   fi
 
-  # Ensure the popup session will start on this window
-  popup_tmux select-window -t "$POPUP_SESSION:$winid"
+  if ! $in_popup; then
+    # Ensure the popup session will start on this window when opened as a popup
+    popup_tmux select-window -t "$POPUP_SESSION:$winid"
 
-  show_info "Opening popup session on window '$winid' via popup socket"
-
-  popup_display "attach-session -t '$POPUP_SESSION' \; select-window -t '$winid'"
+    show_info "Opening popup session on window '$winid' via popup socket"
+    popup_display "attach-session -t '$POPUP_SESSION' \; select-window -t '$winid'"
+  else
+    # Already inside popup session: just select the window, no nested popup.
+    popup_tmux select-window -t "$POPUP_SESSION:$winid"
+  fi
 }
+
 
 function popup_toggle()
 {
   ensure_running_inside_tmux
 
-  check_not_in_popup_session || {
+  check_in_popup_session && {
     show_info "Toggle from inside the popup, detaching client!"
     popup_tmux detach-client
     return
