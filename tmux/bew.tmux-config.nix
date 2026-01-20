@@ -13,9 +13,12 @@ in {
 
   outputs.editable-cfgDir = cfg.lib.mkLink ./.;
 
-  # Only depend on conf files (skip Nix files to avoid useless rebuilds)
+  # Only depend on conf files and scripts (skip Nix files to avoid useless rebuilds)
   outputs.non-editable-cfgDir = fs.toSource {
     root = ./.;
-    fileset = fs.fileFilter (f: f.hasExt "conf") ./.;
+    fileset = fs.unions [
+      (fs.fileFilter (f: f.hasExt "conf") ./.)
+      ./scripts
+    ];
   };
 }
