@@ -411,6 +411,9 @@ HiResetTo @lsp.type.comment.lua
 " [Terraform]
 " Disable forced LSP strings, as they hide any language injections in heredoc multiline strings
 HiResetTo @lsp.type.string.terraform
+" Disable LSP variables, they give less precise highlighting than Treesitter-based ones
+" (e.g. `path.module` (builtin) vs `var.foo`)
+HiResetTo @lsp.type.variable.terraform
 
 " [Rust]
 " Disable forced function call the same as function def 😬
