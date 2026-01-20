@@ -129,6 +129,9 @@ cfg.keys = {
   keybind(mods.CS, "c", act.CopyTo("ClipboardAndPrimarySelection")),
   keybind(mods.CS, "v", act.PasteFrom("Clipboard")),
   keybind(mods.CA, "v", act.PasteFrom("Clipboard")), -- note: eats a valid term input
+  -- note: SUPER-v (Cmd-v on MacOS), might be eaten by the desktop env
+  -- This is useful on MacOS to allow clipboard manager (e.g. Maccy) to auto-paste selected entry.
+  keybind(mods.D, "v", act.PasteFrom("Clipboard")),
   -- Paste from PrimarySelection
   keybind(mods.S,  "Insert", act.PasteFrom("PrimarySelection")),
 
