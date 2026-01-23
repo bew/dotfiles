@@ -11,6 +11,8 @@ function die_run
   exit 1
 }
 
+set -euo pipefail # Safe, strict script execution
+
 if [[ $# == 0 ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
   echo_err "Usage: $0 <TARGET_PANE_ID>"
   echo_err

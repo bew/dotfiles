@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+function echo_err
+{
+  echo >&2 "$*"
+}
+
+set -euo pipefail # Safe, strict script execution
+
+SCRIPTS_DIR="$(dirname "$0")"
+
+if [[ $# != 1 ]]; then
+  echo_err "Usage: $0 <PID>"
+  exit 1
+fi
+pid=$1
+
+# Get the process environment and remove everything before & after the Tmux pane ID
+pane_id=$(ps eww "$pid" | sed "1d; s/^.*TMUX_PANE=//;s/ .*//")
+if [[ -z $pane_id ]]; then
+  tmux display-message "Could not find PID, still running?"
+  echo_err "Could not find PID, still running?"
+  exit 1
+fi
+
+$SCRIPTS_DIR/tmux-goto-pane-id $pane_id
