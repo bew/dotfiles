@@ -17,6 +17,8 @@ in {
 
     stable.nushell
 
+    # AI
+    bleedingedge.opencode # ✨ 🤔
 
     # Extra - system (?)
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
