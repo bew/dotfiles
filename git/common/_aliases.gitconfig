@@ -79,6 +79,7 @@
   go = switch
   # Go home (main)
   goh = switch main
+  gomain = switch main
 
   sth = stash
   sth-staged = stash push --staged
@@ -238,12 +239,13 @@
   # --- Miscellaneous aliases
 
   # Like symlinks, but for refs
+  # note: mostly kept as an alias to avoid forgetting about this command (👀)
   #
   # Example: `git symref refs/heads/main refs/heads/master`
   # -> This allows to use both `main` & `master` interchangably
   #    in a repo that normally use `master` as its default branch.
   symref = symbolic-ref
-  # note: mostly kept as an alias to avoid forgetting about this command (👀)
+  symref-main-to-master = symbolic-ref refs/heads/main refs/heads/master
 
   # NOTE: autocompletion of complex aliases like `!f() { foo; bar "$@"; baz }; f` doesn't work on my
   # zsh config, but there seems to be support for that anyway in the provided contrib in git's git repo:
