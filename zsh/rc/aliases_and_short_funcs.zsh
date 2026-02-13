@@ -100,6 +100,11 @@ alias -g NOOUTPUT="NOOUT NOERR"
 # -1    : Select the last command
 alias r="fc -L -e - -1"
 
+# Append current in-memory history to the HISTFILE
+alias history::append-to-histfile="fc -A"
+# Read history from the HISTFILE, only import new entries
+alias history::read-new-from-histfile="fc -RI"
+
 # Import zsh's massive rename helper
 autoload -U zmv
 alias zmv='noglob zmv'
