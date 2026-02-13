@@ -49,8 +49,8 @@ return vim.tbl_extend(
   "error",
   require"mycfg.hl_patterns.keywords",
   require"mycfg.hl_patterns.b2_notes",
-  require"mycfg.hl_patterns.vim_colors",
   require"mycfg.hl_patterns.rgb_colors",
+  require"mycfg.hl_patterns.term_colors",
 
   -- Tech-specific patterns
   require"mycfg.hl_patterns.tech_shell",
