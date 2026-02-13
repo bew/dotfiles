@@ -199,6 +199,55 @@ function segmt::in_sudo
   fi
 }
 
+# Segment for info about the environment ($ENV, $AWS_PROFILE, …)
+function segmt::env_info
+{
+  [[ -z "$ENV" ]] && return
+
+  local bg
+  local env_fg env_display
+  local warn_fg
+  local italic_on="%{\e[3m%}" italic_off="%{\e[23m%}"
+
+  # Map ENV values to display text and colors
+  case "$ENV" in
+    staging)
+      env_display="STG"
+      bg="24" # dark blue background
+      env_fg="white"
+      warn_fg="yellow"
+      ;;
+    production)
+      env_display="PRD"
+      bg="124" # red background
+      env_fg="white"
+      warn_fg="yellow"
+      ;;
+    *)
+      env_display="$ENV"
+      bg="130" # orange background
+      env_fg="white"
+      warn_fg="220"
+      ;;
+  esac
+
+  local env_styled="%F{$env_fg}%B${env_display}%b%f"
+
+  # Check AWS_PROFILE if set
+  if [[ -n "$AWS_PROFILE" ]]; then
+    if [[ "$AWS_PROFILE" == *${ENV}-* ]]; then
+      # AWS_PROFILE contains `${ENV}-`, extract and show suffix (part after $ENV)
+      local aws_suffix="${AWS_PROFILE##*${ENV}-}"
+      aws_styled=":%F{255}%B${italic_on}${aws_suffix}${italic_off}%b%f"
+    else
+      # AWS_PROFILE doesn't contain ENV-, show warning with full profile name
+      aws_styled="|AWS:%F{$warn_fg}%B%U${italic_on}${AWS_PROFILE}${italic_off}%u%b%f"
+    fi
+  fi
+
+  echo -n "%K{$bg} $env_styled$aws_styled %k"
+}
+
 
 # === code-tech-specific segments
 
@@ -452,11 +501,13 @@ PROMPT_PAST="$(make_prompt_str_from_parts "${PROMPT_PAST_PARTS[@]}")"
 # -- Right prompt
 
 RPROMPT_CURRENT_PARTS=(
+  func: segmt::env_info
   func: segmt::in_sudo
   func: segmt::git_branch_fast
 )
 
 RPROMPT_PAST_PARTS=(
+  func: segmt::env_info
   func: segmt::in_sudo
   func: segmt::git_branch_fast
 )
