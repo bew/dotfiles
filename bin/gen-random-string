@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+
+# NOTE: Minimal implementation:
+# ```
+# LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c32; echo
+# ```
+# The following script is derived from this impl, to allow fine-grained control over the charset
+# used for the generated string.
+
+set -euo pipefail # Safe, strict script execution
+
+function echo_err() {
+  echo >&2 "$*"
+}
+
+function usage_and_exit() {
+  cat <<'EOF'
+Usage: gen-random-string [LENGTH] [OPTIONS]
+
+Generate a random string using /dev/urandom, using rules to allow/exclude sets of chars.
+
+Arguments:
+  LENGTH           - Length (default: 32)
+                     Can be specified as first arg or with --len
+
+Options:
+  --len LENGTH     - Alternative way to specify length
+  --only           - Disable default rules (only use explicitly given rules)
+  -h, --help       - Show this help message
+
+  +RULE            - Add charset rule (can specify multiple)
+  +noRULE          - Exclude charset (works for any RULE)
+
+Available Rules (see source code for exact definitions):
+  POSIX char classes:
+    printable      - All printable chars (including spaces)
+    alpha          - Letters (upper and lower)
+    upper          - Uppercase letters only
+    lower          - Lowercase letters only
+    num            - Numbers
+    punct          - Punctuation chars
+    space          - Whitespace chars
+
+  Custom rules:
+    hex / HEX      - Hexadecimal (lowercase/uppercase)
+    b64 / b64url   - Base64 (standard/URL-safe)
+    quotes         - Quote chars ' " `
+    ambig          - Visually similar chars (short list)
+    ambigall       - Visually similar chars (long list)
+
+Note: Any rule can be negated with 'no' prefix
+      Exclusion rules (+noRULE) are processed after inclusion rules (+RULE)
+
+Default rules: +printable +nospace +noquotes +noambig
+
+Examples:
+  gen-random-string                     => 32-char string
+  gen-random-string 16                  => 16-char string
+  gen-random-string 5 --only +num       => 5-digit PIN
+  gen-random-string 64 --only +hex      => 64-char hex token
+  gen-random-string +quotes             => Allow quotes (overrides default quotes exclusion)
+  gen-random-string +nopunct            => Exclude punctuation
+  gen-random-string --only +alpha +num  => Only letters and numbers
+EOF
+  exit "${1:-0}"
+}
+
+# Get charset for the given rule name (for use with `tr` tool)
+function get_charset() {
+  local rule="$1"
+  case "$rule" in
+    # POSIX char classes
+    # .. all printable chars including spaces
+    printable) echo "[:print:]" ;;
+    # .. all letters (upper and lower)
+    alpha) echo "[:alpha:]" ;;
+    # .. uppercase letters
+    upper) echo "[:upper:]" ;;
+    # .. lowercase letters
+    lower) echo "[:lower:]" ;;
+    # .. all digits
+    num) echo "[:digit:]" ;;
+    # .. punctuation chars
+    punct) echo "[:punct:]" ;;
+    # .. whitespace chars
+    space) echo "[:space:]" ;;
+
+    # Custom char sets
+    # .. lowercase hexadecimal
+    hex) echo "0-9a-f" ;;
+    # .. uppercase hexadecimal
+    HEX) echo "0-9A-F" ;;
+    # .. standard base64 alphabet
+    b64) echo "a-zA-Z0-9+/=" ;;
+    # .. URL-safe base64 alphabet
+    b64url) echo "a-zA-Z0-9_-" ;;
+    # .. quote chars
+    quotes) echo "'\"\`" ;;
+    # .. visually similar chars, mini list
+    ambig) echo "0O 1lI" | tr -d " " ;;
+    # .. visually similar chars, long list (using spaces to visually separate the groups of
+    # ambiguous chars)
+    ambigall) echo "0O 1lI 2Z 5S 8B 6G 9g CG DO Uu VvW rn" | tr -d " " ;;
+
+    *)
+      echo_err "Error: Unknown charset rule: $rule"
+      echo_err "Run with --help to see available rules"
+      exit 1
+      ;;
+  esac
+}
+
+function check_is_number() {
+  [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+function main() {
+  local length=32
+  local use_only_given_rules=false
+  local -a additive_rules=()
+  local -a subtractive_rules=()
+
+  # Check if first arg is a number
+  if [[ $# -gt 0 ]] && check_is_number "$1"; then
+    length="$1"
+    shift
+  fi
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        usage_and_exit 0
+        ;;
+      --len)
+        if [[ $# -lt 2 ]]; then
+          echo_err "Error: --len requires an argument"
+          usage_and_exit 1
+        fi
+        length="$2"
+        shift 2
+        ;;
+      --only)
+        use_only_given_rules=true
+        shift
+        ;;
+      +*)
+        local rule="${1#+}" # remove `+` prefix
+        # Check if it's a negation rule
+        if [[ "$rule" == no* ]]; then
+          subtractive_rules+=("${rule#no}")
+        else
+          additive_rules+=("$rule")
+        fi
+        shift
+        ;;
+      *)
+        echo_err "Error: Unknown argument: $1"
+        usage_and_exit 1
+        ;;
+    esac
+  done
+
+  # Validate length
+  if ! check_is_number "$length" || [[ "$length" -lt 1 ]]; then
+    echo_err "Error: Length must be a positive integer"
+    exit 1
+  fi
+
+  # Set default rules if not using --only (or +nodefault)
+  if ! $use_only_given_rules; then
+    # Check for conflicts before adding defaults
+    #
+    # -> This ensures that if user explicitly adds +quotes or +ambig,
+    #    we don't then remove them with the default exclusions.
+    local wants_quotes=false
+    local wants_ambig=false
+    local wants_space=false
+
+    for rule in "${additive_rules[@]}"; do
+      if [[ "$rule" == "quotes" ]]; then
+        wants_quotes=true
+      elif [[ "$rule" == "ambig" ]]; then
+        wants_ambig=true
+      elif [[ "$rule" == "space" ]]; then
+        wants_space=true
+      fi
+    done
+
+    # Add default base charset
+    additive_rules+=("printable")
+
+    # Only add default exclusions if user didn't explicitly request them
+    if ! $wants_space; then
+      subtractive_rules+=("space")
+    fi
+    if ! $wants_quotes; then
+      subtractive_rules+=("quotes")
+    fi
+    if ! $wants_ambig; then
+      subtractive_rules+=("ambig")
+    fi
+  fi
+
+  # Check if we have any additive rules
+  if [[ ${#additive_rules[@]} -eq 0 ]]; then
+    echo_err "Error: No charset rules specified. Use +RULE to add charsets."
+    echo_err "Example: gen-random-string --only +alpha +num +noambig"
+    exit 1
+  fi
+
+  # Build charset by processing rules
+  local include_charset=""
+  local exclude_charset=""
+
+  # Collect full charset for all additive rules
+  for rule in "${additive_rules[@]}"; do
+    local chars
+    chars=$(get_charset "$rule")
+    include_charset="${include_charset}${chars}"
+  done
+
+  # Collect full charset for all subtractive rules
+  for rule in "${subtractive_rules[@]}"; do
+    local chars
+    chars=$(get_charset "$rule")
+    exclude_charset="${exclude_charset}${chars}"
+  done
+
+  # Determine random source (allow custom source for testing)
+  local random_source="/dev/urandom"
+  if [[ -n "${GEN_RANDOM_SOURCE_FILE:-}" ]]; then
+    random_source="$GEN_RANDOM_SOURCE_FILE"
+    echo_err "WARNING: Using custom random source: $random_source (randomness NOT guarenteed!)"
+  fi
+
+  # Generate string using tr-based filter pipeline
+  # Strategy: Include charset first, then exclude unwanted chars
+  # NOTE: We temporarily disable pipefail because `head` will cause SIGPIPE when it closes early
+  set +o pipefail
+  local random_string
+  random_string=$(< "$random_source" LC_ALL=C tr -dc "$include_charset" | tr -d "$exclude_charset" | head -c"$length")
+  set -o pipefail
+
+  echo "$random_string" # Clean output with newline
+}
+
+main "$@"
