@@ -1,4 +1,3 @@
-#!/usr/bin/env bats
 # Test suite for `gen-random-string` script
 #
 # % Uses BATS testing system
@@ -113,7 +112,7 @@ function assert_has_chars() {
   return 0
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: Helper Function
 
 @test "helpers: check assert_length works" {
@@ -148,7 +147,7 @@ function assert_has_chars() {
   [[ "$stderr" == "Output does not contain any chars from required charset"* ]]
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: Basic Functionality with defaults
 
 @test "defaults: generates 32-chars string" {
@@ -174,7 +173,7 @@ function assert_has_chars() {
   assert_no_chars "$output" "0O1lI"
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: source warning
 
 @test "warning: custom random source produces warning on stderr" {
@@ -191,7 +190,7 @@ function assert_has_chars() {
   assert_length "$output" 10
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: Length
 
 @test "length: accepts positional length argument" {
@@ -219,7 +218,7 @@ function assert_has_chars() {
   assert_length "$output" 1024
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Rule Tests: Additive Rules
 
 @test "rule: +quotes includes quote chars" {
@@ -248,7 +247,7 @@ function assert_has_chars() {
   assert_has_chars "$output" " "
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Rule Tests: Subtractive Rules
 
 @test "rule: +nonum excludes numbers" {
@@ -271,7 +270,7 @@ function assert_has_chars() {
   assert_no_chars "$output" "a-z"
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: --only Mode
 
 @test "--only: +num generates numeric-only string" {
@@ -354,7 +353,7 @@ HEX_hex_INPUT="cafe!1234@babe#5678\$DEAD%9012^BEEF&3456*FACE(7890)zzz"
   assert_all_chars "$output" "a-zA-Z0-9_-"
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: args parsing & error handling
 
 @test "cli: options can be given in any order" {
@@ -425,7 +424,7 @@ HEX_hex_INPUT="cafe!1234@babe#5678\$DEAD%9012^BEEF&3456*FACE(7890)zzz"
   [[ "$stderr" == *"--len requires an argument"* ]]
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Tests: Help and Usage
 
 @test "help: -h/--help displays usage message" {
@@ -438,7 +437,7 @@ HEX_hex_INPUT="cafe!1234@babe#5678\$DEAD%9012^BEEF&3456*FACE(7890)zzz"
   [[ "$output" == *"Examples:"* ]]
 }
 
-################################################################################
+# ------------------------------------------------------------------------------
 # Edge Cases and Complex Combinations
 
 @test "edge: multiple subtractive rules work together" {
