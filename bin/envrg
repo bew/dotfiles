@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+set -euo pipefail # Safe, strict script execution
+
+function usage_and_exit() {
+    local status="$1"
+    cat >&2 <<'EOF'
+Usage: envrg PATTERN [rg-flags...]
+       envrg - PATTERN [rg-flags...]
+
+Search environment variable names (not values) using regex patterns.
+
+Use `-` as first argument to read from stdin instead of environment variables,
+allowing you to chain multiple envrg commands.
+
+SMART CASE (default):
+  - Lowercase patterns are case-insensitive: `path` matches PATH, Path, path
+  - Uppercase patterns are case-sensitive: `PATH` only matches PATH
+
+EXAMPLES:
+  envrg path       # Find all variables with `path` in name (any case)
+  envrg PATH       # Find only uppercase PATH variables
+  envrg ^api_      # Variables starting with API_
+  envrg -v test    # Variables NOT containing `test`
+  envrg -s path    # Case-sensitive: only lowercase `path`
+  envrg -i PATH    # Case-insensitive: matches PATH, path, Path
+  envrg --color=never path  # Disable color output
+  envrg foo | envrg - -v bar  # Chain: filter on `foo`, then exclude `bar`
+
+FLAGS:
+  All ripgrep flags are supported (e.g. -i, -s, -v, -S, ...)
+  --color=auto|always|never  # Control color output (default: auto)
+  Set NO_COLOR=1 to disable colors globally
+
+EOF
+    exit "$status"
+}
+
+# Check if case sensitivity flags are already specified by the user
+# This allows users to override the default smart-case behavior
+# Returns 0 if found, 1 if not found
+function params_have_case_flag() {
+    for arg in "$@"; do
+        case "$arg" in
+            -s|--case-sensitive|-i|--ignore-case|-S|--smart-case)
+                return 0
+                ;;
+        esac
+    done
+    return 1
+}
+
+# Determine if color output should be used
+# Colors can be controlled via NO_COLOR env var or --color flag
+# Default behavior: auto (colors enabled if stdout is a terminal)
+# Returns 0 if colors should be used, 1 if not
+function should_use_colors() {
+    # Check for NO_COLOR environment variable (universal color disable)
+    if [[ -n "${NO_COLOR:-}" ]]; then
+        return 1
+    fi
+
+    # Check if --color flag is specified by user
+    for arg in "$@"; do
+        case "$arg" in
+            --color=never)
+                return 1
+                ;;
+            --color=always)
+                return 0
+                ;;
+            --color=auto|--color)
+                # Auto: use colors if stdout is a terminal
+                [[ -t 1 ]] && return 0 || return 1
+                ;;
+        esac
+    done
+
+    # Default: auto (use colors if stdout is a terminal)
+    [[ -t 1 ]] && return 0 || return 1
+}
+
+# Core filtering logic: reads env vars from stdin, matches pattern, and outputs results
+# Applies smart-case by default unless user specifies case flags
+function search_and_filter() {
+    # Determine if colors should be used (respects NO_COLOR and --color flags)
+    local use_colors=false
+    should_use_colors "$@" && use_colors=true
+
+    # Build ripgrep options array
+    local rg_opts=("$@")
+    rg_opts+=(--color=never)
+    if ! params_have_case_flag "$@"; then
+        # User didn't specify any case flags, use smart-case by default!
+        rg_opts+=("--smart-case")
+    fi
+
+    # Read from stdin, extract names, and create a map
+    # This allows us to match patterns against names only, not values
+    local -A env_map
+    while IFS="=" read -r name value; do
+        env_map["$name"]="$value"
+    done
+
+    # Get all names that match the pattern (single rg invocation, fast!)
+    # Note: ${!env_map[@]} expands to all keys in the associative array
+    local matching_names
+    matching_names=$(printf "%s\n" "${!env_map[@]}" | rg "${rg_opts[@]}" 2>/dev/null || true)
+
+    # ANSI color codes for highlighting
+    local bold="\e[1m"
+    local dim="\e[2m"
+    local reset="\e[0m"
+
+    # Output the matching env vars with optional highlighting
+    while IFS= read -r name; do
+        if $use_colors; then
+            # Bold for variable name, dim for equals sign
+            echo -e "${bold}${name}${reset}${dim}=${reset}${env_map[$name]}"
+        else
+            echo "$name=${env_map[$name]}"
+        fi
+    done <<< "$matching_names"
+}
+
+function main() {
+    if [[ $# -eq 0 ]]; then
+        usage_and_exit 1
+    fi
+
+    # Check if first argument is `-` to read from stdin
+    local use_stdin=false
+    if [[ "$1" == "-" ]]; then
+        use_stdin=true
+        shift
+    fi
+
+    if [[ $# -eq 0 ]]; then
+        usage_and_exit 1
+    fi
+
+    if $use_stdin; then
+        search_and_filter "$@"
+    else
+        env | search_and_filter "$@"
+    fi
+}
+
+main "$@"
