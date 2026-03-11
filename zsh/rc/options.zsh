@@ -82,3 +82,8 @@ setopt local_options
 
 # Allow functions to have local traps
 setopt local_traps
+
+# Hash executables only from $PATH
+# note: This is disabled by default to avoid having to stat() every files,
+#   but on modern systems with 2-3k executables this should be imperceptible anyway.
+setopt hash_executables_only
