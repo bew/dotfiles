@@ -26,6 +26,8 @@ vim.g.maplocalleader = TERM_CODES.Space
 
 require"mycfg.mappings"
 
+require"mycfg.commands"
+
 -- ------ PLUGINS
 require"mycfg.plugs".boot_plugins {
   install_dir = vim.fn.stdpath"state" .. "/managed-plugins/start",
