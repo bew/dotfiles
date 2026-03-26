@@ -1,0 +1,9 @@
+matches:
+  - trigger: "!e^!"
+    replace: ê
+
+  - trigger: "!é!" # The upper 'é' is so hard to do..
+    replace: 'É'
+
+  - trigger: "!ç!" # The upper 'ç' is so hard to do..
+    replace: 'Ç'
