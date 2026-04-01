@@ -213,18 +213,6 @@ Plug {
       )
     }
 
-    -- Disable all default keybinds to use my action system instead
-    local disabled_keymaps = {
-      normal = false, -- (default: `ys`)
-      normal_line = false, -- delims on new lines (default: `yS`)
-      normal_cur = false, -- around current line (default: `yss`)
-      normal_cur_line = false, -- around current line, delims on new lines (default: `ySS`)
-      visual = false, -- around selection (default: `S`)
-      visual_line = false, -- around selection, delims on new lines (default: `gS`)
-      delete = false, -- delete surround (default: `ds`)
-      change = false, -- replace surround (default: `cs`)
-      change_line = false, -- replace surround, delims on new lines (default: `cS`)
-    }
     my_actions.add_surround = A.mk_action {
       default_desc = "Add around <motion>",
       n = "<Plug>(nvim-surround-normal)",
@@ -276,8 +264,9 @@ Plug {
     K.toplevel_map{mode="n", key="cS", action=my_actions.change_surround_on_newline}
     K.toplevel_map{mode="n", key="ds", action=my_actions.delete_surround}
 
+    -- Disable all default keybinds to use my action system instead!
+    vim.g.nvim_surround_no_normal_mappings = true
     require"nvim-surround".setup {
-      keymaps = disabled_keymaps,
       surrounds = my_surrounds,
       move_cursor = "sticky",
     }
