@@ -16,6 +16,7 @@ in {
   home.packages = [
 
     stable.nushell
+    stable.bats # Cool bash testing system
 
     # AI
     bleedingedge.opencode # ✨ 🤔
