@@ -23,10 +23,9 @@ Plug.luasnip {
   desc = "Hyper flexible snippet Engine for Neovim",
   tags = {t.insert, t.editing, t.careful_update},
   version = {
-    -- This is a WIP branch, aiming to fix various limitation around restore node
-    -- REF: https://github.com/L3MON4D3/LuaSnip/discussions/1194#discussioncomment-11725813
-    branch = "self-dependent-dNode", -- From PR: https://github.com/L3MON4D3/LuaSnip/pull/1137
-    -- rev = "v2.3.0", -- last release @2024-04
+    -- My PR to add MANY types: https://github.com/L3MON4D3/LuaSnip/pull/1396
+    branch = "add-MANY-types",
+    -- rev = "v2.4.1", -- last release @2026-04
   },
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
@@ -53,9 +52,9 @@ Plug.luasnip {
 
       -- The events uses to check if we're out of a snippet
       -- Stuff to read around history and jumps
-      -- https://github.com/L3MON4D3/LuaSnip/issues/91
-      -- https://github.com/L3MON4D3/LuaSnip/issues/170
-      -- https://github.com/L3MON4D3/LuaSnip/issues/780
+      -- - https://github.com/L3MON4D3/LuaSnip/issues/91
+      -- - https://github.com/L3MON4D3/LuaSnip/issues/170
+      -- - https://github.com/L3MON4D3/LuaSnip/issues/780
       region_check_events = { "CursorHold" }, -- shortly after (`:h 'updatetime'`)
       -- The events used to update the active nodes' dependents (like replicate nodes)
       update_events = {"TextChanged", "TextChangedI"},
