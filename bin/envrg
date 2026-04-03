@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Search environment variable names (not values) using regex patterns.
 
 set -euo pipefail # Safe, strict script execution
 

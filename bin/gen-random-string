@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Generate a random string using /dev/urandom,
+# using rules to allow/exclude sets of chars.
 
 # NOTE: Minimal implementation:
 # ```

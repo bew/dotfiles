@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Print a visual separator line, optionally without surrounding blank lines.
+
+set -euo pipefail # Safe, strict script execution
 
 COMPACT=false
 if [[ "${1:-}" == "--compact" ]]; then
@@ -9,4 +12,4 @@ fi
 echo "<---------------------->"
 [[ "$COMPACT" == false ]] && echo
 
-exit 0 # necessary to end the script with status ok
+true # necessary to always end the script with status ok

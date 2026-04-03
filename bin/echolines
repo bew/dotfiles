@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Print each argument on its own line, unchanged.
+
+set -euo pipefail # Safe, strict script execution
 
 for arg in "$@"; do
   printf "%s\n" "$arg"

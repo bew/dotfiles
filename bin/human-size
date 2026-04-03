@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
+# Convert a byte count into a human-readable IEC size (e.g. 1.3KiB).
 
-# Safer shell script with these options
-# -e          : exit if a command exits with non-zero status
-# -u          : exit if an expanded variable does not exist
-set -eu
+set -euo pipefail # Safe, strict script execution
 
 if [[ $# != 1 ]]; then
-  2>&1 echo "Usage: human_size.sh [-]NUMBER_OF_BYTES"
+  >&2 echo "Usage: human-size [-]NUMBER_OF_BYTES"
   exit 1
 fi
 

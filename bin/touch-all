@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Touch all given paths, creating parent directories as needed.
+
+set -euo pipefail # Safe, strict script execution
 
 for f in "$@"; do
   dir=$(dirname "$f")

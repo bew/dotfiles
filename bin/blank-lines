@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
+# Print a configurable number of blank lines (default: 1).
 
-if [[ $# == 0 ]]; then
-  echo
-  exit 0
-fi
+set -euo pipefail # Safe, strict script execution
 
-if [[ "$1" =~ ^-h|--help$ ]]; then
+if [[ "${1:-}" =~ ^-h|--help$ ]]; then
   echo "Usage: $(basename $0) [N]      print N blank lines (default: 1)"
   exit 0
 fi
@@ -22,7 +20,7 @@ if (( NB_BLANK_LINES < 0 )); then
   exit 0
 fi
 
-# Prin the blank lines!
+# Print the blank lines!
 for i in $(seq $NB_BLANK_LINES); do
   echo
 done
