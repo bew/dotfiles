@@ -6,14 +6,18 @@ This guide documents the shell scripting style and testing practices used in thi
 
 **CRITICAL**: When you detect file changes (via git status, file modifications, etc.), it means the user made manual edits.
 **ALWAYS respect user edits** and do not revert them unless they directly conflict with the current task requirements.
-
 **If you are unsure** whether user edits should be kept or if they conflict with the task, **ASK THE USER** before making changes.
+
+**NEVER** repeat code that you wrote/changed at the end of your answer (the user can already see it in the submitted changes and the resulting files).
+However you can mentnion the kind of changes that you did and constraints, debugs, solutions you
+found if relevant.
 
 ## Shell Script Writing Style
 
 ### General Principles
 
-1. **Always use `#!/usr/bin/env bash`** as the shebang
+1. **Always use `#!/usr/bin/env bash` as the shebang**
+2. **Always use `set -euo pipefail` at start of script** - Ensures the code works as expected in a safe & strict way.
 2. **Write for maintainability** - Assume scripts will be maintained and extended in the long run. Prioritize clarity and good structure over brevity
 3. **Use functions** - Split scripts into logical functions for better organization and testability
 4. **Use descriptive function names** - Functions should clearly indicate what they do, with a verb
@@ -22,7 +26,8 @@ This guide documents the shell scripting style and testing practices used in thi
 7. **Assign function parameters to local variables** - Never use plain `$1`, `$2`, etc. directly in function bodies
 8. **Quote variables** - Always use `"$variable"` to handle spaces correctly
 9. **Use `[[ ... ]]` over `[ ... ]` for conditions** - Modern bash conditional expressions are safer
-10. **No trailing whitespace** - Lines should not contain only whitespace; trim whitespace-only lines
+10. **Use `(( ... ))` over `[[ ... ]]` for numerical conditions**
+11. **No trailing whitespace** - Lines should not contain only whitespace; trim whitespace-only lines
 
 ### Code Organization
 
@@ -116,6 +121,7 @@ NOTE: This is not needed at all for simple scripts with less that 5-7 functions.
 
 ```bash
 #!/usr/bin/env bash
+# Short (1-2 lines) description of the script.
 
 set -euo pipefail
 
@@ -263,9 +269,10 @@ bats_require_minimum_version 1.5.0
 SCRIPT_DIR="$(dirname "$BATS_TEST_FILENAME")"
 SCRIPT_PATH="$SCRIPT_DIR/the-script-being-tested"
 
+# Setup shared across ALL tests
 function setup() {
-    # Setup shared across ALL tests
     # Do NOT add test-specific preparation here
+    export SOME_VAR="for-all-tests"
 }
 
 @test "topic: description of test" {
@@ -281,11 +288,14 @@ function setup() {
 
 #### 1. Setup Function is for ALL Tests
 
-The `setup()` function should only contain preparation shared by ALL tests. **DO NOT** add test-specific setup (environment variables, files, etc.) in `setup()`.
+The `setup()` function should only contain preparation shared by ALL tests.
+**DO NOT** add test-specific setup (environment variables, files, etc.) in `setup()`.
+
+Skip this function if nothing needs to be setup for all tests.
 
 ```bash
+# Shared setup for ALL tests
 function setup() {
-    # Shared setup for all tests
     # Setup clean environment (init common env vars, create common files in $BATS_TEST_TMPDIR, etc.)
 }
 
