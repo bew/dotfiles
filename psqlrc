@@ -1,0 +1,31 @@
+-- Configuration file for `psql`, must be placed at `~/.psqlrc`
+
+-- Nicer prompt to show current user & db name (in color!)
+-- Copied from https://stackoverflow.com/a/76355076/5655255
+\set PROMPT1 '%R%001%033[0;32m%002%n%001%033[0m%002@%001%033[0;33m%002%/%001%033[0;31m%002%x%001%033[0m%002%# '
+\set PROMPT2 '%001%[%033[1;33;40m%]%002%R%001%[%033[0m%]%002%# '
+
+-- Complete keywords and convert to uppercase
+-- e.g. `up`->`UPDATE` or `S`->`SET`
+\set COMP_KEYWORD_CASE upper
+
+-- Store the history file per database
+-- NOTE: it'd be more logical to save in XDG `~/.local/state/psql/`
+--   .. but I want to easily open/edit the file, so a dir in home is good-enough.
+\! mkdir -vp ~/.psql
+\set HISTFILE ~/.psql/psql-history-- :DBNAME
+-- Ignore duplicates in history
+\set HISTCONTROL ignoredups
+
+-- Explicitely show NULL values instead of leaving a blank space
+\pset null '(null)'
+
+-- Nicer table output
+\pset linestyle unicode
+
+-- NOTE: to show expanded rows output, toggle with `\x` or set `\x auto`.
+-- (cannot make an alias for this..)
+
+-------------------------------------------------------------------
+-- NOTE: Custom variables can be made with `\set foobar value`
+-- and used later (as an entire query or as part of a query) using `:foobar`.
