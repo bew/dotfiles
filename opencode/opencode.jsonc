@@ -1,0 +1,13 @@
+// DOC: https://opencode.ai/docs/
+//
+// NOTE: Zen models pricing: https://opencode.ai/docs/zen/#pricing
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "default_agent": "plan",
+
+  "plugin": [
+    // TODO: add description (from MacOS config!)
+    "@tarquinen/opencode-dcp@latest"
+  ]
+}

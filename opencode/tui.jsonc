@@ -1,0 +1,114 @@
+{
+  // Keybinds config (see https://opencode.ai/docs/keybinds/)
+  "$schema": "https://opencode.ai/tui.json",
+  "keybinds": {
+    // Global: general
+    "leader": "alt+space",
+    "command_list": "ctrl+space",
+    "app_exit": "ctrl+d,<leader>q",
+    "terminal_suspend": "ctrl+z",
+    // Global: _visual_ toggles
+    "display_thinking": "<leader>t",
+    "theme_list": "none",
+    "sidebar_toggle": "none",
+    "status_view": "none",
+    "tool_details": "none",
+    "terminal_title_toggle": "none",
+    "tips_toggle": "none",
+
+    // (Prompt) History
+    "history_previous": "up,ctrl+p", // prev used prompt
+    "history_next": "down,ctrl+n", // next used prompt
+
+    // Session: general actions
+    "session_interrupt": "escape",
+    "session_new": "<leader>n",
+    "session_rename": "<leader>r",
+    "session_list": "<leader>l",
+    // Session: Disable other session actions (other ways to trigger)
+    "session_timeline": "none",
+    "session_fork": "none",
+    "session_export": "none",
+    "session_share": "none",
+    "session_unshare": "none",
+    "session_compact": "none",
+
+    // Messages: page/half-page nav
+    "messages_page_up": "pageup,ctrl+alt+u", // (`ctrl+u` used for `input_delete_to_line_start`)
+    "messages_page_down": "pagedown,ctrl+alt+d",
+    "messages_half_page_up": "none",
+    "messages_half_page_down": "none",
+
+    // Messages: general nav
+    "messages_first": "alt+g",
+    "messages_last": "ctrl+g", // FAIL: OC doesn't recognize this
+    "messages_next": "none",
+    "messages_previous": "none",
+    "messages_line_up": "none", // scroll 1 line
+    "messages_line_down": "none", // scroll 1 line
+    "messages_last_user": "none", // jump to last user-authored message
+
+    // Messages: general actions
+    "messages_copy": "<leader>y", // copy last answer
+    "messages_undo": "none", // Use `/undo` instead
+    "messages_redo": "none", // Use `/redo` instead
+    "messages_toggle_conceal": "<leader>h", // toggle raw/pretty markdown rendering
+
+    "variant_cycle": "ctrl+t",
+    "model_list": "none", // Use `/models` instead
+    "model_cycle_recent": "none",
+    "model_cycle_recent_reverse": "none",
+    "model_cycle_favorite": "ctrl+x",
+    "model_cycle_favorite_reverse": "none",
+
+    "agent_list": "<leader>a",
+    "agent_cycle": "tab",
+    "agent_cycle_reverse": "shift+tab",
+
+    "editor_open": "ctrl+alt+e,<leader>e",
+    "input_clear": "ctrl+c",
+    "input_paste": "ctrl+v", // note: uses host clipboard directly to paste text or image
+    "input_submit": "return",
+    "input_newline": "alt+o,shift+return,ctrl+return,alt+return",
+
+    "input_move_left": "left,alt+h",
+    "input_move_down": "down,alt+j",
+    "input_move_up": "up,alt+k",
+    "input_move_right": "right,alt+l",
+    "input_select_left": "shift+left,shift+alt+h",
+    "input_select_down": "shift+down,shift+alt+j",
+    "input_select_up": "shift+up,shift+alt+k",
+    "input_select_right": "shift+right,shift+alt+l",
+
+    "input_line_home": "home",
+    "input_line_end": "end",
+    "input_select_line_home": "shift+home",
+    "input_select_line_end": "shift+end",
+
+    // Input keybinds
+    "input_visual_line_home": "none",
+    "input_visual_line_end": "none",
+    "input_select_visual_line_home": "none",
+    "input_select_visual_line_end": "none",
+
+    "input_buffer_home": "home",
+    "input_buffer_end": "end",
+    "input_select_buffer_home": "shift+home",
+    "input_select_buffer_end": "shift+end",
+    "input_undo": "alt+u",
+    "input_redo": "alt+shift+u", // FAIL: OC doesn't recognize uppercase keybind..
+    "input_word_forward": "alt+w,alt+right,ctrl+right",
+    "input_word_backward": "alt+b,alt+left,ctrl+left",
+    "input_select_word_forward": "alt+shift+w,alt+shift+right",
+    "input_select_word_backward": "alt+shift+b,alt+shift+left",
+
+    // Input keybinds to delete stuff
+    "input_backspace": "backspace",
+    "input_delete": "none",
+    "input_delete_word_forward": "none",
+    "input_delete_word_backward": "ctrl+w,ctrl+backspace,alt+backspace",
+    "input_delete_to_line_start": "ctrl+u",
+    "input_delete_to_line_end": "none",
+    "input_delete_line": "none"
+  }
+}
