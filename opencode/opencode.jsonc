@@ -5,9 +5,12 @@
   "$schema": "https://opencode.ai/config.json",
 
   "default_agent": "plan",
+  "small_model": "opencode/gpt-5-nano", // Free model (not very smart..)
 
   "plugin": [
-    // TODO: add description (from MacOS config!)
+    // Plugin for Dynamic Context Pruning
+    // see: https://github.com/Opencode-DCP/opencode-dynamic-context-pruning
+    // Gives /dcp command, but should be used automatically by the models
     "@tarquinen/opencode-dcp@latest"
   ]
 }
