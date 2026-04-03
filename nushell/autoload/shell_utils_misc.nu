@@ -1,6 +1,6 @@
 # Returns the length of the input
 # Unlike the default `length` it works the same way for string & list/table
-export def len []: [
+def len []: [
   nothing -> nothing,
   any -> int,
 ] {

@@ -2,26 +2,26 @@
 # 👉 `jobs *` & `fg *` commands
 
 # List running-but-frozen jobs / programs, to be resumed with `fg`
-export def "jobs" [] {
+def "jobs" [] {
   job list | where type == frozen | reject type
 }
 
 # Returns whether there are any running-but-frozen jobs / programs.
 # Does NOT take other types of jobs into account (threads/..), use `job list` to see those.
-export def "jobs any?" []: nothing -> bool {
+def "jobs any?" []: nothing -> bool {
   not (jobs | is-empty)
 }
 
 # Attempt to resume a frozen (suspended, with Ctrl-z) job in the shell.
 # Use `last`, `before-last` or a job ID to select which job to resume.
 # Simply prints an informational message if no last/before-last job.
-export def "fg" [job_id?: int] {
+def "fg" [job_id?: int] {
   job unfreeze $job_id
 }
 
 # Attempt to resume the last frozen (suspended, with Ctrl-z) job in the shell.
 # Simply prints an informational message if no jobs.
-export def "fg last" [] {
+def "fg last" [] {
   if not (jobs any?) {
     print "No running jobs"
     return
@@ -36,7 +36,7 @@ export def "fg last" [] {
 # FIXME: Actually wrong impl.. There is no 'recent jobs' tracking
 #   -> Need to impl `job list-recent` to list jobs in recently used order,
 #   so `last` & `before-last` are _actually_ accurate.
-export def "fg before-last" [] {
+def "fg before-last" [] {
   let job_id = try { jobs | get 1.id } catch {
     print "Not enough running jobs"
     return
