@@ -1,32 +1,56 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
+# Countdown for N seconds (default 60).
 
-# Safer shell script with these options
-# -e          : exit if a command exits with non-zero status
-# -u          : exit if an expanded variable does not exist
-# -o pipefail : if a command in a pipeline fail, fail the pipeline
-#               (e.g this now fails: false | true)
-set -euo pipefail
+import signal
+import sys
+import time
 
-function countdown
-{
-  local quit
-  trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
+# Flag set by the SIGINT handler; checked in the countdown loop for a clean exit.
+INTERRUPTED = False
 
-  local from_seconds=$1
-  if [ -z "$from_seconds" ]; then
-    from_seconds=60
-  fi
 
-  local original_timestamp=$(( `date +%s` + $from_seconds ))
+# Use an explicit signal handler instead of catching KeyboardInterrupt.
+# KeyboardInterrupt is only raised in interactive (foreground) processes;
+# when the script is backgrounded (e.g. in tests), Python never raises it.
+# An explicit SIGINT handler fires in both cases.
+def handle_sigint(sig, frame):
+    global INTERRUPTED
+    INTERRUPTED = True  # flag checked in the loop so we exit cleanly
 
-  echo "Counting down from ${from_seconds}s"
 
-  while [ "$original_timestamp" -ge `date +%s` ] && [ -z $quit ]; do
-    echo -ne "$(date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S)\r"
-    sleep .1
-  done
+def countdown(from_seconds: int) -> None:
+    start = time.time()
+    end = start + from_seconds
 
-  date -u --date @$(( $original_timestamp - `date +%s` )) +%M:%S
-}
+    print(f"Counting down from {from_seconds}s..")
 
-countdown
+    while not INTERRUPTED and (remaining := end - time.time()) > 0:
+        mins, secs = divmod(int(remaining), 60)
+        # Leading spaces keep the last timer value visible when ^C is pressed.
+        print(f"   {mins:02d}:{secs:02d}", end="\r", flush=True)
+        time.sleep(0.1)
+
+    if INTERRUPTED:
+        elapsed = time.time() - start
+        print()  # move to a new line so the elapsed message isn't overwritten
+        print(f"Stopped early! Elapsed: {elapsed:.1f}s")
+        sys.exit(0)
+
+    print("Finished!")
+
+
+def main() -> None:
+    # Register the SIGINT handler before starting the countdown.
+    signal.signal(signal.SIGINT, handle_sigint)
+
+    from_seconds = 60
+    if len(sys.argv) == 2:
+        from_seconds = int(sys.argv[1])
+    elif len(sys.argv) != 1:
+        print(f"Usage: {sys.argv[0]} [SECONDS]", file=sys.stderr)
+        sys.exit(1)
+    countdown(from_seconds)
+
+
+if __name__ == "__main__":
+    main()
