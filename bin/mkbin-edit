@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 
-# Safer shell script with these options
-# -e          : exit if a command exits with non-zero status
-# -u          : exit if an expanded variable does not exist
-# -o pipefail : if a command in a pipeline fail, fail the pipeline
-#               (e.g this now fails: false | true)
-set -euo pipefail
+set -euo pipefail # Safe, strict script execution
 
 if [[ $# == 0 ]]; then
-  >&2 echo "Usage: $0 <file> [<args for \$EDITOR>]"
+  >&2 echo "USAGE: mkbin-edit <file> [<args for \$EDITOR>]"
   exit 1
 fi
 
@@ -18,6 +13,6 @@ touch "$FILE_NAME"
 chmod +x "$FILE_NAME"
 
 # We pass the rest of the args, to be able to write:
-#     $0 some/file +"setf sh"
+#     mkbin-edit some/file +"setf sh"
 # to set the filetype to sh in (neo)vim
 "${EDITOR:-nvim}" "$FILE_NAME" "$@"

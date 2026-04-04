@@ -20,7 +20,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
 
 
 def print_err(*args, **kwargs):
@@ -51,7 +50,7 @@ def exit_with_usage():
     sys.exit()
 
 
-def find_bin_in_PATH_or_exit(bin_name: str) -> Path:
+def find_bin_in_PATH_or_exit(bin_name: str) -> Path:  # noqa: N802
     bin_immediate_path = shutil.which(bin_name)
     if bin_immediate_path is None:
         print_err(f"ERROR: '{bin_name}' is not in path :/")
@@ -61,7 +60,7 @@ def find_bin_in_PATH_or_exit(bin_name: str) -> Path:
     return Path(bin_immediate_path)
 
 
-def find_and_resolve_symlinks(path: Path) -> List[Path]:
+def find_and_resolve_symlinks(path: Path) -> list[Path]:
     paths = [path]
     while path.is_symlink():
         link_target = path.readlink()
@@ -90,11 +89,14 @@ def path_to_str_with_info(path: Path) -> str:
     if not path.is_absolute() and path.parts[0] != "..":
         # ensure relative paths are shown as ./foo ../bar
         cwd_relative_prefix = "./"
-    metainfo_str = ", ".join(metainfo)
-    return f"{cwd_relative_prefix}{path} ({metainfo_str})"
+    if metainfo:
+        metainfo_str = f" ({", ".join(metainfo)})"
+    else:
+        metainfo_str = ""
+    return f"{cwd_relative_prefix}{path}{metainfo_str}"
 
 
-def main(args: List[str]):
+def main(args: list[str]):
     if len(args) == 0 or args[0] in ["-h", "--help"]:
         exit_with_usage()
     bin_or_path = args[0]
@@ -119,10 +121,13 @@ def main(args: List[str]):
     # Add information about the target file
     print()
     print("Target file info:")
-    subprocess.run(["file", "--brief", "--dereference", initpath])
+    # Capture and re-print via Python to avoid ordering issues when piped:
+    # subprocess writes to the raw fd, bypassing Python's stdout buffer.
+    file_info = subprocess.run(
+        ["file", "--brief", "--dereference", initpath],
+        capture_output=True, text=True,
+    )
+    print(file_info.stdout, end="")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-
-# TODO: write tests... (need pytest, generate dummy symlinks in tmpdir)
