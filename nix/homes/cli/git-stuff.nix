@@ -10,7 +10,7 @@ in {
         stable.git
 
         # config tools
-        bleedingedge.delta # for nice git diffs
+        stable.delta # for nice git diffs
         stable.onefetch # repo global info
         stable.mergiraf # Treesitter-based conflict solver
 

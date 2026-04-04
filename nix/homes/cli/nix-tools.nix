@@ -12,6 +12,6 @@ in {
       nix-diff-drv = "${lib.getExe stable.nix-diff}";
     })
     stable.nixfmt-rfc-style # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
-    bleedingedge.nix-output-monitor # great build tracking ✨
+    stable.nix-output-monitor # great build tracking ✨
   ];
 }
