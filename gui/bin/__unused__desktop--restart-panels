@@ -29,8 +29,7 @@ echo "primary: $primary_monitor"
 echo "other:   ${monitors[@]}"
 echo
 
-function run_bars
-{
+function run_bars() {
   polybar info-bar --reload &
   polybar sys-bar --reload &
 }

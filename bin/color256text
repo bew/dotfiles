@@ -3,8 +3,7 @@
 
 PROGRAM_NAME=$(basename "$0")
 
-function usage
-{
+function usage() {
   echo "Usage: $PROGRAM_NAME [-h|--help] [<FG-BG-COLOR>...] [<TEXT-STYLE>...]"
   echo
   echo "<FG-BG-COLOR> can be any number of:"
@@ -56,8 +55,7 @@ while [[ -n "${1:-}" ]]; do
   esac
 done
 
-function colored_echo
-{
+function colored_echo() {
   echo -en "${TEXT_COLOR}"
   echo -en "$*"
   echo -en "${RESET}"

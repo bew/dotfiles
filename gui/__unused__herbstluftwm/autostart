@@ -129,8 +129,7 @@ hc keybind $M-r   remove # FIXME: $M-$C-r is already "reload!"
 # Move focus between frames
 #
 # Make sure that a floating client stays focused if it was.
-function bind_frame_focus
-{
+function bind_frame_focus() {
   local keybind="$1"
   local dir="$2"
   # this is basically:
@@ -203,8 +202,7 @@ hc keybind $M-$S-z \
         : use_index +1 --skip-visible \
         : unlock
 
-function bind_monitor_tag_swap
-{
+function bind_monitor_tag_swap() {
   local keybind="$1"
   local dir_flag="$2"
   hc keybind "$keybind" \

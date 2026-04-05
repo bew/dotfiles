@@ -8,8 +8,7 @@
 set -euo pipefail
 
 # Extract common compressed file formats
-function extract
-{
+function extract() {
   if [[ $# == 0 ]]; then
     echo "Usage: extract [--dry-run] <compressed_file> [<directory>]"
     return 1

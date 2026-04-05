@@ -10,8 +10,7 @@ echo -e "$ESC[1;3mbold italic$RESET"
 echo -e "$ESC[4msimple underline$RESET"
 echo -e "$ESC[9mstrikethrough$RESET 👀"
 
-function rainbow_text
-{
+function rainbow_text() {
   local text="$1"
   local rainbow_colors=(
     "255;102;118"

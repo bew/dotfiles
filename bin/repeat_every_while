@@ -10,8 +10,7 @@ set -euo pipefail
 # Invert the return value of a program, always works, even in some cases
 # where `!` is not recognized as a bash builtin.
 # (e.g: when saving it to an array and running the whole cmd)
-function not
-{
+function not() {
   if "$@"; then
     false # worked, invert result to false
   else
@@ -19,14 +18,12 @@ function not
   fi
 }
 
-function usage
-{
+function usage() {
   local ctrl_mode="$1"; shift # The internal mode (while or until)
   echo "Usage: repeat_every_$ctrl_mode <interval> [--sep|--compact-sep] <cmd...>"
 }
 
-function repeat_every_impl
-{
+function repeat_every_impl() {
   local ctrl_mode="$1"; shift # The internal mode (while or until)
 
   if [[ $# == 0 ]]; then

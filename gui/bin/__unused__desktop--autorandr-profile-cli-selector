@@ -12,8 +12,7 @@ EXT_BIN_fzf=${EXT_BIN_fzf:-fzf}
 # - https://frdmtoplay.com/i3-udev-xrandr-hotplugging-output-switching/
 # - https://ruedigergad.com/2012/01/28/hotplug-an-external-screen-to-your-laptop-on-linux/
 
-function get_autorandr_profile
-{
+function get_autorandr_profile() {
   # TODO: Use rofi to select the profile!
   #       So I can bind this to a desktop action (no terminal needed).
   local fzf_cmd=($EXT_BIN_fzf $FZF_BEW_KEYBINDINGS $FZF_BEW_LAYOUT)

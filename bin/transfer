@@ -7,8 +7,7 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function transfer
-{
+function transfer() {
   if [ $# -eq 0 ]; then
     echo "No arguments specified."
     echo

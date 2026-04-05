@@ -1,7 +1,6 @@
 # load ssh keys in the current shell
 #-------------------------------------------------------------
-function loadsshkeys
-{
+function loadsshkeys() {
   eval `ssh-agent`
   ssh-add `find ~/.ssh -name "id_*" -a \! -name "*.pub"`
 }

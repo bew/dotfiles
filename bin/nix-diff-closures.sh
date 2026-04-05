@@ -12,37 +12,32 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function get_closure_size
-{
+function get_closure_size() {
   local drv_path="$1"
   nix path-info --closure-size $drv_path | awk '{ print $2 }'
 }
 
-function human_size
-{
+function human_size() {
   local num="$1"
   # NOTE: format precision is not always available, fallback to default format is it fails.
   numfmt --to=iec-i --format="%.1f" -- $num 2>/dev/null || numfmt --to=iec-i -- $num
 }
 
-function echo_section
-{
+function echo_section() {
   echo -ne "\e[1;34m" # blue, bold
   echo -ne ">>> $*"
   echo -ne "\e[0m"
   echo
 }
 
-function echo_info
-{
+function echo_info() {
   echo -ne "\e[1;36m" # cyan, bold
   echo -ne "--- $*"
   echo -ne "\e[0m"
   echo
 }
 
-function echo_header
-{
+function echo_header() {
   echo -ne "\e[1;33;40m" # fg: yellow, bold | bg: dark grey
   echo -ne ">>>  $* <<<"
   echo -ne "\e[0m"

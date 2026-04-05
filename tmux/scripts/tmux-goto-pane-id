@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-function echo_err
-{
+function echo_err() {
   echo >&2 "$@"
 }
 
-function die_run
-{
+function die_run() {
   "$@"
   exit 1
 }

@@ -29,8 +29,7 @@
 
 # === zsh core
 
-function zsh::utils::check_can_reload_or_exit
-{
+function zsh::utils::check_can_reload_or_exit() {
   if [[ -n "$(jobs)" ]]; then
     local prefix="Error"
     [[ -n "${1:-}" ]] && prefix="Cannot $1"
@@ -43,8 +42,7 @@ function zsh::utils::check_can_reload_or_exit
   fi
 }
 
-function zsh::safe_reload
-{
+function zsh::safe_reload() {
   zsh::utils::check_can_reload_or_exit "reload" || return 1
 
   [[ -n "$ORIGINAL_PATH" ]] && export PATH="$ORIGINAL_PATH"
@@ -52,16 +50,14 @@ function zsh::safe_reload
   exec zsh
 }
 
-function zsh::safe_exit
-{
+function zsh::safe_exit() {
   zsh::utils::check_can_reload_or_exit "exit" || return 1
 
   >&2 echo "--- Exiting safely, bye!"
   exit
 }
 
-function zsh::nuke_exit
-{
+function zsh::nuke_exit() {
   # Ensures the shell cannot save history before quitting!
   kill -9 $$
 }
@@ -145,8 +141,7 @@ alias rename="rename -v"
 # rm/trash
 
 alias rmpermanantly="command rm -vI"
-function rm
-{
+function rm() {
   local rm_confirmation
   echo
   echo -n "👉 Are you sure? [yes/…] "
@@ -213,8 +208,7 @@ alias l1="ls -1"
 alias mkd="mkdir -p" # note: `mkdir` has -v applied already
 
 # Creates 1 or more directories, then cd into the first one
-function mkcd
-{
+function mkcd() {
   mkd "$@"
   cd "$1"
 }
@@ -237,8 +231,7 @@ alias ....="cd ../../..;"
 
 alias cdt="cd /tmp;"
 
-function cdot()
-{
+function cdot() {
   local dotfiles_path=$(readlink ~/.dot)
   [[ -n "$dotfiles_path" ]] || {
     echo "~/.dot does not exist???"
@@ -267,8 +260,7 @@ alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
 # - gclonecd <url>.git
 # - gclonecd <url>      destination_dir
 # - gclonecd <url>.git  destination_dir
-function gclonecd
-{
+function gclonecd() {
   local clone_dir
   if [[ -n "$2" ]] && ! [[ "$2" =~ "-" ]]; then
     clone_dir="$2"
@@ -295,8 +287,7 @@ alias v="nvim -R"
 # e: edit | v: view
 
 # Edit scratch buffer with given file extension (immediate insert mode!)
-function _nvim-guess-filetype()
-{
+function _nvim-guess-filetype() {
   local extension="$1"
   local script="
     vim.cmd'filetype on'
@@ -313,8 +304,7 @@ function _nvim-guess-filetype()
   fi
   echo -n "$filetype"
 }
-function ef
-{
+function ef() {
   local extension="$1"
   local filetype=
   if [[ -n "$extension" ]]; then
@@ -325,15 +315,13 @@ function ef
 
 # Open nvim in 'AI' mode, ready to type ✨
 # Can also be called with an initial prompt that will immediately be answered 🚀
-function ei()
-{
+function ei() {
   nvim +"CodeCompanionChat $*" +only +startinsert
 }
 alias ei="nvim +CodeCompanionChat +only +startinsert"
 
 # Search using `rg` & open the results in neovim via quickfix entries
-function erg()
-{
+function erg() {
   nvim -q =(rg --vimgrep "$@") +copen
 }
 
@@ -357,8 +345,7 @@ alias dl_file="curl -OJ -L"
 
 alias curl_json='curl -H "Accept:application/json" -H "Content-Type:application/json"'
 
-function curl_auth
-{
+function curl_auth() {
   local token="$1"; shift
   if [[ -z "$token" ]]; then
     >&2 echo "Missing <token>"
@@ -367,8 +354,7 @@ function curl_auth
   curl -H "Authorization: Bearer $token" "$@"
 }
 
-function curl_auth_json
-{
+function curl_auth_json() {
   local token="$1"; shift
   if [[ -z "$token" ]]; then
     >&2 echo "Missing <token>"
@@ -413,8 +399,7 @@ alias pss="ps -f --forest"
 # ping
 alias pg="ping google.fr"
 
-function cheatsh
-{
+function cheatsh() {
   curl cht.sh/$1
 }
 
@@ -424,12 +409,10 @@ function cheatsh
 # translation
 alias fr:en='trans fr:en -b'
 alias en:fr='trans en:fr -b'
-function fr:en:fr
-{
+function fr:en:fr() {
   local fr_en="$(fr:en $*)" && echo "en: $fr_en" && en:fr "$fr_en"
 }
-function en:fr:en
-{
+function en:fr:en() {
   local en_fr="$(en:fr $*)" && echo "fr: $en_fr" && fr:en "$en_fr"
 }
 

@@ -7,8 +7,7 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function NormalizePoint
-{
+function NormalizePoint() {
   local x="$1"               # ok if '0x2620'
   x=${x/\\u/0x}              # '\u2620' -> '0x2620'
   x=${x/U+/0x}; x=${x/u+/0x} # 'U+2620' -> '0x2620'
@@ -18,8 +17,7 @@ function NormalizePoint
 
 # Taken from https://stackoverflow.com/a/59040037/5655255
 # and adapted to be a proper cli tool.
-function UnicodePointToUtf8
-{
+function UnicodePointToUtf8() {
   # Normalize input
   NormalizePoint "$1"
   local x=$((REPLY)) # from hex to decimal
@@ -48,8 +46,7 @@ function UnicodePointToUtf8
   echo -n ' '
 }
 
-function DumpUnicodePointRange
-{
+function DumpUnicodePointRange() {
   local verbose=1
   if [[ "${1:-}" == "--quiet" ]]; then
     shift
@@ -406,8 +403,7 @@ UNICODE_BLOCKS=(
   "Supplementary Private Use Area-B"               0x100000 0x10FFFF
 )
 
-function PrintListBlocks
-{
+function PrintListBlocks() {
   echo "All supported blocks:"
 
   local idx=0
@@ -421,8 +417,7 @@ function PrintListBlocks
   done
 }
 
-function FindStartStopForBlock
-{
+function FindStartStopForBlock() {
   local block="$1"
 
   local idx=0
@@ -440,8 +435,7 @@ function FindStartStopForBlock
   return 1
 }
 
-function PrintAllFromBlock
-{
+function PrintAllFromBlock() {
   local block="$1"
 
   if ! FindStartStopForBlock "$block"; then
@@ -454,8 +448,7 @@ function PrintAllFromBlock
   DumpUnicodePointRange --quiet "$start_point" "$end_point"
 }
 
-function PrintAllBlocks
-{
+function PrintAllBlocks() {
   local idx=0
   while [[ "${UNICODE_BLOCKS[idx]}" != "" ]]; do
     local name="${UNICODE_BLOCKS[idx]}"
@@ -467,8 +460,7 @@ function PrintAllBlocks
   done
 }
 
-function help
-{
+function help() {
   local prog_name="$0"
   if [[ "$PATH" =~ "$(dirname "$0")" ]]; then
     # if prog parent dir is in PATH, use only file name as prog name

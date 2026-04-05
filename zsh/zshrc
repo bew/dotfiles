@@ -9,18 +9,15 @@
 #
 
 _CFG_BINS_DEPENDENCIES=()
-function cfg::depends-on-bin()
-{
+function cfg::depends-on-bin() {
   local bin="$1"
   _CFG_BINS_DEPENDENCIES+=($bin)
 }
-function cfg::has-bin()
-{
+function cfg::has-bin() {
   local bin="$1"
   command -v "$bin" >/dev/null
 }
-function cfg::check-dependencies()
-{
+function cfg::check-dependencies() {
   local missing_bins=()
   for bin in ${_CFG_BINS_DEPENDENCIES[@]}; do
     if ! cfg::has-bin "$bin"; then
@@ -155,8 +152,7 @@ zstyle ':chpwd:*' recent-dirs-file \
 #
 # to run the hooks related to chpwd_hook, forcing their execution (at least for
 # chpwd_recent_dirs).
-function chpwd_recent_dirs
-{
+function chpwd_recent_dirs() {
     emulate -L zsh
     setopt extendedglob
     local -aU reply
@@ -193,8 +189,7 @@ hooks-add-hook chpwd_hook chpwd_recent_dirs
 
 # Override the default `bracketed-paste` widget, triggered when an external paste
 # is incoming to the shell.
-function my-bracketed-paste-with-undo
-{
+function my-bracketed-paste-with-undo() {
   # Add an undo mark before receiving the pasted-content, so that the paste can
   # be easily undo-able without loosing anything I might have written before.
   zle split-undo

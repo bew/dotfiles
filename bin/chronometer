@@ -7,8 +7,7 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function chronometer
-{
+function chronometer() {
   local quit
   trap 'echo; quit=1' SIGINT # Prevent lost result on ^C
 

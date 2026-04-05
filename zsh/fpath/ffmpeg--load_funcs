@@ -20,8 +20,7 @@ FFMPEG_DONT_NORMALIZE_SUBTITLES=${FFMPEG_DONT_NORMALIZE_SUBTITLES:-}
 # OR: go the other route, name the in-progress files in a specific way, and rename to the final file
 # when finished..
 
-function ffmpeg::show_config()
-{
+function ffmpeg::show_config() {
   _ffmpeg::show_single_config FFMPEG_DRY_RUN "$FFMPEG_DRY_RUN"
   _ffmpeg::show_single_config FFMPEG_LOGLEVEL "$FFMPEG_LOGLEVEL" warning
   _ffmpeg::show_single_config FFMPEG_VIDEO_SIZE "$FFMPEG_VIDEO_SIZE"
@@ -36,8 +35,7 @@ function ffmpeg::show_config()
   _ffmpeg::show_single_config FFMPEG_DONT_NORMALIZE_SUBTITLES "$FFMPEG_DONT_NORMALIZE_SUBTITLES"
 }
 
-function _ffmpeg::show_single_config()
-{
+function _ffmpeg::show_single_config() {
   local name="$1"
   local value="$2"
   local default="${3:-}"
@@ -50,8 +48,7 @@ function _ffmpeg::show_single_config()
   fi
 }
 
-function _ffmpeg::quote_arg_if_needed
-{
+function _ffmpeg::quote_arg_if_needed() {
   local tmp_quotes=$(printf "%q" "$1")
   if [[ "$tmp_quotes" =~ '\\' ]] || [[ "$tmp_quotes" =~ "'" ]]; then
     # Ref: https://unix.stackexchange.com/a/445477/159811
@@ -61,8 +58,7 @@ function _ffmpeg::quote_arg_if_needed
   fi
 }
 
-function _ffmpeg::display_and_run
-{
+function _ffmpeg::display_and_run() {
   echo "--> Going to run:"
   # Print command and args, with quotes if needed
   for arg in "$@"; do
@@ -80,8 +76,7 @@ function _ffmpeg::display_and_run
   fi
 }
 
-function _ffmpeg::check_need_skip()
-{
+function _ffmpeg::check_need_skip() {
   [[ -n "$FFMPEG_SKIP_EXISTING_OUTPUTS" ]] || return 1 # should NOT skip
 
   local output_path="$1"
@@ -94,8 +89,7 @@ function _ffmpeg::check_need_skip()
   fi
 }
 
-function _ffmpeg::doing_action_from_to()
-{
+function _ffmpeg::doing_action_from_to() {
   local action="$1"
   local from="$2"
   local to="$3"
@@ -107,8 +101,7 @@ function _ffmpeg::doing_action_from_to()
   echo
 }
 
-function ffmpeg::extract-audio
-{
+function ffmpeg::extract-audio() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::extract-audio <input_path> [<format>]"
     echo "  <format> defaults to '$FFMPEG_AUDIO_EXT'"
@@ -136,8 +129,7 @@ function ffmpeg::extract-audio
   return $ret
 }
 
-function ffmpeg::extract-audio::rm_source
-{
+function ffmpeg::extract-audio::rm_source() {
   local input_path="$1"
 
   ffmpeg::extract-audio "${@}"
@@ -154,8 +146,7 @@ function ffmpeg::extract-audio::rm_source
   return $ret
 }
 
-function ffmpeg::transcode-movie::single-file
-{
+function ffmpeg::transcode-movie::single-file() {
   if [[ "$1" == "--verbose" ]] || [[ "$1" == "-v" ]]; then
     shift
     >&2 echo "-> Verbose requested, using loglevel 'info' (was: '$FFMPEG_LOGLEVEL')"
@@ -236,8 +227,7 @@ function ffmpeg::transcode-movie::single-file
   return $ret
 }
 
-function ffmpeg::transcode-movie--low-qual
-{
+function ffmpeg::transcode-movie--low-qual() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::transcode-movie--low-qual <files>..."
     return 1
@@ -254,8 +244,7 @@ function ffmpeg::transcode-movie--low-qual
   done
 }
 
-function ffmpeg::transcode-movie--med-qual
-{
+function ffmpeg::transcode-movie--med-qual() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::transcode-movie--med-qual <files>..."
     return 1
@@ -272,8 +261,7 @@ function ffmpeg::transcode-movie--med-qual
   done
 }
 
-function ffmpeg::transcode-movie--high720-qual
-{
+function ffmpeg::transcode-movie--high720-qual() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::transcode-movie--high720-qual <files>..."
     return 1
@@ -290,8 +278,7 @@ function ffmpeg::transcode-movie--high720-qual
   done
 }
 
-function ffmpeg::take-sample
-{
+function ffmpeg::take-sample() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffmpeg::take-sample <file> [<duration=60>]"
     echo "       ffmpeg::take-sample <file> <end>"
@@ -343,8 +330,7 @@ function ffmpeg::take-sample
   return $ret
 }
 
-function ffmpeg::keep-only-subs
-{
+function ffmpeg::keep-only-subs() {
   if [[ $# == 0 || $# == 1 ]]; then
     echo "Usage: ffmpeg::keep-only-subs <file> <lang1> [<lang2>...]"
     echo "  Keep only the subtitles with the given language codes."
@@ -396,8 +382,7 @@ function ffmpeg::keep-only-subs
   return $ret
 }
 
-function ffprobe::show-top-level
-{
+function ffprobe::show-top-level() {
   if [[ $# == 0 ]]; then
     echo "Usage: ffprobe::show-top-level <files>..."
     echo "  Show top-level informations (streams, duration, ..) for the given files"
@@ -414,8 +399,7 @@ function ffprobe::show-top-level
 
 # This function only needs to exist, when I call it, this file
 # will get executed and the helper functions will be in scope.
-function ffmpeg::load_funcs
-{
+function ffmpeg::load_funcs() {
   echo "Helper functions already loaded!"
 }
 echo "Helper functions loaded!"

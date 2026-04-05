@@ -44,8 +44,7 @@
 # --- End of find TTY
 
 
-function do_copy
-{
+function do_copy() {
   local content_b64="$1"
 
   # >&2 echo "Copying '$content_b64' ('$(base64 --decode <<<"$content_b64")') to tty '$CLIPBOARD_REQUESTOR_TTY'"

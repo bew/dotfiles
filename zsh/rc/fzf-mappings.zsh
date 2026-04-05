@@ -18,8 +18,7 @@ cfg::depends-on-bin git
 
 # Transforms a list of results to a list of relative paths to the given dir
 # (it must be given _at least_ relative to CWD, or as an absolute path).
-function zwidget::utils::results_to_paths_relative_to
-{
+function zwidget::utils::results_to_paths_relative_to() {
   local relative_to_path="$1"
   while read item; do
     # NOTE: --no-symlinks is used to ensure symlinks are not expanded and kept as is.
@@ -28,8 +27,7 @@ function zwidget::utils::results_to_paths_relative_to
 }
 
 # Transforms a list of results to a list of absolute paths.
-function zwidget::utils::results_to_absolute_paths
-{
+function zwidget::utils::results_to_absolute_paths() {
   while read item; do
     realpath "$item"
   done
@@ -37,8 +35,7 @@ function zwidget::utils::results_to_absolute_paths
 
 # Transforms a list of results to zsh arguments, to be inserted at cursor
 # position in the cmdline.
-function zwidget::utils::results_to_args
-{
+function zwidget::utils::results_to_args() {
   while read item; do
     echo -n "${(D)item} "
   done
@@ -46,8 +43,7 @@ function zwidget::utils::results_to_args
 
 FZF_BASE_CMD=($_BIN_fzf)
 
-function zwidget::utils::__fzf_generic_impl_for_paths
-{
+function zwidget::utils::__fzf_generic_impl_for_paths() {
   local completion_prefix="${LBUFFER/* /}" # we remove everything until the last space
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
@@ -143,8 +139,7 @@ function zwidget::utils::__fzf_generic_impl_for_paths
 
 FZF_PREVIEW_CMD_FOR_FILE="$_BIN_bat --color=always --style=numbers,header -- {}"
 
-function zwidget::fzf::smart_find_file
-{
+function zwidget::fzf::smart_find_file() {
   FZF_FINDER_CMD=($_BIN_fd --type f --type l --follow) # follow symlinks
   FZF_PROMPT="Smart files: "
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
@@ -155,8 +150,7 @@ function zwidget::fzf::smart_find_file
 }
 zle -N zwidget::fzf::smart_find_file
 
-function zwidget::fzf::find_file
-{
+function zwidget::fzf::find_file() {
   FZF_FINDER_CMD=(find -L) # follow symlinks
   FZF_FINDER_CMD+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
   FZF_FINDER_CMD+=(-o -type f -o -type l) # actual file filter
@@ -174,8 +168,7 @@ zle -N zwidget::fzf::find_file
 # -C : show dirs in columns
 FZF_PREVIEW_CMD_FOR_DIR="ls --color=always --group-directories-first -F -C --dereference -- {}"
 
-function zwidget::fzf::find_directory
-{
+function zwidget::fzf::find_directory() {
   FZF_PROMPT="Smart dirs: "
   FZF_FINDER_CMD=($_BIN_fd --type d --type l --follow) # follow symlinks
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_DIR"
@@ -195,8 +188,7 @@ zle -N zwidget::fzf::find_directory
 # => use ctrl-r to disable sorting and get the original history order
 FZF_HISTORY_OPTIONS=(--scheme=history --nth 2.. --no-multi --bind=ctrl-r:toggle-sort)
 
-function zwidget::fzf::history
-{
+function zwidget::fzf::history() {
   # -l  | list the commands
   # -r  | show in reverse order (=> most recent first)
   # 1   | start at command n° 1 (the oldest still in history)
@@ -216,8 +208,7 @@ function zwidget::fzf::history
 }
 zle -N zwidget::fzf::history
 
-function zwidget::fzf::zoxide
-{
+function zwidget::fzf::zoxide() {
   local last_pwd=$PWD
 
   # Replace all {} with {2..} to ensure we don't pass the first field (popularity of the dir)
@@ -256,16 +247,14 @@ zle -N zwidget::fzf::zoxide
 
 # Checks if we are in a git repository, displays a ZLE message otherwize.
 # Copied from zle::utils::check_git here to have a mostly self-contained file
-function zwidget::utils::check_git
-{
+function zwidget::utils::check_git() {
   if ! $_BIN_git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     zle -M "Error: Not a git repository"
     return 1
   fi
 }
 
-function zwidget::fzf::git_changed_files
-{
+function zwidget::fzf::git_changed_files() {
   zwidget::utils::check_git || return
 
   if [[ -n "$FZF_GIT_CHANGED_FROM_CWD" ]]; then
@@ -299,8 +288,7 @@ function zwidget::fzf::git_changed_files
 }
 zle -N zwidget::fzf::git_changed_files
 
-function zwidget::fzf::git_changed_files_in_cwd
-{
+function zwidget::fzf::git_changed_files_in_cwd() {
   FZF_GIT_CHANGED_FROM_CWD=1 zwidget::fzf::git_changed_files
 }
 zle -N zwidget::fzf::git_changed_files_in_cwd

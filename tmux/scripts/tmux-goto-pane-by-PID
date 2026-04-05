@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-function echo_err
-{
+function echo_err() {
   echo >&2 "$*"
 }
 

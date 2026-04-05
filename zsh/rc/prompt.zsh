@@ -7,35 +7,30 @@ autoload -U colors && colors
 
 # === shell-specific segments
 
-function segmt::shlvl
-{
+function segmt::shlvl() {
   [[ $SHLVL == 1 ]] && return
 
   # e.g: "L3"
   echo -n "%BL%L%b "
 }
 
-function segmt::jobs
-{
+function segmt::jobs() {
   # e.g: "J3 "
   echo -n "%(1j|%B%F{178}J%j%f%b |)"
 }
 
 # Segment variable debug
-function segmt::debug
-{
+function segmt::debug() {
   echo -n "%K{blue} DEBUG: $* %k"
 }
 
 # Segment last exit code
-function segmt::exit_code_on_error
-{
+function segmt::exit_code_on_error() {
   echo -n "%(?||%K{232}%F{red} %? %f%k )"
 }
 
 # Segment prompt vim mode (normal/insert)
-function segmt::short_vim_mode
-{
+function segmt::short_vim_mode() {
   zle::utils::get-vim-mode
   case "$REPLY" in
     insert)  echo -n "%B%K{28}%F{white} I %f%k%b";; # bg: dark green
@@ -47,8 +42,7 @@ function segmt::short_vim_mode
     *) echo -n "$KEYMAP";;
   esac
 }
-function segmt::tiny_vim_mode
-{
+function segmt::tiny_vim_mode() {
   zle::utils::get-vim-mode
   case "$REPLY" in
     insert)  echo -n "%B%F{34}"I"%f%b";; # fg: green
@@ -67,8 +61,7 @@ PROMPT_NO_GIT_INFO=${PROMPT_NO_GIT_INFO:-}
 PROMPT_NO_SLOW_GIT_MSG=${PROMPT_NO_SLOW_GIT_MSG:-}
 
 # Segment git branch
-function segmt::git_branch_slow
-{
+function segmt::git_branch_slow() {
   [ -n "$PROMPT_NO_GIT_INFO" ] && return
 
   local branchName=$(__git_ps1 "%s")
@@ -81,8 +74,7 @@ function segmt::git_branch_slow
 }
 
 # Segment git branch (fast! complete! responsive!)
-function segmt::git_branch_fast
-{
+function segmt::git_branch_fast() {
   [ -n "$PROMPT_NO_GIT_INFO" ] && {
     echo -n "(git segmt off)"
     return
@@ -189,8 +181,7 @@ function segmt::git_branch_fast
 }
 
 # Segment is shell in sudo session
-function segmt::in_sudo
-{
+function segmt::in_sudo() {
   local result=$(sudo -n echo -n bla 2>/dev/null)
 
   if [[ "$result" == "bla" ]]; then
@@ -200,8 +191,7 @@ function segmt::in_sudo
 }
 
 # Segment for info about the environment ($ENV, $AWS_PROFILE, …)
-function segmt::env_info
-{
+function segmt::env_info() {
   [[ -z "$ENV" ]] && return
 
   local bg
@@ -257,8 +247,7 @@ VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to chang
 PROMPT_VENV_SHORT="${PROMPT_VENV_SHORT:-}"
 
 # Segment with the current active venv directory if any
-function segmt::python_venv
-{
+function segmt::python_venv() {
   [[ -n "$VIRTUAL_ENV" ]] || return
 
   local venv_dir=$(basename "$VIRTUAL_ENV")
@@ -326,8 +315,7 @@ function segmt::python_venv
   # FIXME: find a way to not have to specify before/after spacing in the segements!!!
 }
 
-function segmt::in-nix-shell
-{
+function segmt::in-nix-shell() {
   local shell_tag
   if [[ -n "$IN_NIX_SHELL" ]]; then
     # We are in a `nix-shell` or `nix develop` env.
@@ -388,8 +376,7 @@ function segmt::in-nix-shell
 #
 # TODO: (oneday) allow func args, like:
 #   func: 2 some_func arg1 arg2
-function make_prompt_str_from_parts
-{
+function make_prompt_str_from_parts() {
   local parts=("$@")
 
   local str
@@ -522,15 +509,13 @@ RPROMPT_PAST="$(make_prompt_str_from_parts "${RPROMPT_PAST_PARTS[@]}")"
 
 # -- Setup prompts hooks
 
-function prompt::set-current
-{
+function prompt::set-current() {
   PROMPT=$PROMPT_CURRENT
   RPROMPT=$RPROMPT_CURRENT
 }
 hooks-add-hook precmd_hook prompt::set-current
 
-function prompt::set-past
-{
+function prompt::set-past() {
   PROMPT=$PROMPT_PAST
   RPROMPT=$RPROMPT_PAST
 
@@ -538,8 +523,7 @@ function prompt::set-past
 }
 hooks-add-hook zle_line_finish_hook prompt::set-past
 
-function prompt::reset-to-simple-prompts
-{
+function prompt::reset-to-simple-prompts() {
   PROMPT_CURRENT="[%?] %F{cyan}%2~%f > "
   PROMPT_PAST=$PROMPT_CURRENT
   RPROMPT_CURRENT= # no right prompt
@@ -548,8 +532,7 @@ function prompt::reset-to-simple-prompts
 
 # Setup reactions to keymap changes
 
-function prompt::utils::regen-prompt
-{
+function prompt::utils::regen-prompt() {
   zle reset-prompt
 
   # NOTE: keep it commented because it is nice when debugging (:
@@ -570,23 +553,19 @@ CURSOR_SHAPE_CHANGE_DISABLED="${CURSOR_SHAPE_CHANGE_DISABLED:-}"
 # 4 => steady underline.
 # 5 => blinking bar, xterm.
 # 6 => steady bar, xterm.
-function prompt::utils::set-cursor-block
-{
+function prompt::utils::set-cursor-block() {
   [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
   echo -ne "\e[2 q" # steady block
 }
-function prompt::utils::set-cursor-underline
-{
+function prompt::utils::set-cursor-underline() {
   [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
   echo -ne "\e[4 q" # steady underline
 }
-function prompt::utils::set-cursor-beam
-{
+function prompt::utils::set-cursor-beam() {
   [[ -n "$CURSOR_SHAPE_CHANGE_DISABLED" ]] && return
   echo -ne "\e[6 q" # steady bar
 }
-function prompt::utils::apply-cursor-shape
-{
+function prompt::utils::apply-cursor-shape() {
   zle::utils::get-vim-mode
   case "$REPLY" in
     insert) prompt::utils::set-cursor-beam;;

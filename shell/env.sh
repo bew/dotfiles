@@ -1,15 +1,13 @@
 # vim:set sw=2:
 
 # Returns (via status code) whether $PATH has the given entry
-function path_has_entry()
-{
+function path_has_entry() {
   local entry="$1"
   echo ":$PATH:" | grep -q ":$entry:"
 }
 
 # Add the entry to PATH if it's not already present.
-function path_maybe_add_entry
-{
+function path_maybe_add_entry() {
   local entry="$1"
   local where="${2:-priority}"
 

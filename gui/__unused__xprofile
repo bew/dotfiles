@@ -1,25 +1,21 @@
 #!/usr/bin/env sh
 
 # Checks if the given command exists
-function has_command
-{
+function has_command() {
     command -v $1 >/dev/null
 }
 
 # Runs the program in background if it exists
-function background_run
-{
+function background_run() {
     has_command $1 && $* &
 }
 
 # Runs the program if it exists
-function run
-{
+function run() {
     has_command $1 && $*
 }
 
-function debug
-{
+function debug() {
     echo $* >> /tmp/xinitrc_debug
 }
 

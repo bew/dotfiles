@@ -1,13 +1,12 @@
 #! /bin/bash
 
-function clean_exit
-{
+function clean_exit() {
   echo 'Exiting...'
   xset b off
   exit
 }
 
-trap 'clean_exit' INT # catch SIGINT, to remove the bip on exit
+trap clean_exit INT # catch SIGINT, to remove the bip on exit
 
 xset b on
 
@@ -41,8 +40,7 @@ freqs['RE+']="587"
 ##
 ## example: do_ton 'LA'	300 0.3
 #
-function do_ton
-{
+function do_ton() {
   freq=${freqs[$1]}
   note_duration=$2
   wait=$3
@@ -68,8 +66,7 @@ VOLUME=10    # default 100 (in percent)
 # Helpers for duration & delay
 # DO NOT TOUCH!
 
-function calc
-{
+function calc() {
   operation=$1
   echo "$operation" | bc
 }

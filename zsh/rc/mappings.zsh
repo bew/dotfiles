@@ -10,8 +10,7 @@
 
 
 # Checks if we are in a git repository, displays the error as a ZLE message otherwize.
-function zle::utils::check_git
-{
+function zle::utils::check_git() {
   local out
   out=$(git rev-parse --is-inside-work-tree 2>&1)
   local ret=$?
@@ -33,8 +32,7 @@ function zle::utils::check_git
 #
 # Limitation: does not compose well, we can't easily run another command or
 #   display some arbitrary text after the command is run..
-function zle::utils::no-history-run
-{
+function zle::utils::no-history-run() {
   local cmd="$1"
 
   # Push current buffer, will be auto restored after $cmd
@@ -44,14 +42,12 @@ function zle::utils::no-history-run
   zle .accept-line
 }
 
-function zle::utils::is-insert-mode
-{
+function zle::utils::is-insert-mode() {
   [[ "$KEYMAP" =~ "(main|viins)" ]]
 }
 
 # Set $REPLY with the current vim mode (insert, normal, visual*, replace)
-function zle::utils::get-vim-mode
-{
+function zle::utils::get-vim-mode() {
   if [[ -z $KEYMAP ]]; then
     REPLY="insert"
     return
@@ -74,8 +70,7 @@ function zle::utils::get-vim-mode
 }
 
 # Get the row (0-indexed) the cursor is on (in a multi-lines buffer)
-function zle::utils::get-cursor-row0-in-buffer
-{
+function zle::utils::get-cursor-row0-in-buffer() {
   local cursor_row0_in_buffer=0
   for (( i=1; i<=$#LBUFFER; i++ )); do
     [[ ${LBUFFER[$i]} == $'\n' ]] && (( cursor_row0_in_buffer += 1 ))
@@ -83,8 +78,7 @@ function zle::utils::get-cursor-row0-in-buffer
   REPLY_cursor_row0_in_buffer=$cursor_row0_in_buffer
 }
 
-function zle::term-utils::get-cursor-pos
-{
+function zle::term-utils::get-cursor-pos() {
   # Inspired from: https://www.zsh.org/mla/users/2015/msg00866.html
   # It seems to work well :) (unlike my own old impl from a long time ago)
   local pos="" char
@@ -103,8 +97,7 @@ function zle::term-utils::get-cursor-pos
 }
 
 # NOTE: when implemented in terminals, we can have '...reveal-scrollback-by' !
-function zle::term-utils::hide-scrollback-by
-{
+function zle::term-utils::hide-scrollback-by() {
   local by_rows="${1:-1}" # default to 1 line
   [[ "$by_rows" == 0 ]] && return
 
@@ -115,8 +108,7 @@ function zle::term-utils::hide-scrollback-by
 # --------
 
 # Insert space after cursor
-function zwidget::insert-space-after()
-{
+function zwidget::insert-space-after() {
   RBUFFER=" $RBUFFER"
   # Without moving the cursor, should add a space after
 }
@@ -162,8 +154,7 @@ zle -N zwidget::toggle-sudo-nosudo
 #
 # It's not technically required, but it sometimes help to have blank lines
 # to think about things..
-function zwidget::force-scroll-window
-{
+function zwidget::force-scroll-window() {
   # Don't attempt to scroll in a tty
   [ "$TERM" = "linux" ] && return
 
@@ -178,8 +169,7 @@ zle -N zwidget::force-scroll-window
 GIT_MAPPINGS_ARE_FOR_CWD="${GIT_MAPPINGS_ARE_FOR_CWD:-}"
 
 # Git status (for repo or cwd)
-function zwidget::git-status
-{
+function zwidget::git-status() {
   zle::utils::check_git || return
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
@@ -205,8 +195,7 @@ function zwidget::git-status
 zle -N zwidget::git-status
 
 # Git log (for repo or cwd)
-function zwidget::git-log
-{
+function zwidget::git-log() {
   zle::utils::check_git || return
 
   local cmd=(git pretty-log --all)
@@ -224,16 +213,14 @@ function zwidget::git-log
 zle -N zwidget::git-log
 
 # Git log (always for repo, never for cwd)
-function zwidget::git-log-always-for-repo
-{
+function zwidget::git-log-always-for-repo() {
   # Ensure git log call is for the whole repo
   GIT_MAPPINGS_ARE_FOR_CWD= zwidget::git-log
 }
 zle -N zwidget::git-log-always-for-repo
 
 # Git diff (for repo or cwd)
-function zwidget::git-diff
-{
+function zwidget::git-diff() {
   zle::utils::check_git || return
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
@@ -248,8 +235,7 @@ function zwidget::git-diff
 zle -N zwidget::git-diff
 
 # Git diff cached (for repo or cwd)
-function zwidget::git-diff-cached
-{
+function zwidget::git-diff-cached() {
   zle::utils::check_git || return
 
   if [[ -z "$GIT_MAPPINGS_ARE_FOR_CWD" ]]; then
@@ -265,8 +251,7 @@ zle -N zwidget::git-diff-cached
 
 # FG to the most recent ctrl-z'ed process
 # fg %+
-function zwidget::fg
-{
+function zwidget::fg() {
   [[ $#jobstates == 0 ]] && zle -M "No running jobs" && return
 
   zle::utils::no-history-run "fg %+"
@@ -275,8 +260,7 @@ zle -N zwidget::fg
 
 # FG to the 2nd most recent ctrl-z'ed process
 # fg %-
-function zwidget::fg2
-{
+function zwidget::fg2() {
   [[ $#jobstates < 2 ]] && zle -M "Not enough running jobs" && return
 
   zle::utils::no-history-run "fg %-"
@@ -292,8 +276,7 @@ zle -N zwidget::fg2
 # $ cmd foo 'bar baz'
 # $ cmd foo "bar baz"
 # $ cmd foo bar\ baz
-function zwidget::cycle-quoting
-{
+function zwidget::cycle-quoting() {
   autoload -U modify-current-argument
 
   if [[ ! $WIDGET == $LASTWIDGET ]]; then
@@ -349,8 +332,7 @@ zle -N zwidget::cycle-quoting
 
 # Give a prompt where I can paste or write some text, it will then be single
 # quoted (with escapes if needed) and inserted as a single argument.
-function zwidget::insert_one_arg
-{
+function zwidget::insert_one_arg() {
   function read-from-minibuffer::no-syntax-hl
   {
     local default_maxlength="$ZSH_HIGHLIGHT_MAXLENGTH"
@@ -389,8 +371,7 @@ zle -N zwidget::insert_one_arg
 # |   abc   def   []|  =>  |   abc   [d]ef   |
 # |   abc   def [ ] |  =>  |   abc   [d]ef   |
 # | [ ] abc   def   |  =>  |[ ]  abc   def   |
-function zwidget::jump-previous-shell-arg
-{
+function zwidget::jump-previous-shell-arg() {
   autoload -U split-shell-arguments
 
   local reply REPLY REPLY2
@@ -472,8 +453,7 @@ zle -N zwidget::jump-previous-shell-arg
 # |[ ]  abc   def   |  =>  |   [a]bc   def   |
 # |   abc   def [ ] |  =>  |   abc   def   []|
 # |   abc   de[f]   |  =>  |   abc   def   []|
-function zwidget::jump-next-shell-arg
-{
+function zwidget::jump-next-shell-arg() {
   autoload -U split-shell-arguments
 
   local reply REPLY REPLY2
@@ -522,8 +502,7 @@ zle -N zwidget::jump-next-shell-arg
 # |[ ]  abc   def   |  =>  |   ab[c]   def   |
 # |   abc   def [ ] |  =>  |   abc   def   []|
 # |   abc   de[f]   |  =>  |   abc   def   []|
-function zwidget::jump-end-shell-arg
-{
+function zwidget::jump-end-shell-arg() {
   autoload -U split-shell-arguments
 
   local reply REPLY REPLY2
@@ -580,8 +559,7 @@ function zwidget::jump-end-shell-arg
 }
 zle -N zwidget::jump-end-shell-arg
 
-function zwidget::noop
-{
+function zwidget::noop() {
   # do nothing!
 }
 zle -N zwidget::noop
@@ -601,8 +579,7 @@ zle -N zwidget::noop
 #
 # TODO(?): Make a proper helper binary (in Rust?) or a zsh plugin to allow other
 #          people to have this (generally wanted) behavior?
-function zwidget::clear-but-keep-scrollback
-{
+function zwidget::clear-but-keep-scrollback() {
   local REPLY_cursor_row_in_term REPLY_cursor_col_in_term
   zle::term-utils::get-cursor-pos
 
@@ -655,8 +632,7 @@ fi
 
 typeset -gA keysyms
 
-function zle::utils::register_keysym
-{
+function zle::utils::register_keysym() {
   local sym="$1"
   local prefered_val="$2"
   local fallback_val="$3" # may be empty
@@ -757,8 +733,7 @@ zle::utils::register_keysym Enter "^M"
 # use multi-key bindings in normal mode (e.g. surround's 'ys' 'cs' 'ds')
 #
 # NOTE: default is KEYTIMEOUT=40
-function zle::utils::setup_keytimeout_per_keymap
-{
+function zle::utils::setup_keytimeout_per_keymap() {
   zle::utils::get-vim-mode
   case "$REPLY" in
     insert) KEYTIMEOUT=1;; # 10ms
@@ -770,8 +745,7 @@ function zle::utils::setup_keytimeout_per_keymap
 hooks-add-hook zle_keymap_select_hook zle::utils::setup_keytimeout_per_keymap
 hooks-add-hook zle_line_init_hook zle::utils::setup_keytimeout_per_keymap
 
-function vibindkey
-{
+function vibindkey() {
   bindkey -M viins "$@"
   bindkey -M vicmd "$@"
 }
@@ -860,8 +834,7 @@ bindkey '^w' backward-kill-word
 bindkey '^u' backward-kill-line
 
 # Delete backward until a path separator
-function backward-kill-partial-path
-{
+function backward-kill-partial-path() {
   # Remove '/' from being a part of a word
   local WORDCHARS="${WORDCHARS:s#/#}"
   zle backward-kill-word
@@ -870,8 +843,7 @@ zle -N backward-kill-partial-path
 
 bindkey "${keysyms[Backspace]}" backward-kill-partial-path # Alt-Backspace
 
-function toggle-replace-mode
-{
+function toggle-replace-mode() {
   if [[ $ZLE_STATE == *overwrite* ]]; then
     zle vi-insert
   else
@@ -895,8 +867,7 @@ vibindkey "${keysyms[PageUp]}" beginning-of-buffer-or-history # like gg in vicmd
 vibindkey "${keysyms[PageDown]}" vi-fetch-history             # like G in vicmd
 
 # Cut the buffer and push it on the buffer stack
-function push-input-go-insert-mode
-{
+function push-input-go-insert-mode() {
   zle push-input
   zle vi-insert
 }
@@ -918,30 +889,26 @@ bindkey -M visual S add-surround
 
 # START OF COPY/PASTE SETUP
 
-function zwidget::clipboard-visual-paste
-{
+function zwidget::clipboard-visual-paste() {
   local content=$(cli-clipboard-provider paste-from smart-session)
   zle copy-region-as-kill "$content" # copy content in the kill buffer
   zle put-replace-selection
 }
 zle -N zwidget::clipboard-visual-paste
 
-function zwidget::clipboard-paste-before
-{
+function zwidget::clipboard-paste-before() {
   CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
   zle vi-put-before
 }
 zle -N zwidget::clipboard-paste-before
 
-function zwidget::clipboard-paste-after
-{
+function zwidget::clipboard-paste-after() {
   CUTBUFFER=$(cli-clipboard-provider paste-from smart-session)
   zle vi-put-after
 }
 zle -N zwidget::clipboard-paste-after
 
-function zwidget::clipboard-visual-copy
-{
+function zwidget::clipboard-visual-copy() {
   zle vi-yank # copy region to kill buffer
   local content="$CUTBUFFER"
   printf "%s" "$content" | cli-clipboard-provider copy-to smart-session
@@ -956,8 +923,7 @@ bindkey -M viins 'v' zwidget::clipboard-paste-before
 bindkey -M vicmd 'v' zwidget::clipboard-paste-after
 
 # copy selection to host system (via osc52)
-function zwidget::clipboard-visual-copy-to-system
-{
+function zwidget::clipboard-visual-copy-to-system() {
   zle vi-yank # copy region to kill buffer
   local content="$CUTBUFFER"
   export CLIPBOARD_REQUESTOR_TTY=$TTY # needed for osc52 (see its provider for details)
@@ -972,8 +938,7 @@ bindkey -M visual 'C' zwidget::clipboard-visual-copy-to-system
 
 # - Go right if possible (if there is text on the right)
 # - Call `git log` if no text on the right (or empty input line)
-function zwidget::go-right_or_git-log
-{
+function zwidget::go-right_or_git-log() {
   if [[ -z "$RBUFFER" ]]; then
     zwidget::git-log
   else
@@ -983,8 +948,7 @@ function zwidget::go-right_or_git-log
 zle -N zwidget::go-right_or_git-log
 
 # When in zsh-vim normal mode, the cursor is never after the last char, we must ignore it
-function zwidget::go-right_or_git-log::vicmd
-{
+function zwidget::go-right_or_git-log::vicmd() {
   if [[ ${#RBUFFER} == 1 ]] || [[ -z $BUFFER ]]; then
     # cursor on last char, or empty buffer
     zwidget::git-log

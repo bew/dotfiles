@@ -60,8 +60,7 @@ zmodload zsh/complist
 
 # Add few missing options completions (_gnu_generic parses and extracts options from 'cmd --help')
 # (maybe move these somewhere else?)
-function zcompl::extract_options_completion_from_cmd_help
-{
+function zcompl::extract_options_completion_from_cmd_help() {
   local program="$1"
   compdef _gnu_generic "$1"
   # Rename the option tag to say it comes from --help (for display in menu completion)
@@ -81,8 +80,7 @@ zstyle ':completion:*' menu select #interactive
 
 # Refresh commands list if we're completing a command
 # This fixes installing a program and then immediately trying to tab-complete its name.
-function _compl_force_rehash
-{
+function _compl_force_rehash() {
   # rehash only when trying to complete a command name
   if (( CURRENT == 1 )); then
     rehash
@@ -93,8 +91,7 @@ function _compl_force_rehash
 
 # Add global aliases for completion
 # ref: https://stackoverflow.com/a/59513051/5655255
-function _compl_global_alias
-{
+function _compl_global_alias() {
   # FIXME: How to put these in a tag named 'global aliases' ?
   [[ -n $PREFIX ]] && compadd -- ${(M)${(k)galiases}:#$PREFIX*}
   return 1 # Because we didn't really complete anything

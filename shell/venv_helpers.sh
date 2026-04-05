@@ -4,8 +4,7 @@
 #   IDEA for completion of venv_* (except venv_with_do),
 #        search DIRs where $DIR/bin/python exists.
 
-function _venv__echo2_n_color_guard
-{
+function _venv__echo2_n_color_guard() {
   local color="${1:-0m}"; shift
   local content="$*"
   if [[ -t 2 ]] || [[ -n "${VENV_FORCE_COLOR:-}" ]]; then # NOTE: we check we're on a tty for colors
@@ -22,8 +21,7 @@ _VENV__ECHO_LAST_LINE_COLOR=""
 _VENV__ECHO_LAST_LINE_PREFIX=""
 _VENV__ECHO_LAST_LINE_PREFIX_COLOR=""
 
-function _venv__echo2
-{
+function _venv__echo2() {
   if [[ $# == 0 ]] || [[ $1 =~ "^-h|--help$" ]]; then
     _venv__echo2 usage "Usage: _venv__echo2 KIND [stuff-to-echo...]"
     _venv__echo2 usage
@@ -66,8 +64,7 @@ function _venv__echo2
 
 VENV_DEFAULT_DIR="${VENV_DEFAULT_DIR:-.venv}"
 
-function _venv__ensure_exists
-{
+function _venv__ensure_exists() {
   local venv_dir="${1:-$VENV_DEFAULT_DIR}"
 
   if ! [[ -d "$venv_dir" ]]; then
@@ -81,24 +78,21 @@ function _venv__ensure_exists
   fi
 }
 
-function _venv__ensure_inside
-{
+function _venv__ensure_inside() {
   if [[ -z "${VIRTUAL_ENV:-}" ]]; then
     _venv__echo2 err "ERROR: not in a virtual env"
     return 1
   fi
 }
 
-function _venv__ensure_outside
-{
+function _venv__ensure_outside() {
   if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     _venv__echo2 info "--- Disabling active virtual env.."
     _venv__deactivate_with_fallback
   fi
 }
 
-function _venv__deactivate_with_fallback
-{
+function _venv__deactivate_with_fallback() {
   if ! deactivate; then
     _venv__echo2 warn "'deactivate' failed, maybe we're in a subshell?"
     _venv__echo2 info "--- Disabling virtual env manually (remove it from \$PATH and unset \$VIRTUAL_ENV)"
@@ -114,8 +108,7 @@ function _venv__deactivate_with_fallback
 
 VENV_DEFAULT_PYTHON_BIN="${VENV_DEFAULT_PYTHON_BIN:-python3}"
 
-function _venv__find_python_bin_path
-{
+function _venv__find_python_bin_path() {
   local show_used_bin=false
   local want_path=false
   [[ "${1:-}" == "--verbose" ]] && shift && show_used_bin=true
@@ -132,8 +125,7 @@ function _venv__find_python_bin_path
   echo "$python_bin_path"
 }
 
-function venv_init
-{
+function venv_init() {
   local venv_dir="${1:-$VENV_DEFAULT_DIR}"
 
   if [[ -d "$venv_dir" ]]; then
@@ -146,8 +138,7 @@ function venv_init
   "$python_bin_path" -m venv -- "$venv_dir"
 }
 
-function venv_on
-{
+function venv_on() {
   local venv_dir="${1:-$VENV_DEFAULT_DIR}"
 
   _venv__ensure_outside
@@ -162,16 +153,14 @@ function venv_on
   source "$venv_dir/bin/activate"
 }
 
-function venv_off
-{
+function venv_off() {
   _venv__ensure_inside || return 1
 
   _venv__echo2 info "--- Disabling virtual env.."
   _venv__deactivate_with_fallback
 }
 
-function venv_do
-{
+function venv_do() {
   # NOTE: here venv_dir is assumed to be "$VENV_DEFAULT_DIR"
   if [[ $# == 0 ]] || [[ $1 =~ "^-h|--help$" ]]; then
     _venv__echo2 usage "Usage: venv_do [VENV_DIR] -- CMD..."
@@ -238,8 +227,7 @@ function venv_do
 
 # Helper to activate a venv, deactivating an existing one and
 # creating it if necessary.
-function venv_here
-{
+function venv_here() {
   local venv_dir="${1:-$VENV_DEFAULT_DIR}"
 
   _venv__ensure_outside
@@ -255,8 +243,7 @@ alias venv=venv_here # short alias
 
 # Helper to reset a venv, deactivating an existing one and recreate
 # the whole virtual env.
-function venv_reset
-{
+function venv_reset() {
   local venv_dir="${1:-$VENV_DEFAULT_DIR}"
 
   _venv__ensure_outside
@@ -276,8 +263,7 @@ VENV_VOLATILE_BASE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/volatile-venvs"
 # Helper to create a volatile venv with the given packages and run a command.
 #
 # E.g: venv_with_do ansible -- ansible-playbook ...
-function venv_with_do
-{
+function venv_with_do() {
   if [[ $# == 0 ]] || [[ $1 =~ "^-h|--help$" ]]; then
     _venv__echo2 usage "Usage: venv_with_do [--new|--upgrade|--quiet|-q] PKGS... [-- [CMD...]]"
     _venv__echo2 usage
@@ -387,8 +373,7 @@ function venv_with_do
 alias venv_with_do::upgrade="venv_with_do --upgrade"
 
 # cd into current venv (to search something, ..)
-function cdvenv
-{
+function cdvenv() {
   if [[ -z "$VIRTUAL_ENV" ]]; then
     >&2 echo "Not in a virtual env :shrug: (\$VIRTUAL_ENV not set)"
   fi
@@ -401,8 +386,7 @@ function cdvenv
 
 # A pip replacement, disabled unless in a virtual env or --allow-for-global-env is passed
 # to avoid changing the global user python env by mistake.
-function pip::disabled-for-global-env
-{
+function pip::disabled-for-global-env() {
   if [[ "$1" == "--allow-for-global-env" ]]; then
     shift
     _venv__echo2 note "note: if a virtual env is currently active, you'll change that env not your user's."

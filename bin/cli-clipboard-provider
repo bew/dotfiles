@@ -13,14 +13,12 @@
 #               (e.g this now fails: false | true)
 set -euo pipefail
 
-function echoerr
-{
+function echoerr() {
   >&2 echo "$@"
 }
 
 # Inspired from https://stackoverflow.com/a/948117/5655255
-function all_commands_starting_with
-{
+function all_commands_starting_with() {
   local cmd_start="$1"
   echo -n $PATH |
     xargs -d : -I {} \
@@ -28,8 +26,7 @@ function all_commands_starting_with
     -printf '%P\n'
 }
 
-function usage
-{
+function usage() {
   echoerr "Usage: $0 [-h|--help] <direction> PROVIDERS..."
   echoerr
   echoerr "<direction>   Either 'copy-to' or 'paste-from'"
@@ -53,8 +50,7 @@ function usage
   echoerr
 }
 
-function check_provider_exists
-{
+function check_provider_exists() {
   local provider_name="$1"
   command -v "clipboard-provider--${provider_name}" >/dev/null
 }

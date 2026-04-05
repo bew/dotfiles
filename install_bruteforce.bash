@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-function make-link
-{
+function make-link() {
   local link_to="$1"
   local link_destination="$2"
 
@@ -35,14 +34,12 @@ function make-link
   fi
 }
 
-function label
-{
+function label() {
   echo
   echo "---- $1"
 }
 
-function skip
-{
+function skip() {
   echo "SKIPPED: $*"
 }
 
