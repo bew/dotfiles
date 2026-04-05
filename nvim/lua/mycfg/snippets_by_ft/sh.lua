@@ -5,6 +5,9 @@ local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local SNIPS = {}
 local snip = SU.get_snip_fn(SNIPS)
 
+local ls_extras = require"luasnip.extras"
+ls_extras.repeat_node = ls_extras.rep
+
 local i = ls.insert_node ---@diagnostic disable-line: unused-local
 local t = ls.text_node ---@diagnostic disable-line: unused-local
 
@@ -22,18 +25,39 @@ snip("safe", { desc = "Safe, strict script execution" }, ls.choice_node(1, {
   },
 }))
 
-snip("l", { desc = "local var decl/def" }, SU.myfmt_braces {
-  "local {var}={after}",
-  {
-    var = i(1, "var"),
-    after = i(2),
+-- MAYBE(?): allow adding as many vars at decl step? (easier for the decl-first variant 🤔)
+-- but how to still properly support switching from one form to the other?..
+snip("l", { desc = "local var decl/def" }, ls.choice_node(1, {
+  SU.myfmt_braces {
+    "local {var}={after}",
+    {
+      var = ls.restore_node(1, "var"),
+      after = ls.restore_node(2, "after"),
+    },
+  },
+  SU.myfmt_braces {
+    [[
+      local {var}
+      {var_again}={after}
+    ]],
+    {
+      var = ls.restore_node(1, "var"),
+      var_again = ls_extras.repeat_node(1),
+      after = ls.restore_node(2, "after"),
+    },
+  },
+}), {
+  stored = {
+    -- Keys for ls.restore_node
+    -- (used to share nodes between choice node branches ✨)
+    var = i(nil, "var"),
+    after = i(nil),
   },
 })
 
 snip("fn", { desc = "function foo() { ... }" }, SU.myfmt {
   [[
-    function <name>()
-    {
+    function <name>() {
     	<body>
     }
   ]],
@@ -46,8 +70,8 @@ snip("fn", { desc = "function foo() { ... }" }, SU.myfmt {
 snip("case", { desc = "switch case ..." }, SU.myfmt {
   [[
     case <word> in
-      <pattern>)
-        <body>;;<next>
+    	<pattern>)
+    		<body>;;<next>
     esac
   ]],
   {
@@ -61,7 +85,7 @@ snip("case", { desc = "switch case ..." }, SU.myfmt {
 snip("do", {desc = "do ... end"}, SU.myfmt {
   [[
     do
-      <body>
+    	<body>
     done
   ]],
   { body = SU.insert_node_default_selection(1) },
@@ -70,7 +94,7 @@ snip("do", {desc = "do ... end"}, SU.myfmt {
 snip("if", {desc = "if ...; then ... fi"}, SU.myfmt {
   [[
     if <cond>; then
-      <body_true>
+    	<body_true>
     fi
   ]],
   {
@@ -78,16 +102,23 @@ snip("if", {desc = "if ...; then ... fi"}, SU.myfmt {
       -- In a choiceNode, direct children nodes that normally expect an index don't need one;
       -- their jump-index is the same as the choiceNodes'.
       i(nil, "condition"),
-      (SU.myfmt {"[[ <test> ]]", { test = i(1) }}),
+      SU.myfmt {"[[ <test> ]]", { test = ls.restore_node(1, "test") } },
+      SU.myfmt {"(( <test> ))", { test = ls.restore_node(1, "test") } },
     }),
     body_true = i(2),
+  },
+}, {
+  stored = {
+    -- Keys for ls.restore_node
+    -- (used to share nodes between choice node branches ✨)
+    test = i(nil),
   },
 })
 
 snip("th", {desc = "then ... fi"}, SU.myfmt {
   [[
     then
-      <body>
+    	<body>
     fi
   ]],
   {
@@ -95,9 +126,15 @@ snip("th", {desc = "then ... fi"}, SU.myfmt {
   },
 })
 
-snip("cond", {desc = "[[ ... ]]"}, SU.myfmt {
-  "[[ <test> ]]",
-  { test = i(1) },
+snip("cond", {desc = "[[ ... ]]"}, ls.choice_node(1, {
+  SU.myfmt { "[[ <test> ]]", { test = ls.restore_node(1, "test") } },
+  SU.myfmt { "(( <test> ))", { test = ls.restore_node(1, "test") } },
+}), {
+  stored = {
+    -- Keys for ls.restore_node
+    -- (used to share nodes between choice node branches ✨)
+    test = i(1),
+  },
 })
 
 snip("err", {desc = "echo to stderr"}, {
