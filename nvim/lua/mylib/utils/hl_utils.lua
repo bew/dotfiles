@@ -61,27 +61,56 @@ M.HlGroup.mt = { __index = M.HlGroup }
 M.HlGroupNamed = setmetatable({ _type = "HlGroupNamed" }, { __index = M.HlGroup })
 M.HlGroupNamed.mt = { __index = M.HlGroupNamed }
 
---- Get a HlGroup instance, by name or from a raw hlspec.
+---@alias mylib.hl.Opts.GroupSpec string|vim.api.keyset.highlight|mylib.hl.HlGroup|mylib.hl.HlGroupNamed
+
+--- Get a HlGroup instance, by name or from a raw hlspec, resolving all links.
 ---
 --- If a name is present in group_spec, a HlGroupNamed instance will be returned.
 ---
----@param group_spec string|vim.api.keyset.highlight|mylib.hl.HlGroup|mylib.hl.HlGroupNamed HL group
----  name or highlight spec.
+---@param group_spec mylib.hl.Opts.GroupSpec HL group name or highlight spec.
 ---@return mylib.hl.HlGroup|mylib.hl.HlGroupNamed
 ---
 ---@overload fun(group_spec: vim.api.keyset.highlight|mylib.hl.HlGroup): mylib.hl.HlGroup
 ---@overload fun(group_spec: string): mylib.hl.HlGroupNamed
 ---@overload fun(group_spec: mylib.hl.HlGroupNamed): mylib.hl.HlGroupNamed
 function M.group(group_spec)
+  return M.raw_group(group_spec, {resolve_links=true})
+end
+
+--- Get a HlGroup instance, by name or from a raw hlspec, WITHOUT resolving links.
+---
+--- If a name is present in group_spec, a HlGroupNamed instance will be returned.
+---
+---@param group_spec mylib.hl.Opts.GroupSpec HL group name or highlight spec.
+---@param opts {resolve_links: boolean}
+---@return mylib.hl.HlGroup|mylib.hl.HlGroupNamed
+function M.raw_group(group_spec, opts)
   local name ---@type string?
   local group ---@type vim.api.keyset.highlight
+  local resolve_links = opts and opts.resolve_links or false
   if type(group_spec) == "string" then
     -- Find an existing group by name
     name = group_spec
-    local get_hl_group_info = vim.api.nvim_get_hl(0, { name = group_spec })
+    local get_hl_opts = { name = group_spec }
+    if resolve_links then
+      -- This will force `nvim_get_hl` to resolve all hl links
+      get_hl_opts.link = false
+    end
+    local get_hl_group_info = vim.api.nvim_get_hl(0, get_hl_opts)
     group = _get_hl_to_api_highlight(get_hl_group_info)
   else
     name = rawget(group_spec, "name")
+    if name then
+      -- Go through the other branch to eventually resolve links, then apply eventual overrides
+      local group = M.raw_group(name, opts)
+      -- Apply overrides if any (skip `name` & `link`)
+      for key, value in pairs(group_spec) do
+        if key ~= "name" or key ~= "link" then
+          group[key] = value
+        end
+      end
+      return group
+    end
     group = group_spec
   end
   -- note: Here we upcast the vim.api.keyset.highlight to a HlGroup (compatible!)
