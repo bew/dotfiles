@@ -35,6 +35,10 @@ in {
 
     # Extra - terminal fun
     stable.asciiquarium # nice ASCII aquarium 'screen saver'
+    bleedingedge.lavat # nice lavalamp
+    (stable.writeShellScriptBin "lavat-fancy" ''
+      ${bleedingedge.lavat}/bin/lavat -g -b 15 -r 1 -k f2902e -c 3a2919
+    '')
     stable.chafa # crazy cool img/gif terminal viewer
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
 
