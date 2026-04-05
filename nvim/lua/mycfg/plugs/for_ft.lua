@@ -32,59 +32,12 @@ Plug {
     Plug.lib_web_devicons,
   },
   on_load = function()
-    require"render-markdown".setup {
+    ---@type render.md.UserConfig
+    local cfg = {
       -- Don't disable all rendering (prevent layout disruption) when selecting un-related text
       render_modes = { "n", "v", "V", "c", "t" }, -- adds visual modes compared to defaults
       nested = false, -- don't render nested markdown in code block
-      sign = { enabled = false },
-      heading = {
-        sign = false,
-        setext = false, -- disable dashes below text to define headers
-        icons = {
-          "# ",
-          "## ",
-          "### ",
-          "#4## ",
-          "#5### ",
-          "#6#### ",
-        },
-        width = "block",
-        right_pad = 2, -- at the very least
-        border = {true, true, true, false, false, false},
-        above = "▃", -- default: "▄"
-        below = "🮃", -- default: "▀"
-        foregrounds = { -- for the icon & text
-          "@markup.heading.1",
-          "@markup.heading.2",
-          "@markup.heading.3",
-          "@markup.heading.4",
-          "@markup.heading.5",
-          "@markup.heading.6",
-        },
-        backgrounds = { -- for the borders + text backgrounds all the way
-          "@markup.heading.1.bg",
-          "@markup.heading.2.bg",
-          "@markup.heading.3.bg",
-          "@markup.heading.4.bg",
-          "@markup.heading.5.bg",
-          "@markup.heading.6.bg",
-        },
-      },
-      dash = {
-        icon = "━",
-        width = 80,
-        highlight = "@punctuation.delimiter.markdown",
-      },
       bullet = { enabled = false },
-      code = {
-        conceal_delimiters = false,
-        border = "thin",
-        language_border = "▄",
-        language_left = "▄█",
-        language_right = "█",
-        inline_left = "▐",
-        inline_right = "▌",
-      },
       html = {
         comment = { conceal = false },
       },
@@ -94,30 +47,81 @@ Plug {
         -- REF: https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/303#issuecomment-2608156758
         conceallevel = { default = 0, rendered = 3 },
       },
-      overrides = {
-        filetype = {
-          codecompanion = {
-            heading = {
-              width = "full",
-              custom = {
-                me = {
-                  pattern = "^## Me$",
-                  icon = " ",
-                  foreground = "@ai.heading.me",
-                  background = "@ai.heading.me",
-                },
-                cc = {
-                  pattern = "^## CodeCompanion.*",
-                  icon = " ✨ ",
-                  foreground = "@ai.heading.generated",
-                  background = "@ai.heading.generated",
-                },
+      sign = { enabled = false },
+    }
+    cfg.heading = {
+      sign = false,
+      setext = false, -- disable dashes below text to define headers
+      icons = {
+        "# ",
+        "## ",
+        "### ",
+        "#4## ",
+        "#5### ",
+        "#6#### ",
+      },
+      width = "block",
+      right_pad = 2, -- at the very least
+      border = {true, true, true, false, false, false},
+      above = "▃", -- default: "▄"
+      below = "🮃", -- default: "▀"
+      foregrounds = { -- for the icon & text
+        "@markup.heading.1",
+        "@markup.heading.2",
+        "@markup.heading.3",
+        "@markup.heading.4",
+        "@markup.heading.5",
+        "@markup.heading.6",
+      },
+      backgrounds = { -- for the borders + text backgrounds all the way
+        "@markup.heading.1.bg",
+        "@markup.heading.2.bg",
+        "@markup.heading.3.bg",
+        "@markup.heading.4.bg",
+        "@markup.heading.5.bg",
+        "@markup.heading.6.bg",
+      },
+    }
+    cfg.dash = {
+      icon = "━",
+      width = 80,
+      highlight = "@punctuation.delimiter.markdown",
+    }
+
+    cfg.code = {
+      conceal_delimiters = false,
+      border = "thin",
+      inline_left = "▐",
+      inline_right = "▌",
+      language_border = "▄",
+      language_left = "▄█",
+      language_right = "█",
+    }
+
+    cfg.overrides = {
+      filetype = {
+        codecompanion = {
+          heading = {
+            width = "full",
+            custom = {
+              me = {
+                pattern = "^## Me$",
+                icon = " ",
+                foreground = "@ai.heading.me",
+                background = "@ai.heading.me",
+              },
+              cc = {
+                pattern = "^## CodeCompanion.*",
+                icon = " ✨ ",
+                foreground = "@ai.heading.generated",
+                background = "@ai.heading.generated",
               },
             },
           },
         },
       },
     }
+    require"render-markdown".setup(cfg)
   end,
   on_colorscheme_change = function()
     U.hl.set("@ai.heading.me", {
