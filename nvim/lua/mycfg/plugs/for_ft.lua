@@ -91,12 +91,31 @@ Plug {
     cfg.code = {
       conceal_delimiters = false,
       border = "thin",
-      inline_left = "▐",
-      inline_right = "▌",
       language_border = "▄",
       language_left = "▄█",
       language_right = "█",
+      -- note: these are 0.5 cell wide, but I feel they leaves too much empty space around..
+      -- inline_left = "▐",
+      -- inline_right = "▌",
+      --
+      -- note: these are 0.25 & 0.75 cell wide, (better for surrounding space)
+      --   but the left side needs to have reversed color (see below)
+      inline_left = "▎",
+      inline_right = "▊",
+      -- 👉 Nice inline code 'larger' bg padding
+      -- SEE: https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/630#issuecomment-4188925587
+      highlight_inline = "@markup.raw.markdown_inline",
+      highlight_inline_right = "@markup.raw.markdown_inline.icon_right",
+      highlight_inline_left = "@markup.raw.markdown_inline.icon_left",
     }
+    -- note: We use full control over the inline code highlight for better hlspec coherence
+    local inline_ctermbg = U.hl.group"@markup.raw.markdown_inline".ctermbg
+    U.hl.set("@markup.raw.markdown_inline.icon_right", {ctermfg = inline_ctermbg})
+    U.hl.set("@markup.raw.markdown_inline.icon_left", {
+      -- needs to be reversed for the unicode char to work on the left!
+      reverse = true,
+      ctermfg = inline_ctermbg,
+    })
 
     cfg.overrides = {
       filetype = {
