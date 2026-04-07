@@ -88,6 +88,25 @@ snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true }, ls.function_node
   return lines
 end))
 
+-- NOTE: This is a self-dependent dynamic node!
+-- IDEA: offer it as a choice node, to switch between identifier-mode vs general-text-mode
+snip("up", { desc = "Auto-UPPERCASE text" }, ls.dynamic_node(1, function(given_nodes_text)
+  -- NOTE: in the case of self-dependent dynamic node (using `snippetstring_args=true`), the arg is
+  --   actually a SnippetString obj.
+  ---@cast given_nodes_text LuaSnip.SnippetString[]
+  if not given_nodes_text[1] then
+    -- This is the first invocation, to get the _default_ content.
+    -- note: the function will be called again of that default until its result stablizes.
+    return ls.snippet_node(nil, ls.insert_node(1, "some text", {key="text"}))
+  else
+    -- This is the non-first invocation, the 'default' text here will be ENFORCED and _should_ be a
+    -- transformation of the input.
+    -- WARNING: This will be called X times until the result stablizes to a final result.
+    local transformed_text = given_nodes_text[1]:upper()
+    return ls.snippet_node(nil, ls.insert_node(1, transformed_text, {key="text"}))
+  end
+end, {SU.maybe_node_ref"text"}, {snippetstring_args=true}))
+
 -- End of snippets definitions
 
 return SNIPS, {} -- snippets, autosnippets

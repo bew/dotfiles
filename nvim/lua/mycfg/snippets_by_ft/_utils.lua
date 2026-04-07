@@ -235,6 +235,9 @@ end
 
 local node_key_ref = require"luasnip.nodes.key_indexer".new_key -- to use key indexed node refs
 local node_absolute_ref = require"luasnip.nodes.absolute_indexer"
+local node_optional_ref = require"luasnip.nodes.optional_arg".new_opt
+
+--- Returns a node reference.
 ---@param ref string|table|integer
 ---@return LuaSnip.NodeRef
 function SU.node_ref(ref)
@@ -245,6 +248,13 @@ function SU.node_ref(ref)
   else
     return ref
   end
+end
+
+--- Returns an optional node reference.
+---@param ref string|table|integer
+---@return LuaSnip.NodeRef
+function SU.maybe_node_ref(ref)
+  return node_optional_ref(SU.node_ref(ref))
 end
 
 return SU
