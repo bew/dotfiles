@@ -17,6 +17,12 @@
   # Smart sort tags as versions (latest first)
   sort = -version:refname
 
+[status]
+  # Show a line at the end of `git status` to say the number of stashes.
+  # Useful since stashes are basically not discoverable otherwise.
+  # (other than with my custom shell prompts)
+  showstash = true
+
 [commit]
   # Always enable `--verbose` on commit/squash/...
   # (shows diff of what is being commited <3)
