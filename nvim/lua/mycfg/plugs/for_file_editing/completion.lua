@@ -159,6 +159,8 @@ Plug.cmp {
     -- NOTE: mapping presets are in https://github.com/hrsh7th/nvim-cmp/blob/main/lua/cmp/config/mapping.lua
     global_cfg.mapping = cmp.mapping.preset.insert({
       ["<C-c>"] = cmp.mapping.abort(), -- in addition to <C-e>
+      ["<M-C-j>"] = cmp.mapping.scroll_docs(4),
+      ["<M-C-k>"] = cmp.mapping.scroll_docs(-4),
       ["<M-C-n>"] = cmp.mapping.scroll_docs(4),
       ["<M-C-p>"] = cmp.mapping.scroll_docs(-4),
     })
