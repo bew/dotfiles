@@ -1,0 +1,244 @@
+#!/usr/bin/env bash
+# Manage directory aliases as symlinks, with a change-tick for editor/shell integration.
+#
+# Aliases are stored as symlinks in XDG_STATE_HOME/diralias/aliases/.
+# A change-tick file is incremented on every alias change, allowing editors and shells
+# to detect when aliases need to be reloaded.
+
+set -euo pipefail # Safe, strict script execution
+
+DIRALIAS_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/diralias"
+DIRALIAS_ALIASES_DIR="$DIRALIAS_STATE_DIR/aliases"
+DIRALIAS_TICK_FILE="$DIRALIAS_STATE_DIR/change-tick"
+
+function echo_err() {
+    echo >&2 "$*"
+}
+
+function usage_and_exit() {
+    local status="$1"
+    cat >&2 <<'EOF'
+Usage: diralias COMMAND [args...]
+
+Manage directory aliases as symlinks, with a change-tick for shell/editor integration.
+
+COMMANDS:
+  add NAME PATH   Create an alias NAME pointing to PATH
+  get [PATH]      Get the alias name for PATH (default: current directory)
+  status          List all aliases and current change-tick
+  tick-file       Print the path to the change-tick file
+
+STORAGE:
+  Aliases are stored as symlinks in:
+    ${XDG_STATE_HOME:-~/.local/state}/diralias/aliases/
+  Change-tick is stored at:
+    ${XDG_STATE_HOME:-~/.local/state}/diralias/change-tick
+
+EXAMPLES:
+  diralias add foo /some/path/to/foo-dir   # Create alias 'foo'
+  diralias get                             # Get alias for current directory
+  diralias get /some/path/to/foo-dir       # Get alias for given path
+  diralias status                          # Show all aliases and change-tick
+  diralias tick-file                       # Print path to change-tick file
+
+EOF
+    exit "$status"
+}
+
+# Create storage directories and initialize tick file if missing
+function ensure_storage_exists() {
+    mkdir -p "$DIRALIAS_ALIASES_DIR"
+    if [[ ! -f "$DIRALIAS_TICK_FILE" ]]; then
+        echo "0" > "$DIRALIAS_TICK_FILE"
+    fi
+}
+
+# Read the current tick value
+function read_tick() {
+    cat "$DIRALIAS_TICK_FILE"
+}
+
+# Increment the change-tick by 1
+function increment_tick() {
+    local current_tick
+    current_tick=$(read_tick)
+    echo $(( current_tick + 1 )) > "$DIRALIAS_TICK_FILE"
+}
+
+# Validate that NAME is a safe alias name (no slashes or whitespace)
+function validate_alias_name() {
+    local name="$1"
+    if [[ "$name" == */* ]]; then
+        echo_err "Error: Alias name must not contain '/': $name"
+        exit 1
+    fi
+    if [[ "$name" =~ [[:space:]] ]]; then
+        echo_err "Error: Alias name must not contain whitespace: $name"
+        exit 1
+    fi
+    if [[ -z "$name" ]]; then
+        echo_err "Error: Alias name must not be empty"
+        exit 1
+    fi
+}
+
+# Add a new alias NAME -> PATH
+function cmd_add() {
+    if [[ $# -lt 2 ]]; then
+        echo_err "Error: 'add' requires NAME and PATH arguments"
+        echo_err "Usage: diralias add NAME PATH"
+        exit 1
+    fi
+
+    local alias_name="$1"
+    local alias_path="$2"
+
+    validate_alias_name "$alias_name"
+
+    if [[ ! -d "$alias_path" ]]; then
+        echo_err "Error: Path is not an existing directory: $alias_path"
+        exit 1
+    fi
+
+    # Resolve to absolute path
+    local resolved_path
+    resolved_path="$(cd "$alias_path" && pwd)"
+
+    ensure_storage_exists
+
+    local link_path="$DIRALIAS_ALIASES_DIR/$alias_name"
+
+    if [[ -L "$link_path" ]]; then
+        echo_err "Warning: Alias '$alias_name' already exists, overwriting"
+        rm "$link_path"
+    elif [[ -e "$link_path" ]]; then
+        echo_err "Error: '$link_path' exists and is not a symlink — refusing to overwrite"
+        exit 1
+    fi
+
+    ln -s "$resolved_path" "$link_path"
+    increment_tick
+
+    echo "Added alias '$alias_name' -> $resolved_path"
+}
+
+# Get the alias name (and optional remainder) for a given path (default: $PWD).
+# Performs prefix matching: if the path is inside an aliased directory, outputs
+# "ALIAS_NAME remainder/path". When multiple aliases are prefixes of the given
+# path, the most specific (longest target path) wins.
+function cmd_get() {
+    local target_path="${1:-$PWD}"
+
+    ensure_storage_exists
+
+    local alias_link alias_name alias_target
+    local best_name="" best_target="" best_len=0
+
+    for alias_link in "$DIRALIAS_ALIASES_DIR"/*; do
+        [[ -L "$alias_link" ]] || continue
+
+        alias_name="$(basename "$alias_link")"
+        alias_target="$(readlink "$alias_link")"
+
+        # Exact match
+        if [[ "$alias_target" == "$target_path" ]]; then
+            # Exact match is always the most specific possible — use it immediately
+            echo "$alias_name"
+            return 0
+        fi
+
+        # Prefix match: target_path must start with alias_target + "/"
+        if [[ "$target_path" == "$alias_target"/* ]]; then
+            local target_len="${#alias_target}"
+            if (( target_len > best_len )); then
+                best_len="$target_len"
+                best_name="$alias_name"
+                best_target="$alias_target"
+            fi
+        fi
+    done
+
+    if [[ -n "$best_name" ]]; then
+        local remainder="${target_path#"$best_target"/}"
+        echo "$best_name $remainder"
+        return 0
+    fi
+
+    echo_err "Error: No alias found for path: $target_path"
+    return 1
+}
+
+# Print the path to the change-tick file (useful for editor/shell integration)
+function cmd_tick_file() {
+    ensure_storage_exists
+    echo "$DIRALIAS_TICK_FILE"
+}
+
+# Show all aliases and the current change-tick
+function cmd_status() {
+    ensure_storage_exists
+
+    local tick
+    tick=$(read_tick)
+    echo "change-tick: $tick"
+    echo ""
+
+    local found_any=false
+    local alias_link alias_name alias_target
+
+    # Collect and sort aliases
+    local -a alias_links=()
+    for alias_link in "$DIRALIAS_ALIASES_DIR"/*; do
+        [[ -L "$alias_link" ]] || continue
+        alias_links+=("$alias_link")
+    done
+
+    if [[ ${#alias_links[@]} -eq 0 ]]; then
+        echo "(no aliases defined)"
+        return 0
+    fi
+
+    # Sort alphabetically and print
+    local sorted_links
+    sorted_links=$(printf "%s\n" "${alias_links[@]}" | sort)
+
+    while IFS= read -r alias_link; do
+        alias_name="$(basename "$alias_link")"
+        alias_target="$(readlink "$alias_link")"
+        printf "  %-20s -> %s\n" "$alias_name" "$alias_target"
+    done <<< "$sorted_links"
+}
+
+function main() {
+    if [[ $# -eq 0 ]]; then
+        usage_and_exit 1
+    fi
+
+    local cmd="$1"
+    shift
+
+    case "$cmd" in
+        add)
+            cmd_add "$@"
+            ;;
+        get)
+            cmd_get "$@"
+            ;;
+        status)
+            cmd_status "$@"
+            ;;
+        tick-file)
+            cmd_tick_file "$@"
+            ;;
+        -h|--help|help)
+            usage_and_exit 0
+            ;;
+        *)
+            echo_err "Error: Unknown command: $cmd"
+            echo_err "Run 'diralias --help' to see available commands"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
