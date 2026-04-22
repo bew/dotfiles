@@ -131,6 +131,9 @@ matches:
   - trigger: "!musc!"
     replace: '💪'
 
+  - trigger: "!fr!"
+    replace: '🔥'
+
   - trigger: "!freesk!" # freeskates
     replace: '➿'
 
