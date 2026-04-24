@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# NOTE: Sometimes my Neovim exits badly and the terminal didn't fully restore the main scrollback
+# buffer (can be seen when mouse scroll goes through command history…).
+# Need this workaround fix to restore the main scrollback buffer.
+
+# Restores the main scrollback buffer (disable alternate screen)
+tput rmcup # Usually the same as: `printf '\e[?1049l'`
+
+# note: to go back to the alternate screen, use `tput smcup`
