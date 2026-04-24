@@ -12,25 +12,18 @@ bats_require_minimum_version 1.5.0
 SCRIPT_DIR="$(dirname "$BATS_TEST_FILENAME")"
 SCRIPT_PATH="$SCRIPT_DIR/diralias"
 
-# Each test gets an isolated XDG_STATE_HOME so aliases never bleed across tests
+# Each test gets an isolated HOME & XDG_STATE_HOME so aliases never bleed across tests
 function setup() {
+    export HOME="$BATS_TEST_TMPDIR/home"
+    mkdir -p "$HOME"
+
     export XDG_STATE_HOME="$BATS_TEST_TMPDIR/state"
-}
-
-# Helper: run the script, expect success (exit 0)
-function run_script() {
-    run -0 "$SCRIPT_PATH" "$@"
-}
-
-# Helper: run the script, expect failure (non-zero exit)
-function run_script_failed() {
-    run -1 "$SCRIPT_PATH" "$@"
 }
 
 # Helper: create a real temporary directory for use as an alias target
 function make_target_dir() {
     local name="$1"
-    local dir="$BATS_TEST_TMPDIR/$name"
+    local dir="$BATS_TEST_TMPDIR/targets/$name"
     mkdir -p "$dir"
     echo "$dir"
 }
@@ -70,7 +63,7 @@ function make_target_dir() {
     local target
     target="$(make_target_dir mydir)"
 
-    run_script add myalias "$target"
+    run -0 "$SCRIPT_PATH" add myalias "$target"
     [[ "$output" == *"Added alias 'myalias'"* ]]
 
     local state_dir="$BATS_TEST_TMPDIR/state/diralias/aliases"
@@ -84,12 +77,12 @@ function make_target_dir() {
 
     local tick_file="$BATS_TEST_TMPDIR/state/diralias/change-tick"
 
-    run_script add first "$target"
+    run -0 "$SCRIPT_PATH" add first "$target"
     [[ "$(cat "$tick_file")" == "1" ]]
 
     local target2
     target2="$(make_target_dir tick-test2)"
-    run_script add second "$target2"
+    run -0 "$SCRIPT_PATH" add second "$target2"
     [[ "$(cat "$tick_file")" == "2" ]]
 }
 
@@ -98,7 +91,7 @@ function make_target_dir() {
     target="$(make_target_dir reldir)"
 
     # Run add with a relative path by changing to BATS_TEST_TMPDIR first
-    run -0 bash -c "cd '$BATS_TEST_TMPDIR' && '$SCRIPT_PATH' add reltest reldir"
+    run -0 bash -c "cd '$BATS_TEST_TMPDIR/targets/' && '$SCRIPT_PATH' add reltest reldir"
 
     local link_target
     link_target="$(readlink "$BATS_TEST_TMPDIR/state/diralias/aliases/reltest")"
@@ -113,7 +106,7 @@ function make_target_dir() {
     local target2
     target2="$(make_target_dir new)"
 
-    run_script add mything "$target"
+    run -0 "$SCRIPT_PATH" add mything "$target"
 
     run -0 --separate-stderr "$SCRIPT_PATH" add mything "$target2"
     [[ "$stderr" == *"Warning: Alias 'mything' already exists, overwriting"* ]]
@@ -129,8 +122,8 @@ function make_target_dir() {
     local target2
     target2="$(make_target_dir over2)"
 
-    run_script add samename "$target"
-    run_script add samename "$target2"
+    run -0 "$SCRIPT_PATH" add samename "$target"
+    run -0 "$SCRIPT_PATH" add samename "$target2"
 
     local tick
     tick="$(cat "$BATS_TEST_TMPDIR/state/diralias/change-tick")"
@@ -183,8 +176,8 @@ function make_target_dir() {
     local target
     target="$(make_target_dir getdir)"
 
-    run_script add gettest "$target"
-    run_script get "$target"
+    run -0 "$SCRIPT_PATH" add gettest "$target"
+    run -0 "$SCRIPT_PATH" get "$target"
     [[ "$output" == "gettest" ]]
 }
 
@@ -192,7 +185,7 @@ function make_target_dir() {
     local target
     target="$(make_target_dir cwddir)"
 
-    run_script add cwdalias "$target"
+    run -0 "$SCRIPT_PATH" add cwdalias "$target"
 
     # Run get from within the target directory
     run -0 bash -c "cd '$target' && '$SCRIPT_PATH' get"
@@ -204,13 +197,13 @@ function make_target_dir() {
     target1="$(make_target_dir multi1)"
     target2="$(make_target_dir multi2)"
 
-    run_script add alias1 "$target1"
-    run_script add alias2 "$target2"
+    run -0 "$SCRIPT_PATH" add alias1 "$target1"
+    run -0 "$SCRIPT_PATH" add alias2 "$target2"
 
-    run_script get "$target1"
+    run -0 "$SCRIPT_PATH" get "$target1"
     [[ "$output" == "alias1" ]]
 
-    run_script get "$target2"
+    run -0 "$SCRIPT_PATH" get "$target2"
     [[ "$output" == "alias2" ]]
 }
 
@@ -218,8 +211,8 @@ function make_target_dir() {
     local target
     target="$(make_target_dir base)"
 
-    run_script add mybase "$target"
-    run_script get "$target/something/else"
+    run -0 "$SCRIPT_PATH" add mybase "$target"
+    run -0 "$SCRIPT_PATH" get "$target/something/else"
     [[ "$output" == "mybase something/else" ]]
 }
 
@@ -227,8 +220,8 @@ function make_target_dir() {
     local target
     target="$(make_target_dir single)"
 
-    run_script add root "$target"
-    run_script get "$target/child"
+    run -0 "$SCRIPT_PATH" add root "$target"
+    run -0 "$SCRIPT_PATH" get "$target/child"
     [[ "$output" == "root child" ]]
 }
 
@@ -238,15 +231,15 @@ function make_target_dir() {
     child="$base/sub"
     mkdir -p "$child"
 
-    run_script add base "$base"
-    run_script add sub "$child"
+    run -0 "$SCRIPT_PATH" add base "$base"
+    run -0 "$SCRIPT_PATH" add sub "$child"
 
     # Path inside child — should match the more specific alias
-    run_script get "$child/deep/path"
+    run -0 "$SCRIPT_PATH" get "$child/deep/path"
     [[ "$output" == "sub deep/path" ]]
 
     # Path directly under base but not under child — should match base
-    run_script get "$base/other"
+    run -0 "$SCRIPT_PATH" get "$base/other"
     [[ "$output" == "base other" ]]
 }
 
@@ -254,8 +247,8 @@ function make_target_dir() {
     local target
     target="$(make_target_dir exact)"
 
-    run_script add exact "$target"
-    run_script get "$target"
+    run -0 "$SCRIPT_PATH" add exact "$target"
+    run -0 "$SCRIPT_PATH" get "$target"
     [[ "$output" == "exact" ]]
 }
 
@@ -265,7 +258,7 @@ function make_target_dir() {
     local subdir="$target/a/b"
     mkdir -p "$subdir"
 
-    run_script add cwdbase "$target"
+    run -0 "$SCRIPT_PATH" add cwdbase "$target"
 
     run -0 bash -c "cd '$subdir' && '$SCRIPT_PATH' get"
     [[ "$output" == "cwdbase a/b" ]]
@@ -288,7 +281,7 @@ function make_target_dir() {
     target="$(make_target_dir known)"
     other="$(make_target_dir unknown)"
 
-    run_script add known "$target"
+    run -0 "$SCRIPT_PATH" add known "$target"
 
     run -1 --separate-stderr "$SCRIPT_PATH" get "$other"
     [[ "$stderr" == *"No alias found for path"* ]]
@@ -298,7 +291,7 @@ function make_target_dir() {
 # status
 
 @test "status: shows change-tick and no aliases when empty" {
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     [[ "$output" == *"change-tick: 0"* ]]
     [[ "$output" == *"(no aliases defined)"* ]]
 }
@@ -308,10 +301,10 @@ function make_target_dir() {
     target1="$(make_target_dir s1)"
     target2="$(make_target_dir s2)"
 
-    run_script add alpha "$target1"
-    run_script add beta "$target2"
+    run -0 "$SCRIPT_PATH" add alpha "$target1"
+    run -0 "$SCRIPT_PATH" add beta "$target2"
 
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     [[ "$output" == *"alpha"* ]]
     [[ "$output" == *"$target1"* ]]
     [[ "$output" == *"beta"* ]]
@@ -322,22 +315,22 @@ function make_target_dir() {
     local target
     target="$(make_target_dir tick)"
 
-    run_script add one "$target"
-    run_script add two "$(make_target_dir tick2)"
+    run -0 "$SCRIPT_PATH" add one "$target"
+    run -0 "$SCRIPT_PATH" add two "$(make_target_dir tick2)"
 
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     [[ "$output" == *"change-tick: 2"* ]]
 }
 
 @test "status: aliases are listed in alphabetical order" {
-    run_script add zebra "$(make_target_dir z)"
-    run_script add apple "$(make_target_dir a)"
-    run_script add mango "$(make_target_dir m)"
+    run -0 "$SCRIPT_PATH" add zebra "$(make_target_dir z)"
+    run -0 "$SCRIPT_PATH" add apple "$(make_target_dir a)"
+    run -0 "$SCRIPT_PATH" add mango "$(make_target_dir m)"
 
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     # Extract alias names from output lines (lines containing " -> ")
     local alias_names
-    alias_names=$(echo "$output" | grep " -> " | awk '{print $1}' | tr -d ' ')
+    alias_names=$(echo "$output" | grep " -> " | awk '{print $2}')
     local first second third
     first=$(echo "$alias_names" | sed -n '1p')
     second=$(echo "$alias_names" | sed -n '2p')
@@ -348,31 +341,110 @@ function make_target_dir() {
     [[ "$third" == "zebra" ]]
 }
 
-# ------------------------------------------------------------------------------
-# tick-file
+@test "status: displays paths under HOME with ~ prefix" {
+    # note: HOME is a custom dir in test tmp path!
+    echo "HOME is at '$HOME'"
+    # Create a directory under HOME to test ~ expansion
+    local home_subdir="$HOME/diralias-test-$$"
+    mkdir -p "$home_subdir"
 
-@test "tick-file: prints the path to the change-tick file" {
+    run -0 "$SCRIPT_PATH" add homealias "$home_subdir"
+    run -0 "$SCRIPT_PATH" status
+
+    # Output should contain ~ instead of $HOME
+    [[ "$output" == *"homealias -> ~/diralias-test-$$"* ]]
+    ! [[ "$output" == *"$HOME"* ]]
+}
+
+@test "status: displays HOME itself as just ~" {
+    run -0 "$SCRIPT_PATH" add homedir "$HOME"
+    run -0 "$SCRIPT_PATH" status
+
+    # $HOME itself should be displayed as just ~
+    [[ "$output" == *"homedir -> ~"* ]]
+}
+
+@test "status: displays paths outside HOME with full path" {
+    # Using BATS_TEST_TMPDIR which is outside HOME in tests
+    local outside_dir
+    outside_dir="$(make_target_dir outside)"
+
+    run -0 "$SCRIPT_PATH" add outsidealias "$outside_dir"
+    run -0 "$SCRIPT_PATH" status
+
+    # Path outside HOME should show full path (no ~ substitution)
+    [[ "$output" == *"outsidealias -> $outside_dir"* ]]
+}
+
+# ------------------------------------------------------------------------------
+# path/tick-file
+
+@test "path/tick-file: prints the path to the change-tick file" {
     local expected_tick_file="$BATS_TEST_TMPDIR/state/diralias/change-tick"
-    run_script tick-file
+    run -0 "$SCRIPT_PATH" path tick-file
     [[ "$output" == "$expected_tick_file" ]]
 }
 
-@test "tick-file: creates storage on first use" {
+@test "path/tick-file: creates storage on first use" {
     local state_dir="$BATS_TEST_TMPDIR/state/diralias"
     [[ ! -d "$state_dir" ]]
 
-    run_script tick-file
+    run -0 "$SCRIPT_PATH" path tick-file
     [[ -f "$BATS_TEST_TMPDIR/state/diralias/change-tick" ]]
 }
 
-@test "tick-file: printed path is the actual file that holds the tick value" {
-    run_script add one "$(make_target_dir tf1)"
-    run_script add two "$(make_target_dir tf2)"
+@test "path/tick-file: printed path is the actual file that holds the tick value" {
+    run -0 "$SCRIPT_PATH" add one "$(make_target_dir tf1)"
+    run -0 "$SCRIPT_PATH" add two "$(make_target_dir tf2)"
 
-    run_script tick-file
+    run -0 "$SCRIPT_PATH" path tick-file
     local tick_path="$output"
 
     [[ "$(cat "$tick_path")" == "2" ]]
+}
+
+# ------------------------------------------------------------------------------
+# path/aliases-dir
+
+@test "path/aliases-dir: prints the path to the aliases directory" {
+    local expected_aliases_dir="$BATS_TEST_TMPDIR/state/diralias/aliases"
+    run -0 "$SCRIPT_PATH" path aliases-dir
+    [[ "$output" == "$expected_aliases_dir" ]]
+}
+
+@test "path/aliases-dir: creates storage on first use" {
+    local state_dir="$BATS_TEST_TMPDIR/state/diralias"
+    [[ ! -d "$state_dir" ]]
+
+    run -0 "$SCRIPT_PATH" path aliases-dir
+    [[ -d "$BATS_TEST_TMPDIR/state/diralias/aliases" ]]
+}
+
+@test "path/aliases-dir: printed path is the actual directory that holds aliases" {
+    local target
+    target="$(make_target_dir ad1)"
+    run -0 "$SCRIPT_PATH" add myalias "$target"
+
+    run -0 "$SCRIPT_PATH" path aliases-dir
+    local aliases_dir="$output"
+
+    [[ -L "$aliases_dir/myalias" ]]
+    [[ "$(readlink "$aliases_dir/myalias")" == "$target" ]]
+}
+
+# ------------------------------------------------------------------------------
+# path/error
+
+@test "path/error: calling path without sub-command shows error and exits non-zero" {
+    run -1 --separate-stderr "$SCRIPT_PATH" path
+    [[ "$stderr" == *"'path' requires a sub-command"* ]]
+    [[ "$stderr" == *"tick-file|aliases-dir"* ]]
+}
+
+@test "path/error: unknown sub-command shows error and exits non-zero" {
+    run -1 --separate-stderr "$SCRIPT_PATH" path bogus-subcmd
+    [[ "$stderr" == *"Unknown path sub-command: bogus-subcmd"* ]]
+    [[ "$stderr" == *"tick-file|aliases-dir"* ]]
 }
 
 # ------------------------------------------------------------------------------
@@ -382,13 +454,13 @@ function make_target_dir() {
     local state_dir="$BATS_TEST_TMPDIR/state/diralias"
     [[ ! -d "$state_dir" ]]
 
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     [[ -d "$state_dir/aliases" ]]
     [[ -f "$state_dir/change-tick" ]]
 }
 
 @test "edge: tick file initializes to 0" {
-    run_script status
+    run -0 "$SCRIPT_PATH" status
     local tick
     tick="$(cat "$BATS_TEST_TMPDIR/state/diralias/change-tick")"
     [[ "$tick" == "0" ]]
@@ -398,7 +470,7 @@ function make_target_dir() {
     local target
     target="$(make_target_dir "dir with spaces")"
 
-    run_script add spacey "$target"
-    run_script get "$target"
+    run -0 "$SCRIPT_PATH" add spacey "$target"
+    run -0 "$SCRIPT_PATH" get "$target"
     [[ "$output" == "spacey" ]]
 }

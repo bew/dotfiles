@@ -45,14 +45,24 @@ matching target) wins.
 
 Exits non-zero if no alias matches.
 
-#### `tick-file`
+#### `path tick-file`
 
 Print the absolute path to the change-tick file.
 Useful for editor/shell plugins that want to watch the file directly without hard-coding the path.
 
 ```
-$ diralias tick-file
+$ diralias path tick-file
 /home/user/.local/state/diralias/change-tick
+```
+
+#### `path aliases-dir`
+
+Print the absolute path to the aliases directory.
+Useful for editor/shell plugins that need to access the aliases directly.
+
+```
+$ diralias path aliases-dir
+/home/user/.local/state/diralias/aliases
 ```
 
 #### `status`
@@ -63,9 +73,13 @@ List all aliases and the current change-tick value.
 $ diralias status
 change-tick: 3
 
-  foo                  -> /some/path/to/foo-dir
-  work                 -> /home/user/projects/work
+ • foo  -> /some/path/to/foo-dir
+ • work -> ~/projects/work
 ```
+
+> [!NOTE]
+> This command is for humans!
+> The output format of this command should NOT be used programatically, it may change at any time.
 
 ## Storage
 
