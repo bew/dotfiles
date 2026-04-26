@@ -1,9 +1,14 @@
 matches:
+  # note: this one is a kind of workaround for Google Keep..
+  # @2026-04 inserting '^e' there gives a buggy 'ê'... (next letter deletes the 'ê' char ><)
   - trigger: "!e^!"
     replace: ê
 
-  - trigger: "!é!" # The upper 'é' is so hard to do..
-    replace: 'É'
+  - trigger: "!é!" # upper version
+    replace: É
 
-  - trigger: "!ç!" # The upper 'ç' is so hard to do..
-    replace: 'Ç'
+  - trigger: "!ç!" # upper version
+    replace: Ç
+
+  - trigger: "!A!" # accented version
+    replace: À
