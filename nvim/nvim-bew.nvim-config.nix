@@ -34,7 +34,7 @@ in {
 
           # Grammars - nice to have
           p.c p.css p.dot p.editorconfig p.gitattributes p.go p.helm p.http
-          p.jq p.json5 p.make p.regex p.typescript p.typst p.xml
+          p.jq p.json5 p.kotlin p.make p.regex p.typescript p.typst p.xml
           # p.dockerfile (very broken 🙁)
           # p.tmux (very broken.. 🙁)
           #   https://github.com/Freed-Wu/tree-sitter-tmux/issues/2
