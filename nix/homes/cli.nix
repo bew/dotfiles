@@ -43,8 +43,10 @@ in {
     # Best alias: chafa -c 256 --fg-only (--size 70x70) --symbols braille YOUR_GIF
 
     # Extra - media stuff
-    bleedingedge.yt-dlp # youtube-dl FTW!!
     stable.ffmpeg # (transcode all-the-things!)
+    # @2026-04 `yt-dlp` now requires `deno`, which takes ~forever to build its `rusty-v8` dep...
+    # Let's only manage its install via `nix profile install` for now 🤔
+    # bleedingedge.yt-dlp # youtube-dl FTW!!
 
     # Languages
     # NOTE: Compilers, interpreter shouldn't really be made available in a global way..
