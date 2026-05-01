@@ -54,4 +54,24 @@ add_rule {
   },
 }
 
+-- Match `<owner/repo#ISSUE1234>` as a github user/repo ISSUE URL
+-- Match `<owner/repo#PR1234>` as a github user/repo PR URL
+-- Match `<owner/repo#1234>` as a github user/repo ISSUE/PR URL
+-- (this syntax is useful as a shorthand in comments)
+add_rule {
+  {
+    regex = [[<([\w\d][-\w\d\._]+)/([^#/]+)#ISSUE(\d+)>]],
+    format = "https://www.github.com/$1/$2/issue/$3",
+  },
+  {
+    regex = [[<([\w\d][-\w\d\._]+)/([^#/]+)#PR(\d+)>]],
+    format = "https://www.github.com/$1/$2/pull/$3",
+  },
+  {
+    regex = [[<([\w\d][-\w\d\._]+)/([^#/]+)#(\d+)>]],
+    -- note: `…/pull/N` works for both issue & prs (`…/issue/N` doesn't)
+    format = "https://www.github.com/$1/$2/pull/$3",
+  },
+}
+
 return cfg
