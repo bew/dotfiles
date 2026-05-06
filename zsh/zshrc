@@ -53,12 +53,12 @@ function cfg::check-dependencies() {
   _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zconvey
   # Check plugin folders exist if paths (start with `/`)
-  for p in "${_zsh_plugins_srcrefs[@]}"; do
-    if [[ "${p[1]}" == "/" ]] && ! [[ -d "$p" ]]; then
-      >&2 echo ":: Plugin folder '$p' does not exist (expect some broken stuff!)"
+  for plugin_path in "${_zsh_plugins_srcrefs[@]}"; do
+    if [[ "${plugin_path[1]}" == "/" ]] && ! [[ -d "$plugin_path" ]]; then
+      >&2 echo ":: Plugin folder '$plugin_path' does not exist (expect some broken stuff!)"
     fi
   done
-  unset _zsh_plugins_srcrefs
+  unset _zsh_plugins_srcrefs plugin_path
 }
 
 #-------------------------------------------------------------
@@ -67,6 +67,9 @@ function cfg::check-dependencies() {
 # zi (old project names: zinit, zplugin)
 # WARNING: needs folder ~/.zi to exist, it will auto download/setup plugins on first launch
 source $_ZSH_PLUGIN_SRCREF__zi/zi.zsh
+# copy zi function as zinit (not as alias, since zoxide overrides zi's target)
+unalias zinit
+functions -c zi zinit
 
 # Syntax highlighting
 FAST_WORK_DIR=$ZSH_DATA_DIR/plugin--fast-syntax-highlighting
