@@ -76,7 +76,8 @@ FAST_WORK_DIR=$ZSH_DATA_DIR/plugin--fast-syntax-highlighting
 mkdir -p "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.cache :/
 # | => to avoid the selected theme to be saved in ~/.cache (tmpfs => empty on boot)
 # \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
-zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H # updated repo for fast-syntax-highlighting
+zinit ice lucid wait # lazy load
+zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H
 # Note: to activate/update my custom theme, run:
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
 # TODO: find a way to not have this manual action on first start?
