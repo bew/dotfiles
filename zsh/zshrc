@@ -48,6 +48,8 @@ function cfg::check-dependencies() {
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__F_Sy_H
   _ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autopair
+  _ZSH_PLUGIN_SRCREF__autoenv=Tarrasch/zsh-autoenv
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autoenv
   _ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__gitstatus
   _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
@@ -111,7 +113,19 @@ eval "$(direnv hook zsh)"
 
 cfg::depends-on-bin zoxide
 eval "$(zoxide init zsh)"
-# note: need to be run _after_ plugins, to override zinit's `zi` alias 👀
+
+# Automatically sources whitelisted `.autoenv.zsh` files
+# https://github.com/Tarrasch/zsh-autoenv
+# (note: cannot lazy load, otherwise autoenv's script is NOT loaded BEFORE direnv stuff for CWD on
+# shell launch)
+zinit light $_ZSH_PLUGIN_SRCREF__autoenv
+# NOTE: Must be loaded AFTER direnv, so that autoenv's chpwd hook is BEFORE direnv's chpwd hook
+# This ensures that PATH changes done by autoenv are not reverted when leaving a direnv-dir
+# (the autoenv plugin appends to the list of chpwd hooks, so we need to prepend ourself first)
+# (to DEBUG: `print -l $chpwd_functions`)
+if (( ! ${chpwd_functions[(I)_autoenv_chpwd_handler]} )); then
+  chpwd_functions=(_autoenv_chpwd_handler $chpwd_functions)
+fi
 
 #-------------------------------------------------------------
 # Setup Hooks

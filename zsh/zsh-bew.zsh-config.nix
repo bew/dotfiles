@@ -41,8 +41,9 @@ in {
   });
 
   deps.plugins = {
-    zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair";
-    gitstatus = "${pkgs.gitstatus}/share/gitstatus";
+    zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair/";
+    zsh-autoenv = "${pkgs.zsh-autoenv}/share/zsh-autoenv/";
+    gitstatus = "${pkgs.gitstatus}/share/gitstatus/";
     zi = fetchFromGitHub {
       owner = "z-shell";
       repo = "zi";
@@ -142,6 +143,7 @@ in {
       --replace-fail "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__autoenv="   "_ZSH_PLUGIN_SRCREF__autoenv=${plugins.zsh-autoenv} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"
   '';
