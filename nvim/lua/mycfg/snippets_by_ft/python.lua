@@ -542,7 +542,12 @@ snip(
     desc = "return …",
     -- Tweak what will be removed exactly before snip expansion
     -- Remove extra spaces after trigger, to always leave cursor 'after space' after snip expansion.
-    resolveExpandParams = SU.mk_expand_params_resolver { delete_after_trig = "^%s+" },
+    resolveExpandParams = SU.mk_expand_params_resolver {
+      delete_after_trig = {
+        "^%s+", -- useful for `r<TRIG>  foo` -> `return foo`
+        "^%s*=%s*", -- useful for `r<TRIG> = foo` -> `return foo`
+      },
+    },
   },
   {
     t"return "
