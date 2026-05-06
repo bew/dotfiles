@@ -41,6 +41,38 @@ snip("cl", {desc = "class def", when = conds.start_of_line}, SU.myfmt {
   }
 })
 
+snip("ce", {desc = "error class def", when = conds.start_of_line}, SU.myfmt {
+  [[
+    class <name>Error(<parent>):
+    	"""<doc>"""<rest>
+  ]],
+  {
+    name = i(1, "MyClass", {key="name"}),
+    parent = i(2, "Exception"),
+    doc = ls.dynamic_node(3, function(given_nodes_text)
+      local base_error_nodes = SU.myfmt {
+        [[Base error class for <doc>]],
+        { doc = ls.restore_node(1, "doc") },
+      }
+      local raised_when_nodes = SU.myfmt {
+        [[Raised when <doc>]],
+        { doc = ls.restore_node(1, "doc") },
+      }
+      local class_name = given_nodes_text[1][1]
+      if vim.startswith(class_name, "Base") then
+        return ls.snippet_node(nil, base_error_nodes)
+      else
+        return ls.snippet_node(nil, ls.choice_node(1, { raised_when_nodes, base_error_nodes }))
+      end
+    end, {SU.node_ref"name"}),
+    rest = i(4),
+  }
+}, {
+  stored = {
+    doc = i(nil, "TODO")
+  }
+})
+
 snip("dc", {desc = "data-only class", when = conds.start_of_line}, SU.myfmt {
   [[
     @dataclass<maybe_decor_params>
@@ -186,7 +218,7 @@ snip(
     name = "__init__",
     first_arg_name = "self",
     maybe_arg = true,
-    return_type = false,
+    needs_return_type = false,
   }
 )
 
@@ -236,7 +268,7 @@ snip(
     default_name = "prop_name",
     first_arg_name = "self",
     maybe_arg = false,
-    return_type = true, -- not optional
+    needs_return_type = true, -- not optional
     maybe_no_cover = true,
   }
 )
@@ -287,7 +319,7 @@ snip(
     decor_name = "property", -- TODO: allow choice_node with `property` / `cached_property`
     default_name = "prop_name",
     first_arg_name = "self",
-    return_type = true, -- not optional
+    needs_return_type = true, -- not optional
   }
 )
 
@@ -303,7 +335,7 @@ snip(
     decor_name = "property",
     default_name = "prop_name",
     first_arg_name = "self",
-    return_type = true, -- not optional
+    needs_return_type = true, -- not optional
     simple_body_node = function()
       return ls.function_node(function(given_nodes_text)
         return "return self._" .. given_nodes_text[1][1]
@@ -725,7 +757,7 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
   }
 })
 
--- FIXME: 🙁 FAILS in all of these cases:
+-- NOTE: Attempting to impl this using Tree-sitter fails in all of these cases:
 -- ```py
 -- class Fail1:
 --     def foo(self):
@@ -743,33 +775,49 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
 -- ```
 -- Because at this point the direct TS parent is either of type 'class_definition' or 'block',
 -- instead of being the `foo` function node 🙁
---
--- 👉 TOTRY: Find immediate function node parent based on current indent
-snip("su", {desc = "super().samefunction(…)"}, ls.dynamic_node(1, function()
-  -- IDEA: Suggest that returning nil in a `dynamic_node` be the same as returning an empty snippet node 🤔
-  local failure_sn = ls.snippet_node(nil, t"")
+-- 👉 Using a simple upward indent-based line scan works in all cases
+snip("su", {desc = "super().samefunction(…)", when = conds.after_indent}, ls.dynamic_node(1, function()
+  local cursor_pos = U.Pos0.from_vimpos("cursor")
+  -- Get all lines up to and including the cursor line (nvim uses 0-indexed rows, exclusive end)
+  local lines = vim.api.nvim_buf_get_lines(0, 0, cursor_pos.row + 1, false)
+  local current_line = vim.api.nvim_get_current_line()
+  local current_indent = #(current_line:match("^(%s*)") or "")
 
-  local node = U.ts.try_get_node_at_cursor { show_warning = true }
-  if not node then return failure_sn end
-
-  local parents = U.ts.collect_node_parents(node, { until_node_type = "class_definition" })
-  if #parents == 0 or parents[1]:type() ~= "class_definition" then
-    vim.notify("!! Not in a class!", vim.log.levels.ERROR)
-    return failure_sn
+  -- Scan upward from cursor to find the enclosing `def` line.
+  -- Normally look for a less-indented line;
+  -- If we first hit a `)…` line (which marks the end of a multi-line def),
+  -- .. Switch to looking for a same-indented `def`.
+  local fn_name = nil ---@type string?
+  local hit_closing_paren = false
+  local ref_indent = current_indent
+  for line in vim.iter(lines):rev() do
+    local indent = #(line:match("^(%s*)") or "")
+    local is_less_indented = indent < ref_indent
+    local is_same_indented = indent == ref_indent
+    if (hit_closing_paren and is_same_indented) or (not hit_closing_paren and is_less_indented) then
+      fn_name = line:match("^%s*def%s+([%w_]+)%s*%(")
+      local at_closing_paren = line:match("^%s*%)")
+      if fn_name or not at_closing_paren then
+        break -- We found the function name!
+      end
+      hit_closing_paren = true
+      ref_indent = indent
+    end
   end
 
-  -- find first 'function_definition' node
-  ---@type TSNode?
-  local class_function_node = vim.iter(parents):find(function(p) return p:type() == "function_definition" end)
-  if not class_function_node then
-    vim.notify("!! Not in a class function node!", vim.log.levels.ERROR)
-    return failure_sn
+  if fn_name then
+    return ls.snippet_node(nil, { t("super()." .. fn_name .. "("), i(1), t")" })
+  else
+    -- Fallback: editable snippet
+    vim.notify("su snippet: could not detect enclosing function name", vim.log.levels.WARN)
+    return ls.snippet_node(nil, SU.myfmt {
+      [[super().<fn>(<args>)]],
+      {
+        fn = i(1, "method_name"),
+        args = i(2),
+      }
+    })
   end
-
-  local fn_name_node = class_function_node:field("name")[1]
-  local fn_name = vim.treesitter.get_node_text(fn_name_node, 0)
-
-  return ls.snippet_node(nil, { t("super()." .. fn_name .. "("), i(1), t")" })
 end))
 
 -- End of snippets definitions
