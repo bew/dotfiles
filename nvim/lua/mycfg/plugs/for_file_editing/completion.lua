@@ -233,29 +233,30 @@ Plug.cmp {
         },
       },
       { name = "path", priority = prio.med }, -- note: By default, '.' is relative to the buffer
-      {
-        -- FIXME: Had a weird case with a TS match bad prefix/grouping compared to an LSP match,
-        -- but for some reason that TS match was MORE prioritzed than the LSP with was lodged in
-        -- middle 👀
-        --
-        -- Example:
-        -- With `Err(anho|)` input (`|` is the cursor)
-        -- I got this completion list (without `priority` setting):
-        --    │ Err(anyhow!("{directive_n… (P)  @TS
-        --    │ anyhow!                         @Lsp
-        --
-        -- BUG:
-        -- I want to get to `anyhow!` but when I navigate to the first one (to got through it) the
-        -- completion menu closes immediately for some reason and I can't simply undo that wrong
-        -- inserted text ><
-        -- 👉 Seems to happen when a match (label? text?) has `{` or `}` 🤔
-        --   .. TODO: minimal repro!
-        name = "treesitter",
-        priority = prio.low, -- it can easily match too much..
-        keyword_length = 4, -- Has lots of noise at 1 char (default)
-        -- FIXME: do NOT consider current word as a potentiol match 👀
-        -- (iirc it shouldn't but it still does sometimes..)
-      },
+      -- GRR: cmp-treesitter is too buggy and too slow when not wanted.. and only marginally useful.. sorry 😬
+      -- {
+      --   -- FIXME: Had a weird case with a TS match bad prefix/grouping compared to an LSP match,
+      --   -- but for some reason that TS match was MORE prioritzed than the LSP with was lodged in
+      --   -- middle 👀
+      --   --
+      --   -- Example:
+      --   -- With `Err(anho|)` input (`|` is the cursor)
+      --   -- I got this completion list (without `priority` setting):
+      --   --    │ Err(anyhow!("{directive_n… (P)  @TS
+      --   --    │ anyhow!                         @Lsp
+      --   --
+      --   -- BUG:
+      --   -- I want to get to `anyhow!` but when I navigate to the first one (to got through it) the
+      --   -- completion menu closes immediately for some reason and I can't simply undo that wrong
+      --   -- inserted text ><
+      --   -- 👉 Seems to happen when a match (label? text?) has `{` or `}` 🤔
+      --   --   .. TODO: minimal repro!
+      --   name = "treesitter",
+      --   priority = prio.low, -- it can easily match too much..
+      --   keyword_length = 4, -- Has lots of noise at 1 char (default)
+      --   -- FIXME: do NOT consider current word as a potentiol match 👀
+      --   -- (iirc it shouldn't but it still does sometimes..)
+      -- },
       {
         name = "tmux",
         priority = prio.low,
