@@ -115,12 +115,7 @@ in {
 
     >&2 echo "Copying no-deps files"
 
-    cp $src/rc/aliases_and_short_funcs.zsh $out/rc/
-    cp $src/rc/completions.zsh $out/rc/
-    cp $src/rc/options.zsh $out/rc/
-    cp $src/rc/prompt.zsh $out/rc/
-    cp $src/rc/mappings.zsh $out/rc/
-    cp $src/rc/fzf-mappings.zsh $out/rc/
+    cp $src/rc/* $out/rc/
 
     # FIXME: this should be part of a sort of activation?
     # Or can I detect it's not set and suggest to run the activation command for that if it's not?
