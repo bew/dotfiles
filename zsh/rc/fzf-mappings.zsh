@@ -127,8 +127,10 @@ function zwidget::utils::__fzf_generic_impl_for_paths() {
   fi
 
   local selected_completions=$( \
-    (cd "$search_root_path"; "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" | "${results_transformer[@]}") |
-    zwidget::utils::results_to_args
+    (
+      builtin cd -q "$search_root_path"; # note: do _not_ trigger chpwd hooks
+      "${FZF_FINDER_CMD[@]}" | "${fzf_cmd[@]}" | "${results_transformer[@]}"
+    ) | zwidget::utils::results_to_args
   )
 
   if [[ -n "$selected_completions" ]]; then
