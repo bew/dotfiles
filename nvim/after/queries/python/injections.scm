@@ -17,3 +17,15 @@
   (#eq? @_attr "execute")
   (#set! injection.language "sql")
 )
+
+; For sql query like `sql_query = "SELECT ..."`
+(expression_statement
+  (assignment
+    left: (identifier) @_name
+    right: (string
+      (string_content) @injection.content
+    )
+  )
+  (#match? @_name "sql")
+  (#set! injection.language "sql")
+)
