@@ -223,7 +223,6 @@ zle -N bracketed-paste my-bracketed-paste-with-undo
 # Named directories
 hash -d dot=$(realpath ~/.dot)
 hash -d cfg=~/.config
-hash -d pkgs=~/.nix-home-current/nixpkgsStable
 
 # Options
 source $ZSH_MY_CONF_DIR/rc/options.zsh
