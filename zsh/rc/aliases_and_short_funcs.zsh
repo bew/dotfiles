@@ -124,10 +124,6 @@ alias j=just
 # (256 colors & RGB are enabled in tmux config, via `terminal-features`)
 alias tmux="tmux -u"
 
-if cfg::has-bin opencode; then
-  alias oc=opencode
-fi
-
 # Big-one letter aliases
 alias H=head
 alias T=tail
@@ -340,6 +336,13 @@ alias todo='rg -i "todo|fixme" --colors=match:fg:yellow --colors=match:style:bol
 # allows to use output as input to `nvim -q <results-file>` for easy navigation \o/
 alias rg='rg -n'
 
+# opencode
+
+if cfg::has-bin opencode; then
+  alias oc=opencode
+fi
+# Resume last opencode session
+alias occ="opencode --continue"
 
 # curl
 
