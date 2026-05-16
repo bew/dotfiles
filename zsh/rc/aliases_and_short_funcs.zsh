@@ -325,6 +325,9 @@ function ei() {
 }
 alias ei="nvim +CodeCompanionChat +only +startinsert"
 
+# Open nvim to edit current directory
+alias ed="nvim ."
+
 # Search using `rg` & open the results in neovim via quickfix entries
 function erg() {
   nvim -q =(rg --vimgrep "$@") +copen
