@@ -124,6 +124,10 @@ alias j=just
 # (256 colors & RGB are enabled in tmux config, via `terminal-features`)
 alias tmux="tmux -u"
 
+if cfg::has-bin opencode; then
+  alias oc=opencode
+fi
+
 # Big-one letter aliases
 alias H=head
 alias T=tail
@@ -156,7 +160,7 @@ function rm() {
     return 1
   fi
 }
-if command -v trashy; then
+if cfg::has-bin trashy; then
   # For once https://github.com/oberblastmeister/trashy/pull/106 is released
   alias trash=trashy
 fi
