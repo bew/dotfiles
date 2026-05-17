@@ -8,6 +8,15 @@ let
   ;
   mybuilders = pkgs.callPackage ../nix/mylib/mybuilders.nix {};
   cfg = config;
+
+  diralias-pkg = let
+    repo = fetchFromGitHub {
+      owner = "bew";
+      repo = "diralias";
+      rev = "v0.1.0";
+      hash = "sha256-7LuHexv3aIH4uecbMxukfSgtqi5I42eQZY87swM7mjU=";
+    };
+  in pkgs.callPackage "${repo}/package.nix" {};
 in {
   # Config ID, responsible for state & cache folders naming
   ID = "bew-nixified"; # !!! do not change unless you know what you're doing
@@ -19,6 +28,7 @@ in {
     git.pkg = pkgs.git;
     eza.pkg = pkgs.eza;
     direnv.pkg = pkgs.direnv;
+    diralias.pkg = diralias-pkg;
 
     # Don't hardcode fzf in zoxide, will use the one in PATH
     zoxide.pkg = pkgs.zoxide.override { withFzf = false; };
@@ -94,6 +104,7 @@ in {
       echo "Copying built feeder binary to plugin files"
       cp -v ${lib.getExe zconvey-feeder} $out/feeder/feeder
     '';
+    diralias = "${diralias-pkg}/share/zsh/plugins/diralias/";
   };
 
   outputs.zdotdir = let
@@ -140,6 +151,7 @@ in {
       --replace-fail "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__autoenv="   "_ZSH_PLUGIN_SRCREF__autoenv=${plugins.zsh-autoenv} #" \
       --replace-fail "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #"
+      --replace-fail "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #" \
+      --replace-fail "_ZSH_PLUGIN_SRCREF__diralias="   "_ZSH_PLUGIN_SRCREF__diralias=${plugins.diralias} #"
   '';
 }

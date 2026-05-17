@@ -54,6 +54,8 @@ function cfg::check-dependencies() {
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__gitstatus
   _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
   _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zconvey
+  _ZSH_PLUGIN_SRCREF__diralias=bew/diralias
+  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__diralias
   # Check plugin folders exist if paths (start with `/`)
   for plugin_path in "${_zsh_plugins_srcrefs[@]}"; do
     if [[ "${plugin_path[1]}" == "/" ]] && ! [[ -d "$plugin_path" ]]; then
@@ -99,6 +101,10 @@ gitstatus_start MY
 zinit ice wait"0" silent # load plugin async & silently
 zinit light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
+
+# My helper to manage directory aliases externally, for multiple tools ✨
+zinit ice lucid wait # lazy load
+zinit light $_ZSH_PLUGIN_SRCREF__diralias
 
 #-------------------------------------------------------------
 # Init additional 'external plugins'
