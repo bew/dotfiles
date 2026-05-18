@@ -4,9 +4,6 @@ matches:
   - trigger: "!+!"
     replace: '👍'
 
-  - trigger: "!-!"
-    replace: '👎'
-
   - trigger: "!ey!"
     replace: '👀'
 
@@ -142,3 +139,9 @@ matches:
 
   - trigger: "!..!" # ellipsis
     replace: '…'
+
+  - trigger: "!>!" # 1-token arrow/implication
+    replace: '→'
+
+  - trigger: "!-!" # semantic-rich separator
+    replace: '—'
