@@ -7,7 +7,7 @@ Apply these rules to all SKILL.md, agent, command, and prompt files.
 Write as if briefing a capable engineer who executes instructions exactly as written.
 
 - **Imperative.** "Run `git status`." Not "You should run…"
-- **Terse.** One idea per sentence. No filler.
+- **Terse.** One idea per sentence. No filler. (use caveman skill)
 - **Concrete.** Name real paths, commands, field names. No abstract placeholders unless genuinely variable.
 - **Neutral.** Cut: "usually", "typically", "generally", "feel free to", "in most cases".
 
