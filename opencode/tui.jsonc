@@ -1,6 +1,14 @@
 {
-  // Keybinds config (see https://opencode.ai/docs/keybinds/)
   "$schema": "https://opencode.ai/tui.json",
+
+  "plugin": [
+    // Plugin for #foo snippet expansion in prompt, very flexible!
+    // see: https://github.com/JosXa/opencode-snippets
+    // NOTE: need to have the same in `opencode.jsonc` for proper support in the server
+    "opencode-snippets@latest"
+  ],
+
+  // Keybinds config (see https://opencode.ai/docs/keybinds/)
   "keybinds": {
     // Global: general
     "leader": "alt+space",

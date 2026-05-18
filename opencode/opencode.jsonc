@@ -14,6 +14,10 @@
     // Plugin for Dynamic Context Pruning
     // see: https://github.com/Opencode-DCP/opencode-dynamic-context-pruning
     // Gives /dcp command, but should be used automatically by the models
-    "@tarquinen/opencode-dcp@latest"
+    "@tarquinen/opencode-dcp@latest",
+    // Plugin for #foo snippet expansion in prompt, very flexible!
+    // see: https://github.com/JosXa/opencode-snippets
+    // NOTE: need to have the same in `tui.jsonc` for completions in TUI
+    "opencode-snippets@latest"
   ]
 }

@@ -1,0 +1,8 @@
+{
+  // JSON Schema for editor autocompletion
+  "$schema": "https://raw.githubusercontent.com/JosXa/opencode-snippets/v2.2.0/schema/config.schema.json",
+
+  // How many messages from the bottom of the conversation to place injected context
+  // Higher = injection feels "older" to the model, lower = closer to recent context
+  "injectRecencyMessages": 3 // Default: 5
+}
