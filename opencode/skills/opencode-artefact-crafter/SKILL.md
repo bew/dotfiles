@@ -142,4 +142,5 @@ Ask: *Ready to write $artefact to '$installpath' ?*
 Write all files.
 For skills, create full directory structure including any `./references/`, `./scripts/`, `./assets/`, or `./templates/` dirs.
 
-Clean up any test directory used during iterations.
+Clean up any test directory used during iterations:
+Must use `trash -v <tmp-dirs>…` (to avoid any issue with mis-written rm commands)

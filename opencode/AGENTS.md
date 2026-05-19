@@ -26,13 +26,15 @@ Karpathy guidelines:
 
 ## Git Guardrail
 
-NEVER run git operations like add/commit/push/reset/switch/restore/checkout/clean.
-When it is really necessary for the task: Ask.
+NEVER run git operations like push/reset/switch/restore/stash/checkout/clean.
+
+When the user explicitly asks for it, you are allowed to add/commit, always ask when not sure.
 
 
 ## Safety
 - ALWAYS `--dry-run` before destructive shell commands.
 - NEVER delete files without explicit confirmation.
+- NEVER attempt to read secrets from e.g. `.env` files.
 - NEVER drop database tables.
 - NEVER try to automatically install something you need. Ask.
 
