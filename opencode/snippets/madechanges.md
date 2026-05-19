@@ -1,6 +1,5 @@
 ---
-aliases:
-- edited
+aliases: edited
 ---
 
 <prepend>
