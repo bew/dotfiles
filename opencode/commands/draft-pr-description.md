@@ -68,25 +68,9 @@ Title: <title>
 
 ## Style rules
 
-### Voice and tone
+Load and apply the `bew-communication-style` skill for all writing style decisions.
 
-- Open with a short friendly sentence: e.g. "Hello! I'm trying your plugin and really liking it!"
-- Use first person: "I found", "my existing X". Never "if you have...".
-- Describe the goal/bug/improvement directly and personally — if a GitHub issue covers it, reference it instead of restating it.
-- No hedging. State directly. Use `🤔` only for genuine open questions to the author.
-- Asides (follow-ups, questions to author) go last, after `---`, with a casual invite.
-
-### Sentences and structure
-
-- Short sentences. Break at breath points. No comma-chaining.
-- Use short paragraphs as the default structure.
-- `👉` as soft bullet for key takeaways.
-- `-` bullet lists only when something is genuinely enumerable.
-- Numbered lists only for truly ordered sequences (e.g. repro steps).
-
-### Emoji
-
-- Use as section-shift markers — one per shift, not decoration.
+Additional PR-specific rule:
 - Conventional commits prefix (`fix:`, `feat:`, `chore:`, etc.) in the title only when it fits naturally — never forced.
 
 ---
@@ -102,12 +86,12 @@ Output:
 > Hello! I'm trying your plugin and really liking it!
 >
 > ⚠️ However, I've found a bug:
-> If you already have a `snippets/` directory (with a config inside or not), the plugin creates a brand new `snippet/` directory and drops a fresh config there on every startup, completely ignoring my existing `snippets/` directory..
+> If you already have a `snippets/` directory (with a config inside or not), the plugin creates a brand new `snippet/` directory and drops a fresh config there on every startup, completely ignoring my existing `snippets/` directory...
 >
 > This PR fixes this! 🚀
 > I ended up doing a small refactor around path handling, which felt necessary to make the fix clean.
 >
-> The old `PATHS` constant didn't distinguish between the *preferred* dir, the *alt* dir, and the *currently active* one, I think that ambiguity was the root cause of the bug. 🤔
+> The old `PATHS` constant didn't distinguish between the *preferred* dir, the *alt* dir, and the *currently active* one. I think that ambiguity was the root cause of the bug. 🤔
 > 👉 I replaced it with a `GLOBAL_PATHS` object typed as `SnippetPaths`, which makes all three explicit.
 > The selection logic lives in a small pure function `resolveSnippetDir(preferred, alt)` that's easy to test in isolation (which I did).
 > The new `GLOBAL_PATHS` is populated once on startup with `getGlobalPaths` which works the same way as `getProjectPaths`, with the new active dir selection.
