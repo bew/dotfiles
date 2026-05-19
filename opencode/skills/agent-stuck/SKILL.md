@@ -52,7 +52,7 @@ Doom loop count is per distinct error. Reset count when a materially different e
 
 Resume original task from step that was blocked. Do not restart from scratch.
 
-If same block recurs after a resolution attempt, re-enter this skill but skip step 3
+NOTE: If same block recurs after a resolution attempt, re-enter this skill but skip step 3
 (no retry). Go directly to halt and ask the user.
 
 ## Rules

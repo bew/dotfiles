@@ -29,6 +29,15 @@ Write as if briefing a capable engineer who executes instructions exactly as wri
 - All other examples (commands, config, file content, structured output): use fenced code block with language tag. Line length follows the language's own conventions.
 - **Short labeled pairs** (`Not:`/`Yes:`, `Bad:`/`Good:`, `Q:`/`A:`): inline form allowed when each side fits on one line.
 
+### Callout blocks
+
+Load the `bew-inline-callout-style` skill for full spec and examples.
+(NOTE: this skill is reference-only — it does not auto-load.)
+
+Use `NOTE:`, `IMPORTANT:`, `WARNING:`, `TIP:` prefixes for inline callouts.
+Same-paragraph lines are attached; blank line ends the callout.
+Parenthesized form `(KEYWORD: ...)` must be one line and may appear inline in another paragraph.
+
 ## Length
 
 | Artefact | Target |

@@ -13,7 +13,7 @@ Behavioral guidelines to reduce common LLM coding mistakes, derived from Andrej 
 3. Touch only what you must. Clean up only your own mess.
 4. Define success criteria first. Loop until verified.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+TRADEOFF: These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ## 1. Think Before Coding
 

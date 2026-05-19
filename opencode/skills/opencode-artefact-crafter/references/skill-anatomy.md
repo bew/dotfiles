@@ -12,7 +12,7 @@ Official documentation: https://agentskills.io/specification
 | Project-scoped | `.agents/skills/<name>/` | Tool-agnostic; works with OpenCode, Copilot Workspace, and other SKILL.md-compatible tools. **Preferred for team repos.** |
 | Global (OpenCode only) | `~/.config/opencode/skills/<name>/` | Personal reusable skills not tied to a repo |
 
-Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
+WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
 
 
 ## Directory layout
@@ -31,14 +31,14 @@ reference.
 └── templates/   ← scaffolds the agent fills in
 ```
 
-Only add resource directories when `SKILL.md` would exceed ~300 lines, or when a resource is cleaner as a standalone file.
+TIP: Only add resource directories when `SKILL.md` would exceed ~300 lines, or when a resource is cleaner as a standalone file.
 
 Reference supporting files explicitly from `SKILL.md`:
 ```markdown
 Read `./references/api-spec.md` before writing any API calls.
 Run `./scripts/validate.sh` before committing the output.
 ```
-Always use `./` prefix when referencing a skill-associated file.
+IMPORTANT: Always use `./` prefix when referencing a skill-associated file.
 
 
 ## Frontmatter
@@ -78,4 +78,4 @@ Optional fields, rarely needed for personal skills: `license`, `compatibility`, 
 
 At startup, OpenCode reads only each skill's `name` and `description`.
 The full body is loaded into context only when the agent calls the `skill` tool.
-A bloated skill wastes tokens for the entire duration of that task.
+WARNING: A bloated skill wastes tokens for the entire duration of that task.
