@@ -2,7 +2,7 @@
 name: opencode-artefact-crafter
 description: |
   Load when the user asks to create, update, edit, or refactor any OpenCode (OC)
-  artefact: skills, agents, or commands — including modifying an existing one.
+  artefact: skills, agents, commands, or snippets — including modifying an existing one.
   Triggers examples: "create a skill", "create a skill to …", "update the X skill",
   "add Y to the OC cmd Z", "edit the W agent", "update the crafter skill".
   Guides the user through discovery, drafting, and iterative refinement.
@@ -10,7 +10,7 @@ description: |
 
 # OpenCode Crafter
 
-Helps users design & create OpenCode artefacts: **skills**, **agents**, **commands**.
+Helps users design & create OpenCode artefacts: **skills**, **agents**, **commands**, **snippets**.
 
 Work in multiple phases:
 
@@ -48,10 +48,16 @@ Ask user what they want to create if not already clear. Use decision table below
 - You want a different model, temperature, or tool set
 - You want to restrict or expand permissions (tool access, mcp, ..) beyond the default
 
+**A snippet is appropriate when…**:
+- You want reusable static text injected anywhere in a message (not just first position)
+- Content is small, self-contained, and has a single responsibility
+- You want to DRY up recurring prompt patterns or instructions
+
 Based on artefact type, read one of the following references for full spec of that type.
 - skill: `./references/skill-anatomy.md`
 - command: `./references/command-anatomy.md`
 - agent: `./references/agent-anatomy.md`
+- snippet: load the `snippets` skill for full spec
 
 ### Should this even be an OpenCode config artefact?
 
@@ -90,6 +96,11 @@ For commands additionally:
 - What arguments does it take? (if any)
 - Does it need shell output or file content injected?
 - Should it run in a subagent session to avoid polluting context?
+
+For snippets additionally:
+- What is the trigger name and any aliases?
+- Should content expand inline, or use `<append>`/`<prepend>` blocks?
+- Does it need shell command output injected (`` !`cmd` ``)?
 
 ---
 
