@@ -1,7 +1,7 @@
 ---
 name: opencode-artefact-crafter
 description: |
-  Interactively creates/update OpenCode artefacts — skills, agents, commands.
+  Interactively creates/update OpenCode (OC) artefacts — skills, agents, commands.
   Use when asked to build, scaffold, design, or refine any of these.
   Guides the user through discovery, drafting, and iterative refinement.
 ---
@@ -98,6 +98,8 @@ Draft: <artefact-type>/<name>
 Include proposed frontmatter & full body. Note any open questions or tradeoffs.
 Ask: *Does this match what you had in mind?*
 
+If the user confirms or requests only minor adjustments, proceed immediately to Phase 4 — no permission needed.
+
 ---
 
 ## Phase 4 — Review and iterate via `opencode-artefact-reviewer` subagent
@@ -109,8 +111,9 @@ Invoke `opencode-artefact-reviewer` subagent via `task` tool:
 ```
 task: refine the <type> draft for <name>
 ```
-Subagent writes draft to a test path, asks user any number of questions via `question` tool, applies feedback.
-Continue until user confirms artefact is correct or types "done". No round limit.
+Subagent writes draft to test path, asks user questions via `question` tool, applies feedback.
+Returns only the tmp path — read file from there as needed. Do not expect file content in response.
+Continue until user confirms or types "done". No round limit.
 
 After the loop, reflect shortly on diff between initial & final draft.
 Ask: *Ready to write $artefact to '$installpath' ?*

@@ -20,7 +20,14 @@ Write as if briefing a capable engineer who executes instructions exactly as wri
 - Tables for comparisons with 3+ items and 2+ dimensions.
 - Bold only for terms being defined or critical warnings.
 - No emojis.
-- Max line length: 100 chars in prose. Code blocks: unconstrained.
+- Max line length: 100 chars in prose. Code blocks and examples: line length follows the content being shown.
+
+### Guidelines for examples
+
+- Prose examples (utterances, natural language outputs): use blockquote (`> ...`). Line length unconstrained.
+  > Write a skill that monitors my inbox and summarizes unread threads every morning at 9am
+- All other examples (commands, config, file content, structured output): use fenced code block with language tag. Line length follows the language's own conventions.
+- **Short labeled pairs** (`Not:`/`Yes:`, `Bad:`/`Good:`, `Q:`/`A:`): inline form allowed when each side fits on one line.
 
 ## Length
 

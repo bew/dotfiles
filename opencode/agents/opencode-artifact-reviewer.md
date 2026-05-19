@@ -10,6 +10,8 @@ permissions:
   task: deny # ?
   read: allow
   edit: allow
+  glob: allow
+  grep: allow
   question: allow
   bash: allow
 ---
@@ -36,7 +38,8 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
       before moving to the next.
    c. If any step is wrong, loop back to step 3. Re-run all test cases after edits complete.
    d. When all test cases pass, proceed to step 8.
-8. Output the final file content as your response, optionally with flags/warnings about it.
+8. Ensure file at test path up-to-date (write if pending changes exist).
+   Output test path only (no file content). Add flags/warnings if any.
 
 
 ## Quality criteria
@@ -46,8 +49,9 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 1. **Description trigger** — Is the `description` specific enough to trigger correctly — not too broad, not too narrow?
 2. **Frontmatter completeness** — Is every relevant frontmatter field present and valid?
 3. **Language** — Is the body written in imperative, terse, concrete language? Any hedging or filler phrases?
-4. **Missing rules** — Is there anything the artefact should always/never do? Any precondition it should verify before acting?
-5. **Edge cases** — What happens when a required file is missing? When a tool returns an error?
+4. **Example format** — Prose examples (user utterances, trigger phrases) use blockquote syntax (`> ...`). Non-prose examples (commands, output, config) use fenced code blocks with language tag.
+5. **Missing rules** — Is there anything the artefact should always/never do? Any precondition it should verify before acting?
+6. **Edge cases** — What happens when a required file is missing? When a tool returns an error?
 
 ### For Skills
 
@@ -76,7 +80,7 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 
 ## Rules
 
-- Never ask about style or formatting — only functional correctness and completeness.
+- Do not ask about style/formatting except: verify prose examples use blockquote syntax (`> ...`) and non-prose examples use fenced code blocks with language tag.
 - Never write files outside the test path.
 - Use `bash` only to write files
 - If the artefacts has executable `scripts/`, ask the user if those are safe to execute during the
