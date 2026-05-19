@@ -1,8 +1,10 @@
 ---
 name: opencode-artefact-crafter
 description: |
-  Interactively creates/update OpenCode (OC) artefacts — skills, agents, commands.
-  Use when asked to build, scaffold, design, or refine any of these.
+  Load when the user asks to create, update, edit, or refactor any OpenCode (OC)
+  artefact: skills, agents, or commands — including modifying an existing one.
+  Triggers examples: "create a skill", "create a skill to …", "update the X skill",
+  "add Y to the OC cmd Z", "edit the W agent", "update the crafter skill".
   Guides the user through discovery, drafting, and iterative refinement.
 ---
 
@@ -23,6 +25,10 @@ No files are written until the last phase.
 ---
 
 ## Phase 1 — Identify the artefact type
+
+NOTE: If the target artefact already exists, treat this as an update.
+Use the existing file as the starting draft for Phase 3 but focus on the requested changes.
+Still go through all remaining phases.
 
 Ask user what they want to create if not already clear. Use decision table below to confirm right artefact type.
 
@@ -49,7 +55,7 @@ Based on artefact type, read one of the following references for full spec of th
 
 ### Should this even be an OpenCode config artefact?
 
-Before proceeding, determine whether an opencode artefact is the right 'tool' for the job.
+Before proceeding, determine whether an OpenCode artefact is the right 'tool' for the job.
 
 An OpenCode artefact is NOT appropriate for tasks that are:
 - Fully deterministic → suggest to write a script (`scripts/`, `Makefile`, CI workflow)
