@@ -8,7 +8,7 @@
   "autoupdate": false,
 
   "default_agent": "plan",
-  "small_model": "opencode/gpt-5-nano", // Free model (not very smart..)
+  "small_model": "opencode/big-pickle", // Free model (not very smart..)
 
   "plugin": [
     // Plugin for Dynamic Context Pruning
