@@ -57,7 +57,7 @@ snip("ld", { desc = "closure (lambda)" }, SU.myfmt {
 snip("fn", { desc = "function definition" }, SU.myfmt {
   [[
     def <q><name><q> [<params>]<ret> {
-      <body>
+    	<body>
     }
   ]],
   {
