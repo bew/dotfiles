@@ -53,7 +53,6 @@ in {
     stable.htop
     stable.tealdeer # tldr, examples for many programs (offline once DB cached)
 
-    stable.ansifilter # Convert text with ANSI seqs to other formats (e.g: remove them)
     stable.entr
     stable.tokei
 

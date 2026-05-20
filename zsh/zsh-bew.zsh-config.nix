@@ -29,6 +29,7 @@ in {
     eza.pkg = pkgs.eza;
     direnv.pkg = pkgs.direnv;
     diralias.pkg = diralias-pkg;
+    ansifilter.pkg = pkgs.ansifilter;
 
     # Don't hardcode fzf in zoxide, will use the one in PATH
     zoxide.pkg = pkgs.zoxide.override { withFzf = false; };
