@@ -88,6 +88,8 @@ zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H
 # autopair all the things!
 # don't auto-init before setting my key bindings, init at the end (with 'autopair-init')
 AUTOPAIR_INHIBIT_INIT=1
+# lazy load, need to call `autopair-init` on-load, which MUST be called after loading my keymaps!
+zinit ice lucid wait atload"autopair-init" nocd
 zinit light $_ZSH_PLUGIN_SRCREF__autopair
 
 # Git branch in prompt (using fast gitstatusd daemon)
@@ -102,7 +104,7 @@ zinit light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
 
 # My helper to manage directory aliases externally, for multiple tools ✨
-zinit ice lucid wait # lazy load
+# Don't lazy-load so it's immediately available on first prompt
 zinit light $_ZSH_PLUGIN_SRCREF__diralias
 
 #-------------------------------------------------------------
@@ -258,8 +260,6 @@ source $ZSH_MY_CONF_DIR/rc/aliases_and_short_funcs.zsh
 
 #-------------------------------------------------------------
 # LATE INIT - initialize things that should be init last
-
-autopair-init
 
 cfg::check-dependencies
 
