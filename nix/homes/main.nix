@@ -25,8 +25,7 @@
   # -------- Global home setup --------
 
   home.username = username;
-  # Mark it as default, so I'll be able to override it for dev builds :)
-  home.homeDirectory = lib.mkDefault "/home/${config.home.username}";
+  home.homeDirectory = "/home/${config.home.username}";
 
   # Configure my dotfiles path, so that direct links created with `config.dyndots.mkLink` point to
   # my repo (editable!).
