@@ -55,8 +55,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     K.local_leader_buf_map{mode="n", key="cu", desc="List usages", action=vim.lsp.buf.references}
 
     -- Displays a function"s signature information
-    K.toplevel_buf_map{mode="i", key="<C-s>", desc="Show signature", action=vim.lsp.buf.signature_help}
-    K.local_leader_buf_map{mode="n", key="cs", desc="Show signature", action=vim.lsp.buf.signature_help}
+    K.toplevel_buf_map{mode={"n", "i"}, key="<C-s>", desc="Show signature", action=vim.lsp.buf.signature_help}
 
     -- Renames all references to the symbol under the cursor
     K.local_leader_buf_map{mode="n", key="cr", desc="Rename", action=vim.lsp.buf.rename}
