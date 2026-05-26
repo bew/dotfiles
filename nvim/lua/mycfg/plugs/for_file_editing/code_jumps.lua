@@ -19,57 +19,107 @@ Plug {
 }
 
 Plug {
-  -- TODO: try https://github.com/bassamsdata/namu.nvim 🤔
-  source = gh"SmiteshP/nvim-navbuddy",
-  desc = "A simple ranger-like popup to navigate LSP document symbols",
-  tags = {t.ui, "lsp"}, -- note: Does NOT support Treesitter navigation
+  source = gh"bassamsdata/namu.nvim",
+  desc = "Sleek fuzzy symbol/… navigator, inspired by Zed",
+  tags = {t.ui, "nav", "lsp", "ts"},
   defer_load = { on_event = "VeryLazy" },
-  depends_on = {
-    Plug { source = gh"SmiteshP/nvim-navic" }, -- NOTE: not auto-enabled, used as a lib
-    Plug.lib_nui
-  },
-  -- NOTE: the plugin supports a bit more than navigation, for example:
-  -- - `a` will insert a new thing after/before item
-  -- - `c` will comment item
-  -- - `r` will rename item
-  -- - `J/K` will move node above/below prev/next item
-  -- - ...
   on_load = function()
-    -- Open with :Navbuddy
-    -- FIXME: I want to hide variables, and only focus on structural symbols (fn, class, modules, ..)
-    require"nvim-navbuddy".setup {
-      lsp = { auto_attach = true },
-      icons = {
-        File = " ",
-        Module = "{}",
-        Namespace = "{}",
-        Package = " ",
-        Class = " ",
-        Method = "󰊕 ",
-        Property = " ",
-        Field = " ",
-        Constructor = " ",
-        Enum = " ",
-        Interface = " ",
-        Function = "󰊕 ",
-        Variable = " ",
-        Constant = " ",
-        String = " ",
-        Number = " ",
-        Boolean = " ",
-        Array = "[]",
-        Object = "{}",
-        Key = " ",
-        Null = "∅ ",
-        EnumMember = " ",
-        Struct = " ",
-        Event = " ",
-        Operator = " ",
-        TypeParameter = " ",
-      }
+    require"namu".setup {
+      -- Global config, for all modules (symbols/diagnostics/…)
+      global = {
+        movement = {
+          next = { "<C-n>", "<DOWN>", "<M-j>" },
+          previous = { "<C-p>", "<UP>", "<M-k>" },
+          delete_word = {"<C-w>"},
+          clear_line = {"<C-u>"},
+        },
+        custom_keymaps = {
+          vertical_split = {
+            desc = "Open in vertical split",
+            keys = { "<M-v>" },
+          },
+          horizontal_split = {
+            desc = "Open in horizontal split",
+            keys = { "<M-h>" },
+          },
+        },
+        display = {
+          format = "tree_guides",
+        },
+        window = {
+          border = "none", -- other borders look very wrong...
+          title_prefix = "§ ",
+        },
+        kindIcons = {
+          File = "󰈙",
+          Module = "󰏗",
+          Namespace = "󰌗",
+          Package = "",
+          Class = "",
+          Method = "󰊕",
+          Property = "󰜢",
+          Field = "󰜢",
+          Constructor = "",
+          Enum = "󰒻",
+          Interface = "󰕘",
+          Function = "󰊕",
+          Variable = "󰀫",
+          Constant = "󰏿",
+          String = "",
+          Number = "󰎠",
+          Boolean = "󰨙",
+          Array = "󰅪",
+          Object = "󰅩",
+          Key = "",
+          Null = "󰟢",
+          EnumMember = "󰒻",
+          Struct = "",
+          Event = "󰉁",
+          Operator = "",
+          TypeParameter = "",
+        },
+        AllowKinds = {
+          -- defaults (for all filetypes)
+          default = {
+            "Function",
+            "Method",
+            "Class",
+            "Module",
+            -- "Property",
+            -- "Variable",
+            -- "Constant",
+            "Enum",
+            "Interface",
+            -- "Field",
+            "Struct",
+            -- "Array"
+          },
+        },
+      },
     }
 
-    K.local_leader_map{mode="n", key="cN", desc="Code LSP Navigation", action=require"nvim-navbuddy".open}
+    K.local_leader_map_define_group{mode="n", prefix_key="cs", name="+namu nav"}
+    K.local_leader_map{mode="n", key="css", desc="Buffer Symbols", action=function()
+      vim.cmd.Namu"symbols"
+    end}
+    K.local_leader_map{mode="n", key="csw", desc="Workspace Symbols", action=function()
+      vim.cmd.Namu"workspace"
+    end}
+    K.local_leader_map{mode="n", key="csB", desc="Opened Buffers Symbols", action=function()
+      vim.cmd.Namu"watchtower"
+    end}
+    K.local_leader_map{mode="n", key="csd", desc="Buffer Diagnostics", action=function()
+      vim.cmd.Namu"diagnostics"
+    end}
+    K.local_leader_map{mode="n", key="csD", desc="Workspace Diagnostics", action=function()
+      vim.cmd.Namu("diagnostics", "workspace")
+    end}
+    K.local_leader_map{mode="n", key="csC", desc="Call hierarchy in/out", action=function()
+      vim.cmd.Namu("call", "both")
+    end}
+  end,
+  on_colorscheme_change = function()
+    U.hl.set("NamuPreview", { ctermbg = 234 })
   end,
 }
 
@@ -183,11 +233,26 @@ Plug {
         Enum = "",
       },
     }
-    K.local_leader_map{mode="n", key="cn", desc="Code Nav popup", action=require"aerial".nav_toggle}
     K.local_leader_map{mode="n", key="cp", desc="Code Nav panel", action=require"aerial".toggle}
   end,
   on_colorscheme_change = function()
     U.hl.set("AerialLine", { link = "Visual" })
+  end,
+}
+
+Plug {
+  source = gh"error311/wayfinder.nvim",
+  desc = "Guided code exploration trails from current symbol (shows defs, refs, callers, git info, ..)",
+  tags = {t.ui, "lsp", "nav"},
+  defer_load = { on_event = "VeryLazy" },
+  on_load = function()
+    require("wayfinder").setup {}
+    -- NOTE: exposes many :Wayfinder* commands
+
+    K.local_leader_map_define_group{mode="n", prefix_key="w", name="+wayfinder"}
+    K.local_leader_map{mode="n", key="wf", action=vim.cmd.Wayfinder, desc="Wayfinder Open"}
+    K.local_leader_map{mode="n", key="wto", action=vim.cmd.WayfinderTrailOpen, desc="Wayfinder Trail Open"}
+    K.local_leader_map{mode="n", key="wtt", action=vim.cmd.WayfinderTrailResume, desc="Wayfinder Trail Resume Last"}
   end,
 }
 

@@ -333,6 +333,9 @@ Plug.cmp {
         { name = "buffer", keyword_length = 2 }, -- so 'sq'<cmpl.select-next> gives 'squash' directly
       }
     })
+    cmp.setup.filetype({"namu_prompt"}, {
+      sources = {}, -- Disable completions!
+    })
   end,
   on_colorscheme_change = function()
     local cols = {}
