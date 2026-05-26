@@ -84,9 +84,8 @@
         config = ./nvim/nvim-bew.nvim-config.nix;
         configOverride = {
           imports = [editableConfigOverride];
-          # Override python lsp to use more recent python
-          # (Attempting to fix FREQUENT crashes with dmypy 1.11.x)
-          deps.bins.python-lsp-server.extra.pyPkg = lib.mkForce bleedingedgePkgs.python313;
+          # Override to use latest Pyrefly (v1+)
+          deps.bins.pyrefly.pkg = lib.mkForce bleedingedgePkgs.pyrefly;
           # Require v0.15.0+ to avoid this issue:
           # ref: https://github.com/LuaLS/lua-language-server/issues/3175
           # ref: https://github.com/LuaLS/lua-language-server/pull/3182 (PR)

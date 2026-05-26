@@ -5,10 +5,20 @@ return {
   filetypes = { "python" },
 
   cmd = {"ruff", "server"},
-  settings = {
-    lineLength = 100,
-    select = {"F", "E", "W", "N", "UP", "RUF"},
-    extendSelect = {"RUF"}, -- Ensure these rules are always checked
+  init_options = {
+    -- https://docs.astral.sh/ruff/editors/settings/
+    settings = {
+      lineLength = 100,
+      -- Let configs in `pyproject.toml`/… to override editor settings
+      configurationPreference = "filesystemFirst",
+      lint = {
+        select = {"F", "E", "W", "N", "UP", "RUF"},
+        extendSelect = {"RUF"}, -- Ensure these rules are always checked
+        ignore = {
+          "F841", -- unused variables (already reported by the LSP)
+        },
+      },
+    },
   },
   single_file_support = true,
 

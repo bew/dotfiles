@@ -26,11 +26,9 @@ vim.lsp.config("*", {
 vim.lsp.enable {
   "lua_ls",
   "nu-lsp",
-  "pylsp",
-  -- note: ty is not super useful yet, lots of unknown, config options too limited
-  -- (e.g. no way to disable import errors for some modules, https://github.com/astral-sh/ty/issues/1354)
-  -- "py-ty",
-  -- "py-ruff",
+  "py-ruff", -- (fast) Rust-based linter
+  "py-pyrefly", -- (fast) Rust-based full LSP
+  -- "pylsp", -- (legacy) python-based LSP/linter/..
   "tf-ls",
   "yamlls",
   "kotlin-lsp",
