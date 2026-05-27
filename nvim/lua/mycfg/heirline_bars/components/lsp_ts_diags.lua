@@ -81,6 +81,7 @@ M.Diagnostics = {
     "LspAttach", -- to show checkmark early
     "LspDetach",
     "DiagnosticChanged",
+    "BufWinEnter", -- after we switched to another buf in the window
     callback = function()
       -- Ensure the component is redrawn on update
       -- (otherwise it's only updated on cursor movement)
