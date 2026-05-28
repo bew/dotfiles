@@ -84,7 +84,6 @@ snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true }, ls.function_node
     table.insert(lines, lorem_paragraphs[(n % #lorem_paragraphs) +1])
   end
   table.remove(lines, 1) -- remove first blank line
-  vim.print(lines)
   return lines
 end))
 
