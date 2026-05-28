@@ -162,6 +162,7 @@ local function make_def_snip(opts)
       maybe_return_type = (
         opts.maybe_return_type and ls.choice_node(next_insert_idx(), {
           { t" -> ", i(1, "Any") },
+          t" -> None",
           t"",
         })
         or opts.needs_return_type and ls.snippet_node(next_insert_idx(), {t" -> ", i(1, "Any")})
@@ -348,7 +349,7 @@ snip(
 
 snip("deft", { desc = "def test function", when = conds.start_of_line }, SU.myfmt {
   [[
-  <deco>def test_<name>(<args>):
+  <deco>def test_<name>(<args>) <arrow> None:
   	<body>
   ]],
   {
@@ -358,6 +359,7 @@ snip("deft", { desc = "def test function", when = conds.start_of_line }, SU.myfm
     }),
     name = i(2, "something_is_working"),
     args = i(3),
+    arrow = t"->", -- to avoid bare `>` in fmt string conflicting with placeholders
     body = i(4, [[assert False, "TODO: write a test!"]]),
   }
 })
@@ -714,7 +716,7 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
     	return parser.parse_args(args)
 
 
-    def main(args):
+    def main(args) ->> None:
     	opts = parse_args(args)
     	<body>
 
@@ -739,7 +741,7 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
 
 snip("mainsimple", {desc = "simple main() script", when = conds.very_start_of_line}, SU.myfmt {
   [[
-    def main():
+    def main() ->> None:
     	<body>
 
 
@@ -762,7 +764,7 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
   }
 })
 
--- NOTE: Attempting to impl this using Tree-sitter fails in all of these cases:
+-- NOTE(FAIL): Attempting to impl this using Tree-sitter fails in all of these cases:
 -- ```py
 -- class Fail1:
 --     def foo(self):
@@ -780,7 +782,7 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
 -- ```
 -- Because at this point the direct TS parent is either of type 'class_definition' or 'block',
 -- instead of being the `foo` function node 🙁
--- 👉 Using a simple upward indent-based line scan works in all cases
+-- SOLUTION: Using a simple upward indent-based line scan works in all cases
 snip("su", {desc = "super().samefunction(…)", when = conds.after_indent}, ls.dynamic_node(1, function()
   local cursor_pos = U.Pos0.from_vimpos("cursor")
   -- Get all lines up to and including the cursor line (nvim uses 0-indexed rows, exclusive end)
