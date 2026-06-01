@@ -5,7 +5,7 @@
 autoload -U colors && colors
 
 
-# === shell-specific segments
+# === 'shell' specific segments
 
 function segmt::shlvl() {
   [[ $SHLVL == 1 ]] && return
@@ -55,7 +55,7 @@ function segmt::tiny_vim_mode() {
   esac
 }
 
-# === common-cli-specific segments
+# === 'common cli' specific segments
 
 PROMPT_NO_GIT_INFO=${PROMPT_NO_GIT_INFO:-}
 PROMPT_NO_SLOW_GIT_MSG=${PROMPT_NO_SLOW_GIT_MSG:-}
@@ -190,6 +190,9 @@ function segmt::in_sudo() {
   fi
 }
 
+
+# === 'code/tech' specific segments
+
 # Segment for info about the environment ($ENV, $AWS_PROFILE, …)
 function segmt::env_info() {
   [[ -z "$ENV" ]] && return
@@ -237,9 +240,6 @@ function segmt::env_info() {
 
   echo -n "%K{$bg} $env_styled$aws_styled %k"
 }
-
-
-# === code-tech-specific segments
 
 VIRTUAL_ENV_DISABLE_PROMPT=thankyou # Avoid python's venv loader script to change my prompt
 
