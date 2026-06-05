@@ -321,12 +321,27 @@ function ei() {
 }
 alias ei="nvim +CodeCompanionChat +only +startinsert"
 
-# Open nvim to edit current directory
-alias ed="nvim ."
+# Open nvim to edit given directory (default: cwd)
+function ed() {
+  local dir_path="${1:-.}"; shift
+  nvim "$dir_path" "$@"
+}
 
 # Search using `rg` & open the results in neovim via quickfix entries
 function erg() {
-  nvim -q =(rg --vimgrep "$@") +copen
+  local tmpfile=$(mktemp -t rg-quickfix-results-XXX)
+  rg --vimgrep "$@" > "$tmpfile"
+  local ret=$?
+  if [[ $ret != 0 ]]; then
+    if [[ $ret == 1 ]]; then
+      echo >&2 "Zero matches..."
+    else
+      echo >&2 "ERROR: rg exited with status $ret"
+    fi
+    return $ret
+  fi
+  nvim -q "$tmpfile" +copen || true
+  command rm "$tmpfile"
 }
 
 # rg
