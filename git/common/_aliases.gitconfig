@@ -108,6 +108,8 @@
   reb-keep-dates  = rebase    --committer-date-is-author-date
   rebi-keep-dates = rebase -i --committer-date-is-author-date
 
+  wt = worktree
+
   dtool = difftool
   mtool = mergetool
 
