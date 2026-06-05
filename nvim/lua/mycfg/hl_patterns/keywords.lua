@@ -354,6 +354,7 @@ end
 -- e.g. WIP [TOTRY]
 patterns.misc_heavy_words = {
   pattern = U.concat_lists {
+    heavy_word_variants"SAFETY",
     heavy_word_variants"DOC",
     heavy_word_variants"TOTRY",
     heavy_word_variants"TOTHINK",
