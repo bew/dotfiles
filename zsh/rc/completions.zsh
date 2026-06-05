@@ -30,6 +30,10 @@ setopt menu_complete # Show the menu immediately if ambiguous, and select first 
 autoload -U compinit && compinit
 zmodload zsh/complist
 
+# Fix `source <TAB>` completions to only search files
+# (by default it searches $PATH first for some weird reason...)
+compdef _files source
+
 # FIXME: completion inside text (with remaining input after cursor) is BROKEN,
 #        it eats chars from the right..
 #   mpv-audio-loop tra| --shuffle
