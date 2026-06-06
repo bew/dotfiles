@@ -1,9 +1,10 @@
 ---
 name: agent-blocker
 description: |
-  Load when the agent hits an environment or runtime wall: missing binary, version/runtime mismatch,
-  permission denied, auth/credentials failure, unreachable network/API, or a test suite broken
-  independently of agent changes.
+  Load when the agent hits an environment/runtime hard error: command/module not found/installed,
+  version/runtime mismatch, permission denied, auth/credentials failure, unreachable network/API,
+  or a test suite broken independently of agent changes. (and close variants)
+  Do NOT auto attempt manual correction/workaround.
 ---
 
 ## Goal
