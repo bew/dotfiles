@@ -323,7 +323,11 @@ alias ei="nvim +CodeCompanionChat +only +startinsert"
 
 # Open nvim to edit given directory (default: cwd)
 function ed() {
-  local dir_path="${1:-.}"; shift
+  local dir_path="."
+  if [[ $# -ge 1 ]]; then
+    dir_path=$1
+    shift
+  fi
   nvim "$dir_path" "$@"
 }
 
