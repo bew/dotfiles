@@ -155,6 +155,7 @@ in {
       fyiExtraDirs = {
         xdg_config = xdgConfigDir;
         xdg_data = xdgDataDir;
+        bins_path = outs.deps.bins;
       };
       extraWrapperParams = ''
         --set NVIM_APPNAME ${outs.NVIM_APPNAME} \
