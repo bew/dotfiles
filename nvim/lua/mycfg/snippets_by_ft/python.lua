@@ -523,7 +523,7 @@ snip("ss", {desc = "self._?X = X (~repeated)", when = conds.start_of_line}, ls.c
     },
   },
   SU.myfmt {
-    [[self.<name_again> = <name>]],
+    [[self.<name> = <name_again>]],
     {
       name = ls.restore_node(1, "name"),
       name_again = ls_extras.repeat_node(1), -- same as written node

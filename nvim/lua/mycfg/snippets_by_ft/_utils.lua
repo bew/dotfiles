@@ -115,6 +115,9 @@ function SU._myfmt_inner(args)
     -- Use `<foo>` by default for placeholders instead of `{foo}`
     opts.delimiters = "<>"
   end
+  -- NOTE: This should be safe to always enable, as I never duplicate keys
+  -- except for small text-only nodes.
+  opts.repeat_duplicates = true
   args[3] = opts
   return ls_fmt(unpack(args))
 end
@@ -221,12 +224,15 @@ function SU.insert_node_default_selection(pos, default_text)
     local snip = parent.snippet
 
     local maybe_after_node = ls.text_node""
+    local maybe_before_node = ls.text_node""
     if SU.has_stored_selection(snip) then
       -- override default text with last selection
       default_text = snip.env.LS_SELECT_DEDENT
       maybe_after_node = ls.insert_node(2) -- node after, to have a tabstop after injected selection
+      maybe_before_node = ls.insert_node(3) -- node before, to have a tabstop before injected selection
     end
     return ls.snippet_node(nil, {
+      maybe_before_node,
       ls.insert_node(1, default_text),
       maybe_after_node,
     })
@@ -239,7 +245,7 @@ local node_optional_ref = require"luasnip.nodes.optional_arg".new_opt
 
 --- Returns a node reference.
 ---@param ref string|table|integer
----@return LuaSnip.NodeRef
+---@return LuaSnip.NodeRef|integer
 function SU.node_ref(ref)
   if type(ref) == "string" then
     return node_key_ref(ref)

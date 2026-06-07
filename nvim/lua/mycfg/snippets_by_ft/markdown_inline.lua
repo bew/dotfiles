@@ -2,6 +2,6 @@
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 
 SU.filetype_setup {
-  filetype = "zsh", -- same as current collection
-  inherits_from = {"sh"},
+  filetype = "markdown_inline", -- same as current collection
+  inherits_from = {"markdown"},
 }

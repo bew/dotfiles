@@ -39,6 +39,18 @@ snip("com", { desc = "HTML comment" }, SU.myfmt_braces {
   },
 })
 
+snip("cc", { desc = "code block" }, SU.myfmt {
+  [[
+    ```<lang>
+    <code>
+    ```
+  ]],
+  {
+    lang = i(1),
+    code = SU.insert_node_default_selection(2),
+  }
+})
+
 ---@param kind string
 ---@param restore_body boolean
 local function get_nodes_gfm_panel(kind, restore_body)
