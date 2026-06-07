@@ -932,20 +932,6 @@ do
   end
 end
 
--- Smart window split (based on current window size)
-local function smart_split()
-  local win_width = vim.fn.winwidth(0)
-  local win_height = vim.fn.winheight(0)
-  if (win_width / 3) > win_height then
-    directional_split("left")
-  else
-    directional_split("up")
-  end
-end
-vim.keymap.set("n", "<C-w><C-s>", smart_split)
-K.global_leader_map{mode="n", key="<C-s>", desc="Split smart", action=smart_split}
-
-
 -- Full-width/height window splits
 -- Q: Do I need this? Would I use this?
 -- FIXME: Since I use noequalalways, the created splits takes way too much space...

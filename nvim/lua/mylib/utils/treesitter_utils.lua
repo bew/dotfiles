@@ -1,4 +1,5 @@
 local U_ts = {}
+local U_args = require"mylib.utils.args_utils"
 
 --- Returns whether a Treesitter parser is available for the current buf
 function U_ts.is_available_here()
@@ -40,19 +41,38 @@ function U_ts.try_get_node_at_cursor(opts)
   return node
 end
 
+--- Traverse *node* parents until node matching node type(s).
+---@param node TSNode
+---@param opts {node_types: string[]}
+---@return TSNode?
+function U_ts.find_first_parent_node_matching(node, opts)
+  opts = opts or {}
+
+  local node = node:parent() ---@type TSNode?
+  -- Collect parent nodes until no more parent, or until the first 'class_definition' node
+  while node do
+    if vim.tbl_contains(opts.node_types, node:type()) then
+      return node
+    end
+    node = node:parent()
+  end
+  return nil
+end
+
 --- Collect parents of given TSNode
 ---@param node TSNode
----@param opts? {until_node_type?: string}
+---@param opts? {until_node_type?: string[]|string}
 ---@return TSNode[]
 function U_ts.collect_node_parents(node, opts)
   opts = opts or {}
+  local until_node_type = U_args.normalize_arg_one_or_more(opts.until_node_type or {})
 
   local parents = {} ---@type TSNode[]
   local node = node:parent() ---@type TSNode?
   -- Collect parent nodes until no more parent, or until the first 'class_definition' node
   while node do
     table.insert(parents, 1, node) -- prepend to the list of parents
-    if opts.until_node_type and node:type() == opts.until_node_type then
+    if vim.tbl_contains(until_node_type, node:type()) then
       break
     end
     node = node:parent()
@@ -63,6 +83,15 @@ function U_ts.collect_node_parents(node, opts)
   -- vim.print(parent_types)
 
   return parents
+end
+
+--- Collect types of parent nodes of given TSNode
+---@param node TSNode
+---@param opts? {until_node_type?: string}
+---@return string[]
+function U_ts.collect_node_parents_types(node, opts)
+  local parent_nodes = U_ts.collect_node_parents(node, opts)
+  return vim.iter(parent_nodes):map(function(p) return p:type() end):totable()
 end
 
 return U_ts

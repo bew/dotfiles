@@ -1,4 +1,5 @@
 ---@diagnostic disable: missing-fields, unused-local
+-- vim:set ft=lua.luasnip: (for defining luasnip snippets)
 
 vim.env.LAZY_STDPATH = "/tmp/nvim-mini-repro"
 load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
@@ -23,7 +24,7 @@ local plugin_luasnip = {
     ---@diagnostic disable: unused-local
     local i = ls.insert_node
     local t = ls.text_node
-    local fmt = require"luasnip.extras.fmt".fmt
+    local fmta = require"luasnip.extras.fmt".fmta
     local rep = require"luasnip.extras".rep
     local k = require"luasnip.nodes.key_indexer".new_key
     ---@diagnostic enable: unused-local
