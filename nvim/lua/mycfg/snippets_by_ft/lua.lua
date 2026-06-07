@@ -307,32 +307,42 @@ snip("thi", {desc = "then … end (inline)"}, SU.myfmt {
   { body = i(1) },
 })
 
--- NOTE: Adds `elseif..then..else` in an if/elseif/else chain.
--- (easy to use by adding `if<snip-trig!>` to an existing `else` at END of the chain)
-snip("elseif", {desc = "append elseif case at end of if chain", when = conds.start_of_line}, SU.myfmt {
-  [[
-    elseif <cond> then
-      <body>
-    else
-  ]],
-  {
-    cond = i(1, "false"),
-    body = SU.insert_node_default_selection(2),
-  },
-})
-
--- NOTE: Adds `elseif..then..` (doesn't add `else`) in an if/elseif/else chain.
--- (use on a blank line before a `elseif/else` line to add IN a chain)
-snip("elif", {desc = "insert elseif case in if chain", when = conds.start_of_line}, SU.myfmt {
-  [[
-    elseif <cond> then
-      <body>
-  ]],
-  {
-    cond = i(1, "false"),
-    body = SU.insert_node_default_selection(2),
-  },
-})
+-- NOTE: Adds `elseif..then..(else)` in an if/elseif/else chain.
+-- Automatically appends `else` if the next non-blank line does NOT already start with `else`.
+-- (works both at END of chain and IN a chain before an existing `elseif/else`)
+local function mk_elseif_nodes()
+  return SU.myfmt {
+    [[
+      elseif <cond> then
+        <body><maybe_else_line>
+    ]],
+    {
+      cond = i(1, "false"),
+      body = SU.insert_node_default_selection(2),
+      maybe_else_line = ls.function_node(function(_args, snip)
+        local cur_line_nr = tonumber(snip.env.TM_LINE_NUMBER) -- 1-indexed
+        local buf_lines = vim.api.nvim_buf_get_lines(0, cur_line_nr, cur_line_nr + 10, false) -- lines after cursor line (max 10)
+        for _, line in ipairs(buf_lines) do
+          -- Search first non-blank line down from cursor (search max 10 lines)
+          if line:match"%S" then
+            if line:match"^%s*else" then
+              -- next non-blank line already has `else[if]`, don't add one
+              return ""
+            else
+              -- add `else` on a new line (LuaSnip auto-indents)
+              return {"", "else"}
+            end
+          end
+        end
+        -- no non-blank line found
+        -- => Add `else` at end of block
+        return {"", "else"}
+      end),
+    },
+  }
+end
+snip("elseif", {desc = "elseif case (adds else if needed)", when = conds.start_of_line}, mk_elseif_nodes())
+snip("eli",    {desc = "elseif case (adds else if needed)", when = conds.start_of_line}, mk_elseif_nodes())
 
 snip("forn", {desc = "for n in range (including end)", when = conds.start_of_line}, SU.myfmt {
   [[
