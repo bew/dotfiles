@@ -204,32 +204,38 @@ snip("l", {desc = "local var = …", resolver = SR.delete_spaces_after_trigger},
   local _, rest_of_line = U.get_line_around_cursor()
   if rest_of_line:match"^[^ ]+ =" or rest_of_line:match"^function " then
     -- rest_of_line looks like `|foo = ...` or `|function foo...`
-    -- only add `local`
+    -- => only add `local`
     return ls.snippet_node(nil, t"local ")
   end
-  local assignment_node
+  local has_text_after = rest_of_line:match"^[^ ]"
+  local var_node = i(1, "var")
+  local maybe_assignment_node ---@type LuaSnip.Node
   if rest_of_line:match"^= " then
     -- rest_of_line looks like `|= ...`
     -- (e.g. after we've replaced a var name to put a local var instead)
-    -- We don't need the assignment
-    assignment_node = t" "
+    -- => We don't need the assignment
+    maybe_assignment_node = t" "
+  elseif has_text_after then
+    return ls.snippet_node(nil, SU.myfmt {
+      [[local <var> = ]],
+      { var = var_node }
+    })
   else
-    local has_text_after = not not rest_of_line:match"^[^ ]"
-    assignment_node = ls.choice_node(2, {
+    maybe_assignment_node = ls.choice_node(2, {
       SU.myfmt_no_strip {
         [[ = <value>]],
         -- note: default value is important to avoid _breaking_ syntax highlight
-        { value = SU.insert_node_default_selection(1, has_text_after and "" or "nil") }
+        { value = SU.insert_node_default_selection(1, "nil") }
       },
       {t" ---@type ", i(1)},
       t"",
     })
   end
   return ls.snippet_node(nil, SU.myfmt {
-    [[local <var><assignment>]],
+    [[local <var><maybe_assignment>]],
     {
-      var = i(1, "var"),
-      assignment = assignment_node,
+      var = var_node,
+      maybe_assignment = maybe_assignment_node,
     },
   })
 end))
@@ -482,22 +488,95 @@ snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
   },
 })
 
+-- TODO: and do nothing if cursor not in a table
+snip("k", { desc = "key = value", resolver = SR.delete_spaces_after_trigger }, ls.dynamic_node(1, function()
+  local empty_snip_node = ls.snippet_node(nil, t"")
+
+  -- (WIP, not tested! todo: make shorter!)
+  -- local node_at_cursor = U.ts.try_get_node_at_cursor()
+  -- if not node_at_cursor then
+  --   vim.notify("!! No Treesitter node here 👀", vim.log.levels.ERROR)
+  --   return empty_snip_node
+  -- end
+  -- local parent_nodes_until_table = U.ts.collect_node_parents(
+  --   node_at_cursor,
+  --   { until_node_type = "table_constructor" }
+  -- )
+  -- local in_scope_not_table = vim.iter(parents_until_table):any(function(parent_node)
+  --   vim.tbl_contains({"chunk"}, parent_node:type())
+  -- end)
+  -- if in_scope_not_table then
+  --   vim.notify("!! Cursor is in statement scope, not table!", vim.log.levels.ERROR)
+  --   return empty_snip_node
+  -- end
+  --
+  -- local table_node = parent_nodes_until_table[-1]
+
+  local line_before, rest_of_line = U.get_line_around_cursor()
+  -- DEBUG
+  -- print("line_before:", vim.inspect(line_before), "rest_of_line:", vim.inspect(rest_of_line))
+
+  local after_node = t""
+  if rest_of_line:match"^$" then
+    -- Cursor at EOL
+    -- => Append comma
+    after_node = t","
+  elseif line_before:match"{ .*$" and rest_of_line:match"^}" then
+    -- line looks like `{ | }` or `{ foo = bar, | }`
+    -- => Append single space
+    after_node = t" "
+  elseif rest_of_line:match"^[a-zA-Z0-9_]+[ ]*=" then
+    -- rest of line looks like `{ |foo = true }`
+    -- => Append comma + space
+    after_node = t", "
+  end
+
+  local nodes = SU.myfmt {
+    [[<key> = <value><after>]],
+    {
+      key = i(1, "TODO"),
+      value = i(2, "nil"),
+      after = after_node,
+    }
+  }
+  return ls.snippet_node(nil, nodes)
+end))
+
 snip("p", {desc = "print(..)"}, SU.myfmt {
   [[print(<stuff>)]],
   { stuff = i(1) }
 })
 
-snip("pp", {desc = "pretty print + inspect"}, SU.myfmt {
-  [[print("DEBUG", "<prompt>:", vim.inspect(<expr>))]],
-  {
-    prompt = i(1, "debug this thing"),
-    expr = SU.insert_node_default_selection(2)
-  }
+-- To be used with `dv` (debug var) or `de` (debug expr) below
+snip("pd", {desc = "print debug"}, SU.myfmt {
+  [[print("DEBUG", <more>)]],
+  {more = i(1)}
 })
 
 snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
   [[vim.inspect(<expr>)]],
   { expr = SU.insert_node_default_selection(1) }
+})
+
+-- for `print(|)` -> `print("var:", vim.inspect(var))`
+snip("dv", { desc = [[debug "var:" + inspect var]] }, SU.myfmt {
+  -- note: having insert node _after_ repeat node doesn't work well for autocompletion
+  [["<var>:", vim.inspect(<var_again>)<more>]],
+  {
+    var = i(1, "var"),
+    var_again = rep(1),
+    more = i(2),
+  }
+})
+
+-- for `print(|)` -> `print("this thing:", vim.inspect(expr))`
+snip("de", {desc = "debug expr"}, SU.myfmt {
+  [["<prompt>:", vim.inspect(<expr>)<more>]],
+  {
+    prompt = i(1, "this thing"),
+    expr = SU.insert_node_default_selection(2, "expr"),
+    more = i(3),
+  }
 })
 
 snip("mod", {desc = "Module init M = {}; ...; ret M", when = conds.very_start_of_line}, SU.myfmt {
