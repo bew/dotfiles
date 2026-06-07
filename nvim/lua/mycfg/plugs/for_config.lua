@@ -19,6 +19,17 @@ Plug.lazydev_lua {
     Plug { source = gh"Bilal2453/luvit-meta", defer_load = { on_event = "VeryLazy", on_ft = "lua" } },
   },
   on_load = function()
+    -- /!\ lazydev expects the client name to be:
+    --    -> 'lua_ls' for lua-language-server
+    --    -> 'emmylua_ls' for emmylua-rust-analyzer
+    -- 👉 But now I use my own lang server naming convention, making lazydev basically disabled 😬😅
+    require"lazydev.lsp".supported_clients = {
+      -- My own naming convention for lua lang servers:
+      "lua-ls", "lua-emmylua-ls",
+      -- original lazydev supported clients (just in case..)
+      "lua_ls", "emmylua_ls",
+    }
+
     require"lazydev".setup {
       library = {
         -- Only load luvit types when the `vim.uv` or `vim.loop` word is found
