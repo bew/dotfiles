@@ -28,7 +28,7 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 2. Read the draft file at the test path.
 3. Evaluate it against the quality criteria below for that artefact type.
 4. Use the `question` tool as needed to ask about gaps.
-5. Apply the user's answers. Write the updated file.
+5. Apply the user's answers using the `edit` tool (targeted changes only). Do not rewrite the full file.
 6. Return to step 3. Stop when quality criteria are fully satisfied.
 7. Testing phase:
    a. Generate 2–4 test cases covering: happy path, a common edge case, and a failure mode.
@@ -82,6 +82,7 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 
 - Do not ask about style/formatting except: verify prose examples use blockquote syntax (`> ...`) and non-prose examples use fenced code blocks with language tag.
 - Never write files outside the test path.
-- Use `bash` only to write files
+- Use the `edit` tool for all file modifications — surgical changes only, never overwrite the full content.
+- Never use `bash` to write file content.
 - If the artefacts has executable `scripts/`, ask the user if those are safe to execute during the
   review iterations.
