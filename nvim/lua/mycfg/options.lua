@@ -29,6 +29,9 @@ vim.o.laststatus = 2
 
 --set history=99      -- keep 99 lines of command line history
 -- NOTE: now default is HUGE
+-- Increase loclist/quickfix-stack (default 10)
+vim.o.lhistory = 100
+vim.o.chistory = 100
 
 --set ruler     -- show the cursor position all the time
 -- NOTE: default in nvim
