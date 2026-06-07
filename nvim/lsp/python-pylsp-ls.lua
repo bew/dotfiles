@@ -1,3 +1,4 @@
+-- https://github.com/python-lsp/python-lsp-server
 
 local venv_py_exec
 if vim.env.VIRTUAL_ENV and vim.uv.fs_stat(vim.env.VIRTUAL_ENV .. "/bin/python") then
@@ -51,11 +52,8 @@ pylsp_settings.pylsp.plugins.ruff = {
 return {
   filetypes = { "python" },
 
-  -- https://github.com/python-lsp/python-lsp-server
   cmd = {"pylsp"},
-  settings = pylsp_settings,
   single_file_support = true,
-
   root_markers = {
     "pyproject.toml",
     "setup.py",
@@ -63,4 +61,6 @@ return {
     "requirements.txt",
     ".git",
   },
+
+  settings = pylsp_settings,
 }

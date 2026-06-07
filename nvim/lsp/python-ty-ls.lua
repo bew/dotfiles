@@ -1,10 +1,21 @@
 -- https://docs.astral.sh/ty/
+-- https://github.com/astral-sh/ty
 
 ---@type vim.lsp.Config
 return {
   filetypes = { "python" },
 
   cmd = {"ty", "server"},
+  single_file_support = true,
+  root_markers = {
+    "pyproject.toml",
+    "requirements.txt",
+    ".git",
+    -- for legacy projects (e.g. in deps)
+    "setup.py",
+    "setup.cfg",
+  },
+
   settings = {
     ty = {
       -- This is only for editor settings (https://docs.astral.sh/ty/reference/editor-settings/)
@@ -16,15 +27,5 @@ return {
       --   ["undefined-reveal"] = "ignore",
       -- },
     },
-  },
-  single_file_support = true,
-
-  root_markers = {
-    "pyproject.toml",
-    "requirements.txt",
-    ".git",
-    -- for legacy projects (e.g. in deps)
-    "setup.py",
-    "setup.cfg",
   },
 }

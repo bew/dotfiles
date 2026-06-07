@@ -24,14 +24,18 @@ vim.lsp.config("*", {
 
 -- Enable LSP for all my lsp configs
 vim.lsp.enable {
-  "lua_ls",
-  "nu-lsp",
-  "py-ruff", -- (fast) Rust-based linter
-  "py-pyrefly", -- (fast) Rust-based full LSP
-  -- "pylsp", -- (legacy) python-based LSP/linter/..
-  "tf-ls",
-  "yamlls",
-  "kotlin-lsp",
+  -- note: naming scheme: `<lang>[-variant]-{ls,linter}`
+  "bash-ls",
+  "markdown-oxide-ls",
+  "lua-ls", -- NOTE: /!\ on update, patch `lazydev` init as it expects 'lua_ls' client name
+  "nu-ls",
+  "python-ruff-linter", -- (fast, in rust)
+  "python-pyrefly-ls", -- (fast, in rust)
+  -- "python-pylsp-ls", -- (slow/buggy, in python LSP/linter/..)
+  "terraform-ls",
+  "yaml-ls",
+  "kotlin-kmp-ls", -- (fast but incomplete, TS-based, in rust)
+  "kotlin-official-ls", -- (slow, in java)
 }
 
 ------------------------------------------------------------

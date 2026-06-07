@@ -1,10 +1,21 @@
 -- https://docs.astral.sh/ruff/
+-- https://github.com/astral-sh/ruff
 
 ---@type vim.lsp.Config
 return {
   filetypes = { "python" },
 
   cmd = {"ruff", "server"},
+  single_file_support = true,
+  root_markers = {
+    "pyproject.toml",
+    "requirements.txt",
+    ".git",
+    -- for legacy projects (e.g. in deps)
+    "setup.py",
+    "setup.cfg",
+  },
+
   init_options = {
     -- https://docs.astral.sh/ruff/editors/settings/
     settings = {
@@ -19,15 +30,5 @@ return {
         },
       },
     },
-  },
-  single_file_support = true,
-
-  root_markers = {
-    "pyproject.toml",
-    "requirements.txt",
-    ".git",
-    -- for legacy projects (e.g. in deps)
-    "setup.py",
-    "setup.cfg",
   },
 }

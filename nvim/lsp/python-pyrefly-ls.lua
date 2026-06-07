@@ -1,10 +1,21 @@
 -- https://pyrefly.org/
+-- https://github.com/facebook/pyrefly
 
 ---@type vim.lsp.Config
 return {
   filetypes = { "python" },
 
   cmd = {"pyrefly", "lsp"},
+  single_file_support = true,
+  root_markers = {
+    "pyproject.toml",
+    "requirements.txt",
+    ".git",
+    -- for legacy projects (e.g. in deps)
+    "setup.py",
+    "setup.cfg",
+  },
+
   init_options = {
     -- https://pyrefly.org/en/docs/IDE/#lsp-initializationoptions
     pyrefly = {
@@ -16,15 +27,5 @@ return {
         semanticTokens = true, -- I prefer TS-based highlighting 👀
       },
     },
-  },
-  single_file_support = true,
-
-  root_markers = {
-    "pyproject.toml",
-    "requirements.txt",
-    ".git",
-    -- for legacy projects (e.g. in deps)
-    "setup.py",
-    "setup.cfg",
   },
 }

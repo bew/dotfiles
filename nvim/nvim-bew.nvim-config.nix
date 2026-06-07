@@ -50,23 +50,31 @@ in {
 
   # LSP Servers
   deps.bins = {
+    # Bash
+    bash-language-server.pkg = pkgs.bash-language-server;
+    shellcheck.pkg = pkgs.shellcheck;
+
     # Lua
     lua-language-server.pkg = pkgs.lua-language-server;
 
-    # python
-    # note: the python pkg is in a separate option to make it easy to replace/override.
-    python-lsp-server.extra.pyPkg = pkgs.python3;
-    python-lsp-server.pkg = let
-      pyPkg = cfg.deps.bins.python-lsp-server.extra.pyPkg;
-    in pyPkg.withPackages (pp: [
-      pp.python-lsp-server
-      pp.python-lsp-ruff
-      pp.pylsp-mypy
-      # pp.python-lsp-isort (FIXME: not in nixpkgs yet..)
-    ]);
-    pyrefly.pkg = pkgs.pyrefly;
+    # Markdown
+    markdown-oxide.pkg = pkgs.markdown-oxide;
 
-    # rust
+    # Python
+    # note: the python pkg is in a separate option to make it easy to replace/override.
+    # python-lsp-server.extra.pyPkg = pkgs.python3;
+    # python-lsp-server.pkg = let
+    #   pyPkg = cfg.deps.bins.python-lsp-server.extra.pyPkg;
+    # in pyPkg.withPackages (pp: [
+    #   pp.python-lsp-server
+    #   pp.python-lsp-ruff
+    #   pp.pylsp-mypy
+    #   # pp.python-lsp-isort (FIXME: not in nixpkgs yet..)
+    # ]);
+    pyrefly.pkg = pkgs.pyrefly;
+    ruff.pkg = pkgs.ruff;
+
+    # Rust
     rust-analyzer.pkg = pkgs.rust-analyzer;
 
     # YAML

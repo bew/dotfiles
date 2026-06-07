@@ -1,3 +1,6 @@
+-- https://luals.github.io/
+-- https://github.com/luals/lua-language-server
+
 ---@type vim.lsp.Config
 return {
   filetypes = { "lua", "lua.luasnip" },
