@@ -31,6 +31,18 @@ Plug.luasnip {
   on_load = function()
     local ls = require"luasnip"
     local ls_types = require"luasnip.util.types"
+
+    -- Function to override filetype detection to prepend raw filetype.
+    -- (luasnip' defaults always splits on `.`, which I don't want for my `lua.luasnip` snippets)
+    local function ft_func()
+      local detected_filetypes = require"luasnip.extras.filetype_functions".from_pos_or_filetype()
+      if vim.bo.filetype:find"%." then
+        -- when filetype looks like `foo.bar`, prepend it, it always takes precedence!
+        table.insert(detected_filetypes, 1, vim.bo.filetype)
+      end
+      return detected_filetypes
+    end
+
     ls.setup {
       -- NOTE about child-snippets vs root-snippets:
       -- - Child-snippets are nested inside other snippets, so when jumping through a snippet,
@@ -82,6 +94,21 @@ Plug.luasnip {
           }
         },
       },
+
+      -- Override filetype detection functions to prepend raw filetype.
+      -- (luasnip' defaults always splits on `.`, which I don't want for my `lua.luasnip` snippets)
+      ft_func = function()
+        local detected_filetypes = ft_func()
+        -- DEBUG
+        -- print("ft_func: detected_filetypes:", vim.inspect(detected_filetypes))
+        return detected_filetypes
+      end,
+      load_ft_func = function()
+        local detected_filetypes = ft_func()
+        -- DEBUG
+        -- print("load_ft_func: detected_filetypes:", vim.inspect(detected_filetypes))
+        return detected_filetypes
+      end,
     }
     -- Auto-(re)load snippets at this path
     local xdg_config_dirs = vim.env.XDG_CONFIG_DIRS ~= nil and vim.split(vim.env.XDG_CONFIG_DIRS, ":") or {}
