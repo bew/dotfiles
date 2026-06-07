@@ -11,7 +11,7 @@ in {
       # CLI to explain why 2 derivations differ (https://github.com/Gabriel439/nix-diff)
       nix-diff-drv = "${lib.getExe stable.nix-diff}";
     })
-    stable.nixfmt-rfc-style # a Nix formatter (more at https://github.com/nix-community/nixpkgs-fmt#formatters)
+    stable.nixfmt # a standard Nix formatter
     stable.nix-output-monitor # great build tracking ✨
   ];
 }

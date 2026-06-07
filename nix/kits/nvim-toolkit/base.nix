@@ -88,7 +88,7 @@ in {
     };
 
     deps.plugins = lib.mkOption {
-      description = "Vim plugins to install in DATA site dir (note: atm the those are only 'opt' plugins)";
+      description = "Vim plugins to install in DATA site dir (note: atm those are only 'opt' plugins)";
       type = ty.attrsOf ty.package;
       default = {};
     };

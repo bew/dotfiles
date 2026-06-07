@@ -53,7 +53,16 @@ in {
 
   deps.plugins = {
     zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair/";
-    zsh-autoenv = "${pkgs.zsh-autoenv}/share/zsh-autoenv/";
+    zsh-autoenv = let
+      # @2026-05-06 the licence in nixpkgs was changed to 'unfree', because the repo doesn't have a
+      # license.. (ref: https://github.com/NixOS/nixpkgs/commit/ce5e5116a00c234decb2098ddcfa2fa62243ae57)
+      # SOLUTION(WORKAROUND): patch the pkg to change back the licence 👀
+      zsh-autoenv-pkg = pkgs.zsh-autoenv.overrideAttrs (old: {
+        meta = old.meta // {
+          license = pkgs.lib.licenses.free;
+        };
+      });
+    in "${zsh-autoenv-pkg}/share/zsh-autoenv/";
     gitstatus = "${pkgs.gitstatus}/share/gitstatus/";
     zi = fetchFromGitHub {
       owner = "z-shell";

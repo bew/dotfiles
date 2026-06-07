@@ -60,7 +60,7 @@ in {
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
 
     # network tools
-    (mybuilders.linkBins "dogdns-as-dig" { dig = "${stable.dogdns}/bin/dog"; }) # nicer `dig`
+    (mybuilders.linkBins "doggo-as-dig" { dig = "${stable.doggo}/bin/doggo"; }) # nicer `dig`
     stable.netcat-openbsd # for `nc`
     stable.xh # httpie but fasterrr
     bleedingedge.resterm # nice TUI REST HTTP client

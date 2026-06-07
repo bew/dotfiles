@@ -2,9 +2,14 @@ local U_ts = {}
 local U_args = require"mylib.utils.args_utils"
 
 --- Returns whether a Treesitter parser is available for the current buf
+---@return boolean
 function U_ts.is_available_here()
-  local success, _parser = pcall(vim.treesitter.get_parser)
-  return success
+  local success, parser = pcall(vim.treesitter.get_parser)
+  if success and parser then
+    return true
+  else
+    return false
+  end
 end
 
 ---@class mylib.Opts.try_get_ts_node: vim.treesitter.get_node.Opts

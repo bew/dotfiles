@@ -17,21 +17,44 @@ local U = require"mylib.utils"
 --------------------------------
 
 Plug.ts {
-  source = fallback("treesitter", dist_managed_opt_plug"nvim-treesitter"),
-  desc = "Nvim Treesitter configurations and abstraction layer",
-  defer_load = { on_event = "VeryLazy" },
+  source = fallback("nvim-TS", dist_managed_opt_plug"nvim-TS"),
+  desc = "Nvim Treesitter queries & parsers",
   on_load = function()
-    ---@diagnostic disable-next-line: missing-fields (don't care, it works)
-    require"nvim-treesitter.configs".setup {
-      auto_install = false,
+    ---@param buf integer
+    ---@param language string
+    local function treesitter_try_attach(buf, language)
+      -- Check if a parser exists and load it
+      if not vim.treesitter.language.add(language) then
+        -- There is no parser for the language, nothing to do here..
+        return
+      end
+      -- Enable syntax highlighting and other treesitter features
+      vim.treesitter.start(buf, language)
 
-      -- Enable TS modules
-      highlight = { enable = true },
-      indent = { enable = true },
+      -- Enable treesitter based folds
+      -- For more info on folds see `:help folds`
+      -- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      -- vim.wo.foldmethod = "expr"
 
-      -- Module for matchup (https://github.com/andymass/vim-matchup)
-      matchup = { enable = true },
-    }
+      -- Enable treesitter based indentation
+      local has_indent_query = vim.treesitter.query.get(language, "indents") ~= nil
+      if has_indent_query then
+        vim.bo.indentexpr = [[v:lua.require"nvim-treesitter".indentexpr()]]
+      end
+    end
+
+    local augroup = vim.api.nvim_create_augroup("treesitter-setup", {clear=true})
+    vim.api.nvim_create_autocmd("FileType", {
+      group = augroup,
+      callback = function(args)
+        local buf, filetype = args.buf, args.match
+
+        local language = vim.treesitter.language.get_lang(filetype)
+        if not language then return end
+
+        treesitter_try_attach(buf, language)
+      end,
+    })
   end,
 }
 
