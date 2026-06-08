@@ -77,7 +77,7 @@ matches:
   - trigger: "!pls!" # grimacing
     replace: '🙏'
 
-  - trigger: "!shr!" # shrug (short/emoji form)
+  - trigger: "!shrug!" # (short/emoji form), !shr! used for long form
     replace: '🤷'
 
   - trigger: "!sk!" # sparkles

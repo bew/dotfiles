@@ -1,8 +1,11 @@
 # This file will be auto-loaded.
 
 matches:
-  - trigger: "!shrug!"
+  - trigger: "!shr!"
     replace: '¯\_(ツ)_/¯'
+
+  - trigger: "!shrr!" # with escapes for e.g. markdown zones
+    replace: '¯\\\_(ツ)\_/¯'
 
   - trigger: "!why!"
     replace: 'щ(ºДºщ)'
