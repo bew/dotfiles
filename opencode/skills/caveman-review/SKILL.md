@@ -2,8 +2,9 @@
 name: caveman-review
 description: >
   Compressed code review comments. Cuts noise from feedback while preserving the actionable signal.
-  Each comment is one line: location, problem, fix. Use when user says "review this ..", "code
-  review", "review the diff", or invokes /caveman-review.
+  Each comment is one line: location, problem, fix.
+  When the context is already using caveman mode, and user requests a review, ask user whether this
+  skill should be used.
 ---
 
 Write code review comments terse and actionable.
@@ -16,10 +17,10 @@ No throat-clearing.
 **Format:** `L<line>: <problem>. <fix>.` — or `<file>:L<line>: ...` when reviewing multi-file diffs.
 
 **Severity prefix (optional, when mixed):**
-- `❌ bug:` — broken behavior, will cause incident
-- `🤔 risk:` — works but fragile (race, missing null check, swallowed error)
-- `🔵 nit:` — style, naming, micro-optim. Author can ignore
-- `❔ Q:` — genuine question, not a suggestion
+- `BUG:` — broken behavior, will cause incident
+- `RISK:` — works but fragile (race, missing null check, swallowed error)
+- `nit:` — style, naming, micro-optim. Author can ignore
+- `Q:` — genuine question, not a suggestion
 
 **Drop:**
 - "I noticed that...", "It seems like...", "You might want to consider..."
