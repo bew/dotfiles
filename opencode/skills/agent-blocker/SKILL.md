@@ -4,6 +4,8 @@ description: |
   Load when the agent hits an environment/runtime hard error: command/module not found/installed,
   version/runtime mismatch, permission denied, auth/credentials failure, unreachable network/API,
   or a test suite broken independently of agent changes. (and close variants)
+  Also load when a user-specified resource (path, repo, URL, named config, etc.) does not exist
+  or is inaccessible — do NOT silently substitute or work around it.
   Do NOT auto attempt manual correction/workaround.
 ---
 
@@ -26,6 +28,7 @@ Identify which case applies before acting, more than one may apply simultaneousl
 | **Auth/credentials failure** | HTTP 401/403, expired token, missing API key or credential |
 | **Network/API unavailable** | External service unreachable, timeout, 5xx, or DNS failure |
 | **Test suite broken independently** | Tests fail in ways unrelated to agent's own changes |
+| **User-specified resource missing/inaccessible** | A path, repo, URL, or named resource given by the user does not exist, returns 404, or cannot be opened |
 
 ### 2. Act based on case
 
@@ -64,26 +67,37 @@ Identify which case applies before acting, more than one may apply simultaneousl
 
 1. Run `git diff HEAD -- <specific files the tests cover>`.
    If those files are unchanged relative to `HEAD`, failure pre-dates agent's edits.
-2. Never run `git stash`.
-3. If pre-existing: doc, skip those tests, continue main task.
-4. Do not spend cycles trying to fix tests outside current task's scope.
-5. Report pre-existing failures to user as side note.
+2. If pre-existing: doc, skip those tests, continue main task.
+3. Do not spend cycles trying to fix tests outside current task's scope.
+4. Report pre-existing failures to user as side note.
+
+#### User-specified resource missing/inaccessible
+
+1. State exactly what was specified and what the error was.
+2. Do NOT silently substitute, skip, or use a different resource.
+3. Ask: "Resource `<X>` not found. How to proceed?"
+   - Fix/provide the correct resource
+   - Use `<workaround>` instead (only if known workaround exists)
+   If and only if an alternative has been verified to exist, offer it as a second option.
+4. Wait for user confirmation before doing anything.
 
 ### 3. After unblocking
 
+Once resolved, user might say go, continue, or resolved.
 Resume original task from step that was blocked.
 
-If user confirms blocker is unresolvable: doc what cannot be completed, state which part is blocked, and stop. Do not speculate on alternatives.
+If user confirms blocker is unresolvable: doc what cannot be completed, state which part is blocked, and stop.
+Ask user if they want alternatives explored.
 
 ## Rules
 
 - Never install binaries, packages, or system dependencies without explicit user approval.
 - Never silently skip a blocker — always surface it to the user.
 - Never run destructive commands (permission changes, version switches) autonomously.
-- Never run `git stash`.
+- Never run git stash/restore/checkout/clean/reset.
 - Never read, guess, or generate credential or secret values.
 - `git diff HEAD -- <files>` is allowed; scope it to files relevant to the failure.
-- Resolve each blocker in minimum turns — one ask, wait for user response, then resume.
+- Resolve each blocker in minimum turns — ask, wait for user responses, then resume.
 
 ## Guidelines
 
