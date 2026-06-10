@@ -129,6 +129,8 @@
     "dialog.select.submit": "return,ctrl+space", // (ctrl+j not recognized..)
     "dialog.prompt.submit": "return,ctrl+j",
     "dialog.mcp.toggle": "space",
+    // FIXME: nav broken for `#…` autocomplete, but works for `/…` or `@…` 👀
+    // TICKET: https://github.com/JosXa/opencode-snippets/issues/36
     "prompt.autocomplete.prev": "alt+k,up",
     "prompt.autocomplete.next": "alt+j,down",
     "prompt.autocomplete.hide": "escape",
