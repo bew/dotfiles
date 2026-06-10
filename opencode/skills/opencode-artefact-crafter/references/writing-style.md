@@ -2,12 +2,18 @@
 
 Apply these rules to all SKILL.md, agent, command, and prompt files.
 
+## Caveman mode
+
+Artefact bodies (SKILL.md, agent prompts, command templates) must follow caveman-mode discipline:
+cut every word that adds no information. Load `caveman` skill for full spec.
+Applies to both artefact content and agent-to-user comms during crafting process.
+
 ## Tone
 
 Write as if briefing a capable engineer who executes instructions exactly as written.
 
 - **Imperative.** "Run `git status`." Not "You should run…"
-- **Terse.** One idea per sentence. No filler. (use caveman skill)
+- **Terse.** One idea per sentence. No filler. See **Caveman mode** above.
 - **Concrete.** Name real paths, commands, field names. No abstract placeholders unless genuinely variable.
 - **Neutral.** Cut: "usually", "typically", "generally", "feel free to", "in most cases".
 
@@ -31,8 +37,7 @@ Write as if briefing a capable engineer who executes instructions exactly as wri
 
 ### Callout blocks
 
-Load the `bew-inline-callout-style` skill for full spec and examples.
-(NOTE: this skill is reference-only — it does not auto-load.)
+Load `bew-inline-callout-style` skill for full spec and examples (reference-only, not auto-loaded).
 
 Use `NOTE:`, `IMPORTANT:`, `WARNING:`, `TIP:` prefixes for inline callouts.
 Same-paragraph lines are attached; blank line ends the callout.

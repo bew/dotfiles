@@ -1,11 +1,11 @@
 ---
 name: opencode-artefact-crafter
 description: |
-  Load when the user asks to create, update, edit, or refactor any OpenCode (OC)
+  Load when user asks to create, update, edit, or refactor any OpenCode (OC)
   artefact: skills, agents, commands, or snippets — including modifying an existing one.
-  Triggers examples: "create a skill", "create a skill to …", "update the X skill",
-  "add Y to the OC cmd Z", "edit the W agent", "update the crafter skill".
-  Guides the user through discovery, drafting, and iterative refinement.
+  Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
+  "edit the W agent", "update crafter skill".
+  Guides user through discovery, drafting, and iterative refinement.
 ---
 
 # OpenCode Crafter
@@ -14,27 +14,29 @@ Helps users design & create OpenCode artefacts: **skills**, **agents**, **comman
 
 Work in multiple phases:
 
-1. **Artefact type** — identify right artefact type for the need
-2. **Discover** — gather requirements through focused questions
-3. **Draft** — plan artefact structure in-chat
-4. **Iterate** — refine with user via `opencode-artefact-reviewer` subagent
-5. **Write** — commit final files
+1. `Phase:classify` — Identify right artefact type
+2. `Phase:discover` — Gather requirements through focused questions
+3. `Phase:draft` — Plan structure; setup `$draftpath`; Iterate on draft
+3.5. `Phase:scripts` _(if needed)_ — POC & iterate on scripts via subagent
+4. `Phase:review` — Review & refine with user via subagent
+5. `Phase:ship` — Copy from `$draftpath` to `$installpath` (new artefacts only)
 
-No files are written until the last phase.
+Two paths used throughout:
+- `$draftpath` — where files are edited during crafting session.
+- `$installpath` — final install location, inferred from artefact type & scope (project vs global).
 
----
+## 1. `Phase:classify` — Identify right artefact type
 
-## Phase 1 — Identify the artefact type
-
-NOTE: If the target artefact already exists, treat this as an update.
-Use the existing file as the starting draft for Phase 3 but focus on the requested changes.
-Still go through all remaining phases.
+NOTE: If target artefact already exists, treat this as an update.
+Use existing files as starting draft for `Phase:draft`, focusing only on requested changes.
+`$draftpath` = `$installpath` for updates — edit files in-place, no tmp copy needed.
+Still go through all remaining phases — including `Phase:review`.
 
 Ask user what they want to create if not already clear. Use decision table below to confirm right artefact type.
 
 **A skill is appropriate when…**:
 - Task requires judgment, branching, or dynamically composing tools
-- Task should be automatically done based on needs of the model
+- Task should be automatically done based on needs of ther agent
 - Agent needs to use skill-associated files/scripts/references
 - Task is reusable across many sessions
 
@@ -46,18 +48,23 @@ Ask user what they want to create if not already clear. Use decision table below
 **An agent is appropriate when…**:
 - You need a persistent specialised assistant workflow
 - You want a different model, temperature, or tool set
-- You want to restrict or expand permissions (tool access, mcp, ..) beyond the default
+- You want to restrict or expand permissions (tool access, mcp, ..) beyond defaults
+
+NOTE: Only **skills** support companion files (`references/`, `scripts/`, `assets/`, `templates/`).
+Agents and commands use single `.md` file — all content must be self-contained.
 
 **A snippet is appropriate when…**:
 - You want reusable static text injected anywhere in a message (not just first position)
 - Content is small, self-contained, and has a single responsibility
 - You want to DRY up recurring prompt patterns or instructions
 
-Based on artefact type, read one of the following references for full spec of that type.
+Based on artefact type, read one of following references for full spec of that type.
 - skill: `./references/skill-anatomy.md`
 - command: `./references/command-anatomy.md`
 - agent: `./references/agent-anatomy.md`
-- snippet: load the `snippets` skill for full spec
+- snippet: load `snippets` skill for full spec
+
+If skill will use a script, read `./references/skill-with-script.md`.
 
 ### Should this even be an OpenCode config artefact?
 
@@ -69,19 +76,17 @@ An OpenCode artefact is NOT appropriate for tasks that are:
 - Run unattended in CI/CD → suggest to use a pipeline action, not an agent
 - Simple enough to be a one-liner → suggest to write command in `AGENTS.md`
 
-If requested need appears to 'violate' these rules, suggest user toward alternative solution (or let user force).
+If requested need appears to 'violate' these rules, suggest user toward alternative solution.
 
----
+## 2. `Phase:discover` — Gather reqs through focused questions
 
-## Phase 2 — Discover
-
-Ask focused questions until you have enough to draft. Limit to two rounds.
+Ask focused questions until you have enough requirements to draft. Limit to 3 rounds.
 
 For all artefact types:
-- What is the single responsibility?
+- What is the single responsibility of the artefact?
 - Project-scoped or global/personal?
 - Any constraints, failure modes, or edge cases?
-  (these may appear during review iterations or later as the thing is used in different contexts)
+  (these may appear during review iterations or later as artefact used in different contexts)
 
 For skills additionally:
 - What inputs does agent receive? What should it produce?
@@ -98,49 +103,72 @@ For commands additionally:
 - Should it run in a subagent session to avoid polluting context?
 
 For snippets additionally:
-- What is the trigger name and any aliases?
+- What is trigger name? any aliases?
 - Should content expand inline, or use `<append>`/`<prepend>` blocks?
 - Does it need shell command output injected (`` !`cmd` ``)?
 
----
+## 3. `Phase:draft` — Plan structure; setup `$draftpath`; Iterate on draft
 
-## Phase 3 — Draft (in-chat, no files yet)
+**First**: establish `$draftpath`.
+- New artefact: suggest `/tmp/opencode_crafter/<name>/`, confirm with user.
+- Update: `$draftpath` = `$existingpath` (path where artefact already lives) — no copy needed.
 
-Present draft as a fenced markdown block, labeled:
-````
-Draft: <artefact-type>/<name>
-````
-(Always use 4 backticks when showing artefact, so nested code blocks don't break formatting)
+Write all draft files to `$draftpath` as soon as they exist.
+**Writing files early is critical** — it protects draft content from context compression in long sessions.
+Keep them updated after every meaningful change.
 
-Include proposed frontmatter & full body. Note any open questions or tradeoffs.
+Do not output draft content inline. Tell user where to inspect it:
+> Draft written to `$draftpath/<filename>` — open to inspect.
+
+Note any open questions or tradeoffs.
+
+Draft prose should be lean and terse — imperative, no filler.
+NOTE: Use light caveman mode for drafting of artefact files, as well as all comms with user during crafting process.
+(load `caveman` skill for more info)
+
 Ask: *Does this match what you had in mind?*
 
-If the user confirms or requests only minor adjustments, proceed immediately to Phase 4 — no permission needed.
+Iterate until confirmation.
+Then proceed to `Phase:scripts` (for skill, if scripts needed) or `Phase:review`.
 
----
+## 3.5. `Phase:scripts` (if needed) — Script POC & iterate via subagent
 
-## Phase 4 — Review and iterate via `opencode-artefact-reviewer` subagent
+Skip phase if artefact does NOT have script.
 
-Once draft shape is agreed, read `./references/writing-style.md` & apply it to all artefact bodies.
-Always keep these rules in mind when making edits.
+Invoke `opencode-skill-script-crafter` subagent via `task` tool.
+Pass in prompt:
+- `$draftpath` (agent works there), SKILL.md there used for script's interface spec
+- Only extra context not captured in SKILL.md: behavioral notes, edge cases, impl details
+  discussed in `Phase:discover/draft` that SKILL draft intentionally omits.
 
-Invoke `opencode-artefact-reviewer` subagent via `task` tool:
-```
-task: refine the <type> draft for <name>
-```
-Subagent writes draft to test path, asks user questions via `question` tool, applies feedback.
-Returns only the tmp path — read file from there as needed. Do not expect file content in response.
+Subagent writes scripts and tests into `$draftpath`, iterates with user, and returns when confirmed.
+
+Only proceed to `Phase:review` once user confirms scripts are done.
+Script review does not count as full-artefact review — `Phase:review` covers the complete artefact.
+If user abandons script work mid-phase, note any unresolved scripts and carry the gap into `Phase:review`.
+
+## 4. `Phase:review` — Review & iterate with user via subagent
+
+Invoke `opencode-artefact-reviewer` subagent via `task` tool.
+Pass in prompt:
+- Artefact type and name
+- `$draftpath` (reviewer reads and edits files there)
+- For updates: which parts changed, so reviewer can focus
+
+Subagent reads and edits files at `$draftpath`, asks user questions via `question` tool.
+Reviewer handles writing-style conformance — do not pre-apply style yourself.
+For updates: tell reviewer to focus on changed sections and verify coherence with unchanged parts.
 Continue until user confirms or types "done". No round limit.
 
-After the loop, reflect shortly on diff between initial & final draft.
-Ask: *Ready to write $artefact to '$installpath' ?*
+After iterations, reflect shortly on diff between initial & final draft.
+Ask: *Ready to write `<name>` to `$installpath` ?* (skip for updates — `$draftpath` = `$existingpath`)
 
----
+## 5. `Phase:ship` — Write (new artefacts only)
 
-## Phase 5 — Write
+Skip this phase for updates — `$draftpath` = `$installpath`, files are already in place.
 
-Write all files.
-For skills, create full directory structure including any `./references/`, `./scripts/`, `./assets/`, or `./templates/` dirs.
+Copy all files from `$draftpath` to `$installpath`.
+For skills, create full directory structure including any `./references/`, `./scripts/`, `./assets/`, `./templates/` or `tests/` dirs.
 
-Clean up any test directory used during iterations:
-Must use `trash -v <tmp-dirs>…` (to avoid any issue with mis-written rm commands)
+After confirming all files are written successfully, clean up:
+Must use `trash -v $draftpath` (never `rm -rf`).

@@ -52,8 +52,13 @@ The markdown body is the agent's system prompt. Write it as direct instructions.
 | Mode | Usage |
 |---|---|
 | `primary` | Main agent; cycle with Tab or `switch_agent` keybind |
-| `subagent` | Invoked via `task` tool or `@mention`; runs in a child session with isolated context |
+| `subagent` | Invoked via `task` tool (or `@mention`, if not hidden); runs in a child session with isolated context |
 | `all` | Can be used as either (default) |
+
+**Convention**: always annotate the `mode:` line:
+- `mode: subagent # isolated context!` — subagent has no access to caller's history
+- `mode: primary  # shared context!`
+- `mode: all      # context depends on invocation`
 
 ## Subagent interaction
 
