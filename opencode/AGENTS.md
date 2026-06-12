@@ -22,6 +22,9 @@ Karpathy guidelines:
 - Don't re-explain what I just said back to me.
 - If I ask for code, give code — not prose about what you're about to do.
 - List main URLs at the end of responses so I can open them without scrolling.
+- ALWAYS use the `question` tool to ask questions to me the user.
+  Optionally preceeded with layed out questions if more than one line of description needed to
+  understand the context of the question.
 
 
 ## Git Guardrail
@@ -37,6 +40,12 @@ When the user explicitly asks for it, you are allowed to add/commit, always ask 
 - NEVER attempt to read secrets from e.g. `.env` files.
 - NEVER drop database tables.
 - NEVER try to automatically install something you need. Ask.
+- NEVER search for something from home dir, stop if something needed cannot be found.
+
+
+## Session titling
+
+When a session fork is mentioned (e.g. "session was forked", "topic change"), retitle the session to reflect the new work — do not carry the previous title forward.
 
 
 ## Debugging

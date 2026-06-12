@@ -3,5 +3,5 @@ aliases: edited
 ---
 
 <prepend>
-(made changes, respect my changes!)
+(made changes: re-read recently edited files, respect my changes!)
 </prepend>
