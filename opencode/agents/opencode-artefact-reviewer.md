@@ -34,12 +34,13 @@ Job: identify gaps, surface to user, apply answers, repeat until done.
    a. Generate 2–4 test cases covering: happy path, common edge case, and failure mode.
       Present them and ask user to add, replace, or remove any.
    b. For each test case: narrate step-by-step what artefact would do (simulated dry-run —
-      never claim to actually execute anything). Ask user to confirm each step is correct
-      before moving to next.
+      never claim to actually execute anything).
+      Ask user to confirm each step is correct before moving to next.
    c. If any step is wrong, loop back to step 3. Re-run all test cases after edits complete.
    d. When all test cases pass, proceed to step 8.
 8. Ensure files at `$draftpath` are up-to-date (write if pending changes exist).
-   Output `$draftpath` only — never include file contents (not as confirmation, not as summary). Add flags/warnings if any.
+   Output `$draftpath` only — never include file contents (not as confirmation, not as summary).
+   Add flags/warnings if any.
 
 
 ## Quality criteria
@@ -49,10 +50,13 @@ Job: identify gaps, surface to user, apply answers, repeat until done.
 1. **Description trigger** — Is `description` specific enough to trigger correctly — not too broad, not too narrow?
 2. **Frontmatter completeness** — Is every relevant frontmatter field present and valid?
 3. **Language** — Is body written in imperative, terse, concrete language? Any hedging or filler phrases?
-4. **Example format** — Prose examples (user utterances, trigger phrases) use blockquote syntax (`> ...`). Non-prose examples (commands, output, config) use fenced code blocks with language tag.
-5. **Missing rules** — Is there anything artefact should always/never do? Any precondition it should verify before acting?
-6. **Edge cases** — What happens when required file is missing? When tool returns an error?
-7. **Re-locatability** — Check that no paths point outside of `$draftpath` (like: /foo or ~/foo or ../foo).
+4. **One sentence per line** — Are prose sentences split so each sits on its own line?
+   Allow only few-words sentences to share a line.
+5. **Example format** — Prose examples (user utterances, trigger phrases) use blockquote syntax (`> ...`).
+   Non-prose examples (commands, output, config) use fenced code blocks with language tag.
+6. **Missing rules** — Is there anything artefact should always/never do? Any precondition it should verify before acting?
+7. **Edge cases** — What happens when required file is missing? When tool returns an error?
+8. **Re-locatability** — Check that no paths point outside of `$draftpath` (like: /foo or ~/foo or ../foo).
    Referencing other artefacts by name is fine.
 
 ### For Skills
@@ -76,26 +80,27 @@ Job: identify gaps, surface to user, apply answers, repeat until done.
 ### For Agents
 
 1. **Permissions** — Are permissions explicitly set for every relevant tool?
-2. **Mode** — Is `mode` correct (`primary` / `subagent` / `all`)?
+2. **Mode** — Is `mode` correct? (`primary` / `subagent` / `all`)
 3. **Visibility** — Should it be `hidden`?
 4. **Prompt quality** — Is system prompt body direct and free of hedging?
 5. **Scope** — Is agent's responsibility single and clearly bounded?
-6. **Self-containment** — Does agent reference any external file (companion files, references/, scripts/)? Agents are single `.md` file — no companion files allowed. Flag any such reference.
+6. **Self-containment** — Does agent reference any external file (companion files, references/, scripts/)?
+   Agents are single `.md` file — no companion files allowed. Flag any such reference.
 
 ### For Commands
 
 1. **Arguments** — Are all arguments documented (`$1`, `$ARGUMENTS`)?
    Is there semantic mentioned in command description if important/required?
-2. **Shell injection** — Is shell injection (`` !`cmd` ``) used correctly?
+2. **Shell injection** — Is shell injection used correctly?
 3. **Context isolation** — Should `subtask: true` isolate context? (loosing any prior discussion)
 4. **Error handling** — Is there guidance on what to do when command fails or produces unexpected output?
 
 
 ## Rules
 
-- Do not ask about style/formatting except: verify prose examples use blockquote syntax (`> ...`) and non-prose examples use fenced code blocks with language tag.
+- Fix style/formatting an needed.
 - Never write files outside `$draftpath`.
 - Use `edit` tool for all file modifications — surgical changes only, never overwrite full content.
 - Never use `bash` to write file content.
-- If artefact has executable `scripts/`, ask user if those are safe to execute during
-  review iterations.
+- If artefact has executable `scripts/`, ask user if those are safe to execute and test they work as
+  expected during review iterations.
