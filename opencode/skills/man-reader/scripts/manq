@@ -1,0 +1,615 @@
+#!/usr/bin/env python3
+"""manq - man page query tool for token-efficient reading.
+
+Builds a lightweight syntax tree from the raw troff/mdoc source,
+then renders only the sections needed for each operation.
+"""
+
+import argparse
+import subprocess
+import sys
+import re
+import os
+import gzip
+from pathlib import Path
+from dataclasses import dataclass, field
+
+
+# ---------------------------------------------------------------------------
+# Data model
+# ---------------------------------------------------------------------------
+
+@dataclass
+class Item:
+    """A flag/option entry (.TP/.It Fl) within a section."""
+    tag_src: str          # raw troff tag line(s)
+    tag_text: str         # cleaned display tag
+    body_lines: list[str] = field(default_factory=list)  # raw troff body lines
+
+
+@dataclass
+class Section:
+    """A .SH/.Sh or .SS/.Ss node."""
+    name: str
+    level: int            # 1 = top-level, 2 = subsection
+    src_start: int        # line index in source (inclusive)
+    src_end: int          # line index in source (exclusive)
+    children: list["Section"] = field(default_factory=list)
+    items: list[Item] = field(default_factory=list)
+
+    @property
+    def src_line_count(self) -> int:
+        return self.src_end - self.src_start
+
+    @property
+    def subsection_count(self) -> int:
+        return len(self.children)
+
+
+@dataclass
+class ManDoc:
+    """Parsed man page syntax tree."""
+    name: str
+    section_num: str | None
+    source_lines: list[str]
+    sections: list[Section]   # top-level only; children nested inside
+    format: str               # "mdoc" | "man" | "unknown"
+    _rendered: str | None = field(default=None, repr=False)
+    _rendered_sections: dict[str, list[str]] | None = field(default=None, repr=False)
+
+    def rendered(self) -> str:
+        if self._rendered is None:
+            self._rendered = render_full(self.name, self.section_num)
+        return self._rendered
+
+    def rendered_section_map(self) -> dict[str, list[str]]:
+        if self._rendered_sections is None:
+            self._rendered_sections = split_rendered_sections(self.rendered())
+        return self._rendered_sections
+
+
+# ---------------------------------------------------------------------------
+# Source acquisition
+# ---------------------------------------------------------------------------
+
+def get_source_path(name: str, section: str | None) -> Path | None:
+    cmd = ["man", "-w"]
+    if section:
+        cmd += [section, name]
+    else:
+        cmd.append(name)
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        p = Path(r.stdout.strip())
+        return p if p.exists() else None
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
+def read_source(path: Path) -> str:
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8", errors="replace") as f:
+            return f.read()
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def render_full(name: str, section: str | None) -> str:
+    """Render full man page to plain text (called once, result cached on ManDoc)."""
+    cmd = ["man"]
+    if section:
+        cmd += [section, name]
+    else:
+        cmd.append(name)
+    env = os.environ.copy()
+    env["MANPAGER"] = "cat"
+    env["MANWIDTH"] = "120"
+    try:
+        r = subprocess.run(cmd, capture_output=True, env=env, check=True)
+        col = subprocess.run(["col", "-bx"], input=r.stdout, capture_output=True)
+        return col.stdout.decode("utf-8", errors="replace")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"error: cannot render man page: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def split_rendered_sections(rendered: str) -> dict[str, list[str]]:
+    """Split full rendered text into a dict of section_name -> lines."""
+    lines = rendered.splitlines()
+    result: dict[str, list[str]] = {}
+    current_name: str | None = None
+    current_lines: list[str] = []
+
+    # Section headers: all-caps at column 0 (no leading whitespace)
+    _HEADER_RE = re.compile(r'^([A-Z][A-Z0-9 _()/-]{1,})$')
+
+    for line in lines:
+        m = _HEADER_RE.match(line.rstrip())
+        if m:
+            if current_name:
+                result[current_name] = current_lines
+            current_name = m.group(1).strip()
+            current_lines = [line]
+        else:
+            if current_name:
+                current_lines.append(line)
+    if current_name and current_lines:
+        result[current_name] = current_lines
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Syntax tree parser
+# ---------------------------------------------------------------------------
+
+# Section header patterns
+_SH_RE  = re.compile(r'^\.S[Hh]\s+"?([^"]+?)"?\s*$')
+_SS_RE  = re.compile(r'^\.S[Ss]\s+"?([^"]+?)"?\s*$')
+# mdoc option item: .It Fl x , Fl Fl long-opt ...
+_IT_FL  = re.compile(r'^\.It\s+Fl')
+# man .TP option entry
+_TP_RE  = re.compile(r'^\.TP\b')
+# mdoc list begin/end
+_BL_RE  = re.compile(r'^\.Bl\b')
+_EL_RE  = re.compile(r'^\.El\b')
+
+
+def detect_format(lines: list[str]) -> str:
+    for l in lines[:40]:
+        if re.match(r'^\.Dd\b', l) or re.match(r'^\.Dt\b', l):
+            return "mdoc"
+        if re.match(r'^\.TH\b', l):
+            return "man"
+    return "unknown"
+
+
+def parse_tree(source: str, name: str, section_num: str | None) -> ManDoc:
+    lines = source.splitlines()
+    fmt = detect_format(lines)
+
+    sections: list[Section] = []   # all sections flat (for building)
+    stack: list[Section] = []      # current nesting stack
+
+    def close_current(at: int):
+        if stack:
+            s = stack[-1]
+            if s.src_end == -1:
+                s.src_end = at
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        m = _SH_RE.match(line)
+        if m:
+            close_current(i)
+            # Close all open sections
+            while stack:
+                s = stack.pop()
+                if s.src_end == -1:
+                    s.src_end = i
+            sec = Section(name=m.group(1).strip(), level=1, src_start=i, src_end=-1)
+            sections.append(sec)
+            stack.append(sec)
+            i += 1
+            continue
+
+        m = _SS_RE.match(line)
+        if m:
+            close_current(i)
+            # Close subsections but keep parent SH
+            while stack and stack[-1].level >= 2:
+                s = stack.pop()
+                if s.src_end == -1:
+                    s.src_end = i
+            sec = Section(name=m.group(1).strip(), level=2, src_start=i, src_end=-1)
+            sections.append(sec)
+            if stack:
+                stack[-1].children.append(sec)
+            stack.append(sec)
+            i += 1
+            continue
+
+        # Parse option items for the innermost section
+        if stack:
+            parent = stack[-1]
+            if fmt == "mdoc" and _IT_FL.match(line):
+                item, i = _parse_mdoc_item(lines, i)
+                parent.items.append(item)
+                continue
+            if fmt == "man" and _TP_RE.match(line):
+                item, i = _parse_tp_item(lines, i)
+                parent.items.append(item)
+                continue
+
+        i += 1
+
+    # Close any unclosed sections
+    for s in stack:
+        if s.src_end == -1:
+            s.src_end = len(lines)
+
+    # Build top-level list (level==1 only; children already nested)
+    top = [s for s in sections if s.level == 1]
+
+    return ManDoc(
+        name=name,
+        section_num=section_num,
+        source_lines=lines,
+        sections=top,
+        format=fmt,
+    )
+
+
+def _clean_troff(text: str) -> str:
+    """Strip common troff markup for display."""
+    text = re.sub(r'\\f[BIPR0-9]', '', text)
+    text = re.sub(r'\\-', '-', text)
+    text = re.sub(r'\\&', '', text)
+    text = re.sub(r'\\~', ' ', text)
+    text = re.sub(r'\\s[+-]?\d*', '', text)
+    text = re.sub(r'\\[*(]..', '', text)
+    # mdoc: Fl -> -, Ar -> <arg>, Ns -> (join), Oo/Oc -> [/]
+    text = re.sub(r'\bFl\s+', '-', text)
+    text = re.sub(r'\bAr\s+(\S+)', r'<\1>', text)
+    text = re.sub(r'\bNs\b', '', text)
+    text = re.sub(r'\bOo\b', '[', text)
+    text = re.sub(r'\bOc\b', ']', text)
+    text = re.sub(r'\bCm\b', '', text)
+    text = re.sub(r'\bEv\b', '', text)
+    text = re.sub(r'\bNo\b', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+
+def _parse_mdoc_item(lines: list[str], i: int) -> tuple[Item, int]:
+    """Parse a .It Fl ... mdoc item entry."""
+    tag_src = lines[i]
+    # Tag may continue on next line if it ends with ,
+    tag_parts = [lines[i][len('.It '):].strip()]
+    i += 1
+    body = []
+    while i < len(lines):
+        l = lines[i]
+        if re.match(r'^\.(?:It|El|Sh|SH|Ss|SS|Pp|Bl)\b', l):
+            break
+        body.append(l)
+        i += 1
+    tag_text = _clean_troff(" ".join(tag_parts))
+    return Item(tag_src=tag_src, tag_text=tag_text, body_lines=body), i
+
+
+def _parse_tp_item(lines: list[str], i: int) -> tuple[Item, int]:
+    """Parse a .TP man item entry."""
+    tag_src = lines[i]
+    i += 1
+    # Next non-macro line is the tag
+    tag_raw = ""
+    while i < len(lines):
+        l = lines[i]
+        if not l.startswith('.'):
+            tag_raw = l
+            i += 1
+            break
+        i += 1
+    body = []
+    while i < len(lines):
+        l = lines[i]
+        if re.match(r'^\.(?:TP|SH|SS|PP|sp|br|RE|RS|El)\b', l):
+            break
+        body.append(l)
+        i += 1
+    tag_text = _clean_troff(tag_raw)
+    return Item(tag_src=tag_src, tag_text=tag_text, body_lines=body), i
+
+
+# ---------------------------------------------------------------------------
+# Lazy section rendering
+# ---------------------------------------------------------------------------
+
+def render_section(doc: ManDoc, section: Section,
+                   line_range: tuple[int, int] | None = None) -> str:
+    """Get rendered lines for a section from cached full render."""
+    sec_map = doc.rendered_section_map()
+    # Try exact name, then case-insensitive
+    lines = sec_map.get(section.name)
+    if lines is None:
+        for k, v in sec_map.items():
+            if k.upper() == section.name.upper():
+                lines = v
+                break
+    if lines is None:
+        return f"(section '{section.name}' not found in rendered output)"
+
+    # Strip leading/trailing blank lines (keep header)
+    while len(lines) > 1 and not lines[-1].strip():
+        lines = lines[:-1]
+
+    if line_range:
+        start = max(0, line_range[0] - 1)
+        end = line_range[1] if line_range[1] else len(lines)
+        lines = lines[start:end]
+
+    return "\n".join(lines)
+
+
+def find_section(doc: ManDoc, name: str) -> Section | None:
+    """Case-insensitive section lookup (top-level + subsections)."""
+    name_up = name.upper()
+    for s in doc.sections:
+        if s.name.upper() == name_up:
+            return s
+        for ss in s.children:
+            if ss.name.upper() == name_up:
+                return ss
+    return None
+
+
+def find_synopsis_short(doc: ManDoc) -> str | None:
+    """Return first 1-3 content lines of SYNOPSIS from rendered output."""
+    sec_map = doc.rendered_section_map()
+    lines = sec_map.get("SYNOPSIS")
+    if not lines:
+        return None
+    # Skip header line and blank lines
+    content = [l.strip() for l in lines[1:] if l.strip()]
+    return "  ".join(content[:3]) if content else None
+
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+def cmd_toc(args):
+    name, section_num = parse_name(args.manpage)
+    path = get_source_path(name, section_num)
+    if not path:
+        print(f"error: man page not found: {args.manpage}", file=sys.stderr)
+        sys.exit(1)
+    source = read_source(path)
+    doc = parse_tree(source, name, section_num)
+
+    synopsis = find_synopsis_short(doc)
+    label = name + (f"({section_num})" if section_num else "")
+    print(f"{label}  [{doc.format}]")
+    if synopsis:
+        print(f"  {synopsis}")
+    print()
+
+    scope = args.S.upper() if args.S else None
+    max_level = args.L  # None = all
+
+    def print_section(s: Section, indent: int):
+        pad = "  " * indent
+        nsubs = s.subsection_count
+        nitems = len(s.items)
+        meta = f"[{s.src_line_count} lines"
+        if nsubs:
+            meta += f", {nsubs} subsections"
+        if nitems:
+            meta += f", {nitems} options"
+        meta += "]"
+        print(f"{pad}{s.name}  {meta}")
+        if max_level is None or indent + 1 < max_level:
+            for ss in s.children:
+                print_section(ss, indent + 1)
+
+    if scope:
+        target = find_section(doc, scope)
+        if not target:
+            print(f"Section '{scope}' not found.", file=sys.stderr)
+            sys.exit(1)
+        print_section(target, 0)
+    else:
+        for s in doc.sections:
+            print_section(s, 0)
+
+    if args.O:
+        # Collect all items from OPTIONS/FLAGS sections, or from any section
+        items = _collect_options(doc)
+        if items:
+            print()
+            print("Options:")
+            for item in items:
+                tag = item.tag_text[:45]
+                desc = _item_desc_short(item, doc.format)
+                print(f"  {tag:<45}  {desc}")
+        else:
+            print("\n  (no options found)")
+
+
+def cmd_section(args):
+    name, section_num = parse_name(args.manpage)
+    path = get_source_path(name, section_num)
+    if not path:
+        print(f"error: man page not found: {args.manpage}", file=sys.stderr)
+        sys.exit(1)
+    source = read_source(path)
+    doc = parse_tree(source, name, section_num)
+
+    line_range = parse_line_range(args.lines) if args.lines else None
+
+    for sect_name in args.sections:
+        sec = find_section(doc, sect_name)
+        if not sec:
+            print(f"Section '{sect_name}' not found.", file=sys.stderr)
+            continue
+        rendered = render_section(doc, sec, line_range)
+        rlines = rendered.splitlines()
+        total_lines = len(render_section(doc, sec).splitlines())
+        if line_range:
+            s, e = line_range[0] or 1, line_range[1] or total_lines
+            print(f"## {sec.name} [showing lines {s}-{min(e, total_lines)} of {total_lines}]")
+        else:
+            print(f"## {sec.name} [{total_lines} lines]")
+        print(rendered)
+        print()
+
+
+def cmd_flag(args):
+    name, section_num = parse_name(args.manpage)
+    path = get_source_path(name, section_num)
+    if not path:
+        print(f"error: man page not found: {args.manpage}", file=sys.stderr)
+        sys.exit(1)
+    source = read_source(path)
+    doc = parse_tree(source, name, section_num)
+
+    all_items = _collect_options(doc)
+
+    for target in args.flags:
+        matched = [it for it in all_items
+                   if _flag_matches(target, it.tag_text)]
+        if matched:
+            for item in matched:
+                print(f"  {item.tag_text}")
+                desc = _item_desc_full(item, doc)
+                if desc:
+                    for l in desc.splitlines():
+                        print(f"    {l}")
+                print()
+        else:
+            print(f"  {target}: not found")
+            print()
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _collect_options(doc: ManDoc) -> list[Item]:
+    """Return items from OPTIONS/FLAGS sections; fall back to all sections."""
+    for candidate in ("OPTIONS", "FLAGS", "DESCRIPTION"):
+        sec = find_section(doc, candidate)
+        if sec and sec.items:
+            return sec.items
+    # Last resort: gather from all sections
+    all_items = []
+    for s in doc.sections:
+        all_items.extend(s.items)
+        for ss in s.children:
+            all_items.extend(ss.items)
+    return all_items
+
+
+def _item_desc_short(item: Item, fmt: str) -> str:
+    """Single-line description for toc -O output."""
+    for l in item.body_lines:
+        if l.startswith('.'):
+            continue
+        cleaned = _clean_troff(l)
+        if cleaned:
+            return cleaned[:60]
+    return ""
+
+
+def _item_desc_full(item: Item, doc: ManDoc) -> str:
+    """Get rendered description for a flag item by finding it in rendered OPTIONS."""
+    # Find the item tag in the rendered OPTIONS/DESCRIPTION section
+    tag_clean = item.tag_text.strip()
+    sec_map = doc.rendered_section_map()
+    for sect_name in ("OPTIONS", "FLAGS", "DESCRIPTION"):
+        lines = sec_map.get(sect_name)
+        if not lines:
+            continue
+        # Find the tag line in rendered text
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            # Match if the tag appears in a flag-like line
+            if stripped and any(
+                f in stripped for f in _extract_flags_from_tag(tag_clean)
+            ):
+                # Collect description: lines after this until next flag entry or blank
+                desc_lines = []
+                for j in range(i + 1, min(i + 8, len(lines))):
+                    l = lines[j]
+                    if not l.strip():
+                        break
+                    # Next option entry (indented flag line)
+                    if re.match(r'^\s{5,10}-', l):
+                        break
+                    desc_lines.append(l.rstrip())
+                if desc_lines:
+                    return "\n".join(desc_lines)
+    return _clean_troff("\n".join(item.body_lines[:4]))
+
+
+def _extract_flags_from_tag(tag: str) -> list[str]:
+    """Extract individual flag strings from a combined tag like '-v , --verbose'."""
+    parts = re.split(r'[\s,]+', tag)
+    return [p for p in parts if p.startswith('-')]
+
+
+def _flag_matches(target: str, tag_text: str) -> bool:
+    """True if target exactly matches one of the flag tokens in tag_text.
+
+    '-v' must match '-v' or '--verbose' token literally, never as a substring
+    of another token like '-V' or '--recursive'.
+    """
+    tokens = _extract_flags_from_tag(tag_text)
+    # Normalise: strip trailing '=' or '<arg>' for long opts
+    def _norm(t: str) -> str:
+        return re.sub(r'[=<].*$', '', t)
+    target_norm = _norm(target)
+    for tok in tokens:
+        if _norm(tok) == target_norm:
+            return True
+    return False
+
+
+def parse_name(manpage: str) -> tuple[str, str | None]:
+    if ":" in manpage:
+        parts = manpage.rsplit(":", 1)
+        return parts[0], parts[1]
+    return manpage, None
+
+
+def parse_line_range(s: str) -> tuple[int | None, int | None]:
+    """Parse '1-50' -> (1, 50), '51' -> (51, None)."""
+    if "-" in s:
+        parts = s.split("-", 1)
+        start = int(parts[0]) if parts[0] else 1
+        end = int(parts[1]) if parts[1] else None
+        return start, end
+    return int(s), None
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(prog="manq", description="Token-efficient man page queries")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+
+    p_toc = sub.add_parser("toc", help="List sections with metadata")
+    p_toc.add_argument("manpage")
+    p_toc.add_argument("-S", "--section", dest="S", metavar="SECT",
+                       help="Scope TOC to one section")
+    p_toc.add_argument("-L", "--level", dest="L", type=int, default=None, metavar="N",
+                       help="Max depth (default: all)")
+    p_toc.add_argument("-O", "--options", dest="O", action="store_true",
+                       help="Append condensed options list")
+
+    p_sec = sub.add_parser("section", help="Extract one or more sections")
+    p_sec.add_argument("manpage")
+    p_sec.add_argument("sections", nargs="+", metavar="SECTION")
+    p_sec.add_argument("--lines", metavar="START[-END]",
+                       help="Line range within rendered section (1-indexed)")
+
+    p_flag = sub.add_parser("flag", help="Show description for specific flags")
+    p_flag.add_argument("manpage")
+    p_flag.add_argument("flags", nargs=argparse.REMAINDER, metavar="FLAG")
+
+    args = parser.parse_args()
+
+    if args.cmd == "toc":
+        cmd_toc(args)
+    elif args.cmd == "section":
+        cmd_section(args)
+    elif args.cmd == "flag":
+        cmd_flag(args)
+
+
+if __name__ == "__main__":
+    main()
