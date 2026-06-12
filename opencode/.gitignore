@@ -2,3 +2,8 @@ node_modules/
 package.json
 bun.lock
 logs/
+
+# NOTE: opencode-snippets plugin supports both snippet/ (preferred) & snippets/ (my preference)
+# And there is a bug where even if snippets/config.jsonc exists it'll re-create snippet/config.jsonc..
+# NOTE: Opened PR: <https://github.com/JosXa/opencode-snippets/pull/34>
+snippet/
