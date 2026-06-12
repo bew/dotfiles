@@ -1,16 +1,16 @@
 # Writing Style for OpenCode Artefacts
 
-Apply these rules to all SKILL.md, agent, command, and prompt files.
+Apply to all SKILL.md, agent, command, & prompt files.
 
 ## Caveman mode
 
 Artefact bodies (SKILL.md, agent prompts, command templates) must follow caveman-mode discipline:
-cut every word that adds no information. Load `caveman` skill for full spec.
-Applies to both artefact content and agent-to-user comms during crafting process.
+Use `caveman` skill to cut every word that adds no information.
+Applies to artefact content & agent-to-user comms during crafting process.
 
 ## Tone
 
-Write as if briefing a capable engineer who executes instructions exactly as written.
+Brief a capable engineer who executes instructions exactly as written.
 
 - **Imperative.** "Run `git status`." Not "You should run…"
 - **Terse.** One idea per sentence. No filler. See **Caveman mode** above.
@@ -21,28 +21,31 @@ Write as if briefing a capable engineer who executes instructions exactly as wri
 ## Formatting
 
 - `##` for top-level sections, `###` for subsections. No deeper nesting.
-- Numbered lists for ordered steps. Bullet lists for unordered rules or options.
+- Numbered lists for ordered steps. Bullets for unordered rules/options.
 - Inline code for all commands, paths, field names, values.
-- Fenced code blocks with a language tag for multi-line content.
-- Tables for comparisons with 3+ items and 2+ dimensions.
-- Bold only for terms being defined or critical warnings.
+- Fenced code blocks with language tag for multi-line content.
+  Use short language tag like `md` or `py`.
+- Tables for comparisons with 3+ items & 2+ dimensions.
+- Bold for terms being defined or critical warnings only.
 - No emojis.
-- Max line length: 100 chars in prose. Code blocks and examples: line length follows the content being shown.
+- Line length:
+  For prose: 100 chars.
+  For code blocks & examples: line length follows content.
 
 ### Guidelines for examples
 
 - Prose examples (utterances, natural language outputs): use blockquote (`> ...`). Line length unconstrained.
   > Write a skill that monitors my inbox and summarizes unread threads every morning at 9am
-- All other examples (commands, config, file content, structured output): use fenced code block with language tag. Line length follows the language's own conventions.
+- All other examples (commands, config, file content, structured output): fenced code block with language tag. Line length follows language's own conventions.
 - **Short labeled pairs** (`Not:`/`Yes:`, `Bad:`/`Good:`, `Q:`/`A:`): inline form allowed when each side fits on one line.
 
 ### Callout blocks
 
-Load `bew-inline-callout-style` skill for full spec and examples (reference-only, not auto-loaded).
+Load `bew-inline-callout-style` skill for full spec & examples (reference-only, not auto-loaded).
 
 Use `NOTE:`, `IMPORTANT:`, `WARNING:`, `TIP:` prefixes for inline callouts.
-Same-paragraph lines are attached; blank line ends the callout.
-Parenthesized form `(KEYWORD: ...)` must be one line and may appear inline in another paragraph.
+Same-paragraph lines are attached; blank line ends callout.
+Parenthesized form `(KEYWORD: ...)` must be one line; may appear inline in another paragraph.
 
 ## Length
 
@@ -54,5 +57,5 @@ Parenthesized form `(KEYWORD: ...)` must be one line and may appear inline in an
 | Agent prompt | 50–200 lines |
 | Command template | 5–50 lines |
 
-Prefer to extract content to `references/` once a skill body exceeds ~300 lines.
-Must extract once a skill body exceeds 400 lines.
+Prefer to split to `references/` when skill body exceeds ~300 lines.
+Must split when skill body exceeds 400 lines.

@@ -7,7 +7,7 @@ description: >
   skill should be used.
 ---
 
-Write code review comments terse and actionable.
+Write code review comments terse & actionable.
 One line per finding: Location, problem, fix.
 No throat-clearing.
 

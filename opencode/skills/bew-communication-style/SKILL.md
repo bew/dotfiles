@@ -9,29 +9,29 @@ description: |
 
 ## Goal
 
-Produce prose that matches bew's personal writing voice: direct, warm, casually
-self-aware, never corporate — and iterate on it until bew confirms.
+Produce prose matching bew's personal writing voice: direct, warm, casually
+self-aware, never corporate — iterate until bew confirms.
 
 ## Steps
 
-1. **Gather context** — infer the communication form and audience from the request.
-   Use the `question` tool to ask only what's still missing, adapting questions to the form:
+1. **Gather context** — infer communication form and audience from request.
+   Use `question` tool to ask only what's still missing, adapting to form:
    - **PR / issue / GitHub comment**: what change or decision needs communicating, any linked context (issue, discussion)?
-   - **Community post / announcement**: what news to land, who the audience is, desired next action from readers?
+   - **Community post / announcement**: what news to land, who audience is, desired next action from readers?
    - **Email / DM**: relationship to recipient, formality level, urgency?
    - **Any form**: main point to land, anything to explicitly avoid (tone, scope, topics)
    Skip questions whose answers are already clear from context.
 
-2. **Draft** — produce a first version applying all Rules and Guidelines below.
-   Present it labeled `Draft`.
+2. **Draft** — produce first version applying all Rules and Guidelines below.
+   Present labeled `Draft`.
 
-3. **Ask for feedback** — use the `question` tool with one open question:
+3. **Ask for feedback** — use `question` tool with one open question:
    "Any changes? (tone, content, structure, length…)"
-   Offer a few concrete options based on the draft when it helps (e.g. "shorter",
+   Offer few concrete options based on draft when it helps (e.g. "shorter",
    "more casual", "different opening").
 
-4. **Iterate** — apply feedback, re-present the updated draft.
-   Repeat steps 3–4 until the user confirms or signals done.
+4. **Iterate** — apply feedback, re-present updated draft.
+   Repeat steps 3–4 until user confirms or signals done.
 
 ## Rules
 
@@ -42,7 +42,7 @@ self-aware, never corporate — and iterate on it until bew confirms.
 - No summary paragraphs that restate what was just written.
 - Cut every sentence that adds no information. No hard length limit.
 - Use inline backticks for identifiers: function names, paths, config keys.
-- Emoji must carry a distinct emotional register — never decoration.
+- Emoji must carry distinct emotional register — never decoration.
   One emoji per tonal shift, not one per sentence.
 - `👉` for calls to action or key takeaways only.
 - `_italics_` for asides, caveats, meta-comments.
@@ -52,14 +52,14 @@ self-aware, never corporate — and iterate on it until bew confirms.
 
 ## Guidelines
 
-- Open with the main point. Context follows, not precedes.
+- Open with main point. Context follows, not precedes.
 - Acknowledge real constraints plainly: life, blockers, uncertainty.
   Do not over-explain them.
 - Signal intent without over-committing: "rough vision", "probably X", "maybe Y".
 - End with low-pressure invites, not demands.
 - Use humor markers `^^'`, `🙃`, `:/` only where contextually earned.
 - Separate thematic blocks with two blank lines in longer pieces.
-- Put asides and meta-comments at the end, in `_italics_` or after `---`.
+- Put asides and meta-comments at end, in `_italics_` or after `---`.
 
 ## Output format guideline
 

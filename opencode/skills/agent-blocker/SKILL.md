@@ -11,7 +11,7 @@ description: |
 
 ## Goal
 
-Diagnose any blockers & escalate to user with concrete, actionable ask.
+Diagnose blockers & escalate to user with concrete, actionable ask.
 
 ## Steps
 
@@ -28,7 +28,7 @@ Identify which case applies before acting, more than one may apply simultaneousl
 | **Auth/credentials failure** | HTTP 401/403, expired token, missing API key or credential |
 | **Network/API unavailable** | External service unreachable, timeout, 5xx, or DNS failure |
 | **Test suite broken independently** | Tests fail in ways unrelated to agent's own changes |
-| **User-specified resource missing/inaccessible** | A path, repo, URL, or named resource given by the user does not exist, returns 404, or cannot be opened |
+| **User-specified resource missing/inaccessible** | A path, repo, URL, or named resource given by user does not exist, returns 404, or cannot be opened |
 
 ### 2. Act based on case
 
@@ -47,20 +47,20 @@ Identify which case applies before acting, more than one may apply simultaneousl
 #### Permission denied
 
 1. Identify exact path, port, or resource.
-2. Check if fixable by agent (e.g., `chmod` on an agent-created file) or requires elevated privileges.
+2. Check if fixable by agent (e.g., `chmod` on agent-created file) or requires elevated privileges.
 3. If fixable: propose exact fix command for user to run (don't run it autonomously).
 4. If not fixable: ask user to resolve it.
 
 #### Auth/credentials failure
 
-1. State exact call that failed & the error (401, 403, token expired, etc.).
+1. State exact call that failed & error (401, 403, token expired, etc.).
 2. Do NOT attempt to read, guess, or generate credential values.
-3. Ask user to set or renew the credential and confirm when done.
+3. Ask user to set or renew credential and confirm when done.
 
 #### Network/API unavailable
 
-1. State what was called & what the error was (timeout, 5xx, DNS failure).
-2. Do not retry in a tight loop. Wait or ask user to confirm service is up.
+1. State what was called & what error was (timeout, 5xx, DNS failure).
+2. Do not retry in tight loop. Wait or ask user to confirm service is up.
 3. If API is optional for task: proceed without, flag as skipped.
 
 #### Test suite broken independently
@@ -68,17 +68,17 @@ Identify which case applies before acting, more than one may apply simultaneousl
 1. Run `git diff HEAD -- <specific files the tests cover>`.
    If those files are unchanged relative to `HEAD`, failure pre-dates agent's edits.
 2. If pre-existing: doc, skip those tests, continue main task.
-3. Do not spend cycles trying to fix tests outside current task's scope.
+3. Do not spend cycles fixing tests outside current task's scope.
 4. Report pre-existing failures to user as side note.
 
 #### User-specified resource missing/inaccessible
 
-1. State exactly what was specified and what the error was.
+1. State exactly what was specified and what error was.
 2. Do NOT silently substitute, skip, or use a different resource.
 3. Ask: "Resource `<X>` not found. How to proceed?"
-   - Fix/provide the correct resource
+   - Fix/provide correct resource
    - Use `<workaround>` instead (only if known workaround exists)
-   If and only if an alternative has been verified to exist, offer it as a second option.
+   If and only if an alternative has been verified to exist, offer it as second option.
 4. Wait for user confirmation before doing anything.
 
 ### 3. After unblocking
@@ -92,11 +92,11 @@ Ask user if they want alternatives explored.
 ## Rules
 
 - Never install binaries, packages, or system dependencies without explicit user approval.
-- Never silently skip a blocker — always surface it to the user.
+- Never silently skip a blocker — always surface it to user.
 - Never run destructive commands (permission changes, version switches) autonomously.
 - Never run git stash/restore/checkout/clean/reset.
 - Never read, guess, or generate credential or secret values.
-- `git diff HEAD -- <files>` is allowed; scope it to files relevant to the failure.
+- `git diff HEAD -- <files>` is allowed; scope it to files relevant to failure.
 - Resolve each blocker in minimum turns — ask, wait for user responses, then resume.
 
 ## Guidelines

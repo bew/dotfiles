@@ -1,6 +1,6 @@
 # Agent Anatomy
 
-An agent is a markdown file that configures a specialised AI assistant.
+Markdown file configuring a specialised AI assistant.
 
 Official documentation: https://opencode.ai/docs/agents/
 
@@ -11,7 +11,7 @@ Official documentation: https://opencode.ai/docs/agents/
 | Project-scoped | `.opencode/agents/<name>.md` |
 | Global | `~/.config/opencode/agents/<name>.md` |
 
-The filename (without `.md`) becomes the agent name, usable via `@mention`.
+Filename (without `.md`) becomes agent name, usable via `@mention`.
 
 ## Frontmatter
 
@@ -45,7 +45,7 @@ permissions:
 
 ## Body
 
-The markdown body is the agent's system prompt. Write it as direct instructions.
+Markdown body is agent's system prompt. Write as direct instructions.
 
 ## Modes
 
@@ -62,7 +62,7 @@ The markdown body is the agent's system prompt. Write it as direct instructions.
 
 ## Subagent interaction
 
-When a subagent uses the `question` tool, execution pauses and the prompt surfaces to the user in the child session.
+When subagent uses `question` tool, execution pauses & prompt surfaces to user in child session.
 Navigate with:
 - `<Leader>+Down` — enter first child session
 - `Right` / `Left` — cycle child sessions
@@ -70,7 +70,7 @@ Navigate with:
 
 ## Task permissions
 
-Control which subagents an agent may invoke via the `task` tool using glob patterns:
+Control which subagents may be invoked via `task` tool using glob patterns:
 
 ```yaml
 permissions:

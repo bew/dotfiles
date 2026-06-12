@@ -1,6 +1,6 @@
 # Skill Anatomy
 
-A skill is a named directory containing a `SKILL.md` entry point and optional supporting resources.
+Named directory containing `SKILL.md` entry point + optional supporting resources.
 
 Official documentation: https://agentskills.io/specification
 
@@ -17,8 +17,7 @@ WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to Open
 
 ## Directory layout
 
-A skill is defined as a directory with a `SKILL.md`, with optional resources that the skill can
-reference.
+Directory with `SKILL.md` + optional resources.
 
 ```
 <skill-name>/
@@ -33,7 +32,7 @@ reference.
 
 ## Progressive Disclosure
 
-Skills load context in tiers — design your content to match:
+Skills load context in tiers — design content to match:
 
 | Tier | What | When loaded |
 |---|---|---|
@@ -41,7 +40,7 @@ Skills load context in tiers — design your content to match:
 | L2 | `SKILL.md` body | When skill is triggered for the current task |
 | L3 | Additional files (e.g. in `references/`) | On demand — agent reads only what it needs |
 
-Keep content in `SKILL.md` vs. extract to a reference file:
+Keep in `SKILL.md` vs. extract to reference file:
 
 | Criterion | Keep in SKILL.md | Extract to references/ |
 |---|---|---|
@@ -50,24 +49,22 @@ Keep content in `SKILL.md` vs. extract to a reference file:
 | Body exceeds ~300 lines (prefer to extract) | No | Yes |
 | Two concerns rarely needed together | No | Each in own file |
 
-A common sub-scenario split is **create vs. update**:
-instructions for creating something new (type selection, scaffolding rules, gate checks)
-are irrelevant when updating an existing artefact.
-Extract the create-only content; keep the shared skeleton and update detection inline.
+Common split: **create vs. update** — create instructions (type selection, scaffolding, gate checks)
+irrelevant when updating. Extract create-only content; keep shared skeleton + update detection inline.
 
 ### Conditional instructions load
 
-Reference files only work if the agent knows *when* to read them.
-Every reference must have an explicit conditional trigger in `SKILL.md`.
+Reference files only work if agent knows *when* to read them.
+Every reference must have explicit conditional trigger in `SKILL.md`.
 
-Good — scenario is concrete and specific:
-```markdown
+Good — concrete & specific:
+```md
 Read `./references/forms.md` before filling out any form field.
 Read `./references/api-spec.md` only when writing or modifying API calls.
 ```
 
 Bad — agent cannot decide when to load:
-```markdown
+```md
 Read `./references/extra-context.md` if you need more detail.
 ```
 
@@ -86,7 +83,7 @@ description: |          # 1–1024 chars: what it does + WHEN to use it
 ---
 ```
 
-Optional fields, rarely needed for personal skills: `license`, `compatibility`, `metadata` (string → string map).
+Optional fields (rarely needed for personal skills): `license`, `compatibility`, `metadata` (string → string map).
 
 
 ## Body sections
@@ -112,5 +109,5 @@ Optional fields, rarely needed for personal skills: `license`, `compatibility`, 
 ## Loading behaviour
 
 At startup, OpenCode reads only each skill's `name` and `description`.
-The full body is loaded into context only when the agent calls the `skill` tool.
+Full body loaded into context only when agent calls the `skill` tool.
 WARNING: A bloated skill wastes tokens for the entire duration of that task.

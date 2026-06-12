@@ -6,7 +6,7 @@ description: Draft a PR description in my personal style
 
 ### Phase 1 — Gather context
 
-Check the "Additional user context" section at the bottom first. Pre-filled answers skip their corresponding question below.
+Check "Additional user context" section at bottom first. Pre-filled answers skip their corresponding question below.
 
 Ask (skipping any already answered):
 1. What is the diff source?
@@ -14,24 +14,24 @@ Ask (skipping any already answered):
    - Current branch vs `main` / `master`
    - Staged changes only
    - Custom — I'll provide a diff command
-2. Is there a linked GitHub issue? If so, what's the URL or number?
+2. Is there a linked GitHub issue? If so, what's URL or number?
 3. Any extra context or notes to include? (optional)
 
 Do not proceed until questions 1 and 2 are answered. Question 3 is optional.
 
 ### Phase 2 — Fetch the diff
 
-From the chosen diff source, deduce the exact `git diff` command to run.
-If the mapping is ambiguous, state the command you plan to run and ask for confirmation before executing.
-Run the command and use its output as the diff content for drafting.
+From chosen diff source, deduce exact `git diff` command to run.
+If mapping is ambiguous, state command you plan to run and ask for confirmation before executing.
+Run command and use output as diff content for drafting.
 
 ### Phase 3 — Draft
 
-Produce an initial PR title and body following the output structure and style rules below.
+Produce initial PR title and body following output structure and style rules below.
 
 ### Phase 4 — Iterate
 
-After the draft, ask:
+After draft, ask:
 - Does this look right?
 - Anything to adjust, add, or remove?
 
@@ -39,9 +39,9 @@ Iterate until confirmed.
 
 ### Phase 5 — Offer to save
 
-Offer to save the description to `pr-desc.txt` for easier editing or copying.
-Run `git rev-parse --show-toplevel` to find the repo root.
-If `pr-desc.txt` already exists there, warn the user before overwriting.
+Offer to save description to `pr-desc.txt` for easier editing or copying.
+Run `git rev-parse --show-toplevel` to find repo root.
+If `pr-desc.txt` already exists there, warn user before overwriting.
 Save only on explicit confirmation. Skipping is fine.
 
 ---
@@ -60,24 +60,24 @@ Title: <title>
 <asides, if any>
 ```
 
-- Title on the first line, prefixed with `Title:`.
-- Blank line before the body.
-- Asides separated by `---` at the end.
+- Title on first line, prefixed with `Title:`.
+- Blank line before body.
+- Asides separated by `---` at end.
 
 ---
 
 ## Style rules
 
-Load and apply the `bew-communication-style` skill for all writing style decisions.
+Load and apply `bew-communication-style` skill for all writing style decisions.
 
 Additional PR-specific rule:
-- Conventional commits prefix (`fix:`, `feat:`, `chore:`, etc.) in the title only when it fits naturally — never forced.
+- Conventional commits prefix (`fix:`, `feat:`, `chore:`, etc.) in title only when it fits naturally — never forced.
 
 ---
 
 ## Example
 
-Input: a discussion and diff of changes covering a fix for a bug where the `snippets/` dir was ignored at startup, plus a related path-tracking refactor.
+Input: a discussion and diff of changes covering a fix for a bug where `snippets/` dir was ignored at startup, plus a related path-tracking refactor.
 
 Output:
 
