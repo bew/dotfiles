@@ -26,6 +26,10 @@ model: provider/model-id    # optional model override
 
 Command description should succinctly mention the semantic of the args to help user fill them on use if needed.
 
+**Convention**: always annotate the `subtask:` line:
+- `subtask: true # isolated context!`
+- `subtask: false # shared context!`
+
 ## Body (template)
 
 The body is the prompt template.
