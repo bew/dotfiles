@@ -109,6 +109,11 @@ cfg.keys = {
   -- (C-/ cannot be represented, and it's nice to hit to comment sth!)
   keybind(mods.C, ":" --[[ key with / ]], act.SendKey{mods=mods.A, key="/"}),
 
+  -- Remap C-Enter to A-Enter
+  -- Useful in OpenCode to trigger submit the prompt 🤔
+  keybind(mods.C, "Enter", act.SendKey{mods=mods.A, key="Enter"}),
+  keybind(mods.D, "Enter", act.SendKey{mods=mods.A, key="Enter"}),
+
   -- Ensure Alt-² is encoded correctly
   -- (By default it's wrong.. https://github.com/wez/wezterm/issues/4259)
   keybind(mods.A, get_raw_key"²", act.SendKey{mods=mods.A, key="²"}),
@@ -117,6 +122,7 @@ cfg.keys = {
   keybind(mods.S, "PageDown", act.ScrollByPage( 1)),
 
   -- keybind(mods.CS, "r", act.ReloadConfiguration),
+  keybind(mods.CS, "R", act.EmitEvent("my-reload-config-with-notif")),
   keybind(mods.CS, "r", act.EmitEvent("my-reload-config-with-notif")),
 
   keybind(mods.CS, "l", act.ClearScrollback("ScrollbackAndViewport")),
