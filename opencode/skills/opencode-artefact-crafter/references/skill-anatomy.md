@@ -47,8 +47,13 @@ Keep content in `SKILL.md` vs. extract to a reference file:
 |---|---|---|
 | Needed every time skill runs | Yes | No |
 | Only needed in specific sub-scenarios | No | Yes |
-| Body exceeds ~300 lines | No | Yes |
+| Body exceeds ~300 lines (prefer to extract) | No | Yes |
 | Two concerns rarely needed together | No | Each in own file |
+
+A common sub-scenario split is **create vs. update**:
+instructions for creating something new (type selection, scaffolding rules, gate checks)
+are irrelevant when updating an existing artefact.
+Extract the create-only content; keep the shared skeleton and update detection inline.
 
 ### Conditional instructions load
 

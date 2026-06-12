@@ -63,6 +63,15 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 4. **Output specification** — Is the expected output concrete? Is there a fenced example if applicable?
 5. **Resources** — Are needed resource directories (`references/`, `scripts/`, etc.) identified? Any unused file?
 6. **Scope** — Does the skill do more than one job? If so, flag it.
+7. **Progressive disclosure** — Is context loaded at the right tier?
+   - Is anything in `SKILL.md` only needed in a specific sub-scenario? If so, flag it as a candidate for extraction.
+   - Is anything in a reference file needed on every invocation? If so, flag it as a candidate to inline.
+   - Every reference file must have a conditional trigger in `SKILL.md` — is each trigger specific and unambiguous?
+     A trigger like "read X if you need more detail" is too vague; it must name a concrete scenario.
+8. **Flow correctness** — If the skill has multiple flows (e.g. create vs. update, or sub-scenarios):
+   - Does each flow disclose only what it needs?
+   - Is there content loaded unconditionally that only applies to one flow?
+   - Are skip/fast-exit guards present and inline (not buried in a reference file)?
 
 ### For Agents
 

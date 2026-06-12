@@ -12,25 +12,32 @@ description: |
 
 Helps users design & create OpenCode artefacts: **skills**, **agents**, **commands**, **snippets**.
 
-Work in multiple phases:
+Work is separated in multiple phases:
 
 1. `Phase:classify` — Identify right artefact type
 2. `Phase:discover` — Gather requirements through focused questions
-3. `Phase:draft` — Plan structure; setup `$draftpath`; Iterate on draft
+3. `Phase:draft` — Plan structure; setup `$draftpath`; Iterate on draft with user
 3.5. `Phase:scripts` _(if needed)_ — POC & iterate on scripts via subagent
 4. `Phase:review` — Review & refine with user via subagent
 5. `Phase:ship` — Copy from `$draftpath` to `$installpath` (new artefacts only)
 
-Two paths used throughout:
+**For new artefact**:
+classify → discover → draft → (scripts) → review → ship
+
+**For updating existing artefact**:
+classify → discover → draft → (scripts) → review
+
+Three paths used throughout:
 - `$draftpath` — where files are edited during crafting session.
 - `$installpath` — final install location, inferred from artefact type & scope (project vs global).
+- `$existingpath` — path where an existing artefact already lives (updates only).
 
 At potential end of each phase, mention "Ready to move to <next-phase>? (say 'next' or similar to proceed)".
 This is informational only — do not use `question` tool for it.
 
-NOTE: When skill invoked, if there is prior conversation context on a different topic, ask user if they want to retitle session to reflect artefact work.
-- Skip if session is fresh.
-- Skip if prior discussion is already about artefact being worked on.
+NOTE: When skill invoked, must ask: "Retitle session to reflect artefact work?" — unless:
+- Session is fresh (no prior context).
+- Prior discussion is already about the artefact being worked on.
 
 ### Session titling
 
@@ -48,57 +55,20 @@ Session titling conventions (if a retitle tool is available):
 
 ## 1. `Phase:classify` — Identify right artefact type
 
-NOTE: If target artefact already exists, treat this as an update.
-Use existing files as starting draft for `Phase:draft`, focusing only on requested changes.
-`$draftpath` = `$installpath` for updates — edit files in-place, no tmp copy needed.
-Still go through all remaining phases — including `Phase:review`.
+If target artefact already exists, treat this as an update:
+- Use existing files as starting draft for `Phase:draft`, focusing only on requested changes.
+- `$draftpath` = `$installpath` for updates — edit files in-place, no tmp copy needed.
+- Still go through all remaining phases — including `Phase:review`.
 
-Ask user what they want to create if not already clear.
-Use decision table below to confirm right artefact type.
+If creating a new artefact: read `./references/classify-new.md` for type decision rules and artefact-gate check.
 
-**A skill is appropriate when…**:
-- Task requires judgment, branching, or dynamically composing tools
-- Task should be automatically done based on needs of agent
-- Agent needs to use skill-associated files/scripts/references
-- Task is reusable across many sessions
-
-**A command is appropriate when…**:
-- Task is a fixed prompt template run on demand
-- You want a `/shortcut` that injects context (args, shell output, files)
-- Output format is always the same
-
-**An agent is appropriate when…**:
-- You need a persistent specialised assistant workflow
-- You want a different model, temperature, or tool set
-- You want to restrict or expand permissions (tool access, mcp, ..) beyond defaults
-
-NOTE: Only **skills** support companion files (`references/`, `scripts/`, `assets/`, `templates/`).
-Agents and commands use single `.md` file — all content must be self-contained.
-
-**A snippet is appropriate when…**:
-- You want reusable static text injected anywhere in a message (not just first position)
-- Content is small, self-contained, and has a single responsibility
-- You want to DRY up recurring prompt patterns or instructions
-
-Based on artefact type, read one of following references for full spec of that type.
+Based on artefact type, read one of following references for full spec of that type:
 - skill: `./references/skill-anatomy.md`
 - command: `./references/command-anatomy.md`
 - agent: `./references/agent-anatomy.md`
 - snippet: load `snippets` skill for full spec
 
 If skill will use a script, read `./references/skill-with-script.md`.
-
-### Should this even be an OpenCode config artefact?
-
-Before proceeding, determine whether an OpenCode artefact is the right 'tool' for the job.
-
-An OpenCode artefact is NOT appropriate for tasks that are:
-- Fully deterministic → suggest to write a script (`scripts/`, `Makefile`, CI workflow)
-- Always identical → suggest to use a template or code generator
-- Run unattended in CI/CD → suggest to use a pipeline action, not an agent
-- Simple enough to be a one-liner → suggest to write command in `AGENTS.md`
-
-If requested need appears to 'violate' these rules, suggest user toward alternative solution.
 
 ## 2. `Phase:discover` — Gather reqs through focused questions
 
@@ -150,7 +120,7 @@ Note any open questions or tradeoffs.
 
 Draft prose should be lean and terse — imperative, no filler.
 State intent and constraints only; do not prescribe output structure or section layout.
-NOTE: Use light caveman mode for drafting of artefact files, as well as all comms with user during crafting process.
+NOTE: Use caveman mode for drafting of artefact files, as well as all comms with user during crafting process.
 (load `caveman` skill for more info)
 
 Ask: *Does this match what you had in mind?*
@@ -161,45 +131,15 @@ Then proceed to `Phase:scripts` (for skill, if scripts needed) or `Phase:review`
 ## 3.5. `Phase:scripts` (if needed) — Script POC & iterate via subagent
 
 Skip phase if artefact does NOT have script.
-
-Invoke `opencode-skill-script-crafter` subagent via `task` tool.
-Pass in prompt:
-- `$draftpath` (agent works there), SKILL.md there used for script's interface spec
-- Only extra context not captured in SKILL.md: behavioral notes, edge cases, impl details
-  discussed in `Phase:discover/draft` that SKILL draft intentionally omits.
-
-Subagent writes scripts and tests into `$draftpath`, iterates with user, and returns when confirmed.
-
-Only proceed to `Phase:review` once user confirms scripts are done.
-Script review does not count as full-artefact review — `Phase:review` covers the complete artefact.
-If user abandons script work mid-phase, note any unresolved scripts and carry the gap into `Phase:review`.
+If skill will use a script: read `./references/phase-scripts.md` for full instructions.
 
 ## 4. `Phase:review` — Review & iterate with user via subagent
 
-Invoke `opencode-artefact-reviewer` subagent via `task` tool.
-Pass in prompt:
-- Artefact type and name
-- `$draftpath` (reviewer reads and edits files there)
-- For updates: which parts changed, so reviewer can focus
-
-Subagent reads and edits files at `$draftpath`, asks user questions via `question` tool.
-Reviewer handles writing-style conformance — do not pre-apply style yourself.
-For updates: tell reviewer to focus on changed sections and verify coherence with unchanged parts.
-Continue until user confirms or types "done". No round limit.
-
-After iterations, briefly reflect on diff between initial & final draft.
-Ask: *Ready to write `<name>` to `$installpath` ?* (skip for updates — `$draftpath` = `$existingpath`)
-
-For updates: once user confirms, retitle session with `done:` prefix (see Session titling above).
+When entering Phase:review: read `./references/phase-review.md` for full instructions.
+After subagent returns and user confirms (update path): retitle session with `done:` prefix (see § Session titling).
 
 ## 5. `Phase:ship` — Write (new artefacts only)
 
 Skip this phase for updates — `$draftpath` = `$installpath`, files are already in place.
-
-Copy all files from `$draftpath` to `$installpath`.
-For skills, create full directory structure including any `./references/`, `./scripts/`, `./assets/`, `./templates/` or `tests/` dirs.
-
-After confirming all files are written successfully, clean up:
-Must use `trash $draftpath` (never `rm -rf`).
-
-Retitle session with `done:` prefix (see session titling conventions above).
+When entering Phase:ship (new artefact only): read `./references/phase-ship.md` for full instructions.
+After ship confirmed: retitle session with `done:` prefix (see § Session titling).

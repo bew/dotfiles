@@ -54,4 +54,5 @@ Parenthesized form `(KEYWORD: ...)` must be one line and may appear inline in an
 | Agent prompt | 50–200 lines |
 | Command template | 5–50 lines |
 
-If a skill exceeds 400 lines, extract content in the `references/` resource dir.
+Prefer to extract content to `references/` once a skill body exceeds ~300 lines.
+Must extract once a skill body exceeds 400 lines.
