@@ -14,6 +14,7 @@ Write as if briefing a capable engineer who executes instructions exactly as wri
 
 - **Imperative.** "Run `git status`." Not "You should run…"
 - **Terse.** One idea per sentence. No filler. See **Caveman mode** above.
+- IMPORTANT: One sentence per line. Never pack multiple sentences on one line (unless each sentence is very short, few words only).
 - **Concrete.** Name real paths, commands, field names. No abstract placeholders unless genuinely variable.
 - **Neutral.** Cut: "usually", "typically", "generally", "feel free to", "in most cases".
 

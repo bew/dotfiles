@@ -9,7 +9,7 @@ Official documentation: https://agentskills.io/specification
 
 | Scope | Path | Notes |
 |---|---|---|
-| Project-scoped | `.agents/skills/<name>/` | Tool-agnostic; works with OpenCode, Copilot Workspace, and other SKILL.md-compatible tools. **Preferred for team repos.** |
+| Project-scoped | `.agents/skills/<name>/` | Tool-agnostic; works with OpenCode, and other SKILL.md-compatible tools. **Preferred for team repos.** |
 | Global (OpenCode only) | `~/.config/opencode/skills/<name>/` | Personal reusable skills not tied to a repo |
 
 WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
@@ -31,14 +31,44 @@ reference.
 └── templates/   ← scaffolds the agent fills in
 ```
 
-TIP: Only add resource directories when `SKILL.md` would exceed ~300 lines, or when a resource is cleaner as a standalone file.
+## Progressive Disclosure
 
-Reference supporting files explicitly from `SKILL.md`:
+Skills load context in tiers — design your content to match:
+
+| Tier | What | When loaded |
+|---|---|---|
+| L1 | `description` frontmatter | Always — every session, to decide whether to trigger the skill |
+| L2 | `SKILL.md` body | When skill is triggered for the current task |
+| L3 | Additional files (e.g. in `references/`) | On demand — agent reads only what it needs |
+
+Keep content in `SKILL.md` vs. extract to a reference file:
+
+| Criterion | Keep in SKILL.md | Extract to references/ |
+|---|---|---|
+| Needed every time skill runs | Yes | No |
+| Only needed in specific sub-scenarios | No | Yes |
+| Body exceeds ~300 lines | No | Yes |
+| Two concerns rarely needed together | No | Each in own file |
+
+### Conditional instructions load
+
+Reference files only work if the agent knows *when* to read them.
+Every reference must have an explicit conditional trigger in `SKILL.md`.
+
+Good — scenario is concrete and specific:
 ```markdown
-Read `./references/api-spec.md` before writing any API calls.
-Run `./scripts/validate.sh` before committing the output.
+Read `./references/forms.md` before filling out any form field.
+Read `./references/api-spec.md` only when writing or modifying API calls.
 ```
+
+Bad — agent cannot decide when to load:
+```markdown
+Read `./references/extra-context.md` if you need more detail.
+```
+
 IMPORTANT: Always use `./` prefix when referencing a skill-associated file.
+
+TIP: If the trigger condition is "always", keep the content in `SKILL.md` instead.
 
 
 ## Frontmatter

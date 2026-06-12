@@ -25,6 +25,27 @@ Two paths used throughout:
 - `$draftpath` — where files are edited during crafting session.
 - `$installpath` — final install location, inferred from artefact type & scope (project vs global).
 
+At potential end of each phase, mention "Ready to move to <next-phase>? (say 'next' or similar to proceed)".
+This is informational only — do not use `question` tool for it.
+
+NOTE: When skill invoked, if there is prior conversation context on a different topic, ask user if they want to retitle session to reflect artefact work.
+- Skip if session is fresh.
+- Skip if prior discussion is already about artefact being worked on.
+
+### Session titling
+
+Session titling conventions (if a retitle tool is available):
+- Title format: `<phase>: <artefact-type>/<artefact-name> — <brief-what>`
+  where `<brief-what>` is scope/goal (e.g. "new", "add retitle support", "rework discover phase")
+  e.g. `classify: skill/my-skill — new`, `draft: snip/my-snippet — support X/Y`, `review: cmd/foo — rework args to …`
+- At start of entering a phase — including re-entry (e.g. "start over", restart) — retitle with that phase name as prefix.
+  Only retitle AFTER user has confirmed transition (e.g. said 'next', 'proceed', 'yes').
+  Never retitle preemptively based on agent's own readiness signal.
+- Keep `<brief-what>` stable across phase transitions.
+  Only update if what's being built or changed shifts.
+- When artefact is fully shipped (or update confirmed), retitle with prefix `done:`
+  e.g. `done: skill/my-skill — add retitle support`
+
 ## 1. `Phase:classify` — Identify right artefact type
 
 NOTE: If target artefact already exists, treat this as an update.
@@ -32,11 +53,12 @@ Use existing files as starting draft for `Phase:draft`, focusing only on request
 `$draftpath` = `$installpath` for updates — edit files in-place, no tmp copy needed.
 Still go through all remaining phases — including `Phase:review`.
 
-Ask user what they want to create if not already clear. Use decision table below to confirm right artefact type.
+Ask user what they want to create if not already clear.
+Use decision table below to confirm right artefact type.
 
 **A skill is appropriate when…**:
 - Task requires judgment, branching, or dynamically composing tools
-- Task should be automatically done based on needs of ther agent
+- Task should be automatically done based on needs of agent
 - Agent needs to use skill-associated files/scripts/references
 - Task is reusable across many sessions
 
@@ -80,7 +102,8 @@ If requested need appears to 'violate' these rules, suggest user toward alternat
 
 ## 2. `Phase:discover` — Gather reqs through focused questions
 
-Ask focused questions until you have enough requirements to draft. Limit to 3 rounds.
+Ask focused questions until you have enough requirements to draft.
+Limit to 3 rounds.
 
 For all artefact types:
 - What is the single responsibility of the artefact?
@@ -91,6 +114,9 @@ For all artefact types:
 For skills additionally:
 - What inputs does agent receive? What should it produce?
 - Are there reference docs, scripts, or templates it needs?
+- Are there sub-scenarios where only part of the instructions applies?
+  If yes: apply progressive disclosure — read `./references/skill-anatomy.md` § Progressive Disclosure
+  for the pattern (split criteria, conditional trigger syntax).
 
 For agents additionally:
 - Primary agent or subagent? Hidden from autocomplete? Should have isolated context?
@@ -110,7 +136,7 @@ For snippets additionally:
 ## 3. `Phase:draft` — Plan structure; setup `$draftpath`; Iterate on draft
 
 **First**: establish `$draftpath`.
-- New artefact: suggest `/tmp/opencode_crafter/<name>/`, confirm with user.
+- New artefact: use `/tmp/opencode_crafter/<type>-<name>/`.
 - Update: `$draftpath` = `$existingpath` (path where artefact already lives) — no copy needed.
 
 Write all draft files to `$draftpath` as soon as they exist.
@@ -123,12 +149,13 @@ Do not output draft content inline. Tell user where to inspect it:
 Note any open questions or tradeoffs.
 
 Draft prose should be lean and terse — imperative, no filler.
+State intent and constraints only; do not prescribe output structure or section layout.
 NOTE: Use light caveman mode for drafting of artefact files, as well as all comms with user during crafting process.
 (load `caveman` skill for more info)
 
 Ask: *Does this match what you had in mind?*
 
-Iterate until confirmation.
+Iterate until user explicitly confirms the draft is ready.
 Then proceed to `Phase:scripts` (for skill, if scripts needed) or `Phase:review`.
 
 ## 3.5. `Phase:scripts` (if needed) — Script POC & iterate via subagent
@@ -160,8 +187,10 @@ Reviewer handles writing-style conformance — do not pre-apply style yourself.
 For updates: tell reviewer to focus on changed sections and verify coherence with unchanged parts.
 Continue until user confirms or types "done". No round limit.
 
-After iterations, reflect shortly on diff between initial & final draft.
+After iterations, briefly reflect on diff between initial & final draft.
 Ask: *Ready to write `<name>` to `$installpath` ?* (skip for updates — `$draftpath` = `$existingpath`)
+
+For updates: once user confirms, retitle session with `done:` prefix (see Session titling above).
 
 ## 5. `Phase:ship` — Write (new artefacts only)
 
@@ -171,4 +200,6 @@ Copy all files from `$draftpath` to `$installpath`.
 For skills, create full directory structure including any `./references/`, `./scripts/`, `./assets/`, `./templates/` or `tests/` dirs.
 
 After confirming all files are written successfully, clean up:
-Must use `trash -v $draftpath` (never `rm -rf`).
+Must use `trash $draftpath` (never `rm -rf`).
+
+Retitle session with `done:` prefix (see session titling conventions above).

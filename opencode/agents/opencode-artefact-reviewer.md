@@ -38,8 +38,8 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
       before moving to the next.
    c. If any step is wrong, loop back to step 3. Re-run all test cases after edits complete.
    d. When all test cases pass, proceed to step 8.
-8. Ensure files at `$draftpath` are up-to-date (write if pending changes exist).
-   Output `$draftpath` only (no file content). Add flags/warnings if any.
+ 8. Ensure files at `$draftpath` are up-to-date (write if pending changes exist).
+    Output `$draftpath` only — never include file contents (not as confirmation, not as summary). Add flags/warnings if any.
 
 
 ## Quality criteria
@@ -76,8 +76,9 @@ Your job: identify gaps, surface them to the user, apply answers, repeat until d
 ### For Commands
 
 1. **Arguments** — Are all arguments documented (`$1`, `$ARGUMENTS`)?
+   Is there semantic mentioned in command description if important/required?
 2. **Shell injection** — Is shell injection (`` !`cmd` ``) used correctly?
-3. **Context isolation** — Should `subtask: true` isolate context?
+3. **Context isolation** — Should `subtask: true` isolate context? (loosing any prior discussion)
 4. **Error handling** — Is there guidance on what to do when the command fails or produces unexpected output?
 
 
