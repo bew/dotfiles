@@ -36,11 +36,11 @@ Plug.ts {
       -- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
       -- vim.wo.foldmethod = "expr"
 
-      -- Enable treesitter based indentation
-      local has_indent_query = vim.treesitter.query.get(language, "indents") ~= nil
-      if has_indent_query then
-        vim.bo.indentexpr = [[v:lua.require"nvim-treesitter".indentexpr()]]
-      end
+      -- Enable treesitter based indentation (note: Disabled for now, still very broken @2026-06..)
+      -- local has_indent_query = vim.treesitter.query.get(language, "indents") ~= nil
+      -- if has_indent_query then
+      --   vim.bo.indentexpr = [[v:lua.require"nvim-treesitter".indentexpr()]]
+      -- end
     end
 
     local augroup = vim.api.nvim_create_augroup("treesitter-setup", {clear=true})
