@@ -21,6 +21,8 @@ Brief a capable engineer who executes instructions exactly as written.
 ## Formatting
 
 - `##` for top-level sections, `###` for subsections. No deeper nesting.
+- Never use `---` horizontal rules as default separators before section headers.
+  Use `---` only to mark a deliberate structural break (e.g. before an appendix, after front-matter).
 - Numbered lists for ordered steps. Bullets for unordered rules/options.
 - Inline code for all commands, paths, field names, values.
 - Fenced code blocks with language tag for multi-line content.

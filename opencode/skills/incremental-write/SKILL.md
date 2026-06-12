@@ -1,9 +1,11 @@
 ---
 name: incremental-write
 description: |
-  Pattern for writing long files incrementally: skeleton first, then fill each section/function
+  Pattern for writing structured files incrementally: skeleton first, then fill each section/function
   via targeted edits. Improves reviewability and avoids large opaque writes.
-  Load when considering whether to incrementally write a long structured file (spec, code, config, etc.).
+  Load when writing or rewriting any structured file with identifiable sections:
+  spec, design doc, README, config, code module, skill/agent/command artefact, etc.
+  Applies regardless of file length — structure is the trigger, not line count.
 ---
 
 ## Goal
@@ -12,9 +14,10 @@ Write long files as skeleton first (headers/signatures only), confirm structure,
 
 ## Steps
 
-1. **Assess** — Apply when: file has identifiable structural units (sections, functions, config blocks) AND is non-trivial to review in one write (>40–50 lines or >3 sections) AND is new or full rewrite.
+1. **Assess** — Apply when: file has identifiable structural units (sections, functions, config blocks) AND is new or full rewrite.
+   Skip only for trivially small files (single section, <15 lines) — normal Write is cleaner there.
 
-2. **Confirm with user** — If not already agreed: ask *"Long structured file — use incremental write (skeleton first, then fill each part)?"* If no, proceed with normal Write.
+2. **Confirm with user** — If not already agreed: ask *"Structured file — use incremental write (skeleton first, then fill each part)?"* If no, proceed with normal Write.
 
 3. **Write skeleton** — Write structure only, no content bodies. Use Write tool.
    - Prose/spec: section headings + one-line placeholder (e.g. `<!-- TODO -->`)
@@ -31,7 +34,7 @@ Write long files as skeleton first (headers/signatures only), confirm structure,
 - Always use Edit (not Write) for every fill step after initial skeleton.
 - Never skip structure confirmation unless structure was already agreed upon with user.
 - Ask once per task — don't re-ask for each file when writing multiple files.
-- Don't use incremental write for short files or files without structural units; normal Write is cleaner.
+- Don't use incremental write for files without structural units, or trivially small files (<15 lines); normal Write is cleaner.
 
 ## Guidelines
 

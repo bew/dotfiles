@@ -48,6 +48,13 @@ When the user explicitly asks for it, you are allowed to add/commit, always ask 
 When a session fork is mentioned (e.g. "session was forked", "topic change"), retitle the session to reflect the new work — do not carry the previous title forward.
 
 
+## Markdown
+
+- Never use `---` horizontal rules as default separators before section headers.
+- Use `---` only to intentionally separate distinct parts of a document (e.g. before an appendix,
+  after a front-matter block, or to mark a major structural break).
+
+
 ## Debugging
 
 - Start with the simplest hypothesis.
