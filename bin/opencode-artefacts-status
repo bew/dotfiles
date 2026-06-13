@@ -1,0 +1,182 @@
+#!/usr/bin/env nu
+# List OpenCode artefacts (skills, commands, agents, ...) and whether they have uncommitted changes.
+
+# Specs for all supported artefact types.
+# Fields:
+#   name        - type identifier used as CLI argument
+#   rel_dir     - path relative to the dotfiles git root
+#   kind        - how artefacts are stored: "file" | "dir" | "mixed"
+#   description - short one-line description shown by --list-types
+const ARTEFACT_TYPE_SPECS = [
+  {
+    name: "skills",
+    rel_dir: "opencode/skills",
+    kind: "dir",
+    description: "Dir-based artefacts, one subdir per skill (contains SKILL.md)"
+  }
+  {
+    name: "commands",
+    rel_dir: "opencode/commands",
+    kind: "file",
+    description: "Single .md file per slash-command"
+  }
+  {
+    name: "agents",
+    rel_dir: "opencode/agents",
+    kind: "file",
+    description: "Single .md file per agent"
+  }
+  {
+    name: "snippets",
+    rel_dir: "opencode/snippets",
+    kind: "file",
+    description: "Single .md file per snippet"
+  }
+  {
+    name: "plugins",
+    rel_dir: "opencode/plugins",
+    kind: "mixed",
+    description: "Single .js file or subdir per plugin"
+  }
+]
+
+# Return the dotfiles git root (the script relies on artefacts being tracked there).
+# Override with OC_ARTEFACTS_GIT_ROOT env var for testing.
+def git-root []: nothing -> string {
+  if $env.OC_ARTEFACTS_GIT_ROOT? != null {
+    $env.OC_ARTEFACTS_GIT_ROOT
+  } else {
+    git -C ($env.FILE_PWD) rev-parse --show-toplevel | str trim
+  }
+}
+
+# Return a set of opencode/* paths that have uncommitted changes (as a list of strings)
+def changed-paths [git_root: string]: nothing -> list<string> {
+  let raw = (
+    git -C $git_root status --short -- "opencode/"
+    | complete
+  ).stdout
+
+  $raw
+  | lines
+  | where { |l| ($l | str trim) != "" }
+  | each { |l|
+      # git status --short: "XY path" or "XY old -> new" (rename)
+      # We only need the path (last word after optional " -> ")
+      let parts = $l | str trim | split row " "
+      let path = if ($l | str contains " -> ") {
+        # rename: "R  old -> new" — take the new path
+        $parts | last
+      } else {
+        $parts | last
+      }
+      $path | str trim
+  }
+}
+
+# Build the list of artefacts for one type spec, with wip status
+def list-type [
+  spec: record   # one entry from ARTEFACT_TYPE_SPECS
+  git_root: string
+  changed: list<string>
+]: nothing -> list<record<type: string, name: string, wip: bool>> {
+  let abs_dir = $git_root | path join $spec.rel_dir
+
+  if not ($abs_dir | path exists) {
+    return []
+  }
+
+  if $spec.kind == "mixed" {
+    # Each entry (file or dir) is one artefact
+    ls $abs_dir | each { |entry|
+      let name = if $entry.type == "file" {
+        $entry.name | path basename | path parse | get stem
+      } else {
+        $entry.name | path basename
+      }
+      let artefact_prefix = [$spec.rel_dir $name] | path join
+      let wip = $changed | any { |p| $p | str starts-with $artefact_prefix }
+      { type: $spec.name, name: $name, wip: $wip }
+    }
+  } else {
+    let artefacts = if $spec.kind == "dir" {
+      # Each subdirectory = one artefact
+      ls $abs_dir
+      | where type == dir
+      | get name
+      | each { |p| $p | path basename }
+    } else {
+      # Each file = one artefact (strip extension for display)
+      ls $abs_dir
+      | where type == file
+      | get name
+      | each { |p| $p | path basename | path parse | get stem }
+    }
+
+    $artefacts | each { |name|
+      let artefact_prefix = [$spec.rel_dir $name] | path join
+      let wip = $changed | any { |p| $p | str starts-with $artefact_prefix }
+      { type: $spec.name, name: $name, wip: $wip }
+    }
+  }
+}
+
+# List OpenCode artefacts with uncommitted-change status
+def main [
+  ...types: string        # Artefact types to show (default: all)
+  --wip                   # Only show artefacts with uncommitted changes
+  --list-types            # List supported artefact types and exit
+]: nothing -> nothing {
+  if $list_types {
+    let name_width = ($ARTEFACT_TYPE_SPECS | get name | each { |n| $n | str length } | math max)
+    $ARTEFACT_TYPE_SPECS | each { |spec|
+      let padded = $spec.name | fill --alignment left --width $name_width
+      print $"  ($padded)  ($spec.description)"
+    }
+    return
+  }
+
+  let known_types = $ARTEFACT_TYPE_SPECS | get name
+
+  let selected_types = if ($types | is-empty) {
+    $known_types
+  } else {
+    # Validate
+    for t in $types {
+      if not ($known_types | any { |k| $k == $t }) {
+        error make { msg: $"Unknown artefact type: '($t)'. Known types: ($known_types | str join ', ')" }
+      }
+    }
+    $types
+  }
+
+  let git_root = git-root
+  let changed = changed-paths $git_root
+
+  let rows = $selected_types | each { |t|
+    let spec = $ARTEFACT_TYPE_SPECS | where name == $t | first
+    list-type $spec $git_root $changed
+  } | flatten
+
+  let filtered = if $wip {
+    $rows | where wip == true
+  } else {
+    $rows
+  }
+
+  if ($filtered | is-empty) {
+    return
+  }
+
+  # Render with color
+  $filtered | each { |row|
+    let wip_marker = if $row.wip {
+      $"(ansi yellow)* WIP(ansi reset)"
+    } else {
+      $"(ansi dark_gray)  ---(ansi reset)"
+    }
+    let type_col = $"(ansi cyan)($row.type)(ansi reset)"
+    print $"  ($wip_marker)  ($type_col)  ($row.name)"
+  }
+  return
+}
