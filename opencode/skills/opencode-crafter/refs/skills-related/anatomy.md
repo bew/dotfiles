@@ -14,6 +14,8 @@ Official documentation: https://agentskills.io/specification
 
 WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
 
+NOTE: for global scope, the skills are found in `opencode/skills` in my `dotfiles` repo.
+Use this relative path instead for edits if in the `dotfiles` repo.
 
 ## Directory layout
 
@@ -24,13 +26,22 @@ Directory with `SKILL.md` + optional resources.
 │ (required entrypoint)
 ├── SKILL.md     ← describes the skill, when to use, what it does
 │ (optional resources)
-├── references/  ← docs the agent reads during execution
+├── refs/        ← docs the agent reads during execution
 ├── scripts/     ← executable helpers the agent can run
 ├── assets/      ← static files used verbatim in output
 └── templates/   ← scaffolds the agent fills in
 ```
 
+## Phases
+
+For complex skills with 3+ distinct concerns, structure workflow as named **phases** rather than a flat Steps list.
+Phases enforce bounded context per stage, user checkpoints, and independent updateability.
+
+Always read <`../rules-for-steps-phases-headers.md`> for naming rules, when named steps are required, phase gates, and optional phases.
+If skill has phases: also read <`./skill-phases.md`> for SKILL.md structure and crafter integration.
+
 ## Progressive Disclosure
+<!-- §progressive-disclosure -->
 
 Skills load context in tiers — design content to match:
 
@@ -38,11 +49,11 @@ Skills load context in tiers — design content to match:
 |---|---|---|
 | L1 | `description` frontmatter | Always — every session, to decide whether to trigger the skill |
 | L2 | `SKILL.md` body | When skill is triggered for the current task |
-| L3 | Additional files (e.g. in `references/`) | On demand — agent reads only what it needs |
+| L3 | Additional files (e.g. in `refs/`) | On demand — agent reads only what it needs |
 
 Keep in `SKILL.md` vs. extract to reference file:
 
-| Criterion | Keep in SKILL.md | Extract to references/ |
+| Criterion | Keep in SKILL.md | Extract to refs/ |
 |---|---|---|
 | Needed every time skill runs | Yes | No |
 | Only needed in specific sub-scenarios | No | Yes |
@@ -59,16 +70,17 @@ Every reference must have explicit conditional trigger in `SKILL.md`.
 
 Good — concrete & specific:
 ```md
-Read `./references/forms.md` before filling out any form field.
-Read `./references/api-spec.md` only when writing or modifying API calls.
+Read <`./refs/forms.md`> before filling out any form field.
+Read <`./refs/api-spec.md`> only when writing or modifying API calls.
 ```
 
 Bad — agent cannot decide when to load:
 ```md
-Read `./references/extra-context.md` if you need more detail.
+Read `./refs/extra-context.md` if you need more detail.
 ```
 
-IMPORTANT: Always use `./` prefix when referencing a skill-associated file.
+IMPORTANT: Always use angle-bracket syntax when referencing a skill-associated file: `<` + backtick-path + `>`.
+Paths are relative to the file doing the referencing (filesystem-accurate).
 
 TIP: If the trigger condition is "always", keep the content in `SKILL.md` instead.
 

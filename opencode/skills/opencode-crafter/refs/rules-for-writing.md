@@ -24,7 +24,10 @@ Brief a capable engineer who executes instructions exactly as written.
 - Never use `---` horizontal rules as default separators before section headers.
   Use `---` only to mark a deliberate structural break (e.g. before an appendix, after front-matter).
 - Numbered lists for ordered steps. Bullets for unordered rules/options.
+- Never use `[ ]` checkboxes for review or checklist items — plain bullets only.
 - Inline code for all commands, paths, field names, values.
+- Tool names are lowercase: `write`, `edit`, `read`, `bash`, etc. — never PascalCase.
+- Phase names always in inline code: `Phase:Discover`, `Phase:Draft`, etc. — never bare text.
 - Fenced code blocks with language tag for multi-line content.
   Use short language tag like `md` or `py`.
 - Tables for comparisons with 3+ items & 2+ dimensions.
@@ -59,5 +62,5 @@ Parenthesized form `(KEYWORD: ...)` must be one line; may appear inline in anoth
 | Agent prompt | 50–200 lines |
 | Command template | 5–50 lines |
 
-Prefer to split to `references/` when skill body exceeds ~300 lines.
+Prefer to split to `refs/` when skill body exceeds ~300 lines.
 Must split when skill body exceeds 400 lines.

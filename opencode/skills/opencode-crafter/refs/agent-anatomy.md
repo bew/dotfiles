@@ -13,6 +13,9 @@ Official documentation: https://opencode.ai/docs/agents/
 
 Filename (without `.md`) becomes agent name, usable via `@mention`.
 
+NOTE: for global scope, the agents are found in `opencode/agents` in my `dotfiles` repo.
+Use this relative path instead for edits if in the `dotfiles` repo.
+
 ## Frontmatter
 
 ```yaml
@@ -46,6 +49,7 @@ permissions:
 ## Body
 
 Markdown body is agent's system prompt. Write as direct instructions.
+Before writing body: read <`./rules-for-steps-phases-headers.md`> for naming, structure, phase gates, and when named steps are required.
 
 ## Modes
 

@@ -1,7 +1,7 @@
 ---
 description: |
   Drafts, tests, and iterates on scripts for OpenCode skill artefacts.
-  Invoked by opencode-artefact-crafter during Phase:scripts.
+  Invoked by opencode-crafter during Phase:Scripts.
   Not for direct use.
 mode: subagent # isolated context!
 hidden: true

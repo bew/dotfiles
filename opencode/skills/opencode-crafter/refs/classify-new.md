@@ -21,7 +21,7 @@ Use decision table below to confirm right artefact type.
 - Want different model, temperature, or tool set
 - Want to restrict or expand permissions (tool access, mcp, ..) beyond defaults
 
-NOTE: Only **skills** support companion files (`references/`, `scripts/`, `assets/`, `templates/`).
+NOTE: Only **skills** support companion files (`refs/`, `scripts/`, `assets/`, `templates/`).
 Agents & commands use single `.md` file — all content must be self-contained.
 
 **A snippet is appropriate when…**:
