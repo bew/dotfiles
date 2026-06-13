@@ -34,6 +34,11 @@ NEVER run git operations like push/reset/switch/restore/stash/checkout/clean.
 When the user explicitly asks for it, you are allowed to add/commit, always ask when not sure.
 
 
+## Token efficiency
+
+- When writing identical/near-identical files to multiple paths, write once then `cp` — never repeat the write tool call.
+
+
 ## Safety
 - ALWAYS `--dry-run` before destructive shell commands.
 - NEVER delete files without explicit confirmation.
@@ -46,6 +51,7 @@ When the user explicitly asks for it, you are allowed to add/commit, always ask 
 ## Session titling
 
 When a session fork is mentioned (e.g. "session was forked", "topic change"), retitle the session to reflect the new work — do not carry the previous title forward.
+Retitle immediately, before any other action — do not wait for user confirmation.
 
 
 ## Markdown
