@@ -30,6 +30,10 @@ Format: `N. [artefact-name or "general"] — what to add/change/remove`
 
 ---
 
-At end, add this note:
+If the last 1-2 message has explicit mention that session was forked (e.g. "session forked" or similar):
+- Omit the fork note below.
+- Instead, offer to directly proceed with applying the improvement ideas.
+
+Otherwise, add this note at end:
 
 > To act on these, fork this session before proceeding with these updates.
