@@ -1,4 +1,4 @@
-# Extension System Spec
+# [DRAFT] Extension System
 
 ## Introduction
 
@@ -19,28 +19,26 @@ Concrete use-cases in this config:
 - Declare a fuzzy-search selector contract; impl wraps telescope; key-binding modules collect all registered selectors and expose them as a picker.
 - Declare a plugin-loading contract; impl wraps lazy.nvim; every `Plug {}` call becomes an ExtPoint contributing to the plugin list (see end of spec).
 
----
+## Terminology
 
-## Concepts
-
-**Extension Interface** — the schema.
+**Extension Interface** (new!): the schema of a contract.
 Declares extension fields with types, defaults, and descriptions.
 Can also expose functions (like `boot_plugins`), hooks, events, and global config options.
-One active Extension Provider per interface at a time.
+At most one active Extension Provider per interface at a time.
+Short name: **ExtInterface**.
 
-**Extension Provider** — the implementation.
+**Extension Provider** (new!): the implementation of one ExtInterface.
 Bound to exactly one interface.
-Receives aggregated ExtPoint data and drives runtime behaviour.
+Receives all aggregated ExtPoint data and drives runtime behaviour.
 Only one active per interface; if multi-backend behaviour is needed, use an adapter ExtProvider that delegates internally.
+Short name: **ExtProvider**.
 
-**Extension Point** — the usage site.
-Registers values for fields already declared by an interface.
-Does *not* declare new fields.
-Can reference fields from any interface that has an active ExtProvider.
+**Extension Point** (new!): a usage site that registers values for fields declared by an ExtInterface.
+Does not declare new fields — only supplies values for fields the interface already defines.
+Can contribute to multiple interfaces simultaneously.
+Short name: **ExtPoint**.
 
 All three can be defined in any module — one per file, many per file, mixed in plugin files or dedicated modules.
-
----
 
 ## Naming & IDs
 
@@ -60,8 +58,6 @@ Forward references are safe: `Ext.myid` creates a placeholder; `Ext.myid { ... }
 ExtInterface.hl_groups = Ext.mk_interface(...)
 ExtProvider.colorscheme = Ext.mk_provider(ExtInterface.hl_groups, ...)
 ```
-
----
 
 ## API
 
@@ -166,8 +162,6 @@ Ext {
 }
 ```
 
----
-
 ## Interface Definition & Static Typing
 
 Interface defined imperatively (builder pattern) — no static type info available at edit time.
@@ -181,8 +175,6 @@ ExtPoint authors get autocompletion & type-checking from the cached annotations;
 This is opt-in per interface.
 Interfaces that change rarely benefit most.
 
----
-
 ## Late Binding
 
 Everything resolves at boot, not at declaration time.
@@ -193,8 +185,6 @@ Order of operations does not constrain where things are defined:
 - `ExtInterface.foo:use_impl provider` can appear before or after ExtPoints register.
 
 ExtPoints collect values eagerly; the ExtProvider processes them at activation or at a defined lifecycle hook (e.g. `P:init()`).
-
----
 
 ## ExtPoint: Registration, Not Declaration
 
@@ -251,16 +241,12 @@ How an ExtProvider passes additional arguments beyond `self` (e.g. a context tab
 Options include: fixed extra params after `self`, a single context table as second param, or a calling convention declared on the extension field type.
 This needs further design — see Open Questions.
 
----
-
-## Placement
+## Placement / Scope
 
 Any of ExtInterface / ExtProvider / ExtPoint can be defined anywhere: dedicated module, inside a plugin file, scattered across config.
 No required directory structure or load order — late binding handles it.
 
----
-
-## Plug as ExtPoint (future)
+## `Plug {}` as ExtPoint
 
 `Plug { ... }` can be redefined as an ExtPoint once this system is stable:
 
@@ -285,13 +271,13 @@ This bootstrapping problem requires the ExtProvider to know which ExtPoint is th
 A `pre_boot` hook field on `ExtInterface.plugin` handles this cleanly: the pkg manager ExtPoint registers itself on this hook, and the ExtProvider runs all `pre_boot` hooks before processing the rest of the plugin specs.
 Multiple ExtPoints can register a `pre_boot` value without conflict.
 
----
+## Alternatives & Tradeoffs
 
-## Positioning Question: Ext System vs. Plain Lua Module
+The Ext System earns its complexity only at sufficient scale.
+The simpler alternative is a plain Lua module per concern.
 
-Worth explicitly questioning whether this system earns its complexity.
+### Plain Lua module (simpler alternative)
 
-**Plain Lua module approach:**
 ```lua
 local HL = require"mycfg.hl_system"
 HL.setup({ autocmd = true })
@@ -300,45 +286,63 @@ HL.register("MyGroup", function(hl) hl.set(...) end)
 HL.reload_all()
 ```
 
-Advantages: zero framework, full LSP support, simple to understand, easy to debug.
+**Advantages:**
+- Zero framework overhead.
+- Full LSP support out of the box — no LuaCATS cache step.
+- Simple to understand and debug; one hop from call site to impl.
 
-**Ext System advantages:**
-- Cross-cutting concerns (hl groups, fuzzy pickers, plugin specs) all use one pattern — new contributors learn one API.
-- Interfaces are self-documenting (schema + types) — a plain module's `setup({})` isn't.
+### Ext System
+
+**Advantages:**
+- Cross-cutting concerns (hl groups, fuzzy pickers, plugin specs) all use one pattern — one API to learn.
+- Interfaces are self-documenting (schema + types); a plain module's `setup({})` is not.
 - Runtime validation catches wrong field types at registration, not silently at call time.
 - ExtPoints can be defined before the impl exists — useful for configs that conditionally activate features.
 - The `expose_function` / `expose_action` mechanism gives a standard way to publish callable API from a subsystem.
 
-**Ext System costs:**
-- Indirection: to understand what `Ext { define_hl_groups = ... }` does, you must find `ExtInterface.hl_groups`, then find the ExtProvider, then follow `Ext:collect_values`. Three hops vs. one `rg HL.register`.
+**Costs:**
+- Indirection: to understand `Ext { define_hl_groups = ... }` requires finding the ExtInterface, then the ExtProvider, then following `Ext:collect_values` — three hops vs. one `rg HL.register`.
 - No static typing without the LuaCATS cache mechanism.
 - Debugging a misbehaving ExtProvider requires understanding the framework, not just the domain.
 
-**Rough heuristic:** use the Ext System when a contract has 3+ independent usage sites that need to stay decoupled.
-Use a plain module when it's 1-2 callers and the impl is stable.
+### Decision criteria
 
----
+Use the **Ext System** when a contract has 3+ independent usage sites that need to stay decoupled, or when runtime validation and introspection (`:ExtDebug`) are worth the overhead.
+Use a **plain module** when there are 1–2 callers and the impl is stable.
+
+## Related files
+
+No companion files yet.
+This section will list any reference implementations, experiments, or generated LuaCATS annotation files added alongside `SPEC.md`.
 
 ## Open Questions
 
-1. **ExtProvider-specific exposure** — how does an ExtProvider expose things (functions, state) that aren't part of the interface contract?
-   e.g. `provider.reload_all()` called from outside.
-   Through `ext:expose_function`? Through a separate returned handle?
+1. **ExtProvider-specific exposure.**
+   Non-blocking. How does an ExtProvider expose things (functions, state) not part of the interface contract?
+   E.g. `provider.reload_all()` called from outside.
+   Options: through `ext:expose_function`, or through a separate handle returned by `mk_provider`.
 
-2. **`final` proxy** — is the `final` arg in `mk_interface` actually useful?
-   The use-case (default impls that reference not-yet-bound methods) seems fragile.
-   Worth keeping?
+2. **`final` proxy utility.**
+   Non-blocking. Is the `final` arg in `mk_interface` actually useful?
+   The use-case (default impls referencing not-yet-bound methods) seems fragile.
+   Leaning toward removing it unless a concrete use-case emerges.
 
-3. **ExtPoint scopes & interface groups** — how exactly are groups assigned to interfaces?
+3. **ExtPoint scopes & interface groups.**
+   Blocking. How are groups assigned to interfaces?
    How does an ExtPoint scope declare which groups it allows?
    Is the check a hard error or a warning?
    Can an ExtPoint opt out of scope restrictions for a specific field?
+   Must be resolved before the system can be used in plugin files safely.
 
-4. **Function value calling convention** — when an ExtProvider calls a collected function value, how are extra args passed beyond the implicit `self` (ExtPoint instance)?
-   Options: fixed positional params, a single context table, or a calling convention declared on the field type in `ext:extension_field`.
+4. **Function value calling convention.**
+   Blocking. When an ExtProvider calls a collected function value, how are extra args passed beyond the implicit `self` (ExtPoint instance)?
+   Options: fixed positional params after `self`, a single context table as second param, or a calling convention declared on the field type in `ext:extension_field`.
+   Must be settled before any ExtInterface is implemented.
 
-5. **ExtProvider simplification** — as noted in the code comment: for some interfaces, skipping `mk_provider` entirely and just calling `Ext:collect_values` from a plain function may be simpler.
-   Should the system support "interface without formal ExtProvider" as a first-class mode?
+5. **Interface without formal ExtProvider.**
+   Non-blocking. For some interfaces, skipping `mk_provider` and calling `Ext:collect_values` from a plain function may be simpler.
+   Should the system support this as a first-class mode?
 
-6. **Ext System bootstrapping** — the Ext System itself needs to be initialized before any interface, ExtProvider, or ExtPoint is declared.
-   How this boot phase works (especially in a Neovim config with lazy-loaded modules) is a topic for another day.
+6. **Ext System boot order.**
+   Blocking. The Ext System itself must be initialized before any ExtInterface, ExtProvider, or ExtPoint is declared.
+   How this boot phase works in a Neovim config with lazy-loaded modules is unresolved.
