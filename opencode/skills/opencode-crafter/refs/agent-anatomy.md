@@ -49,7 +49,7 @@ permissions:
 ## Body
 
 Markdown body is agent's system prompt. Write as direct instructions.
-Before writing body: read <`./rules-for-steps-phases-headers.md`> for naming, structure, phase gates, and when named steps are required.
+Before writing body: read <./rules-for-steps-phases-headers.md> for naming, structure, phase gates, and when named steps are required.
 
 ## Modes
 

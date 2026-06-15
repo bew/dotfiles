@@ -63,19 +63,19 @@ If target artefact already exists, treat as update:
 - `$draftpath` = `$installpath` for updates — edit files in-place, no tmp copy needed.
 - Still go through all remaining phases — including `Phase:Review`.
 
-If creating new artefact: read <`./refs/classify-new.md`> for type decision rules & artefact-gate check.
+If creating new artefact: read <./refs/classify-new.md> for type decision rules & artefact-gate check.
 
 Based on artefact type, read one of following references for full spec of that type:
-- skill: <`./refs/skills-related/anatomy.md`>
-- command: <`./refs/command-anatomy.md`>
-- agent: <`./refs/agent-anatomy.md`>
+- skill: <./refs/skills-related/anatomy.md>
+- command: <./refs/command-anatomy.md>
+- agent: <./refs/agent-anatomy.md>
 - snippet: load `snippets` skill for full spec
 
 Ready to move to `Phase:Discover`? (say 'next' or similar to proceed)
 
 ## 2. `Phase:Discover` — Gather reqs through focused questions
 
-Read <`./refs/discover-questions.md`> for full question set.
+Read <./refs/discover-questions.md> for full question set.
 
 Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 
@@ -89,8 +89,8 @@ Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 - New skill: add `metadata.maintainers: [$currentuser]` to frontmatter.
 - Update existing skill: if `maintainers` already present but does not include `$currentuser`, ask user whether to add `$currentuser` to the list.
 
-Before writing any artefact prose: read <`./refs/rules-for-writing.md`> and <`./refs/rules-for-steps-phases-headers.md`>.
-If skill includes a script: read <`./refs/skills-related/with-script.md`>.
+Before writing any artefact prose: read <./refs/rules-for-writing.md> and <./refs/rules-for-steps-phases-headers.md>.
+If skill includes a script: read <./refs/skills-related/with-script.md>.
 
 Write all draft files to `$draftpath` as soon as they exist.
 **Writing files early is critical** — protects draft content from context compression in long sessions.
@@ -109,15 +109,15 @@ Then proceed to `Phase:Scripts` (for skill, if scripts needed) or `Phase:Review`
 ## 3.5. `Phase:Scripts` (if needed) — Script POC & iterate via subagent
 
 Skip if artefact does not include a script (only skills support companion scripts).
-If skill includes a script: read <`./refs/phases/scripts.md`> for full instructions.
+If skill includes a script: read <./refs/phases/scripts.md> for full instructions.
 
 ## 4. `Phase:Review` — Review & iterate with user via subagent
 
-When entering `Phase:Review`: read <`./refs/phases/review.md`> for full instructions.
+When entering `Phase:Review`: read <./refs/phases/review.md> for full instructions.
 After subagent returns & user confirms (update path): retitle session with `done:` prefix (see `§session-titling`).
 
 ## 5. `Phase:Ship` — Write (new artefacts only)
 
 Skip this phase for updates — `$draftpath` = `$installpath`, files are already in place.
-When entering `Phase:Ship` (new artefact only): read <`./refs/phases/ship.md`> for full instructions.
+When entering `Phase:Ship` (new artefact only): read <./refs/phases/ship.md> for full instructions.
 After ship confirmed: retitle with `done:` prefix (see `§session-titling`).

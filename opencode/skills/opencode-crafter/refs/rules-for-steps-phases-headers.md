@@ -1,6 +1,4 @@
-# Steps and Phases
-
-Applies to skills and agents.
+# Steps, Phases, Headers
 
 ## What are phases
 
@@ -16,10 +14,13 @@ Use named steps or phases when **any** of the following:
 
 - 3+ top-level phases or steps in the artefact
 - 3+ steps within any single phase
-- Any step references another step (even if fewer than 3 items — positional refs become unreliable)
+- Any step references another step (even if fewer than 3 items, positional refs become unreliable)
 
-**Named steps** — definition: `1. **Setup**` (bold name inline in list); reference: `*Setup*` (italic).
+**Named steps**:
+Def with: `1. **Setup**` (bold name inline in list)
+Ref with: `*Setup*` (italic)
 
+Example:
 ```md
 1. **Setup** — read inputs, validate, load files
 2. **Review** — evaluate criteria, surface gaps, apply fixes
@@ -28,10 +29,13 @@ If input missing: stop. Do not proceed to *Review*.
 If criteria loop finds new gaps: return to *Review*.
 ```
 
-**Named phases** — definition: `## Phase N: \`Phase:Foo\` — short description` header with body; reference: `` `Phase:Foo` ``.
+**Named phases**:
+Def with: ``## N. `Phase:Foo` — short description`` header with body
+Ref with: `` `Phase:Foo` ``
 
+Example:
 ```md
-## Phase 2: `Phase:Review` — evaluate criteria, apply fixes
+## 2. `Phase:Review` — evaluate criteria, apply fixes
 
 ...phase body...
 
@@ -40,9 +44,9 @@ Return to `Phase:Setup` if inputs change.
 
 ## Naming convention
 
-**Phase names**: `Phase:<Name>` format — title-case, no spaces, e.g. `` `Phase:Discover` ``, `` `Phase:Draft` ``.
+**Phase names**: `Phase:<Name>` format — title-case, no spaces, e.g. `Phase:Discover`, `Phase:Draft`.
 Names: short verb/noun — `Discover`, `Draft`, `Review`, `Ship`, `Setup`, `Output`.
-Avoid generic names: ~~`Phase:Step1`~~, ~~`Phase:Processing`~~.
+Avoid generic names: ~~`Phase1`~~, ~~`Phase:Processing`~~.
 
 **Step names**: plain title-case word(s), no prefix — `Setup`, `Review`, `Output`.
 Avoid generic names: ~~`Step1`~~, ~~`Processing`~~.
@@ -59,8 +63,8 @@ Add an anchor to any header you need to reference from elsewhere — opt-in, not
 ```
 
 **Reference** — use the slug inline:
-- Same file: `§req-phases-can-extract`
-- Cross-file: <`./skills-related/skill-phases.md§req-phases-can-extract`>
+- Same file: <§req-phases-can-extract>
+- Cross-file: <./other/file.md§req-phases-can-extract>
 
 **Slug format**: kebab-case, descriptive but no filler words — derive from heading meaning, not verbatim heading text.
 Encode modality when it matters: a heading about something that *can* happen differs from one about something that *always* does — the slug should reflect that (`§req-phases-can-extract` not `§req-phases-extract`).
@@ -89,7 +93,7 @@ Mark optional phases with a `_(if needed)_` suffix in the overview list.
 Include a skip condition immediately before or inside the phase entry.
 
 ```md
-3.5. `Phase:Scripts` _(if needed)_ — script POC & iterate via subagent
+## 3.5. `Phase:Scripts` _(if needed)_ — script POC & iterate via subagent
 
 Skip this phase if artefact does NOT have a script.
 ```
@@ -102,25 +106,10 @@ Rules for `§slug` anchors and references — enforce when writing or reviewing 
 
 - Every `§slug` reference must have a matching `<!-- §slug -->` anchor in the target location.
 - Same-file ref (`§slug`): anchor must exist in the same file.
-- Cross-file ref (<`./path/to/file.md§slug`>): target file must exist and contain `<!-- §slug -->`.
+- Cross-file ref (<./path/to/file.md§slug>): target file must exist and contain `<!-- §slug -->`.
 - Anchors with no reference anywhere are dead weight — remove or add a reference.
 - Add an anchor only when a reference to it exists (opt-in, not mandatory on all headers).
 
-## File references
-
-Use angle-bracket syntax for all file path mentions in prose:
-
-```md
-Read <`./refs/rules.md`> before writing any prose.
-Read <`../rules-for-writing.md`> for tone and formatting rules.
-Read <`./skill-phases.md§progressive-disclosure-phases`> for phase extraction criteria.
-```
-
-- Paths are relative to the file doing the referencing (filesystem-accurate).
-- `./` = same directory as this file. `../` = parent directory. Never use `./refs/` from inside `refs/`.
-- `§slug` appended directly after the filename, no space, inside the angle brackets.
-- Applies to "read", "see", "load" instructions in prose — not to code blocks or YAML values.
-
 ---
 
-For skill-specific guidance (SKILL.md structure, crafter integration): read <`./skills-related/skill-phases.md`>.
+For skill-specific guidance (SKILL.md structure, crafter integration): read <./skills-related/skill-phases.md>.

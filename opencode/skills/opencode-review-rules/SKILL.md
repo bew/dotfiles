@@ -29,13 +29,13 @@ Check these first, regardless of artefact type.
    Referencing other artefacts by name is fine.
 7. **Reference integrity** — For every `§slug` reference in any file under `$draftpath`:
    - Same-file ref (`§slug`): a matching `<!-- §slug -->` anchor must exist in that file.
-   - Cross-file ref (<`./path/to/file.md§slug`>): target file must exist and contain `<!-- §slug -->`.
+   - Cross-file ref (<./path/to/file.md§slug>): target file must exist and contain `<!-- §slug -->`.
    Flag dangling references (no anchor) and dead anchors with no reference (candidate for removal).
 
 ## Type-specific criteria
 
 Based on artefact type, read the appropriate file for additional criteria:
 
-- skill: read <`./refs/skills.md`>
-- agent: read <`./refs/agents.md`>
-- command: read <`./refs/commands.md`>
+- skill: read <./refs/skills.md>
+- agent: read <./refs/agents.md>
+- command: read <./refs/commands.md>

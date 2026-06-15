@@ -11,7 +11,7 @@ Each entry: number, phase name in inline code, em dash, one-line description.
 3. `Phase:Review` — review with user; assess readiness
 ```
 
-For each phase, include a section heading in `SKILL.md`. Phase instructions may live inline or in a dedicated ref file — let the progressive disclosure conditions (see `§progressive-disclosure-phases`) decide which.
+For each phase, include a section heading in `SKILL.md`. Phase instructions may live inline or in a dedicated ref file — let the progressive disclosure conditions decide which.
 
 ## Progressive disclosure with phases
 <!-- §progressive-disclosure-phases -->
@@ -29,14 +29,15 @@ Keep inline in `SKILL.md` when phase instructions are short and needed for orien
 
 Always keep in `SKILL.md`:
 - The phase overview list (needed at all times for orientation)
-- A `## Phase N: \`Phase:Foo\`` section heading per phase
+- A ``## N. `Phase:Foo` `` section heading per phase
 
-When a phase is extracted, the section body is a single trigger line:
+When a phase is extracted, the section body is a single trigger line.
 
+Example:
 ```md
-## Phase 2: `Phase:Draft` — Write skeleton; fill sections iteratively
+## 2. `Phase:Draft` — Write skeleton; fill sections iteratively
 
-When entering `Phase:Draft`: read <`./refs/phases/draft.md`> for full instructions.
+When entering `Phase:Draft`: read <./refs/phases/draft.md> for full instructions.
 ```
 
 ### Required phases still benefit from extraction
@@ -63,9 +64,9 @@ For **existing phased skills**: no confirmation needed — phases already in pla
 
 Check phased skills for:
 - Phase overview list present near top of `SKILL.md`
-- Each phase has a `## Phase N: \`Phase:Foo\`` section heading in `SKILL.md`
+- Each phase has ``## N. `Phase:Foo` — small description`` section heading in `SKILL.md`
 - Extracted phases: single trigger line in `SKILL.md` body pointing to ref file; full instructions in `refs/phases/<name>.md`
 - Phase gate present at end of each phase's section (inline body or ref file)
 - Optional phases marked `_(if needed)_` with a skip condition
-- Progressive disclosure conditions applied correctly (see `§progressive-disclosure-phases`)
-- Named steps used wherever required (see <`../rules-for-steps-phases-headers.md§when-named-steps`>)
+- Progressive disclosure conditions applied correctly
+- Named steps used wherever required (see <../rules-for-steps-phases-headers.md§when-named-steps>)

@@ -37,8 +37,8 @@ Directory with `SKILL.md` + optional resources.
 For complex skills with 3+ distinct concerns, structure workflow as named **phases** rather than a flat Steps list.
 Phases enforce bounded context per stage, user checkpoints, and independent updateability.
 
-Always read <`../rules-for-steps-phases-headers.md`> for naming rules, when named steps are required, phase gates, and optional phases.
-If skill has phases: also read <`./skill-phases.md`> for SKILL.md structure and crafter integration.
+Always read <../rules-for-steps-phases-headers.md> for naming rules, when named steps are required, phase gates, and optional phases.
+If skill has phases: also read <./skill-phases.md> for SKILL.md structure and crafter integration.
 
 ## Progressive Disclosure
 <!-- §progressive-disclosure -->
@@ -70,8 +70,8 @@ Every reference must have explicit conditional trigger in `SKILL.md`.
 
 Good — concrete & specific:
 ```md
-Read <`./refs/forms.md`> before filling out any form field.
-Read <`./refs/api-spec.md`> only when writing or modifying API calls.
+Read <./refs/forms.md> before filling out any form field.
+Read <./refs/api-spec.md> only when writing or modifying API calls.
 ```
 
 Bad — agent cannot decide when to load:
@@ -79,7 +79,7 @@ Bad — agent cannot decide when to load:
 Read `./refs/extra-context.md` if you need more detail.
 ```
 
-IMPORTANT: Always use angle-bracket syntax when referencing a skill-associated file: `<` + backtick-path + `>`.
+IMPORTANT: Always use angle-bracket syntax when referencing a skill-associated file: `<./path/to/file.md>`.
 Paths are relative to the file doing the referencing (filesystem-accurate).
 
 TIP: If the trigger condition is "always", keep the content in `SKILL.md` instead.

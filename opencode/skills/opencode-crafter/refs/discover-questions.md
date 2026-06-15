@@ -12,7 +12,7 @@ For skills additionally:
 - What inputs does agent receive? What should it produce?
 - Any reference docs, scripts, or templates needed?
 - Any sub-scenarios where only part of instructions applies?
-  If yes: apply progressive disclosure — read <`./skills-related/anatomy.md§progressive-disclosure`>
+  If yes: apply progressive disclosure — read <./skills-related/anatomy.md§progressive-disclosure>
   for pattern (split criteria, conditional trigger syntax).
 
 For agents additionally:
