@@ -274,10 +274,6 @@ function gclonecd() {
   git clone "$@" && cd "$clone_dir"
 }
 
-# Open git viewer in nvim
-# (https://github.com/junegunn/gv.vim)
-alias gv="e +GV"
-
 # git-diff based diff (with delta <3)
 alias gdiff="git dd --no-index"
 alias gdiff::split="git dds --no-index"
