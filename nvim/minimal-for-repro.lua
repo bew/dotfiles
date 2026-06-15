@@ -14,7 +14,9 @@ local plugin_luasnip = {
   config = function()
     local ls = require"luasnip"
     vim.keymap.set("i", [[<tab>]], function() ls.expand() end)
-    vim.keymap.set("i", [[<M-c>]], function()
+    vim.keymap.set({"i","v"}, [[<M-j>]], function() ls.jump(1) end)
+    vim.keymap.set({"i","v"}, [[<M-k>]], function() ls.jump(-1) end)
+    vim.keymap.set({"i","v"}, [[<M-c>]], function()
       if ls.in_snippet() and ls.choice_active() then
         ls.change_choice(1)
       end
