@@ -319,8 +319,8 @@ local function mk_elseif_nodes()
     {
       cond = i(1, "false"),
       body = SU.insert_node_default_selection(2),
-      maybe_else_line = ls.function_node(function(_args, snip)
-        local cur_line_nr = tonumber(snip.env.TM_LINE_NUMBER) -- 1-indexed
+      maybe_else_line = ls.function_node(function()
+        local cur_line_nr = vim.fn.line"." -- 1-indexed
         local buf_lines = vim.api.nvim_buf_get_lines(0, cur_line_nr, cur_line_nr + 10, false) -- lines after cursor line (max 10)
         for _, line in ipairs(buf_lines) do
           -- Search first non-blank line down from cursor (search max 10 lines)
@@ -500,9 +500,8 @@ snip("fni", {desc = "function def (inline, anon)"}, SU.myfmt {
 
 -- TODO: and do nothing if cursor not in a table
 snip("k", { desc = "key = value", resolver = SR.delete_spaces_after_trigger }, ls.dynamic_node(1, function()
-  local empty_snip_node = ls.snippet_node(nil, t"")
-
   -- (WIP, not tested! todo: make shorter!)
+  -- local empty_snip_node = ls.snippet_node(nil, t"")
   -- local node_at_cursor = U.ts.try_get_node_at_cursor()
   -- if not node_at_cursor then
   --   vim.notify("!! No Treesitter node here 👀", vim.log.levels.ERROR)
@@ -569,6 +568,9 @@ snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
 })
 
 -- for `print(|)` -> `print("var:", vim.inspect(var))`
+--
+-- FIXME: Want to switch out `vim.inspect` on-demand with a choice node
+-- but using repeat node seems to break the choice node...(OPENED: <L3MON4D3/LuaSnip#1443>)
 snip("dv", { desc = [[debug "var:" + inspect var]] }, SU.myfmt {
   -- note: having insert node _after_ repeat node doesn't work well for autocompletion
   [["<var>:", vim.inspect(<var_again>)<more>]],
@@ -581,12 +583,22 @@ snip("dv", { desc = [[debug "var:" + inspect var]] }, SU.myfmt {
 
 -- for `print(|)` -> `print("this thing:", vim.inspect(expr))`
 snip("de", {desc = "debug expr"}, SU.myfmt {
-  [["<prompt>:", vim.inspect(<expr>)<more>]],
+  [["<prompt>:", <value><more>]],
   {
     prompt = i(1, "this thing"),
-    expr = SU.insert_node_default_selection(2, "expr"),
+    value = ls.choice_node(2, {
+      SU.myfmt {
+        [[vim.inspect(<expr>)]],
+        { expr = ls.restore_node(1, "expr") },
+      },
+      i(nil, "expr")
+    }),
     more = i(3),
   }
+}, {
+  stored = {
+    expr = SU.insert_node_default_selection(nil, "expr"),
+  },
 })
 
 snip("mod", {desc = "Module init M = {}; ...; ret M", when = conds.very_start_of_line}, SU.myfmt {
