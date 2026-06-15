@@ -1,0 +1,47 @@
+#!/usr/bin/env nu
+
+# Rename a spec directory from one slug to another.
+# Handles git-tracked and plain directories.
+# Usage: nu rename-spec.nu <from-path> <to-path> [--skip-git-check]
+
+def main [
+  from: path,   # Source spec directory (e.g. _WIP_SPECS/old-slug)
+  to: path,     # Destination spec directory (e.g. _WIP_SPECS/new-slug)
+  --skip-git-check,  # Skip staged-changes check (use only when you know what you're doing)
+] {
+  # Validate source exists
+  if not ($from | path exists) {
+    error make { msg: $"Source does not exist: ($from)" }
+  }
+
+  # Check for staged changes (would pollute a rename commit)
+  if not $skip_git_check {
+    let staged = (
+      do { git diff --cached --name-only } | complete
+    )
+    if $staged.exit_code == 0 and ($staged.stdout | str trim | str length) > 0 {
+      error make {
+        msg: $"Staged changes detected. Resolve staged changes first, or rerun with --skip-git-check.\nStaged files:\n($staged.stdout)"
+      }
+    }
+  }
+
+  # Detect if source is git-tracked
+  let tracked = (
+    do { git ls-files --error-unmatch $from } | complete
+  )
+  let is_git = $tracked.exit_code == 0
+
+  if $is_git {
+    git mv $from $to
+    print $"Renamed \(git\): ($from) -> ($to)"
+  } else {
+    mv $from $to
+    print $"Renamed: ($from) -> ($to)"
+  }
+
+  print ""
+  print "Next: update $slug / $specdir / $specpath in your session, and update the H1 in SPEC.md if the name changed."
+  print "Consider committing the rename now (before further edits, to keep history clean):"
+  print $"  git add -A && git commit -m \"rename spec: ($from | path basename) -> ($to | path basename)\""
+}
