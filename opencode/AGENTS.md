@@ -61,6 +61,12 @@ Retitle immediately, before any other action — do not wait for user confirmati
   after a front-matter block, or to mark a major structural break).
 
 
+## Design Exploration
+
+- When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill
+  before writing. Never produce code or spec content speculatively on an unexplored idea.
+
+
 ## Debugging
 
 - Start with the simplest hypothesis.
