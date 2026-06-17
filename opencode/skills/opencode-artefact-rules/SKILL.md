@@ -1,5 +1,4 @@
 ---
-name: opencode-review-rules
 description: |
   Quality criteria and review checklist for OpenCode artefacts (skills, agents, commands).
   Invoked by opencode-reviewer agent.
@@ -30,7 +29,7 @@ Check these first, regardless of artefact type.
 7. **Reference integrity** — For every `§slug` reference in any file under `$draftpath`:
    - Same-file ref (`§slug`): a matching `<!-- §slug -->` anchor must exist in that file.
    - Cross-file ref (<./path/to/file.md§slug>): target file must exist and contain `<!-- §slug -->`.
-   Flag dangling references (no anchor) and dead anchors with no reference (candidate for removal).
+   Flag dangling references (no anchor) and dead anchors with no reference.
 
 ## Type-specific criteria
 

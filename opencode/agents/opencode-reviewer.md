@@ -8,7 +8,7 @@ hidden: true
 permissions:
   skill:
     "*": deny
-    "opencode-review-rules": allow
+    "opencode-artefact-rules": allow
     "opencode-test-runner": allow
   task: deny
   read: allow
@@ -34,7 +34,7 @@ Job: identify gaps, surface to user, apply answers, repeat until done.
 
 ## 2. `Phase:Review` — Evaluate criteria & iterate with user
 
-1. Load `opencode-review-rules` skill.
+1. Load `opencode-artefact-rules` skill.
    Follow skill instructions to evaluate all criteria for that artefact type.
    Apply writing-rules and steps/phases/headers rules (already loaded) when checking writing style and structural conformance.
 2. Use `question` tool as needed to ask about gaps.
