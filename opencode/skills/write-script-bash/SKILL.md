@@ -29,6 +29,64 @@ NOTE: Load `write-script-generic` skill first — it defines the shared structur
   `pipefail` with `set +o pipefail`, then re-enable.
   Always add a comment explaining why it is disabled.
 
+## Function parameters
+
+Always assign positional parameters to named local variables at the start of the function.
+Never use `$1`, `$2`, etc. directly in the function body (except trivial one-liners).
+
+```bash
+# Good
+function process_file() {
+    local file_path="$1"
+    local mode="$2"
+
+    if [[ -f "$file_path" ]]; then
+        echo "Processing $file_path in $mode mode"
+    fi
+}
+
+# Bad — bare positionals used throughout body
+function process_file() {
+    if [[ -f "$1" ]]; then
+        echo "Processing $1 in $2 mode"
+    fi
+}
+```
+
+## Conditions with computations
+
+When a condition requires a computation or function call, extract the result to a local variable first.
+Avoid embedding calls inside `if` expressions.
+
+```bash
+# Good — extract complex condition to separate steps, then simple if
+function validate_input() {
+    local input="$1"
+
+    if check_format "$input" && check_length "$input"; then
+        process_input "$input"
+    fi
+}
+
+# Good — simple inline check with a single function call is fine
+function main() {
+    if [[ $# -gt 0 ]] && check_is_number "$1"; then
+        local length="$1"
+        shift
+    fi
+}
+
+# Bad — multiline condition with embedded subshell logic
+function validate_input() {
+    local input="$1"
+
+    if [[ -n $(check_format "$input" && \
+              check_length "$input") ]]; then
+        process_input "$input"
+    fi
+}
+```
+
 ## Output capture
 
 Separate variable declaration (bash-specific: `local` always exits 0, swallowing the real exit code):

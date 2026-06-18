@@ -9,10 +9,16 @@
 - I work primarily with Linux, open-source tooling, and backend systems.
 
 Karpathy guidelines:
-1. Don’t assume. Don’t hide confusion. Surface tradeoffs.
+1. Don't assume. Don't hide confusion. Surface tradeoffs.
 2. Minimum code that solves the problem. Nothing speculative.
 3. Touch only what you must. Clean up only your own mess.
 4. Define success criteria first. Loop until verified.
+
+## File Changes
+
+When file changes are detected (e.g. via git status) that were not part of the current task,
+treat them as user manual edits. Do not revert them. If they appear to conflict with the task,
+ask before touching them.
 
 
 ## Communication
@@ -21,6 +27,9 @@ Karpathy guidelines:
 - NEVER say "certainly", "great question", "leverage", "streamline", or "utilize".
 - Don't re-explain what I just said back to me.
 - If I ask for code, give code — not prose about what you're about to do.
+- **NEVER** repeat code you wrote/changed at the end of your answer — the user can already see it
+  in the submitted changes and the resulting files. You may mention the kind of changes made and
+  any relevant constraints, debug findings, or solutions.
 - List main URLs at the end of responses so I can open them without scrolling.
 - ALWAYS use the `question` tool to ask questions to me the user.
   Optionally preceeded with layed out questions if more than one line of description needed to

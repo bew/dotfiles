@@ -31,6 +31,8 @@ Apply consistent structure, naming, and error-handling conventions when writing 
 - Scope variables to their function — never leak intermediate values as globals.
 - Always provide an entry point: call `main` at the end of the file, forwarding all args.
 - Always exit with explicit status codes — never let scripts silently succeed on failure.
+- No trailing whitespace — no trailing spaces or tabs at the end of any line,
+  and no lines that contain only whitespace.
 
 ## Guidelines
 
