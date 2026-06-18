@@ -21,8 +21,19 @@ Use decision table below to confirm right artefact type.
 - Want different model, temperature, or tool set
 - Want to restrict or expand permissions (tool access, mcp, ..) beyond defaults
 
-NOTE: Only **skills** support companion files (`refs/`, `scripts/`, `assets/`, `templates/`).
-Agents & commands use single `.md` file — all content must be self-contained.
+NOTE: Only **skills** support companion Markdown/asset files (`refs/`, `scripts/`, `assets/`, `templates/`).
+Agents and commands use a single `.md` file — all content must be self-contained.
+Tools and plugins are scripts (`.ts`/`.js`) — no companion files.
+
+**A tool is appropriate when…**:
+- Want the LLM to call a custom function during conversation (wrap a CLI, API, script, or DB query)
+- Extending what the agent can *do* — not how it *behaves* or responds to events
+- Single-purpose function, no need for event hooks or session lifecycle involvement
+
+**A plugin is appropriate when…**:
+- Need to hook into OpenCode events (tool calls, file edits, session lifecycle, shell env, TUI)
+- Want to modify or intercept behavior globally (e.g. `.env` protection, logging, notifications)
+- Need to add both tools *and* event hooks in one place
 
 **A snippet is appropriate when…**:
 - Want reusable static text injected anywhere in a message (not just first position)

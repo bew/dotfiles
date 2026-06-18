@@ -2,15 +2,15 @@
 name: opencode-crafter
 description: |
   Load when user asks to create, update, edit, or refactor any OpenCode (OC)
-  artefact: skills, agents, commands, or snippets — including modifying an existing one.
+  artefact: skills, agents, commands, tools, plugins, or snippets — including modifying an existing one.
   Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
-  "edit the W agent", "update crafter skill".
+  "edit the W agent", "write a plugin to …", "create a tool for …", "update crafter skill".
   Guides user through discovery, drafting, and iterative refinement.
 ---
 
 # OpenCode Crafter
 
-Design & create OpenCode artefacts: **skills**, **agents**, **commands**, **snippets**.
+Design & create OpenCode artefacts: **skills**, **agents**, **commands**, **tools**, **plugins**, **snippets**.
 
 Phases:
 
@@ -69,6 +69,8 @@ Based on artefact type, read one of following references for full spec of that t
 - skill: <./refs/skills-related/anatomy.md>
 - command: <./refs/command-anatomy.md>
 - agent: <./refs/agent-anatomy.md>
+- tool: <./refs/tool-anatomy.md>
+- plugin: <./refs/plugin-anatomy.md>
 - snippet: load `snippets` skill for full spec
 
 Ready to move to `Phase:Discover`? (say 'next' or similar to proceed)
