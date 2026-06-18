@@ -22,21 +22,23 @@ vim.lsp.config("*", {
   root_markers = { ".git" },
 })
 
--- Enable LSP for all my lsp configs
-vim.lsp.enable {
-  -- note: naming scheme: `<lang>[-variant]-{ls,linter}`
-  "bash-ls",
-  "markdown-oxide-ls",
-  "lua-ls", -- NOTE: /!\ on update, patch `lazydev` init as it expects 'lua_ls' client name
-  "nu-ls",
-  "python-ruff-linter", -- (fast, in rust)
-  "python-pyrefly-ls", -- (fast, in rust)
-  -- "python-pylsp-ls", -- (slow/buggy, in python LSP/linter/..)
-  "terraform-ls",
-  "yaml-ls",
-  "kotlin-kmp-ls", -- (fast but incomplete, TS-based, in rust)
-  "kotlin-official-ls", -- (slow, in java)
-}
+if vim.env.NVIM_CFG_DISABLE_LSP ~= "1" then
+  -- Enable LSP for all my lsp configs
+  vim.lsp.enable {
+    -- note: naming scheme: `<lang>[-variant]-{ls,linter}`
+    "bash-ls",
+    "markdown-oxide-ls",
+    "lua-ls", -- NOTE: /!\ on update, patch `lazydev` init as it expects 'lua_ls' client name
+    "nu-ls",
+    "python-ruff-linter", -- (fast, in rust)
+    "python-pyrefly-ls", -- (fast, in rust)
+    -- "python-pylsp-ls", -- (slow/buggy, in python LSP/linter/..)
+    "terraform-ls",
+    "yaml-ls",
+    "kotlin-kmp-ls", -- (fast but incomplete, TS-based, in rust)
+    "kotlin-official-ls", -- (slow, in java)
+  }
+end
 
 ------------------------------------------------------------
 
