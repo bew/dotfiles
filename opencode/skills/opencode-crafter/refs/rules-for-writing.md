@@ -30,6 +30,7 @@ Brief a capable engineer who executes instructions exactly as written.
 - Phase names always in inline code: `Phase:Discover`, `Phase:Draft`, etc. — never bare text.
 - Fenced code blocks with language tag for multi-line content.
   Use short language tag like `md` or `py`.
+  Use `pseudo-code` tag for language-agnostic pseudo-code examples.
 - Tables for comparisons with 3+ items & 2+ dimensions.
 - Bold for terms being defined or critical warnings only.
 - No emojis.

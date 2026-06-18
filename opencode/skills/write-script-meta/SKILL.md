@@ -48,6 +48,7 @@ Skill directory and `name` frontmatter field must follow: `write-script-<lang>`.
 | Subcommand dispatch (`cmd_*` pattern) | `write-script-generic` |
 | Error message actionability rules | `write-script-generic` |
 | Script structure template (pseudo-code) | `write-script-generic` |
+| Code examples for generic rules (no prose restatement) | lang skill |
 | Shebang, strict-mode flags | lang skill |
 | Language-specific conditionals, quoting, operators | lang skill |
 | Full boilerplate template with real syntax | lang skill |
@@ -116,5 +117,8 @@ Good:
 
 - Never restate a rule already in `write-script-generic` in a lang skill.
   If the rule is generic, it belongs in `write-script-generic` — move it there instead.
-- Prose rules are allowed in lang skills when they are genuinely lang-specific.
+- Before placing a new rule in a lang skill, verify it is truly lang-specific.
+  If unsure, ask: does this rule apply identically to a second unrelated language?
+  If yes, it belongs in `write-script-generic`.
+- Prose rules are allowed in lang skills only when genuinely lang-specific.
   When a lang skill adds a code example for a generic rule, omit the prose — the generic skill owns it.

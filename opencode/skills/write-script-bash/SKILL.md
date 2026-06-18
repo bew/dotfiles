@@ -23,6 +23,8 @@ NOTE: Load `write-script-generic` skill first — it defines the shared structur
 - Always quote variables: `"$var"`, `"$@"`, `"${arr[@]}"`.
 - Use `function name() { ... }` style — always include the `function` keyword.
 - Use `${VAR:-default}` for optional arguments and env var defaults with fallback values.
+- In bash, also add *what* comments when the syntax itself is non-obvious —
+  e.g. symbol-heavy expressions, unusual pipeline ordering, or constructs that read backwards.
 - When a pipeline step may cause SIGPIPE (e.g. piping into `head`): temporarily disable
   `pipefail` with `set +o pipefail`, then re-enable.
   Always add a comment explaining why it is disabled.
@@ -108,12 +110,3 @@ main "$@"
 The standard testing system for bash scripts in this repo is **Bats** (Bash Automated Testing System).
 
 Load `write-script-bats` skill when writing or running tests for a bash script.
-
-## Section separators
-
-Syntax for grouping sections (see `write-script-generic` for when to use them):
-
-```bash
-# ------------------------------------------------------------------------------
-# Section Name
-```

@@ -16,11 +16,16 @@ Apply consistent structure, naming, and error-handling conventions when writing 
 
 ## Rules
 
+- Always add a top-level comment at the start of the script: short description of what it does,
+  optionally how to use it (keep to 1-2 lines), and links to inspiration or upstream sources if any.
 - Always split script into functions — no top-level logic outside `main`.
 - Use descriptive function names with a verb (e.g. `parse_args`, `check_format`).
 - Add a short comment above every function explaining its purpose or why it exists.
   One line is enough for simple helpers.
   A few lines for non-obvious ones.
+- Inline comments inside function bodies must explain *why*, not *what*.
+  Skip comments that restate what the code already says.
+  Write them when the intent, constraint, or reason is not obvious from the code alone.
 - Assign positional parameters to named local variables at the start of every function.
   Never reference bare positionals (`$1`, `$2`) in function bodies (except trivial one-liners).
 - Scope variables to their function — never leak intermediate values as globals.
@@ -42,6 +47,8 @@ Apply consistent structure, naming, and error-handling conventions when writing 
   Then write a simple condition — avoid embedding calls inside `if` expressions.
 - Guard against missing external dependencies at the top of the script with a short-circuit exit.
   Check before any logic runs, not inline when the tool is first used.
+- Use type annotations for parameters and variables whenever the language supports it.
+  Prefer explicit types over implicit ones — they serve as inline documentation.
 
 ## Standard function names
 
@@ -59,7 +66,7 @@ Use these names consistently across scripts:
 When a script has multiple subcommands, implement each as a `cmd_<name>` function.
 Dispatch in `main` with a switch/case on the first argument:
 
-```
+```pseudo-code
 # Dispatch to subcommand handler or show usage
 main(cmd, ...rest):
     case cmd:
@@ -72,7 +79,7 @@ main(cmd, ...rest):
 
 Error messages must be actionable: explain what went wrong AND how to fix it.
 
-```
+```pseudo-code
 # Good
 print_err "Error: --len requires an argument"
 print_err "Example: gen-random-string --len 16"
@@ -99,7 +106,7 @@ If no testing skill exists for the language, ask the user how they want tests st
 
 ## Script structure
 
-```
+```pseudo-code
 [shebang]
 
 # Short (1-2 line) description of what the script does and when to use it.
