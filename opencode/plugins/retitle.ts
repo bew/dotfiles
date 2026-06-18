@@ -6,11 +6,11 @@
 // which tells the LLM to generate a good title from the conversation and
 // then call this tool to persist it.
 
-import { tool } from "@opencode-ai/plugin";
+import { type Plugin, tool } from "@opencode-ai/plugin";
 
 // `client` is an HTTP client connected to this OpenCode server instance.
 // It can call the same REST API endpoints that the TUI and CLI use.
-export const Retitle = async ({ client }) => {
+export const Retitle: Plugin = async ({ client }) => {
   return {
     // Tools registered here become available to the LLM alongside built-in tools
     // (read, write, bash, glob, grep, etc.). They are surfaced to every session.
