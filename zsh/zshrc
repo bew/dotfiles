@@ -142,17 +142,17 @@ source $_ZSH_PLUGIN_SRCREF__zsh_hooks/zsh-hooks.plugin.zsh
 
 # precmd_hook
 hooks-define-hook precmd_hook
-function precmd-wrapper { hooks-run-hook precmd_hook }
+function precmd-wrapper { hooks-run-hook precmd_hook; }
 add-zsh-hook precmd precmd-wrapper
 
 # preexec_hook
 hooks-define-hook preexec_hook
-function preexec-wrapper { hooks-run-hook preexec_hook "$@" }
+function preexec-wrapper { hooks-run-hook preexec_hook "$@"; }
 add-zsh-hook preexec preexec-wrapper
 
 # chpwd_hook
 hooks-define-hook chpwd_hook
-function chpwd-wrapper { hooks-run-hook chpwd_hook }
+function chpwd-wrapper { hooks-run-hook chpwd_hook; }
 add-zsh-hook chpwd chpwd-wrapper
 
 #-------------------------------------------------------------
