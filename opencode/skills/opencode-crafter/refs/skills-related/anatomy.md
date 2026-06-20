@@ -102,12 +102,17 @@ Optional fields (rarely needed for personal skills): `license`, `compatibility`,
 
 | Section | Required | Purpose |
 |---|---|---|
-| **Goal** | Yes | One sentence — what the agent must produce |
-| **Steps** | Yes | Numbered sequential actions, one instruction each |
-| **Rules** | Yes | Hard constraints: "must" / "always" / "never" |
+| **Goal** | Default | One sentence — what the agent must produce |
+| **Steps** | Default | Numbered sequential actions, one instruction each |
+| **Rules** | Recommanded | Hard constraints: "must" / "always" / "never" |
 | **Guidelines** | No | Soft recommendations: "prefer" / "avoid" |
 | **Output format** | When applicable | Fenced example of the exact expected output |
 | **Example** | Optional | Minimal end-to-end scenario when steps are ambiguous |
+
+NOTE: "Default" sections are the standard structure, not mandates.
+A skill is valid if its content is complete and unambiguous without them — for example, a single
+imperative sentence can replace `## Goal` + `## Steps` when the action is trivial.
+Omit a default section only when its content would be redundant.
 
 **Rules vs Guidelines**:
 

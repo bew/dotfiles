@@ -1,7 +1,10 @@
 # Phase:Review — Review & iterate with user via subagent
 
-Invoke `opencode-reviewer` subagent via `task` tool.
-Pass in prompt:
+IMPORTANT: Invoke the `opencode-reviewer` subagent immediately.
+Do not pre-apply writing or structural rules yourself first.
+The reviewer handles all conformance checks.
+
+Invoke via `task` tool. Pass in prompt:
 - Artefact type and name
 - `$draftpath` (reviewer reads and edits files there)
 - Path to writing rules file: `./refs/rules-for-writing.md`
@@ -10,8 +13,6 @@ Pass in prompt:
 - For updates: which parts changed, so reviewer can focus
 
 Subagent reads & edits files at `$draftpath`, asks user questions via `question` tool.
-Reviewer handles writing & structural conformance — do not pre-apply rules yourself.
-For updates: tell reviewer to focus on changed sections & verify coherence with unchanged parts.
 Continue until user confirms / types "done". No round limit.
 
 After iterations, briefly reflect on diff between initial & final draft.
