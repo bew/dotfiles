@@ -26,6 +26,8 @@ Apply consistent structure, naming, and error-handling conventions when writing 
 - Inline comments inside function bodies must explain *why*, not *what*.
   Skip comments that restate what the code already says.
   Write them when the intent, constraint, or reason is not obvious from the code alone.
+  Exception: structural signpost comments are allowed when a function body or file has multiple
+  sections/phases/logical-blocks of code — they aid navigation without restating code.
 - Assign positional parameters to named local variables at the start of every function.
   Never reference bare positionals (`$1`, `$2`) in function bodies (except trivial one-liners).
 - Scope variables to their function — never leak intermediate values as globals.
