@@ -60,14 +60,18 @@ WARNING: This diff mixes N distinct concerns. Consider splitting into separate c
 Keep it 72 chars or fewer. Imperative mood. No trailing period.
 Use style detected in step 1.
 
-**Body**: scale to diff size — omit entirely for simple, obvious
-changes; include when context or multiple concerns warrant explanation.
-Use short paragraphs where useful.
-Group changes into semantic bullet points (`- `).
-Wrap lines at 72 chars.
+**Default verbosity — middle ground**:
+- Omit body entirely only for single-line trivial changes (typo fix,
+  rename, comment tweak).
+- Otherwise: one short explanatory paragraph (2–3 sentences max)
+  summarising intent, followed by condensed bullets — one per
+  semantic concern, kept to one line each.
+- Do not produce exhaustive bullet lists covering every detail of
+  the diff. Aim for enough context to understand the change without
+  reading the diff.
 
-**Bullet discipline** — each bullet must answer "what changed and why", not "which file changed".
-Diff already records file locations.
+**Bullet discipline** — each bullet must answer "what changed and why",
+not "which file changed". Diff already records file locations.
 Rules:
 - One bullet per semantic concern (may cover several files/lines).
 - Omit file paths unless path itself is meaningful information.
@@ -78,7 +82,7 @@ Rules:
 
 Example body format:
 ```
-Optional explanatory paragraph here if needed.
+Brief paragraph explaining the intent or context.
 
 - Add configurable IAM role input to replace all hardcoded ARNs.
 - Pass all secrets via env vars instead of inline template expressions.
@@ -89,3 +93,19 @@ When body is present: blank line between subject and body, and
 between paragraphs. This MUST ALWAYS be respected.
 
 Output only raw commit message (and warning if applicable) — no markdown fencing, no extra commentary.
+
+### Step 4 — Offer adjustment
+
+After outputting the commit message, ask the user whether they want
+to adjust it. Use the `question` tool with these options:
+
+- **Use as-is** — proceed
+- **More details** — ask a targeted follow-up: which area needs more
+  explanation? (paragraph, bullets, a specific concern, overall?)
+- **Less details** — ask a targeted follow-up: what to trim? (paragraph,
+  bullets, a specific area, collapse to subject only?)
+- **Edit subject** — user wants to tweak wording of the subject line
+
+When the user picks "More details" or "Less details", use the
+`question` tool again to ask the targeted follow-up before rewriting.
+Do not guess what to change — ask first.
