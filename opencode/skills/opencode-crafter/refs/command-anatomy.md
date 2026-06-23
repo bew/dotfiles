@@ -70,23 +70,25 @@ Then stop.
 
 **Pick / Ask user to choose injection form if need unclear**:
 
-*Form 1 — Inline optional* (focus hint, filter, or short free-text):
-```
-Additional context (may be empty): $ARGUMENTS
-If provided, treat it as a focus hint — weight your analysis toward it.
-```
-
-*Form 2 — Fenced pre-fill block* (structured/multiline context that may answer earlier questions):
+*Form 1 — Fenced block* (default for any free-form or optional argument):
 `````
-## Additional user context
+## Additional context
 
-May be empty. If non-empty, pre-fill answers & skip corresponding questions.
+May be empty. If non-empty, treat as focus hint — weight analysis toward it.
 
 ```
 $ARGUMENTS
 ```
 `````
 Place at end of command body.
+Use for any argument that could be multiline, free-text, or a focus hint.
+
+*Form 2 — Inline* (keyword filter or very short single-value arg only):
+```
+Additional context (may be empty): $ARGUMENTS
+If provided, treat it as a focus hint — weight your analysis toward it.
+```
+Avoid for free-form text — use Form 1 instead.
 
 *Form 3 — Positional `$1`, `$2`* (args with distinct semantic roles):
 ```
