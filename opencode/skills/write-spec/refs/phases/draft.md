@@ -12,6 +12,7 @@ Ask: *Sections look right? Say 'next' to start writing.*
 Adjust section list if user requests changes.
 
 Once confirmed, write the file: H1 with status tag + all confirmed section headings, empty bodies.
+Each main section (`##`) that may surface open questions gets an empty `### Open Questions` subsection.
 Use `write` tool for this initial creation only.
 All subsequent changes use `edit` only — never overwrite the file again.
 
@@ -19,6 +20,24 @@ H1 format:
 ```md
 # [DRAFT] <Name>
 ```
+
+Skeleton example (sections with OQ subsections):
+```md
+## Introduction
+
+## Terminology
+
+## <Domain Section>
+
+### Open Questions
+
+## <Another Decision Section>
+
+### Open Questions
+```
+
+Omit `### Open Questions` from Introduction and Terminology — they are definitional/contextual sections, not decision surfaces.
+Omit from sections unlikely to surface design decisions (e.g. Component Inventory, Related Files).
 
 ## Structure
 
@@ -37,17 +56,20 @@ Different concerns belong in separate files
 
 ## Filling
 
-Fill sections top-to-bottom using `edit`.
-Complete one section before moving to the next.
-Do not batch multiple non-trivial sections into one edit.
+Fill one section at a time, then pause.
+After filling a section, note what was written and any open questions surfaced.
+Wait for user feedback before moving to the next section.
+If user says "continue" or similar without feedback, proceed to next section.
 
-After each section is filled, briefly note what was written and any open questions surfaced.
-Add open questions to the Open Questions section immediately — do not defer.
+Add open questions to the section's own `### Open Questions` subsection immediately — do not defer.
 
 On edit failure (placeholder mismatch): re-read `$specpath`, locate current state, resume.
 
-After all sections are filled, tell user:
-> Draft written to `$specpath` — open to inspect and share review feedback.
+After all sections are filled:
+
+1. Prune empty `### Open Questions` subsections — remove any that have no entries.
+2. Tell user:
+   > Draft written to `$specpath` — open to inspect and share review feedback.
 
 ## Refinement
 
@@ -66,7 +88,9 @@ When refining an existing spec (not a new draft):
 - Never mix terminology once terms are defined in Terminology.
   Use exact names from Terminology everywhere.
 - Always define all terms in Terminology before using them elsewhere in spec.
-- Always include Open Questions section, even if short.
+- Always include `### Open Questions` subsections in main sections that may surface design decisions.
+  Never add OQ subsections to Introduction or Terminology — they are not decision surfaces.
+  Empty OQ subsections serve as drafting placeholders — prune them before leaving `Phase:Draft` (see *Filling* above).
 - Always include Alternatives & Tradeoffs section comparing proposed design
   against simpler alternative.
 - When omitting a section, flag it explicitly: name section and state reason it was skipped.

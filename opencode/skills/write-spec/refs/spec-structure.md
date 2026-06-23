@@ -34,7 +34,10 @@ flag each omission explicitly (name section + reason).
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
 8. **Alternatives & Tradeoffs** — compare against alternatives; include decision criteria
 9. **Related files** — list files in `$specdir` other than `SPEC.md`, with one-line descriptions
-10. **Open Questions** — numbered list; unresolved design decisions, tradeoffs not yet settled
+
+Open Questions are per-section `### Open Questions` subsections, placed at end of each `##` section that surfaces design decisions.
+There is no global Open Questions section at end of spec.
+See <./phases/draft.md> for skeleton and pruning rules.
 
 ## Terminology entries
 

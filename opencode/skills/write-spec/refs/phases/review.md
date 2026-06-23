@@ -14,7 +14,8 @@ Check each of the following, flag any issues:
 - All terms used in spec are defined in Terminology before first use
 - No terminology drift — single canonical name used everywhere for each concept
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
-- Open Questions section present, entries follow correct format (see <../spec-structure.md>)
+- No empty `### Open Questions` subsections remain
+- Any OQ entries present follow correct format (see <../spec-structure.md>)
 - Prose in touched sections follows sentence-per-line format
 - Status tag in H1 reflects current state
 
