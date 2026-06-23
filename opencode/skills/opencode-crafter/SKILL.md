@@ -105,6 +105,13 @@ Note open questions & tradeoffs.
 
 Ask: *Does this match what you had in mind?*
 
+**New scope detection**: during iteration, if user introduces a new idea, constraint, or design angle
+not covered in `Phase:Discover` (signals: "what if…", "could we…", "idea:", "🤔", or a concept absent from prior discovery):
+- Pause drafting.
+- Ask: *"This looks like new scope — do a quick discover loop before writing it in?"*
+- Do not silently absorb new inputs into draft content.
+- If user confirms: return to `Phase:Discover` for the new scope, then resume `Phase:Draft`.
+
 Iterate until user explicitly confirms draft is ready.
 Then proceed to `Phase:Scripts` (for skill, if scripts needed) or `Phase:Review`.
 

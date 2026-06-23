@@ -81,6 +81,15 @@ When refining an existing spec (not a new draft):
 4. After edits, verify prose still follows sentence-per-line format in touched sections.
    If any violation found, flag to user: fix silently / fix with confirmation / leave as-is.
 
+## New scope detection
+
+During iteration, if user introduces a new idea, constraint, or design angle not covered in `Phase:Discover`
+(signals: "what if…", "could we…", "idea:", "🤔", or a concept absent from prior discovery):
+- Pause drafting.
+- Ask: *"This looks like new scope — do a quick discover loop before writing it in?"*
+- Do not silently absorb new inputs into spec content.
+- If user confirms: return to `Phase:Discover` for the new scope, then resume `Phase:Draft`.
+
 ## Rules
 
 - Never write full rewrite when targeted edit is requested. Surgical edits only.
