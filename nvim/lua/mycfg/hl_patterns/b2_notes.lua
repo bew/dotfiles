@@ -5,15 +5,35 @@ local patterns = {}
 
 -- e.g.
 -- - 20251117T1742
--- - @2025-11-17
--- TODO: find a nice way to distinguish the different part of the date/brainID 🤔
 patterns.b2_id = {
   pattern = {
     "%d%d%d%d%d%d%d%dT%d%d%d%d", -- brain ID
-    "@%d%d%d%d%-%d%d%-%d%d", -- @date
   },
   group = _U.define_hl("b2_id", {
     ctermfg = 140,
+    italic = true,
+  }),
+}
+patterns.b2_id_T = {
+  pattern = {
+    "%d%d%d%d%d%d%d%d()T()%d%d%d%d", -- brain ID
+  },
+  group = _U.define_hl("b2_id_T", {
+    ctermfg = 141,
+    bold = true,
+  }),
+}
+
+-- e.g.
+-- - @2025-11-17
+-- - @2026-06
+patterns.b2_dates = {
+  pattern = {
+    "@%d%d%d%d%-%d%d%-%d%d", -- @date (year-month-day)
+    "@%d%d%d%d%-%d%d", -- @dat (year-month)
+  },
+  group = _U.define_hl("b2_dates", {
+    ctermfg = 32, -- (like 'note:')
     italic = true,
   }),
 }
