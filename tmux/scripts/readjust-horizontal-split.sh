@@ -22,8 +22,8 @@
 #                                   both split
 
 # Configuration - read from tmux user variables (with fallback)
-THRESHOLD=$(tmux show-options -gv @wide_layout_split_threshold 2>/dev/null || echo "240")
-TARGET_RATIO=$(tmux show-options -gv @wide_layout_split_ratio 2>/dev/null || echo "36")
+THRESHOLD=$(tmux show-options -gv @mycfg-layout-wide-win-autosplit-threshold 2>/dev/null || echo "240")
+TARGET_RATIO=$(tmux show-options -gv @mycfg-layout-wide-win-autosplit-ratio 2>/dev/null || echo "36")
 
 # Get window dimensions
 window_width=$(tmux display-message -p "#{window_width}")
