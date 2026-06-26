@@ -54,7 +54,9 @@ When the user explicitly asks for it, you are allowed to add/commit, always ask 
 - NEVER attempt to read secrets from e.g. `.env` files.
 - NEVER drop database tables.
 - NEVER try to automatically install something you need. Ask.
-- NEVER search for something from home dir, stop if something needed cannot be found.
+- NEVER run broad filesystem searches (find, glob from /, ~, /nix, /run, /usr, etc.)
+  to locate something whose path is unknown. If a required path is missing or unresolved,
+  stop and ask the user — do not try to discover it automatically.
 
 
 ## Session titling
