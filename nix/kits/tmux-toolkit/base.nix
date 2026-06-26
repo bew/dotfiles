@@ -18,6 +18,25 @@ in {
     outputs.cfgDir = configDirOption;
     outputs.editable-cfgDir = configDirOption;
     outputs.non-editable-cfgDir = configDirOption;
+
+    # TODO: move to base toolkit? 🤔
+    # (might need more flexibility, decide where to inject / maybe in upcoming wrapper-kit?)
+    env = lib.mkOption {
+      description = "Configure wrapper environment vars";
+      type = ty.attrsOf (ty.submodule {
+        options.set = lib.mkOption {
+          description = "add VAR with value VAL to the executable's environment";
+          type = ty.nullOr ty.str;
+          default = null;
+        };
+        options.set-default = lib.mkOption {
+          description = "like `set`, but only adds VAR if not already set in the environment";
+          type = ty.nullOr ty.str;
+          default = null;
+        };
+      });
+      default = {};
+    };
   };
 
   config = {
@@ -41,10 +60,23 @@ in {
       nativeBuildInputs = [ pkgs.makeWrapper ];
       meta.mainProgram = binName;
       postBuild = /* sh */ ''
-        makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} \
-          --add-flags "-f ${outs.cfgEntrypoint}" \
-          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgEntrypoint} \
+        wrapperArgs=(
+          # Start tmux with custom config entrypoint
+          --add-flags "-f ${outs.cfgEntrypoint}"
+          # Send env var for config reloads
+          --set TMUX_CONFIG_ENTRYPOINT ${outs.cfgEntrypoint}
+          # Inject other env vars
+          ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: valSpec:
+            if valSpec.set != null then
+              "--set ${name} ${lib.escapeShellArg valSpec.set}"
+            else if valSpec.set-default != null then
+              "--set-default ${name} ${lib.escapeShellArg valSpec.set-default}"
+            else
+              throw "tmux-toolkit: env.${name}: action not supported ☹️"
+          ) cfg.env)}
           --prefix TERMINFO_DIRS : ${config.package.terminfo}/share/terminfo
+        )
+        makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} "''${wrapperArgs[@]}"
       '';
       # NOTE: we need to prepend terminfo to ensure the programs running in tmux find the correct
       #   terminfo database for the running tmux. (and not an eventual outdated system version)
