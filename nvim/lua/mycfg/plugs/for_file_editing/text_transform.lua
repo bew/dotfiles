@@ -682,106 +682,46 @@ Plug {
 }
 
 Plug {
-  source = gh"numToStr/Comment.nvim",
-  desc = "Smart and powerful comment plugin for neovim",
+  source = gh"nvim-mini/mini.comment",
+  desc = "Fast and familiar per-line commenting",
   tags = {t.editing, t.textobj},
   defer_load = { on_event = "VeryLazy" },
   on_load = function()
-    ---@diagnostic disable-next-line: missing-fields
-    require"Comment".setup {
-      mappings = false,
+    local MiniComment = require"mini.comment"
+    MiniComment.setup {
+      -- Disable all mappings, I set them myself below
+      mappings = {
+        comment = "",
+        comment_line = "",
+        comment_visual = "",
+        textobject = "",
+      },
     }
-    -- FIXME: Allow `gcA` to be dot-repeated
-    -- Opened issue: https://github.com/numToStr/Comment.nvim/issues/222
-    -- (closed as wontfix :/ TODO: make a PR that does it!)
-
-    -- TODO: make omap `ac` also delete leading / trailing spaces for delete action!
-
-    -- NOTE: smart uncomment on inline comments (like `foo /* bar */ baz`) doesn't work automatically by default
-    -- => There is a way, when triggering a 'linewise' un/comment/toggle on a region
-    --    (via motion / visual selection) that is inside current line, it does an inline block comment
-    --    around that region when possible.
-    -- Tracking issue: https://github.com/numToStr/Comment.nvim/issues/39
-
-    K.local_leader_map_define_group{mode={"n", "v"}, prefix_key="cc", name="+comment"}
 
     my_actions.toggle_line_comment = A.mk_action {
-      n = {
-        default_desc = "toggle comment (linewise)",
-        map_opts = {expr = true},
-        function()
-          if vim.v.count == 0 then
-            return "<Plug>(comment_toggle_linewise_current)"
-          else
-            return "<Plug>(comment_toggle_linewise_count)"
-          end
-        end,
-      },
-      v = {
-        default_desc = "toggle comment on selection (linewise)",
-        function()
-          U.switch_to_normal_mode()
-          -- note: visualmode() must be called _after_ <esc> to be correct on first use
-          require"Comment.api".locked("toggle.linewise")(vim.fn.visualmode())
-          U.feed_keys_sync"gv" -- re-select
+      default_desc = "toggle comment (linewise)",
+      map_opts = { expr = true },
+      [{"n", "v"}] = function()
+        local is_visual = vim.tbl_contains({ "v", "V", "\22" }, vim.fn.mode())
+        if is_visual then
+          return MiniComment.operator()
         end
-      },
-    }
-
-    -- note: C-/ is remapped to A-/ at terminal-level
-    K.toplevel_map{mode={"n", "v"}, key="<M-/>", action=my_actions.toggle_line_comment}
-
-    K.local_leader_map{
-      mode={"n", "v"},
-      key="cc<Space>",
-      action=my_actions.toggle_line_comment,
-    }
-    K.local_leader_map{
-      mode={"n"},
-      key="ccb<Space>",
-      action=function()
-        if vim.v.count == 0 then
-          return "<Plug>(comment_toggle_blockwise_current)"
-        else
-          return "<Plug>(comment_toggle_blockwise_count)"
-        end
+        return MiniComment.operator() .. "_"
       end,
-      desc="toggle current (blockwise)",
-      opts={expr=true},
     }
 
-    -- These mappings work as a prefix for an operator-pending-like mode
-    -- (e.g: '<leader> cct 3j' to toggle comment on 4 lines (linewise))
-    -- (e.g: '<leader> cct ip' to toggle comment in-paragraph (linewise))
-    -- (e.g: '<leader> cct e' to toggle comment next word (blockwise (it's a little smart!))
-    K.local_leader_map_define_group{mode={"n", "v"}, prefix_key="cct", name="+for-motion"}
-    K.local_leader_map{mode={"n"}, key="cct", action="<Plug>(comment_toggle_linewise)",        desc="toggle for motion (linewise, can inline)"}
-    K.local_leader_map{mode={"v"}, key="cct", action="<Plug>(comment_toggle_linewise_visual)", desc="toggle for motion (linewise, can inline)"}
-    --local_leader_map{mode={"n"}, key="ccmb", action="<Plug>(comment_toggle_blockwise)",        desc="toggle for motion (blockwise)"}
-    --local_leader_map{mode={"v"}, key="ccmb", action="<Plug>(comment_toggle_blockwise_visual)", desc="toggle for motion (blockwise)"}
+    -- NOTE: Comment textobj are `ic`/`ac`, provided by `mini.ai` plugin
 
-    local comment_api = require"Comment.api"
-    K.local_leader_map{mode={"n"}, key="cco", action=comment_api.insert.linewise.below, desc="insert (linewise) below"}
-    K.local_leader_map{mode={"n"}, key="ccO", action=comment_api.insert.linewise.above, desc="insert (linewise) above"}
-    K.local_leader_map{mode={"n"}, key="cca", action=comment_api.insert.linewise.eol,   desc="insert (linewise) at end of line"}
+    -- Comment mappings
+    K.local_leader_map_define_group{ mode = { "n", "v" }, prefix_key = "cc", name = "+comment" }
+    -- note: C-/ (C-: really) is remapped to A-/ at terminal-level
+    K.toplevel_map{mode={"n", "v"}, key="<M-/>", action=my_actions.toggle_line_comment}
+    K.local_leader_map{mode={"n", "v"}, key="cc<Space>", action=my_actions.toggle_line_comment}
 
-    -- force comment/uncomment line
-    -- (normal)
-    K.local_leader_map{mode={"n"}, key="ccc", action=comment_api.call("comment.linewise.current", "g@$"),   desc="force (linewise)", opts={expr = true}}
-    K.local_leader_map{mode={"n"}, key="ccu", action=comment_api.call("uncomment.linewise.current", "g@$"), desc="remove (linewise)", opts={expr = true}}
-    -- (visual)
-    K.local_leader_map{
-      mode={"v"},
-      key="ccc",
-      action=[[<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>]],
-      desc="force (linewise)",
-    }
-    K.local_leader_map{
-      mode={"v"},
-      key="ccu",
-      action=[[<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>]],
-      desc="remove (linewise)"
-    }
+    -- MAYBE: other mappings, could be useful..
+    --   ccc (n+v) - force comment (always add comment markers, even if already commented)
+    --   cco/ccO   - insert comment line below/above and enter insert mode
+    --   cca       - append comment at end of line and enter insert mode
   end,
 }
 
