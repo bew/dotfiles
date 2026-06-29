@@ -770,9 +770,6 @@ vibindkey 'S' zwidget::toggle-sudo-nosudo
 vibindkey 'q' zwidget::cycle-quoting
 vibindkey '^a' zwidget::insert_one_arg
 
-# Alt-Enter => insert a newline
-vibindkey "${keysyms[Enter]}" self-insert-unmeta
-
 # Ctrl-Alt-L => force scroll window for free thinking :)
 vibindkey '^l' zwidget::force-scroll-window
 
