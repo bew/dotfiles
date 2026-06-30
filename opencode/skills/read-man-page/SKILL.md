@@ -1,18 +1,16 @@
 ---
-name: man-reader
+name: read-man-page
 description: |
   Token-efficient man page reading.
-  Load when looking up CLI tool docs, flags, options, usage examples, config formats..
+  Load when looking up CLI tool docs, flags, options, usage examples, config formats.
+  Do NOT use bash to run `man` directly without loading this skill first.
 ---
 
 # Man Page Reader
 
-## Goal
+GOAL: Read man pages in targeted chunks via `manq` (man query) script.
 
-Read man pages in targeted chunks via `manq` (man query) script.
-Never load full page.
-
-## Choose `--help` vs `man`
+## Choose to use `--help` vs `man`
 
 | Situation | Action |
 |---|---|
@@ -32,21 +30,19 @@ man -K <string>     # full-text search across all man pages
 
 ## Man page sections
 
-`manq` accepts `<name>` or `<name:N>` where `N` is section number:
+`manq` accepts `<name>` or `<name>:N` where `N` is a standard man category number:
 
-| N | Topic |
-|---|---|
-| 1 | User commands |
-| 2 | System calls |
-| 3 | Library functions |
-| 4 | Device files |
-| 5 | File formats & config |
-| 6 | Games |
-| 7 | Misc (protocols, conventions) |
-| 8 | Admin commands |
+1 — User commands
+2 — System calls
+3 — Library functions
+4 — Device files
+5 — File formats & config
+6 — Games
+7 — Misc (protocols, conventions)
+8 — Admin commands
 
 Omit `:N` to use first match.
-Use `<name:N>` to disambiguate (e.g. `printf:1` vs `printf:3`, `githooks:5`).
+Use `<name>:N` to disambiguate (e.g. `printf:1` vs `printf:3`, `githooks:5`).
 
 ## Script usage
 
@@ -56,14 +52,16 @@ Resolve `./scripts/manq` to absolute path before invoking.
 <skill-dir>/scripts/manq <subcommand> <name[:N]> [options]
 ```
 
+(NOTE: examples below use grep)
+
 ### Subcommands
 
 **`toc`** — section list with line count, subsection count, condensed synopsis.
 ```sh
 ./scripts/manq toc grep
-./scripts/manq toc grep -S OPTIONS        # TOC scoped to one section
-./scripts/manq toc grep -L 2              # limit depth (default: all)
-./scripts/manq toc grep -O                # include condensed options list
+./scripts/manq toc grep -S OPTIONS   # TOC scoped to one section
+./scripts/manq toc tree -L 2         # limit depth level (default: all)
+./scripts/manq toc rg -O             # include condensed options list
 ```
 
 Common section names usable directly with `section` without running `toc` first:
@@ -82,13 +80,13 @@ Use `--lines` to read incrementally.
 **`flag`** — show description block for specific flags.
 ```sh
 ./scripts/manq flag grep -v
-./scripts/manq flag grep -v --include      # multiple flags in one call
+./scripts/manq flag grep -v --include   # multiple flags in one call
 ```
 
 ## Steps
 
-1. Orient with `toc` if section names unknown. Use `-O` to include options summary.
-2. Read known sections directly with `section`. Multiple sections in one call.
+1. Orient with `toc` if section names unknown; use `-O` for options summary.
+2. Read known sections with `section`; multiple per call allowed.
 3. For long sections (>80 lines), read in 50-line increments with `--lines`.
 4. Look up specific flags with `flag` instead of reading all of OPTIONS.
 
