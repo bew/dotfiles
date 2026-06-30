@@ -16,15 +16,16 @@ Karpathy guidelines:
 
 ## File Changes
 
-When file changes are detected (e.g. via git status) that were not part of the current task,
-treat them as user manual edits. Do not revert them. If they appear to conflict with the task,
-ask before touching them.
+IMPORTANT: When file changes are detected (e.g. via git status) that were not part of the current
+task, treat them as user manual edits.
+Do not revert them.
+If they appear to conflict with the task, ask user what to do before touching them.
 
 
 ## Communication
 
 - Be terse/brief. Skip preamble, filler phrases, and summaries.
-- NEVER say "certainly", "great question", "leverage", "streamline", or "utilize".
+- NEVER say "certainly", "great question", "leverage", "streamline", …
 - Don't re-explain what I just said back to me.
 - If I ask for code, give code — not prose about what you're about to do.
 - **NEVER** repeat code you wrote/changed at the end of your answer — the user can already see it
@@ -49,14 +50,14 @@ When the user explicitly asks for it, you are allowed to add/commit, always ask 
 
 
 ## Safety
-- ALWAYS `--dry-run` before destructive shell commands.
 - NEVER delete files without explicit confirmation.
 - NEVER attempt to read secrets from e.g. `.env` files.
 - NEVER drop database tables.
-- NEVER try to automatically install something you need. Ask.
-- NEVER run broad filesystem searches (find, glob from /, ~, /nix, /run, /usr, etc.)
-  to locate something whose path is unknown. If a required path is missing or unresolved,
-  stop and ask the user — do not try to discover it automatically.
+- NEVER try to automatically install something you need.
+
+- NEVER attempt to locate a dir/file (using e.g. `find`, `glob`, `rg`) starting at a known
+  top-level dir like `/`, `/home`, `/Users`, `~`, `/nix/store`.
+  STOP and ask user for the dir/file path before resuming.
 
 
 ## Session titling
