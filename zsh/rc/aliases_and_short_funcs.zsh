@@ -394,10 +394,12 @@ function curl_auth_json() {
 
 # ssh
 
-# Always expose a known TERM (not the 256color version) to the server I'm connecting to.
-alias ssh='TERM=xterm ssh'
+# Always expose a widely known TERM (n../zsh/rc/aliases_and_short_funcs.zshot the tmux one) to the server I'm connecting to.
+alias ssh="TERM=xterm-256color ssh"
 
-alias ssh-password-only='ssh -o PubkeyAuthentication=no'
+alias ssh-password-only="ssh -o PubkeyAuthentication=no"
+
+alias ssh-keygen-ed25519="ssh-keygen -t ed25519"
 
 
 # sudo
