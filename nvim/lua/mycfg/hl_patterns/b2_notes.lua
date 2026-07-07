@@ -10,8 +10,7 @@ patterns.b2_id = {
     "%d%d%d%d%d%d%d%dT%d%d%d%d", -- brain ID
   },
   group = _U.define_hl("b2_id", {
-    ctermfg = 140,
-    italic = true,
+    ctermfg = 147,
   }),
 }
 patterns.b2_id_T = {
@@ -19,7 +18,7 @@ patterns.b2_id_T = {
     "%d%d%d%d%d%d%d%d()T()%d%d%d%d", -- brain ID
   },
   group = _U.define_hl("b2_id_T", {
-    ctermfg = 141,
+    ctermfg = 153,
     bold = true,
   }),
 }
@@ -29,12 +28,22 @@ patterns.b2_id_T = {
 -- - @2026-06
 patterns.b2_dates = {
   pattern = {
-    "@%d%d%d%d%-%d%d%-%d%d", -- @date (year-month-day)
-    "@%d%d%d%d%-%d%d", -- @dat (year-month)
+    "@()%d%d%d%d%-%d%d%-%d%d()", -- @date (year-month-day)
+    "@()%d%d%d%d%-%d%d()", -- @dat (year-month)
   },
   group = _U.define_hl("b2_dates", {
     ctermfg = 32, -- (like 'note:')
     italic = true,
+  }),
+}
+patterns.b2_dates_at_sym = {
+  pattern = {
+    "()@()%d%d%d%d%-%d%d%-%d%d", -- @ symbol for @date (year-month-day)
+    "()@()%d%d%d%d%-%d%d", -- @ symbol for @dat (year-month)
+  },
+  group = _U.define_hl("b2_dates_at_sym", {
+    ctermfg = 39,
+    bold = true,
   }),
 }
 
@@ -44,7 +53,7 @@ patterns.b2_dates = {
 -- - <brain:20251117T1744#someid>
 --
 -- But does NOT match
--- - <https://foo> or <file:///bla> (url)
+-- - <https://foo> or <file:///bla/bla/more/bla> (uri)
 -- - <23:> (doesn't start with letter..)
 -- - <T: Random> (rust!)
 -- - foo::<bar::baz>
