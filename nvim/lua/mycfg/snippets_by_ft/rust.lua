@@ -250,6 +250,38 @@ snip("fn", {desc = "fn def", when = conds.start_of_line}, SU.myfmt {
   },
 })
 
+snip("fn", { desc = "inline lambda" }, SU.myfmt {
+  [[<args> <body>]],
+  {
+    args = ls.choice_node(1, {
+      SU.myfmt {
+        [[|<args>|]],
+        { args = ls.restore_node(1, "args") },
+      },
+      SU.myfmt {
+        [[move |<args>|]],
+        { args = ls.restore_node(1, "args") },
+      },
+    }, { restore_cursor = true }),
+    body = ls.choice_node(2, {
+      ls.restore_node(nil, "body"),
+      SU.myfmt {
+        [[
+          {
+          	<body>
+          }
+        ]],
+        { body = ls.restore_node(1, "body") },
+      },
+    }, { restore_cursor = true }),
+  },
+}, {
+  stored = {
+    args = i(nil),
+    body = i(nil),
+  },
+})
+
 -- Smart impl block snip ✨
 -- - Auto-add `where` when there are undefined generic types
 snip("im", {desc="impl block", when = conds.start_of_line}, SU.myfmt {
