@@ -68,7 +68,8 @@ my_actions.save_buffer = A.mk_action {
 }
 K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<M-s>]], action=my_actions.save_buffer}
 -- FIXME: this should really be a virtual key that is overriden when multi-cursors are active!
-K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<C-M-s>]], action=my_actions.save_buffer, desc="Save buffer, clear any edit state (e.g. multi-cursors)"}
+-- NOTE: This mapping is overriden when multicursor mode is active (to actually clear multi-cursors)
+K.toplevel_map{mode={"n", "i", "v", "s"}, key=[[<C-M-s>]], action=my_actions.save_buffer, desc="Save buffer & clear edit state (e.g. removes multi-cursors)"}
 
 -- I: Switch to normal mode with <M-q>
 -- This is to avoid the default behavior that goes to normal mode and initiates a macro recording

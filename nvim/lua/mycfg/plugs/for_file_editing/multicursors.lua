@@ -142,7 +142,7 @@ Plug {
     K.toplevel_map{mode="v", key="<M-Space>I", desc="Insert for all lines of selection", action=mc.insertVisual}
     K.toplevel_map{mode="v", key="<M-Space>A", desc="Append for all lines of selection", action=mc.appendVisual}
 
-    my_actions.mc_save_buf_n_clear_cursors = A.mk_action {
+    my_actions.mc_save_buf_and_clear_cursors = A.mk_action {
       default_desc = "Save buffer & clear cursors",
       [{"n", "v"}] = function()
         U.switch_to_normal_mode()
@@ -185,9 +185,14 @@ Plug {
       layer_map{mode={"n", "v"}, key="g<C-a>", action=mc.sequenceIncrement}
       layer_map{mode={"n", "v"}, key="g<C-x>", action=mc.sequenceDecrement}
 
-      local save_n_clear = my_actions.mc_save_buf_n_clear_cursors
-      local save_n_clear_desc = save_n_clear.mode_actions.n.default_desc -- same desc for all mods
-      layer_map{mode={"n", "v", "i"}, key=[[<C-M-S>]], action=save_n_clear:get_multimode_proxy_fn(), desc=save_n_clear_desc}
+      local save_and_clear = my_actions.mc_save_buf_and_clear_cursors
+      local save_and_clear_desc = save_and_clear.mode_actions.n.default_desc -- same desc for all mods
+      layer_map{
+        mode={"n", "v", "i"},
+        key=[[<C-M-S>]],
+        action=save_and_clear:get_multimode_proxy_fn(),
+        desc=save_and_clear_desc,
+      }
     end)
 
     K.toplevel_map{mode={"n", "v"}, key="<M-Space><C-d>", desc="Clone cursors, disable originals", action=mc.duplicateCursors}
