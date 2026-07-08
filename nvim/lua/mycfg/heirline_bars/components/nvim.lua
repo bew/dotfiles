@@ -10,7 +10,7 @@ local function tbl_merge(default, ...)
   return vim.tbl_extend("force", default, ...)
 end
 
-local ModeInnerText_only = {
+local Mode_textonly = {
   provider = function(self)
     -- MUST be under `Mode` to have the correct variable set!
     return _U.some_text_or(self.matching_mode_spec.text, "?!")
@@ -60,17 +60,19 @@ M.Mode = {
   {
     -- Flexible components, contract early but keep visible
     -- If the N-th child doesn't have enough space, N+1-th child is tried.
+    -- FIXME: I don't understand why, since I added flexible config on `CursorPosLineCol_textonly`
+    -- this works but `Mode` never shrinks anymore..
     flexible = 100,
     {
       _,
-      ModeInnerText_only,
+      Mode_textonly,
       _,
     },
     {
-      ModeInnerText_only,
+      Mode_textonly,
       _,
     },
-    ModeInnerText_only, -- limited space fallback
+    Mode_textonly, -- limited space fallback
   },
   hl = function(self)
     -- NOTE: hl _could_ be done in a wrapper widget
@@ -82,7 +84,7 @@ M.Mode = {
   end,
 }
 
-local WinNr_only = {
+local WinNr_textonly = {
   -- mycfg-feature:direct-win-focus
   provider = function()
     local winnr = vim.fn.winnr()
@@ -100,14 +102,14 @@ M.WinNr = {
   flexible = 100,
   {
     _,
-    WinNr_only,
+    WinNr_textonly,
     _,
   },
   {
-    WinNr_only,
+    WinNr_textonly,
     _,
   },
-  WinNr_only, -- limited space fallback
+  WinNr_textonly, -- limited space fallback
 
   hl = { ctermfg = 242, cterm = { bold=true } },
 }
@@ -193,7 +195,7 @@ M.ReadOnlyMaybeEditableWithToggle = {
   },
 }
 
-local FileType_only = {
+local FileType_textonly = {
   provider = function()
     -- no ft or ft set to ""
     if not vim.bo.filetype or #vim.bo.filetype == 0 then
@@ -206,40 +208,45 @@ local FileType_only = {
 M.FileType = {
   flexible = 50,
   {
-    FileType_only,
+    FileType_textonly,
     _
   },
   { provider = "" }, -- when limited space, fallback to nothing
 }
 
-local CursorPos_only = {
-  provider = function()
-    -- Use nvim_strwidth to determine the cursor column (unicode-aware) ?
-    -- Try to play with these lines for example:
-    -- ```
-    -- |example normal text - example normal text - example normal text|
-    -- |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
-    -- ```
-    -- Cursor column differs when on first vs second line.
-
-    -- NOTE: %c is the byte-column of the cursor
-    -- IDEA: It would be nice to also have the unicode-aware column when different than %c,
-    --   to see the 'character' column.
-    if vim.tbl_contains({"", "NONE", "none"}, vim.o.virtualedit) then
-      return "%l:%02c"
-    else
-      -- Add virtual column (when different than %c), aka the screen-wise position of the cursor
-      -- Ref: https://stackoverflow.com/a/13544885
-      -- NOTE: It is not _always_ enabled, because it would appear too often,
-      --   e.g. when on a wrapped line with 'linebreak' set.
-      --
-      -- FIXME: column info can be wrong when line wraps
-      return "%l:%02c%V"
-    end
-  end,
+local CursorPosLine_textonly = {
+  provider = "L%l",
 }
+local CursorPosLineCol_textonly = {
+  flexible = 75,
+  {
+    provider = function()
+      -- IDEA: Use nvim_strwidth to determine the cursor column (unicode-aware) ?
+      -- Try to play with these lines for example:
+      -- ```
+      -- |example normal text - example normal text - example normal text|
+      -- |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+      -- ```
+      -- Cursor column differs when on first vs second line.
 
-local Ruler_only = { provider = "%P" }
+      -- NOTE: %c is the byte-column of the cursor
+      -- IDEA: It would be nice to also have the unicode-aware column when different than %c,
+      --   to see the 'character' column.
+      if vim.tbl_contains({"", "NONE", "none"}, vim.o.virtualedit) then
+        return "%l:%02c"
+      else
+        -- Add virtual column (when different than %c), aka the screen-wise position of the cursor
+        -- Ref: https://stackoverflow.com/a/13544885
+        -- NOTE: It is not _always_ enabled, because it would appear too often,
+        --   e.g. when on a wrapped line with 'linebreak' set.
+        --
+        -- FIXME: column info can be wrong when line wraps
+        return "%l:%02c%V"
+      end
+    end,
+  },
+  CursorPosLine_textonly, -- limited space: shorten to line-only
+}
 
 M.RulerAndCursorPos = {
   {
@@ -247,10 +254,10 @@ M.RulerAndCursorPos = {
       flexible = 50,
       {
         _,
-        Ruler_only,
+        { provider = "%P" },
       },
       -- TODO: tiny ruler in one char (no spacer around, w/ braille?)
-      { provider = "" }, -- limited space fallback to nothing
+      { provider = "" }, -- limited space: remove
     },
     _,
     {
@@ -258,9 +265,9 @@ M.RulerAndCursorPos = {
       fallthrough = false,
       {
         condition = hline_conditions.is_active,
-        CursorPos_only,
+        CursorPosLineCol_textonly,
       },
-      { provider = "L%l" }, -- Defaults to only the line
+      CursorPosLine_textonly, -- Defaults to only the line
     },
     _,
   },
