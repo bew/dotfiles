@@ -243,15 +243,20 @@ end))
 -- NOTE: By default, use custom name for <var>.
 -- But I want choice to auto-set <var> as the last part of <modulepath>.
 -- 👉 This is actually non-trivial, see: <https://github.com/L3MON4D3/LuaSnip/discussions/1194>
-snip("lr", {desc = [[local require"…"]], when = conds.start_of_line}, SU.myfmt {
-  [[local <var> = require"<modulepath>"]],
-  {
-    modulepath = i(1, "the.module", {key="mod-path"}),
-
-    -- choice node for custom name or 'last part of <modulepath>'
-    var = ls.choice_node(2, {
-      i(nil, "customname"),
-      ls.function_node(
+-- NOTE: Choice node over whole snip allows to switch var/derivedvar from anywhere (better DX).
+snip("lr", {desc = [[local require]], when = conds.start_of_line}, ls.choice_node(1, {
+  SU.myfmt {
+    [[local <var> = require"<modulepath>"]],
+    {
+      var = i(1, "customname"),
+      modulepath = ls.restore_node(2, "modulepath")
+    },
+  },
+  SU.myfmt {
+    [[local <derivedvar> = require"<modulepath>"]],
+    {
+      modulepath = ls.restore_node(1, "modulepath"),
+      derivedvar = ls.function_node(
         function(given_nodes_text)
           local module_name = given_nodes_text[1][1]
           local last_part = vim.iter(vim.gsplit(module_name, ".", {plain=true})):last()
@@ -259,7 +264,11 @@ snip("lr", {desc = [[local require"…"]], when = conds.start_of_line}, SU.myfmt
         end,
         {SU.node_ref"mod-path"}
       ),
-    })
+    }
+  }
+}, { restore_cursor = true }), {
+  stored = {
+    modulepath = i(nil, "the.module", {key="mod-path"}),
   },
 })
 
