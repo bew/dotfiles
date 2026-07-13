@@ -5,7 +5,7 @@ let
 in {
   imports = [
     # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
-    ../../bash_minimal/proxy_to_zsh.home-module.nix
+    ../../cli-others/bash_minimal/proxy_to_zsh.home-module.nix
 
     ./cli-core.nix
     ./cli/nix-recent.nix
