@@ -107,7 +107,7 @@ export PATH
 # --tabs : Sets length of tabs
 # --window=-n : Changes the scrolling window size, -n means VISIBLE_LINES -N
 export LESS="-R --ignore-case --incsearch --LONG-PROMPT --tabs=4 --window=-4"
-export LESSKEYIN=~/.dot/less/lesskey-bew
+export LESSKEYIN=~/.dot/cli-others/less/lesskey-bew
 
 export PAGER="less"
 export MANPAGER='nvim +Man!' # man in vim!
