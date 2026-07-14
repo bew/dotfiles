@@ -157,3 +157,28 @@ Plug {
     })
   end,
 }
+
+Plug.ts_ctx_commentstring {
+  source = gh"JoosepAlviste/nvim-ts-context-commentstring",
+  desc = "Dynamically get 'commentstring' option based on TS language/node",
+  tags = {t.editing},
+  -- no defer_load, otherwise plugin misses initial FileType events and doesn't initialize properly.
+  on_load = function()
+    require"ts_context_commentstring".setup {
+      -- Don't use the default autocmd on CursorHold to update 'commentstring',
+      -- it uses node at start of cursor line, instead of node at cursor..
+      -- (not that useful to have commentstring set anyway)
+      enable_autocmd = false,
+      -- Builtin languages:
+      -- https://github.com/JoosepAlviste/nvim-ts-context-commentstring/blob/main/lua/ts_context_commentstring/config.lua
+      languages = {
+        -- Add support for Rust
+        rust = {
+          __default = "// %s",
+          -- Additionally in these TS nodes...
+          doc_comment = "/// %s",
+        },
+      },
+    }
+  end,
+}

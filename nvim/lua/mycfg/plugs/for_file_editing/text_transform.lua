@@ -691,6 +691,7 @@ Plug {
   desc = "Fast and familiar per-line commenting",
   tags = {t.editing, t.textobj},
   defer_load = { on_event = "VeryLazy" },
+  config_depends_on = { Plug.ts_ctx_commentstring },
   on_load = function()
     local MiniComment = require"mini.comment"
     MiniComment.setup {
@@ -700,6 +701,18 @@ Plug {
         comment_line = "",
         comment_visual = "",
         textobject = "",
+      },
+      options = {
+        custom_commentstring = function()
+          if U.is_module_available"ts_context_commentstring" then
+            return require"ts_context_commentstring".calculate_commentstring {
+              -- start search of commentstring from current node (not node at BOL)
+              location = require"ts_context_commentstring.utils".get_cursor_location(),
+            } or vim.bo.commentstring
+          else
+            return vim.bo.commentstring
+          end
+        end,
       },
     }
 
