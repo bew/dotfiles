@@ -39,7 +39,7 @@ M.TreesitterStatus = {
   end,
 }
 
----@param opts {hl: vim.api.keyset.highlight, sev: vim.diagnostic.SeverityInt, icon: string}
+---@param opts {hl: vim.api.keyset.highlight, sev: vim.diagnostic.Severity, icon: string}
 function M.mkDiagnosticForSeverity(opts)
   return {
     condition = function()
@@ -82,6 +82,7 @@ M.Diagnostics = {
     "LspDetach",
     "DiagnosticChanged",
     "BufWinEnter", -- after we switched to another buf in the window
+    "WinEnter", -- after we switched to another window
     callback = function()
       -- Ensure the component is redrawn on update
       -- (otherwise it's only updated on cursor movement)
