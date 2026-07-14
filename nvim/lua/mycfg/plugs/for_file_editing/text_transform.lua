@@ -626,12 +626,17 @@ Plug {
     npairs.add_rule(
       Rule{start_pair = [[=]], end_pair = [[,]], filetypes = {"lua", "lua.luasnip"}}
         :insert_pair_when(cond.ts_node_check(function(node)
-          -- print("pairing check for `=,`, ts node type:", node and node:type())
-          if node:type() ~= "table_constructor" then
-            -- Never pair outside of a table constructor
-            return false
+          -- print("DEBUG: pairing check for `=,`, ts node type:", node and node:type())
+          if node:type() == "table_constructor" or node:type() == "field" then
+            -- Consider pairing when cursor is on a 'table_constructor' node
+            --
+            -- Can also be a 'field' node @2026-07; the TS tree seems to consider a key with 10+
+            -- chars as a field with an ERROR inside, not as a plain ERROR in a table_constructor.
+            -- (happens when new key is before/above another key, like `{ foo| existing = true}`)
+            return nil -- fallback to other checks
+          else
+            return false -- Never pair
           end
-          return nil -- fallback to other checks
         end))
         -- quickly check if we're in a simple case (current line check)
         :insert_pair_when(cond.try_surrounded_by(_after_identifier, {rx="^$"})) -- e.g. `foo |` (at eol)
