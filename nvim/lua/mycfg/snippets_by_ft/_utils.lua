@@ -8,6 +8,8 @@ local SU = {}
 ---@field filetype string The filetype to extend
 ---@field inherits_from string[] The additional collections of snippets to use for `ft`
 
+---@alias mysnips.SnipPrio "last"|"low"|"normal"|"high"
+
 ---@class mysnips.SnipContext: LuaSnip.SnipContext
 ---@field when? LuaSnip.SnipContext.ConditionObj Sets both `condition` & `show_condition`
 ---  (shouldn't depend on the trigger! Only on `line_to_cursor`!)
@@ -15,6 +17,7 @@ local SU = {}
 ---@field show_when? LuaSnip.SnipContext.ShowCondition Sets `show_condition` (overrides `when`)
 ---@field rx? boolean Whether the trigger is a pattern
 ---@field resolver? LuaSnip.ResolveExpandParamsFn
+---@field prio? mysnips.SnipPrio Sets `priority` by name
 
 ---@class mysnips.Opts.MyFmt
 ---@field [1] string
@@ -62,6 +65,19 @@ function SU.get_snip_fn(list_of_snippets)
     context.trig = trigger
     if context.rx then
       context.trigEngine = "pattern"
+      context.rx = nil
+    end
+    if context.prio then
+      if context.prio == "normal" then
+        context.priority = 1000 -- note: this is the default anyway
+      elseif context.prio == "high" then
+        context.priority = 1500 -- higher prio!
+      elseif context.prio == "low" then
+        context.priority = 500 -- lower prio!
+      elseif context.prio == "last" then
+        context.priority = 100 -- very low prio
+      end
+      context.prio = nil
     end
     context.condition = context.expand_when or context.when or nil
     context.show_condition = context.show_when or context.when or nil
