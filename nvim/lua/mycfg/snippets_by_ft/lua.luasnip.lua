@@ -87,7 +87,7 @@ local function mk_fmt_nodes()
         local has_double_sq_brackets = vim.iter(template_lines)
           :any(function(line)
             local match = line:find"%[%[" or line:find"%]%]"
-            print("DEBUG", "line:", vim.inspect(line), "match:", vim.inspect(match))
+            -- print("DEBUG", "line:", vim.inspect(line), "match:", vim.inspect(match))
             return match
           end)
         if has_double_sq_brackets then

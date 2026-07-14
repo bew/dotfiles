@@ -568,8 +568,17 @@ snip("p", {desc = "print(..)"}, SU.myfmt {
 
 -- To be used with `dv` (debug var) or `de` (debug expr) below
 snip("pd", {desc = "print debug"}, SU.myfmt {
-  [[print("DEBUG", <more>)]],
-  {more = i(1)}
+  [[print("DEBUG<maybe_msg>"<maybe_more>)]],
+  {
+    maybe_msg = ls.choice_node(1, {
+      SU.myfmt { [[: <msg>]], { msg = i(1) } },
+      t"",
+    }),
+    maybe_more = ls.choice_node(2, {
+      SU.myfmt { [[, <more>]], { more = i(1) } },
+      t"",
+    }),
+  },
 })
 
 snip("ins", {desc = "vim.inspect(..)"}, SU.myfmt {
