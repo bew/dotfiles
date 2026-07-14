@@ -56,25 +56,17 @@ snip("#!", { desc = "Interpreter shebang!" }, SU.myfmt {
   }
 })
 
-snip("modeline", { desc = "vim modeline" }, SU.myfmt{
+snip("modeline", { desc = "vim modeline", priority = 100 }, SU.myfmt{
   [[vim:set ft=<filetype>:]],
   { filetype = i(1) },
 })
 
--- Companion example snippet for the store-selection action (see DOC.md of LuaSnip)
-snip("selected_text_debug", { desc = "debug selected lines" }, ls.function_node(function(_args, snip)
-  local res, env = {}, snip.env
-  table.insert(res, "Selected Text (current line is " .. env.TM_LINE_NUMBER .. "):")
-  for _, ele in ipairs(env.LS_SELECT_RAW) do table.insert(res, ele) end
-  return res
-end, {}))
-
-snip("lorem", { desc = "Lorem paragraph", rx = true }, ls.function_node(function()
+snip("lorem", { desc = "Lorem paragraph", rx = true, priority = 100 }, ls.function_node(function()
   local lorem_paragraphs = require"myassets.lorem_paragraphs"
   return lorem_paragraphs[1]
 end))
 
-snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true }, ls.function_node(function(_args, snip)
+snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true, priority = 100 }, ls.function_node(function(_args, snip)
   local lorem_paragraphs = require"myassets.lorem_paragraphs"
   local count = tonumber(snip.env.LS_CAPTURE_1)
   local lines = {}
