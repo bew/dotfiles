@@ -176,13 +176,14 @@ end
 
 --------------------------
 
--- NOTE: must be after annotations, to avoid matching `---d|`
+-- note: low priority to ensure it doesn't take over `---d|` snip
 -- note: Does not include the ending space, I can easily add it and it helps with LuaLS function doc
 --   generation (which would otherwise add a space before all generated annotations ><).
 snip("d", {
   desc = "Documentation prefix",
   resolver = SR.delete_spaces_after_trigger,
   when = conds.start_of_line,
+  prio = "low",
 }, { t"---" })
 
 snip("%-%-", {desc = "--[[block comment]]", rx = true}, SU.myfmt {

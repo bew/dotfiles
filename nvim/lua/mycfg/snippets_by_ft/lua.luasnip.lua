@@ -151,7 +151,8 @@ snip("fmt", { desc = "SU.myfmt* { .. }" }, mk_fmt_nodes(), {
   },
 })
 
-snip("t", { desc = "ls.text_node" }, SU.myfmt {
+-- note: low priority to ensure it doesn't take precedence over `@t` snip
+snip("t", { desc = "ls.text_node", prio = "low" }, SU.myfmt {
   [[t"<txt>"]],
   { txt = i(1) },
 })

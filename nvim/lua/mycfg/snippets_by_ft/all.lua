@@ -56,17 +56,17 @@ snip("#!", { desc = "Interpreter shebang!" }, SU.myfmt {
   }
 })
 
-snip("modeline", { desc = "vim modeline", priority = 100 }, SU.myfmt{
+snip("modeline", { desc = "vim modeline", prio = "low" }, SU.myfmt{
   [[vim:set ft=<filetype>:]],
   { filetype = i(1) },
 })
 
-snip("lorem", { desc = "Lorem paragraph", rx = true, priority = 100 }, ls.function_node(function()
+snip("lorem", { desc = "Lorem paragraph", rx = true, prio = "last" }, ls.function_node(function()
   local lorem_paragraphs = require"myassets.lorem_paragraphs"
   return lorem_paragraphs[1]
 end))
 
-snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true, priority = 100 }, ls.function_node(function(_args, snip)
+snip("lorem(%d+)", { desc = "Lorem 2+ paragraphs", rx = true, prio = "last" }, ls.function_node(function(_args, snip)
   local lorem_paragraphs = require"myassets.lorem_paragraphs"
   local count = tonumber(snip.env.LS_CAPTURE_1)
   local lines = {}
