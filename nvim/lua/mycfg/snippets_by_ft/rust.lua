@@ -3,6 +3,7 @@ local U = require"mylib.utils"
 local _q = U.fmt.str_simple_quote_surround
 
 local ls = require"luasnip"
+local ls_events = require"luasnip.util.events"
 local SU = require"mycfg.snippets_by_ft._utils" -- Snip Utils
 local SR = require"mycfg.snippets_by_ft._resolvers" -- Snip Resolvers
 local conds = require"mycfg.snippets_by_ft._conditions"
@@ -410,6 +411,68 @@ snip("ok", {desc = "Ok(…)"}, SU.myfmt {
 snip("vec", {desc = "vec![…] literal"}, SU.myfmt {
   "vec![<values>]",
   { values = i(1) }
+})
+
+-- This snip stores the last use log level, and re-orders the choice nodes to suggest the last one
+-- used first, while keeping log level order.
+local last_log_level_choice_idx = 1
+local available_log_levels = {
+  "trace",
+  "debug",
+  "info",
+  "warn",
+  "error",
+}
+snip("lg", { desc = "log::LEVEL!(…);" }, ls.dynamic_node(1, function()
+  -- Generate level nodes choices so that last idx is first, and rest is in order.
+  -- So if last_idx=2, nodes should have: debug,info,warn,error,trace
+  -- (this basically simulates the possibility to set current choice index, keeping choice order)
+  -- print("DEBUG: in dynamic_node, last_log_level_choice_idx is:", last_log_level_choice_idx)
+  local log_levels_for_nodes = {} ---@type string[]
+  -- add log level starting from last idx, to last available log level
+  for idx = last_log_level_choice_idx, #available_log_levels do
+    table.insert(log_levels_for_nodes, available_log_levels[idx])
+  end
+  -- add log level starting from first available log level, to last idx -1
+  for idx = 1, last_log_level_choice_idx -1 do
+    table.insert(log_levels_for_nodes, available_log_levels[idx])
+  end
+  -- print("DEBUG: log_levels_for_nodes:", vim.inspect(log_levels_for_nodes))
+
+  -- Build the list of choice nodes for the levels
+  local level_nodes = {} ---@type LuaSnip.Node[]
+  for _, level in ipairs(log_levels_for_nodes) do
+    table.insert(level_nodes, t(level))
+  end
+  local level_choice_node = ls.choice_node(1, level_nodes, {
+    node_callbacks = {
+      ---@param node LuaSnip.ChoiceNode
+      [ls_events.change_choice] = function(node)
+        local text = node:get_text()[1]
+        for idx, level in ipairs(available_log_levels) do
+          if level == text then
+            last_log_level_choice_idx = idx
+            -- print("DEBUG: last_log_level_choice_idx set to:", idx)
+            return
+          end
+        end
+        -- print("DEBUG: unknown log level 👀")
+      end,
+    },
+  })
+  return ls.snippet_node(nil, SU.myfmt {
+    [[log::<level>!("<msg>"<after>);]],
+    {
+      level = level_choice_node,
+      msg = i(2),
+      after = i(3),
+    },
+  })
+end))
+
+snip("lt", { desc = "log::trace!(…);" }, SU.myfmt {
+  [[log::trace!("<msg>"<after>);]],
+  { msg = i(1), after = i(2) },
 })
 
 -- note: dynamically adds the `;` if at EOL
