@@ -10,13 +10,6 @@ local function tbl_merge(default, ...)
   return vim.tbl_extend("force", default, ...)
 end
 
-local Mode_textonly = {
-  provider = function(self)
-    -- MUST be under `Mode` to have the correct variable set!
-    return _U.some_text_or(self.matching_mode_spec.text, "?!")
-  end,
-}
-
 M.Mode = {
   static = {
     mode_palette = {
@@ -42,42 +35,36 @@ M.Mode = {
       ["?"] = {style="unknown", text="??"},
     },
   },
-  -- Update the component on ModeChanged only.
-  -- NOTE: This seems necessary to have proper mode update when going Select->Visual with Ctrl-g.
-  update = {
-    "ModeChanged",
-    pattern = "*:*",
-    callback = vim.schedule_wrap(function()
-      vim.cmd[[redrawstatus]]
-    end),
-  },
   -- NOTE: This function is called whenever a component is evaluated
   -- (right after condition but before hl and provider).
   init = function(self)
-    local mode = hline_conditions.is_active() and vim.fn.mode() or "n"
-    self.matching_mode_spec = self.mode_specs[mode] or {}
+    -- WARN: When switching to a new window after Telescope prompt where mode was `i`, mode is NOT
+    --   reset to `n` immediately.. so we (re)set it ourself in `init`.
+    self.current_mode = "n"
+    -- print("DEBUG: component init! mode is:", self.current_mode, "---", vim.inspect(self.id))
   end,
-  {
-    -- Flexible components, contract early but keep visible
-    -- If the N-th child doesn't have enough space, N+1-th child is tried.
-    -- FIXME: I don't understand why, since I added flexible config on `CursorPosLineCol_textonly`
-    -- this works but `Mode` never shrinks anymore..
-    flexible = 100,
-    {
-      _,
-      Mode_textonly,
-      _,
-    },
-    {
-      Mode_textonly,
-      _,
-    },
-    Mode_textonly, -- limited space fallback
+  update = {
+    "ModeChanged",
+    "WinEnter",
+    "BufWinEnter",
+    callback = function(self, _event)
+      self.current_mode = vim.fn.mode()
+      -- print("DEBUG: Mode update callback!", "event is:", _event.event, vim.fn.strftime"%M:%S", "mode is:", vim.fn.mode(), self.current_mode, "---", vim.inspect(self.id))
+      vim.schedule_wrap(function()
+        vim.cmd.redrawstatus()
+      end)
+    end,
   },
+  provider = function(self)
+    -- print("DEBUG: component provider! mode is:", vim.fn.mode(), self.current_mode, "---", vim.inspect(self.id))
+    local matching_mode_spec = self.mode_specs[self.current_mode] or {}
+    return " " .. _U.some_text_or(matching_mode_spec.text, "?!") .. " "
+  end,
   hl = function(self)
     -- NOTE: hl _could_ be done in a wrapper widget
+    local matching_mode_spec = self.mode_specs[self.current_mode] or {}
     if hline_conditions.is_active() then
-      return self.mode_palette[self.matching_mode_spec.style] or self.mode_palette.unknown
+      return self.mode_palette[matching_mode_spec.style] or self.mode_palette.unknown
     else
       return { ctermbg = 235, ctermfg = 242 }
     end
