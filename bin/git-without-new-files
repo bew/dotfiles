@@ -1,0 +1,57 @@
+#!/usr/bin/env nu
+# vim:set sw=4:
+
+def blank-line [] {
+    print --stderr ""
+}
+
+def log [msg: string, --no-prefix] {
+    let prefix = if $no_prefix { "" } else { "git-without-new-files: " }
+    print --stderr $"($prefix)($msg)"
+}
+
+# Temporarily strip all `git add -N` (intent-to-add) entries from the index,
+# run the requested git command, then restore those entries exactly on success.
+# On failure, new files are printed for easy re-add later on.
+#
+# Use when stash, diff, or other git operations choke on intent-to-add files,
+# but you want your normal workflow to remain unchanged afterward.
+def main [...args] {
+    log "Collecting new files (added with `git add --intent-to-add` or unstaged renames)"
+    let new_files = (git new-files --json | from json | get path)
+
+    if ($new_files | is-not-empty) {
+        log $"Temporarily removing ($new_files | length) new files from index"
+        ^git reset -- ...$new_files
+    } else {
+        log "No new files found"
+    }
+
+    blank-line
+    log $"Running: git ($args | str join ' ')"
+    try {
+        ^git ...$args
+
+        blank-line
+        log "✅ Wrapped git command succeeded"
+        if ($new_files | is-not-empty) {
+            log "Restoring intent-to-add files to index"
+            ^git add --intent-to-add -- ...$new_files
+        }
+
+        log "👍 done"
+        exit 0
+    } catch {
+        blank-line
+        log $"❌ Wrapped git command failed with exit code ($env.LAST_EXIT_CODE)"
+        log  "⚠️ New files were NOT restored:"
+
+        if ($new_files | is-not-empty) {
+            $new_files | each { |p| print --stderr --raw $"  ($p)" }
+        } else {
+            print --stderr --raw "  (none)\n"
+        }
+
+        exit $env.LAST_EXIT_CODE
+    }
+}

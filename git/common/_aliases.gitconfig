@@ -99,6 +99,11 @@
   # (note: stashes don't have named reference on them though, only commit hash :/)
   sth-log = !git pretty-log $(git stash list --format="%h")
 
+  # Alias (for nice completion after sth-<TAB>) to help use new git-without-new-files helper script.
+  # This is _VERY_ useful to be able to stash some/all files except the new files which `git stash`
+  # doesn't support, even when added through git (via `git add --intent-to-add ...`).
+  sth-without-new-files = without-new-files stash
+
   reb  = rebase
   rebi = rebase -i
   # Do not changes commit dates of rebased commits

@@ -1,0 +1,54 @@
+#!/usr/bin/env nu
+
+# Strip surrounding double-quotes from a path git may have quoted (e.g. paths with spaces)
+def dequote []: string -> string {
+    str trim --char '"'
+}
+
+# List files added with `git add --intent-to-add` or unstaged renames (mv + git add -N),
+# so you can inspect or script around them without touching other modified or untracked files.
+#
+# Use when you want to see which "new but not yet committed" paths exist
+# before running stash/commit/diff workflows that are sensitive to -N entries.
+def main [
+    --raw   # output only file paths, one per line (no label prefix)
+    --json  # output as JSON array of records with `kind`, `path` (and `old_path` for renames)
+] {
+    let entries = (
+        # Each relevant line is one of:
+        #   ` A path`           — intent-to-add        (X=space, Y=A)
+        #   ` R old -> new`     — unstaged rename + -N  (X=space, Y=R)
+        ^git status --porcelain=v1
+        | lines
+        | where { ($in | str starts-with " A") or ($in | str starts-with " R") }
+        | each {|line|
+            if ($line | str starts-with " A") {
+                {kind: "new-file", path: ($line | str substring 3.. | dequote)}
+            } else {
+                # ` R old -> new` — extract old and new paths around ` -> `
+                let parts = ($line | str substring 3.. | split row " -> " | each { dequote })
+                {kind: "rename", path: ($parts | last), old_path: ($parts | first)}
+            }
+        }
+    )
+
+    if $json {
+        print ($entries | to json)
+        return
+    }
+
+    let lines_to_print = if $raw {
+        $entries | each { $in.path }
+    } else {
+        $entries | each {|e|
+            if $e.kind == "new-file" {
+                $"new file: ($e.path)"
+            } else {
+                $" renamed: ($e.path)"
+            }
+        }
+    }
+    for line in $lines_to_print {
+        print $line
+    }
+}
