@@ -59,6 +59,15 @@ let
       expr = configNestedAgain._kitState.nestingLevel;
       expected = 2;
     };
+    # Test lib functions are inherited across config extensions
+    "test.5lib-func-works" = {
+      expr = configInit.lib.doubleThat 3;
+      expected = 6;
+    };
+    "test.6lib-func-inherited-after-extend" = {
+      expr = configNested.lib.doubleThat 4;
+      expected = 8;
+    };
     # Other tests
     "test.with-warning" = {
       expr = configWithWarn.warnings;

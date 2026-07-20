@@ -7,4 +7,6 @@
       type = ty.anything;
     };
   };
+
+  config.lib.doubleThat = n: n * 2;
 }
