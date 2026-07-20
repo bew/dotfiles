@@ -35,6 +35,10 @@ NOTE: Function bodies inside `@test` blocks and helper functions follow `write-s
 - Custom assertion helpers must be prefixed `assert_`.
 - Test execution wrappers must be prefixed `run_`.
 - Setup helpers (beyond the shared `setup()`) must be prefixed `setup_`.
+- Never build arg strings dynamically (e.g. `printf '%q ' "$@"`).
+  Pass `"$@"` through directly — it is always safe, including when empty.
+- When told to add a check "in each test", place it in each `@test` body.
+  Never collapse it into a shared helper to avoid repetition — the explicitness is intentional.
 
 ## Test topics (canonical list)
 
@@ -116,23 +120,65 @@ Group tests by topic using `# Tests: <topic>` headers:
 # Tests: cli
 ```
 
-## `run_script` wrapper helpers
+## `setup()` patterns
 
-When many tests call the same script with similar setup, define script-specific wrappers:
+If the script expects to run inside a specific directory structure (e.g. a git repo),
+`cd` into it in `setup()`.
+Tests then call `run -0 "$SCRIPT_PATH"` directly — no path juggling, no wrapper needed.
 
 ```bash
-# Run the script expecting success; sets $output
+function setup() {
+    TEST_REPO="$BATS_TEST_TMPDIR/repo"
+    mkdir -p "$TEST_REPO"
+    cd "$TEST_REPO"
+    git init -q
+    git config user.email "test@example.com"
+    git config user.name "Test"
+}
+```
+
+## `run_script` wrapper helpers
+
+Define a wrapper only when it adds real logic — environment variables, input files,
+fixed flags, or other shared setup that every call needs.
+A purely pass-through wrapper is noise; don't define it.
+
+When tests share non-trivial setup (e.g. creating an input file and setting an env var),
+define script-specific wrappers:
+
+```bash
+# Run the script expecting success; creates input file and sets env var
 function run_script() {
-    run -0 "$SCRIPT_PATH" "$@"
+    setup_test_input_file
+    GEN_RANDOM_SOURCE_FILE="$TEST_INPUT_FILE" run -0 --separate-stderr "$SCRIPT_PATH" "$@"
 }
 
-# Run the script expecting failure; sets $output and $status
+# Run the script expecting failure; exposes error log written by the script
 function run_script_failed() {
-    run -1 "$SCRIPT_PATH" "$@"
+    local error_log="$BATS_TEST_TMPDIR/error.log"
+    run -1 --separate-stderr "$SCRIPT_PATH" --error-log "$error_log" "$@"
+    error_log_content="$(cat "$error_log" 2>/dev/null || true)"
 }
 ```
 
 These are script-specific — define them per `.bats` file, not as shared helpers.
+
+## JSON output testing
+
+Always use `jq` to verify JSON output — never string-match raw JSON directly.
+
+- For small payloads (~100 chars or fewer): normalize with `jq -c '.'` and compare with an
+  exact compact string. Whitespace- and key-order-safe.
+- For large or dynamic payloads: use field-level `jq` queries instead of full-output comparison.
+
+Example (small payload, exact compact match):
+
+```bash
+@test "json: outputs empty array when no entries" {
+    run -0 --separate-stderr "$SCRIPT_PATH" --json
+    [[ "$(jq -c '.' <<< "$output")" == '[]' ]]
+}
+```
 
 ## Running tests
 
