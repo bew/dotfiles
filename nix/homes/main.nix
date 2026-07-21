@@ -9,7 +9,8 @@
 
 {
   imports = [
-    ../modules/generic/dyndots.nix
+    flakeInputs.dyndots.modules.generic.dyndots
+    flakeInputs.dyndots.modules.homeManager.dyndotsChecker
     ../modules/home/link-flake-inputs.nix
     ../modules/home/nix-registry.nix
   ] ++ [

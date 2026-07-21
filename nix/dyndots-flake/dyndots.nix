@@ -31,15 +31,16 @@ in {
   };
 
   config = let
-    mkStoreLink = givenPath: givenPath; # nothing to do, will be converted by home-manager
-    mkEditableDirectLink = (pkgs.callPackage ../../mylib/editable-symlinker.nix {}) {
+    mkStoreLink = givenPath: givenPath;
+    mkEditableDirectLink = (pkgs.callPackage ./editable-symlinker.nix {}) {
       nixStorePath = cfg.dotfilesNixPath;
       realPath = cfg.dotfilesRealPath;
     };
   in {
-    dyndots.mkLink =
+    dyndots.mkLink = (
       if cfg.mode == "editable"
       then mkEditableDirectLink
-      else mkStoreLink;
+      else mkStoreLink
+    );
   };
 }

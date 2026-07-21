@@ -24,6 +24,10 @@
     homeManager.url = "github:nix-community/home-manager/release-26.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
 
+    dyndots.url = "path:./nix/dyndots-flake";
+    dyndots.inputs.nixpkgs.follows = "nixpkgsStable";
+    dyndots.inputs.systems.follows = "systems";
+
     systems.url = "github:nix-systems/default";
   };
 
@@ -51,8 +55,6 @@
       inherit (pkgsForSys system) myPkgs stablePkgs bleedingedgePkgs;
     in rec {
       inherit myPkgs stablePkgs bleedingedgePkgs;
-
-      directSymlinker = stablePkgs.callPackage ./nix/mylib/editable-symlinker.nix {};
 
       lib = stablePkgs.lib;
       mybuilders = stablePkgs.callPackage ./nix/mylib/mybuilders.nix {};
