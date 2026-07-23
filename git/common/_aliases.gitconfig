@@ -60,6 +60,14 @@
   # NOTE: changes the index only (the staging area)
   unstage = reset HEAD
 
+  # NOTE: depends on my custom `git-new-files` script that lists files added via `git add -N`
+  unstage-new-files = "!f() { \
+    echo "New files:"; \
+    git new-files --raw; \
+    echo; echo 'Unstaging...'; \
+    git unstage `git new-files --raw`; \
+  }; f"
+
   # Restore from rev
   restore-from = restore --source
 
