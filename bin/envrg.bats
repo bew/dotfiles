@@ -173,6 +173,19 @@ function setup() {
     [[ "$output" == "EMPTY_VAR=" ]]
 }
 
+@test "edge: ignores lines without = sign (e.g. multiline values from a nix develop env)" {
+    # Simulate env output that includes lines without `=` (e.g. bash exported
+    # functions or nix dev shell multiline values that spill into subsequent lines)
+    run -0 bash -c "printf 'REAL_VAR=value\nfollowing line noequalssign\n' | $SCRIPT_PATH - REAL_VAR"
+    [[ "$output" == "REAL_VAR=value" ]]
+}
+
+@test "edge: ignores lines that does not look like env var" {
+    # Simulate env output that includes multiline values, potentially with = in them at wrong place
+    run -0 bash -c "printf 'REAL_VAR=value\nfollowing line REAL_VAR = true\n' | $SCRIPT_PATH - REAL_VAR"
+    [[ "$output" == "REAL_VAR=value" ]]
+}
+
 @test "isolation: only shows variables from current environment" {
     export ONLY_THIS="should appear"
 

@@ -98,8 +98,13 @@ function search_and_filter() {
 
     # Read from stdin, extract names, and create a map
     # This allows us to match patterns against names only, not values
+    # Skip lines that don't look like valid env var assignments:
+    # - lines without `=` (blank lines, bash exported function stubs)
+    # - lines where the name part isn't a valid identifier (e.g. nix dev shell
+    #   multiline values that spill into subsequent lines)
     local -A env_map
     while IFS="=" read -r name value; do
+        [[ "$name" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || continue
         env_map["$name"]="$value"
     done
 
