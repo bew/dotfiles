@@ -298,11 +298,13 @@ patterns.sym_excl = {
 
 -- e.g. oh yeah <3
 -- e.g. (or in a note <3)
--- But not `<3.0`
+-- But not `<3.0` nor `1<<3`
 patterns.sym_heart = {
   pattern = {
-    "()<3()$",
-    "()<3()[^%.]",
+    "^()<3()$", -- alone on a line
+    "^()<3()[^%.]", -- at line start, not followed by `.`
+    "[^<]()<3()$", -- at line end, not preceded by <
+    "[^<]()<3()[^%.]", -- inline, not preceded by <, not followed by `.`
   },
   group = _U.define_hl("sym_heart", {
     ctermfg = 204,
