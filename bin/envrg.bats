@@ -10,6 +10,8 @@
 
 # Require BATS 1.5.0+ for flag support on `run`
 
+# shellcheck disable=SC2030,SC2031
+
 bats_require_minimum_version 1.5.0
 
 # Get the directory where this test file is located
@@ -37,12 +39,18 @@ function setup() {
     export NO_COLOR=1
 }
 
+# ------------------------------------------------------------------------------
+# Tests: usage
+
 @test "usage: shows usage when no arguments provided" {
     run -1 "$SCRIPT_PATH"
     [[ "$output" =~ "Usage:" ]]
 }
 
-@test "matching: matches variable names containing pattern" {
+# ------------------------------------------------------------------------------
+# Tests: defaults
+
+@test "defaults: matches variable names containing pattern" {
     export PATH_RELATED="some path value"
     export MY_PATH="/usr/bin"
 
@@ -51,7 +59,7 @@ function setup() {
     [[ "$output" =~ "MY_PATH=/usr/bin" ]]
 }
 
-@test "matching: does not match pattern in values, only in names" {
+@test "defaults: does not match pattern in values, only in names" {
     export TEST_VAR_ONE="contains_PATH_in_value"
     export PATH_RELATED="some path value"
 
@@ -61,7 +69,24 @@ function setup() {
     [[ "$output" =~ "PATH_RELATED=" ]]
 }
 
-@test "smart-case: lowercase pattern is case-insensitive" {
+@test "defaults: matches FOO in HELLO_FOO_STUFF" {
+    export HELLO_FOO_STUFF="test value"
+
+    run -0 "$SCRIPT_PATH" foo
+    [[ "$output" =~ "HELLO_FOO_STUFF=" ]]
+}
+
+@test "defaults: uses standard env format" {
+    export MY_PATH="/usr/bin"
+
+    run -0 "$SCRIPT_PATH" MY_PATH
+    [[ "$output" == "MY_PATH=/usr/bin" ]]
+}
+
+# ------------------------------------------------------------------------------
+# Tests: cli
+
+@test "cli: smart-case lowercase pattern is case-insensitive" {
     export DB_HOST="localhost"
     export db_user="admin"
 
@@ -70,7 +95,7 @@ function setup() {
     [[ "$output" =~ "db_user=" ]]
 }
 
-@test "smart-case: uppercase pattern is case-sensitive" {
+@test "cli: smart-case uppercase pattern is case-sensitive" {
     export DB_HOST="localhost"
     export db_user="admin"
 
@@ -80,7 +105,7 @@ function setup() {
     [[ ! "$output" =~ "db_user=" ]]
 }
 
-@test "flags: -s enables explicit case-sensitive search" {
+@test "cli: -s enables explicit case-sensitive search" {
     export DB_HOST="localhost"
     export db_user="admin"
 
@@ -90,37 +115,7 @@ function setup() {
     [[ ! "$output" =~ "DB_HOST=" ]]
 }
 
-@test "matching: matches FOO in HELLO_FOO_STUFF" {
-    export HELLO_FOO_STUFF="test value"
-
-    run -0 "$SCRIPT_PATH" foo
-    [[ "$output" =~ "HELLO_FOO_STUFF=" ]]
-}
-
-@test "regex: supports regex patterns" {
-    export API_KEY="secret123"
-    export API_TOKEN="token456"
-    export NOT_API="other"
-
-    run -0 "$SCRIPT_PATH" ^api_
-    [[ "$output" =~ "API_KEY=" ]]
-    [[ "$output" =~ "API_TOKEN=" ]]
-    [[ ! "$output" =~ "NOT_API=" ]]
-}
-
-@test "regex: matches complete variable names with anchors" {
-    export PATH_RELATED="some path value"
-    export MY_PATH="/usr/bin"
-
-    run -0 "$SCRIPT_PATH" ^PATH$
-    # Should match PATH exactly
-    [[ "$output" =~ ^PATH= ]]
-    # Should NOT match PATH_RELATED or MY_PATH
-    [[ ! "$output" =~ "PATH_RELATED=" ]]
-    [[ ! "$output" =~ "MY_PATH=" ]]
-}
-
-@test "flags: -v inverts match" {
+@test "cli: -v inverts match" {
     export TEST_VAR_ONE="value1"
     export TEST_VAR_TWO="value2"
     export DATABASE_URL="postgres://localhost"
@@ -135,12 +130,62 @@ function setup() {
     [[ "$output" =~ "API_KEY=" ]]
 }
 
-@test "output: uses standard env format" {
+@test "cli: regex pattern with prefix anchor" {
+    export API_KEY="secret123"
+    export API_TOKEN="token456"
+    export NOT_API="other"
+
+    run -0 "$SCRIPT_PATH" ^api_
+    [[ "$output" =~ "API_KEY=" ]]
+    [[ "$output" =~ "API_TOKEN=" ]]
+    [[ ! "$output" =~ "NOT_API=" ]]
+}
+
+@test "cli: regex pattern with both anchors matches exact name" {
+    export PATH_RELATED="some path value"
     export MY_PATH="/usr/bin"
 
-    run -0 "$SCRIPT_PATH" MY_PATH
-    [[ "$output" == "MY_PATH=/usr/bin" ]]
+    run -0 "$SCRIPT_PATH" ^PATH$
+    # Should match PATH exactly
+    [[ "$output" =~ ^PATH= ]]
+    # Should NOT match PATH_RELATED or MY_PATH
+    [[ ! "$output" =~ "PATH_RELATED=" ]]
+    [[ ! "$output" =~ "MY_PATH=" ]]
 }
+
+@test "cli: --color=never disables colors" {
+    export MY_VAR="value"
+
+    run -0 "$SCRIPT_PATH" --color=never MY_VAR
+    # Output should not contain ANSI escape codes
+    [[ ! "$output" =~ $'\e' ]]
+    [[ "$output" == "MY_VAR=value" ]]
+}
+
+@test "cli: NO_COLOR environment variable disables colors" {
+    export MY_VAR="value"
+    export NO_COLOR=1
+
+    run -0 "$SCRIPT_PATH" MY_VAR
+    # Output should not contain ANSI escape codes
+    [[ ! "$output" =~ $'\e' ]]
+    [[ "$output" == "MY_VAR=value" ]]
+}
+
+@test "cli: --color=always enables colors" {
+    export MY_VAR="value"
+    unset NO_COLOR
+
+    run -0 "$SCRIPT_PATH" --color=always MY_VAR
+    # Output should contain ANSI escape codes (bold and dim)
+    [[ "$output" =~ $'\e[1m' ]]  # Bold
+    [[ "$output" =~ $'\e[2m' ]]  # Dim
+    [[ "$output" =~ "MY_VAR" ]]
+    [[ "$output" =~ "value" ]]
+}
+
+# ------------------------------------------------------------------------------
+# Tests: edge
 
 @test "edge: handles variables with equals signs in values" {
     export COMPLEX_VAR="key=value&foo=bar"
@@ -186,7 +231,7 @@ function setup() {
     [[ "$output" == "REAL_VAR=value" ]]
 }
 
-@test "isolation: only shows variables from current environment" {
+@test "edge: only shows variables from current environment" {
     export ONLY_THIS="should appear"
 
     run -0 "$SCRIPT_PATH" .
@@ -200,38 +245,10 @@ function setup() {
     [[ ! "$output" =~ "SHELL=" ]]
 }
 
-@test "color: --color=never disables colors" {
-    export MY_VAR="value"
+# ------------------------------------------------------------------------------
+# Tests: integration
 
-    run -0 "$SCRIPT_PATH" --color=never MY_VAR
-    # Output should not contain ANSI escape codes
-    [[ ! "$output" =~ $'\e' ]]
-    [[ "$output" == "MY_VAR=value" ]]
-}
-
-@test "color: NO_COLOR environment variable disables colors" {
-    export MY_VAR="value"
-    export NO_COLOR=1
-
-    run -0 "$SCRIPT_PATH" MY_VAR
-    # Output should not contain ANSI escape codes
-    [[ ! "$output" =~ $'\e' ]]
-    [[ "$output" == "MY_VAR=value" ]]
-}
-
-@test "color: --color=always enables colors" {
-    export MY_VAR="value"
-    unset NO_COLOR
-
-    run -0 "$SCRIPT_PATH" --color=always MY_VAR
-    # Output should contain ANSI escape codes (bold and dim)
-    [[ "$output" =~ $'\e[1m' ]]  # Bold
-    [[ "$output" =~ $'\e[2m' ]]  # Dim
-    [[ "$output" =~ "MY_VAR" ]]
-    [[ "$output" =~ "value" ]]
-}
-
-@test "stdin: supports reading from stdin with - argument" {
+@test "integration: supports reading from stdin with - argument" {
     export API_KEY="secret"
     export API_TOKEN="token"
 
@@ -240,7 +257,7 @@ function setup() {
     [[ "$output" == "API_KEY=secret" ]]
 }
 
-@test "stdin: can chain multiple filters" {
+@test "integration: can chain multiple filters" {
     export TEST_FOO="value1"
     export TEST_BAR="value2"
     export PROD_FOO="value3"
@@ -250,6 +267,9 @@ function setup() {
     run -0 bats_pipe "$SCRIPT_PATH" prod \| "$SCRIPT_PATH" - -v FOO
     [[ "$output" == "PROD_BAR=value4" ]]
 }
+
+# ------------------------------------------------------------------------------
+# Tests: error
 
 @test "error: requires pattern after - argument" {
     run -1 bats_pipe echo TEST=value \| "$SCRIPT_PATH" -
