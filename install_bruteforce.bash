@@ -81,7 +81,7 @@ make-link ~/.dot/cli-others/gh   ~/.config/gh
 label "Nix stuff"
 make-link ~/.dot/nix/nix-self-config  ~/.config/nix
 
-label "other cli tools"
+label "Other cli tools"
 make-link ~/.dot/cli-others/htop ~/.config/htop
 # skip make-link ~/.dot/tmux     ~/.config/tmux # now managed by Nix
 make-link ~/.dot/cli-others/gdb      ~/.config/gdb
@@ -89,9 +89,9 @@ make-link ~/.dot/cli-others/gdb      ~/.config/gdb
 mkdir -vp ~/.ipython/profile_default/startup
 make-link ~/.dot/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
 
-label "X apps configs"
-# terms
+label "Apps configs"
 make-link ~/.dot/gui-apps/wezterm   ~/.config/wezterm
+make-link ~/.dot/gui-apps/espanso   ~/.config/espanso
 
 # Desktop env
 # skip make-link ~/.dot/gui-apps/flameshot     ~/.config/flameshot
