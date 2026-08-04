@@ -18,15 +18,21 @@ The `./French-PC.actually-sane.keylayout` layout is a heavily modified `French -
 ## Install a keyboard layout
 
 ```sh
+$ cp something.keylayout /Library/Keyboard Layouts/
+# OR:
 $ ln -s ~/.dot/full/path/to/something.keylayout /Library/Keyboard Layouts/
 ```
 
 Then open dialog to add a new Input Source, in `System Preferences > Keyboard > Input Sources`,
-navigate in the 'Other' language and select the layout, then switch to that layout with the layout
-switcher in the top bar.
+navigate in the 'Others' language (at the very bottom) and select the layout,
+then switch to that layout with the layout switcher in the top bar.
+
+> [!TIP]
+> If the custom keyboard layout does not appear in 'Others', try rebooting.
 
 > [!NOTE]
-> If the custom keyboard layout does not appear in 'Other', try rebooting.
+> Relevant Perplexity discussion:
+> <https://www.perplexity.ai/search/4c89b79d-627f-4222-92f5-2d063790d9f6>
 
 > [!WARNING]
 > GRR: After adding a 2nd input sources (going from 1 to 2+ sources), the default keyboard shortcut
