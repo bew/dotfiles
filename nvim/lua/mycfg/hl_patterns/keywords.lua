@@ -108,6 +108,19 @@ patterns.small_idea = {
   }),
 }
 
+-- e.g. tip: some tips!
+-- e.g. TIP: yes this!
+patterns.tips = {
+  pattern = U.concat_lists {
+    { _U.keywordize"tip:" },
+    _big_word_variants"TIP",
+  },
+  group = _U.define_hl("tips", {
+    ctermfg = 135,
+    nocombine = true,
+  }),
+}
+
 patterns.big_fail_bad = {
   pattern = U.concat_lists {
     _big_word_variants"FAIL",
