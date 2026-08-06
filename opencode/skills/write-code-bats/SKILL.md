@@ -1,5 +1,5 @@
 ---
-name: write-script-bats
+name: write-code-bats
 description: |
   Bats test file writing guidelines: file structure, test naming, setup conventions, and helpers.
   Auto-load when writing or reviewing .bats test files.
@@ -11,8 +11,8 @@ metadata:
 
 Write well-structured Bats test files following consistent naming, setup, and assertion conventions.
 
-NOTE: Load `write-script-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
-NOTE: Function bodies inside `@test` blocks and helper functions follow `write-script-bash` conventions.
+NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
+NOTE: Function bodies inside `@test` blocks and helper functions follow `write-code-bash` conventions.
 
 ## Rules
 

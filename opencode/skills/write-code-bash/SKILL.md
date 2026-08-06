@@ -1,18 +1,18 @@
 ---
-name: write-script-bash
+name: write-code-bash
 description: |
-  Bash script writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
+  Bash code writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
   Auto-load when writing or reviewing bash scripts.
-  Loads write-script-generic for language-agnostic rules.
+  Loads write-code-generic for language-agnostic rules.
 metadata:
   maintainers: [bew]
 ---
 
 ## Goal
 
-Write bash scripts following strict-mode conventions and bash idioms, building on `write-script-generic` rules.
+Write bash scripts following strict-mode conventions and bash idioms, building on `write-code-generic` rules.
 
-NOTE: Load `write-script-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
+NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
 
 ## Rules
 
@@ -167,4 +167,4 @@ main "$@"
 
 The standard testing system for bash scripts in this repo is **Bats** (Bash Automated Testing System).
 
-Load `write-script-bats` skill when writing or running tests for a bash script.
+Load `write-code-bats` skill when writing or running tests for a bash script.

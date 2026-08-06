@@ -1,8 +1,8 @@
 ---
-name: write-script-meta
+name: write-code-meta
 description: |
-  Rules for drafting a new write-script-<lang> skill.
-  Load when creating or updating any write-script-* language-specific skill.
+  Rules for drafting a new write-code-<lang> skill.
+  Load when creating or updating any write-code-* language-specific skill.
 metadata:
   maintainers: [bew]
 ---
@@ -12,42 +12,42 @@ Load it to look up rules, naming, and structure requirements — not to follow a
 
 ## Goal
 
-Produce a well-structured `write-script-<lang>` skill that correctly extends `write-script-generic`
-without restating rules already in `write-script-generic`.
+Produce a well-structured `write-code-<lang>` skill that correctly extends `write-code-generic`
+without restating rules already in `write-code-generic`.
 
 ## When to create a new lang skill
 
-Create a new `write-script-<lang>` skill when:
+Create a new `write-code-<lang>` skill when:
 - The language has a distinct shebang, strict-mode equivalent, or safety flags.
 - The language has idioms that override or contradict generic conventions (e.g. no `function` keyword,
   different error signaling, structured data instead of string manipulation).
 - There is enough lang-specific boilerplate to justify a reusable template.
 
-Extend `write-script-generic` instead when:
+Extend `write-code-generic` instead when:
 - The language follows generic conventions with only minor stylistic differences.
 - The difference is a single rule or naming convention — add it to generic as a note.
 
 ## Examples
 
 Refer to these existing skills as concrete examples of the pattern:
-- `write-script-bash` — fully featured: strict mode, boilerplate, output capture, testing section
-- `write-script-nushell` — minimal: core idioms only, typed params, native error model
+- `write-code-bash` — fully featured: strict mode, boilerplate, output capture, testing section
+- `write-code-nushell` — minimal: core idioms only, typed params, native error model
 
 ## Naming
 
-Skill directory and `name` frontmatter field must follow: `write-script-<lang>`.
-`<lang>` is lowercase, hyphenated if needed (e.g. `write-script-bash`, `write-script-nushell`).
+Skill directory and `name` frontmatter field must follow: `write-code-<lang>`.
+`<lang>` is lowercase, hyphenated if needed (e.g. `write-code-bash`, `write-code-nushell`).
 
 ## Split contract: what belongs where
 
 | Concern | Belongs in |
 |---|---|
-| Function decomposition, naming verbs, `main` entry point | `write-script-generic` |
-| Function comments, local variable scoping | `write-script-generic` |
-| Global variable naming (SCREAMING_SNAKE_CASE) | `write-script-generic` |
-| Subcommand dispatch (`cmd_*` pattern) | `write-script-generic` |
-| Error message actionability rules | `write-script-generic` |
-| Script structure template (pseudo-code) | `write-script-generic` |
+| Function decomposition, naming verbs, `main` entry point | `write-code-generic` |
+| Function comments, local variable scoping | `write-code-generic` |
+| Global variable naming (SCREAMING_SNAKE_CASE) | `write-code-generic` |
+| Subcommand dispatch (`cmd_*` pattern) | `write-code-generic` |
+| Error message actionability rules | `write-code-generic` |
+| Script structure template (pseudo-code) | `write-code-generic` |
 | Code examples for generic rules (no prose restatement) | lang skill |
 | Shebang, strict-mode flags | lang skill |
 | Language-specific conditionals, quoting, operators | lang skill |
@@ -59,20 +59,20 @@ Skill directory and `name` frontmatter field must follow: `write-script-<lang>`.
 
 ```md
 ---
-name: write-script-<lang>
+name: write-code-<lang>
 description: |
-  <Lang> script writing guidelines: <2-3 key topics>.
-  Auto-load when writing or reviewing <lang> scripts.
-  Loads write-script-generic for language-agnostic rules.
+  <Lang> code writing guidelines: <2-3 key topics>.
+  Auto-load when writing or reviewing <lang> code files.
+  Loads write-code-generic for language-agnostic rules.
 metadata:
   maintainers: [<github-user>]
 ---
 
 ## Goal
 
-<One sentence: what this skill produces, referencing write-script-generic.>
+<One sentence: what this skill produces, referencing write-code-generic.>
 
-NOTE: Load `write-script-generic` skill first — it defines the shared structure,
+NOTE: Load `write-code-generic` skill first — it defines the shared structure,
 naming conventions, and error-handling rules this skill builds on.
 
 ## Rules
@@ -85,7 +85,7 @@ naming conventions, and error-handling rules this skill builds on.
 [complete, copy-pasteable template in the target language]
 
 ## Testing
-[name known testing system(s); load write-script-<testing-skill> when tests are wanted;
+[name known testing system(s); load write-code-<testing-skill> when tests are wanted;
 if no testing skill exists, say so and instruct agent to ask user]
 
 ## Section separators
@@ -103,7 +103,7 @@ Optional sections (add when relevant): `## Output capture`, `## Error handling`,
 The `description` field must:
 - Name the language explicitly so the auto-trigger fires on file type or task context.
 - Say "Auto-load when writing or reviewing <lang> scripts" (or `.bats` / `.nu` etc.).
-- Mention that it loads `write-script-generic`.
+- Mention that it loads `write-code-generic`.
 
 Bad (too vague, won't auto-trigger reliably):
 > Script writing conventions for shell programs.
@@ -111,14 +111,14 @@ Bad (too vague, won't auto-trigger reliably):
 Good:
 > Bash script writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
 > Auto-load when writing or reviewing bash scripts.
-> Loads write-script-generic for language-agnostic rules.
+> Loads write-code-generic for language-agnostic rules.
 
 ## Rules
 
-- Never restate a rule already in `write-script-generic` in a lang skill.
-  If the rule is generic, it belongs in `write-script-generic` — move it there instead.
+- Never restate a rule already in `write-code-generic` in a lang skill.
+  If the rule is generic, it belongs in `write-code-generic` — move it there instead.
 - Before placing a new rule in a lang skill, verify it is truly lang-specific.
   If unsure, ask: does this rule apply identically to a second unrelated language?
-  If yes, it belongs in `write-script-generic`.
+  If yes, it belongs in `write-code-generic`.
 - Prose rules are allowed in lang skills only when genuinely lang-specific.
   When a lang skill adds a code example for a generic rule, omit the prose — the generic skill owns it.

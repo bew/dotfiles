@@ -1,7 +1,7 @@
 ---
-name: write-script-nushell
+name: write-code-nushell
 description: |
-  Nushell script writing guidelines: idioms, types, entry point, error handling.
+  Nushell code writing guidelines: idioms, types, entry point, error handling.
   Auto-load when writing or reviewing Nushell (.nu) scripts.
 metadata:
   maintainers: [bew]
@@ -11,7 +11,7 @@ metadata:
 
 Write Nushell scripts using native idioms: typed parameters, structured data, and proper error handling.
 
-NOTE: Load `write-script-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
+NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
 
 ## Rules
 

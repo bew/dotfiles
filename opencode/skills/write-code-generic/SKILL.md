@@ -1,9 +1,9 @@
 ---
-name: write-script-generic
+name: write-code-generic
 description: |
-  General script writing guidelines: structure, naming, error handling, and organization.
-  Language-agnostic. Auto-load when writing or reviewing any script.
-  Language-specific skills (write-script-bash, write-script-bats) build on top of this.
+  General code writing guidelines: structure, naming, error handling, and organization.
+  Language-agnostic. Auto-load when writing or reviewing any code file.
+  Language-specific skills (write-code-bash, write-code-bats) build on top of this.
 metadata:
   maintainers: [bew]
 ---
