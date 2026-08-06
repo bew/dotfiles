@@ -9,12 +9,9 @@ Official documentation: https://opencode.ai/docs/agents/
 | Scope | Path |
 |---|---|
 | Project-scoped | `.opencode/agents/<name>.md` |
-| Global | `~/.config/opencode/agents/<name>.md` |
+| Global | `$opencodepath_global/agents/<name>.md` |
 
 Filename (without `.md`) becomes agent name, usable via `@mention`.
-
-NOTE: for global scope, the agents are found in `opencode/agents` in my `dotfiles` repo.
-Use this relative path instead for edits if in the `dotfiles` repo.
 
 ## Frontmatter
 

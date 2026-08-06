@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# Resolve the opencode dir where an artefact would be installed based on its type.
+# For global scope, handles giving out the dotfiles dir if relevant
+
+set -euo pipefail
+
+function echo_err() { echo >&2 "$*"; }
+
+function usage_and_exit() {
+    local status="$1"
+    cat >&2 <<'EOF'
+Usage: find-opencode-root <scope> [<cwd>]
+       find-opencode-root --help
+
+Arguments:
+  <scope>   One of global or project:
+
+    "global"  — opencode config dir (dotfiles-aware):
+      cwd inside dotfiles → <dotfiles_root>/opencode
+      cwd elsewhere       → ~/.config/opencode
+
+    "project" — git repo root + /.opencode (via git rev-parse).
+      Exits with error if not inside git repo.
+
+  <cwd>     Directory to start detection from. Defaults to $PWD.
+EOF
+    exit "$status"
+}
+
+# True if $2 is equal to or a descendant of $1 (both absolute, canonical).
+function is_path_under() {
+    local prefix="$1" path="$2"
+    [[ "$path" == "$prefix"/* || "$path" == "$prefix" ]]
+}
+
+# Print the global opencode dir: <dotfiles>/opencode if cwd is inside dotfiles, else $XDG_CONFIG_HOME/opencode.
+function resolve_global() {
+    local start_dir="$1"
+
+    local dotfiles_root
+    dotfiles_root=$(realpath ~/.dot 2>/dev/null) || true
+
+    if [[ -n "$dotfiles_root" ]]; then
+        local canonical_dir
+        canonical_dir=$(realpath "$start_dir" 2>/dev/null) || true
+        if [[ -n "$canonical_dir" ]] && is_path_under "$dotfiles_root" "$canonical_dir"; then
+            echo "$dotfiles_root/opencode"
+            return 0
+        fi
+    fi
+
+    # Fallback: standard config dir — always print, regardless of existence.
+    echo "${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+}
+
+# Print the project opencode dir: <git_root>/.opencode. Errors if not inside a git repo.
+function resolve_project() {
+    local start_dir="$1"
+
+    local git_root
+    if ! git_root=$(git -C "$start_dir" rev-parse --show-toplevel 2>/dev/null); then
+        echo_err "Error: not inside a git repository: $start_dir"
+        return 1
+    fi
+
+    echo "$git_root/.opencode"
+}
+
+function main() {
+    if [[ "${1:-}" == "--help" ]]; then
+        usage_and_exit 0
+    fi
+
+    if [[ $# -lt 1 || $# -gt 2 ]]; then
+        usage_and_exit 1
+    fi
+
+    local scope="$1"
+    local start_dir="${2:-$PWD}"
+
+    if [[ ! -d "$start_dir" ]]; then
+        echo_err "Error: not a directory: $start_dir"
+        exit 1
+    fi
+
+    case "$scope" in
+        global)  resolve_global  "$start_dir" ;;
+        project) resolve_project "$start_dir" ;;
+        *)
+            echo_err "Error: unknown scope: $scope"
+            echo_err "Expected: global or project"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

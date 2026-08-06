@@ -9,12 +9,9 @@ Official documentation: https://opencode.ai/docs/commands/
 | Scope | Path |
 |---|---|
 | Project-scoped | `.opencode/commands/<name>.md` |
-| Global | `~/.config/opencode/commands/<name>.md` |
+| Global | `$opencodepath_global/commands/<name>.md` |
 
 Filename (without `.md`) becomes command name.
-
-NOTE: for global scope, the commands are found in `opencode/commands` in my `dotfiles` repo.
-Use this relative path instead for edits if in the `dotfiles` repo.
 
 ## Frontmatter
 

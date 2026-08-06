@@ -14,10 +14,7 @@ Prefer **TypeScript** (`.ts`) over JavaScript (`.js`).
 | Scope | Path |
 |---|---|
 | Project-scoped | `.opencode/tools/<name>.ts` |
-| Global | `~/.config/opencode/tools/<name>.ts` |
-
-NOTE: for global scope, tools are found in `opencode/tools` in my `dotfiles` repo.
-Use this relative path instead for edits if in the `dotfiles` repo.
+| Global | `$opencodepath_global/tools/<name>.ts` |
 
 Only top-level `.ts`/`.js` files are loaded — the glob is `{tool,tools}/*.{js,ts}` (non-recursive).
 

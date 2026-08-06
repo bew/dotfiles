@@ -10,12 +10,9 @@ Official documentation: https://agentskills.io/specification
 | Scope | Path | Notes |
 |---|---|---|
 | Project-scoped | `.agents/skills/<name>/` | Tool-agnostic; works with OpenCode, and other SKILL.md-compatible tools. **Preferred for team repos.** |
-| Global (OpenCode only) | `~/.config/opencode/skills/<name>/` | Personal reusable skills not tied to a repo |
+| Global (OpenCode only) | `$opencodepath_global/skills/<name>/` | Personal reusable skills not tied to a repo |
 
 WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
-
-NOTE: for global scope, the skills are found in `opencode/skills` in my `dotfiles` repo.
-Use this relative path instead for edits if in the `dotfiles` repo.
 
 ## Directory layout
 

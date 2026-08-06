@@ -15,7 +15,7 @@ Prefer **TypeScript** (`.ts`) over JavaScript (`.js`).
 | Source | Path / config |
 |---|---|
 | Project-local | `.opencode/plugins/<name>.ts` — auto-loaded |
-| Global | `~/.config/opencode/plugins/<name>.ts` — auto-loaded |
+| Global | `$opencodepath_global/plugins/<name>.ts` — auto-loaded |
 
 Only top-level `.ts`/`.js` files are loaded — subdirectories are ignored.
 
@@ -35,9 +35,6 @@ plugins/
 ```ts
 export { default } from "./my-plugin/main"
 ```
-
-NOTE: for global scope, plugins are found in `opencode/plugins` in my `dotfiles` repo.
-Use this relative path instead for edits if in the `dotfiles` repo.
 
 Load order: global config → project config → global plugin dir → project plugin dir.
 

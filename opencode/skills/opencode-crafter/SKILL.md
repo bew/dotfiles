@@ -27,10 +27,13 @@ Phases:
 **For updating existing artefact**:
 `Phase:Classify` → `Phase:Discover` → `Phase:Draft` → (`Phase:Scripts`) → `Phase:Review`
 
-Three paths used throughout:
+Paths used throughout:
 - `$draftpath` — where files are edited during crafting session.
-- `$installpath` — final install location, inferred from artefact type & scope (project vs global).
 - `$existingpath` — path where an existing artefact already lives (updates only).
+- `$installpath` — final install location, inferred from artefact type & scope (project vs global).
+- `$opencodepath_global` — resolved global OpenCode config root (e.g. `~/.config/opencode`).
+
+NOTE: To resolve `$opencodepath_global`: Run `<./scripts/find-opencode-root> global`
 
 At potential end of each phase, mention: "Ready to move to `Phase:<next>`? (say 'next' or similar to proceed)".
 Informational only — do not use `question` tool for it.
