@@ -41,6 +41,7 @@ in {
     stable.trashy
     stable.jq
     stable.yq
+    stable.sd # nicer sed for ~simple search/replace
     stable.ripgrep
     stable.tree
     stable.just
