@@ -7,6 +7,7 @@ Pass in prompt:
   discussed in `Phase:Discover`/`Phase:Draft` that SKILL draft intentionally omits.
 
 Subagent writes scripts + tests into `$draftpath`, iterates with user, returns when confirmed.
+Always propose a companion `.bats` test file alongside the script.
 
 Proceed to `Phase:Review` only once user confirms scripts done.
 Script review does not count as full-artefact review — `Phase:Review` covers complete artefact.

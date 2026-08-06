@@ -32,6 +32,8 @@ long as keyword clearly signals nature of callout (e.g. `CONTEXT:`, `CAVEAT:`,
 - Write keyword in plain text, not bold: `WARNING:` not `**WARNING:**`.
 - Same-paragraph lines (no blank line) are attached to and part of callout.
 - Blank line ends callout.
+- A new keyword at the start of a line also ends the previous callout.
+  Adjacent callouts need no blank line between them when they are on the same topic.
 - Parenthesized form `(KEYWORD: ...)`: must be single line. Can appear inline
   within another paragraph without blank line separator.
 - Guideline: avoid callouts for regular prose or step descriptions careful
@@ -45,7 +47,9 @@ Multi-line WARNING — blank line ends callout:
 WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to
 OpenCode only and blocks non-OC contributors.
 
-This line is no longer part of the warning.
+NOTE: another callout on different topic, no longer part of the warning.
+
+This line is no longer part of the note.
 ````
 
 Parenthesized IMPORTANT inline in a paragraph:
@@ -54,4 +58,11 @@ Parenthesized IMPORTANT inline in a paragraph:
 Present the draft as a fenced block labeled with the artefact type.
 (IMPORTANT: Always use 4 backticks so nested code blocks don't break formatting.)
 Ask: *Does this match what you had in mind?*
+````
+
+Adjacent callouts, different keywords, same topic — no blank line between them:
+
+````md
+NOTE: This rule applies only when the skill is loaded explicitly.
+WARNING: Loading it in auto-load context produces undefined behaviour.
 ````

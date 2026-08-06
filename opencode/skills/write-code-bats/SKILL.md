@@ -11,6 +11,8 @@ metadata:
 
 Write well-structured Bats test files following consistent naming, setup, and assertion conventions.
 
+NOTE: Bats test files are written in bash, but can end-to-end test scripts/tools in any language — not just bash.
+
 NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
 NOTE: Function bodies inside `@test` blocks and helper functions follow `write-code-bash` conventions.
 

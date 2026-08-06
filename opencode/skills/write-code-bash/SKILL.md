@@ -29,6 +29,11 @@ NOTE: Load `write-code-generic` skill first — it defines the shared structure,
   `pipefail` with `set +o pipefail`, then re-enable.
   Always add a comment explaining why it is disabled.
 
+## Guidelines
+
+- Executable scripts have no extension by default — do not add `.sh` or `.bash`.
+  Use `.sh` for files intended to be sourced.
+
 ## Function parameters
 
 Always assign positional parameters to named local variables at the start of the function.
@@ -168,3 +173,5 @@ main "$@"
 The standard testing system for bash scripts in this repo is **Bats** (Bash Automated Testing System).
 
 Load `write-code-bats` skill when writing or running tests for a bash script.
+
+When writing a bash script, propose the companion `.bats` test file — do not wait to be asked.
