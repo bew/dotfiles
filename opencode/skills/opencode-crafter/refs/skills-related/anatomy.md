@@ -7,10 +7,9 @@ Official documentation: https://agentskills.io/specification
 
 ## Install paths
 
-| Scope | Path | Notes |
-|---|---|---|
-| Project-scoped | `.agents/skills/<name>/` | Tool-agnostic; works with OpenCode, and other SKILL.md-compatible tools. **Preferred for team repos.** |
-| Global (OpenCode only) | `$opencodepath_global/skills/<name>/` | Personal reusable skills not tied to a repo |
+- Project: `$AGENTS_configroot/skills/<name>/` — tool-agnostic; works with OpenCode and other
+  SKILL.md-compatible tools. **Preferred for team repos.**
+- Global: `$OC_configroot/skills/<name>/` — personal reusable skills not tied to a repo.
 
 WARNING: Avoid `.opencode/skills/` for team repos — it locks the skill to OpenCode only.
 

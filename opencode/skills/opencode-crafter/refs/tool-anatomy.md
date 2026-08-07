@@ -11,10 +11,7 @@ Prefer **TypeScript** (`.ts`) over JavaScript (`.js`).
 
 ## Install paths
 
-| Scope | Path |
-|---|---|
-| Project-scoped | `.opencode/tools/<name>.ts` |
-| Global | `$opencodepath_global/tools/<name>.ts` |
+`$OC_configroot/tools/<name>.ts`
 
 Only top-level `.ts`/`.js` files are loaded — the glob is `{tool,tools}/*.{js,ts}` (non-recursive).
 

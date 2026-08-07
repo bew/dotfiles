@@ -6,10 +6,7 @@ Official documentation: https://opencode.ai/docs/commands/
 
 ## Install paths
 
-| Scope | Path |
-|---|---|
-| Project-scoped | `.opencode/commands/<name>.md` |
-| Global | `$opencodepath_global/commands/<name>.md` |
+`$OC_configroot/commands/<name>.md`
 
 Filename (without `.md`) becomes command name.
 

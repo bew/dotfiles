@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+# Resolve or shorten an OpenCode artefact path.
+# Outputs the shortest of: relative path from cwd, ~/.dot/… alias (if applicable), or absolute path.
+
+set -euo pipefail
+
+function echo_err() { echo >&2 "$*"; }
+
+function usage_and_exit() {
+    local status="$1"
+    cat >&2 <<'EOF'
+Usage: resolve-artefact-path --get <scope> [--cwd <cwd>]
+       resolve-artefact-path --artefact <path> [--cwd <cwd>]
+       resolve-artefact-path --help
+
+Modes:
+  --get <scope>       Resolve an OpenCode config root. Valid scopes:
+                        opencode:global   ~/.config/opencode (or dotfiles variant)
+                        opencode:project  <git_root>/.opencode
+                        agents:global     alias for opencode:global
+                        agents:project    <git_root>/.agents
+
+  --artefact <path>   Shorten an existing artefact path to its shortest
+                      representation (no path computation, pure shortening).
+
+Options:
+  --cwd <cwd>         Directory to use as resolution anchor. Defaults to $PWD.
+
+Output:
+  Prints the shortest of: relative path from <cwd>, ~/.dot/… alias (when path
+  is under the dotfiles root), or the full absolute path.
+EOF
+    exit "$status"
+}
+
+# True if $2 is equal to or a descendant of $1 (both absolute, canonical).
+function is_path_under() {
+    local prefix="$1" path="$2"
+    [[ "$path" == "$prefix"/* || "$path" == "$prefix" ]]
+}
+
+# Print the shortest representation of abs_path relative to start_dir.
+# Candidates: relative path from start_dir, ~/.dot/… alias (if under dotfiles_root), absolute path.
+# dotfiles_root may be empty — skips the ~/.dot alias candidate in that case.
+function shortest_path() {
+    local abs_path="$1"
+    local start_dir="$2"
+    local dotfiles_root="$3"
+
+    local best="$abs_path"
+
+    # Relative path from start_dir — may be shorter when target is nearby.
+    # -m: allow non-existent paths (target dir may not exist yet).
+    local rel
+    rel=$(realpath -m --relative-to="$start_dir" "$abs_path" 2>/dev/null) || true
+    # Always prefix with ./ so the result is unambiguously relative.
+    # "." means cwd itself — normalize to "./" rather than "./.".
+    # Skip only if already starting with ./ or ../ — bare names like "foo" or ".foo" get ./ prepended.
+    if [[ "$rel" == "." ]]; then
+        rel="./"
+    elif [[ -n "$rel" && "$rel" != "./"* && "$rel" != "../"* ]]; then
+        rel="./$rel"
+    fi
+    if [[ -n "$rel" && ${#rel} -lt ${#best} ]]; then
+        best="$rel"
+    fi
+
+    # ~/.dot/… alias — only when abs_path is under the dotfiles root.
+    if [[ -n "$dotfiles_root" ]] && is_path_under "$dotfiles_root" "$abs_path"; then
+        local dot_alias="~/.dot${abs_path#"$dotfiles_root"}"
+        if [[ ${#dot_alias} -lt ${#best} ]]; then
+            best="$dot_alias"
+        fi
+    fi
+
+    echo "$best"
+}
+
+# Resolve the global OpenCode config root and print its shortest representation.
+# Used for both opencode:global and agents:global (same root).
+function resolve_global() {
+    local start_dir="$1"
+
+    local dotfiles_root
+    dotfiles_root=$(realpath ~/.dot 2>/dev/null) || true
+
+    local abs_path
+    if [[ -n "$dotfiles_root" ]]; then
+        local canonical_dir
+        canonical_dir=$(realpath "$start_dir" 2>/dev/null) || true
+        if [[ -n "$canonical_dir" ]] && is_path_under "$dotfiles_root" "$canonical_dir"; then
+            abs_path="$dotfiles_root/opencode"
+            shortest_path "$abs_path" "$start_dir" "$dotfiles_root"
+            return 0
+        fi
+    fi
+
+    # Fallback: standard config dir — always print, regardless of existence.
+    abs_path="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+    shortest_path "$abs_path" "$start_dir" "${dotfiles_root:-}"
+}
+
+# Resolve a project-scoped OpenCode config dir and print its shortest representation.
+# subdir: ".opencode" or ".agents"
+function resolve_project() {
+    local start_dir="$1"
+    local subdir="$2"
+
+    local git_root
+    if ! git_root=$(git -C "$start_dir" rev-parse --show-toplevel 2>/dev/null); then
+        echo_err "Error: not inside a git repository: $start_dir"
+        return 1
+    fi
+
+    local dotfiles_root
+    dotfiles_root=$(realpath ~/.dot 2>/dev/null) || true
+
+    local abs_path="$git_root/$subdir"
+    shortest_path "$abs_path" "$start_dir" "${dotfiles_root:-}"
+}
+
+# Shorten an arbitrary artefact path to its shortest representation.
+function resolve_artefact() {
+    local artefact_path="$1"
+    local start_dir="$2"
+
+    local abs_path
+    # -m: allow non-existent paths.
+    abs_path=$(realpath -m "$artefact_path" 2>/dev/null) || true
+    if [[ -z "$abs_path" ]]; then
+        echo_err "Error: cannot resolve path: $artefact_path"
+        return 1
+    fi
+
+    local dotfiles_root
+    dotfiles_root=$(realpath ~/.dot 2>/dev/null) || true
+
+    shortest_path "$abs_path" "$start_dir" "${dotfiles_root:-}"
+}
+
+function main() {
+    if [[ "${1:-}" == "--help" ]]; then
+        usage_and_exit 0
+    fi
+
+    if [[ $# -eq 0 ]]; then
+        usage_and_exit 1
+    fi
+
+    local mode=""
+    local get_scope=""
+    local artefact_path=""
+    local cwd="$PWD"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --get)
+                if [[ $# -lt 2 ]]; then
+                    echo_err "Error: --get requires a scope argument"
+                    exit 1
+                fi
+                mode="get"
+                get_scope="$2"
+                shift 2
+                ;;
+            --artefact)
+                if [[ $# -lt 2 ]]; then
+                    echo_err "Error: --artefact requires a path argument"
+                    exit 1
+                fi
+                mode="artefact"
+                artefact_path="$2"
+                shift 2
+                ;;
+            --cwd)
+                if [[ $# -lt 2 ]]; then
+                    echo_err "Error: --cwd requires a directory argument"
+                    exit 1
+                fi
+                cwd="$2"
+                shift 2
+                ;;
+            *)
+                echo_err "Error: unknown option: $1"
+                usage_and_exit 1
+                ;;
+        esac
+    done
+
+    if [[ -z "$mode" ]]; then
+        echo_err "Error: one of --get or --artefact is required"
+        usage_and_exit 1
+    fi
+
+    if [[ ! -d "$cwd" ]]; then
+        echo_err "Error: not a directory: $cwd"
+        exit 1
+    fi
+
+    case "$mode" in
+        get)
+            case "$get_scope" in
+                opencode:global | agents:global)
+                    resolve_global "$cwd"
+                    ;;
+                opencode:project)
+                    resolve_project "$cwd" ".opencode"
+                    ;;
+                agents:project)
+                    resolve_project "$cwd" ".agents"
+                    ;;
+                *)
+                    echo_err "Error: unknown scope: $get_scope"
+                    echo_err "Valid scopes: opencode:global, opencode:project, agents:global, agents:project"
+                    exit 1
+                    ;;
+            esac
+            ;;
+        artefact)
+            resolve_artefact "$artefact_path" "$cwd"
+            ;;
+    esac
+}
+
+main "$@"

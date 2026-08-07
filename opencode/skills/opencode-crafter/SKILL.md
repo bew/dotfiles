@@ -31,9 +31,9 @@ Paths used throughout:
 - `$draftpath` — where files are edited during crafting session.
 - `$existingpath` — path where an existing artefact already lives (updates only).
 - `$installpath` — final install location, inferred from artefact type & scope (project vs global).
-- `$opencodepath_global` — resolved global OpenCode config root (e.g. `~/.config/opencode`).
-
-NOTE: To resolve `$opencodepath_global`: Run `<./scripts/find-opencode-root> global`
+- `$OC_configroot` — resolved OpenCode config root (global or project-scoped `.opencode`).
+- `$AGENTS_configroot` — resolved agents config root (project `.agents`;
+  global = same as `$OC_configroot`).
 
 At potential end of each phase, mention: "Ready to move to `Phase:<next>`? (say 'next' or similar to proceed)".
 Informational only — do not use `question` tool for it.
@@ -86,8 +86,22 @@ Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 
 ## 3. `Phase:Draft` — Plan structure; setup `$draftpath`; Iterate on draft
 
-**First**: establish `$draftpath`.
-- New artefact: use `/tmp/opencode_crafter/<type>-<name>/`.
+**First**: establish `$draftpath` and `$installpath`.
+
+Resolve config roots via `<./scripts/resolve-artefact-path>` — pick scope matching the artefact:
+- `$OC_configroot`: `resolve-artefact-path --get opencode:global` or `--get opencode:project`
+- `$AGENTS_configroot`: `resolve-artefact-path --get agents:global` or `--get agents:project`
+- `$existingpath` (updates): shorten with `resolve-artefact-path --artefact <path>`
+
+If the script exits with an error (e.g. project scope outside a git repo): stop, surface the
+error to the user, and ask how to proceed. Do not invent or assume a path.
+
+The anatomy ref defines which config root and type subdir combine to form `$installpath`.
+
+Never hardcode or reuse a path resolved earlier in the session without re-deriving it.
+This applies across all phases, including `Phase:Ship`.
+
+- New artefact: `$draftpath` = `/tmp/opencode_crafter/<type>-<name>/`.
 - Update: `$draftpath` = `$existingpath` (path where artefact already lives) — no copy needed.
 
 **For skills**: before writing frontmatter, detect current user: `git config github.user || echo "no user found"`

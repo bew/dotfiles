@@ -6,10 +6,7 @@ Official documentation: https://opencode.ai/docs/agents/
 
 ## Install paths
 
-| Scope | Path |
-|---|---|
-| Project-scoped | `.opencode/agents/<name>.md` |
-| Global | `$opencodepath_global/agents/<name>.md` |
+`$OC_configroot/agents/<name>.md`
 
 Filename (without `.md`) becomes agent name, usable via `@mention`.
 

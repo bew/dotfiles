@@ -12,10 +12,7 @@ Prefer **TypeScript** (`.ts`) over JavaScript (`.js`).
 
 ## Install paths
 
-| Source | Path / config |
-|---|---|
-| Project-local | `.opencode/plugins/<name>.ts` — auto-loaded |
-| Global | `$opencodepath_global/plugins/<name>.ts` — auto-loaded |
+`$OC_configroot/plugins/<name>.ts` — auto-loaded
 
 Only top-level `.ts`/`.js` files are loaded — subdirectories are ignored.
 
