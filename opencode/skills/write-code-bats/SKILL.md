@@ -3,6 +3,7 @@ name: write-code-bats
 description: |
   Bats test file writing guidelines: file structure, test naming, setup conventions, and helpers.
   Auto-load when writing or reviewing .bats test files.
+  Requires write-code-generic and write-code-bash skills.
 metadata:
   maintainers: [bew]
 ---
@@ -11,10 +12,10 @@ metadata:
 
 Write well-structured Bats test files following consistent naming, setup, and assertion conventions.
 
-NOTE: Bats test files are written in bash, but can end-to-end test scripts/tools in any language — not just bash.
+REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `write-code-bash` skill — function bodies in `@test` blocks and helpers follow bash conventions.
 
-NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
-NOTE: Function bodies inside `@test` blocks and helper functions follow `write-code-bash` conventions.
+NOTE: Bats test files are written in bash, but can end-to-end test scripts/tools in any language — not just bash.
 
 ## Rules
 
@@ -41,6 +42,8 @@ NOTE: Function bodies inside `@test` blocks and helper functions follow `write-c
   Pass `"$@"` through directly — it is always safe, including when empty.
 - When told to add a check "in each test", place it in each `@test` body.
   Never collapse it into a shared helper to avoid repetition — the explicitness is intentional.
+- Never recompute expected values dynamically using the same tool the script under test uses.
+  When the test environment is fully controlled (known paths, fixed structure), hardcode expected values directly.
 
 ## Test topics (canonical list)
 

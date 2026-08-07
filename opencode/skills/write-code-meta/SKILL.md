@@ -63,7 +63,7 @@ name: write-code-<lang>
 description: |
   <Lang> code writing guidelines: <2-3 key topics>.
   Auto-load when writing or reviewing <lang> code files.
-  Loads write-code-generic for language-agnostic rules.
+  Requires write-code-generic skill.
 metadata:
   maintainers: [<github-user>]
 ---
@@ -72,8 +72,7 @@ metadata:
 
 <One sentence: what this skill produces, referencing write-code-generic.>
 
-NOTE: Load `write-code-generic` skill first — it defines the shared structure,
-naming conventions, and error-handling rules this skill builds on.
+REQUIRES: load `write-code-generic` skill first.
 
 ## Rules
 [lang-specific hard rules only]
@@ -103,7 +102,7 @@ Optional sections (add when relevant): `## Output capture`, `## Error handling`,
 The `description` field must:
 - Name the language explicitly so the auto-trigger fires on file type or task context.
 - Say "Auto-load when writing or reviewing <lang> scripts" (or `.bats` / `.nu` etc.).
-- Mention that it loads `write-code-generic`.
+- Mention that it requires `write-code-generic`.
 
 Bad (too vague, won't auto-trigger reliably):
 > Script writing conventions for shell programs.
@@ -111,7 +110,7 @@ Bad (too vague, won't auto-trigger reliably):
 Good:
 > Bash script writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
 > Auto-load when writing or reviewing bash scripts.
-> Loads write-code-generic for language-agnostic rules.
+> Requires write-code-generic skill.
 
 ## Rules
 

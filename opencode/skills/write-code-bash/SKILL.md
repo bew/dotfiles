@@ -3,7 +3,7 @@ name: write-code-bash
 description: |
   Bash code writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
   Auto-load when writing or reviewing bash scripts.
-  Loads write-code-generic for language-agnostic rules.
+  Requires write-code-generic skill.
 metadata:
   maintainers: [bew]
 ---
@@ -12,7 +12,7 @@ metadata:
 
 Write bash scripts following strict-mode conventions and bash idioms, building on `write-code-generic` rules.
 
-NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
+REQUIRES: load `write-code-generic` skill first.
 
 ## Rules
 
