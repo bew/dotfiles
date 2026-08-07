@@ -16,11 +16,12 @@ Use named steps or phases when **any** of the following:
 - 3+ steps within any single phase
 - Any step references another step (even if fewer than 3 items, positional refs become unreliable)
 
-**Named steps**:
+**Named steps** — two forms depending on body size:
+
+*List form* — use when each step is a line or short paragraph:
 Def with: `1. **Setup**` (bold name inline in list)
 Ref with: `*Setup*` (italic)
 
-Example:
 ```md
 1. **Setup** — read inputs, validate, load files
 2. **Review** — evaluate criteria, surface gaps, apply fixes
@@ -28,6 +29,26 @@ Example:
 If input missing: stop. Do not proceed to *Review*.
 If criteria loop finds new gaps: return to *Review*.
 ```
+
+*Section form* — use when each step has a substantial body (rules, constraints, or examples
+that read poorly as a compact list item):
+Steps must NOT have sub-steps — flatten or regroup if needed.
+Def with: `## Step N — Name` (header, no backticks, no `Phase:` prefix)
+Ref with: `*Step N*` or `*Name*` (italic)
+
+```md
+## Step 1 — Setup
+
+Read inputs. Validate. Load files.
+If input missing: stop. Do not proceed to *Step 2*.
+
+## Step 2 — Review
+
+Evaluate criteria, surface gaps, apply fixes.
+If new gaps found: return to *Step 2*.
+```
+
+Pick one form per artefact — do not mix list and section form in the same artefact.
 
 **Named phases**:
 Def with: ``## N. `Phase:Foo` — short description`` header with body

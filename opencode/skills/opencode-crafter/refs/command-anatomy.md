@@ -62,6 +62,10 @@ Then stop.
 
 *Optional* — degrades gracefully when args absent.
 
+Each of `$ARGUMENTS`, `$1`, `$2`, … must appear **at most once** in the command body.
+Repeating a placeholder — even wrapped in inline backticks — causes the user's input to be duplicated in the rendered prompt.
+When referencing an arg in prose instructions, use plain words instead (e.g. "if no arguments were provided").
+
 **Pick / Ask user to choose injection form if need unclear**:
 
 *Form 1 — Fenced block* (default for any free-form or optional argument):
