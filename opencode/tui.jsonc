@@ -12,7 +12,7 @@
   "keybinds": {
     // Global: general
     "leader": "alt+space",
-    "command_list": "ctrl+space",
+    "command_list": "ctrl+space,<leader>alt+space",
     "app_exit": "ctrl+d,<leader>q",
     "terminal_suspend": "ctrl+z",
     // Global: _visual_ toggles
