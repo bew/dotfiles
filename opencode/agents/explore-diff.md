@@ -9,8 +9,9 @@ description: |
   - purpose (e.g. "commit message drafting", "code review")
   - optionally: which fields to extract per concern (e.g. "include user-facing impact, skip risks")
   This agent is useful to explore a diff without polluting the parent context with a tons of tokens.
+  Use proactively whenever the user asks to explore, split, review, or understand a diff — even outside of commit drafting.
+  The parent agent should never run `git diff` directly; always delegate to this agent.
 mode: subagent # isolated context!
-hidden: true
 permissions:
   bash:
     "git diff*": allow

@@ -93,6 +93,9 @@ Resolve config roots via `<./scripts/resolve-artefact-path>` — pick scope matc
 - `$AGENTS_configroot`: `resolve-artefact-path --get agents:global` or `--get agents:project`
 - `$existingpath` (updates): shorten with `resolve-artefact-path --artefact <path>`
 
+Use the script output as-is — do not convert to absolute path.
+(shell will understand correctly)
+
 If the script exits with an error (e.g. project scope outside a git repo): stop, surface the
 error to the user, and ask how to proceed. Do not invent or assume a path.
 
