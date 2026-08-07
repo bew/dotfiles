@@ -11,6 +11,9 @@ Invoke via `task` tool. Pass in prompt:
 - Path to steps/phases/headers rules file: `./refs/rules-for-steps-phases-headers.md`
   NOTE: these are crafter-root-relative paths — pass as literal strings in the task prompt; reviewer resolves them from the crafter skill directory.
 - For updates: which parts changed, so reviewer can focus
+- Simulated execution environment for any scripts the artefact invokes:
+  - `cwd`: the directory the user's agent session is running from (i.e. the user's project root)
+  - Any env vars the script depends on, if known
 
 Subagent reads & edits files at `$draftpath`, asks user questions via `question` tool.
 Continue until user confirms / types "done". No round limit.

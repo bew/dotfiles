@@ -2,7 +2,7 @@
 name: opencode-test-runner
 description: |
   Testing phase instructions for OpenCode artefact review: generate test cases, narrate dry-runs, iterate on failures.
-  Invoked by opencode-reviewer agent.
+  Invoked by opencode-simulated-test-runner agent (preferred) or opencode-reviewer agent (fallback).
   Not for direct use.
 metadata:
   maintainers: [bew]
@@ -29,4 +29,6 @@ Report failures back to the caller.
 ## Rules
 
 - Never claim to actually execute anything — simulation only.
+  Exception: if the artefact under test invokes a real executable to produce a value the test
+  depends on (e.g. a path resolver script), ask the user before running it.
 - Never output file contents as confirmation or summary.

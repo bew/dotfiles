@@ -10,7 +10,9 @@ permissions:
     "*": deny
     "opencode-artefact-rules": allow
     "opencode-test-runner": allow
-  task: deny
+  task:
+    "*": deny
+    "opencode-simulated-test-runner": allow
   read: allow
   edit: allow
   glob: allow
@@ -49,7 +51,9 @@ Skip if changes are purely non-structural (style fixes, wording tweaks, path ren
 Run if changes are structural (new steps, new flows, new criteria, logic changes, added conditions).
 If unsure: ask user via `question` tool before proceeding.
 
-1. Load `opencode-test-runner` skill and follow its instructions.
+1. Invoke `opencode-simulated-test-runner` subagent via `task` tool, passing the artefact file path (e.g. the dir for a skill).
+   If invocation fails: ask user via `question` tool whether to fall back to loading
+   `opencode-test-runner` skill directly in-context.
 2. If tester reports a failure: re-enter `Phase:Review`, fix, then re-invoke tester.
 3. If tester reports all passed: proceed to `Phase:Output`.
 
