@@ -78,12 +78,28 @@ Ambiguous diff source. Specify a file path, a git command (e.g. "staged changes"
 
 Then stop.
 
-If diff is empty, output exactly:
-```
-Empty diff. Nothing to analyse.
+If diff is empty:
+- If diff source is **not** git-based: *empty-stop*.
+- If diff source is git-based but **no scope** was given: *empty-stop*.
+- If diff source is git-based **and** a scope was given: run fallback check below.
+
+**Fallback check** — run `git status --short -- <scope>` to find unstaged or untracked files matching the scope.
+
+If nothing found: *empty-stop*.
+
+If files found: output **exactly** this block (fill in placeholders, do not paraphrase) and stop.
+
+```text
+FALLBACK: staged diff was empty.
+Found <N> unstaged/untracked file(s) matching scope `<scope>`:
+- <file> (<git-status-code>)
+- …
+Caller: decide whether to re-run with working tree diff.
 ```
 
-Then stop.
+Do not add advice. Do not continue to *Step 2*.
+
+*empty-stop*: output exactly `Empty diff. Nothing to analyse.` and stop.
 
 ## Step 2 — Identify concerns
 

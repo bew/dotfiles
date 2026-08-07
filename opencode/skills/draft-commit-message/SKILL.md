@@ -32,9 +32,19 @@ Pass this task (adapt based on any scope/focus inputs received from caller):
 > [Extra context from caller: `<focus>` (if present).]
 
 Wait for subagent to return.
-If subagent reports an empty diff: stop.
 
-Use that summary as the sole basis for *Step 2* and *Step 3*.
+If subagent reports `Empty diff. Nothing to analyse.`: stop.
+
+If subagent reports a `FALLBACK:` block (staged diff was empty, unstaged files found):
+Read the list of files from the report.
+Ask user via `question` tool — construct the question text dynamically:
+- Mention the found files by name.
+- Option 1: "Use these unstaged changes" — re-run `explore-diff` with `git diff -- <scope>` as diff source.
+- Option 2: "Abort" — stop.
+If user picks option 1: re-invoke `explore-diff` with `git diff -- <scope>` and continue to *Step 2*.
+If user picks option 2: stop.
+
+Use subagent summary as the sole basis for *Step 2* and *Step 3*.
 Do not run `git diff` yourself.
 
 ## Step 2 — Detect commit style
