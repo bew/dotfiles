@@ -1,3 +1,7 @@
+-- scrolloff=0 so double-clicking an entry at the top of the window doesn't
+-- cause the window to scroll on the first click before the second click lands.
+vim.opt_local.scrolloff = 0
+
 local TERM_CODES = require"mylib.term_codes"
 local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
