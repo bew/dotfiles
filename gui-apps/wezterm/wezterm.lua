@@ -1,7 +1,6 @@
 -- WezTerm configuration
 ---------------------------------------------------------------
 
-local wezterm = require"wezterm"
 local mytable = require "lib/mystdlib".mytable
 
 local cfg_misc = {
