@@ -136,9 +136,9 @@ Output raw commit message (and warning if applicable) — no markdown fencing, n
 
 After outputting the message, ask user using the `question` tool.
 
-Always include one of these options:
-- **✅ Use as-is** — done (if we're in PLAN mode)
-- **🚀 Use as-is and commit** — done and commit (if we're in BUILD mode)
+Always include one or both of these options:
+- **✅ Use as-is** — reply `Done` & stop
+- **🚀 Use as-is and commit** (if we're in BUILD mode)
 
 And inspect the message to include concrete, message-specific suggestions (no emojis!):
 - If it has a bullet list: offer structural variants for the list
