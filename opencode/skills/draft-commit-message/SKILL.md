@@ -18,7 +18,11 @@ Both are optional; defaults to full staged diff with no extra context.
 
 ## Step 1 — Analyse diff via `explore-diff`
 
-Invoke the `explore-diff` subagent via the `task` tool.
+If `explore-diff` was already invoked in the last few messages and the result is still visible
+in context: check whether it covers the current diff (it may have a broader scope).
+If yes, extract the relevant concerns from it — skip subagent invocation.
+
+Otherwise, invoke the `explore-diff` subagent via the `task` tool.
 
 Pass this task (adapt based on any scope/focus inputs received from caller):
 
@@ -136,9 +140,9 @@ Output raw commit message (and warning if applicable) — no markdown fencing, n
 
 After outputting the message, ask user using the `question` tool.
 
-Always include one or both of these options:
-- **✅ Use as-is** — reply `Done` & stop
-- **🚀 Use as-is and commit** (if we're in BUILD mode)
+Always include one or both of these options (labels to be used verbatim):
+- "✅ Use as-is" — reply `Done` & stop
+- "🚀 Use as-is and commit" — (important: omit this option if in PLAN mode, only include it in BUILD mode)
 
 And inspect the message to include concrete, message-specific suggestions (no emojis!):
 - If it has a bullet list: offer structural variants for the list
@@ -152,5 +156,12 @@ And inspect the message to include concrete, message-specific suggestions (no em
 - If the body feels long: offer "Shorten body — trim `<specific area>`"
 - Omit options that don't apply to the message as written
 
-Apply the requested change and re-output.
+Apply any requested change and re-output.
 Repeat until user says "use as-is" or equivalent.
+
+If user picks "🚀 Use as-is and commit": run `git commit -m "<message>"`.
+Do NOT run `git commit` before reaching this step — never commit speculatively without user approval
+for THIS commit.
+
+Similarly `git add` is only allowed when explicitly requested by the user for THIS commit.
+Ask via `question` tool with specific files listed before staging anything.
