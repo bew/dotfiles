@@ -132,6 +132,7 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Use backticks only for identifiers that appear literally in code
   (variable names, command names, flags).
 - Do not backtick-quote technical terms or scope names.
+- Fit into 72 chars, use newlines as needed (compress text a little, should still be ~prose)
 
 Always blank line between subject and body, and between paragraphs.
 
@@ -139,11 +140,11 @@ Output raw commit message (and warning if applicable) — no markdown fencing, n
 
 ## Step 4 — Iterate
 
-After outputting the message, ask user using the `question` tool.
+After outputting the message, iterate with user, and use the `question` tool.
 
-Always include one or both of these options (labels to be used verbatim):
+Always include one or both of these options based on BUILD/PLAN mode (labels to be used verbatim):
 - "✅ Use as-is" — reply `Done` & stop
-- "🚀 Use as-is and commit" — (important: omit this option if in PLAN mode, only include it in BUILD mode)
+- "🚀 Use as-is and commit" — (omit this option if in PLAN mode)
 
 And inspect the message to include concrete, message-specific suggestions (no emojis!):
 - If it has a bullet list: offer structural variants for the list
@@ -152,7 +153,7 @@ And inspect the message to include concrete, message-specific suggestions (no em
 - If it has a paragraph: offer paragraph-level changes
   (e.g. "Drop the paragraph, lead with the bullets directly",
   "Tighten the paragraph — it's repeating the subject")
-- If the subject is near the 72-char limit: offer "Shorten subject — trim `<the verbose part>`"
+- If the subject is near the 72 chars limit: offer "Shorten subject — trim `<the verbose part>`"
   or alternative subject wording that could fit.
 - If the body feels long: offer "Shorten body — trim `<specific area>`"
 - Omit options that don't apply to the message as written
