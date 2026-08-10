@@ -27,6 +27,7 @@ Otherwise, invoke the `explore-diff` subagent via the `task` tool.
 Pass this task (adapt based on any scope/focus inputs received from caller):
 
 > Diff source: requested diff source [restricted to `<scope>` if scope arg present].
+> Working directory: `<absolute path>`
 > Purpose: commit message drafting.
 > For each concern: include label, what changed (specific), inferred intent,
 > and the representative file(s) or directory(ies) most useful as git log pathspecs
@@ -45,7 +46,7 @@ Ask user via `question` tool — construct the question text dynamically:
 - Mention the found files by name.
 - Option 1: "Use these unstaged changes" — re-run `explore-diff` with `git diff -- <scope>` as diff source.
 - Option 2: "Abort" — stop.
-If user picks option 1: re-invoke `explore-diff` with `git diff -- <scope>` and continue to *Step 2*.
+If user picks option 1: retry `explore-diff` with `git diff -- <scope>` as diff source and the same workdir, then continue to *Step 2*.
 If user picks option 2: stop.
 
 Use subagent summary as the sole basis for *Step 2* and *Step 3*.

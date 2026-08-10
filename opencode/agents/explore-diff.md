@@ -6,6 +6,7 @@ description: |
   Caller provides:
   - diff source (as a path, a command to run, or git prose like "staged changes" or "branch X vs main";
     never pre-fetch the diff and pass it inline)
+  - working directory (absolute path)
   - purpose (e.g. "commit message drafting", "code review")
   - optionally: which fields to extract per concern (e.g. "include user-facing impact, skip risks")
   This agent is useful to explore a diff without polluting the parent context with a tons of tokens.
@@ -18,6 +19,10 @@ permissions:
     "git log*": allow
     "git show*": allow
     "git status*": allow
+    "git -C * diff*": allow
+    "git -C * log*": allow
+    "git -C * show*": allow
+    "git -C * status*": allow
     "*": deny
   read: allow
   glob: allow
@@ -33,22 +38,27 @@ permissions:
 Explore diff, produce structured summary.
 Load `caveman` skill for terse output.
 
+Set `$dir` = working directory provided by caller.
+Use `git -C $dir` for all git commands.
+
 ## Input contract
 
 Caller's task must specify:
 
 - **Diff source**: pointer to diff — file path, command to run, git-vocabulary.
   Examples: `"/tmp/my.patch"`, `"staged changes"`, `"branch X vs main"`, commit SHA.
+- **Working directory**: absolute path. Becomes `$dir`.
 - **Purpose**: what diff summary will be used for — controls which sections to include/frame.
   Do not perform the purpose (e.g. do not write a commit msg, do not conduct a code review).
   Examples: `"commit message drafting"`,
   `"PR description — include user-facing impact, skip risks"`,
   `"code review — focus on risky patterns"`.
 
-If diff source or purpose is missing, output exactly:
+If any of diff source, working directory, or purpose is missing, output exactly:
 ```
 Missing input. Caller must specify:
 - Diff source (e.g. "staged changes", "/path/to/file.patch", "<sha>", "branch X vs main")
+- Working directory (absolute path; e.g. "/home/user/myproject")
 - Purpose (e.g. "commit message drafting", "PR description", "code review")
 ```
 
@@ -61,15 +71,16 @@ Choose method based on diff source:
 **File or path**: use `read` tool directly.
 
 **Git context** (caller mentions "staged", "commit", "branch", "HEAD", SHA, or similar git vocabulary).
-Run appropriate `git` command:
-- Staged changes: `git diff --staged`
-- Specific commit: `git show <sha> --format=""`
-- Branch diff: `git diff <base>..<head>`
-- Working tree: `git diff`
+Run appropriate git command using `$dir`:
+- Unstaged changes (aka 'current diff'): `git -C $dir diff --unstaged`
+- Staged changes: `git -C $dir diff --staged`
+- Specific commit: `git -C $dir show <sha> --format=""`
+- Branch diff: `git -C $dir diff <base>..<head>`
+- Working tree: `git -C $dir diff`
 
 For **branch diff**: also read commit msgs to try better understand intents. (may not be useful)
-Run `git log --oneline <base>..<head>` first.
-If any commit subject too terse, fetch full body: `git show <sha> --format="%B" --no-patch`.
+Run `git -C $dir log --oneline <base>..<head>` first.
+If any commit subject too terse, fetch full body: `git -C $dir show <sha> --format="%B" --no-patch`.
 Do not read commit diffs — only messages.
 
 **Other / ambiguous**: output exactly:
@@ -84,7 +95,7 @@ If diff is empty:
 - If diff source is git-based but **no scope** was given: *empty-stop*.
 - If diff source is git-based **and** a scope was given: run fallback check below.
 
-**Fallback check** — run `git status --short -- <scope>` to find unstaged or untracked files matching the scope.
+**Fallback check** — run `git -C $dir status --short -- <scope>` to find unstaged or untracked files matching the scope.
 
 If nothing found: *empty-stop*.
 
@@ -159,7 +170,7 @@ Honour those: e.g. "skip risks" → omit `Risk / notes` everywhere.
 
 Output format:
 ```
-## Concerns (N total)
+## Concerns
 
 ### <concern label>
 
