@@ -66,6 +66,11 @@ If unsure: ask user via `question` tool before proceeding.
 
 ## Rules
 
+- When flagging redundancy: verify the distinction is not load-bearing before raising it.
+  Two conditions that look similar may encode different checks (e.g. time window vs. presence in context).
+  If unsure, ask the user before flagging.
+- When writing or reviewing temporal conditions: require precise window language.
+  Reject vague terms like "recently" or "just" — use "in the last few messages", "within this session", etc.
 - Fix style/formatting as needed.
 - Never write files outside `$draftpath`.
 - Use `edit` tool for all file modifications — surgical changes only, never overwrite full content.

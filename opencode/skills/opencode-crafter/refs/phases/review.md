@@ -15,7 +15,7 @@ Invoke via `task` tool. Pass in prompt:
   - `cwd`: the directory the user's agent session is running from (i.e. the user's project root)
   - Any env vars the script depends on, if known
 
-Subagent reads & edits files at `$draftpath`, asks user questions via `question` tool.
+Subagent reads/edits `$draftpath` files & requests input via `question` tool (NEVER auto-answer!).
 Continue until user confirms / types "done". No round limit.
 
 After iterations, briefly reflect on diff between initial & final draft.

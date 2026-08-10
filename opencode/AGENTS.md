@@ -43,6 +43,9 @@ NEVER run git operations like push/reset/switch/restore/stash/checkout/clean.
 
 When the user explicitly asks for it, you are allowed to add/commit, always ask when not sure.
 
+When the user specifies a git command with a path argument (e.g. `git diff .`, `git log src/`),
+treat the path as a required constraint — never silently drop it or widen the scope.
+
 
 ## Token efficiency
 
