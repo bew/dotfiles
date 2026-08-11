@@ -132,6 +132,13 @@ not covered in `Phase:Discover` (signals: "what if…", "could we…", "idea:", 
 - Do not silently absorb new inputs into draft content.
 - If user confirms: return to `Phase:Discover` for the new scope, then resume `Phase:Draft`.
 
+**Structural-change guard**: before making a structural change (new headers, renamed phases,
+reorganized sections, or any change that shifts the skeleton of the artefact):
+- Surface the proposed structure to the user first (list of headers / phases / sections).
+- Wait for explicit approval before writing.
+
+Do not apply structural rewrites speculatively, even if the intent seems clear.
+
 Iterate until user explicitly confirms draft is ready.
 Then proceed to `Phase:Scripts` (for skill, if scripts needed) or `Phase:Review`.
 
