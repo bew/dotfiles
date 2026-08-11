@@ -111,7 +111,10 @@ Plug {
 }
 
 Plug {
-  source = gh"nvim-treesitter/nvim-treesitter-context",
+  -- Use my own fork, related to <nvim-treesitter/nvim-treesitter-context#675> for mouse clicks!
+  source = gh"bew/nvim-treesitter-context",
+  version = { branch = "jump-on-click" },
+  -- source = gh"nvim-treesitter/nvim-treesitter-context",
   desc = "Show code context",
   tags = {"ui"},
   defer_load = { on_event = "VeryLazy" },
@@ -126,6 +129,9 @@ Plug {
       -- Separator between context and content (must be single char).
       -- (it's actually annoying as it's hiding a whole line below the context win)
       -- separator = "🮃"
+
+      -- Whether clicking on the context window jumps to that line in the source window
+      jump_on_click = true,
     }
 
     my_actions.ts_context_toggle = A.mk_action {
