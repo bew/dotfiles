@@ -55,7 +55,7 @@ Do not run `git diff` yourself.
 ## Step 2 — Detect commit style
 
 Collect all representative paths from the summary.
-Run one combined `git log --oneline -15 -- <all paths>`.
+Run one combined `git log --oneline -10 -- <all paths>`.
 For any concern whose paths return few/no results:
 also run `git log --oneline -5 -- <that concern's paths>`.
 

@@ -86,7 +86,7 @@ Then, for each group, output the staging + commit commands:
 ```sh
 # <group name>
 git add <file1> <file2> ...
-git commit <<'EOF'
+git commit -F - <<'EOF'
 <subject line>
 
 <body if any>
