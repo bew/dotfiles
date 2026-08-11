@@ -27,7 +27,7 @@ Otherwise, invoke the `explore-diff` subagent via the `task` tool.
 Pass this task (adapt based on any scope/focus inputs received from caller):
 
 > Diff source: requested diff source [restricted to `<scope>` if scope arg present].
-> Working directory: `<absolute path>`
+> Working directory: `<absolute path, from session prompt>`
 > Purpose: commit message drafting.
 > For each concern: include label, what changed (specific), inferred intent,
 > and the representative file(s) or directory(ies) most useful as git log pathspecs

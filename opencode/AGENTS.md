@@ -21,6 +21,11 @@ task, treat them as user manual edits.
 Do not revert them.
 If they appear to conflict with the task, ask user what to do before touching them.
 
+When editing an existing file, always use `edit` — never `write`. `write` replaces the whole file
+and loses unrelated content; `edit` is surgical.
+Exception: if the change is so substantial that `edit` is impractical (e.g. full rewrite),
+ask the user before using `write`.
+
 
 ## Communication
 
