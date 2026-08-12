@@ -66,6 +66,9 @@ If unsure: ask user via `question` tool before proceeding.
 
 ## Rules
 
+- When checking sentence-per-line conformance on soft-wrapped text: read the full continuation
+  block (all lines of the same paragraph/bullet) before concluding.
+  A line that appears to be one sentence may continue on the next line — evaluate the block as a whole.
 - When flagging redundancy: verify the distinction is not load-bearing before raising it.
   Two conditions that look similar may encode different checks (e.g. time window vs. presence in context).
   If unsure, ask the user before flagging.
