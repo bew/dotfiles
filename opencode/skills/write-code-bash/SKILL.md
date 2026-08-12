@@ -2,7 +2,7 @@
 name: write-code-bash
 description: |
   Bash code writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
-  Auto-load when writing or reviewing bash scripts.
+  Always load when writing or reviewing bash scripts.
   Requires write-code-generic skill.
 metadata:
   maintainers: [bew]

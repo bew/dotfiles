@@ -2,7 +2,7 @@
 name: write-code-generic
 description: |
   General code writing guidelines: structure, naming, error handling, and organization.
-  Language-agnostic. Auto-load when writing or reviewing any code file.
+  Language-agnostic. Always load when writing or reviewing any code file.
   Load this skill before any write-code-* skill.
   Language-specific skills (write-code-bash, write-code-bats) build on top of this.
 metadata:

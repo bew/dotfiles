@@ -1,8 +1,8 @@
 ---
 name: write-code-meta
 description: |
-  Rules for drafting a new write-code-<lang> skill.
-  Load when creating or updating any write-code-* language-specific skill.
+  Rules for writing write-code-<lang> skills.
+  Always load whenever any write-code-* skill is going to be added/modified.
 metadata:
   maintainers: [bew]
 ---
@@ -62,7 +62,7 @@ Skill directory and `name` frontmatter field must follow: `write-code-<lang>`.
 name: write-code-<lang>
 description: |
   <Lang> code writing guidelines: <2-3 key topics>.
-  Auto-load when writing or reviewing <lang> code files.
+  Always load when writing or reviewing <lang> code files.
   Requires write-code-generic skill.
 metadata:
   maintainers: [<github-user>]
@@ -101,7 +101,7 @@ Optional sections (add when relevant): `## Output capture`, `## Error handling`,
 
 The `description` field must:
 - Name the language explicitly so the auto-trigger fires on file type or task context.
-- Say "Auto-load when writing or reviewing <lang> scripts" (or `.bats` / `.nu` etc.).
+- Say "Always load when writing or reviewing <lang> scripts" (or `.bats` / `.nu` etc.).
 - Mention that it requires `write-code-generic`.
 
 Bad (too vague, won't auto-trigger reliably):
@@ -109,7 +109,7 @@ Bad (too vague, won't auto-trigger reliably):
 
 Good:
 > Bash script writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
-> Auto-load when writing or reviewing bash scripts.
+> Always load when writing or reviewing bash scripts.
 > Requires write-code-generic skill.
 
 ## Rules

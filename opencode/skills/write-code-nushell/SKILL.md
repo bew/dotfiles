@@ -2,7 +2,7 @@
 name: write-code-nushell
 description: |
   Nushell code writing guidelines: idioms, types, entry point, error handling.
-  Auto-load when writing or reviewing Nushell (.nu) scripts.
+  Always load when writing or reviewing Nushell (.nu) scripts.
 metadata:
   maintainers: [bew]
 ---
