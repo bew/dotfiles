@@ -73,7 +73,7 @@ For topic sub-scope, use `:` as inner separator (e.g: `hl:foo` or `skl:crafter`)
 ## Step 3 — Write the commit message
 
 If summary has 2+ distinct concerns, output this before the message:
-```text
+```
 WARNING: This diff mixes distinct concerns. Consider splitting into separate commits:
 - <concern 1 label>
 - <concern 2 label>
@@ -90,7 +90,11 @@ Capitalize the first word of the subject (after the `prefix: ` part, if any).
 Prefer outcome/intent phrasing over mechanical phrasing:
 "Unify X into Y" or "Add support for Z" — not "Replace A with B" or "Rename X to Y".
 
-When listing multiple items, separate with `/` (not `, ` or `and`):
+When the subject describes a fix, name the root cause or mechanism — not just the symptom or
+the artifacts changed.
+Think: does the subject say _why_ it's broken, or just _what_ is broken?
+
+When listing 2+ items or when trying to shorten the line, separate with `/` (not `, ` or `and`):
 "Fix foo/bar/baz" or "Tighten rules for commands/ship gate/steps".
 
 If the list would push past 72 chars, abbreviate the last items or collapse to a category word.
@@ -109,15 +113,20 @@ EXCEPTION: a number is fine when it represents a significant quantity or a befor
 Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 
 **Form** — choose what fits best:
-- **Paragraph only** — when a short paragraph names all concerns clearly enough on its own.
+- **Paragraph(s) only** — when a short paragraph names all concerns clearly enough on its own.
   Use when bullets would just restate what the paragraph already said.
-- **Paragraph + bullets** — when each concern benefits from its own line for clarity or detail.
+- **Paragraph(s) + bullets** — when each concern benefits from its own line for clarity or detail.
   One bullet per semantic concern.
-- Default to paragraph + bullets when unsure; the iteration step lets the user trim.
+- Default to paragraph(s) + bullets when unsure; the iteration step lets the user trim.
 
-**Paragraph rules**:
+**Paragraph(s) rules**:
 - Describe the new state or outcome only.
   No before/after comparisons ("old X did Y; new X does Z") — just what the result is and why.
+- When a sentence describes a structural change ("X lets Y become Z"), make sure to close the loop:
+  mention what Z actually means in practice.
+  Think: does the reader know what the result means after this sentence?
+- Express intent and tradeoff — not which artifacts were touched.
+  "Document the shell-alias subdir tradeoff, wrt…" over "Add a comment and inline notes to the file."
 - When listing items that follow a clear pattern, express the pattern rather than enumerating
   all members (e.g. "opencode/agents + global/project scopes" over four individual strings).
 
@@ -143,10 +152,14 @@ Output raw commit message (and warning if applicable) — no markdown fencing, n
 After outputting the message, iterate with user, and use the `question` tool.
 
 Always include one or both of these options based on BUILD/PLAN mode (labels to be used verbatim):
-- "✅ Use as-is" — reply `Done` & stop
-- "🚀 Use as-is and commit" — (omit this option if in PLAN mode)
+- "✅ Looks good" — reply `Done` & stop.
+- "🚀 Use as-is and commit" — commit & stop.
+  (omit this option if in PLAN mode)
 
 And inspect the message to include concrete, message-specific suggestions (no emojis!):
+- Always offer 1–2 alternative subject lines when they would be meaningfully different
+  (e.g. different framing, tighter wording, or different root-cause emphasis).
+  Label them inline, e.g. "Alt subject: <wording>".
 - If it has a bullet list: offer structural variants for the list
   (e.g. "Drop the bullets, fold key points into the paragraph",
   "Expand the X bullet with more detail")
@@ -159,7 +172,7 @@ And inspect the message to include concrete, message-specific suggestions (no em
 - Omit options that don't apply to the message as written
 
 Apply any requested change and re-output.
-Repeat until user says "use as-is" or equivalent.
+Repeat until user ends says 'looks good' / 'use as-is' or equivalent.
 
 If user picks "🚀 Use as-is and commit": run `git commit -m "<message>"`.
 Do NOT run `git commit` before reaching this step — never commit speculatively without user approval
