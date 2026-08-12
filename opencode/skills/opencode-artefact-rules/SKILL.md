@@ -1,4 +1,5 @@
 ---
+name: opencode-artefact-rules
 description: |
   Quality criteria and review checklist for OpenCode artefacts (skills, agents, commands).
   Invoked by opencode-reviewer agent.
