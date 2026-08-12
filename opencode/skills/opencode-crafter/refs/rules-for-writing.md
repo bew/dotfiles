@@ -28,7 +28,7 @@ Brief a capable engineer who executes instructions exactly as written.
 - Inline code for all commands, paths, field names, values.
 - Tool names are lowercase: `write`, `edit`, `read`, `bash`, etc. — never PascalCase.
 - Phase names always in inline code: `Phase:Discover`, `Phase:Draft`, etc. — never bare text.
-- Fenced code blocks with language tag for multi-line content.
+- Fenced code blocks with language tag for multi-line content (except for bare text — no tag needed).
   Use short language tag like `md` or `py`.
   Use `pseudo-code` tag for language-agnostic pseudo-code examples.
 - Tables for comparisons with 3+ items & 2+ dimensions.
@@ -42,7 +42,9 @@ Brief a capable engineer who executes instructions exactly as written.
 
 - Prose examples (utterances, natural language outputs): use blockquote (`> ...`). Line length unconstrained.
   > Write a skill that monitors my inbox and summarizes unread threads every morning at 9am
-- All other examples (commands, config, file content, structured output): fenced code block with language tag. Line length follows language's own conventions.
+- All other examples (commands, config, file content, structured output):
+  fenced code block with language tag (omit tag only for bare text).
+  Line length follows language's own conventions.
 - **Short labeled pairs** (`Not:`/`Yes:`, `Bad:`/`Good:`, `Q:`/`A:`): inline form allowed when each side fits on one line.
 - **Inline contrast quotes** (`Use "X" over "Y"`, `"X" not "Y"`): inline form allowed when embedded in a rule line
   (e.g. a bullet or wrapped paragraph).
