@@ -44,6 +44,9 @@ Brief a capable engineer who executes instructions exactly as written.
   > Write a skill that monitors my inbox and summarizes unread threads every morning at 9am
 - All other examples (commands, config, file content, structured output): fenced code block with language tag. Line length follows language's own conventions.
 - **Short labeled pairs** (`Not:`/`Yes:`, `Bad:`/`Good:`, `Q:`/`A:`): inline form allowed when each side fits on one line.
+- **Inline contrast quotes** (`Use "X" over "Y"`, `"X" not "Y"`): inline form allowed when embedded in a rule line
+  (e.g. a bullet or wrapped paragraph).
+  Blockquote would break the prose flow in these cases.
 
 ### Callout blocks
 
