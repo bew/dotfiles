@@ -58,6 +58,10 @@ Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 
 ## 3. `Phase:Draft` — draft commit message per group, one by one
 
+NOTE: If user asks to commit at any point and the session is in PLAN mode: stop immediately.
+Output: "Cannot commit in PLAN mode — switch to BUILD mode first, then ask again."
+Do not proceed until user has switched modes and re-requested.
+
 For each confirmed group in order (or all in one go, if requested):
 
 1. Announce: "Drafting commit for group: **<group name>**".

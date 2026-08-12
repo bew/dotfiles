@@ -146,6 +146,12 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 Always blank line between subject and body, and between paragraphs.
 
 Output raw commit message (and warning if applicable) — no markdown fencing, no extra commentary.
+Surround the message with `-----` delimiter lines so it stands out in the terminal output:
+```
+-----
+<commit message>
+-----
+```
 
 ## Step 4 — Iterate
 
