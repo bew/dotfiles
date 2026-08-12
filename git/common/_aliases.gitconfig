@@ -1,3 +1,8 @@
+# The [alias] section defines git subcommands aliases.
+#
+# WARN: `!`-prefixed shell aliases are started from repo root, not current dir /!\
+# (note: $GIT_PREFIX defines subdir if needed)
+#
 # See IDEA for complex aliases metadata & completions at the end of the file
 [alias]
 
@@ -131,14 +136,15 @@
   nb = switch -c
   # note: nb is 'new branch'
 
-  br = !git --no-pager branch
-  brv = !git --no-pager branch -vv
-  brr = !git --no-pager branch -r
-  bra = !git --no-pager branch -a
+  # (note: pager is disabled in [pager] section below, after [alias] section)
+  br = branch
+  brv = branch -vv
+  brr = branch -r
+  bra = branch -a
 
-  br-gone = !git --no-pager -c color.ui=always branch -vv | grep ': gone'
+  br-gone = !git -c color.ui=always branch -vv | grep ': gone'
   brg = br-gone
-  # note: Use `git trim` if installed, it's nice ;)
+  # note: Use `git trim` instead if installed, it's nice ;)
 
 
   # remote interaction
@@ -183,7 +189,8 @@
 
   # NOTE: using the verbose version, because it's more complete,
   # and does not add a blank line at the end.
-  last-log = !git --no-pager pretty-log-verbose -n1
+  # (note: pager is disabled in [pager] section below, after [alias] section)
+  last-log = pretty-log-verbose -n1
   ll = last-log
 
   stat-last-log = stat @^..@
@@ -205,7 +212,8 @@
   diff-next-push = d @{u}..@
   dnp = diff-next-push
 
-  stat = !git --no-pager diff --stat --summary
+  # (note: pager is disabled in [pager] section below, after [alias] section)
+  stat = diff --stat --summary
   stat-staged = stat --cached
 
   stat-next-push = stat @{u}..@
@@ -282,5 +290,17 @@
   # _aliases--completer = "!f() { git aliases | awk -F' |\\.' '{print $2}' }; f"
   # Or even more generic (but requires good json(/nuon?) support.. hard to type in gitconfig)
   # _aliases--metadata = "{description: ..., usage: ..., ... }"
+
+# The [pager] section controls pager use for individual subcommand / aliases.
+#
+# NOTE: This is used instead of using `--no-pager` in the alias definitions,
+#   because `--no-pager` in a plain alias is rejected by git (it "changes environment variables"),
+#   which forces use of `!git` shell aliases — and those always run from the repo root, breaking
+#   path-scoped calls like `g ll .` from subdirs.
+[pager]
+  # These commands/aliases have pager disabled:
+  last-log = false
+  stat = false
+  branch = false
 
 # vim:set ft=gitconfig:
