@@ -30,6 +30,9 @@ out.dot
 # Zsh autoenv files
 .autoenv*
 
+# AI handoff docs
+HANDOFF-*.md
+
 # -------- Platform-specific common ignores
 
 # MacOS
