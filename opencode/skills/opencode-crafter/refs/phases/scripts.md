@@ -12,3 +12,7 @@ Always propose a companion `.bats` test file alongside the script.
 Proceed to `Phase:Review` only once user confirms scripts done.
 Script review does not count as full-artefact review — `Phase:Review` covers complete artefact.
 If user abandons script work mid-phase, note unresolved scripts & carry gap into `Phase:Review`.
+
+NOTE: Passing bats tests = unit-level correctness only.
+The simulated test runner (skill-level agent behaviour) runs in `Phase:Review`.
+Do not conflate the two when reporting test results to the user.

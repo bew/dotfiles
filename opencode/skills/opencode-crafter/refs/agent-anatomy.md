@@ -45,6 +45,9 @@ permissions:
 Markdown body is agent's system prompt. Write as direct instructions.
 Before writing body: read <./rules-for-steps-phases-headers.md> for naming, structure, phase gates, and when named steps are required.
 
+If the agent extracts structured inputs from free-form context (path, scope, hints, …):
+read <./with-precise-inputs.md> for the `## Setup` pattern and input rules.
+
 ## Modes
 
 | Mode | Usage |

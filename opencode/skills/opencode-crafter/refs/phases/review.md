@@ -1,6 +1,11 @@
 # Phase:Review — Review & iterate with user via subagent
 
-IMPORTANT: Invoke the `opencode-reviewer` subagent immediately.
+NOTE: Test-only path — if the user explicitly says "test" (not "review") when entering this phase:
+Invoke `opencode-simulated-test-runner` directly — skip `opencode-reviewer`.
+Pass the same context (artefact type/name, `$draftpath`, simulated execution environment).
+After subagent returns, proceed normally (reflect on results, ask if ready to ship).
+
+Otherwise — IMPORTANT: Invoke the `opencode-reviewer` subagent immediately.
 Do not pre-apply writing or structural rules yourself first.
 The reviewer handles all conformance checks.
 
