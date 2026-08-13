@@ -4,6 +4,9 @@ description: |
   Load when the agent hits an environment/runtime hard error: command/module not found/installed,
   version/runtime mismatch, permission denied, auth/credentials failure, unreachable network/API,
   or a test suite broken independently of agent changes. (and close variants)
+  Also load when a tool invocation or subagent launch fails with an error that prevents the current
+  task from proceeding — including "Task cancelled", subagent errors, or any tool exit that blocks
+  the next step.
   Also load when a user-specified resource (path, repo, URL, named config, etc.) does not exist
   or is inaccessible — do NOT silently substitute or work around it.
   Do NOT auto attempt manual correction/workaround.

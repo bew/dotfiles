@@ -104,6 +104,8 @@ Before writing or modifying a script, ask the user:
 - Are there existing tests for this script?
 - Should tests be written alongside to verify the script works?
 
+Also applies when rewriting a script in a different language — treat it as a new write.
+
 Use tests actively during development — run them after each meaningful change to verify correctness.
 Do not treat testing as a post-step.
 

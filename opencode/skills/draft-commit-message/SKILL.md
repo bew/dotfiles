@@ -178,7 +178,7 @@ And inspect the message to include concrete, message-specific suggestions (no em
 - Omit options that don't apply to the message as written
 
 Apply any requested change and re-output.
-Repeat until user ends says 'looks good' / 'use as-is' or equivalent.
+Repeat until user says 'looks good' / 'use as-is' or equivalent.
 
 If user picks "🚀 Use as-is and commit": run `git commit -m "<message>"`.
 Do NOT run `git commit` before reaching this step — never commit speculatively without user approval

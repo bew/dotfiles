@@ -93,6 +93,27 @@ description: |          # 1–1024 chars: what it does + WHEN to use it
 
 Optional fields (rarely needed for personal skills): `license`, `compatibility`, `metadata` (string → string map).
 
+## Trigger style
+
+The `description` field is the **only** thing the agent reads when deciding whether to load the skill.
+It must encode the trigger condition precisely — what situation, phrase, or event causes the skill to load.
+
+Read <./trigger-styles.md> for the full catalogue of trigger styles and how to phrase each one.
+Include concrete trigger examples in the description — the more cases listed, the more reliably the agent recognises the trigger in real use.
+
+If the skill has a companion command trigger: read <./with-command-trigger.md> for the command body pattern.
+
+## Structured inputs
+
+If the skill (or agent) extracts structured inputs from free-form context (path, scope, hints, …):
+read <../with-precise-inputs.md> for the `## Setup` pattern and input rules.
+
+## Computed vars
+
+If the skill computes values mid-session that are referenced across multiple steps or phases
+(e.g. a resolved path, a slug, a target directory):
+read <../with-computed-vars.md> for the declaration block pattern, naming guidelines, and rules.
+
 
 ## Body sections
 
@@ -100,7 +121,7 @@ Optional fields (rarely needed for personal skills): `license`, `compatibility`,
 |---|---|---|
 | **Goal** | Default | One sentence — what the agent must produce |
 | **Steps** | Default | Numbered sequential actions, one instruction each |
-| **Rules** | Recommanded | Hard constraints: "must" / "always" / "never" |
+| **Rules** | Recommended | Hard constraints: "must" / "always" / "never" |
 | **Guidelines** | No | Soft recommendations: "prefer" / "avoid" |
 | **Output format** | When applicable | Fenced example of the exact expected output |
 | **Example** | Optional | Minimal end-to-end scenario when steps are ambiguous |

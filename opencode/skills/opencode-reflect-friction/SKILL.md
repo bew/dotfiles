@@ -18,7 +18,8 @@ Collect: task_id, agent type, and brief description of what each subagent was la
 
 If any task_ids are found:
 - List them to the user: task_id, agent type, one-line purpose.
-- Ask: "Which of these subagents should I collect friction from?" (allow "all", "none", or a subset)
+- Ask via `question` tool: "Which of these subagents should I collect friction from?" (allow "all", "none", or a subset)
+- **STOP. Wait for user's answer before doing anything else.**
 
 If none found, skip to *Main conversation scan*.
 
@@ -54,11 +55,8 @@ or had to repeat a preference that should have been known.
 If a focus hint was provided by the caller, weight analysis toward that area, artefact, or theme.
 Do not restrict scan to it.
 
+Collect internally — do not output anything yet.
 If no friction found anywhere (main + all subagents), output only: `No friction detected.` and stop.
-
-Otherwise, for each friction moment, note:
-- brief description of what happened
-- which artefact (skill/command/agent) was active or responsible
 
 Proceed to *Produce report*.
 

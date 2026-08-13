@@ -1,5 +1,5 @@
 ---
-name: grill-me-minimal
+name: grill-me-original
 ---
 
 Interview relentlessly about every aspect of this plan until we reach shared understanding.

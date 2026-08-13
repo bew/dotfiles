@@ -14,7 +14,6 @@ Each entry: number, phase name in inline code, em dash, one-line description.
 For each phase, include a section heading in `SKILL.md`. Phase instructions may live inline or in a dedicated ref file — let the progressive disclosure conditions decide which.
 
 ## Progressive disclosure with phases
-<!-- §progressive-disclosure-phases -->
 
 Context accumulates as a skill's workflow progresses: each phase's ref file is loaded when that phase starts and remains in context for all subsequent phases. This means:
 - Instructions for a future phase must NOT be in context yet — they add noise and clutter before they're relevant.

@@ -5,7 +5,7 @@ subtask: false # shared context!
 
 User is questioning something you did or didn't do:
 <user-context>
-$ARGUMENTS
+Why you $ARGUMENTS
 </user-context>
 
 Do NOT open with apology. State root cause directly.
