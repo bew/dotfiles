@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+# Report lines longer than a given limit in one or more files.
+# Usage: check-long-lines <limit> <file>...
+# Output: lines grouped by file; each hit shows 15 chars before the limit,
+#         a '┃' marker at the limit column, then the overflow.
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+CONTEXT_CHARS = 15
+
+
+def print_err(msg: str) -> None:
+    print(msg, file=sys.stderr)
+
+
+def usage_and_exit(status: int) -> None:
+    print_err(
+        "Usage: check-long-lines <limit> <file>...\n"
+        "\n"
+        "Report lines that exceed <limit> characters.\n"
+        "\n"
+        "Output format (grouped by file):\n"
+        "  ('┃' at column <limit>)\n"
+        "\n"
+        "  path/to/file.ts:\n"
+        "  12: …context before┃overflow text here\n"
+        "\n"
+        "EXAMPLES:\n"
+        "  check-long-lines 100 src/foo.ts src/bar.ts\n"
+        "  check-long-lines 80 README.md"
+    )
+    sys.exit(status)
+
+
+def parse_limit(raw: str) -> int:
+    """Parse and validate the limit argument."""
+    try:
+        value = int(raw)
+    except ValueError:
+        print_err(f"Error: limit must be a positive integer, got: {raw!r}")
+        sys.exit(1)
+    if value <= 0:
+        print_err(f"Error: limit must be a positive integer, got: {value}")
+        sys.exit(1)
+    return value
+
+
+def display_path(path: Path) -> str:
+    """Return the shortest human-readable form of path.
+
+    Priority: relative to CWD (if nested inside), then ~/... (if under HOME), then absolute.
+    """
+    abs_path = path.resolve()
+    cwd = Path.cwd().resolve()
+    home = Path.home().resolve()
+    try:
+        rel = abs_path.relative_to(cwd)
+        return str(rel)
+    except ValueError:
+        pass
+    try:
+        rel_home = abs_path.relative_to(home)
+        return "~/" + str(rel_home)
+    except ValueError:
+        pass
+    return str(abs_path)
+
+
+def format_hit(line: str, lineno: int, limit: int) -> str:
+    """Build the display string for one over-limit line."""
+    start = max(0, limit - CONTEXT_CHARS)
+    before = line[start:limit]
+    overflow = line[limit:]
+    return f"{lineno}: {before}┃{overflow}"
+
+
+def scan_file(path: Path, limit: int) -> list[str] | None:
+    """Return formatted hit strings for every over-limit line in path.
+
+    Returns None if the file cannot be read.
+    """
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        print_err(f"Error: cannot read file '{path}': {exc.strerror}")
+        return None
+
+    hits: list[str] = []
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        # splitlines strips the newline — length is content-only, as intended.
+        if len(line) > limit:
+            hits.append(format_hit(line, lineno, limit))
+    return hits
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    if len(args) < 2:
+        usage_and_exit(1)
+
+    limit = parse_limit(args[0])
+    files = [Path(p) for p in args[1:]]
+
+    print(f"('┃' at column {limit})\n")
+
+    single = len(files) == 1
+    errors: list[str] = []
+    for file in files:
+        if not file.exists():
+            errors.append(f"Error: file not found: {file}")
+            continue
+
+        hits = scan_file(file, limit)
+        if hits is None:
+            errors.append(f"Error: cannot read file: {file}")
+            continue
+
+        if not single:
+            print(f"{display_path(file)}:")
+        if hits:
+            print("\n".join(hits))
+        else:
+            print("(OK)")
+        if not single:
+            print()
+
+    if errors:
+        for err in errors:
+            print_err(err)
+        sys.exit(1)
+
+
+main()
