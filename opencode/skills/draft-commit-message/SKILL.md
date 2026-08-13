@@ -13,8 +13,27 @@ metadata:
 
 Produce a well-formed git commit message for a diff, then iterate until user is satisfied.
 
-Caller may pass a scope (path/glob to restrict the diff) and/or a focus hint (free-text context).
-Both are optional; defaults to full staged diff with no extra context.
+## Setup — resolve inputs
+
+Determine the following values from whatever is available in context
+(prior command output, user message, session prompt, or defaults):
+
+- **Working directory**: from user context. Default: <from env block in system prompt>.
+- **Scope**: a path, glob, or area to narrow the diff (e.g. `src/adapters/`, `*.ts`).
+  Default: none (full diff).
+- **Diff type**: infer from any available wording — "staged" means staged changes; anything else
+  (including "unstaged", "current diff", or no mention) means staged. Default: staged.
+- **Focus**: free-text note to guide writing (intent, emphasis, context).
+  If user context looks like a diff scope — treat it as scope instead.
+  Both scope and focus may be present simultaneously.
+
+State resolved values:
+```text
+Working directory: <resolved absolute dir>
+Scope: <path/glob, or "(none)">
+Diff type: staged | unstaged
+Focus: <free-text, or "(none)">
+```
 
 ## Step 1 — Analyse diff via `explore-diff`
 
@@ -24,10 +43,10 @@ If yes, extract the relevant concerns from it — skip subagent invocation.
 
 Otherwise, invoke the `explore-diff` subagent via the `task` tool.
 
-Pass this task (adapt based on any scope/focus inputs received from caller):
+Pass this task (adapt based on *Setup* values):
 
-> Diff source: requested diff source [restricted to `<scope>` if scope arg present].
-> Working directory: `<absolute path, from session prompt>`
+> Diff source: `<git diff [--staged] -- <scope>>` (use values from *Setup*).
+> Working directory: `<working directory from Setup>`
 > Purpose: commit message drafting.
 > For each concern: include label, what changed (specific), inferred intent,
 > and the representative file(s) or directory(ies) most useful as git log pathspecs
@@ -54,21 +73,30 @@ Do not run `git diff` yourself.
 
 ## Step 2 — Detect commit style
 
-Collect all representative paths from the summary.
-Run one combined `git log --oneline -10 -- <all paths>`.
-For any concern whose paths return few/no results:
-also run `git log --oneline -5 -- <that concern's paths>`.
+A **subsystem dir** is inferred from a concern's label + paths:
+Pick the dir naming the component:
+.. not too shallow (not repo root or containers like `src/`),
+.. not too deep (not the leaf file's parent).
+If the concern touches both code & test paths, use code path(s) only; if test-only, use test path(s).
 
-Inspect results:
-- If majority follow `<type>(<maybe-scope>): <subject>` (conventional commits): use that format.
-- If majority follow `topic(<maybe-sub-scope>): <subject>` (scoped commits): use that format.
+Run `git log --oneline -5` scoped to a path per the following, then inspect results:
+- **Single concern**: scope = subsystem dir.
+  If empty → `git log --oneline -10` (no pathspec).
+- **2+ concerns**: scope = deepest common ancestor of all changed paths, if meaningful
+  (not repo root or a broad container).
+  If no meaningful common ancestor: run `git log --oneline -5 -- <subsystem dir>` per concern; merge non-empty results.
+  If no results for common ancestor or per-concern logs → `git log --oneline -10` (no pathspec).
+
+Inspect results to derive commit prefix & style:
+- If majority follow `<type>(<maybe-topic/scope>): <subject>` (conventional commits): use that format.
+- If majority follow `<topic>(<maybe-sub-scope>): <subject>` (scoped commits): use that format.
 - Otherwise: Default to scoped commits style:
   Derive a short lowercase topic word from the concern labels or paths
   (subsystem, directory, or area being changed) and use as prefix.
-  Examples: `ci`, `docs`, `adapters`.
+  Examples: `ci`, `docs`, `adapters`. `misc` allowed for small changes.
   If no clear topic can be derived: use no prefix.
 
-For topic sub-scope, use `:` as inner separator (e.g: `hl:foo` or `skl:crafter`).
+For topic sub-scope (if needed), use `:` as inner separator (e.g: `hl:foo` or `skl:crafter`).
 
 ## Step 3 — Write the commit message
 
@@ -146,10 +174,12 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 Always blank line between subject and body, and between paragraphs.
 
 Output raw commit message (and warning if applicable) — no markdown fencing, no extra commentary.
-Surround the message with `-----` delimiter lines so it stands out in the terminal output:
+Surround the message with `-----` delimiter lines & blank lines so it stands out in the terminal output:
 ```
 -----
+
 <commit message>
+
 -----
 ```
 
@@ -161,6 +191,10 @@ Always include one or both of these options based on BUILD/PLAN mode (labels to 
 - "✅ Looks good" — reply `Done` & stop.
 - "🚀 Use as-is and commit" — commit & stop.
   (omit this option if in PLAN mode)
+
+IMPORTANT: Use these labels verbatim.
+Do NOT combine or conflate them (e.g. "Looks good — proceed to commit" is not allowed).
+They are distinct: one approves, one commits.
 
 And inspect the message to include concrete, message-specific suggestions (no emojis!):
 - Always offer 1–2 alternative subject lines when they would be meaningfully different

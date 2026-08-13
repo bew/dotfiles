@@ -3,19 +3,12 @@ description: Split diff into commits, draft each message interactively (default:
 subtask: false # shared context
 ---
 
-Read `$ARGUMENTS` (may be empty). Extract if present:
+Load the `diff-to-commits-drafts` skill and follow its instructions.
 
-- **Path**: a path or glob to narrow the diff (e.g. `src/`, `*.ts`). Default: `.`
-- **Diff type**: `--staged` to use staged changes; `--unstaged` is default.
+## User context
 
-Resolve the diff source string:
-- Staged + path: `git diff --staged -- <path>`
-- Unstaged + path: `git diff -- <path>`
+May be empty. If non-empty, diff scope or focus hints for the skill.
 
-State these two resolved values clearly in context:
-```text
-Diff source: <resolved diff source string>
-Working directory: <absolute path, from session prompt>
 ```
-
-Then load the `diff-to-commits-drafts` skill and follow its instructions.
+$ARGUMENTS
+```

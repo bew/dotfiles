@@ -8,7 +8,27 @@ metadata:
   maintainers: [bew]
 ---
 
-The command has already resolved `Diff source` and `Working directory` into context.
+## Setup — resolve diff source
+
+Determine the following values from whatever is available in context
+(prior command output, user message, session prompt, or defaults):
+
+- **Working directory**: from user context. Default: <from env block in system prompt>.
+- **Path**: a path or glob to narrow the diff (e.g. `src/`, `*.ts`). Default: `.`
+- **Diff type**: infer from any available wording — "staged" means staged changes; anything else
+  (including "unstaged", "current diff", or no mention) means unstaged. Default: unstaged.
+- **Hints**: any remaining free-form guidance from the user — carry forward for use in later phases.
+
+Resolve the diff source string:
+- Staged + path: `git diff --staged -- <path>`
+- Unstaged + path: `git diff -- <path>`
+
+State resolved values clearly:
+```text
+Diff source: <resolved diff source string>
+Working directory: <resolved absolute dir>
+Hints: <free-form hints, or "(none)">
+```
 
 ## Overview
 
@@ -19,7 +39,7 @@ The command has already resolved `Diff source` and `Working directory` into cont
 
 ## 1. `Phase:Explore` — analyse diff via subagent
 
-Read `Diff source` and `Working directory` from context (set by the command).
+Read `Diff source` and `Working directory` from context (resolved in *Setup*).
 
 NOTE: Subagents do not inherit the parent's cwd — pass `Working directory` explicitly in the prompt.
 
