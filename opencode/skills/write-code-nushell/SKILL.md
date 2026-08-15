@@ -2,28 +2,33 @@
 name: write-code-nushell
 description: |
   Nushell code writing guidelines: idioms, types, entry point, error handling.
-  Always load when writing or reviewing Nushell (.nu) scripts.
+  Always load when asked to draft/write/edit/refactor/review Nushell (.nu) code files.
 metadata:
   maintainers: [bew]
 ---
 
 ## Goal
 
-Write Nushell scripts using native idioms: typed parameters, structured data, and proper error handling.
+Write Nushell code using native idioms: typed parameters, structured data, and proper error handling.
 
-NOTE: Load `write-code-generic` skill first — it defines the shared structure, naming conventions, and error-handling rules this skill builds on.
+REQUIRES: load `write-code-generic` skill first.
+
+In Nushell, **module code** is any `.nu` file loaded via `use` or `source` by other code — no shebang,
+uses `export def` to expose public commands.
+**Script code** is a file run directly: has a shebang (`#!/usr/bin/env nu`) and defines `def main [...]`.
+
+If working on **module code**: read <./module-rules.md>.
+If working on **script code**: read <./script-rules.md>.
 
 ## Rules
 
-- Always use `#!/usr/bin/env nu` as shebang.
-- Define the entry point as `def main [...] { ... }` with typed, documented parameters.
 - Annotate all parameters with types (e.g. `name: string`, `items: list<string>`, `count?: int`).
 - Place the docstring comment directly above the `def` — nushell uses it as the command's help text.
 - Use `let` for immutable locals, `mut` for mutable locals.
 - Use `const` for compile-time constants.
-- Use `error make { msg: "..." }` to signal errors — never echo + exit.
+- Use `error make { msg: "..." }` to signal errors — never `print` + `exit`.
 - Access optional env vars with `$env.VAR?` (returns `null` if unset, no crash).
-- Use `$env.FILE_PWD` for the script's own directory — not a `$SCRIPT_DIR` workaround.
+- Use `$env.FILE_PWD` for the file's own directory — not a `$SCRIPT_DIR` workaround.
 
 ## Guidelines
 
@@ -32,29 +37,6 @@ NOTE: Load `write-code-generic` skill first — it defines the shared structure,
   with `: inputtype -> outputtype` for clarity.
 - Prefer `let` over `mut` — reach for `mut` only when re-assignment is truly needed.
 - Flags are declared as `--flag-name` parameters in the `def` signature, not parsed manually.
-
-## Script structure
-
-```nu
-#!/usr/bin/env nu
-
-# [optional: const declarations for compile-time constants]
-const SOME_CONST = "value"
-
-# Helper: short description of what this does
-def helper-name [param: string]: nothing -> string {
-    # ...
-}
-
-# Entry point: description of the script and its arguments
-def main [
-    required_arg: string  # what this arg means
-    optional_arg?: int    # optional, defaults to null
-    --flag                # boolean flag
-]: nothing -> nothing {
-    # ...
-}
-```
 
 ## Parameter style
 
@@ -70,11 +52,6 @@ def process [
 def process [path mode] { ... }
 ```
 
-## Testing
-
-No dedicated Nushell testing skill exists yet.
-Ask the user how they want tests structured before writing any.
-
 ## Error handling
 
 ```nu
@@ -87,3 +64,8 @@ if not ($path | path exists) {
 print $"Error: file not found"
 exit 1
 ```
+
+## Testing
+
+No dedicated Nushell testing skill exists yet.
+Ask the user how they want tests structured before writing any.

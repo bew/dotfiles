@@ -2,8 +2,7 @@
 name: write-code-bats
 description: |
   Bats test file writing guidelines: file structure, test naming, setup conventions, and helpers.
-  Always load when writing or reviewing .bats test files.
-  Requires write-code-generic and write-code-bash skills.
+  Always load when asked to draft/write/edit/refactor/review .bats test files.
 metadata:
   maintainers: [bew]
 ---

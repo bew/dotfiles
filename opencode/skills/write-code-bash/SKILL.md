@@ -2,8 +2,7 @@
 name: write-code-bash
 description: |
   Bash code writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
-  Always load when writing or reviewing bash scripts.
-  Requires write-code-generic skill.
+  Always load when asked to draft/write/edit/refactor/review bash code files.
 metadata:
   maintainers: [bew]
 ---
@@ -14,10 +13,14 @@ Write bash scripts following strict-mode conventions and bash idioms, building o
 
 REQUIRES: load `write-code-generic` skill first.
 
+In bash, **module code** is a `.sh` file sourced by other scripts (no shebang).
+**Script code** is an executable run directly: no file extension, shebang + `main "$@"` at end.
+
+If working on **module code**: read <./module-rules.md>.
+If working on **script code**: read <./script-rules.md>.
+
 ## Rules
 
-- Always use `#!/usr/bin/env bash` as shebang.
-- Always add `set -euo pipefail` immediately after the script header comment.
 - Use `[[ ... ]]` over `[ ... ]` for all conditional expressions.
 - Use `(( ... ))` over `[[ ... ]]` for numeric comparisons.
 - Always quote variables: `"$var"`, `"$@"`, `"${arr[@]}"`.
@@ -28,11 +31,6 @@ REQUIRES: load `write-code-generic` skill first.
 - When a pipeline step may cause SIGPIPE (e.g. piping into `head`): temporarily disable
   `pipefail` with `set +o pipefail`, then re-enable.
   Always add a comment explaining why it is disabled.
-
-## Guidelines
-
-- Executable scripts have no extension by default — do not add `.sh` or `.bash`.
-  Use `.sh` for files intended to be sourced.
 
 ## Function parameters
 
@@ -94,7 +92,8 @@ function validate_input() {
 
 ## Output capture
 
-Separate variable declaration (bash-specific: `local` always exits 0, swallowing the real exit code):
+When capturing command output to a local variable, declare separately from the assignment.
+`local` always exits 0 in bash, swallowing the real exit code otherwise:
 
 ```bash
 # Good — separate declaration preserves exit code from get_charset
@@ -123,49 +122,6 @@ local output
 set +o pipefail
 output=$(some_cmd | head -n1)
 set -o pipefail
-```
-
-
-## Full script boilerplate
-
-```bash
-#!/usr/bin/env bash
-
-# Short (1-2 line) description of the script.
-
-set -euo pipefail
-
-# Print message to stderr.
-# Uses "$*" (not "$@") — joins all arguments into one string, which is correct for a message helper.
-function echo_err() {
-    echo >&2 "$*"
-}
-
-# Print usage to stderr and exit with given status
-function usage_and_exit() {
-    local status="$1"
-    cat >&2 <<'EOF'
-Usage: script-name ARGS...
-
-Description of the script.
-
-EXAMPLES:
-  script-name example1    - What this does
-  script-name example2    - What this does
-EOF
-    exit "$status"
-}
-
-# Entry point
-function main() {
-    if [[ $# -eq 0 ]]; then
-        usage_and_exit 1
-    fi
-
-    # Main logic
-}
-
-main "$@"
 ```
 
 ## Testing
