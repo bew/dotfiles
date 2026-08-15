@@ -76,10 +76,10 @@ Description pattern: "Load after … and user signals …"
 
 Loads whenever a specific file type or task domain is active.
 
-Description pattern: "Always load when writing/reviewing …"
+Description pattern: "Always load when asked to draft/write/edit/refactor/review …"
 
-> "Always load when writing or reviewing SQL migration files."
-> "Always load when writing or reviewing Dockerfile or docker-compose files."
+> "Always load when asked to draft/write/edit/refactor/review SQL migration files."
+> "Always load when asked to draft/write/edit/refactor/review Dockerfile or docker-compose files."
 
 ### Reference-only (explicit load, no auto)
 

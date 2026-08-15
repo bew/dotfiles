@@ -1,9 +1,8 @@
 ---
 name: check-long-lines
 description: |
-  Use when the agent needs to find or report lines exceeding a length limit in one or more files.
-  (do NOT use `awk` or any other ad-hoc method)
-  Load when about to check line lengths, report long lines, or compute column overflow in any file.
+  Load when about to check line lengths, report long lines, or compute column overflow in any file
+  — do NOT use `awk`, `grep`, or any ad-hoc method (including before writing `awk length > N`).
 metadata:
   maintainers: [bew]
 ---
