@@ -3,7 +3,9 @@ name: write-code-python
 description: |
   Python code writing guidelines: docstrings, file headers, main() conventions,
   type annotations, and error handling.
-  Always load when asked to draft/write/edit/refactor/review Python (.py) files.
+  Always load when asked to draft/write/edit/refactor/review Python code —
+  including .py files, extensionless scripts with a Python shebang, and rewrites
+  of another language's script into Python.
 metadata:
   maintainers: [bew]
 ---
