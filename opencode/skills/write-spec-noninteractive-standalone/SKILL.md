@@ -62,6 +62,7 @@ Before filling any section:
 write the H1 with `[DRAFT]` status + all confirmed section headings, empty bodies.
 Each main section (`##`) likely to surface design decisions gets an empty `### Open Questions` subsection.
 Omit `### Open Questions` from Introduction and Terminology — they are not decision surfaces.
+If the chosen design has meaningful sub-variants, include a placeholder heading for the optional design-options section (choose a descriptive name — see section order below).
 
 H1 format: `# [DRAFT] <Name>`
 
@@ -104,8 +105,11 @@ Omit a section only if genuinely not applicable — state the section name and r
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
-8. **Alternatives & Tradeoffs** — compare against alternatives; include decision criteria
-9. **Related files** — list files next to `SPEC.md`, with one-line descriptions (omit if none)
+8. *(optional)* — different options within the chosen design; include tradeoffs and decision criteria to help choose between them.
+   Covers any kind of design-internal alternative: implementation approaches, configuration strategies, protocol choices, library choices, API surface variants, algorithm selection, storage strategies, etc.
+   Omit if the chosen design has no meaningful sub-variants.
+9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
+10. **Related artifacts** — contextual pointers to related artifacts
 
 ### Mode behavior
 
@@ -175,6 +179,14 @@ If a short name is defined, use it consistently throughout — never alternate w
 
 ### Alternatives & Tradeoffs section
 
+**Scope:** compare whole-spec with alternative directions.
+For localized alternatives within the chosen direction (affecting only one-two sections),
+place them in the optional section 8 instead.
+
+Do not go deep into alternative directions — mention them and their tradeoffs
+only if they were discussed with the user during discovery.
+This section is a concise comparison, not an exhaustive exploration.
+
 **Single proposed design vs simpler alternative:**
 
 1. Show simplest viable alternative in code.
@@ -190,6 +202,21 @@ If a short name is defined, use it consistently throughout — never alternate w
 - End with **Decision criteria**: name concrete conditions under which each option wins.
   Avoid "it depends" without specifying what it depends on.
 - If genuinely unresolved: move to Open Questions.
+
+### Related Artifacts section
+
+This section provides contextual pointers to artifacts worth knowing about:
+proofs-of-concept, reference implementations, relevant source dirs, design docs, URLs.
+
+This is not a file list.
+Describe what the artifact provides or demonstrates —
+e.g. "a proof-of-concept showing cross-process handoff lives in `$specdir/poc/`".
+
+When a companion file is already referenced from another section
+(e.g. a schema file linked in API), don't repeat it here.
+
+Each entry: name + one-line description of relevance.
+Omit if nothing meaningful to note.
 
 ### Open Questions format
 

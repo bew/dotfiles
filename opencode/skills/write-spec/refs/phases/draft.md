@@ -7,6 +7,7 @@ Read <../spec-structure.md> for section order, prose rules, API conventions, and
 
 Before writing anything: list the sections that will be created
 (based on <../spec-structure.md> section order, adapted to what's known about the spec so far).
+If the chosen design has meaningful sub-variants, include the optional design-options section in the list.
 
 Ask: *Sections look right? Say 'next' to start writing.*
 Adjust section list if user requests changes.
@@ -37,7 +38,7 @@ Skeleton example (sections with OQ subsections):
 ```
 
 Omit `### Open Questions` from Introduction and Terminology — they are definitional/contextual sections, not decision surfaces.
-Omit from sections unlikely to surface design decisions (e.g. Component Inventory, Related Files).
+Omit from sections unlikely to surface design decisions (e.g. Component Inventory, Related Artifacts).
 
 ## Structure
 

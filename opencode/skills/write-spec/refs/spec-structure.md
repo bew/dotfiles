@@ -6,7 +6,7 @@ Alternatives & Tradeoffs, and Open Questions format.
 ## Layout
 
 Each spec lives at `$specpath` = `$specdir/SPEC.md`, where `$specdir` = `$basedir/<slug>/`.
-Related files (examples, experiments, reference impls) go next to the spec file:
+Related artifacts (examples, experiments, reference impls, external links) go next to the spec file:
 
 ```
 $basedir/
@@ -32,8 +32,11 @@ flag each omission explicitly (name section + reason).
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
-8. **Alternatives & Tradeoffs** — compare against alternatives; include decision criteria
-9. **Related files** — list files in `$specdir` other than `SPEC.md`, with one-line descriptions
+8. *(optional)* — different options within the chosen design; include tradeoffs and decision criteria to help choose between them.
+   Covers any kind of design-internal alternative: implementation approaches, configuration strategies, protocol choices, library choices, API surface variants, algorithm selection, storage strategies, etc.
+   Omit if the chosen design has no meaningful sub-variants.
+9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
+10. **Related artifacts** — contextual pointers to related artifacts
 
 Open Questions are per-section `### Open Questions` subsections, placed at end of each `##` section that surfaces design decisions.
 There is no global Open Questions section at end of spec.
@@ -94,6 +97,14 @@ This is another sentence that wraps and continues here.
 
 ## Alternatives & Tradeoffs section
 
+**Scope:** compare whole-spec with alternative directions.
+For localized alternatives within the chosen direction (affecting only one-two sections),
+place them in the optional section 8 instead.
+
+Do not go deep into alternative directions — mention them and their tradeoffs
+only if they were discussed with the user during discovery.
+This section is a concise comparison, not an exhaustive exploration.
+
 ### Single proposed design vs simpler alternative
 
 Structure:
@@ -113,6 +124,21 @@ When two or more competing implementations or approaches:
 - End with **Decision criteria**: name concrete conditions under which each option wins.
   Avoid "it depends" without specifying what it depends on.
 - If choice is genuinely unresolved, move to Open Questions instead of leaving a vague heuristic.
+
+## Related Artifacts section
+
+This section provides contextual pointers to artifacts worth knowing about:
+proofs-of-concept, reference implementations, relevant source dirs, design docs, URLs.
+
+This is not a file list.
+Describe what the artifact provides or demonstrates —
+e.g. "a proof-of-concept showing cross-process handoff lives in `$specdir/poc/`".
+
+When a companion file is already referenced from another section
+(e.g. a schema file linked in API), don't repeat it here.
+
+Each entry: name + one-line description of relevance.
+Omit if nothing meaningful to note.
 
 ## Open Questions format
 

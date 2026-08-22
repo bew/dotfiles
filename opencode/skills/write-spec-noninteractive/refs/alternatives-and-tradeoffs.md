@@ -1,5 +1,13 @@
 # Alternatives & Tradeoffs
 
+**Scope:** compare whole-spec with alternative directions.
+For localized alternatives within the chosen direction (affecting only one-two sections),
+place them in the optional section 8 instead.
+
+Do not go deep into alternative directions — mention them and their tradeoffs
+only if they were discussed with the user during discovery.
+This section is a concise comparison, not an exhaustive exploration.
+
 ## Single proposed design vs simpler alternative
 
 1. Show simplest viable alternative in code.
