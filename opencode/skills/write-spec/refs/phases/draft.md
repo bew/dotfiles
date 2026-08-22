@@ -1,7 +1,8 @@
 # Phase:Draft
 
 Write the spec to `$specpath`, filling sections iteratively.
-Read <../spec-structure.md> for section order, prose rules, API conventions, and Open Questions format.
+Read <../spec-structure.md> for section order and Open Questions format.
+Read <../writing-guidelines.md> for prose style, API conventions, and naming discipline.
 
 ## Initial Skeleton
 
@@ -26,8 +27,6 @@ Skeleton example (sections with OQ subsections):
 ```md
 ## Introduction
 
-## Terminology
-
 ## <Domain Section>
 
 ### Open Questions
@@ -35,10 +34,31 @@ Skeleton example (sections with OQ subsections):
 ## <Another Decision Section>
 
 ### Open Questions
+
+## Global Open Questions
+
+**Terminology & Key Concepts** (TKC) — Whether this section is needed for this spec.
+Non-blocking. Refer to spec-writing skill for guidance.
 ```
 
-Omit `### Open Questions` from Introduction and Terminology — they are definitional/contextual sections, not decision surfaces.
+Omit `### Open Questions` from Introduction — it is a definitional/contextual section, not a decision surface.
+Omit from Terminology section (if present) for the same reason.
 Omit from sections unlikely to surface design decisions (e.g. Component Inventory, Related Artifacts).
+
+## Global Open Questions
+
+`## Global Open Questions` is always appended at end of spec.
+It is not a decision surface — it holds deferred questions that span the whole spec.
+Do not add a `### Open Questions` subsection inside it.
+
+### Default entries
+
+Include these entries verbatim in the skeleton:
+
+```
+**Terminology & Key Concepts** (TKC) — Whether this section is needed for this spec.
+Non-blocking. Refer to spec-writing skill for guidance.
+```
 
 ## Structure
 
@@ -64,7 +84,7 @@ If user says "continue" or similar without feedback, proceed to next section.
 
 Add open questions to the section's own `### Open Questions` subsection immediately — do not defer.
 
-On edit failure (placeholder mismatch): re-read `$specpath`, locate current state, resume.
+On edit failure: re-read `$specpath`, locate current state, resume.
 
 After all sections are filled:
 
@@ -95,11 +115,13 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 
 - Never write full rewrite when targeted edit is requested. Surgical edits only.
 - Never paper over unresolved decisions. Surface them in Open Questions.
-- Never mix terminology once terms are defined in Terminology.
-  Use exact names from Terminology everywhere.
-- Always define all terms in Terminology before using them elsewhere in spec.
+- Never mix terminology once terms are defined.
+  If Terminology section exists, use exact names from there everywhere.
+- Terminology section (if present): define all terms there before using them elsewhere in spec.
+- `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
+  Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
 - Always include `### Open Questions` subsections in main sections that may surface design decisions.
-  Never add OQ subsections to Introduction or Terminology — they are not decision surfaces.
+  Never add OQ subsections to Introduction or Terminology (if present) — they are not decision surfaces.
   Empty OQ subsections serve as drafting placeholders — prune them before leaving `Phase:Draft` (see *Filling* above).
 - Always include Alternatives & Tradeoffs section comparing proposed design
   against simpler alternative.

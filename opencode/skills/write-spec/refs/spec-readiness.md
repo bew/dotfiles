@@ -18,12 +18,15 @@ Update in-place with `edit` whenever status changes.
 
 A spec is `MAYBE-READY` when **all** of the following hold:
 
-1. Introduction and Terminology sections are complete prose — no placeholders, no skeleton headings.
+1. Introduction is complete prose — no placeholders, no skeleton headings.
+   Terminology section (if present) is also complete prose.
 2. All `FIXME:` callouts have been addressed or converted to Open Questions entries.
-3. All Open Questions entries are marked **Blocking** or **Non-blocking**.
+3. All Open Questions entries (per-section and Global) are marked **Blocking** or **Non-blocking**.
 4. No **Blocking** Open Questions remain unresolved.
+   Global entries default to **Non-blocking**; they must be escalated to Blocking explicitly during review to block readiness.
 5. Alternatives & Tradeoffs section is present and compares against at least one simpler alternative.
-6. Naming discipline holds: no synonym drift, all terms defined in Terminology before use.
+6. Naming discipline holds: no synonym drift.
+   If Terminology section exists, all terms are defined there before use.
 7. Author (user) has reviewed the spec and explicitly agreed it reflects current design intent.
 
 A spec does NOT need to be implementation-complete to be `MAYBE-READY`.

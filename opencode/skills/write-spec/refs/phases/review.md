@@ -9,12 +9,15 @@ Read full `$specpath` before starting.
 
 Check each of the following, flag any issues:
 
-- All Open Questions are either resolved or explicitly marked blocking/non-blocking
-- Introduction and Terminology are complete prose (not skeleton placeholders)
-- All terms used in spec are defined in Terminology before first use
+- All Open Questions (per-section and Global) are either resolved or explicitly marked non-blocking
+  with a one-line reason (or longer explanation if this is still in-flux).
+- Introduction is prose (not skeleton placeholders)
+- Terminology section (if present) is complete prose (not skeleton placeholders)
+- If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
-- No empty `### Open Questions` subsections remain
+- `## Global Open Questions` section is present at end of spec
+- No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
 - Any OQ entries present follow correct format (see <../spec-structure.md>)
 - Prose in touched sections follows sentence-per-line format
 - Status tag in H1 reflects current state
@@ -51,4 +54,7 @@ If user confirms:
 
 If user declines: leave in `_WIP_SPECS/`, status stays `[MAYBE-READY]`.
 
-NOTE: Do not offer promotion if any blocking Open Questions remain unresolved.
+NOTE: `## Global Open Questions` entries default to **Non-blocking**.
+If a review pass judges a Global entry as critical, escalate it to **Blocking**.
+
+Do not offer promotion if any blocking Open Questions remain unresolved.

@@ -1,7 +1,6 @@
 # Spec Structure
 
-Reference for section order, prose rules, API conventions,
-Alternatives & Tradeoffs, and Open Questions format.
+Reference for section order, Alternatives & Tradeoffs, and Open Questions format.
 
 ## Layout
 
@@ -24,76 +23,56 @@ Use this order.
 Omit a section only if genuinely not applicable —
 flag each omission explicitly (name section + reason).
 
+Exception: Terminology & Key Concepts (section 2) is omitted by default.
+The "Global Open Questions" tracks whether it is needed — see <./terminology-and-key-concepts.md>.
+
 1. **Introduction** — context, motivation, use-cases, inspirations (full prose, no compression)
-2. **Terminology** — define every term used in spec (full prose, precise);
-   mark each entry as new or updated (see Terminology entries below)
+2. **Terminology & Key Concepts** (optional — resolved via Global Open Questions).
+   See <./terminology-and-key-concepts.md> for entry format and guidance.
 3. **Naming & IDs** — if system has named/anonymous things, show patterns here
 4. **API** — code examples are central; prose explains intent, code shows shape
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
 8. *(optional)* — different options within the chosen design; include tradeoffs and decision criteria to help choose between them.
-   Covers any kind of design-internal alternative: implementation approaches, configuration strategies, protocol choices, library choices, API surface variants, algorithm selection, storage strategies, etc.
+   Covers any kind of design-internal alternative:
+   implementation approaches, configuration strategies, protocol choices, library choices,
+   API surface variants, algorithm selection, storage strategies, etc.
    Omit if the chosen design has no meaningful sub-variants.
 9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
 10. **Related artifacts** — contextual pointers to related artifacts
 
+**Global Open Questions** — unnumbered, always appended.
+Default entries included verbatim in skeleton (see <./phases/draft.md>).
+Entries default to **Non-blocking** and may escalate to **Blocking** during review.
+See Open Questions format below.
+
 Open Questions are per-section `### Open Questions` subsections, placed at end of each `##` section that surfaces design decisions.
-There is no global Open Questions section at end of spec.
 See <./phases/draft.md> for skeleton and pruning rules.
 
-## Terminology entries
+## Open Questions format
 
-Each entry must indicate whether the term is new, updated, or well-known:
+Two kinds of open questions exist in a spec:
 
-- `**Some New Thing** (new!): The definition…`
-- `**Some Updated Thing** (updated!):` The revised definition — explicitly state what part changed, or mark as `(replaced!)` if the old meaning is fully superseded.
-- Well-known terms (standard, widely understood): no need to re-define;
-  a one-line note referencing the accepted meaning is enough,
-  or omit entirely if context makes it obvious.
+**Per-section Open Questions** — `### Open Questions` at end of any `##` section
+that surfaces design decisions. These are specific to that section's domain.
 
-### Short names
+**Global Open Questions** — `## Global Open Questions` at end of spec.
+Covers broad unresolved decisions that span multiple sections.
+They may escalate to **Blocking** during review if the reviewer judges them critical.
 
-A term may define a short name (e.g. `ExtPoint` for `Extension Point`).
-Short names reduce token count in prose and avoid horizontal overflow in code comments.
-Short names are optional — always validate with user before adopting one
-(judge whether it adds clarity or just obscures).
-If a short name is defined, it must be used consistently throughout the spec
-(not interchanged with the full name).
+Each entry must include:
 
-## Prose style
+- Clear statement of unresolved decision.
+- **Blocking** or **Non-blocking** — must this be resolved before implementation starts?
+- Brief rationale: what is blocking the decision, or what tradeoff makes it non-obvious.
 
-- One sentence per line.
-  Long sentences may wrap, but next sentence always starts on a new line.
-- Introduction and Terminology: full prose, no compression.
-- Other sections: terse, imperative, concrete.
-- Use `NOTE:` / `FIXME:` / `WARNING:` for callouts.
+Remove or strike questions once resolved — do not let stale entries accumulate.
 
-Bad:
-```text
-This is a sentence. This is another sentence
-that wraps and continues here.
-```
+Example:
 
-Good:
-```text
-This is a sentence.
-This is another sentence that wraps and continues here.
-```
-
-## Naming discipline
-
-- Define canonical name for each concept in Terminology.
-- Use that exact name everywhere — in prose, code comments, section headings.
-- If concept has short internal form (e.g. `P` for provider inside impl), define at first use.
-- Never use synonyms: pick one word and hold it.
-
-## API sections
-
-- Show most complete realistic example, not a toy.
-- Preserve honest comments (`-- FIXME`, `-- NOTE`) — they are design signals, not noise.
-- If API has multiple forms (named / anonymous, shorthand / full), show all.
-- If a field has a type annotation, show both simple and more-defined type variants if relevant.
+> 1. Should providers be allowed to deregister at runtime?
+>    Non-blocking. No clear use-case yet; adding it costs lifecycle complexity that may never pay off.
 
 ## Alternatives & Tradeoffs section
 
@@ -139,18 +118,3 @@ When a companion file is already referenced from another section
 
 Each entry: name + one-line description of relevance.
 Omit if nothing meaningful to note.
-
-## Open Questions format
-
-Each entry must include:
-
-- Clear statement of unresolved decision.
-- **Blocking** or **Non-blocking** — must this be resolved before implementation starts?
-- Brief rationale: what is blocking the decision, or what tradeoff makes it non-obvious.
-
-Remove or strike questions once resolved — do not let stale entries accumulate.
-
-Example:
-
-> 1. Should providers be allowed to deregister at runtime?
->    Non-blocking. No clear use-case yet; adding it costs lifecycle complexity that may never pay off.

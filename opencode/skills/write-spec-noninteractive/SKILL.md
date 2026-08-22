@@ -40,6 +40,8 @@ Collect inputs (infer what you can; defer the rest to `Phase:Defer`):
 - **Slug** — short kebab-case identifier; derive from name if not given.
 - **Problem** — what does it solve, and for whom?
 - **Inspirations** — prior art, external systems, or prior sessions that shaped the design.
+- **Terminology section preference** (via Global OQ) — infer candidate terms;
+   decided in `Phase:Defer`.
 
 If the user has supplied context inline, extract inputs directly — do not ask one by one.
 If the prompt contains conflicting or ambiguous design signals
@@ -65,7 +67,8 @@ Read <./refs/spec-structure.md> for:
 
 ## 4. `Phase:Fill` — fill sections
 
-Read <./refs/writing-guidelines.md> for prose style, terminology entry format, API section rules, and naming discipline.
+Read <./refs/writing-guidelines.md> for prose style, API section rules, and naming discipline.
+Read <./refs/terminology-and-key-concepts.md> for terminology entry format.
 Read <./refs/open-questions.md> for spec open question format and placement.
 Read <./refs/alternatives-and-tradeoffs.md> for how to write the Alternatives & Tradeoffs section.
 
@@ -93,3 +96,14 @@ After all sections are filled (or updates applied):
 
 Read <./refs/review-and-readiness.md> for the review checklist, readiness criteria,
 and deferred questions format.
+
+Include a deferred question about the Terminology & Key Concepts section:
+the decision is tracked via the Global Open Questions entry in the skeleton
+(see <./refs/spec-structure.md> — Global Open Questions).
+Infer candidate terms from the spec content
+(scan for distinct entities, non-standard terms, acronyms, external systems —
+see <./refs/terminology-and-key-concepts.md> for candidate inference rules)
+and list the inferred candidates in the batched deferred questions
+so the user can confirm, reject, or extend them.
+If user confirms: update the spec (two-pass — insert section, fill it, re-check readiness).
+If user declines: no changes needed — mark the Global OQ entry as resolved.

@@ -1,7 +1,13 @@
 # Open Questions format
 
-Open Questions appear throughout the spec — in any `### Open Questions` subsection under a section where design decisions remain unresolved.
-They are not specific to Alternatives & Tradeoffs.
+Two kinds of open questions exist in a spec:
+
+**Per-section Open Questions** — `### Open Questions` at end of any `##` section
+that surfaces design decisions. These are specific to that section's domain.
+
+**Global Open Questions** — `## Global Open Questions` at end of spec.
+Covers broad unresolved decisions that span multiple sections.
+They may escalate to **Blocking** during review if the reviewer judges them critical.
 
 Each entry must include:
 

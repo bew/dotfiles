@@ -61,7 +61,8 @@ Use `edit` for all subsequent changes.
 Before filling any section:
 write the H1 with `[DRAFT]` status + all confirmed section headings, empty bodies.
 Each main section (`##`) likely to surface design decisions gets an empty `### Open Questions` subsection.
-Omit `### Open Questions` from Introduction and Terminology — they are not decision surfaces.
+Omit `### Open Questions` from Introduction — they are not decision surfaces.
+If Terminology section is present, also omit OQ subsections from it.
 If the chosen design has meaningful sub-variants, include a placeholder heading for the optional design-options section (choose a descriptive name — see section order below).
 
 H1 format: `# [DRAFT] <Name>`
@@ -73,13 +74,16 @@ Example skeleton:
 
 ## Introduction
 
-## Terminology
-
 ## API
 
 ### Open Questions
 
 ## Alternatives & Tradeoffs
+
+## Global Open Questions
+
+**Terminology & Key Concepts** (TKC) — Whether this section is needed for this spec.
+Non-blocking. Refer to spec-writing skill for guidance.
 ```
 
 **Heading hierarchy**: use `##` for top-level spec sections, `###` for sub-topics within a section.
@@ -99,17 +103,25 @@ Write sections in this order.
 Omit a section only if genuinely not applicable — state the section name and reason for omission.
 
 1. **Introduction** — context, motivation, use-cases, inspirations (full prose, no compression)
-2. **Terminology** — define every term used in spec; mark each as `(new!)`, `(updated!)`, or well-known
+2. **Terminology & Key Concepts** (optional — resolved via Global Open Questions):
+   see Terminology entries below for format and guidance.
 3. **Naming & IDs** — if system has named/anonymous things, show patterns here
 4. **API** — code examples are central; prose explains intent, code shows shape
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
 8. *(optional)* — different options within the chosen design; include tradeoffs and decision criteria to help choose between them.
-   Covers any kind of design-internal alternative: implementation approaches, configuration strategies, protocol choices, library choices, API surface variants, algorithm selection, storage strategies, etc.
+   Covers any kind of design-internal alternative:
+   implementation approaches, configuration strategies, protocol choices, library choices,
+   API surface variants, algorithm selection, storage strategies, etc.
    Omit if the chosen design has no meaningful sub-variants.
 9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
 10. **Related artifacts** — contextual pointers to related artifacts
+
+**Global Open Questions** — unnumbered, always appended.
+Default entries included verbatim in skeleton (see Phase:Skeleton example).
+Entries default to **Non-blocking** and may escalate to **Blocking** during review.
+See Open Questions format below for both per-section and Global OQ format.
 
 ### Mode behavior
 
@@ -129,6 +141,8 @@ If a violation is found, fix it silently.
 - When a config field's value may depend on runtime state:
   note the uncertainty in the spec and add a spec open question
   ("should this be a plain value or a lazy function? if a function, is result cached?").
+- `## Global Open Questions` is always included. Default entries included verbatim in skeleton.
+  Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
 
 After all sections are filled (or updates applied):
 - Prune empty `### Open Questions` subsections.
@@ -138,7 +152,8 @@ After all sections are filled (or updates applied):
 
 - One sentence per line.
   Long sentences may wrap, but next sentence always starts on a new line.
-- Introduction and Terminology: full prose, no compression.
+- Introduction: full prose, no compression.
+- Terminology section (if present): full prose, no compression.
 - Other sections: terse, imperative, concrete.
 - Use `NOTE:` / `FIXME:` / `WARNING:` for callouts.
 
@@ -156,9 +171,8 @@ This is another sentence that wraps and continues here.
 
 ### Terminology entries
 
-- `**Some New Thing** (new!): The definition…`
-- `**Some Updated Thing** (updated!):` The revised definition — state what changed, or mark `(replaced!)` if fully superseded.
-- Well-known terms: no need to re-define; one-line note or omit entirely.
+Each candidate term is one of: **New**, **Changed / replaced**, or **Important to understand**.
+Markers like `(new!)` are optional — use them only when they add clarity.
 
 A term may define a short name (e.g. `ExtPoint` for `Extension Point`).
 Short names reduce token count and avoid horizontal overflow.
@@ -166,7 +180,8 @@ If a short name is defined, use it consistently throughout — never alternate w
 
 ### Naming discipline
 
-- Define canonical name for each concept in Terminology.
+- Define canonical name for each concept.
+  If Terminology section exists, define names there.
 - Use that exact name everywhere — in prose, code comments, section headings.
 - Never use synonyms: pick one word and hold it.
 
@@ -220,9 +235,14 @@ Omit if nothing meaningful to note.
 
 ### Open Questions format
 
-Open Questions appear throughout the spec — in any `### Open Questions` subsection under a section
-where design decisions remain unresolved.
-They are not specific to Alternatives & Tradeoffs.
+Two kinds of open questions exist in a spec:
+
+**Per-section Open Questions** — `### Open Questions` at end of any `##` section
+that surfaces design decisions. These are specific to that section's domain.
+
+**Global Open Questions** — `## Global Open Questions` at end of spec.
+Covers broad unresolved decisions that span multiple sections.
+They may escalate to **Blocking** during review if the reviewer judges them critical.
 
 Each entry must include:
 
@@ -243,11 +263,13 @@ Example:
 
 After all sections are filled, check:
 
-- All Open Questions are marked **Blocking** or **Non-blocking**
-- Introduction and Terminology are complete prose (no skeleton placeholders)
-- All terms used in spec are defined in Terminology before first use
+- All Open Questions (per-section and Global) are marked **Blocking** or **Non-blocking**
+- Introduction is complete prose (no skeleton placeholders)
+- Terminology section (if present) is complete prose (no skeleton placeholders)
+- If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
-- No empty `### Open Questions` subsections remain
+- `## Global Open Questions` section is present at end of spec
+- No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
 - `FIXME:` callouts are allowed as design signals — they do not block readiness.
   If a callout is not specific to its surrounding text, move it to Open Questions instead.
 - Prose in touched sections follows sentence-per-line format
@@ -272,12 +294,15 @@ All tags other than `DRAFT` are set manually by the user — not by the agent.
 Assess readiness after the review pass.
 State which criteria pass and which fail — do not update the H1 tag.
 
-1. Introduction and Terminology are complete prose — no placeholders.
+1. Introduction is complete prose — no placeholders.
+   Terminology section (if present) is also complete prose.
 2. Any unfocused `FIXME:` callouts moved to Open Questions (focused ones may remain).
-3. All Open Questions marked **Blocking** or **Non-blocking**.
+3. All Open Questions (per-section and Global) marked **Blocking** or **Non-blocking**.
 4. No **Blocking** Open Questions remain unresolved.
+   Global entries default to **Non-blocking**; they must be escalated to Blocking explicitly during review to block readiness.
 5. Alternatives & Tradeoffs section present and honest.
-6. No synonym drift — all terms defined in Terminology before use.
+6. No synonym drift.
+   If Terminology section exists, all terms defined there before use.
 7. Spec reflects current design intent — surface as a deferred question: *"Does this spec reflect your current design intent?"*
 
 If all criteria 1–6 pass and the only deferred question is criterion 7:
@@ -289,6 +314,14 @@ Then output the deferred questions block.
 After the full draft is written and readiness assessed,
 output a single batched list of all questions that require user input.
 Do not ask questions mid-pass.
+
+The decision about the Terminology & Key Concepts section is tracked via the Global Open Questions entry in the skeleton.
+Infer candidate terms from the spec content
+(scan for distinct entities, non-standard terms, acronyms, external systems)
+and include the inferred candidates in the batched deferred questions
+so the user can confirm, reject, or extend them.
+If user confirms: update the spec (two-pass — insert section, fill it, re-check readiness).
+If user declines: no changes needed — mark the Global OQ entry as resolved.
 
 Format:
 

@@ -6,17 +6,25 @@ Write sections in this order.
 Omit a section only if genuinely not applicable — state the section name and reason for omission.
 
 1. **Introduction** — context, motivation, use-cases, inspirations (full prose, no compression)
-2. **Terminology** — define every term used in spec; mark each as `(new!)`, `(updated!)`, or well-known
+2. **Terminology & Key Concepts** (optional — resolved via Global Open Questions).
+   See <./terminology-and-key-concepts.md> for entry format and guidance.
 3. **Naming & IDs** — if system has named/anonymous things, show patterns here
 4. **API** — code examples are central; prose explains intent, code shows shape
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
 8. *(optional)* — different options within the chosen design; include tradeoffs and decision criteria to help choose between them.
-   Covers any kind of design-internal alternative: implementation approaches, configuration strategies, protocol choices, library choices, API surface variants, algorithm selection, storage strategies, etc.
+   Covers any kind of design-internal alternative:
+   implementation approaches, configuration strategies, protocol choices, library choices,
+   API surface variants, algorithm selection, storage strategies, etc.
    Omit if the chosen design has no meaningful sub-variants.
 9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
 10. **Related artifacts** — contextual pointers to related artifacts
+
+**Global Open Questions** — unnumbered, always appended.
+Default entries included verbatim in skeleton (see below).
+Entries default to **Non-blocking** and may escalate to **Blocking** during review.
+See <./open-questions.md> for both per-section and Global OQ format.
 
 ## H1 status tag
 
@@ -39,7 +47,8 @@ All tags other than `DRAFT` are set manually by the user — not by the agent.
 Before filling any section:
 write the H1 with `[DRAFT]` status + all confirmed section headings, empty bodies.
 Each main section (`##`) likely to surface design decisions gets an empty `### Open Questions` subsection.
-Omit `### Open Questions` from Introduction and Terminology — they are not decision surfaces.
+Omit `### Open Questions` from Introduction — it is not a decision surface.
+If Terminology section is present, also omit OQ subsections from it.
 If the chosen design has meaningful sub-variants, include a placeholder heading for the optional design-options section (choose a descriptive name — see section order above).
 
 Example skeleton:
@@ -49,13 +58,22 @@ Example skeleton:
 
 ## Introduction
 
-## Terminology
-
 ## API
 
 ### Open Questions
 
 ## Alternatives & Tradeoffs
+
+## Global Open Questions
+```
+
+### Default Global Open Question entries
+
+Include these entries verbatim in the skeleton:
+
+```
+**Terminology & Key Concepts** (TKC) — Whether this section is needed for this spec.
+Non-blocking. Refer to spec-writing skill for guidance.
 ```
 
 ## Structure rules

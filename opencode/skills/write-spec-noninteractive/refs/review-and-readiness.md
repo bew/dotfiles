@@ -4,11 +4,13 @@
 
 After all sections are filled, check:
 
-- All Open Questions are marked **Blocking** or **Non-blocking**
-- Introduction and Terminology are complete prose (no skeleton placeholders)
-- All terms used in spec are defined in Terminology before first use
+- All Open Questions (per-section and Global) are marked **Blocking** or **Non-blocking**
+- Introduction is complete prose (no skeleton placeholders)
+- Terminology section (if present) is complete prose (no skeleton placeholders)
+- If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
-- No empty `### Open Questions` subsections remain
+- `## Global Open Questions` section is present at end of spec
+- No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
 - `FIXME:` callouts are allowed as design signals — they do not block readiness.
   If a callout is not specific to its surrounding text, move it to Open Questions instead.
 - Prose in touched sections follows sentence-per-line format
@@ -21,12 +23,15 @@ Flag any issues found; note them in the deferred questions block if they require
 Assess readiness after the review pass.
 State which criteria pass and which fail — do not update the H1 tag.
 
-1. Introduction and Terminology are complete prose — no placeholders.
+1. Introduction is complete prose — no placeholders.
+   Terminology section (if present) is also complete prose.
 2. Any unfocused `FIXME:` callouts moved to Open Questions (focused ones may remain).
-3. All Open Questions marked **Blocking** or **Non-blocking**.
+3. All Open Questions (per-section and Global) marked **Blocking** or **Non-blocking**.
 4. No **Blocking** Open Questions remain unresolved.
+   Global entries default to **Non-blocking**; they must be escalated to Blocking explicitly during review to block readiness.
 5. Alternatives & Tradeoffs section present and honest.
-6. No synonym drift — all terms defined in Terminology before use.
+6. No synonym drift.
+   If Terminology section exists, all terms defined there before use.
 7. Spec reflects current design intent — surface as a deferred question: *"Does this spec reflect your current design intent?"*
 
 If all criteria 1–6 pass and the only deferred question is criterion 7:
