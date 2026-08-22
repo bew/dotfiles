@@ -13,7 +13,8 @@ If the chosen design has meaningful sub-variants, include the optional design-op
 Ask: *Sections look right? Say 'next' to start writing.*
 Adjust section list if user requests changes.
 
-Once confirmed, write the file: H1 with status tag + all confirmed section headings, empty bodies.
+Once confirmed, write the file: H1 with status tag + skill loader meta-paragraph
+(for any non-READY status) + all confirmed section headings, empty bodies.
 Each main section (`##`) that may surface open questions gets an empty `### Open Questions` subsection.
 Use `write` tool for this initial creation only.
 All subsequent changes use `edit` only — never overwrite the file again.
@@ -22,9 +23,14 @@ H1 format:
 ```md
 # [DRAFT] <Name>
 ```
+Immediately followed by the skill loader meta-paragraph for any non-READY status — see skeleton example below.
 
 Skeleton example (sections with OQ subsections):
 ```md
+# [DRAFT] <Name>
+
+> IMPORTANT: When editing this spec, agents MUST load one of the spec-writing skills.
+
 ## Introduction
 
 ## <Domain Section>
@@ -120,6 +126,11 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - Terminology section (if present): define all terms there before using them elsewhere in spec.
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
   Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
+- The skill loader meta-paragraph (between H1 and first section) is required
+  for all non-READY statuses.
+  It is removed only on promotion to READY.
+  If refining a spec with a non-READY status, ensure the meta-paragraph is
+  present (add it if missing).
 - Always include `### Open Questions` subsections in main sections that may surface design decisions.
   Never add OQ subsections to Introduction or Terminology (if present) — they are not decision surfaces.
   Empty OQ subsections serve as drafting placeholders — prune them before leaving `Phase:Draft` (see *Filling* above).

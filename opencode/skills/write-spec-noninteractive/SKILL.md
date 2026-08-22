@@ -61,7 +61,7 @@ Use `edit` for all subsequent changes.
 
 Read <./refs/spec-structure.md> for:
 - Section order and what to omit
-- H1 status tag format and meaning
+- H1 status tag format and meaning, including skill loader meta-paragraph placement
 - How to write the skeleton
 - Heading hierarchy and file-splitting rules
 

@@ -28,7 +28,11 @@ See <./open-questions.md> for both per-section and Global OQ format.
 
 ## H1 status tag
 
-H1 format: `# [STATUS] <Name>`
+H1 format:
+```md
+# [STATUS] <Name>
+```
+Immediately followed by the skill loader meta-paragraph for non-READY statuses — see skeleton example below.
 
 Status tags and meanings:
 
@@ -45,7 +49,7 @@ All tags other than `DRAFT` are set manually by the user — not by the agent.
 
 *Create mode only.*
 Before filling any section:
-write the H1 with `[DRAFT]` status + all confirmed section headings, empty bodies.
+write the H1 with `[DRAFT]` status + skill loader meta-paragraph + all confirmed section headings, empty bodies.
 Each main section (`##`) likely to surface design decisions gets an empty `### Open Questions` subsection.
 Omit `### Open Questions` from Introduction — it is not a decision surface.
 If Terminology section is present, also omit OQ subsections from it.
@@ -55,6 +59,8 @@ Example skeleton:
 
 ```md
 # [DRAFT] My System
+
+> IMPORTANT: When editing this spec, agents MUST load one of the spec-writing skills.
 
 ## Introduction
 
@@ -87,9 +93,13 @@ Companion files supplement — they do not replace readable content in `SPEC.md`
 Before extracting, verify the content type matches the file name.
 Different concerns belong in separate files (e.g. CLI behavior and file format are distinct — do not conflate them).
 
-## Related Artifacts section
+## Skill loader meta-paragraph
 
-This section provides contextual pointers to artifacts worth knowing about:
+The skill loader meta-paragraph is required for all non-READY statuses (DRAFT, ABANDONED).
+It is placed immediately after the H1, before the first `##` section.
+When updating a spec with a non-READY status: ensure the meta-paragraph is present (add it if missing).
+
+## Related Artifacts section
 proofs-of-concept, reference implementations, relevant source dirs, design docs, URLs.
 
 This is not a file list.

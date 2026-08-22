@@ -59,18 +59,24 @@ Use `edit` for all subsequent changes.
 *Create mode only.*
 
 Before filling any section:
-write the H1 with `[DRAFT]` status + all confirmed section headings, empty bodies.
+write the H1 with `[DRAFT]` status + skill loader meta-paragraph + all confirmed section headings, empty bodies.
 Each main section (`##`) likely to surface design decisions gets an empty `### Open Questions` subsection.
 Omit `### Open Questions` from Introduction — they are not decision surfaces.
 If Terminology section is present, also omit OQ subsections from it.
 If the chosen design has meaningful sub-variants, include a placeholder heading for the optional design-options section (choose a descriptive name — see section order below).
 
-H1 format: `# [DRAFT] <Name>`
+H1 format:
+```md
+# [DRAFT] <Name>
+```
+Immediately followed by the skill loader meta-paragraph for any non-READY status — see skeleton example below.
 
 Example skeleton:
 
 ```md
 # [DRAFT] My System
+
+> IMPORTANT: When editing this spec, agents MUST load one of the spec-writing skills.
 
 ## Introduction
 
@@ -143,6 +149,8 @@ If a violation is found, fix it silently.
   ("should this be a plain value or a lazy function? if a function, is result cached?").
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton.
   Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
+- The skill loader meta-paragraph (between H1 and first section) is required for all non-READY statuses.
+  When updating a spec with a non-READY status, ensure it is present (add it if missing).
 
 After all sections are filled (or updates applied):
 - Prune empty `### Open Questions` subsections.
@@ -274,6 +282,7 @@ After all sections are filled, check:
   If a callout is not specific to its surrounding text, move it to Open Questions instead.
 - Prose in touched sections follows sentence-per-line format
 - Status tag in H1 reflects current state (set to `[DRAFT]` on creation; preserved on updates)
+- Skill loader meta-paragraph present for non-READY statuses, absent for `READY`
 
 Flag any issues found; note them in the deferred questions block if they require user input.
 

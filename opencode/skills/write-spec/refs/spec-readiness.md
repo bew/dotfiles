@@ -42,6 +42,10 @@ It needs to be design-stable enough that an implementer could start from it.
 
 `_WIP_SPECS/<slug>/` → `_SPECS/<slug>/` means the spec is considered stable reference material.
 Use <./rename.md> to move the directory (handles git-tracked and plain directories).
-After move, update H1 status tag to `[READY]` and update session vars.
+After move, update H1 status tag to `[READY]`,
+remove the skill loader meta-paragraph (between H1 and first section),
+and update session vars.
 
-Demotion (`_SPECS/` → `_WIP_SPECS/`) is allowed if design reopens — update tag to `DRAFT`.
+Demotion (`_SPECS/` → `_WIP_SPECS/`) is allowed if design reopens —
+update tag to `DRAFT` and restore the skill loader meta-paragraph after H1
+(exact text in <./phases/draft.md> H1 format).

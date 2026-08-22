@@ -21,6 +21,7 @@ Check each of the following, flag any issues:
 - Any OQ entries present follow correct format (see <../spec-structure.md>)
 - Prose in touched sections follows sentence-per-line format
 - Status tag in H1 reflects current state
+- Skill loader meta-paragraph present for non-READY statuses, absent for `READY`
 
 `FIXME:` / `TODO:` callouts are allowed — they signal work still to be done, not a review failure.
 If a callout is not specific to its surrounding text, suggest moving it to Open Questions instead.
@@ -49,8 +50,9 @@ Offer: *Spec looks ready. Promote to `_SPECS/<slug>/`? This moves the directory 
 If user confirms:
 1. Read <../rename.md> — run `<skill-dir>/scripts/rename-spec $basedir/<slug>/ _SPECS/<slug>/`
 2. Update H1 in `$specpath` (now at `_SPECS/<slug>/SPEC.md`) to `[READY]`
-3. Update `$basedir`, `$specdir`, `$specpath` in session to reflect new location
-4. Report new path to user
+3. Remove the skill loader meta-paragraph (between H1 and first section).
+4. Update `$basedir`, `$specdir`, `$specpath` in session to reflect new location
+5. Report new path to user
 
 If user declines: leave in `_WIP_SPECS/`, status stays `[MAYBE-READY]`.
 

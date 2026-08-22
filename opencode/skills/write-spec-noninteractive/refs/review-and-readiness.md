@@ -15,6 +15,7 @@ After all sections are filled, check:
   If a callout is not specific to its surrounding text, move it to Open Questions instead.
 - Prose in touched sections follows sentence-per-line format
 - Status tag in H1 reflects current state (set to `[DRAFT]` on creation; preserved on updates)
+- Skill loader meta-paragraph present for non-READY statuses, absent for `READY`
 
 Flag any issues found; note them in the deferred questions block if they require user input.
 
