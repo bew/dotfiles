@@ -8,6 +8,17 @@
 # d8888888P  8""888P' o888o o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o
 #
 
+# Profiling on-demand (see related line at end of config)
+# Example quick iterations with hyperfine (global config load check only):
+#   nix run ..#zsh-bew
+#   hyperfine --warmup 2 './result/bin/zsh -i -c exit'
+#
+# .. Would be better to check time to first prompt using zsh-bench:
+# .. https://github.com/romkatv/zsh-bench
+if [[ -n "$ZSH_MY_CONF_PROFILING" ]]; then
+  zmodload zsh/zprof
+fi
+
 _CFG_BINS_DEPENDENCIES=()
 function cfg::depends-on-bin() {
   local bin="$1"
@@ -104,7 +115,7 @@ zinit light $_ZSH_PLUGIN_SRCREF__zconvey
 zstyle ":plugin:zconvey" greeting "none"
 
 # My helper to manage directory aliases externally, for multiple tools ✨
-# Don't lazy-load so it's immediately available on first prompt
+# Don't lazy-load so aliases are immediately available on first prompt
 zinit light $_ZSH_PLUGIN_SRCREF__diralias
 
 #-------------------------------------------------------------
@@ -270,6 +281,11 @@ USER_LOCAL_ZSHRC_PATH=~/.zshrc.local
 if [[ -f "$USER_LOCAL_ZSHRC_PATH" ]]; then
   echo ":: NOTE: ${(D)USER_LOCAL_ZSHRC_PATH} exists, sourcing.."
   source "$USER_LOCAL_ZSHRC_PATH"
+fi
+
+# Profiling on-demand (see related line at start of config)
+if [[ -n "$ZSH_MY_CONF_PROFILING" ]]; then
+  zprof
 fi
 
 true # The config should always finish well!
