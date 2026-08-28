@@ -87,7 +87,7 @@ make-link ~/.dot/cli-others/htop ~/.config/htop
 make-link ~/.dot/cli-others/gdb      ~/.config/gdb
 
 mkdir -vp ~/.ipython/profile_default/startup
-make-link ~/.dot/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
+make-link ~/.dot/cli-others/ipy-startup/00-custom-config.py ~/.ipython/profile_default/startup/
 
 label "Apps configs"
 make-link ~/.dot/gui-apps/wezterm   ~/.config/wezterm
