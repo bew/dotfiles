@@ -26,8 +26,22 @@ setopt always_to_end # After a successfull middle word compl, move cursor at end
 setopt list_packed # Smaller compl list by 'packing' matches in columns
 setopt menu_complete # Show the menu immediately if ambiguous, and select first entry
 
-# Initialize the completion system
-autoload -U compinit && compinit
+# Initialize the completion system, with caching
+autoload -Uz compinit
+if [[ -n "${ZSH_CONFIG_HASH:-}" ]]; then
+  zcompdump_cache="$ZSH_CACHE_DIR/zcompdump.$ZSH_CONFIG_HASH"
+  if [[ -f "$zcompdump_cache" ]]; then
+    # Load completion fast from past dump for this config
+    # (bypassing validation checks already done when dump was made)
+    compinit -C -d "$zcompdump_cache"
+  else
+    echo ":: Zsh Completion system not cached, caching now.."
+    # Rebuild (& load) completion cache
+    compinit -d "$zcompdump_cache"
+    # note: tried to zcompile the result, but it doesn't improve load time 🤷
+  fi
+fi
+
 zmodload zsh/complist
 
 # Fix `source <TAB>` completions to only search files
