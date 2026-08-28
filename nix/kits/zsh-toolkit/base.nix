@@ -14,6 +14,12 @@ in {
       description = "ZSH's config folder, with .zsh{rc,env} entrypoints";
       type = ty.package;
     };
+    outputs.zdotdir-hash = lib.mkOption {
+      description = "The Nix hash of the built 'zdotdir' output";
+      type = ty.singleLineStr;
+      default = builtins.substring 0 32 (builtins.baseNameOf cfg.outputs.zdotdir);
+      readOnly = true;
+    };
   };
 
   config = {
@@ -36,6 +42,7 @@ in {
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/zsh $out/bin/zsh \
           --set ZDOTDIR ${outs.zdotdir} \
+          --set ZSH_CONFIG_HASH ${outs.zdotdir-hash} \
           --set SHELL_CLI_ENV ${outs.deps.bins}
       '';
     };
@@ -60,6 +67,7 @@ in {
       ];
       home.file.".zshrc".text = ''
         ZDOTDIR=${outs.zdotdir}
+        ZSH_CONFIG_HASH=${outs.zdotdir-hash}
         source ${outs.zdotdir}/.zshrc
       '';
       home.file.".zshenv".text = ''
