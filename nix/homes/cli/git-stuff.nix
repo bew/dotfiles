@@ -4,26 +4,6 @@ let
   inherit (pkgsChannels) stable bleedingedge;
 in {
   home.packages = [
-    (pkgs.buildEnv {
-      name = "git-bew-env";
-      paths = [
-        stable.git
-
-        # config tools
-        stable.delta # for nice git diffs
-        stable.onefetch # repo global info
-        stable.mergiraf # Treesitter-based conflict solver
-
-        # extra commands
-        stable.git-lfs # store specific (large) files out-of-repo
-        stable.git-trim # auto delete merged branches
-        stable.git-absorb # automatic `git commit --fixup` on relevant commits
-
-        # other tools
-        stable.gh # github cli for view & operations
-        stable.lazygit
-      ];
-      meta.mainProgram = "git";
-    })
+    (stable.callPackage ../../../git/package-bew-env.nix {})
   ];
 }
