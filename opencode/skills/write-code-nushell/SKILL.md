@@ -9,13 +9,15 @@ metadata:
 
 ## Goal
 
-Write Nushell code using native idioms: typed parameters, structured data, and proper error handling.
+Write Nushell code using native idioms: typed parameters, structured data,
+and proper error handling.
 
 REQUIRES: load `write-code-generic` skill first.
 
-In Nushell, **module code** is any `.nu` file loaded via `use` or `source` by other code — no shebang,
-uses `export def` to expose public commands.
-**Script code** is a file run directly: has a shebang (`#!/usr/bin/env nu`) and defines `def main [...]`.
+In Nushell, **module code** is any `.nu` file loaded via `use` or `source` by other code —
+no shebang, uses `export def` to expose public commands.
+**Script code** is a file run directly: has a shebang (`#!/usr/bin/env nu`),
+and defines `def main [...]`.
 
 If working on **module code**: read <./module-rules.md>.
 If working on **script code**: read <./script-rules.md>.
@@ -26,7 +28,7 @@ If working on **script code**: read <./script-rules.md>.
 - Place the docstring comment directly above the `def` — nushell uses it as the command's help text.
 - Use `let` for immutable locals, `mut` for mutable locals.
 - Use `const` for compile-time constants.
-- Use `error make { msg: "..." }` to signal errors — never `print` + `exit`.
+- Signal errors per code kind — see <./module-rules.md> and <./script-rules.md>.
 - Access optional env vars with `$env.VAR?` (returns `null` if unset, no crash).
 - Use `$env.FILE_PWD` for the file's own directory — not a `$SCRIPT_DIR` workaround.
 
@@ -50,19 +52,6 @@ def process [
 
 # Bad — untyped, undocumented
 def process [path mode] { ... }
-```
-
-## Error handling
-
-```nu
-# Good
-if not ($path | path exists) {
-    error make { msg: $"File not found: ($path)" }
-}
-
-# Bad
-print $"Error: file not found"
-exit 1
 ```
 
 ## Testing
