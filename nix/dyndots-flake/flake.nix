@@ -25,5 +25,10 @@
       # Kit module adding editable.* options and lib.mkLink to a kit config.
       # Not a NixOS module — intended for use with kit-system eval (or similar).
       modules.kitsys.editable = import ./editable.kit-module.nix;
+
+      checks = eachSystem (system:
+        let inherit (forSys system) pkgs lib;
+        in import ./checks.nix { inherit pkgs lib; dyndots-flake = self; }
+      );
     };
 }
