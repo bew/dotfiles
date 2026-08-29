@@ -9,7 +9,7 @@ Omit a section only if genuinely not applicable — state why.
 
 One short paragraph.
 What was this session about?
-State: repo name, working directory, current branch (if determinable).
+State: repo name, working directory, current branch (if already known, skip otherwise).
 
 ## What was done
 

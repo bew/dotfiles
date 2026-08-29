@@ -84,4 +84,5 @@ Do not output the doc content inline.
 - Never write to a path outside the resolved Output dir without explicit user confirmation.
 - Never overwrite an existing handoff file — resolve conflicts before writing.
 - The handoff file must not be git-tracked.
+- Run commands to get missing information (git rev-parse / date) in one tool call, not multiple.
 - Use caveman mode when writing the handoff doc to reduce words without losing signal.
