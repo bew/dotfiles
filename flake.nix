@@ -86,11 +86,9 @@
         config = ./nvim/nvim-bew.nvim-config.nix;
         configOverride = {
           imports = [editableConfigOverride];
-          # Override to use latest Pyrefly (v1+)
+          # Override to use latest Pyrefly (always better!)
           deps.bins.pyrefly.pkg = lib.mkForce bleedingedgePkgs.pyrefly;
-          # Require v0.15.0+ to avoid this issue:
-          # ref: https://github.com/LuaLS/lua-language-server/issues/3175
-          # ref: https://github.com/LuaLS/lua-language-server/pull/3182 (PR)
+          # Override to use latest lua LS (always better!)
           deps.bins.lua-language-server.pkg = lib.mkForce bleedingedgePkgs.lua-language-server;
           # Always use latest to ensure editing my projects using Rust from unstable work well
           # (e.g. when proc-macro-server is more recent in a project, generating errors)
