@@ -1,7 +1,7 @@
 { pkgsChannels, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge myPkgs;
+  inherit (pkgsChannels) stable;
 in {
   home.packages = [
     stable.direnv
@@ -19,7 +19,16 @@ in {
   # (referenced in gcroots to avoid auto-GC and re-fetch when opening projects after few weeks)
   #
   # Ref: https://direnv.net/man/direnv.1.html
-  # > You can also define your own extensions inside $XDG_CONFIG_HOME/direnv/direnvrc or $XDG_CONFIG_HOME/direnv/lib/*.sh files.
-  xdg.configFile."direnv/lib/nix-direnv.sh".source = "${bleedingedge.nix-direnv}/share/nix-direnv/direnvrc";
-  # NOTE: bleedingedge needed to have latest Nix!
+  # > You can also define your own extensions inside $XDG_CONFIG_HOME/direnv/direnvrc or
+  # > $XDG_CONFIG_HOME/direnv/lib/*.sh files.
+  xdg.configFile."direnv/lib/nix-direnv.sh".source = let
+    # NOTE: `pkgs.nix-direnv` depends on the `nix` derivation for some reason, prefer to fetch the
+    # rc myself to install it (avoids having to match the nix drv or duplicating a nix install).
+    nix-direnv = stable.fetchFromGitHub {
+      owner = "nix-community";
+      repo = "nix-direnv";
+      tag = "3.2.0";
+      hash = "sha256-dNJeSRuuqA2avtLpTse7mTTmnYdVnC5BxRsofuLXiqE=";
+    };
+  in "${nix-direnv}/direnvrc";
 }

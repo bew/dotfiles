@@ -3,8 +3,8 @@
 let
   inherit (pkgsChannels) stable bleedingedge;
 in {
-  # Use recent Nix!
-  nix.package = bleedingedge.nix;
+  # Use latest Nix!
+  nix.package = bleedingedge.nixVersions.latest;
   # Also make it available in $PATH
   home.packages = [ config.nix.package ];
 }
