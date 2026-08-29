@@ -1,0 +1,5 @@
+frametop-bew
+# (anything after the first line is ignored)
+# --
+# This file holds the name of the current home config,
+# it is used for `just re*` actions that don't mention a home config name

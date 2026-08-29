@@ -8,6 +8,16 @@ rebuild *ARGS:
     echo "=>> $*"
     "$@"
   }
+
+  CURRENT_HOME_CONFIG_NAME_PATH=./current-home-name
+  if ! [[ -f "$CURRENT_HOME_CONFIG_NAME_PATH" ]]; then
+    >&2 echo "!! Cannot use this action: File '$CURRENT_HOME_CONFIG_NAME_PATH' does not exist / is not readable"
+    exit 1
+  fi
+  home_name=$(head -n1 "$CURRENT_HOME_CONFIG_NAME_PATH")
+  echo ":: Current home config name: $home_name (found in '$CURRENT_HOME_CONFIG_NAME_PATH')"
+  echo # blank line
+
   nix_bin=nom
   if ! command -v nom >/dev/null 2>&1; then
     echo '!!! `nom` (nix-output-monitor) is not in $PATH, using native `nix`'
@@ -17,7 +27,8 @@ rebuild *ARGS:
     echo '$NIX_NOT_NOM is set, using native `nix`'
     nix_bin=nix
   fi
-  show_and_run $nix_bin build '.#homeConfig.activationPackage' {{ ARGS }}
+
+  show_and_run $nix_bin build ".#homeConfig.${home_name}.activationPackage" {{ ARGS }}
   echo
   echo "Home config successfully build!"
   echo

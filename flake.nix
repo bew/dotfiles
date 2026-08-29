@@ -108,7 +108,7 @@
 
   in {
     # note: force system
-    homeConfig = with (forSys "x86_64-linux"); import "${flakeInputs.homeManager}/modules" {
+    homeConfig.frametop-bew = with (forSys "x86_64-linux"); import "${flakeInputs.homeManager}/modules" {
       pkgs = stablePkgs;
       configuration = import ./nix/homes/main.nix {
         inherit flakeInputs;
