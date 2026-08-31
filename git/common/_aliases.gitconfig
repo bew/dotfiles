@@ -6,8 +6,12 @@
 # See IDEA for complex aliases metadata & completions at the end of the file
 [alias]
 
+  # List configs by regex, defaults to all
+  # (note: pager is disabled in [pager] section below, after [alias] section)
+  list-configs = "!f() { git config --get-regexp ${1:-^}; }; f"
+
   # List aliases that start with given word, defaults to all
-  aliases = "!f() { git --no-pager config --get-regexp ^alias.$1; }; f"
+  aliases = "!f() { git list-configs ^alias.$1; }; f"
 
   # index manipulation (staging area)
 
@@ -299,6 +303,7 @@
 #   path-scoped calls like `g ll .` from subdirs.
 [pager]
   # These commands/aliases have pager disabled:
+  list-configs = false
   last-log = false
   stat = false
   branch = false
