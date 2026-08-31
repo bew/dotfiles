@@ -42,6 +42,8 @@ module myprompt {
       } else if $where == "before" {
         " " + $text
       }
+    } else {
+      ""
     }
   }
 
@@ -71,7 +73,7 @@ module myprompt {
       } else if $path_start == "/" {
         $"($style.sep)/" # start of absolute path
       } else {
-        $"(style.path)($path_start)"
+        $"($style.path)($path_start)"
       }
     }
     $path_start_styled + ($path_rest | str join $sep_styled)
