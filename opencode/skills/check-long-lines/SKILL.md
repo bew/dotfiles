@@ -1,8 +1,10 @@
 ---
 name: check-long-lines
 description: |
-  Load when about to check line lengths, report long lines, or compute column overflow in any file
-  — do NOT use `awk`, `grep`, or any ad-hoc method (including before writing `awk length > N`).
+  Load when about to check line lengths, report long lines, or compute column overflow in any text.
+  Supports reading text from any file or arbitrary text via stdin.
+
+  Do NOT attempt to use `awk`, `grep`, or any ad-hoc method to check lines length.
 metadata:
   maintainers: [bew]
 ---
@@ -10,13 +12,27 @@ metadata:
 ## Usage
 
 ```
-<skill-dir>/scripts/check-long-lines <limit> <files>...
+<skill-dir>/scripts/check-long-lines <limit> [- | <files>...]
 ```
 - `<limit>`: maximum allowed line length (positive integer)
 - `<files>...`: one or more file paths (absolute or relative to cwd)
+- `-`: read lines from stdin instead of a file; combinable with files, at most once
+
+Examples:
+- Check files: `<skill-dir>/scripts/check-long-lines 100 src/foo.ts src/bar.ts`
+- Check a command output: `command | <skill-dir>/scripts/check-long-lines 100 -`
+- Check arbitrary text:
+  ```sh
+  <skill-dir>/scripts/check-long-lines 72 <<'EOF'
+  This is an example commit message body with very long lines that must be checked!
+  and more lines of text.
+
+  And even more lines... The first line should be flagged here!
+  EOF
+  ```
 
 When script outputs: `42: ome tex┃t is very long`
-Line 42: `t is very long` is beyond wanted limit.
+Meaning: On line 42, `t is very long` is beyond wanted limit.
 
 ## Rules
 

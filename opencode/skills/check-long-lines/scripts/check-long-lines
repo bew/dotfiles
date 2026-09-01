@@ -7,11 +7,11 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
 CONTEXT_CHARS = 15
+STDIN_PATH = Path("/dev/stdin")
 
 
 def print_err(msg: str) -> None:
@@ -20,21 +20,25 @@ def print_err(msg: str) -> None:
 
 def usage_and_exit(status: int) -> None:
     print_err(
-        "Usage: check-long-lines <limit> <file>...\n"
+        "Usage: check-long-lines <limit> <file>... [-]\n"
         "\n"
-        "Report lines that exceed <limit> characters.\n"
-        "\n"
-        "Output format (grouped by file):\n"
-        "  ('┃' at column <limit>)\n"
-        "\n"
-        "  path/to/file.ts:\n"
-        "  12: …context before┃overflow text here\n"
+        "Report lines that exceed <limit> characters, by file.\n"
+        "Pass '-' to read standard input instead of a file\n"
+        "('-' may appear at most once)\n"
         "\n"
         "EXAMPLES:\n"
         "  check-long-lines 100 src/foo.ts src/bar.ts\n"
-        "  check-long-lines 80 README.md"
+        "  check-long-lines 80 README.md\n"
+        "  printf '...' | check-long-lines 80 -"
     )
     sys.exit(status)
+
+
+def display_source(path: Path) -> str:
+    """Return the label for a source: '<stdin>' for stdin, else display_path()."""
+    if path == STDIN_PATH:
+        return "<stdin>"
+    return display_path(path)
 
 
 def parse_limit(raw: str) -> int:
@@ -79,17 +83,9 @@ def format_hit(line: str, lineno: int, limit: int) -> str:
     return f"{lineno}: {before}┃{overflow}"
 
 
-def scan_file(path: Path, limit: int) -> list[str] | None:
-    """Return formatted hit strings for every over-limit line in path.
-
-    Returns None if the file cannot be read.
-    """
-    try:
-        text = path.read_text(encoding="utf-8", errors="replace")
-    except OSError as exc:
-        print_err(f"Error: cannot read file '{path}': {exc.strerror}")
-        return None
-
+def scan_file(path: Path, limit: int) -> list[str]:
+    """Return formatted hit strings for every over-limit line in path."""
+    text = path.read_text(encoding="utf-8", errors="replace")
     hits: list[str] = []
     for lineno, line in enumerate(text.splitlines(), start=1):
         # splitlines strips the newline — length is content-only, as intended.
@@ -104,30 +100,40 @@ def main() -> None:
         usage_and_exit(1)
 
     limit = parse_limit(args[0])
-    files = [Path(p) for p in args[1:]]
 
-    print(f"('┃' at column {limit})\n")
+    files: list[Path] = []
+    for arg in args[1:]:
+        files.append(STDIN_PATH if arg == "-" else Path(arg))
+    if files.count(STDIN_PATH) > 1:
+        print_err("Error: '- (stdin)' may only appear once")
+        sys.exit(1)
 
     single = len(files) == 1
     errors: list[str] = []
+    need_hint = False
     for file in files:
         if not file.exists():
             errors.append(f"Error: file not found: {file}")
             continue
 
-        hits = scan_file(file, limit)
-        if hits is None:
-            errors.append(f"Error: cannot read file: {file}")
+        try:
+            hits = scan_file(file, limit)
+        except OSError as err:
+            errors.append(f"Error: cannot read file {file!r}: {err}")
             continue
 
         if not single:
-            print(f"{display_path(file)}:")
+            print(f"{display_source(file)}:")
         if hits:
             print("\n".join(hits))
+            need_hint = True
         else:
             print("(OK)")
         if not single:
             print()
+
+    if need_hint:
+        print(f"('┃' at column {limit})\n")
 
     if errors:
         for err in errors:
@@ -135,4 +141,5 @@ def main() -> None:
         sys.exit(1)
 
 
-main()
+if __name__ == "__main__":
+    main()

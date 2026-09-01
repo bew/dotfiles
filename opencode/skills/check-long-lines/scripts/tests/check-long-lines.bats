@@ -47,6 +47,32 @@ function setup() {
     [[ "$output" == *"input.txt"* ]]
 }
 
+@test "cli: rejects more than one '-' (stdin) argument" {
+    run -1 --separate-stderr "$SCRIPT_PATH" 80 - -
+    [[ "$stderr" == *"Error:"* ]]
+    [[ "$stderr" == *"stdin"* ]]
+}
+
+# ------------------------------------------------------------------------------
+# Tests: stdin
+
+@test "stdin: reads lines from stdin when given '-'" {
+    run -0 "$SCRIPT_PATH" 20 - <<< $'0123456789012345678901234\n'
+    [[ "$output" == *"1: "* ]]
+    [[ "$output" == *"┃"* ]]
+}
+
+@test "stdin: no path header printed for single stdin input" {
+    run -0 "$SCRIPT_PATH" 20 - <<< $'short\n'
+    [[ "$output" == *"(OK)"* ]]
+    [[ "$output" != *"<stdin>"* ]]
+}
+
+@test "stdin: '<stdin>' header shown when mixed with files" {
+    run -0 "$SCRIPT_PATH" 20 "$TEST_FILE" - <<< $'short\n'
+    [[ "$output" == *"<stdin>:"* ]]
+}
+
 # ------------------------------------------------------------------------------
 # Tests: error
 
