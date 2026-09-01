@@ -2,11 +2,14 @@
 name: opencode-crafter
 description: |
   Load when user asks to create, update, edit, or refactor any OpenCode (OC)
-  artefact: skills, agents, commands, tools, plugins, or snippets — including modifying an existing one.
+  artefact: skills, agents, commands, tools, plugins, or snippets.
+
+  Must load before editing any existing file under a skill/, agents/, commands/ dir,
+  or any SKILL.md file.
+  Including when the request is phrased as a direct file edit.
+
   Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
   "edit the W agent", "write a plugin to …", "create a tool for …", "update crafter skill".
-  Also triggers when request is phrased as a direct file edit but the target file is an OC artefact
-  (e.g. any file under skills/, agents/, commands/ dirs, or a SKILL.md / AGENT.md / command .md file).
   Guides user through discovery, drafting, and iterative refinement.
 ---
 

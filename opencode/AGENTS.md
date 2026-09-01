@@ -37,9 +37,10 @@ ask the user before using `write`.
   in the submitted changes and the resulting files. You may mention the kind of changes made and
   any relevant constraints, debug findings, or solutions.
 - List main URLs at the end of responses so I can open them without scrolling.
-- ALWAYS use the `question` tool to ask questions to me the user.
-  Optionally preceeded with layed out questions if more than one line of description needed to
-  understand the context of the question.
+
+ALWAYS use the `question` tool to ask questions for the user.
+Optionally preceded with laid-out questions if 2+ lines of description is needed to better
+understand the context.
 
 
 ## Git Guardrail

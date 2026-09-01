@@ -1,3 +1,3 @@
 <prepend>
-(note: I changes some files: re-read recently edited files, respect my changes!)
+(note: I changed some files: re-read recently edited files, respect my changes!)
 </prepend>

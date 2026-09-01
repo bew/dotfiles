@@ -60,7 +60,8 @@ Example skeleton:
 ```md
 # [DRAFT] My System
 
-> IMPORTANT: When editing this spec, agents MUST load one of the spec-writing skills.
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skill first.
 
 ## Introduction
 

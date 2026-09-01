@@ -4,6 +4,7 @@ description: |
   Methodology for drafting technical design specs.
   Load when asked to write, draft, or refine a spec, design doc, architecture note, RFC,
   or similar document for a system, API, protocol, or subsystem.
+  Also load FIRST when a file in context directs agents to load a spec-writing skill.
 metadata:
   maintainers: [bew]
 ---

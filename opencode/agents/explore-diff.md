@@ -3,15 +3,18 @@ description: |
   Generic diff/patch explorer.
   Reads a diff from any source (file, patch, git command, etc.),
   then produces a structured summary of concerns optimised for the caller's stated purpose
+  This agent explores a diff without polluting the parent context with a tons of tokens.
+
+  Trigger on requests involving a diff — exploration, summarizing, reviewing, splitting,
+  understanding, … → Route through this agent.
+  Avoid running `git diff` directly.
+
   Caller provides:
   - diff source (as a path, a command to run, or git prose like "staged changes" or "branch X vs main";
     never pre-fetch the diff and pass it inline)
   - working directory (absolute path)
   - purpose (e.g. "commit message drafting", "code review")
   - optionally: which fields to extract per concern (e.g. "include user-facing impact, skip risks")
-  This agent is useful to explore a diff without polluting the parent context with a tons of tokens.
-  Use proactively whenever the user asks to explore, split, review, or understand a diff — even outside of commit drafting.
-  The parent agent should never run `git diff` directly; always delegate to this agent.
 mode: subagent # isolated context!
 permissions:
   bash:
