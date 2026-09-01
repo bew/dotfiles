@@ -21,7 +21,7 @@ Thin launcher — no extraction, no interpretation of `$ARGUMENTS`.
 The skill load instruction comes first, then the user context block at the end:
 
 `````md
-Load the `<skill-name>` skill and follow its instructions.
+FIRST: Load the `<skill-name>` skill and follow its instructions.
 
 ## User context
 
@@ -42,7 +42,7 @@ If the skill needs to pass it to a subagent: it reads it from the env block itse
 If the skill takes no arguments at all, omit the "User context" section entirely:
 
 `````md
-Load the `<skill-name>` skill and follow its instructions.
+NOW: Load the `<skill-name>` skill and follow its instructions.
 `````
 
 If the skill has structured inputs to extract: read <../with-precise-inputs.md> for the `## Setup` pattern.

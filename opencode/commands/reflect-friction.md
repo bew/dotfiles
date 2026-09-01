@@ -3,7 +3,7 @@ description: Scan session for friction moments; suggest artefact improvements
 subtask: false # shared context!
 ---
 
-Load the `opencode-reflect-friction` skill and apply it.
+FIRST: Load the `opencode-reflect-friction` skill and follow its instructions.
 
 ## Focus hint
 

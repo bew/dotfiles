@@ -3,7 +3,7 @@ description: Split diff into commits, draft each message interactively (default:
 subtask: false # shared context
 ---
 
-Load the `diff-to-commits-drafts` skill and follow its instructions.
+FIRST: Load the `diff-to-commits-drafts` skill and follow its instructions.
 
 ## User context
 

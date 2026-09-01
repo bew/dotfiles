@@ -4,7 +4,7 @@ subtask: false # shared context!
 # note: diff never pollutes the shared context, diff explorer agent handles it
 ---
 
-Load the `draft-commit-message` skill and follow its instructions.
+FIRST: Load the `draft-commit-message` skill and follow its instructions.
 
 ## User context
 
