@@ -37,6 +37,10 @@ Focus: <free-text, or "(none)">
 
 ## Step 1 — Analyse diff via `explore-diff`
 
+IMPORTANT: Never run `git diff` or `git diff --cached` directly — not even to inspect
+the diff before routing to `explore-diff`.
+Raw bash diff output in context does not substitute for an `explore-diff` result.
+
 If `explore-diff` was already invoked in the last few messages and the result is still visible
 in context: check whether it covers the current diff (it may have a broader scope).
 If yes, extract the relevant concerns from it — skip subagent invocation.
@@ -69,7 +73,6 @@ If user picks option 1: retry `explore-diff` with `git diff -- <scope>` as diff 
 If user picks option 2: stop.
 
 Use subagent summary as the sole basis for *Step 2* and *Step 3*.
-Do not run `git diff` yourself.
 
 ## Step 2 — Detect commit style
 
@@ -113,6 +116,7 @@ WARNING: This diff mixes distinct concerns. Consider splitting into separate com
 Must complete "When applied, this commit will `<subject>`".
 72 chars max. Imperative mood. No trailing period.
 Use style from *Step 2*.
+When identifiers appear literally in code, backtick them in the subject too (see **Formatting**).
 Capitalize the first word of the subject (after the `prefix: ` part, if any).
 
 Prefer outcome/intent phrasing over mechanical phrasing:
@@ -148,6 +152,10 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Default to paragraph(s) + bullets when unsure; the iteration step lets the user trim.
 
 **Paragraph(s) rules**:
+- One paragraph per semantic concern. Never mix unrelated topics in a single paragraph.
+  BAD: one paragraph spanning worktrees layout, config extraction, and a cache split.
+  GOOD: one paragraph per concern, each standing alone.
+- A paragraph can be as simple as 1-2 lines, don't attempt to 'fill the void' with words.
 - Describe the new state or outcome only.
   No before/after comparisons ("old X did Y; new X does Z") — just what the result is and why.
 - When a sentence describes a structural change ("X lets Y become Z"), make sure to close the loop:
@@ -155,6 +163,12 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
   Think: does the reader know what the result means after this sentence?
 - Express intent and tradeoff — not which artifacts were touched.
   "Document the shell-alias subdir tradeoff, wrt…" over "Add a comment and inline notes to the file."
+- Omit file paths from paragraph prose. Paths are redundant — they are already visible in
+  `git show`. Only mention a path when the path itself carries meaning (e.g. a naming convention
+  being established for the first time).
+- Describe *what* the result enables, not *how* it works internally.
+  Omit implementation mechanism (library choices, fallback chains, internal field names) unless
+  the mechanism is itself the point of the change — i.e. a deliberate tradeoff worth recording.
 - When listing items that follow a clear pattern, express the pattern rather than enumerating
   all members (e.g. "opencode/agents + global/project scopes" over four individual strings).
 
@@ -163,24 +177,29 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Do not prefix bullets with file paths or directory names. One short clause per bullet.
 - Omit file paths unless the path itself is meaningful.
 - Collapse minor cleanups into one trailing bullet: `- Minor: <comma-separated list>.`
+- Omit the Minor bullet entirely if items are purely structural (doc cross-references,
+  ordering notes, inline prose clarifications) with no behavioral significance.
 - Do not bullet things already said in subject or paragraph.
 
 **Formatting**:
 - Use backticks only for identifiers that appear literally in code
   (variable names, command names, flags).
 - Do not backtick-quote technical terms or scope names.
+- Start each sentence on its own line — never run several sentences back-to-back
+  on one line. Sentences stay in the same paragraph; only a blank line splits paragraphs.
 - Fit into 72 chars, use newlines as needed (compress text a little, should still be ~prose)
 
 Always blank line between subject and body, and between paragraphs.
 
 Output raw commit message (and warning if applicable) — no markdown fencing, no extra commentary.
-Surround the message with `-----` delimiter lines & blank lines so it stands out in the terminal output:
+Surround the message with 2 `---` delimiter lines & blank lines (above/below) so it stands out in
+the terminal output:
 ```
------
+---
 
 <commit message>
 
------
+---
 ```
 
 ## Step 4 — Iterate
@@ -196,27 +215,39 @@ IMPORTANT: Use these labels verbatim.
 Do NOT combine or conflate them (e.g. "Looks good — proceed to commit" is not allowed).
 They are distinct: one approves, one commits.
 
-And inspect the message to include concrete, message-specific suggestions (no emojis!):
-- Always offer 1–2 alternative subject lines when they would be meaningfully different
+Inspect the message and derive concrete, message-specific suggestions.
+Add them as additional options in the SAME `question` tool call:
+- Always add 1–2 alternative subject options when they would be meaningfully different
   (e.g. different framing, tighter wording, or different root-cause emphasis).
-  Label them inline, e.g. "Alt subject: <wording>".
-- If it has a bullet list: offer structural variants for the list
+  Label format: "Alt subject: <wording>".
+- If it has a bullet list: add structural variant option(s)
   (e.g. "Drop the bullets, fold key points into the paragraph",
   "Expand the X bullet with more detail")
-- If it has a paragraph: offer paragraph-level changes
+- If it has a paragraph: add paragraph-level change option(s)
   (e.g. "Drop the paragraph, lead with the bullets directly",
   "Tighten the paragraph — it's repeating the subject")
-- If the subject is near the 72 chars limit: offer "Shorten subject — trim `<the verbose part>`"
+- If the subject is near the 72 chars limit: add "Shorten subject — trim `<the verbose part>`"
   or alternative subject wording that could fit.
-- If the body feels long: offer "Shorten body — trim `<specific area>`"
+- If the body feels long: add "Shorten body — trim `<specific area>`"
 - Omit options that don't apply to the message as written
 
 Apply any requested change and re-output.
 Repeat until user says 'looks good' / 'use as-is' or equivalent.
 
-If user picks "🚀 Use as-is and commit": run `git commit -m "<message>"`.
+If user picks "🚀 Use as-is and commit":
+- When diff-type is **staged**: run the commit directly via the multiline heredoc form:
+  ```sh
+  git commit -F - <<'EOF'
+  <subject line>
+
+  <body if any>
+  EOF
+  ```
+  Do NOT inspect unstaged changes, do NOT run `git diff`, do NOT `git add` anything.
+  The staged content is the contract established in Step 1 — commit it as-is.
+- When diff-type is **unstaged**: ask via `question` tool which files to stage (list them),
+  wait for confirmation, `git add` only the confirmed files, then run the same
+  multiline heredoc commit form above.
+
 Do NOT run `git commit` before reaching this step — never commit speculatively without user approval
 for THIS commit.
-
-Similarly `git add` is only allowed when explicitly requested by the user for THIS commit.
-Ask via `question` tool with specific files listed before staging anything.
