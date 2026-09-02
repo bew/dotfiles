@@ -1,6 +1,19 @@
 ## Milestone file format
 
-The file starts with a **dependency graph** section before any milestone entry.
+The file starts with a **Sources** section, then the **dependency graph** section, before any
+milestone entry.
+
+```md
+## Sources
+
+- Spec: `<$specpath>`
+- Related: <other docs/URLs/context referenced during discovery, if any — omit if none>
+```
+
+Written once, when the file is first created at the end of `Phase:Draft`.
+Updated later only if the user points to a new spec source or related doc for an added milestone.
+
+The **dependency graph** section comes next.
 Same style as the whole-plan view (see <./discussion-views.md>); milestone numbers are appended
 to the topic names.
 The graph is created at the end of `Phase:Draft`; its header carries a `(draft)` marker
@@ -15,6 +28,21 @@ The graph is created at the end of `Phase:Draft`; its header carries a `(draft)`
 - `{topic-b}` (M2): goal.
   Depends on: `{topic-a}`.
 ```
+
+After the dependency graph, an **Out of Scope** section lists anything deliberately descoped or
+deferred — omit this section entirely if there is nothing to list.
+
+```md
+## Out of Scope
+
+- <item>: <why it's descoped/deferred>.
+```
+
+Populated from items surfaced as out-of-scope in `Phase:Discover`, and any later explicit
+descope decision made during `Phase:Discuss`.
+
+A `----` line separates the header sections (Sources, Dependency Graph, Out of Scope) from the
+first milestone entry.
 
 Milestone entries exist in two forms: the draft form and the final form.
 The draft form, produced at the end of `Phase:Draft`, is specified in <./file-draft-form.md>.

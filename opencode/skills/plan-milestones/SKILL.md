@@ -145,6 +145,22 @@ Never a silent default.
 - The concerns belong to different phases (e.g. happy path + production safety).
 - Bundling hides a deliverable that future readers would need to understand the ordering.
 
+**Splitting a single topic across milestones**:
+A topic is not automatically one milestone just because it was one draft topic name.
+Check every topic for a natural split:
+- Distinct make-it-work / make-it-right / make-it-fast phases (see `Milestone ordering rules`).
+- Part of the topic depends on something that lands in a later milestone.
+- Core logic vs. UI: build the core components (data collection/access, processing/business
+  logic, output generation) working end-to-end without a UI first — driven by a script, test,
+  or CLI stub. Add the UI (entry form, wiring, persistence) as a later milestone.
+  Useful when the core logic is the risky/uncertain part and the UI is comparatively
+  mechanical once the core is proven.
+  Example: a milestone for data collection + processing engine + PDF generation, fully
+  working headless; a following milestone for the entry-form UI + persistence wiring on top.
+When splitting is justified: the first milestone for the topic covers the minimal happy path;
+later milestones for the same topic add safety, refactors, or performance/quality refinements,
+without changing observable behavior established by the first.
+
 **CI setup**:
 Do not defer CI past the first milestone that produces testable, non-trivial output.
 CI enables continuous regression detection at each increment — deferring it defeats the purpose

@@ -21,6 +21,9 @@ Goals are memory anchors only — no dependency lines.
 
 Skip unrelated topics — do _not_ dump all topics on every question.
 
+When asking multiple question rounds in the same message, separate each focused-view + question
+block with a `-----` line, so the reader can visually tell rounds apart.
+
 ### Whole-plan view
 
 Whole-plan view used once, for confirmation, at the end of `Phase:Draft`.

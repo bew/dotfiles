@@ -17,6 +17,8 @@ Focus areas:
 - **Ordering**: does the sequence follow make-it-work → make-it-right → make-it-fast?
   Are there hidden dependencies that force a different order?
 - **Persistence**: is there a design gap that needs a milestone before implementation?
+- **Descoping**: does a decision explicitly drop something from scope? Record it in the
+  file's **Out of Scope** section (see <../file-format.md>) rather than leaving it implicit.
 
 **Parallel tracks**: derive parallel candidates from the dependency graph — any two topics with
 no edge between them and a common ancestor are potentially parallel.
