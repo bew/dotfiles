@@ -73,6 +73,13 @@
     "agent_cycle": "ctrl+a",
     "agent_cycle_reverse": "ctrl+shift+a",
 
+    "prompt_skills": "<leader>k", // select skill from list (inserts `/<skill-name>`)
+
+    // Prompt stash ✨
+    "prompt_stash": "<leader>s",
+    "prompt_stash_pop": "<leader>shift+s",
+    "prompt_stash_list": "<leader>#",
+
     "editor_open": "ctrl+alt+e,<leader>e",
     "input_clear": "ctrl+c",
     "input_paste": "ctrl+v", // note: uses host clipboard directly to paste text or image
