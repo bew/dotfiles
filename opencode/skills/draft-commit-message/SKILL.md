@@ -185,9 +185,11 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Use backticks only for identifiers that appear literally in code
   (variable names, command names, flags).
 - Do not backtick-quote technical terms or scope names.
-- Start each sentence on its own line — never run several sentences back-to-back
-  on one line. Sentences stay in the same paragraph; only a blank line splits paragraphs.
-- Fit into 72 chars, use newlines as needed (compress text a little, should still be ~prose)
+- Start each sentence on its own line — never run several sentences back-to-back on one line.
+  Sentences stay in the same paragraph; only a blank line splits paragraphs. This is a hard rule.
+  After writing the body, verify no line contains more than one sentence.
+- Fit into 72 chars, use newlines as needed (compress text a little, should still be ~prose).
+  Never join two sentences on one line to satisfy the limit — see the sentence-break rule above.
 
 Always blank line between subject and body, and between paragraphs.
 
