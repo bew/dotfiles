@@ -86,6 +86,53 @@ def get_type_info(schema: Dict) -> Tuple[str, Optional[str]]:
     ...
 ```
 
+### Proper typing over loose values
+
+Always prefer proper typing instead of loose strings or defaults.
+When a value may legitimately be absent, encode it in the type — do not paper over it.
+
+```python
+# Good — absence is visible to the type checker and callers must handle None
+def find_rev(url: str) -> str | None:
+    ...
+
+# Bad — "" is invisible for the type checker and callers must know to check for ""
+def find_rev(url: str) -> str:
+    ...
+```
+
+Let the empty / not-found case surface through a `X | None` return type that the type
+checker can verify. The type checker is always available — use it.
+
+### Exceptions
+
+- Never `except Exception`. Always except specific exception types.
+- Narrow to the concrete exceptions the guarded region can raise:
+  `OSError`/`subprocess.SubprocessError` for subprocess, `json.JSONDecodeError` for json,
+  `FileNotFoundError` for file access, `ScriptError` or another project exception, etc.
+
+```python
+# Good — concrete types, chained with `from exc`
+try:
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=CMD_TIMEOUT_S)
+except (OSError, subprocess.SubprocessError) as exc:
+    raise ScriptError(f"Could not run `{cmd}`: {exc}") from exc
+
+# Bad — swallows everything, hides the real failure
+try:
+    ...
+except Exception as exc:
+    ...
+```
+
+### Text templates
+
+- Use f-strings as the default for runtime substitution, **iff** the literal contains no `{`/`}`.
+- `@@sentinel@@` + `str.replace` is acceptable for simple replacements, e.g. embedding a
+  path into a shell-hook template that itself contains braces (`${...}`, `%{...}`), where
+  an f-string would be mutilated by the braces.
+- Interpolation targets must be `str` — wrap non-str values explicitly with `str(...)`.
+
 ## Testing
 
 The standard Python testing system is **pytest**.

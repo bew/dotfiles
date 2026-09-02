@@ -1,10 +1,9 @@
 ---
 name: check-long-lines
 description: |
-  Load when about to check line lengths, report long lines, or compute column overflow in any text.
-  Supports reading text from any file or arbitrary text via stdin.
-
-  Do NOT attempt to use `awk`, `grep`, or any ad-hoc method to check lines length.
+  Always load whenever checking, reporting, or verifying line length in any text — never use awk, grep, sed, or ad-hoc shell for this.
+  Supports reading text from files or arbitrary text via stdin.
+  Load when the task involves a line-length check, column overflow report, or prose-limit verification.
 metadata:
   maintainers: [bew]
 ---

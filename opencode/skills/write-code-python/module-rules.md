@@ -11,6 +11,10 @@ These extend the generic module rules. All generic module rules still apply.
   Library/module files are self-documented by their public API and docstrings.
 - Top-level code: classes, functions, and variable/constant definitions only.
   No imperative logic at module level (no function calls, no print, no I/O).
+- When a module needs `try`/`except` but there is no clear exception class to catch,
+  ask the user what errors to expect and whether a base exception exists
+  (project-wide for project stuff, module-wide for specific modules, etc.) before
+  writing the handler. Never fall back to a broad `except` without asking.
 
 ## Guidelines
 

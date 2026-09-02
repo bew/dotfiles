@@ -1,11 +1,11 @@
 ---
 name: write-code-generic
 description: |
-  General code writing guidelines: structure, naming, error handling, and organization.
-  Language-agnostic. Always load when asked to draft/write/edit/refactor/review any code file —
-  including renaming functions, restructuring code, or making targeted edits to existing files.
-  Load this skill before any write-code-* skill.
-  Language/Tech-specific code skills build on top of this.
+  General code writing guidelines: structure, naming, comments, error handling, and organization.
+  Always load when the task drafts/writes/edits/refactors/reviews ANY code file — regardless of language, framework, or tool; module or script; including config-as-code.
+  Applies to large files and small mechanical edits alike — do not skip based on perceived triviality.
+  Load this before any write-code-* skill.
+  Language-specific skills build on top of it.
 metadata:
   maintainers: [bew]
 ---
@@ -28,7 +28,11 @@ When working on **module code**, read <./module-rules.md> before writing.
 end of file, or language-level entrypoint guard).
 When working on **script code**, read <./script-rules.md> before writing.
 
-Both extend the rules below.
+**No executable-script concept** — some languages and config formats (e.g. Nix, JSON/YAML
+config-as-code) are purely declarative or expression-based: every file is module-like. For
+these, the generic module rules apply to all files and the script rules are N/A.
+
+All extend the rules below.
 
 ## Rules
 
@@ -52,3 +56,8 @@ Both extend the rules below.
 - Prefer `get_*` for functions that compute/return a value.
 - Prefer `check_*` for validation functions.
 - Prefer `parse_*` for argument/input parsing.
+
+### CLI naming
+
+- CLI-exposed names (commands, flags, subcommands) must reflect user-facing concepts.
+  Not internal implementation details: a user runs `refresh`, not `refresh-async`.

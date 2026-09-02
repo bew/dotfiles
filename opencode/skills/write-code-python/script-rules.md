@@ -9,10 +9,15 @@ These extend the generic script rules. All generic script rules still apply.
 - Use `if __name__ == "__main__":` as the entrypoint guard.
 - No top-level imperative code outside the `if __name__ == "__main__":` block.
   Top-level code is: imports, constants, class/function definitions, and the entrypoint guard.
+- Define a `ScriptError(Exception)` class at the top of the script, right after imports/constants.
+- Raise `ScriptError` (or a subclass) from any function that hits an error the script should report.
 - `main()` returns `bool` — `True` on success, `False` on failure.
   Exit via `sys.exit(0 if main() else 1)`.
-- Catch exceptions at the boundary in `main`; print to stderr and return `False` on failure.
-  Never let exceptions propagate out of `main` uncaught.
+- In `main`, wrap the dispatch in `try`/`except ScriptError` (plus any distinct concrete
+  exceptions the handlers raise, e.g. `OSError`, `json.JSONDecodeError`); on catch, print to
+  stderr and return `False`.
+- The `try` body must never raise a type outside the caught set — e.g. raise `ScriptError`
+  for unknown commands rather than `ValueError`.
 
 ## File header
 
@@ -36,6 +41,10 @@ import sys
 # [top-level constants — SCREAMING_SNAKE_CASE]
 
 
+class ScriptError(Exception):
+    """Raised when the script encounters an error."""
+
+
 def print_err(msg: str) -> None:
     """Print msg to stderr."""
     print(msg, file=sys.stderr)
@@ -47,15 +56,65 @@ def usage_and_exit(status: int) -> None:
     sys.exit(status)
 
 
-# [helper functions]
+# [helper functions — raise ScriptError on failure]
 
 
 def main() -> bool:
-    # [parse args, call helpers]
-    # Return True on success, False on failure.
+    args = parse_args()
+    try:
+        # [call helpers / match args.command]
+        ...
+    except ScriptError as exc:
+        print_err(f"ERROR: {exc}")
+        return False
     return True
 
 
 if __name__ == "__main__":
     sys.exit(0 if main() else 1)
+```
+
+## CLI subcommand parsing
+
+- Use `argparse.add_subparsers()` for multi-command CLIs.
+  (Never use positional-only commands nor `choices` with `nargs="?"`)
+  (Never use `parse_known_args()` as a workaround for subcommand arguments)
+- Each subcommand must dispatch to a dedicated `cmd_<name>()` function.
+  Never inline subcommand logic in the dispatch block.
+
+```python
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("refresh")
+
+    hook_cmd = sub.add_parser("hook")
+    hook_cmd.add_argument("lang", choices=["zsh"], help="shell language")
+
+    return parser.parse_args()
+
+
+def cmd_refresh() -> None:
+    ...
+
+
+def cmd_hook(args: argparse.Namespace) -> None:
+    ...
+
+
+def main() -> bool:
+    args = parse_args()
+    try:
+        match args.command:
+            case "refresh":
+                cmd_refresh()
+            case "hook":
+                cmd_hook(args)
+            case _:
+                raise ScriptError(f"Unknown command: {args.command}")
+    except ScriptError as exc:
+        print_err(f"ERROR: {exc}")
+        return False
+    return True
 ```

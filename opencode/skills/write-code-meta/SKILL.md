@@ -102,9 +102,22 @@ if no testing skill exists, say so and instruct agent to ask user]
 [syntax only — the threshold rule (5+ functions) is owned by generic, do not restate it]
 ```
 
+### Languages without an executable-script concept
+
+Purely declarative or expression-based languages (e.g. Nix, JSON/YAML config-as-code)
+have no module/script split — every file is module-like.
+
+For these, ship a **single `SKILL.md`**:
+- Omit `module-rules.md`, `script-rules.md`, the module/script identification paragraph,
+  and the conditional loads.
+- State in the body that all files are module-like and script rules are N/A.
+  Mirror the `write-code-generic` note for the same concept.
+- Keep the required `## Testing` section and description-frontmatter requirements.
+
 Required companion files (siblings of `SKILL.md`):
 - `module-rules.md` — lang-specific module rules (extend `write-code-generic/module-rules.md`)
 - `script-rules.md` — lang-specific script rules + complete copy-pasteable boilerplate template
+  Omit both for languages without an executable-script concept (see above).
 
 Required additional section: `## Testing` — name the known testing system(s) for the language and
 which skill to load for writing tests.
