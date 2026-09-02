@@ -156,6 +156,10 @@ If skill includes a script: read <./refs/phases/scripts.md> for full instruction
 
 ## 4. `Phase:Review` — Review & iterate with user via subagent
 
+IMPORTANT: Never review the draft inline by reading files yourself.
+A request to "review" or "check" a draft is a cue to load `opencode-crafter` and enter `Phase:Review` —
+not to perform a manual read and summarize.
+
 When entering `Phase:Review`: read <./refs/phases/review.md> for full instructions.
 After subagent returns & user confirms (update path): retitle session with `done:` prefix (see `§session-titling`).
 
