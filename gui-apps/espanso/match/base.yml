@@ -34,7 +34,10 @@ matches:
   - triggers:
      - "!nohello!"
      - "!nohi!"
-    replace: 'https://nohello.net/'
+    replace: "https://nohello.net/"
+
+  - trigger: "!noslop!"
+    replace: "https://noslopgrenade.com/"
 
   - trigger: "!lorem!" # ends with '!' to not trigger on 'm' if I want `!loremlong`
     replace: |
