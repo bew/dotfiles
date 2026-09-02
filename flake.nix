@@ -207,6 +207,7 @@
               (mybuilders.linkBins "nvim-default" {
                 nvim = lib.getExe myPkgs.nvim-bew;
               })
+              (stablePkgs.callPackage ./git/package-bew-env.nix {})
               stablePkgs.less # ensure modern pager
             ];
             meta.mainProgram = "zsh";
