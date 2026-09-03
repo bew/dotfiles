@@ -61,17 +61,18 @@ def usage_and_exit(status: int) -> None:
 
 def main() -> bool:
     args = parse_args()
-    try:
-        # [call helpers / match args.command]
-        ...
-    except ScriptError as exc:
-        print_err(f"ERROR: {exc}")
-        return False
+    ...
+    # [call helpers / match args.command]
+    ...
     return True
 
 
 if __name__ == "__main__":
-    sys.exit(0 if main() else 1)
+    try:
+        sys.exit(0 if main() else 1)
+    except ScriptError as exc:
+        print_err(f"ERROR: {exc}")
+        sys.exit(1)
 ```
 
 ## CLI subcommand parsing
@@ -105,16 +106,14 @@ def cmd_hook(args: argparse.Namespace) -> None:
 
 def main() -> bool:
     args = parse_args()
-    try:
-        match args.command:
-            case "refresh":
-                cmd_refresh()
-            case "hook":
-                cmd_hook(args)
-            case _:
-                raise ScriptError(f"Unknown command: {args.command}")
-    except ScriptError as exc:
-        print_err(f"ERROR: {exc}")
-        return False
+    ...
+    match args.command:
+        case "refresh":
+            cmd_refresh()
+        case "hook":
+            cmd_hook(args)
+        case _:
+            raise ScriptError(f"Unknown command: {args.command}")
+    ...
     return True
 ```

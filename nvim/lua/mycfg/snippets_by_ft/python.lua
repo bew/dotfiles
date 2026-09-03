@@ -716,14 +716,15 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
     	return parser.parse_args(args)
 
 
-    def main(args) ->> None:
+    def main(args) ->> bool:
     	opts = parse_args(args)
     	<body>
+      return True
 
 
     if __name__ == "__main__":
     	try:
-    		main(sys.argv[1:])
+    		sys.exit(0 if main(sys.argv[1:]) else 1)
     	except ScriptError as err:
     		print(f"ERROR: {err}", file=sys.stderr)
     		sys.exit(1)<after>
@@ -741,15 +742,16 @@ snip("maincli", {desc = "minimal setup for main(args) & cli parsing", when = con
 
 snip("mainsimple", {desc = "simple main() script", when = conds.very_start_of_line}, SU.myfmt {
   [[
-    def main() ->> None:
+    def main() ->> bool:
     	<body>
+      return True
 
 
     if __name__ == "__main__":
-    	main()<after>
+    	sys.exit(0 if main() else 1)<after>
   ]],
   {
-    body = SU.insert_node_default_selection(1, "pass"),
+    body = SU.insert_node_default_selection(1, "# do something useful"),
     after = i(2),
   }
 })
@@ -760,7 +762,7 @@ snip("ifmain", {desc = "if module is main", when = conds.very_start_of_line}, SU
     	<body>
   ]],
   {
-    body = SU.insert_node_default_selection(1, "pass"),
+    body = SU.insert_node_default_selection(1, "sys.exit(0 if main() else 1)"),
   }
 })
 
