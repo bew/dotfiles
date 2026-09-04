@@ -70,5 +70,16 @@ Both forms share the following field definitions and prose style, in order:
 5. **Tasks** — overview of the work units within the milestone.
    Kept as a placeholder until actual task files or tickets exist; replaced by links when they do.
 
-Prose style: each sentence starts on a new line within the same paragraph.
+6. **Future work** — optional, one or two sentences.
+   Points to something in the **Out of Scope** section that this milestone's output would
+   eventually support or relate to, so a future reader can connect the two.
+   Omit if there is none.
+
+Prose style applies file-wide (Out of Scope bullets, Sources, milestone fields, etc.):
+each sentence starts on a new line within the same paragraph/bullet.
 Multiple sentences never appear on the same line.
+
+An aside that isn't part of the main description — e.g. flagging that a milestone can run in
+parallel with another, or pointing to related future work — is written as a standalone
+`NOTE: ...` line, set apart from the surrounding prose.
+This is not for ordinary cross-references (`M<N>`, `` `{topic}` ``), which stay inline as usual.

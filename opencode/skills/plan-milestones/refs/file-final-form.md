@@ -5,7 +5,7 @@ Produced in `Phase:Finalize`.
 - Header: `## M<N> — <topic>`; the `(draft)` marker is stripped.
 - All fields, in the exact order given in <./file-format.md>.
 
-The full final-form example demonstrates all five fields:
+The full final-form example demonstrates all fields:
 ```md
 ## M<N> — `<subcommand>` — core flow (hardcoded stub)
 
@@ -30,6 +30,9 @@ NOTE: can run in parallel with M<N> — {topic-c}.
 - Hardcoded stub struct with the fields the real source will eventually provide.
 - Core plumbing: the end-to-end flow using the stub.
 - Terminal output: step summary and any conditional warning.
+
+**Future work**: `--help` and man-page generation for `<subcommand>` (out of scope for now)
+(optional field — omit when there is no relevant follow-up to flag).
 ```
 The milestone after this one replaces the stub with a real data source,
 keeping observable behavior identical.
