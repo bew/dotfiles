@@ -1,13 +1,15 @@
 {
   writeShellScript,
+  callPackage,
   lib,
-  replaceBinsInPkg,
 
   ncurses,
   fzf,
 }:
 
 let
+  mypkglib = callPackage ../nix/mypkglib.nix {};
+
   keybindings = {
     # meta
     change = "top"; # when changing filter text, select top most result
@@ -77,7 +79,7 @@ let
   );
 in
 
-replaceBinsInPkg {
+mypkglib.replaceBinsInPkg {
   name = "fzf-bew";
   copyFromPkg = fzf;
   meta.mainProgram = "fzf";

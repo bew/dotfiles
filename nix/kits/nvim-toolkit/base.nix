@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mybuilders = pkgs.callPackage ../../mylib/mybuilders.nix {};
+  mypkglib = pkgs.callPackage ../../mypkglib.nix {};
 
   ty = lib.types;
   cfg = config;
@@ -12,7 +12,7 @@ let
     let
       binName = if cfg.useDefaultBinName then "nvim" else outs.NVIM_APPNAME;
     in
-    mybuilders.replaceBinsInPkg {
+    mypkglib.replaceBinsInPkg {
       name = "nvim-with-config-${cfg.ID}";
       copyFromPkg = cfg.package;
       nativeBuildInputs = [ pkgs.makeWrapper ];

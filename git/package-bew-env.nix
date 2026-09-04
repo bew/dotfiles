@@ -10,13 +10,24 @@
   lazygit,
 
   # build deps
+  lib,
   buildEnv,
+  callPackage,
 }:
 
-buildEnv {
+let
+  mypkglib = callPackage ../nix/mypkglib.nix {};
+in buildEnv {
   name = "git-bew-env";
   paths = [
-    git
+    # git drv has many useless bins (for backward compat I think)
+    # I only need `git` bin + other related files (man pages, ..)
+    (mypkglib.replaceBinsInPkg {
+      name = "git-only";
+      copyFromPkg = git;
+      meta.mainProgram = "git";
+      bins = { git = lib.getExe git; };
+    })
 
     # config tools
     delta # for nice git diffs

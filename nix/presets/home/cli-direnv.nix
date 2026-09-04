@@ -1,7 +1,7 @@
-{ pkgsChannels, ... }:
+{ pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable;
+  inherit (pkgsets) stable;
 in {
   home.packages = [
     stable.direnv

@@ -1,15 +1,14 @@
-{ pkgsChannels, ... }:
+{ pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge myPkgs;
+  inherit (pkgsets) stable bleedingedge mypkgs;
 in {
   imports = [
     # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
-    ../../cli-others/bash_minimal/proxy_to_zsh.home-module.nix
+    ../../../cli-others/bash_minimal/proxy_to_zsh.home-module.nix
 
     ./cli-core.nix
-    ./cli/nix-recent.nix
-    ./cli/nix-tools.nix
+    ../../presets/home/nix-tools.nix
     ./cli-tech-python-simple.nix
   ];
 

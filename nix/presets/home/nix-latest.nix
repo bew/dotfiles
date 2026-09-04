@@ -1,7 +1,7 @@
-{ config, pkgsChannels, ... }:
+{ config, pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge;
+  inherit (pkgsets) stable bleedingedge;
 in {
   # Use latest Nix!
   nix.package = bleedingedge.nixVersions.latest;

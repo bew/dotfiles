@@ -1,7 +1,7 @@
-{ config, pkgsChannels, ... }:
+{ config, pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable;
+  inherit (pkgsets) stable;
 in {
   home.packages = [
     # hicolor-icon-theme contains the standard icons for freedesktop.

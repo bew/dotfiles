@@ -1,24 +1,27 @@
-{ pkgsChannels, lib, mybuilders, pkgs, kitConfigs, ... }:
+{ pkgsets, lib, mypkglib, pkgs, kitConfigs, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge myPkgs;
+  inherit (pkgsets) stable bleedingedge mypkgs;
 
   # NOTE: tentative at a global list of cli tools, referenced in other tools as needed..
   #
   # TODO: need to make a proper module, potentially at higher level than the home config?..
   #   (see comment above homeModules.withDefaults in </zsh/tool-configs.nix> for thoughts on bins deps propagation..)
+  # FIXME: remove this! (but where to put that comment above??)
   cliPkgs = {
-    fzf = myPkgs.fzf-bew;
+    fzf = mypkgs.fzf-bew;
   };
 
 in {
   imports = [
+    ../../presets/home/cli-neovim.nix
+
+    ../../presets/home/cli-direnv.nix
+    ../../presets/home/cli-git-stuff.nix
+
+    # FIXME: find a way to not have to import those here 🤔
     kitConfigs.zsh-bew.outputs.homeModules.withDefaults
     kitConfigs.tmux-bew.outputs.homeModules.withDefaults
-
-    ./cli/neovim.nix
-    ./cli/direnv.nix
-    ./cli/git-stuff.nix
   ];
 
   home.packages = [
@@ -61,7 +64,7 @@ in {
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
 
     # network tools
-    (mybuilders.linkBins "doggo-as-dig" { dig = "${stable.doggo}/bin/doggo"; }) # nicer `dig`
+    (mypkglib.linkBins "doggo-as-dig" { dig = "${stable.doggo}/bin/doggo"; }) # nicer `dig`
     stable.netcat-openbsd # for `nc`
     stable.xh # httpie but fasterrr
     bleedingedge.resterm # nice TUI REST HTTP client

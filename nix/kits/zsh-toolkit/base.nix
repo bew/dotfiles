@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mybuilders = pkgs.callPackage ../../mylib/mybuilders.nix {};
+  mypkglib = pkgs.callPackage ../../mypkglib.nix {};
 
   ty = lib.types;
   cfg = config;
@@ -34,7 +34,7 @@ in {
     #    packages and use overriden bins if any (HOW?)
 
     # Standalone zsh binary with the config
-    outputs.toolPkg.standalone = mybuilders.replaceBinsInPkg {
+    outputs.toolPkg.standalone = mypkglib.replaceBinsInPkg {
       name = "zsh-bew"; # FIXME: this should be `zsh-with-config-{ID}` 🤔
       copyFromPkg = cfg.package;
       nativeBuildInputs = [ pkgs.makeWrapper ];

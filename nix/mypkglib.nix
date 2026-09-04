@@ -1,4 +1,8 @@
-{pkgs, lib, ...}:
+{
+  lib,
+  runCommandLocal,
+  buildEnv,
+}:
 
 rec {
   # Creates a derivation with only links to the given binaries.
@@ -104,7 +108,7 @@ rec {
             ${binSpecHelp}
           ''
       );
-    in pkgs.runCommandLocal name {} ''
+    in runCommandLocal name {} ''
       mkdir -p $out/bin
       cd $out/bin
       ${lib.concatMapStrings ({name, path}: ''
@@ -127,7 +131,7 @@ rec {
     let
       binName = baseNameOf path;
       meta.mainProgram = binName;
-    in pkgs.runCommandLocal "${binName}-single-bin" { inherit meta; } ''
+    in runCommandLocal "${binName}-single-bin" { inherit meta; } ''
       mkdir -p $out/bin
       ln -s ${lib.escapeShellArg path} $out/bin/
     '';
@@ -176,7 +180,7 @@ rec {
   #     └── share -> /nix/store/dy11j8bd6a6gq0nsgx54zddg32qrcd7l-zsh-5.8.1/share
   #
   replaceBinsInPkg = { name, copyFromPkg, bins ? {}, nativeBuildInputs ? [], postBuild ? "", meta ? {} }:
-    pkgs.buildEnv {
+    buildEnv {
       inherit name nativeBuildInputs meta;
       paths = [ copyFromPkg ];
       postBuild = /* sh */ ''

@@ -1,7 +1,7 @@
-{ pkgsChannels, mybuilders, ... }:
+{ pkgsets, mypkglib, ... }:
 
 let
-  inherit (pkgsChannels) stable;
+  inherit (pkgsets) stable;
 in {
   home.packages = [
     stable.python3
@@ -12,6 +12,6 @@ in {
         # See: https://rich.readthedocs.io/en/stable/introduction.html#ipython-extension
         pypkgs.rich
       ]);
-    in mybuilders.linkSingleBin "${ipythonEnv stable.python3}/bin/ipython")
+    in mypkglib.linkSingleBin "${ipythonEnv stable.python3}/bin/ipython")
   ];
 }

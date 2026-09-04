@@ -1,7 +1,7 @@
-{ pkgsChannels, pkgs, ... }:
+{ pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge;
+  inherit (pkgsets) stable;
 in {
   home.packages = [
     (stable.callPackage ../../../git/package-bew-env.nix {})

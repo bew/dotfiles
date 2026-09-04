@@ -1,7 +1,7 @@
-{ config, pkgsChannels, ... }:
+{ config, pkgsets, ... }:
 
 let
-  inherit (pkgsChannels) stable bleedingedge myPkgs;
+  inherit (pkgsets) stable bleedingedge mypkgs;
 in {
   imports = [
     ./gui-fix-xdg-data-dirs.nix

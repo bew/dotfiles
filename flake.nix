@@ -7,6 +7,20 @@
 # - https://github.com/mjlbach/nix-dotfiles/blob/master/nixpkgs/flake.nix
 # - https://discourse.nixos.org/t/example-use-nix-flakes-with-home-manager-on-non-nixos-systems/10185
 
+# NOTE about specialArgs/extraSpecialArgs vs _module.args
+# Setting something through `_module.args` has major limitation:
+#
+# A value in `_module.args.……` CANNOT be used in modules `imports`
+# .. because an option like `_module` needs to resolve all imports _first_ 🤪.
+# (e.g. to use `callPackage` to dynamically fill/configure a function that returns a module,
+# like `(pkgsets.fooPkgs.callPackage ./bar.nix {}).someBarSpecificModule`)
+#
+# => Setting `pkgsets` via `specialArgs` of the underlying `evalModules` function works
+#    because it statically sets module arguments from OUTSIDE of the module system,
+#    without going through all of the fixpoint stuff and resolving all imports.
+#
+# (Thank you `Lily Foster` on Matrix for quickly helping me find the recursion issue! ❤️)
+
 {
   description = "Nix flake packaging bew's dotfiles";
 
@@ -37,35 +51,26 @@
     lib = flakeInputs.nixpkgsStable.lib;
     eachSystem = lib.genAttrs (import systems);
 
-    # FIXME: This should be configured in each 'home' config,
-    #   and injected in tool configs with an override 🤔
-    editableConfigOverride = {
-      editable.config = {
-        nixStorePath = self;
-        realPath = "/home/bew/.dot"; # FIXME: hardcoded $USER 😬
-      };
-    };
-
-    pkgsForSys = system: {
-      myPkgs = self.packages.${system};
-      stablePkgs = flakeInputs.nixpkgsStable.legacyPackages.${system};
-      bleedingedgePkgs = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
+    pkgsetsForSys = system: {
+      mypkgs = self.packages.${system};
+      stable = flakeInputs.nixpkgsStable.legacyPackages.${system};
+      bleedingedge = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
     };
     forSys = system: let
-      inherit (pkgsForSys system) myPkgs stablePkgs bleedingedgePkgs;
+      pkgsets = pkgsetsForSys system;
+      inherit (pkgsets) mypkgs stable bleedingedge;
     in rec {
-      inherit myPkgs stablePkgs bleedingedgePkgs;
+      inherit mypkgs stable bleedingedge;
+      inherit pkgsets;
 
-      lib = stablePkgs.lib;
-      mybuilders = stablePkgs.callPackage ./nix/mylib/mybuilders.nix {};
-      # IDEA: rename to `pkglib`?
-      #   (to show it's a lib but about packages (so not system-agnostic))
+      lib = stable.lib;
+      mypkglib = stable.callPackage ./nix/mypkglib.nix {};
 
       kitsys = import ./nix/kit-system { inherit lib; };
 
       zsh-kit = kitsys.newKit (import ./nix/kits/zsh-toolkit/kit.nix);
       toolConfigs.zsh-bew = zsh-kit.eval {
-        pkgs = stablePkgs;
+        pkgs = stable;
         config = ./zsh/zsh-bew.zsh-config.nix;
       };
       toolConfigs.zsh-bew-bins-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
@@ -77,69 +82,42 @@
 
       nvim-kit = kitsys.newKit (import ./nix/kits/nvim-toolkit/kit.nix);
       toolConfigs.nvim-minimal = nvim-kit.eval {
-        pkgs = stablePkgs;
+        pkgs = stable;
         config = ./nvim/nvim-minimal.nvim-config.nix;
-        configOverride = editableConfigOverride;
       };
       toolConfigs.nvim-bew = nvim-kit.eval {
-        pkgs = stablePkgs;
+        pkgs = stable;
         config = ./nvim/nvim-bew.nvim-config.nix;
         configOverride = {
-          imports = [editableConfigOverride];
+          # Override to use latest Ruff (always better!)
+          deps.bins.ruff.pkg = lib.mkForce bleedingedge.ruff;
           # Override to use latest Pyrefly (always better!)
-          deps.bins.pyrefly.pkg = lib.mkForce bleedingedgePkgs.pyrefly;
+          deps.bins.pyrefly.pkg = lib.mkForce bleedingedge.pyrefly;
           # Override to use latest lua LS (always better!)
-          deps.bins.lua-language-server.pkg = lib.mkForce bleedingedgePkgs.lua-language-server;
+          deps.bins.lua-language-server.pkg = lib.mkForce bleedingedge.lua-language-server;
           # Always use latest to ensure editing my projects using Rust from unstable work well
           # (e.g. when proc-macro-server is more recent in a project, generating errors)
-          deps.bins.rust-analyzer.pkg = lib.mkForce bleedingedgePkgs.rust-analyzer;
+          deps.bins.rust-analyzer.pkg = lib.mkForce bleedingedge.rust-analyzer;
         };
       };
 
       tmux-kit = kitsys.newKit (import ./nix/kits/tmux-toolkit/kit.nix);
       toolConfigs.tmux-bew = tmux-kit.eval {
-        pkgs = stablePkgs;
+        pkgs = stable;
         config = ./tmux/bew.tmux-config.nix;
-        configOverride = editableConfigOverride;
-      };
-    };
-
-  in {
-    # note: force system
-    homeConfig.frametop-bew = with (forSys "x86_64-linux"); import "${flakeInputs.homeManager}/modules" {
-      pkgs = stablePkgs;
-      configuration = import ./nix/homes/main.nix {
-        inherit flakeInputs;
-        system = "x86_64-linux";
-        username = "bew";
       };
 
-      # Pkgs channels from flakeInputs
-      # => Allows to have a stable sharing point for multiple pkgs sets
-      #
-      # NOTE: `pkgsChannels` CANNOT be set through `_module.args` without a major limitation:
-      #   Using `_module.args...` somewhere in `imports` is NOT possible because evaluating
-      #   an option like `_module` needs to resolve all imports _first_.
-      #   (e.g. to use `callPackage` to dynamically fill/configure a function that returns a module,
-      #   like `(pkgsChannels.fooPkgs.callPackage ./bar.nix {}).someBarSpecificModule`)
-      #
-      #   => Setting `pkgsChannels` via `specialArgs` of the underlying `evalModules` function works
-      #      because it statically sets module arguments from OUTSIDE of the module system,
-      #      without going through all of the fixpoint stuff and resolving all imports.
-      #
-      #   (Thank you `Lily Foster` on Matrix for quickly helping me find the recursion issue! ❤️)
-      extraSpecialArgs.pkgsChannels = {
-        stable = stablePkgs;
-        bleedingedge = bleedingedgePkgs;
-        myPkgs = myPkgs;
-      };
-
-      # Expose to home modules various tool configs.
-      # (but not exposed out of the dotfiles flake')
-      #
-      # Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
-      extraSpecialArgs.kitConfigs = let
+      # Returns editable kit configs with symlinks pointing to `dotfilesRealPath`.
+      # Called per-home so each host gets its own real dotfiles path ✨.
+      mkKitConfigsEditable = dotfilesRealPath: let
+        editableOverride = {
+          editable.config = {
+            nixStorePath = self;
+            realPath = dotfilesRealPath;
+          };
+        };
         makeEditable = config: config.lib.extendWith {
+          imports = [editableOverride];
           # Make the config editable if it's supported
           editable.try_enable = true;
         };
@@ -149,6 +127,60 @@
         nvim-bew = makeEditable toolConfigs.nvim-bew;
         tmux-bew = makeEditable toolConfigs.tmux-bew;
       };
+    };
+
+    mkEditableBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configImports }: let
+      sys = forSys system;
+      pkgs = sys.pkgsets.${defaultPkgsetName};
+    in import "${flakeInputs.homeManager}/modules" {
+      inherit pkgs;
+      configuration = {
+        imports = configImports ++ [
+          {
+            home.username = username;
+            home.homeDirectory = homeDir;
+          }
+          (import ./nix/setup-nix-registry.nix { inherit flakeInputs; })
+          flakeInputs.dyndots.modules.generic.dyndots
+          flakeInputs.dyndots.modules.homeManager.dyndotsChecker
+          {
+            # Configure my dotfiles path, so that direct links created with `config.dyndots.mkLink` point to
+            # my repo (editable!).
+            dyndots.mode = "editable";
+            dyndots.dotfilesRealPath = "${homeDir}/.dot";
+            dyndots.dotfilesNixPath = flakeInputs.self;
+          }
+        ];
+      };
+
+      # Expose pkgs sets from flake inputs
+      extraSpecialArgs.pkgsets = sys.pkgsets;
+      # Expose various tool configs to home modules, with editable symlinks for this host's dotfiles path
+      extraSpecialArgs.kitConfigs = sys.mkKitConfigsEditable "${homeDir}/.dot";
+      # .. Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
+    };
+
+  in {
+    homeConfig.frametop-bew = mkEditableBewHomeConfig rec {
+      system = "x86_64-linux";
+      username = "bew";
+      homeDir = "/home/${username}";
+      defaultPkgsetName = "stable";
+      configImports = [
+        ./nix/homes/frametop-bew
+        { home.stateVersion = "21.05"; }
+      ];
+    };
+
+    homeConfig.work-mac = mkEditableBewHomeConfig rec {
+      system = "aarch64-darwin";
+      username = "benoitlesellierdechezelles";
+      homeDir = "/Users/${username}";
+      defaultPkgsetName = "stable";
+      configImports = [
+        ./nix/homes/work-mac
+        { home.stateVersion = "26.05"; }
+      ];
     };
 
     # --- Stuff I want to be able to do with binaries & packages:
@@ -170,15 +202,12 @@
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
       zsh-bew-zdotdir = toolConfigs.zsh-bew.outputs.zdotdir;
-      zsh-bew-bin = mybuilders.linkSingleBin (
+      zsh-bew-bin = mypkglib.linkSingleBin (
         lib.getExe (useStandalonePkg toolConfigs.zsh-bew)
       );
 
-      fzf-bew = stablePkgs.callPackage ./nix/pkgs/fzf-with-bew-cfg.nix {
-        fzf = stablePkgs.fzf;
-        replaceBinsInPkg = mybuilders.replaceBinsInPkg;
-      };
-      fzf-bew-bin = mybuilders.linkSingleBin (lib.getExe myPkgs.fzf-bew);
+      fzf-bew = stable.callPackage ./fzf/package-bew.nix {};
+      fzf-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.fzf-bew);
 
       nvim-minimal = useStandalonePkg toolConfigs.nvim-minimal;
       nvim-bew = useStandalonePkg toolConfigs.nvim-bew;
@@ -186,33 +215,36 @@
       tmux-bew = useStandalonePkg toolConfigs.tmux-bew;
     });
 
+    # (useful for debugging in `nix repl`)
+    toolConfigs = eachSystem (system: with (forSys system); toolConfigs);
+
     apps = eachSystem (system: with (forSys system); {
       # An env with all 'core' cli tools :)
       default = {
         type = "app";
         program = let
           tmux-config = toolConfigs.tmux-bew;
-          env = stablePkgs.buildEnv {
+          env = stable.buildEnv {
             name = "cli-base-env";
             paths = let
               useStandalonePkg = config: config.outputs.toolPkg.standalone;
             in [
               # note: cannot use `toolConfigs.zsh-bew`, otherwise my fzf-bew custom pkg isn't used
-              #   (packages in myPkgs are not cross-referenced yet..)
+              #   (packages in mypkgs are not cross-referenced yet..)
               (useStandalonePkg toolConfigs.zsh-bew-bins-from-PATH)
-              myPkgs.nvim-minimal
-              myPkgs.nvim-bew
-              myPkgs.fzf-bew
+              mypkgs.nvim-minimal
+              mypkgs.nvim-bew
+              mypkgs.fzf-bew
               (useStandalonePkg tmux-config)
-              (mybuilders.linkBins "nvim-default" {
-                nvim = lib.getExe myPkgs.nvim-bew;
+              (mypkglib.linkBins "nvim-default" {
+                nvim = lib.getExe mypkgs.nvim-bew;
               })
-              (stablePkgs.callPackage ./git/package-bew-env.nix {})
-              stablePkgs.less # ensure modern pager
+              (stable.callPackage ./git/package-bew-env.nix {})
+              stable.less # ensure modern pager
             ];
             meta.mainProgram = "zsh";
           };
-          entrypoint = stablePkgs.writeShellScript "cli-base-entrypoint" /* sh */ ''
+          entrypoint = stable.writeShellScript "cli-base-entrypoint" /* sh */ ''
             if [[ -z "''${PATH_BEFORE_MY_NIX_CLI_ENV:-}" ]]; then
               export PATH_BEFORE_MY_NIX_CLI_ENV=$PATH
               # note: Do _not_ re-set it to ensure its content is not 'infected' by Nix paths

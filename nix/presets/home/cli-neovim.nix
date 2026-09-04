@@ -1,7 +1,7 @@
-{ pkgsChannels, lib, mybuilders, kitConfigs, ... }:
+{ pkgsets, lib, mypkglib, kitConfigs, ... }:
 
 let
-  inherit (pkgsChannels) stable;
+  inherit (pkgsets) stable;
 
   nvim-base = stable.neovim.override {
     # python3 & ruby providers are enabled by default..
@@ -13,7 +13,7 @@ let
   # this is not a config, it's the raw original nvim but as another name
   # 👉 Should be moved out of this file ?
   # .. But then how to access `nvim-base` ? Move `nvim-base` out of this file as well & pass it as input ?
-  nvim-original = mybuilders.replaceBinsInPkg {
+  nvim-original = mypkglib.replaceBinsInPkg {
     # The original nvim Nix package, with another bin name
     name = "nvim-original";
     copyFromPkg = nvim-base;
@@ -34,7 +34,7 @@ in {
     (nvim-bew.lib.extendWith { useDefaultBinName = true; }).outputs.toolPkg.configured
 
     nvim-original
-    (mybuilders.linkBins "extra-nvim-bins" {
+    (mypkglib.linkBins "extra-nvim-bins" {
       nvim-minimal = lib.getExe nvim-minimal.outputs.toolPkg.standalone;
     })
   ];

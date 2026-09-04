@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mybuilders = pkgs.callPackage ../../mylib/mybuilders.nix {};
+  mypkglib = pkgs.callPackage ../../mypkglib.nix {};
 
   ty = lib.types;
   cfg = config;
@@ -51,7 +51,7 @@ in {
     ];
     outputs.cfgEntrypoint = "${outs.cfgDir}/tmux.conf";
 
-    outputs.toolPkg.standalone = mybuilders.replaceBinsInPkg (let
+    outputs.toolPkg.standalone = mypkglib.replaceBinsInPkg (let
       binName = "tmux"; # for now, until I fix my `tx` alias, when used in `nix run dots`… 👀
       # binName = "tmux-${config.ID}";
     in {

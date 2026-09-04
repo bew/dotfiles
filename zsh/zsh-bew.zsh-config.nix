@@ -6,7 +6,7 @@ let
     runCommandLocal
     stdenv
   ;
-  mybuilders = pkgs.callPackage ../nix/mylib/mybuilders.nix {};
+  mypkglib = pkgs.callPackage ../nix/mypkglib.nix {};
   cfg = config;
 
   diralias-pkg = let
@@ -39,7 +39,7 @@ in {
     fd.pkg = pkgs.fd;
     bat.pkg = pkgs.bat;
   } // (let
-    coreutilsBin = binName: mybuilders.linkSingleBin "${pkgs.coreutils}/bin/${binName}";
+    coreutilsBin = binName: mypkglib.linkSingleBin "${pkgs.coreutils}/bin/${binName}";
   in {
     # coreutils bins
     # (only link bins we need to avoid mass bins pollution of the env closure)
