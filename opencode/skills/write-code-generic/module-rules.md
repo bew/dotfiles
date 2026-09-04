@@ -13,4 +13,7 @@ These extend `write-code-generic`. All generic rules still apply.
 - Expose a minimal public surface.
   Only export symbols that callers need.
   Keep helpers private (prefix with `_` or equivalent).
+- Never reference CLI interface surface in module code comments.
+  Describe behaviour in terms of the language's types and values, not flags,
+  positional arg names, or env-var names that belong to the caller's layer.
 

@@ -45,17 +45,33 @@ All extend the rules below.
   Write them when the intent, constraint, or reason is not obvious from the code alone.
   Exception: structural signpost comments are allowed when a function body or file has multiple
   sections/phases/logical-blocks of code — they aid navigation without restating code.
+  For non-trivial code blocks (loops with inner computation, iterator chains, match arms with
+  branching logic), add a comment for each logical phase — not just one for the block as a whole.
 - Top-level constants: SCREAMING_SNAKE_CASE, defined at top of file after header/imports.
 - No trailing whitespace — no trailing spaces or tabs at the end of any line,
   and no lines that contain only whitespace.
 - Use type annotations for parameters and variables whenever the language supports it.
   Prefer explicit types over implicit ones — they serve as inline documentation.
+- Sentences in comments start on a new line.
+  Do not chain multiple sentences on a single line unless they fit the remaining line width
+  without wrapping.
+- When a function receives 4 or more related data inputs, prefer to group them into a named
+  struct/record/object rather than passing them as individual parameters. (ask user if unsure)
 
 ## Guidelines
 
 - Prefer `get_*` for functions that compute/return a value.
 - Prefer `check_*` for validation functions.
 - Prefer `parse_*` for argument/input parsing.
+- Section separators may be used when file has 5+ functions/structs/enums.
+  Usually not needed for smaller files.
+  Format: (example for language with '//' prefix for comments)
+  ```
+  // -------------------------------------------------------
+  // Section title
+  ```
+  The dashes line goes above the title, never below it.
+  A blank line is added both before & after the section comment.
 
 ### CLI naming
 

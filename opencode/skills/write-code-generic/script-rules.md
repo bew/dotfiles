@@ -25,8 +25,6 @@ They are module code — read <./module-rules.md> instead.
 
 ## Guidelines
 
-- Use section separators when a script has 5 or more functions.
-  Not needed for smaller scripts.
 - Mutable globals (parsed args, state): SCREAMING_SNAKE_CASE, declared in `main` or `parse_args`.
 - Guard against missing external dependencies at the top of the script with a short-circuit exit.
   Check before any logic runs, not inline when the tool is first used.
@@ -95,6 +93,15 @@ Do not treat testing as a post-step.
 
 If tests are wanted and none exist, load the appropriate lang-specific testing skill before starting.
 If no testing skill exists for the language, ask the user how they want tests structured before writing any.
+
+Test inputs must use values that are independent of the code under test.
+Construct them from raw components or deserialize from a static fixture.
+Never call the function you are testing to produce its own input — this only
+proves the function is self-consistent, not correct.
+
+For example, do not construct a datetime by parsing a string with the same
+format specifier that `format_timestamp` outputs.
+Build the input from year/month/day/.. components instead.
 
 ## Script structure
 
