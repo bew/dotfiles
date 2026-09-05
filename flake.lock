@@ -63,11 +63,11 @@
         "nixpkgs-lib-only": "nixpkgs-lib-only"
       },
       "locked": {
-        "lastModified": 1763124636,
-        "narHash": "sha256-gcN8LRmfAPbBQeP6DOIbR846l5V40aFnvxQk+gWjcwA=",
+        "lastModified": 1788632648,
+        "narHash": "sha256-Yg/7r1yVSnTE39wgNM4NZiC4YRjXrKIh7Ml0bLy3ZCQ=",
         "owner": "bew",
         "repo": "my-nix-templates",
-        "rev": "1df198f4ec7f74e85242ac954620bbaa0207f5c7",
+        "rev": "b773f50b5ae6b098ce7304f5a8904ac748fd031b",
         "type": "github"
       },
       "original": {

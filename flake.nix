@@ -57,11 +57,8 @@
       stable = flakeInputs.nixpkgsStable.legacyPackages.${system};
       bleedingedge = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
     };
-    forSys = system: let
-      pkgsets = pkgsetsForSys system;
+    forSys = system: let pkgsets = pkgsetsForSys system; in rec {
       inherit (pkgsets) mypkgs stable bleedingedge;
-    in rec {
-      inherit mypkgs stable bleedingedge;
       inherit pkgsets;
 
       lib = stable.lib;
