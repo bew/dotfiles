@@ -43,11 +43,12 @@
     dyndots.inputs.systems.follows = "systems";
 
     systems.url = "github:nix-systems/default";
+    devshell.url = "github:numtide/devshell";
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
   #   define my toplevel flake in multiples files & auto-merge packages, homeConfig, homeModules, {tool,…}ConfigModules...
-  outputs = { self, systems, ... }@flakeInputs: let
+  outputs = { self, systems, devshell, ... }@flakeInputs: let
     lib = flakeInputs.nixpkgsStable.lib;
     eachSystem = lib.genAttrs (import systems);
 
@@ -281,6 +282,19 @@
             exec ${lib.getExe env} "$@"
           '';
         in entrypoint.outPath;
+      };
+    });
+
+    devShells = eachSystem (system: with (forSys system); {
+      default = devshell.legacyPackages.${system}.mkShell {
+        packages = [
+          stable.just # for repo actions
+
+          # deps for drv diff on build
+          stable.dix # drv diff viewer
+          stable.ansifilter
+          stable.moreutils
+        ];
       };
     });
   };
