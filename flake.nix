@@ -200,8 +200,16 @@
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
       zsh-bew-zdotdir = toolConfigs.zsh-bew.outputs.zdotdir;
-      zsh-bew-bin = mypkglib.linkSingleBin (
-        lib.getExe (useStandalonePkg toolConfigs.zsh-bew)
+      zsh-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.zsh-bew);
+      zsh-bew-with-fzf-bew = (
+        # note: this variant is useful for testing fzf stuff with my fzf config!
+        let
+          zsh-bew-fzf-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
+            deps.bins.fzf.pkg = lib.mkForce "from-PATH";
+          };
+        in zsh-bew-fzf-from-PATH.outputs.toolPkg.standaloneWith {
+          PATH_append = [mypkgs.fzf-bew];
+        }
       );
 
       fzf-bew = stable.callPackage ./fzf/package-bew.nix {};

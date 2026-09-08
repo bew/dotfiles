@@ -34,18 +34,27 @@ in {
     #    packages and use overriden bins if any (HOW?)
 
     # Standalone zsh binary with the config
-    outputs.toolPkg.standalone = mypkglib.replaceBinsInPkg {
-      name = "zsh-with-config-${cfg.ID}";
-      copyFromPkg = cfg.package;
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      meta.mainProgram = "zsh";
-      postBuild = /* sh */ ''
-        makeWrapper ${cfg.package}/bin/zsh $out/bin/zsh \
-          --set ZDOTDIR ${outs.zdotdir} \
-          --set ZSH_CONFIG_HASH ${outs.zdotdir-hash} \
-          --set SHELL_CLI_ENV ${outs.deps.bins}
-      '';
-    };
+    outputs.toolPkg.standaloneWith = (
+      { PATH_append ? [] }:
+      mypkglib.replaceBinsInPkg {
+        name = "zsh-with-config-${cfg.ID}";
+        copyFromPkg = cfg.package;
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        meta.mainProgram = "zsh";
+        postBuild = /* sh */ ''
+          makeWrapper ${cfg.package}/bin/zsh $out/bin/zsh \
+            --set ZDOTDIR ${outs.zdotdir} \
+            --set ZSH_CONFIG_HASH ${outs.zdotdir-hash} \
+            --set SHELL_CLI_ENV ${outs.deps.bins} \
+            --prefix PATH : ${lib.makeBinPath PATH_append}
+
+          # Add important PATHs in the package (for easy introspection)
+          ln -s ${outs.zdotdir} $out/zdotdir
+          ln -s ${outs.deps.bins} $out/bins-dependancies
+        '';
+      }
+    );
+    outputs.toolPkg.standalone = outs.toolPkg.standaloneWith {};
 
     # TODO: blend/propagate config binaries deps into chosen home config & chosen binaries..
     #   => Need a separate home module to represent home bins and the ones to choose..
