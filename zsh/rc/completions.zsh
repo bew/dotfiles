@@ -31,9 +31,10 @@ setopt menu_complete # Show the menu immediately if ambiguous, and select first 
 # NOTE: compinit must be called _after_ fpath is set,
 # it will autoload all matching _* functions for completions.
 autoload -Uz compinit
-ZSH_COMPLETION_CACHE_PREFIX="$ZSH_CACHE_DIR/completion-dumps/"
+ZSH_COMPLETION_CACHE_DIR="$ZSH_CACHE_DIR/completion-dumps"
+mkdir -p "$ZSH_COMPLETION_CACHE_DIR"
 if [[ -n "${ZSH_CONFIG_HASH:-}" ]]; then
-  zcompdump_cache="$ZSH_COMPLETION_CACHE_PREFIX/zcompdump.$ZSH_CONFIG_HASH"
+  zcompdump_cache="$ZSH_COMPLETION_CACHE_DIR/zcompdump.$ZSH_CONFIG_HASH"
   if [[ -f "$zcompdump_cache" ]]; then
     # Load completion fast from past dump for this config
     # (bypassing validation checks already done when dump was made)
@@ -46,13 +47,13 @@ if [[ -n "${ZSH_CONFIG_HASH:-}" ]]; then
   fi
 fi
 # Reset completion cache on-demand
-function compreset() {
+function zcompl::reset() {
   echo ":: To reset Zsh Completion cache, run this command then restart shell:"
   echo
-  echo "   rm $ZSH_COMPLETION_CACHE_PREFIX/*"
+  echo "   rm $ZSH_COMPLETION_CACHE_DIR/*"
   echo
 }
-alias fpath-reload=compreset # easier to remember
+alias fpath-reload=zcompl::reset # easier to remember
 
 zmodload zsh/complist
 
