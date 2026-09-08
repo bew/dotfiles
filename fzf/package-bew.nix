@@ -24,6 +24,7 @@ let
     # suggestions nav (long movement)
     ctrl-alt-n = "next-selected"; ctrl-alt-p = "prev-selected";
     alt-g = "first"; alt-G = "last";
+    page-down = "half-page-down"; page-up = "half-page-up";
     alt-J = "half-page-down"; alt-K = "half-page-up";
     alt-z = "jump"; # easymotion-like 1/2-keystroke movement!
 
@@ -37,7 +38,7 @@ let
 
     # preview nav
     alt-p = "toggle-preview";
-    pgdn       = "preview-page-down"; pgup       = "preview-page-up";
+    alt-page-down = "preview-page-down"; alt-page-up = "preview-page-up";
     ctrl-alt-j = "preview-page-down"; ctrl-alt-k = "preview-page-up";
 
     # history
@@ -54,7 +55,7 @@ let
     "hl"  = "166"; # matching substring on all lines (fg)
     "selected-bg" = "235"; # selected lines
     "selected-fg" = "bold"; # selected lines
-    "gutter" = "-1"; # bg color for left gutter : use default terminal bg
+    "gutter" = "236"; # bg color for left gutter
     "marker" = "220:bold"; # current line marker in the gutter
     "preview-bg" = "233"; # bg of preview window
   };
@@ -66,8 +67,9 @@ let
     "--info=inline" # put info on right of prompt
     "--color='${colorsArg}'"
     "--highlight-line"
-    "--pointer=╸"
-    "--marker=▎" # multi-selection markers (looks good with full line highlight)
+    "--pointer=┃"
+    "--gutter=▍"
+    "--marker=▍" # multi-selection markers (looks good with full line highlight)
     "--scrollbar=▌▐"
     "--preview-window=border-bold"
   ];
