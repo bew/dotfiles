@@ -35,7 +35,7 @@ in {
 
     # Standalone zsh binary with the config
     outputs.toolPkg.standalone = mypkglib.replaceBinsInPkg {
-      name = "zsh-bew"; # FIXME: this should be `zsh-with-config-{ID}` 🤔
+      name = "zsh-with-config-${cfg.ID}";
       copyFromPkg = cfg.package;
       nativeBuildInputs = [ pkgs.makeWrapper ];
       meta.mainProgram = "zsh";
