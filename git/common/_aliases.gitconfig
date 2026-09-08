@@ -143,8 +143,8 @@
   # (note: pager is disabled in [pager] section below, after [alias] section)
   br = branch
   brv = branch -vv
-  brr = branch -r
-  bra = branch -a
+  brr = branch -v -r
+  bra = branch -v -a
 
   br-gone = !git -c color.ui=always branch -vv | grep ': gone'
   brg = br-gone
