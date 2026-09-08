@@ -14,7 +14,7 @@
 fpath=($ZSH_MY_CONF_DIR/completions/ $fpath)
 # Add system completions if available
 # (allows to have 'pacman' completions in nix's zsh for example)
-[[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*)
+[[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*(N))
 [[ -d /usr/share/zsh/site-functions ]] && fpath+=(/usr/share/zsh/site-functions)
 # Add completions from Nix if available
 [[ -d ~/.nix-profile/share/zsh/site-functions ]] && fpath+=(~/.nix-profile/share/zsh/site-functions)
@@ -27,9 +27,13 @@ setopt list_packed # Smaller compl list by 'packing' matches in columns
 setopt menu_complete # Show the menu immediately if ambiguous, and select first entry
 
 # Initialize the completion system, with caching
+#
+# NOTE: compinit must be called _after_ fpath is set,
+# it will autoload all matching _* functions for completions.
 autoload -Uz compinit
+ZSH_COMPLETION_CACHE_PREFIX="$ZSH_CACHE_DIR/completion-dumps/"
 if [[ -n "${ZSH_CONFIG_HASH:-}" ]]; then
-  zcompdump_cache="$ZSH_CACHE_DIR/zcompdump.$ZSH_CONFIG_HASH"
+  zcompdump_cache="$ZSH_COMPLETION_CACHE_PREFIX/zcompdump.$ZSH_CONFIG_HASH"
   if [[ -f "$zcompdump_cache" ]]; then
     # Load completion fast from past dump for this config
     # (bypassing validation checks already done when dump was made)
@@ -41,6 +45,14 @@ if [[ -n "${ZSH_CONFIG_HASH:-}" ]]; then
     # note: tried to zcompile the result, but it doesn't improve load time 🤷
   fi
 fi
+# Reset completion cache on-demand
+function compreset() {
+  echo ":: To reset Zsh Completion cache, run this command then restart shell:"
+  echo
+  echo "   rm $ZSH_COMPLETION_CACHE_PREFIX/*"
+  echo
+}
+alias fpath-reload=compreset # easier to remember
 
 zmodload zsh/complist
 
