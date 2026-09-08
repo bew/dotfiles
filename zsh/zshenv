@@ -60,4 +60,11 @@ else
   true # (if branches require a command..)
 fi
 
+# When ZDOTDIR is exported (e.g. from a Nix-built standalone wrapped zsh with config)
+# → Stop the 'export' behavior (but keep it set in the process, useful for some plugins / in repl)
+#
+# note: Keeping it exported can give issues as child processes (e.g. a tmux server) capture it,
+# which can lead to bad behavior as zsh NEVER LOADS its default ~/.zsh{env,rc} when $ZDOTDIR is set.
+[[ -n ${ZDOTDIR+x} ]] && typeset +x ZDOTDIR
+
 true # The config should always finish well!
