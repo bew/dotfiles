@@ -9,10 +9,12 @@ fi
 # NOTE: These lines may be rewritten by config manager.
 _BIN_fzf=fzf
 _BIN_fd=fd
+_BIN_zoxide=zoxide
 _BIN_bat=bat
 _BIN_git=git
 cfg::depends-on-bin fzf
 cfg::depends-on-bin fd
+cfg::depends-on-bin zoxide
 cfg::depends-on-bin bat
 cfg::depends-on-bin git
 
@@ -47,7 +49,7 @@ function zwidget::utils::__fzf_generic_impl_for_paths() {
   local completion_prefix="${LBUFFER/* /}" # we remove everything until the last space
   local lbuffer_without_completion_prefix="${LBUFFER%${completion_prefix}}"
 
-  # NOTE: it's important to NOT put it inside quotes, the expansion wouldn't work 👀.
+  # NOTE: it's important to NOT put it inside quotes, the ~ expansion wouldn't work 👀.
   local expanded_completion_prefix=${~completion_prefix}
 
   # --- cases ---
@@ -110,7 +112,7 @@ function zwidget::utils::__fzf_generic_impl_for_paths() {
   # own 'prompt' var.
   local final_prompt="${FZF_PROMPT:-}${display_root_path}"
 
-  local fzf_cmd=($FZF_BASE_CMD --multi)
+  local fzf_cmd=($FZF_BASE_CMD --ansi --multi)
   fzf_cmd+=(--query "$query_prefill")
   fzf_cmd+=(--prompt "$final_prompt")
   if [[ -n "${FZF_PREVIEW_CMD:-}" ]]; then
@@ -142,7 +144,7 @@ function zwidget::utils::__fzf_generic_impl_for_paths() {
 FZF_PREVIEW_CMD_FOR_FILE="$_BIN_bat --color=always --style=numbers,header -- {}"
 
 function zwidget::fzf::smart_find_file() {
-  FZF_FINDER_CMD=($_BIN_fd --type f --type l --follow) # follow symlinks
+  FZF_FINDER_CMD=($_BIN_fd --type f --type l --follow --color=always) # follow symlinks
   FZF_PROMPT="Smart files: "
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
 
@@ -153,9 +155,8 @@ function zwidget::fzf::smart_find_file() {
 zle -N zwidget::fzf::smart_find_file
 
 function zwidget::fzf::find_file() {
-  FZF_FINDER_CMD=(find -L) # follow symlinks
-  FZF_FINDER_CMD+=('(' -path '*/.*' -o -fstype 'dev' -o -fstype 'proc' ')' -prune) # ignore options
-  FZF_FINDER_CMD+=(-o -type f -o -type l) # actual file filter
+  FZF_FINDER_CMD=($_BIN_fd --follow) # follow symlinks
+  FZF_FINDER_CMD+=(--no-ignore) # actual file filter
 
   FZF_PROMPT="All files: "
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_FILE"
@@ -172,7 +173,7 @@ FZF_PREVIEW_CMD_FOR_DIR="ls --color=always --group-directories-first -F -C --der
 
 function zwidget::fzf::find_directory() {
   FZF_PROMPT="Smart dirs: "
-  FZF_FINDER_CMD=($_BIN_fd --type d --type l --follow) # follow symlinks
+  FZF_FINDER_CMD=($_BIN_fd --type d --type l --follow --color=always) # follow symlinks
   FZF_PREVIEW_CMD="$FZF_PREVIEW_CMD_FOR_DIR"
   FZF_PREVIEW_WINDOW="down:10"
   FZF_USE_FOCUS_AS_PREVIEW_LABEL=true
@@ -231,7 +232,7 @@ function zwidget::fzf::zoxide() {
     --color=preview-label:247:bold
   )
 
-  local selected=( $( zoxide query --list --score | "${fzf_cmd[@]}" ) )
+  local selected=( $( $_BIN_zoxide query --list --score | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
     if [[ -n "$directory" ]]; then
@@ -271,10 +272,9 @@ function zwidget::fzf::git_changed_files() {
     local finder_cmd="$_BIN_git diff --name-only"
     local preview_cmd="$_BIN_git diff --color=always -- :/{}"
 
-    # The finder_cmd gives paths absolute to the root of the repo
-    # (without a leading '/' though). When inserting the results in the
-    # cmdline, each path will be made relative to cwd. We need to give it
-    # the git root to be able to compute correct relative paths:
+    # `git diff --name-only` gives paths absolute to the root of the repo without leading '/'.
+    # When inserting the results in the cmdline, each path will be made relative to cwd.
+    # So we need to give fzf the git root dir to have correct relative paths:
     FZF_ROOT_PATH="$($_BIN_git rev-parse --show-toplevel)"
   fi
 
