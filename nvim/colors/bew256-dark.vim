@@ -419,6 +419,8 @@ HiResetTo @lsp.type.variable.terraform
 " Disable forced function call the same as function def 😬
 HiResetTo @lsp.type.function.rust
 HiResetTo @lsp.type.method.rust
+" Show fn doc link as fn def (like `` /// see [`Self::some_function`] ``)
+hi! link @lsp.typemod.function.documentation.rust @function.rust
 " Ensure properties are highlighted as members
 hi! link @lsp.type.property.rust @variable.member.rust
 " Disable forced non-obvious keywords
