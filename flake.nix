@@ -199,18 +199,11 @@
       useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
-      zsh-bew-zdotdir = toolConfigs.zsh-bew.outputs.zdotdir;
       zsh-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.zsh-bew);
-      zsh-bew-with-fzf-bew = (
-        # note: this variant is useful for testing fzf stuff with my fzf config!
-        let
-          zsh-bew-fzf-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
-            deps.bins.fzf.pkg = lib.mkForce "from-PATH";
-          };
-        in zsh-bew-fzf-from-PATH.outputs.toolPkg.standaloneWith {
-          PATH_append = [mypkgs.fzf-bew];
-        }
-      );
+      # note: this variant is useful for testing zsh zwidgets with my custom fzf config (:
+      zsh-bew-with-fzf-bew = useStandalonePkg (toolConfigs.zsh-bew.lib.extendWith {
+        deps.bins.fzf.pkg = lib.mkForce mypkgs.fzf-bew;
+      });
 
       fzf-bew = stable.callPackage ./fzf/package-bew.nix {};
       fzf-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.fzf-bew);

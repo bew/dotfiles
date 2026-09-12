@@ -25,10 +25,10 @@ let
           )} \
           ${extraWrapperParams}
         # FYI, extra dirs (for easy access in the built derivation)
-        ${if fyiExtraDirs != {} then "mkdir -p $out/fyi_extra_dirs" else ""}
+        ${if fyiExtraDirs != {} then "mkdir -p $out/useful-paths" else ""}
         ${
           lib.concatLines (let
-            linker = name: dir_path: "ln -s ${lib.escapeShellArg dir_path} $out/fyi_extra_dirs/${lib.escapeShellArg name}";
+            linker = name: dir_path: "ln -s ${lib.escapeShellArg dir_path} $out/useful-paths/${lib.escapeShellArg name}";
           in lib.mapAttrsToList linker fyiExtraDirs)
         }
       '';

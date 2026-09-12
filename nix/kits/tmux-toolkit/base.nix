@@ -77,6 +77,10 @@ in {
           --prefix TERMINFO_DIRS : ${config.package.terminfo}/share/terminfo
         )
         makeWrapper ${cfg.package}/bin/tmux $out/bin/${binName} "''${wrapperArgs[@]}"
+
+        # Add useful paths in the package (for easy introspection)
+        mkdir -p $out/useful-paths
+        ln -s ${outs.cfgDir} $out/useful-paths/config
       '';
       # NOTE: we need to prepend terminfo to ensure the programs running in tmux find the correct
       #   terminfo database for the running tmux. (and not an eventual outdated system version)
