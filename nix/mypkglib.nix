@@ -75,6 +75,7 @@ rec {
       '';
 
       typeOf = builtins.typeOf;
+      # convert raw input to list of ({name, path: (path or drv)} or string)
       binsSpecList =
         if (typeOf binsSpec) == "list" then binsSpec
         else if (typeOf binsSpec) == "set" then
@@ -84,16 +85,17 @@ rec {
             For linkBins: Unable to normalize given binsSpec argument of type '${typeOf binsSpec}'
             ${binsSpecHelp}
           '';
+      # normalize to list of {name, path}
       normalizedBinsSpec = lib.forEach binsSpecList (item:
         if (typeOf item) == "string" then
-          { name = baseNameOf item; path = item; }
+          { name = lib.baseNameOf item; path = item; }
         else if (typeOf item) == "set" && (item ? "name") && (item ? "path") then
           let binTarget = item.path; in {
             inherit (item) name;
             path = (
               if (typeOf binTarget) == "string" then
                 binTarget
-              else if (typeOf binTarget) == "set" && (binTarget ? outPath) then
+              else if lib.isDerivation binTarget then
                 lib.getExe binTarget
               else
                 throw ''
@@ -118,18 +120,27 @@ rec {
 
   # Creates a derivation with a single link in bin/ to the given binary path.
   #
-  # Type: linkSingleBin :: String -> derivation
+  # Type: linkSingleBin :: (String or Drv) -> derivation
   #
   # Example:
+  #   linkSingleBin pkgs.neovim
   #   linkSingleBin "${pkgs.neovim}/bin/nvim"
   #   => creates a derivation like:
   #     /nix/store/yv5aigjy8l9bi9kpqh7y1dzf6nv07cl0-nvim-single-bin/
   #     └── bin/
   #         └── nvim -> /nix/store/frlxim9yz5qx34ap3iaf55caawgdqkip-neovim-0.5.1/bin/nvim
   #
-  linkSingleBin = path:
+  linkSingleBin = pathOrDrv:
     let
-      binName = baseNameOf path;
+      path = (
+        if lib.isDerivation pathOrDrv then
+          lib.getExe pathOrDrv
+        else if lib.isString pathOrDrv then
+          pathOrDrv
+        else
+          throw "Cannot convert ${toString pathOrDrv} to a path to single bin"
+      );
+      binName = lib.baseNameOf path;
       meta.mainProgram = binName;
     in runCommandLocal "${binName}-single-bin" { inherit meta; } ''
       mkdir -p $out/bin
@@ -185,15 +196,15 @@ rec {
       paths = [ copyFromPkg ];
       postBuild = /* sh */ ''
         if [[ -e $out/bin ]]; then
-          echo "Remove existing bin/ (was: `readlink $out/bin`)"
+          echo "Removing existing bin/ (was: `readlink $out/bin`).."
           # No need for '-r', it's a symlink!
           rm -f $out/bin
         fi
-        echo "Create empty bin/"
+        echo "Creating empty bin/"
         mkdir $out/bin
 
         ${lib.optionalString (0 != (lib.length (lib.attrNames bins))) ''
-          echo "Add binaries: ${lib.concatStringsSep ", " (lib.attrNames bins)}"
+          echo "Adding binaries: ${lib.concatStringsSep ", " (lib.attrNames bins)}.."
           ${lib.concatStringsSep "\n"
             (lib.mapAttrsToList
               (name: targetBin: "cp ${toString targetBin} $out/bin/${name}")
@@ -203,7 +214,7 @@ rec {
         ''}
 
         ${lib.optionalString (0 != (lib.stringLength postBuild)) ''
-          echo "Run postBuild to add more binaries"
+          echo "Running postBuild to add more binaries.."
           ${postBuild}
         ''}
       '';

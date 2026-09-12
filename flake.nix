@@ -199,14 +199,14 @@
       useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
-      zsh-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.zsh-bew);
+      zsh-bew-bin = mypkglib.linkSingleBin mypkgs.zsh-bew;
       # note: this variant is useful for testing zsh zwidgets with my custom fzf config (:
       zsh-bew-with-fzf-bew = useStandalonePkg (toolConfigs.zsh-bew.lib.extendWith {
         deps.bins.fzf.pkg = lib.mkForce mypkgs.fzf-bew;
       });
 
       fzf-bew = stable.callPackage ./fzf/package-bew.nix {};
-      fzf-bew-bin = mypkglib.linkSingleBin (lib.getExe mypkgs.fzf-bew);
+      fzf-bew-bin = mypkglib.linkSingleBin mypkgs.fzf-bew;
 
       nvim-minimal = useStandalonePkg toolConfigs.nvim-minimal;
       nvim-bew = useStandalonePkg toolConfigs.nvim-bew;
