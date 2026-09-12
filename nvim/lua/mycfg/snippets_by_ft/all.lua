@@ -56,9 +56,22 @@ snip("#!", { desc = "Interpreter shebang!" }, SU.myfmt {
   }
 })
 
-snip("modeline", { desc = "vim modeline", prio = "low" }, SU.myfmt{
-  [[vim:set ft=<filetype>:]],
-  { filetype = i(1) },
+snip("model", { desc = "vim modeline", prio = "low" }, SU.myfmt{
+  [[vim:set<filetype><shiftwidth>:]],
+  {
+    filetype = ls.choice_node(1, {
+      ls.dynamic_node(nil, function()
+        return ls.snippet_node(nil, { t" ft=", i(1, vim.o.filetype) })
+      end),
+      t"",
+    }, { key = "ft" }),
+    shiftwidth = ls.choice_node(2, {
+      ls.dynamic_node(nil, function()
+        return ls.snippet_node(nil, { t" sw=", i(1, tostring(vim.o.shiftwidth)) })
+      end),
+      t"",
+    }, { key = "sw" }),
+  },
 })
 
 snip("lorem", { desc = "Lorem paragraph", rx = true, prio = "last" }, ls.function_node(function()
