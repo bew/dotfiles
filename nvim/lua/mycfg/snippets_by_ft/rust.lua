@@ -303,12 +303,12 @@ snip("im", {desc="impl block", when = conds.start_of_line}, SU.myfmt {
       SU.myfmt {
         [[impl<gen> <trait> for <ty>]],
         {
-          ty = ls.restore_node(1, "ty"),
-          trait = i(2, "SomeTrait"),
+          trait = i(1, "SomeTrait"),
+          ty = ls.restore_node(2, "ty"),
           gen = ls.restore_node(3, "generics"),
         },
       },
-    }, { restore_cursor = true }),
+    }),
     maybe_where = get_maybe_where_node(2, SU.node_ref"gen"),
     body = i(3),
   }
@@ -413,9 +413,9 @@ snip("vec", {desc = "vec![…] literal"}, SU.myfmt {
   { values = i(1) }
 })
 
--- This snip stores the last use log level, and re-orders the choice nodes to suggest the last one
+-- This snip stores the last used log level, and re-orders the choice nodes to suggest the last one
 -- used first, while keeping log level order.
-local last_log_level_choice_idx = 1
+local last_log_level_choice_idx = 1 -- default is 'trace'
 local available_log_levels = {
   "trace",
   "debug",
@@ -425,8 +425,9 @@ local available_log_levels = {
 }
 snip("lg", { desc = "log::LEVEL!(…);" }, ls.dynamic_node(1, function()
   -- Generate level nodes choices so that last idx is first, and rest is in order.
-  -- So if last_idx=2, nodes should have: debug,info,warn,error,trace
-  -- (this basically simulates the possibility to set current choice index, keeping choice order)
+  -- So if last_idx=3, nodes should have: info,warn,error,trace,debug
+  -- (instead of the default level order: trace,debug,info,warn,error)
+  -- -> simulates the possibility to set current choice index, keeping choice order ✨
   -- print("DEBUG: in dynamic_node, last_log_level_choice_idx is:", last_log_level_choice_idx)
   local log_levels_for_nodes = {} ---@type string[]
   -- add log level starting from last idx, to last available log level
@@ -440,17 +441,26 @@ snip("lg", { desc = "log::LEVEL!(…);" }, ls.dynamic_node(1, function()
   -- print("DEBUG: log_levels_for_nodes:", vim.inspect(log_levels_for_nodes))
 
   -- Build the list of choice nodes for the levels
-  local level_nodes = {} ---@type LuaSnip.Node[]
+  local level_snips = {} ---@type LuaSnip.Node[]
   for _, level in ipairs(log_levels_for_nodes) do
-    table.insert(level_nodes, t(level))
+    table.insert(level_snips, SU.myfmt {
+      [[log::]]..level..[[!("<msg>"<after>);]],
+      {
+        msg = ls.restore_node(1, "msg"),
+        after = ls.restore_node(2, "after"),
+      },
+    })
   end
-  local level_choice_node = ls.choice_node(1, level_nodes, {
+  return ls.snippet_node(nil, ls.choice_node(1, level_snips, {
+    restore_cursor = true,
     node_callbacks = {
       ---@param node LuaSnip.ChoiceNode
       [ls_events.change_choice] = function(node)
-        local text = node:get_text()[1]
+        local node_text = node:get_text()[1]
+        local node_level_text = node_text:match"^log::(%a+)!" or node_text
+        -- print("DEBUG: choice node text:", node_text, "| level text:", node_level_text)
         for idx, level in ipairs(available_log_levels) do
-          if level == text then
+          if level == node_level_text then
             last_log_level_choice_idx = idx
             -- print("DEBUG: last_log_level_choice_idx set to:", idx)
             return
@@ -459,16 +469,13 @@ snip("lg", { desc = "log::LEVEL!(…);" }, ls.dynamic_node(1, function()
         -- print("DEBUG: unknown log level 👀")
       end,
     },
-  })
-  return ls.snippet_node(nil, SU.myfmt {
-    [[log::<level>!("<msg>"<after>);]],
-    {
-      level = level_choice_node,
-      msg = i(2),
-      after = i(3),
-    },
-  })
-end))
+  }))
+end), {
+  stored = {
+    msg = i(nil),
+    after = i(nil),
+  },
+})
 
 snip("lt", { desc = "log::trace!(…);" }, SU.myfmt {
   [[log::trace!("<msg>"<after>);]],
