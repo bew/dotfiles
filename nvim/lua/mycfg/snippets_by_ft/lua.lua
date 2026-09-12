@@ -317,37 +317,17 @@ snip("thi", {desc = "then … end (inline)"}, SU.myfmt {
   { body = i(1) },
 })
 
--- NOTE: Adds `elseif..then..(else)` in an if/elseif/else chain.
--- Automatically appends `else` if the next non-blank line does NOT already start with `else`.
--- (works both at END of chain and IN a chain before an existing `elseif/else`)
+-- NOTE: Adds `elseif..then..` in an if/elseif/else chain.
+-- TODO: auto-dedent 🤔 (when triggered in a if/elseif body, need TS checks..)
 local function mk_elseif_nodes()
   return SU.myfmt {
     [[
       elseif <cond> then
-        <body><maybe_else_line>
+        <body>
     ]],
     {
       cond = i(1, "false"),
       body = SU.insert_node_default_selection(2),
-      maybe_else_line = ls.function_node(function()
-        local cur_line_nr = vim.fn.line"." -- 1-indexed
-        local buf_lines = vim.api.nvim_buf_get_lines(0, cur_line_nr, cur_line_nr + 10, false) -- lines after cursor line (max 10)
-        for _, line in ipairs(buf_lines) do
-          -- Search first non-blank line down from cursor (search max 10 lines)
-          if line:match"%S" then
-            if line:match"^%s*else" then
-              -- next non-blank line already has `else[if]`, don't add one
-              return ""
-            else
-              -- add `else` on a new line (LuaSnip auto-indents)
-              return {"", "else"}
-            end
-          end
-        end
-        -- no non-blank line found
-        -- => Add `else` at end of block
-        return {"", "else"}
-      end),
     },
   }
 end
