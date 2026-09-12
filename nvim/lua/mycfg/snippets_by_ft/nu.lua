@@ -19,8 +19,8 @@ snip("p", { desc = "print" }, SU.myfmt {
   [[print <arg>]],
   {
     arg = ls.choice_node(1, {
-      SU.myfmt { [["<str>"]], { str = ls.restore_node(1, "str") } },
-      SU.myfmt { [[$"<str>"]], { str = ls.restore_node(1, "str") } },
+      SU.myfmt { [["<msg>"]], { msg = ls.restore_node(1, "msg") } },
+      SU.myfmt { [[$"<msg>"]], { msg = ls.restore_node(1, "msg") } },
     }, {
       -- Seemlessly keep cursor pos across choice branches
       restore_cursor = true
@@ -30,17 +30,24 @@ snip("p", { desc = "print" }, SU.myfmt {
   stored = {
     -- Keys for ls.restore_node
     -- (used to share nodes between choice node branches)
-    str = i(nil),
+    msg = i(nil),
   },
 })
 
 snip("l", { desc = "local var" }, SU.myfmt {
-  [[<mode> <var> = <end_>]],
+  [[<mode_and_var> = <end_>]],
   {
-    var = i(1, "var"),
-    mode = ls.choice_node(2, { t"let", t"mut", t"const" }),
-    end_ = i(3)
-  }
+    mode_and_var = ls.choice_node(1, {
+      SU.myfmt { [[let <var>]], { var = ls.restore_node(1, "var") } },
+      SU.myfmt { [[mut <var>]], { var = ls.restore_node(1, "var") } },
+      SU.myfmt { [[const <var>]], { var = ls.restore_node(1, "var") } },
+    }, { restore_cursor = true }),
+    end_ = i(2)
+  },
+}, {
+  stored = {
+    var = i(nil, "var"),
+  },
 })
 
 snip("ld", { desc = "closure (lambda)" }, SU.myfmt {
