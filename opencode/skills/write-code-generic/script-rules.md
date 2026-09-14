@@ -36,9 +36,45 @@ Use these names consistently across scripts:
 | Name | Purpose |
 |---|---|
 | `main` | Entry point — called at end of file with forwarded args |
+| `fail` | Print formatted error to stderr and exit 1 |
 | `usage_and_exit` | Print usage/help to stderr, exit with given status |
 | `print_err` | Print message to stderr |
 | `cmd_*` | Subcommand handler (e.g. `cmd_build`, `cmd_deploy`) |
+
+### `fail` vs `usage_and_exit` vs `print_err`
+
+Use `fail` for operational errors — something went wrong and the script cannot continue:
+missing file, invalid input, network failure, assertion, external tool returned non-zero.
+The main message explains what went wrong, with optional guidance.
+
+Use `usage_and_exit` for usage guidance — the user asked for help, passed wrong flags,
+omitted required args, or the script otherwise wants to show how to use it.
+
+Use `print_err` when need multiple stderr messages
+(e.g. batch validation reporting several errors at once).
+
+### `fail` contract
+
+Common form only has a single parameter, the operational error message.
+
+For medium/complex scripts or if user requests it explicitely, an alternative form can have 1+
+additional detail/guidance lines to be printed on their own line, indented to align after the `!! `
+prefix (3 spaces indent).
+
+A single param is usually enough for most programs, only make a version supporting multiple lines
+if user asks for it.
+
+Example expected error outputs:
+```text
+!! ERROR: --limit must be a positive integer, got 'abc'.
+```
+```text
+!! ERROR: missing input file 'data.csv'
+   Specify an input with --input.
+```
+- First line always gets the `!! ERROR:` prefix.
+- Detail lines restart with a small alignment indent — no extra prefix.
+- `fail` exits 1 after printing all lines.
 
 ### `usage_and_exit` contract
 
@@ -47,7 +83,7 @@ Prints usage to stderr.
 Exits with that code.
 
 The file-level header comment is an overview only — a short description of what the script does.
-All usage details (arguments, flags, examples) belong in the function showing usage.
+All actual usage details (arguments, flags, examples) belong in this usage function.
 
 ### Subcommands with `cmd_*`
 
@@ -68,16 +104,17 @@ main(cmd, ...rest):
 Error messages must be actionable: explain what went wrong AND how to fix it.
 
 ```pseudo-code
-# Good
-print_err "Error: --len requires an argument"
-print_err "Example: gen-random-string --len 16"
+# Good — single-line operational error
+fail("--len requires an argument")
 
-# Good
-print_err "Error: unknown rule: $rule"
-print_err "Run with --help to see available rules"
+# Good — concrete operational error with guidance
+fail("unknown rule: $rule", "Use --help to see available rules", ...)
 
-# Bad
-print_err "Error: invalid input"
+# Good — usage guidance (single call, exits immediately)
+usage_and_exit(0)
+
+# Bad — too abstract / not actionable
+fail("invalid input")
 ```
 
 ## Testing
@@ -113,6 +150,7 @@ Build the input from year/month/day/.. components instead.
 [top-level constants — if any]
 
 print_err(...) { ... }
+fail(msg) { ... }
 usage_and_exit(status) { ... }
 
 [helper functions]

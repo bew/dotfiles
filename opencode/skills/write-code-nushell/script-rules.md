@@ -42,3 +42,13 @@ def main [
     # Main logic
 }
 ```
+
+If needed, the multiline variant of `fail` can be written:
+```nu
+# Print error messages & exit now
+def fail [msg: string, ...rest: string]: nothing -> nothing {
+    print --stderr $"!! ERROR: ($msg)"
+    for line in $rest { print --stderr $"   ($line)" }
+    exit 1
+}
+```

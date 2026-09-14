@@ -9,6 +9,9 @@ These extend the generic script rules. All generic script rules still apply.
 - Use `if __name__ == "__main__":` as the entrypoint guard.
 - No top-level imperative code outside the `if __name__ == "__main__":` block.
   Top-level code is: imports, constants, class/function definitions, and the entrypoint guard.
+
+## Error handling
+
 - Define a `ScriptError(Exception)` class at the top of the script, right after imports/constants.
 - Raise `ScriptError` (or a subclass) from any function that hits an error the script should report.
 - `main()` returns `bool` — `True` on success, `False` on failure.
@@ -32,7 +35,7 @@ Add a top-level `#` comment immediately after the shebang — one line describin
 
 ```python
 #!/usr/bin/env python3
-# One-line description of what this script does.
+# [1-2 line description of what this script does]
 
 import sys
 # [other stdlib imports]
@@ -71,7 +74,7 @@ if __name__ == "__main__":
     try:
         sys.exit(0 if main() else 1)
     except ScriptError as exc:
-        print_err(f"ERROR: {exc}")
+        print_err(f"!! ERROR: {exc}")
         sys.exit(1)
 ```
 

@@ -58,6 +58,7 @@ Four layers: generic SKILL.md → generic module/script-rules.md → lang SKILL.
 | How to identify module vs script in this language | lang `SKILL.md` |
 | Conditional load (`module-rules.md` / `script-rules.md`) | lang `SKILL.md` |
 | No shebang, no `exit`, sourcing/import conventions | lang `module-rules.md` |
+| Lang-specific error signaling (`fail`, `ScriptError`, `anyhow::Result`, etc.) | lang `script-rules.md` |
 | Shebang, strict-mode flags, lang boilerplate template | lang `script-rules.md` |
 
 ## Required structure for a lang skill
@@ -114,16 +115,69 @@ For these, ship a **single `SKILL.md`**:
   Mirror the `write-code-generic` note for the same concept.
 - Keep the required `## Testing` section and description-frontmatter requirements.
 
-Required companion files (siblings of `SKILL.md`):
-- `module-rules.md` — lang-specific module rules (extend `write-code-generic/module-rules.md`)
-- `script-rules.md` — lang-specific script rules + complete copy-pasteable boilerplate template
-  Omit both for languages without an executable-script concept (see above).
+## Required companion file structure
 
-Required additional section: `## Testing` — name the known testing system(s) for the language and
+Lang-specific `module-rules.md` and `script-rules.md` must follow these structural rules.
+
+### `module-rules.md`
+
+```md
+# <Lang> module code rules
+
+Rules for <lang> module code — <how module code is identified>.
+These extend the generic module rules. All generic module rules still apply.
+
+## Rules
+[lang-specific module rules: import conventions, etc.]
+
+## Guidelines
+[lang-specific soft recommendations — omit section if none]
+```
+
+### `script-rules.md`
+
+```md
+# <Lang> script code rules
+
+Rules for <lang> script code.
+These extend the generic script rules. All generic script rules still apply.
+
+## Rules
+[lang-specific script rules: shebang, strict-mode flags, file extension convention, etc.]
+
+## Error handling
+[lang-specific error signaling: which error type/mechanism to use, how to catch it,
+what happens on failure. Scripts always exit non-zero on error.]
+
+## Full script boilerplate
+[complete template showing shebang, some helper functions, and the entrypoint (usually `main`)]
+```
+
+### Section rules
+
+- `## Rules` is always required in both companion files.
+- `## Error handling` is **required** in `script-rules.md`.
+  Every language has lang-specific error signaling, for example: `fail` in bash/nushell,
+  `ScriptError` + try-except in Python, `anyhow::Result` in Rust, etc.
+- `## Full script boilerplate` is **required** in `script-rules.md`.
+  It must be a complete, copy-pasteable template — not pseudo-code.
+- `## Guidelines` is optional in both files. Add when there are lang-specific soft
+  recommendations that don't fit the generic guidelines.
+
+### Variant: error handling already in Rules
+
+When the entire error handling model fits in one bullet (e.g. "Signal failure with
+`error make { msg: "..." }`"), it may stay in `## Rules` of `module-rules.md`.
+For `script-rules.md`, `## Error handling` is always a separate section —
+script error handling is richer (multiple helpers, fail/print_err/usage_and_exit split).
+
+## Required additional sections for SKILL.md
+
+`## Testing` — name the known testing system(s) for the language and
 which skill to load for writing tests.
-If no testing skill exists yet, say so explicitly and instruct the agent to ask the user.
+If no testing skill exists yet, say so explicitly and ask the user.
 
-Optional sections (add when relevant): `## Output capture`, `## Error handling`, `## Subcommands`.
+Optional SKILL.md sections (add when relevant): `## Output capture`, `## Subcommands`.
 
 ## Description frontmatter requirements
 

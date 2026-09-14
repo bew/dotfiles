@@ -24,6 +24,13 @@ function echo_err() {
     echo >&2 "$*"
 }
 
+# Print formatted error to stderr and exit 1.
+function fail() {
+    local msg="$1"
+    echo_err "!! ERROR: $msg"
+    exit 1
+}
+
 # Print usage to stderr and exit with given status
 function usage_and_exit() {
     local status="$1"
@@ -49,4 +56,15 @@ function main() {
 }
 
 main "$@"
+```
+
+If needed, the multiline variant of `fail` can be written:
+```sh
+# Print formatted error lines to stderr and exit 1.
+function fail() {
+    local msg="$1"; shift
+    echo_err "!! ERROR: $msg"
+    for line in "$@"; do echo_err "   $line"; done
+    exit 1
+}
 ```
