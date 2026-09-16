@@ -8,8 +8,8 @@ in {
     ./gui-force-system-locales.nix
   ];
 
-  xdg.configFile."espanso".source = config.dyndots.mkLink ../../../gui-apps/espanso;
-  dyndots.checkedPaths = [ config.xdg.configFile."espanso".source ];
+  xdg.configFile."espanso".source = config.dynpaths.mkLink ../../../gui-apps/espanso;
+  dynpaths.checkedPaths = [ config.xdg.configFile."espanso".source ];
 
   home.packages = [
     stable.dupeguru # Nice cross-platform duplicate finder

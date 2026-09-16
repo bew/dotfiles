@@ -112,9 +112,9 @@ in {
   };
 
   # TODO: kit modules (like editable) should eventually be injected from their flake
-  # (e.g. `flakeInputs.dyndots.modules.kitsys.editable`) rather than imported by path.
-  # For now, path import as the dyndots flake lives in the same repo.
-  imports = [ ../../dyndots-flake/editable.kit-module.nix ];
+  # (e.g. `flakeInputs.dynpaths.modules.kitsys.editable`) rather than imported by path.
+  # For now, path import as the dynpaths flake lives in the same repo.
+  imports = [ ../../dynpaths-flake/editable.kit-module.nix ];
 }
 
 # ------------------------------------------------------------------------

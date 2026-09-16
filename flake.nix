@@ -38,9 +38,9 @@
     homeManager.url = "github:nix-community/home-manager/release-26.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
 
-    dyndots.url = "path:./nix/dyndots-flake";
-    dyndots.inputs.nixpkgs.follows = "nixpkgsStable";
-    dyndots.inputs.systems.follows = "systems";
+    dynpaths.url = "path:./nix/dynpaths-flake";
+    dynpaths.inputs.nixpkgs.follows = "nixpkgsStable";
+    dynpaths.inputs.systems.follows = "systems";
 
     systems.url = "github:nix-systems/default";
     devshell.url = "github:numtide/devshell";
@@ -109,7 +109,7 @@
       # Called per-home so each host gets its own real dotfiles path ✨.
       mkKitConfigsEditable = dotfilesRealPath: let
         editableOverride = {
-          editable.config = {
+          editable.roots.dots = {
             nixStorePath = self;
             realPath = dotfilesRealPath;
           };
@@ -139,14 +139,16 @@
             home.homeDirectory = homeDir;
           }
           (import ./nix/setup-nix-registry.nix { inherit flakeInputs; })
-          flakeInputs.dyndots.modules.generic.dyndots
-          flakeInputs.dyndots.modules.homeManager.dyndotsChecker
+          flakeInputs.dynpaths.modules.generic.dynpaths
+          flakeInputs.dynpaths.modules.homeManager.dynpathsChecker
           {
-            # Configure my dotfiles path, so that direct links created with `config.dyndots.mkLink` point to
-            # my repo (editable!).
-            dyndots.mode = "editable";
-            dyndots.dotfilesRealPath = "${homeDir}/.dot";
-            dyndots.dotfilesNixPath = flakeInputs.self;
+            # Configure my dotfiles root, so that direct links created with
+            # `config.dynpaths.mkLink` point to my repo (editable!).
+            dynpaths.mode = "editable";
+            dynpaths.roots.dots = {
+              nixStorePath = flakeInputs.self;
+              realPath = "${homeDir}/.dot";
+            };
           }
         ];
       };

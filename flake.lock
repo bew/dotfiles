@@ -18,7 +18,7 @@
         "type": "github"
       }
     },
-    "dyndots": {
+    "dynpaths": {
       "inputs": {
         "nixpkgs": [
           "nixpkgsStable"
@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "path": "./nix/dyndots-flake",
+        "path": "./nix/dynpaths-flake",
         "type": "path"
       },
       "original": {
-        "path": "./nix/dyndots-flake",
+        "path": "./nix/dynpaths-flake",
         "type": "path"
       },
       "parent": []
@@ -157,7 +157,7 @@
     "root": {
       "inputs": {
         "devshell": "devshell",
-        "dyndots": "dyndots",
+        "dynpaths": "dynpaths",
         "homeManager": "homeManager",
         "myTemplates": "myTemplates",
         "nixpkgsBleedingEdge": "nixpkgsBleedingEdge",

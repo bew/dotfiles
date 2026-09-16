@@ -1,5 +1,5 @@
 {
-  description = "dyndots — editable dotfiles symlink system for Nix/home-manager";
+  description = "dynpaths — editable symlink system for Nix/home-manager (multiple live roots)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -15,12 +15,12 @@
       };
     in {
       # Generic module for Nix module system, for use in NixOS/HomeManager/other module systems.
-      # Includes: dyndots options (config) + mkLink (helper fn) + checkerScript (reference).
-      modules.generic.dyndots = import ./dyndots.nix;
+      # Includes: dynpaths options (config) + mkLink (helper fn) + checkerScript (reference).
+      modules.generic.dynpaths = import ./dynpaths.nix;
 
-      # home-manager specific module: wires `dyndots.checkerScript` into
-      # `home.activation`, must be imported alongside `modules.generic.dyndots`.
-      modules.homeManager.dyndotsChecker = import ./dyndots-checker-for-hm.nix;
+      # home-manager specific module: wires `dynpaths.checkerScript` into
+      # `home.activation`, must be imported alongside `modules.generic.dynpaths`.
+      modules.homeManager.dynpathsChecker = import ./dynpaths-checker-for-hm.nix;
 
       # Kit module adding editable.* options and lib.mkLink to a kit config.
       # Not a NixOS module — intended for use with kit-system eval (or similar).
@@ -28,7 +28,7 @@
 
       checks = eachSystem (system:
         let inherit (forSys system) pkgs lib;
-        in import ./checks.nix { inherit pkgs lib; dyndots-flake = self; }
+        in import ./checks.nix { inherit pkgs lib; dynpaths-flake = self; }
       );
     };
 }
