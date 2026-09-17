@@ -80,7 +80,7 @@ in {
   };
 
   config = {
-    # Assigned unconditionally: the resolver handles the store-link fallback.
+    # Assigned unconditionally: the resolver handles the store-copy fallback.
     # A non-null per-Root `mode` still wins even when not effectively enabled.
     lib.mkLink = resolver { roots = cfg.roots; inherit globalMode; };
   };

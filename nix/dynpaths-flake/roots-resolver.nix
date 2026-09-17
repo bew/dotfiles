@@ -1,8 +1,8 @@
 { lib, pkgs }:
 
 let
-  # Symlink core: builds an Editable link for a resolved Root.
-  mkEditableLink = pkgs.callPackage ./editable-symlinker.nix { };
+  # Symlink core: builds a Symlink redirect for a resolved Root.
+  mkSymlinkRedirect = pkgs.callPackage ./symlink-redirect.nix { };
 
   # Roots as a list of `{ name, nixStorePath, realPath, mode }`, tagging each with its name.
   rootList = roots:
@@ -42,8 +42,8 @@ let
 in
 
 # Build a `mkLink` function for the given Roots and global mode.
-# `mkLink givenPath` returns an Editable link when the winning Root's Effective
-# mode is editable, and the given path unchanged (a Store link) otherwise.
+# `mkLink givenPath` returns a Symlink redirect when the winning Root's Effective
+# mode is editable, and the given path unchanged (a Store copy) otherwise.
 { roots, globalMode }:
 
 let
@@ -57,11 +57,11 @@ let
       winner = findWinner sortedRoots givenPath;
     in
     if winner == null then
-      givenPath # No Root matches: silent Store-link fallback.
+      givenPath # No Root matches: silent Store-copy fallback.
     else if effectiveMode winner != "editable" then
       givenPath
     else
-      mkEditableLink { inherit (winner) name nixStorePath realPath; } givenPath;
+      mkSymlinkRedirect { inherit (winner) name nixStorePath realPath; } givenPath;
 in
 
 # Force the duplicate check eagerly, so it fails at eval time

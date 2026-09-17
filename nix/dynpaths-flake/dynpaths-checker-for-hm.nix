@@ -2,7 +2,7 @@
 
 # home-manager specific wiring for dynpaths.checkerScript.
 # Runs the checker script early in the activation DAG, before any filesystem
-# changes, so activation aborts cleanly if an editable link target is missing.
+# changes, so activation aborts cleanly if a symlink redirect target is missing.
 #
 # Must be imported alongside nixosModules.dynpaths.
 {

@@ -1,5 +1,5 @@
 {
-  description = "dynpaths — editable symlink system for Nix/home-manager (multiple live roots)";
+  description = "dynpaths — Dynamic paths system for Nix modules";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

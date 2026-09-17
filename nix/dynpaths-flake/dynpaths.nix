@@ -35,7 +35,7 @@ let
   # A Root's mode wins when set, otherwise the global mode applies.
   effectiveMode = root: if root.mode != null then root.mode else cfg.mode;
 
-  # Editable links are only checked when at least one Root resolves to editable.
+  # Symlink redirects are only checked when at least one Root resolves to editable.
   anyEditableRoot = lib.any (root: effectiveMode root == "editable") (lib.attrValues cfg.roots);
 in
 {
@@ -91,7 +91,7 @@ in
     # Warn early when editable mode is requested but no Root can ever match.
     dynpaths.mkLink =
       lib.warnIf (cfg.mode == "editable" && cfg.roots == { })
-        "dynpaths: mode is 'editable' but no roots are declared; all links will fall back to store links"
+        "dynpaths: mode is 'editable' but no roots are declared; all links will fall back to store copies"
         (resolver { roots = cfg.roots; globalMode = cfg.mode; });
 
     dynpaths.checkerScript = (
@@ -105,7 +105,7 @@ in
             lib.optionalString (pathDrv ? dynpathRedirectTarget) /* bash */ ''
               _dynpaths_target=${lib.escapeShellArg pathDrv.dynpathRedirectTarget}
               if [[ ! -e "$_dynpaths_target" ]]; then
-                >&2 echo "dynpaths: editable link target does not exist: '$_dynpaths_target' (matched root: ${pathDrv.dynpathMatchedRoot.name})"
+                >&2 echo "dynpaths: symlink redirect target does not exist: '$_dynpaths_target' (matched root: ${pathDrv.dynpathMatchedRoot.name})"
                 _dynpaths_failed=1
               fi
             ''

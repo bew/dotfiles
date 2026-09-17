@@ -7,7 +7,7 @@
   name,
   # Store-side base of the root, stripped from the given path
   nixStorePath,
-  # Real path on the system, will be used as the base for editable links
+  # Real path on the system, will be used as the base for symlink redirects
   realPath,
 }:
 

@@ -54,7 +54,7 @@ let
   };
 
   # -------------------------------------------------------------------------
-  # Editable link resolution
+  # Symlink redirect resolution
 
 in {
 
@@ -123,7 +123,7 @@ in {
       cfg = evalDynpaths editableConfig;
       path = "${pkgs.hello}/foo";
     in [
-      (do-assert "no matching Root yields a Store link (path unchanged)"
+      (do-assert "no matching Root yields a Store copy (path unchanged)"
         (cfg.mkLink path == path))
     ]
   );
