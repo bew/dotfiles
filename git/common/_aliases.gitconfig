@@ -173,8 +173,10 @@
   # info aliases
 
   s   = status --ignore-submodules=all
-  sua = status --untracked-files=all
+  su  = status --untracked-files=all
   sun = status --untracked-files=no
+  # 'snu' for 'status no untracked'
+  snu = status --untracked-files=no
 
   # log (minimal: with metadata + subject)
   pretty-log = log --graph --pretty=bew-minimal
