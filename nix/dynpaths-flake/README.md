@@ -1,7 +1,7 @@
 # dynpaths - Dynamic Paths system to avoid Nix rebuilds on demand!
 
 `dynpaths` is a small flake that builds config paths as symlinks whose target can be either
-a read-only copy in the Nix store, or a live/editable target anywhere on disk.
+a read-only copy in the Nix store, or a live target anywhere on disk.
 
 It targets Home Manager / NixOS setups where config files are referenced from a flake:
 the same configuration yields store copies by default, but can give symlink redirects on-demand.
@@ -20,16 +20,16 @@ for my espanso config folder:
   xdg.configFile."espanso".source = config.dynpaths.mkLink ./gui-apps/espanso;
 
   # (3) later / in an override / for a specific home: the single switch
-  dynpaths.mode = "editable";
+  dynpaths.mode = "dynamic";
 }
 ```
-- With `dynpaths.mode = "editable"` the link resolves to `/home/myuser/.dot/gui-apps/espanso`.
-- With `dynpaths.mode = "not-editable"` (*the default*) the same code produces a link into the store.
+- With `dynpaths.mode = "dynamic"` the link resolves to `/home/myuser/.dot/gui-apps/espanso`.
+- With `dynpaths.mode = "static"` (*the default*) the same code produces a link into the store.
 
 ## Why
 
-The point is to have a single `editable`/`not-editable` switch, **without changing** the config:
-Flipping that single switch (global or per root) turns all affected links editable ✨.
+The point is to have a single `dynamic`/`static` switch, **without changing** the config:
+Flipping that single switch (global or per root) makes all affected links resolve to their live targets ✨.
 
 => You do not maintain two configs, rewrite paths, or re-wire imports:
 the same `mkLink` call resolves to a store copy or a symlink redirect depending on a single option.
@@ -39,7 +39,7 @@ the same `mkLink` call resolves to a store copy or a symlink redirect depending 
 > where I want to freely edit my neovim/git/tmux configs without a Nix rebuild step.
 >
 > For other targets like servers, I don't plan to edit any config and these home profiles can stay
-> non-editable.
+> static.
 
 ## Quick start (NixOS / Home Manager)
 
@@ -61,8 +61,8 @@ inputs.dynpaths.url = "path:./nix/dynpaths-flake"; # FIXME: use repo once extrac
     flakeInputs.dynpaths.modules.homeManager.dynpathsChecker
   ];
 
-  # The single switch. Leave this as "not-editable" for store copies.
-  dynpaths.mode = "editable";
+  # The single switch. Leave this as "static" for store copies.
+  dynpaths.mode = "dynamic";
   dynpaths.roots.dots = {
     nixStorePath = flakeInputs.self;      # store-side base
     realPath = "/home/myuser/.dot";    # live checkout
@@ -81,7 +81,7 @@ inputs.dynpaths.url = "path:./nix/dynpaths-flake"; # FIXME: use repo once extrac
 
 ## How it works
 
-Example editable rewrite of a path literal before it reaches the store:
+Example dynamic rewrite of a path literal before it reaches the store:
 ```text
 For a root 'dots' defined as:
    /nix/store/thehash-src  ->  /home/myuser/.dot
@@ -105,8 +105,8 @@ _would-be_ Nix store path against the declared *Roots* and applies the *Effectiv
 | Condition | Result | Copied to the store |
 | --- | --- | --- |
 | No *Root* matches | the path unchanged | the content |
-| Matched *Root*, `not-editable` | the path unchanged | the content |
-| Matched *Root*, `editable` | a *symlink redirect* | only the symlink, not the content |
+| Matched *Root*, `static` | the path unchanged | the content |
+| Matched *Root*, `dynamic` | a *symlink redirect* | only the symlink, not the content |
 
 **Important terms**:
 
@@ -154,7 +154,7 @@ Example with two valid roots:
 
 ## Activation checking
 
-`dynpaths.checkerScript` is non-null exactly when at least one Root resolves to editable.
+`dynpaths.checkerScript` is non-null exactly when at least one Root resolves to dynamic.
 It is a shell script that checks, for each entry in `dynpaths.checkedPaths`, that the link's
 real target exists on the filesystem.
 Entries without a `dynpathRedirectTarget` passthru (store copies) are silently skipped.
@@ -184,11 +184,11 @@ With `modules.homeManager.dynpathsChecker` imported, the script runs as an activ
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `dynpaths.mode` | `editable`/`not-editable` | `not-editable` | Mode for *Roots* without `mode`. |
+| `dynpaths.mode` | `dynamic`/`static` | `static` | Mode for *Roots* without `mode`. |
 | `dynpaths.roots` | attrset of *Root* | `{ }` | Named *Roots* (see below). |
 | `dynpaths.mkLink` | `path -> package` | managed by module | Link factory: store copy or symlink redirect. |
 | `dynpaths.checkedPaths` | list of package | `[ ]` | Links to verify at activation. |
-| `dynpaths.checkerScript` | `package` or null | read-only | Null unless a *Root* is editable. |
+| `dynpaths.checkerScript` | `package` or null | read-only | Null unless a *Root* is dynamic. |
 
 Each *Root* has the following shape:
 
@@ -196,23 +196,22 @@ Each *Root* has the following shape:
 | --- | --- | --- | --- |
 | `nixStorePath` | `pathInStore` | required | Store-side base; may be a nested subdir. |
 | `realPath` | `path` | required | Absolute live base, outside the store. |
-| `mode` | `null` / `"editable"` / `"not-editable"` | `null` | Per-*Root* override; else global. |
+| `mode` | `null` / `"dynamic"` / `"static"` | `null` | Per-*Root* override; else global. |
 
 > [!NOTE]
 > `dynpaths.mkLink` is assigned by the `dynpaths` module and is meant to be *called*
 > (via `config.dynpaths.mkLink`), not configured.
 
-## Kit module
+## Toolkit module
 
 FIXME: this is specific to my dotfiles repo!
 
-`modules.kitsys.editable` is a kit module (not a NixOS module) for configs evaluated by this
-repo's kit system.
-It adds `editable.{isSupported,enable,try_enable,roots,isEffectivelyEnabled}` and assigns
-`lib.mkLink` from the same resolver, so resolution behaves identically.
-Here `editable.isEffectivelyEnabled` provides the global mode — `true` acts like `"editable"`,
-`false` like `"not-editable"` — and a per-Root `mode` still wins.
-The entries in `editable.roots` have the same shape as `dynpaths.roots`.
+`modules.kitsys.dynpaths` is one of the base module for the toolkit system in this repo.
+It adds `dynpaths.roots` + `dynamicConfig.{isSupported,enable,tryEnable,isEffectivelyEnabled}` and
+assigns `lib.mkLink` from the same resolver, so resolution behaves identically.
+Here `dynamicConfig.isEffectivelyEnabled` provides the global mode — `true` acts like `"dynamic"`,
+`false` like `"static"` — and a per-Root `mode` still wins.
+The entries in `dynpaths.roots` have the same *Root* shape as in the generic module.
 See `../DESIGN_config_system.md` for the kit/module/preset concepts.
 
 ## Development

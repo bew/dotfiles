@@ -43,7 +43,7 @@ in
 
 # Build a `mkLink` function for the given Roots and global mode.
 # `mkLink givenPath` returns a Symlink redirect when the winning Root's Effective
-# mode is editable, and the given path unchanged (a Store copy) otherwise.
+# mode is dynamic, and the given path unchanged (a Store copy) otherwise.
 { roots, globalMode }:
 
 let
@@ -58,7 +58,7 @@ let
     in
     if winner == null then
       givenPath # No Root matches: silent Store-copy fallback.
-    else if effectiveMode winner != "editable" then
+    else if effectiveMode winner != "dynamic" then
       givenPath
     else
       mkSymlinkRedirect { inherit (winner) name nixStorePath realPath; } givenPath;

@@ -47,9 +47,9 @@ let
     };
   };
 
-  # Editable config shared by several tests.
-  editableConfig = {
-    dynpaths.mode = "editable";
+  # Dynamic config shared by several tests.
+  dynamicConfig = {
+    dynpaths.mode = "dynamic";
     dynpaths.roots = baseRoots;
   };
 
@@ -60,7 +60,7 @@ in {
 
   redirect-target-maps-store-subpath = check "redirect-target-maps-store-subpath" (
     let
-      cfg = evalDynpaths editableConfig;
+      cfg = evalDynpaths dynamicConfig;
       link = cfg.mkLink (fakeSubPath "nvim");
     in [
       (do-assert "dynpathRedirectTarget maps store subpath to real path"
@@ -72,7 +72,7 @@ in {
 
   redirect-target-nested-subpath = check "redirect-target-nested-subpath" (
     let
-      cfg = evalDynpaths editableConfig;
+      cfg = evalDynpaths dynamicConfig;
       link = cfg.mkLink (fakeSubPath "gui-apps/espanso");
     in [
       (do-assert "nested subpath is correctly remapped"
@@ -83,7 +83,7 @@ in {
   longest-prefix-root-wins = check "longest-prefix-root-wins" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "editable";
+        dynpaths.mode = "dynamic";
         dynpaths.roots = baseRoots // {
           nvim-dev = {
             nixStorePath = "${fakeStorePath}/nvim";
@@ -103,7 +103,7 @@ in {
   parent-root-wins-outside-nested = check "parent-root-wins-outside-nested" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "editable";
+        dynpaths.mode = "dynamic";
         dynpaths.roots = baseRoots // {
           nvim-dev = {
             nixStorePath = "${fakeStorePath}/nvim";
@@ -120,7 +120,7 @@ in {
 
   unmatched-path-is-store-link = check "unmatched-path-is-store-link" (
     let
-      cfg = evalDynpaths editableConfig;
+      cfg = evalDynpaths dynamicConfig;
       path = "${pkgs.hello}/foo";
     in [
       (do-assert "no matching Root yields a Store copy (path unchanged)"
@@ -130,7 +130,7 @@ in {
 
   no-path-component-boundary-match = check "no-path-component-boundary-match" (
     let
-      cfg = evalDynpaths editableConfig;
+      cfg = evalDynpaths dynamicConfig;
       path = "${fakeStorePath}X/foo";
     in [
       (do-assert "a sibling path sharing a string prefix does NOT match"
@@ -141,38 +141,38 @@ in {
   # -------------------------------------------------------------------------
   # Mode resolution
 
-  not-editable-mkLink-is-identity = check "not-editable-mkLink-is-identity" (
+  static-mkLink-is-identity = check "static-mkLink-is-identity" (
     let
-      cfg = evalDynpaths (overlayDynpaths editableConfig { mode = "not-editable"; });
+      cfg = evalDynpaths (overlayDynpaths dynamicConfig { mode = "static"; });
       path = fakeSubPath "nvim";
     in [
-      (do-assert "mkLink in not-editable mode returns givenPath unchanged"
+      (do-assert "mkLink in static mode returns givenPath unchanged"
         (cfg.mkLink path == path))
     ]
   );
 
-  per-root-mode-overrides-global-not-editable = check "per-root-mode-overrides-global-not-editable" (
+  per-root-mode-overrides-global-static = check "per-root-mode-overrides-global-static" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "not-editable";
-        dynpaths.roots.dots = baseRoots.dots // { mode = "editable"; };
+        dynpaths.mode = "static";
+        dynpaths.roots.dots = baseRoots.dots // { mode = "dynamic"; };
       };
       link = cfg.mkLink (fakeSubPath "nvim");
     in [
-      (do-assert "per-Root mode editable wins over global not-editable"
+      (do-assert "per-Root mode dynamic wins over global static"
         (link.dynpathRedirectTarget == "/home/user/.dot/nvim"))
     ]
   );
 
-  per-root-mode-overrides-global-editable = check "per-root-mode-overrides-global-editable" (
+  per-root-mode-overrides-global-dynamic = check "per-root-mode-overrides-global-dynamic" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "editable";
-        dynpaths.roots.dots = baseRoots.dots // { mode = "not-editable"; };
+        dynpaths.mode = "dynamic";
+        dynpaths.roots.dots = baseRoots.dots // { mode = "static"; };
       };
       path = fakeSubPath "nvim";
     in [
-      (do-assert "per-Root mode not-editable wins over global editable"
+      (do-assert "per-Root mode static wins over global dynamic"
         (cfg.mkLink path == path))
     ]
   );
@@ -180,7 +180,7 @@ in {
   duplicate-storepath-throws = check "duplicate-storepath-throws" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "editable";
+        dynpaths.mode = "dynamic";
         dynpaths.roots = {
           a = { nixStorePath = fakeStorePath; realPath = "/home/user/a"; };
           b = { nixStorePath = fakeStorePath; realPath = "/home/user/b"; };
@@ -196,40 +196,40 @@ in {
   # -------------------------------------------------------------------------
   # checkerScript
 
-  checker-script-null-when-no-editable-root = check "checker-script-null-when-no-editable-root" (
+  checker-script-null-when-no-dynamic-root = check "checker-script-null-when-no-dynamic-root" (
     let
-      cfg = evalDynpaths { dynpaths.mode = "not-editable"; };
+      cfg = evalDynpaths { dynpaths.mode = "static"; };
     in [
-      (do-assert "checkerScript is null when mode is not-editable"
+      (do-assert "checkerScript is null when mode is static"
         (cfg.checkerScript == null))
     ]
   );
 
-  checker-script-null-when-roots-not-editable = check "checker-script-null-when-roots-not-editable" (
+  checker-script-null-when-roots-static = check "checker-script-null-when-roots-static" (
     let
       cfg = evalDynpaths {
-        dynpaths.mode = "editable";
-        dynpaths.roots.dots = baseRoots.dots // { mode = "not-editable"; };
+        dynpaths.mode = "dynamic";
+        dynpaths.roots.dots = baseRoots.dots // { mode = "static"; };
       };
     in [
-      (do-assert "checkerScript is null when no Root resolves to editable"
+      (do-assert "checkerScript is null when no Root resolves to dynamic"
         (cfg.checkerScript == null))
     ]
   );
 
-  checker-script-is-drv-in-editable = check "checker-script-is-drv-in-editable" (
+  checker-script-is-drv-in-dynamic = check "checker-script-is-drv-in-dynamic" (
     let
-      cfg = evalDynpaths editableConfig;
+      cfg = evalDynpaths dynamicConfig;
     in [
-      (do-assert "checkerScript is a derivation when a Root is editable"
+      (do-assert "checkerScript is a derivation when a Root is dynamic"
         (lib.isDerivation cfg.checkerScript))
     ]
   );
 
   checker-script-contains-target-and-root = check "checker-script-contains-target-and-root" (
     let
-      link = (evalDynpaths editableConfig).mkLink (fakeSubPath "nvim");
-      cfg = evalDynpaths (overlayDynpaths editableConfig {
+      link = (evalDynpaths dynamicConfig).mkLink (fakeSubPath "nvim");
+      cfg = evalDynpaths (overlayDynpaths dynamicConfig {
         checkedPaths = [ link ];
       });
       scriptText = builtins.readFile cfg.checkerScript;
@@ -248,7 +248,7 @@ in {
       # Drop store-path context: lib.hasInfix builds a `builtins.match` pattern,
       # which rejects strings carrying store references.
       plainPathStr = lib.unsafeDiscardStringContext (toString plainPath);
-      cfg = evalDynpaths (overlayDynpaths editableConfig {
+      cfg = evalDynpaths (overlayDynpaths dynamicConfig {
         checkedPaths = [ plainPath ];
       });
       scriptText = builtins.readFile cfg.checkerScript;

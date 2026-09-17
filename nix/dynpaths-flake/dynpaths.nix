@@ -25,7 +25,7 @@ let
         example = ''"/home/bew/.dot"'';
       };
       mode = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum [ "editable" "not-editable" ]);
+        type = lib.types.nullOr (lib.types.enum [ "dynamic" "static" ]);
         default = null;
         description = "Per-Root mode; null inherits the global `dynpaths.mode`";
       };
@@ -35,14 +35,14 @@ let
   # A Root's mode wins when set, otherwise the global mode applies.
   effectiveMode = root: if root.mode != null then root.mode else cfg.mode;
 
-  # Symlink redirects are only checked when at least one Root resolves to editable.
-  anyEditableRoot = lib.any (root: effectiveMode root == "editable") (lib.attrValues cfg.roots);
+  # Symlink redirects are only checked when at least one Root resolves to dynamic.
+  anyDynamicRoot = lib.any (root: effectiveMode root == "dynamic") (lib.attrValues cfg.roots);
 in
 {
   options = with lib; {
     dynpaths.mode = mkOption {
-      type = types.enum [ "editable" "not-editable" ];
-      default = "not-editable";
+      type = types.enum [ "dynamic" "static" ];
+      default = "static";
     };
 
     dynpaths.roots = mkOption {
@@ -55,7 +55,7 @@ in
     };
 
     dynpaths.mkLink = mkOption {
-      description = "Entrypoint helper function to be used to make dynpaths links (may be editable)";
+      description = "Entrypoint helper function to be used to make dynpaths references (may be dynamic!)";
     };
 
     dynpaths.checkedPaths = mkOption {
@@ -80,7 +80,7 @@ in
       readOnly = true;
       description = ''
         A script derivation that checks all dynpaths.checkedPaths exist on the real filesystem.
-        Null when no Root resolves to editable (nothing to check).
+        Null when no Root resolves to dynamic (nothing to check).
         Intended to be wired into an activation script by a higher-level module
         (e.g. dynpaths-checker-for-hm.nix).
       '';
@@ -88,14 +88,14 @@ in
   };
 
   config = {
-    # Warn early when editable mode is requested but no Root can ever match.
+    # Warn early when dynamic mode is requested but no Root can ever match.
     dynpaths.mkLink =
-      lib.warnIf (cfg.mode == "editable" && cfg.roots == { })
-        "dynpaths: mode is 'editable' but no roots are declared; all links will fall back to store copies"
+      lib.warnIf (cfg.mode == "dynamic" && cfg.roots == { })
+        "dynpaths: mode is 'dynamic' but no roots are declared; all links will fall back to store copies"
         (resolver { roots = cfg.roots; globalMode = cfg.mode; });
 
     dynpaths.checkerScript = (
-      if !anyEditableRoot then
+      if !anyDynamicRoot then
         null
       else
         let

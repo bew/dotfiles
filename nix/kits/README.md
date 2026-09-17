@@ -5,7 +5,7 @@ It is built with `newToolkit` in [./toolkits.nix](./toolkits.nix) — the regist
 
 Each toolkit bundles:
 - the shared tool [base module](./kit-modules/toolkit-base.kit-module.nix)
-- the editable module (always injected, from the `dynpaths` flake input)
+- the `dynpaths` toolkit module, from the `dynpaths` flake input
 - and the tool-specific base module
 
 A **tool config** is the evaluation of a toolkit with a config module:

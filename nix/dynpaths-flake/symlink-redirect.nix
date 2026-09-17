@@ -25,7 +25,7 @@ let
 in
 
 # $out is a drv that create a symlink redirect:
-# .. from store path ($out) -> to editable target (like ~/.dot/foo)
+# .. from store path ($out) -> to live target (like ~/.dot/foo)
 runCommandLocal "direct-symlink-${builtins.baseNameOf givenPath}" {
   # Expose the real redirect target so callers can inspect it during eval.
   # (e.g. to gen activation checks)

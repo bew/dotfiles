@@ -102,29 +102,29 @@
         config = ./tmux/bew-config.tmuxkit-module.nix;
       };
 
-      # Returns editable kit configs with symlinks pointing to `dotfilesRealPath`.
+      # Returns dynamic kit configs with symlinks pointing to `dotfilesRealPath`.
       # Called per-home so each host gets its own real dotfiles path ✨.
-      mkKitConfigsEditable = dotfilesRealPath: let
-        editableOverride = {
-          editable.roots.dots = {
+      mkKitConfigsDynamic = dotfilesRealPath: let
+        dynpathsOverride = {
+          dynpaths.roots.dots = {
             nixStorePath = self;
             realPath = dotfilesRealPath;
           };
         };
-        makeEditable = config: config.lib.extendWith {
-          imports = [editableOverride];
-          # Make the config editable if it's supported
-          editable.try_enable = true;
+        makeDynamic = config: config.lib.extendWith {
+          imports = [dynpathsOverride];
+          # Make the config dynamic if it's supported
+          dynamicConfig.tryEnable = true;
         };
       in {
         zsh-bew = toolConfigs.zsh-bew-bins-from-PATH;
-        nvim-minimal = makeEditable toolConfigs.nvim-minimal;
-        nvim-bew = makeEditable toolConfigs.nvim-bew;
-        tmux-bew = makeEditable toolConfigs.tmux-bew;
+        nvim-minimal = makeDynamic toolConfigs.nvim-minimal;
+        nvim-bew = makeDynamic toolConfigs.nvim-bew;
+        tmux-bew = makeDynamic toolConfigs.tmux-bew;
       };
     };
 
-    mkEditableBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configImports }: let
+    mkDynamicBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configImports }: let
       sys = forSys system;
       pkgs = sys.pkgsets.${defaultPkgsetName};
     in import "${flakeInputs.homeManager}/modules" {
@@ -141,7 +141,7 @@
           {
             # Configure my dotfiles root, so that direct links created with
             # `config.dynpaths.mkLink` point to my repo (editable!).
-            dynpaths.mode = "editable";
+            dynpaths.mode = "dynamic";
             dynpaths.roots.dots = {
               nixStorePath = flakeInputs.self;
               realPath = "${homeDir}/.dot";
@@ -152,13 +152,13 @@
 
       # Expose pkgs sets from flake inputs
       extraSpecialArgs.pkgsets = sys.pkgsets;
-      # Expose various tool configs to home modules, with editable symlinks for this host's dotfiles path
-      extraSpecialArgs.kitConfigs = sys.mkKitConfigsEditable "${homeDir}/.dot";
+      # Expose various tool configs to home modules, with symlink redirects for this host's dotfiles path
+      extraSpecialArgs.kitConfigs = sys.mkKitConfigsDynamic "${homeDir}/.dot";
       # .. Must be in `extraSpecialArgs` since it's going to be used in modules' imports.
     };
 
   in {
-    homeConfig.frametop-bew = mkEditableBewHomeConfig rec {
+    homeConfig.frametop-bew = mkDynamicBewHomeConfig rec {
       system = "x86_64-linux";
       username = "bew";
       homeDir = "/home/${username}";
@@ -169,7 +169,7 @@
       ];
     };
 
-    homeConfig.work-mac = mkEditableBewHomeConfig rec {
+    homeConfig.work-mac = mkDynamicBewHomeConfig rec {
       system = "aarch64-darwin";
       username = "benoitlesellierdechezelles";
       homeDir = "/Users/${username}";

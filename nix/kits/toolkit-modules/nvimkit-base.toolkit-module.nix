@@ -98,7 +98,7 @@ in {
     package = lib.mkDefault pkgs.neovim;
     toolName = "nvim";
 
-    editable.isSupported = true;
+    dynamicConfig.isSupported = true;
 
     outputs.NVIM_APPNAME = "nvim-${lib.removePrefix "nvim-" cfg.ID}";
 

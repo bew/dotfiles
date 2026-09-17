@@ -23,10 +23,10 @@ in {
     });
   in "${pluginDrv}/share/tmux-plugins/resurrect";
 
-  outputs.editable-cfgDir = cfg.lib.mkLink ./.;
+  outputs.dynamic-cfgDir = cfg.lib.mkLink ./.;
 
   # Only depend on conf files and scripts (skip Nix files to avoid useless rebuilds)
-  outputs.non-editable-cfgDir = fs.toSource {
+  outputs.static-cfgDir = fs.toSource {
     root = ./.;
     fileset = fs.unions [
       (fs.fileFilter (f: f.hasExt "conf") ./.)

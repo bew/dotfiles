@@ -22,9 +22,9 @@
       # `home.activation`, must be imported alongside `modules.generic.dynpaths`.
       modules.homeManager.dynpathsChecker = import ./dynpaths-checker-for-hm.nix;
 
-      # Kit module adding editable.* options and lib.mkLink to a kit config.
+      # Toolkit module adding dynpaths.* options and lib.mkLink to a toolkit config.
       # Not a NixOS module — intended for use with kit-system eval (or similar).
-      modules.kitsys.editable = import ./editable.kit-module.nix;
+      modules.kitsys.dynpaths = import ./dynpaths.toolkit-module.nix;
 
       checks = eachSystem (system:
         let inherit (forSys system) pkgs lib;

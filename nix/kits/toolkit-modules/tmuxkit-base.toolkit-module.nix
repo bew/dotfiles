@@ -16,8 +16,8 @@ in {
     };
   in {
     outputs.cfgDir = configDirOption;
-    outputs.editable-cfgDir = configDirOption;
-    outputs.non-editable-cfgDir = configDirOption;
+    outputs.dynamic-cfgDir = configDirOption;
+    outputs.static-cfgDir = configDirOption;
 
     # TODO: move to base toolkit? 🤔
     # (might need more flexibility, decide where to inject / maybe in upcoming wrapper-kit?)
@@ -43,11 +43,11 @@ in {
     package = lib.mkDefault pkgs.tmux;
     toolName = "tmux";
 
-    editable.isSupported = true;
+    dynamicConfig.isSupported = true;
 
     outputs.cfgDir = lib.mkMerge [
-      (lib.mkIf config.editable.isEffectivelyEnabled cfg.outputs.editable-cfgDir)
-      (lib.mkIf (!config.editable.isEffectivelyEnabled) cfg.outputs.non-editable-cfgDir)
+      (lib.mkIf config.dynamicConfig.isEffectivelyEnabled cfg.outputs.dynamic-cfgDir)
+      (lib.mkIf (!config.dynamicConfig.isEffectivelyEnabled) cfg.outputs.static-cfgDir)
     ];
     outputs.cfgEntrypoint = "${outs.cfgDir}/tmux.conf";
 

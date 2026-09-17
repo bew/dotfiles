@@ -99,8 +99,8 @@ in {
   };
 
   config = {
-    # Function (overridable) used to get the target of a symlink, to a (potentially editable) file/dir.
-    # Defaults to copy to store (not editable).
+    # Function used to get the target of a symlink, to a (potentially dynamic/editable) file/dir.
+    # Defaults to copy to store.
     lib.mkLink = lib.mkDefault (path: "${path}");
 
     outputs.deps.bins = pkgs.buildEnv {
@@ -113,10 +113,10 @@ in {
 }
 
 # ------------------------------------------------------------------------
-# 🤔 EDITABLE CONFIGS 🤔
+# 🤔 STATIC/DYNAMIC OUTPUTS 🤔
 
 # -------------------
-# IDEA: Helper to make different config dir layout based on whether the config is editable or not.
+# IDEA: Helper to make different config dir layout based on whether the config is dynamic or not.
 # -> I made a barebone impl for the tmux config, but it's kinda janky and would benefit from a more
 #    streamlined solution.
 #
@@ -124,8 +124,6 @@ in {
 # with the effective output.
 #
 # Something like:
-#   config.maybeEditableOutputs.FOO = {
-#     editableVariant = BAR;
-#     nonEditableVariant = BAZ;
-#   };
-#   config.outputs.somefoo = config.maybeEditableOutputs.FOO.resolved;
+#   config.dynoutputs.for-static.FOO = BAZ;
+#   config.dynoutputs.for-dynamic.FOO = BAR;
+#   config.outputs.somefoo = config.dynoutputs.FOO;
