@@ -6,30 +6,10 @@ let
   # Shared resolver: turns Roots + global mode into a `mkLink` function.
   resolver = pkgs.callPackage ./roots-resolver.nix { };
 
-  # Root option shape, shared by every entry in `dynpaths.roots`.
-  rootType = lib.types.submodule {
-    options = {
-      nixStorePath = lib.mkOption {
-        type = lib.types.pathInStore;
-        description = "Store-side base of the Root (may be a nested subdir of a store path)";
-        example = "./nvim";
-      };
-      realPath = lib.mkOption {
-        type = lib.types.path;
-        description = ''
-          Absolute live on-disk base of the Root, where the source is checked out and edited.
-          NOTE: must be a live path outside the store. A relative path literal (e.g. ./dot)
-          is coerced by Nix into a store path and silently breaks the live-path contract;
-          pass an absolute string or an absolute path value.
-        '';
-        example = ''"/home/bew/.dot"'';
-      };
-      mode = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum [ "dynamic" "static" ]);
-        default = null;
-        description = "Per-Root mode; null inherits the global `dynpaths.mode`";
-      };
-    };
+  # Per-Root option schema, shared with the toolkit module.
+  rootType = import ./roots-type.nix {
+    inherit lib;
+    defaultsToInheritFrom = "the global `dynpaths.mode`";
   };
 
   # A Root's mode wins when set, otherwise the global mode applies.

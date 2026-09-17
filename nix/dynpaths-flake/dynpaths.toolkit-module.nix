@@ -8,26 +8,10 @@ let
   # Shared resolver: turns Roots + global mode into a `mkLink` function.
   resolver = pkgs.callPackage ./roots-resolver.nix { };
 
-  # Root option shape, shared by every entry in `dynpaths.roots`.
-  rootType = ty.submodule {
-    options = {
-      nixStorePath = lib.mkOption {
-        type = ty.pathInStore;
-        description = "Store-side base of the Root (may be a nested subdir of a store path)";
-      };
-      realPath = lib.mkOption {
-        type = ty.path;
-        description = ''
-          Absolute live on-disk base of the Root, where the source is checked out and edited.
-          NOTE: must be a live path outside the store.
-        '';
-      };
-      mode = lib.mkOption {
-        type = ty.nullOr (ty.enum [ "dynamic" "static" ]);
-        default = null;
-        description = "Per-Root mode; null inherits `dynamicConfig.isEffectivelyEnabled`";
-      };
-    };
+  # Per-Root option schema, shared with the generic module.
+  rootType = import ./roots-type.nix {
+    inherit lib;
+    defaultsToInheritFrom = "`dynamicConfig.isEffectivelyEnabled`";
   };
 
   # Map the toolkit's boolean dynamic support onto the resolver's enum mode.
