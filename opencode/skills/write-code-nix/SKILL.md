@@ -14,9 +14,9 @@ Write idiomatic Nix code that evaluates and builds, building on generic conventi
 
 REQUIRES: load `write-code-generic` skill first.
 
-NOTE: This skill only covers general Nix expression files.
+NOTE: This skill covers general Nix expression files and reusable module option conventions.
 It will later expand with dedicated pages for other Nix areas:
-Nix packaging (/ derivations), NixOS/home-manager modules, flake-related topics, etc.
+Nix packaging (derivations), flake-related topics, etc.
 
 Nix is an expression language — there is no module/script split.
 Every file is an expression; the last expression is the file's value.
@@ -28,7 +28,7 @@ All files are module-like: generic module rules apply, script rules are N/A.
 - Pass dependencies via curried function args: `{ pkgs, lib, ... }:`.
   Destructure the args you use; keep `...` when more may be passed.
 - Use `? default` for optional args with defaults.
-- Wrap bindings in `let ... in`. Put a `#` comment above each binding.
+- For `let ... in` bindings: Comment non-obvious bindings; skip comments on self-evident ones.
 - Use `inherit x;` and `inherit (parent) a b;` to reuse bindings.
 - Interpolate values into strings with `${expr}`.
 - Use `''...''` for multi-line / indented strings — leading whitespace is stripped.
@@ -55,17 +55,44 @@ All files are module-like: generic module rules apply, script rules are N/A.
 - Aggregate a developer profile with `pkgs.buildEnv { name = "..."; paths = [...]; }`
   listing the tools the profile should expose.
 
+## Reusable modules
+
+For a Nix module that declares its own options:
+
+- Always define `ty = lib.types` binding, use it in all option types
+- Define `cfg = config.<root>` binding when the declared options share a root owned by this module
+
+Example module:
+```nix
+{ config, lib, ... }:
+
+let
+  ty = lib.types;
+  cfg = config.foo;
+in {
+  options {
+    foo.enable = lib.mkEnableOption "my super feature";
+    foo.bar = lib.mkOption {
+      description = ''some description'';
+      type = ty.enum ["hello" "world"];
+    };
+  };
+  config = lib.mkIf cfg.enable {
+    something.being.configured = cfg.bar;
+  };
+}
+```
+
 ## Verify
 
-Run `nixfmt --check <file>.nix` and `nix-instantiate --parse <file>.nix` yourself —
-both are fast syntax/format checks.
+Run `nix-instantiate --parse <file>.nix` yourself to quickly verify syntax.
 
 For the rest, ASK the user before running; they are heavier and may need network/build:
-1. `nix eval --file <file>.nix --json` — evaluate the expression.
-2. `nix build .#<attr>` — build a package attribute.
-3. `nix flake check` — full flake checks.
+1. `nix build .#<attr>` — build a package attribute.
+2. `nix flake check` — full flake checks.
 
-Do not auto-run the heavier checks. Report status and let the user decide.
+Do NOT auto-run the heavier checks. Report status and let the user decide.
+Do NOT use `nixfmt` unless explicitly requested by user.
 
 ## Testing
 
