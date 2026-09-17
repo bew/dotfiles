@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mypkglib = pkgs.callPackage ../mypkglib.nix {};
+  mypkglib = pkgs.callPackage ../../mypkglib.nix {};
 
   ty = lib.types;
   cfg = config;

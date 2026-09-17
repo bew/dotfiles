@@ -29,17 +29,17 @@ in {
   toolkits = {
     zshkit = newToolkit {
       tool = "zsh";
-      baseModule = ./zshkit-base.toolkit-module.nix;
+      baseModule = ./toolkit-modules/zshkit-base.toolkit-module.nix;
       meta.name = "Zsh tool kit";
     };
     nvimkit = newToolkit {
       tool = "nvim";
-      baseModule = ./nvimkit-base.toolkit-module.nix;
+      baseModule = ./toolkit-modules/nvimkit-base.toolkit-module.nix;
       meta.name = "Nvim tool kit";
     };
     tmuxkit = newToolkit {
       tool = "tmux";
-      baseModule = ./tmuxkit-base.toolkit-module.nix;
+      baseModule = ./toolkit-modules/tmuxkit-base.toolkit-module.nix;
       meta.name = "Tmux tool kit";
     };
   };
