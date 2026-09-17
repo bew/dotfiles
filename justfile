@@ -42,8 +42,8 @@ rebuild *ARGS:
     echo '!!! `nom` (nix-output-monitor) is not in $PATH, using native `nix`'
     nix_bin=nix
   fi
-  if [[ -n "${NIX_NOT_NOM:-}" ]]; then
-    echo '$NIX_NOT_NOM is set, using native `nix`'
+  if [[ -n "${NIX_NOT_NOM:-}" ]] || [[ -n "${OPENCODE:-}" ]]; then
+    echo '$NIX_NOT_NOM or $OPENCODE is set, using native `nix`'
     nix_bin=nix
   fi
 
