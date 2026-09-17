@@ -1,5 +1,7 @@
 {
   git,
+
+  # Tools
   delta,
   onefetch,
   mergiraf,
@@ -8,6 +10,8 @@
   git-absorb,
   gh,
   lazygit,
+  worktrunk,
+  git-filter-repo,
 
   # build deps
   lib,
@@ -34,10 +38,13 @@ in buildEnv {
     onefetch # repo global info
     mergiraf # Treesitter-based conflict solver
 
+    worktrunk # Manage worktrees ✨
+
     # extra commands
     git-lfs # store specific (large) files out-of-repo
     git-trim # auto delete merged branches
     git-absorb # automatic `git commit --fixup` on relevant commits
+    git-filter-repo # better filter-branch (even recommanded in `man git-filter-branch`!)
 
     # other tools
     gh # github cli for view & operations
