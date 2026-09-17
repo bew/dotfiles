@@ -28,14 +28,18 @@
         ]
       },
       "locked": {
-        "path": "./nix/dynpaths-flake",
-        "type": "path"
+        "lastModified": 1789686902,
+        "narHash": "sha256-9Zgm1Pqo0Lzmhjr2SA88Rtf66OSUiJUPmTc3u0LyaC8=",
+        "owner": "bew",
+        "repo": "nix-dynpaths",
+        "rev": "ba12fdbc373663e65ca12a6272a3dfdbd4f2a75d",
+        "type": "github"
       },
       "original": {
-        "path": "./nix/dynpaths-flake",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "bew",
+        "repo": "nix-dynpaths",
+        "type": "github"
+      }
     },
     "homeManager": {
       "inputs": {

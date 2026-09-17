@@ -38,7 +38,7 @@
     homeManager.url = "github:nix-community/home-manager/release-26.05";
     homeManager.inputs.nixpkgs.follows = "nixpkgsStable";
 
-    dynpaths.url = "path:./nix/dynpaths-flake";
+    dynpaths.url = "github:bew/nix-dynpaths";
     dynpaths.inputs.nixpkgs.follows = "nixpkgsStable";
     dynpaths.inputs.systems.follows = "systems";
 
