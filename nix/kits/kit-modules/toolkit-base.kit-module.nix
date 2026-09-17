@@ -110,11 +110,6 @@ in {
       in lib.mapAttrsToList (_name: dep: dep.pkg) binsWithPkg;
     };
   };
-
-  # TODO: kit modules (like editable) should eventually be injected from their flake
-  # (e.g. `flakeInputs.dynpaths.modules.kitsys.editable`) rather than imported by path.
-  # For now, path import as the dynpaths flake lives in the same repo.
-  imports = [ ../../dynpaths-flake/editable.kit-module.nix ];
 }
 
 # ------------------------------------------------------------------------

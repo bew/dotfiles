@@ -1,0 +1,46 @@
+{ kitsys, flakeInputs }:
+
+let
+  editableModule = flakeInputs.dynpaths.modules.kitsys.editable;
+
+  # A toolkit is a kit specialized for a tool, it always gets:
+  # - the shared tool base module
+  # - the editable module
+  # - the tool-specific `baseModule`
+  newToolkit = { tool, baseModule, meta ? {} }:
+    kitsys.newKit ({ self, kitsys }: {
+      inherit meta;
+      baseModules = [
+        ./kit-modules/toolkit-base.kit-module.nix
+        editableModule
+        baseModule
+      ];
+      eval = kitsys.defineEval {
+        inherit self;
+        class = "tool.${tool}";
+
+        # `lib` option is already defined in the tool base module
+        declareLibOption = false;
+      };
+    });
+in {
+  lib = { inherit newToolkit; };
+
+  toolkits = {
+    zshkit = newToolkit {
+      tool = "zsh";
+      baseModule = ./zshkit-base.toolkit-module.nix;
+      meta.name = "Zsh tool kit";
+    };
+    nvimkit = newToolkit {
+      tool = "nvim";
+      baseModule = ./nvimkit-base.toolkit-module.nix;
+      meta.name = "Nvim tool kit";
+    };
+    tmuxkit = newToolkit {
+      tool = "tmux";
+      baseModule = ./tmuxkit-base.toolkit-module.nix;
+      meta.name = "Tmux tool kit";
+    };
+  };
+}

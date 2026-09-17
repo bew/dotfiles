@@ -64,12 +64,11 @@
       lib = stable.lib;
       mypkglib = stable.callPackage ./nix/mypkglib.nix {};
 
-      kitsys = import ./nix/kit-system { inherit lib; };
+      toolkits = (import ./nix/kits { inherit lib flakeInputs; }).toolkits;
 
-      zsh-kit = kitsys.newKit (import ./nix/kits/zsh-toolkit/kit.nix);
-      toolConfigs.zsh-bew = zsh-kit.eval {
+      toolConfigs.zsh-bew = toolkits.zshkit.eval {
         pkgs = stable;
-        config = ./zsh/zsh-bew.zsh-config.nix;
+        config = ./zsh/bew-config.zshkit-module.nix;
       };
       toolConfigs.zsh-bew-bins-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
         deps.bins = {
@@ -78,14 +77,13 @@
         };
       };
 
-      nvim-kit = kitsys.newKit (import ./nix/kits/nvim-toolkit/kit.nix);
-      toolConfigs.nvim-minimal = nvim-kit.eval {
+      toolConfigs.nvim-minimal = toolkits.nvimkit.eval {
         pkgs = stable;
-        config = ./nvim/nvim-minimal.nvim-config.nix;
+        config = ./nvim/minimal-config.nvimkit-module.nix;
       };
-      toolConfigs.nvim-bew = nvim-kit.eval {
+      toolConfigs.nvim-bew = toolkits.nvimkit.eval {
         pkgs = stable;
-        config = ./nvim/nvim-bew.nvim-config.nix;
+        config = ./nvim/bew-config.nvimkit-module.nix;
         configOverride = {
           # Override to use latest Ruff (always better!)
           deps.bins.ruff.pkg = lib.mkForce bleedingedge.ruff;
@@ -99,10 +97,9 @@
         };
       };
 
-      tmux-kit = kitsys.newKit (import ./nix/kits/tmux-toolkit/kit.nix);
-      toolConfigs.tmux-bew = tmux-kit.eval {
+      toolConfigs.tmux-bew = toolkits.tmuxkit.eval {
         pkgs = stable;
-        config = ./tmux/bew.tmux-config.nix;
+        config = ./tmux/bew-config.tmuxkit-module.nix;
       };
 
       # Returns editable kit configs with symlinks pointing to `dotfilesRealPath`.
@@ -218,6 +215,7 @@
 
     # (useful for debugging in `nix repl`)
     toolConfigs = eachSystem (system: with (forSys system); toolConfigs);
+    toolkits = eachSystem (system: with (forSys system); toolkits);
 
     apps = eachSystem (system: with (forSys system); {
       # An env with all 'core' cli tools :)
