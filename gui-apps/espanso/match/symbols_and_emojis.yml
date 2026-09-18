@@ -140,8 +140,14 @@ matches:
   - trigger: "!..!" # ellipsis
     replace: '…'
 
+  - trigger: "!-!" # semantic-rich separator
+    replace: '—'
+
   - trigger: "!>!" # 1-token arrow/implication
     replace: '→'
 
-  - trigger: "!-!" # semantic-rich separator
-    replace: '—'
+  - trigger: "!<!" # 1-token reversed arrow
+    replace: '←'
+
+  - trigger: "!<>!" # 2-token left-right arrows
+    replace: '←→'
