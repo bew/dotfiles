@@ -117,6 +117,18 @@ For these, ship a **single `SKILL.md`**:
   Mirror the `coder-generic` note for the same concept.
 - Keep the required `## Testing` section and description-frontmatter requirements.
 
+## Variant: `coder-<lang>-for-<tool>`
+
+A tool-specific variant (e.g. `coder-lua-for-nvim`) extends a lang skill with conventions
+tied to one tool or its use in a specific repo.
+
+- Name: `coder-<lang>-for-<tool>` — `<lang>` matches the parent lang skill.
+- REQUIRES chain: load `coder-generic`, then `coder-<lang>`, then this skill.
+- Content: tool-specific rules only.
+  Never restate generic or parent-lang rules.
+- `## Rules` may use `###` subsections per topic (API, keymaps, layout, …).
+- Include a `## Testing` section for tool-specific test workflows.
+
 ## Required companion file structure
 
 Lang-specific `module-rules.md` and `script-rules.md` must follow these structural rules.
