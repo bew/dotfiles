@@ -95,10 +95,14 @@ Retitle immediately, before any other action — do not wait for user confirmati
 
 ---
 
-## Markdown rules
+## General prose rules
+
+Applies in Markdown, but also in other places like code comments, skill triggers, ..
 
 IMPORTANT: Every sentence must start on its own line within the current paragraph, bullet, or
 list item (semantic line breaks).
+
+## Markdown rules
 
 - Never use `---` horizontal rules as default separators before section headers.
 - Use `---` only to intentionally separate distinct parts of a document (e.g. before an appendix,
