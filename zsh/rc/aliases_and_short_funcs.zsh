@@ -251,6 +251,9 @@ alias dot=cdot
 alias gnp="git --no-pager"
 alias git_watch="watch --color -- git --no-pager -c color.ui=always"
 
+alias gomain="git go main"
+alias goback="git go -"
+
 alias ghh="gh pr checkout"
 
 alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
