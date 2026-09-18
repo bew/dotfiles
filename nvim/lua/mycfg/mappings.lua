@@ -933,6 +933,42 @@ do
   end
 end
 
+-- Argslist layout
+-- Change how the argument list files are laid out.
+-- NOTE: mapping helpers are required right before use (special allowance for this file).
+local args_layout = require"mycfg.mapping_helpers.args_layout"
+
+--- Open the argslist in a layout and report the resulting arrangement.
+---@param layout mycfg.ArgsLayout Arrangement to apply
+local function open_args_layout(layout)
+  if args_layout.open_args_in(layout) then
+    vim.notify("Argslist: " .. layout)
+  end
+end
+
+my_actions.args_layout_in_tabs = A.mk_action {
+  default_desc = "Argslist in tabs",
+  n = function() open_args_layout("tabs") end,
+}
+my_actions.args_layout_in_splits = A.mk_action {
+  default_desc = "Argslist in splits",
+  n = function() open_args_layout("splits") end,
+}
+my_actions.args_layout_in_vsplits = A.mk_action {
+  default_desc = "Argslist in vsplits",
+  n = function() open_args_layout("vsplits") end,
+}
+my_actions.args_layout_cycle = A.mk_action {
+  default_desc = "Cycle argslist layout",
+  n = function() open_args_layout(args_layout.get_next_layout()) end,
+}
+
+K.global_leader_map_define_group{mode="n", prefix_key="<C-a>", name="+args-layout"}
+K.global_leader_map{mode="n", key="<C-a><C-t>", action=my_actions.args_layout_in_tabs}
+K.global_leader_map{mode="n", key="<C-a><C-s>", action=my_actions.args_layout_in_splits}
+K.global_leader_map{mode="n", key="<C-a><C-v>", action=my_actions.args_layout_in_vsplits}
+K.global_leader_map{mode="n", key="<C-a><C-a>", action=my_actions.args_layout_cycle}
+
 -- Full-width/height window splits
 -- Q: Do I need this? Would I use this?
 -- FIXME: Since I use noequalalways, the created splits takes way too much space...

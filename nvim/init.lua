@@ -26,6 +26,8 @@ vim.g.maplocalleader = TERM_CODES.Space
 
 require"mycfg.mappings"
 
+require"mycfg.mapping_helpers.args_layout".setup_autocmd()
+
 require"mycfg.commands"
 
 -- ------ PLUGINS
