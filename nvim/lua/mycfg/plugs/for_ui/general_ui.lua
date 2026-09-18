@@ -101,6 +101,8 @@ Plug {
 -- FIXME: 'mbbill/undotree' does NOT have diff preview when going up/down :/
 -- Best would be 'simnalamburt/vim-mundo' BUT it requires python...
 -- See: https://github.com/nvim-lua/wishlist/issues/21
+-- TODO: See if `:h :Undotree` builtin can replace this plugin? 🤔
+-- (note: need `packadd nvim.undotree`)
 Plug {
   source = gh"mbbill/undotree",
   desc = "Vim undo tree visualizer",
