@@ -17,7 +17,7 @@ metadata:
 ## Goal
 
 Produce or update a structured, honest, maintainable technical spec in a single pass,
-capturing design decisions, API shape, invariants, and open questions.
+capturing design decisions, interface shape, invariants, and open questions.
 Do not pause for user checkpoints mid-pass.
 Any question that arises during drafting must be deferred — added to the batched questions block at the end of the pass.
 
@@ -81,7 +81,7 @@ Example skeleton:
 
 ## Introduction
 
-## API
+## Interface / How to use
 
 ### Open Questions
 
@@ -113,7 +113,9 @@ Omit a section only if genuinely not applicable — state the section name and r
 2. **Terminology & Key Concepts** (optional — resolved via Global Open Questions):
    see Terminology entries below for format and guidance.
 3. **Naming & IDs** — if system has named/anonymous things, show patterns here
-4. **API** — code examples are central; prose explains intent, code shows shape
+4. **Interface / How to use** — the primary user-facing interface: CLI, API, config format, etc.
+   Show how to invoke or interact with the thing.
+   Use subsections for complex interfaces (e.g. one per subcommand for a CLI).
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
@@ -194,11 +196,11 @@ If a short name is defined, use it consistently throughout — never alternate w
 - Use that exact name everywhere — in prose, code comments, section headings.
 - Never use synonyms: pick one word and hold it.
 
-### API sections
+### Interface / How to use sections
 
 - Show most complete realistic example, not a toy.
-- Preserve honest comments (`-- FIXME`, `-- NOTE`) — they are design signals.
-- If API has multiple forms (named / anonymous, shorthand / full), show all.
+- Preserve honest comments (`-- FIXME`, `-- NOTE`) — they are design signals, not noise.
+- If the interface has multiple forms (named / anonymous, shorthand / full), show all.
 - If a field has a type annotation, show both simple and more-defined type variants if relevant.
 
 ### Alternatives & Tradeoffs section
@@ -237,7 +239,7 @@ Describe what the artifact provides or demonstrates —
 e.g. "a proof-of-concept showing cross-process handoff lives in `$specdir/poc/`".
 
 When a companion file is already referenced from another section
-(e.g. a schema file linked in API), don't repeat it here.
+(e.g. a schema file linked in Interface / How to use), don't repeat it here.
 
 Each entry: name + one-line description of relevance.
 Omit if nothing meaningful to note.

@@ -30,7 +30,9 @@ The "Global Open Questions" tracks whether it is needed — see <./terminology-a
 2. **Terminology & Key Concepts** (optional — resolved via Global Open Questions).
    See <./terminology-and-key-concepts.md> for entry format and guidance.
 3. **Naming & IDs** — if system has named/anonymous things, show patterns here
-4. **API** — code examples are central; prose explains intent, code shows shape
+4. **Interface / How to use** — the primary user-facing interface: CLI, API, config format, etc.
+   Show how to invoke or interact with the thing.
+   Use subsections for complex interfaces (e.g. one per subcommand for a CLI).
 5. *(domain-specific sections)* — non-obvious invariants each get their own section
 6. **Placement / Scope** — where things can/must be defined
 7. **`<Feature>` as `<Primitive>`** — if familiar concept maps to a primitive in new system, show it explicitly
@@ -114,7 +116,7 @@ Describe what the artifact provides or demonstrates —
 e.g. "a proof-of-concept showing cross-process handoff lives in `$specdir/poc/`".
 
 When a companion file is already referenced from another section
-(e.g. a schema file linked in API), don't repeat it here.
+(e.g. a schema file linked in Interface / How to use), don't repeat it here.
 
 Each entry: name + one-line description of relevance.
 Omit if nothing meaningful to note.

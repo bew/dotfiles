@@ -16,7 +16,7 @@ metadata:
 ## Goal
 
 Produce or update a structured, honest, maintainable technical spec in a single pass,
-capturing design decisions, API shape, invariants, and open questions.
+capturing design decisions, interface shape, invariants, and open questions.
 Do not pause for user checkpoints mid-pass.
 Any question that arises during drafting must be deferred — added to the batched questions block at the end of the pass.
 
@@ -67,7 +67,7 @@ Read <./refs/spec-structure.md> for:
 
 ## 4. `Phase:Fill` — fill sections
 
-Read <./refs/writing-guidelines.md> for prose style, API section rules, and naming discipline.
+Read <./refs/writing-guidelines.md> for prose style, Interface / How to use section rules, and naming discipline.
 Read <./refs/terminology-and-key-concepts.md> for terminology entry format.
 Read <./refs/open-questions.md> for spec open question format and placement.
 Read <./refs/alternatives-and-tradeoffs.md> for how to write the Alternatives & Tradeoffs section.

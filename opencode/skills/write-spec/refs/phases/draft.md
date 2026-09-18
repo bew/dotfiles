@@ -2,7 +2,7 @@
 
 Write the spec to `$specpath`, filling sections iteratively.
 Read <../spec-structure.md> for section order and Open Questions format.
-Read <../writing-guidelines.md> for prose style, API conventions, and naming discipline.
+Read <../writing-guidelines.md> for prose style, Interface / How to use conventions, and naming discipline.
 
 ## Initial Skeleton
 
@@ -85,13 +85,22 @@ Different concerns belong in separate files
 ## Filling
 
 Fill one section at a time, then pause.
-After filling a section, note what was written and any open questions surfaced.
-Wait for user feedback before moving to the next section.
-If user says "continue" or similar without feedback, proceed to next section.
+NOTE: Earlier sections may be edited freely at any point, if needed.
 
 Add open questions to the section's own `### Open Questions` subsection immediately — do not defer.
 
 On edit failure: re-read `$specpath`, locate current state, resume.
+
+After filling a section:
+- Note what was written and any open questions surfaced.
+- Print:
+  > Feedback on this section?
+- List the remaining sections still to fill.
+- Print:
+  > Say 'next' or similar to continue with next section; or give specific section to work on.
+
+The user's response should be handled as feedback by default.
+Only 'next' or similar can be interpreted as signal to move on.
 
 After all sections are filled:
 

@@ -14,7 +14,7 @@ metadata:
 ## Goal
 
 Produce structured, honest, maintainable technical specs
-capturing design decisions, API shape, invariants, and open questions.
+capturing design decisions, interface shape, invariants, and open questions.
 
 ## Phases
 

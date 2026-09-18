@@ -31,9 +31,9 @@ This is another sentence that wraps and continues here.
 - If concept has short internal form (e.g. `P` for provider inside impl), define at first use.
 - Never use synonyms: pick one word and hold it.
 
-## API sections
+## Interface / How to use sections
 
-- Show most complete realistic example, not a toy.
+- Show the most complete realistic example, not a toy.
 - Preserve honest comments (`-- FIXME`, `-- NOTE`) — they are design signals, not noise.
-- If API has multiple forms (named / anonymous, shorthand / full), show all.
+- If the interface has multiple forms (named / anonymous, shorthand / full), show all.
 - If a field has a type annotation, show both simple and more-defined type variants if relevant.

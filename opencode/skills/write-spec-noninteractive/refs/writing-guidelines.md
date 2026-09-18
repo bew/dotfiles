@@ -21,11 +21,11 @@ This is a sentence.
 This is another sentence that wraps and continues here.
 ```
 
-## API sections
+## Interface / How to use sections
 
 - Show most complete realistic example, not a toy.
 - Preserve honest comments (`-- FIXME`, `-- NOTE`) — they are design signals.
-- If API has multiple forms (named / anonymous, shorthand / full), show all.
+- If the interface has multiple forms (named / anonymous, shorthand / full), show all.
 
 ## Naming discipline
 
