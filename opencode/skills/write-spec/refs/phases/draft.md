@@ -96,6 +96,8 @@ Two fill modes exist.
 A plain 'next' confirm enters it.
 Never fill a second section in the same turn, even if it is small or the design feels settled.
 The pause is mandatory; never skip or batch it.
+If the user names or selects several sections at once (e.g. answers a multi-select question with several),
+treat it as an ordered queue, not a batch: still fill exactly one section per turn and pause between each.
 
 **batch** — fill all remaining sections in one pass, with no per-section pause.
 Reached only via the exit aliases below; sticky until a trigger alias re-enables incremental.
@@ -173,6 +175,7 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 
 - In `incremental` mode, never fill more than one section per turn.
   The pause after each section is mandatory — do not skip it nor batch it.
+  A user answer that names or selects several sections is a queue, not a batch authorization.
 - `incremental` is the default/canonical mode.
 - Never write full rewrite when targeted edit is requested. Surgical edits only.
 - Never paper over unresolved decisions. Surface them in Open Questions.
