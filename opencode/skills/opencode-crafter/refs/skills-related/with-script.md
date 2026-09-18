@@ -48,9 +48,10 @@ Bad: `check` iterates over each ref, calls `curl` to verify, then writes failure
 
 ## Tests
 
-Test files in `scripts/tests/`.
+Test files (one per script) are alongside their script in `scripts/`.
+
+If additional files are needed (e.g. fixture files), place them in `scripts/test-fixtures/`.
 One `.bats` file per script (split only for very complex scripts).
-Fixture files alongside tests in `scripts/tests/` (no separate `fixtures/` subdir).
 
 Keep scripts and tests in `$draftpath` during iteration.
 `Phase:Ship` copies them to final `$installpath` alongside other skill-related files.
