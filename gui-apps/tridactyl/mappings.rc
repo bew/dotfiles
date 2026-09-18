@@ -71,7 +71,7 @@ bind --mode=ex     <A-Z> tabmove +1
 
 # tab operations
 bind <CA-t> tabduplicate
-bind <CA-n> tabdetach
+bind --mode=insert <CA-t> tabduplicate
 
 # tab close
 
