@@ -43,6 +43,13 @@ function zwidget::utils::results_to_args() {
   done
 }
 
+# Replaces every $HOME occurrence with '~' (stdin -> stdout).
+function zwidget::utils::collapse_home() {
+  local output
+  output="$(cat)"
+  print -r -- "${output//$HOME/~}"
+}
+
 FZF_BASE_CMD=($_BIN_fzf)
 
 function zwidget::utils::__fzf_generic_impl_for_paths() {
@@ -232,11 +239,11 @@ function zwidget::fzf::zoxide() {
     --color=preview-label:247:bold
   )
 
-  local selected=( $( $_BIN_zoxide query --list --score | "${fzf_cmd[@]}" ) )
+  local selected=( $( $_BIN_zoxide query --list --score | zwidget::utils::collapse_home | "${fzf_cmd[@]}" ) )
   if [[ -n "$selected" ]]; then
     local directory="${selected[2, -1]}" # pop first element (the frecency score)
     if [[ -n "$directory" ]]; then
-      cd "$directory"
+      cd "${directory/#\~/$HOME}" # cd to new dir! replacing ~ by full $HOME
       HOOK_LIKE_TOPLEVEL=1 hooks-run-hook chpwd_hook
     fi
   fi
