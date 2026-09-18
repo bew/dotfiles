@@ -1,5 +1,5 @@
 ---
-name: write-code-python
+name: coder-python
 description: |
   Python code writing guidelines: docstrings, file headers, main() conventions,
   type annotations, and error handling.
@@ -14,7 +14,7 @@ metadata:
 
 Produce idiomatic, well-typed Python code, building on generic conventions.
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 In Python, **module code** is any `.py` file imported by other modules — no shebang.
 **Script code** is a file run directly: has a shebang (`#!/usr/bin/env python3`).
@@ -136,4 +136,4 @@ except Exception as exc:
 ## Testing
 
 The standard Python testing system is **pytest**.
-When writing tests, load the `write-code-pytest` skill for full conventions.
+When writing tests, load the `coder-pytest` skill for full conventions.

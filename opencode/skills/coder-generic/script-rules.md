@@ -3,7 +3,7 @@
 Reference for script code rules. Load this when working on script code — a file
 with a shebang, a `main` entry point, or a language-level entrypoint guard.
 
-These rules extend `write-code-generic`. All generic rules still apply.
+These rules extend `coder-generic`. All generic rules still apply.
 
 ## What makes script code
 

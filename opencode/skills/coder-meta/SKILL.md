@@ -1,10 +1,10 @@
 ---
-name: write-code-meta
+name: coder-meta
 description: |
-  Rules for writing write-code-<lang> skills. Load BEFORE writing any content.
-  Always load when asked to draft/write/edit/refactor/review any write-code-* skills.
-  Triggers: "new write-code-X skill", "draft write-code-X", "add write-code-X",
-  "update write-code-X", "write-code-python", "write-code-go", or any lang-specific code skill.
+  Rules for writing coder-<lang> skills. Load BEFORE writing any content.
+  Always load when asked to draft/write/edit/refactor/review any coder-* skills.
+  Triggers: "new coder-X skill", "draft coder-X", "add coder-X",
+  "update coder-X", "coder-python", "coder-go", or any lang-specific code skill.
 metadata:
   maintainers: [bew]
 ---
@@ -14,32 +14,32 @@ Load it to look up rules, naming, and structure requirements — not to follow a
 
 ## Goal
 
-Produce a well-structured `write-code-<lang>` skill that correctly extends `write-code-generic`
-without restating rules already in `write-code-generic`.
+Produce a well-structured `coder-<lang>` skill that correctly extends `coder-generic`
+without restating rules already in `coder-generic`.
 
 ## When to create a new lang skill
 
-Create a new `write-code-<lang>` skill when:
+Create a new `coder-<lang>` skill when:
 - The language has a distinct shebang, strict-mode equivalent, or safety flags.
 - The language has idioms that override or contradict generic conventions
   (e.g. no `function` keyword, different error signaling,
   structured data instead of string manipulation).
 - There is enough lang-specific boilerplate to justify a reusable template.
 
-Extend `write-code-generic` instead when:
+Extend `coder-generic` instead when:
 - The language follows generic conventions with only minor stylistic differences.
 - The difference is a single rule or naming convention — add it to generic as a note.
 
 ## Examples
 
 Refer to these existing skills as concrete examples of the pattern:
-- `write-code-bash` — fully featured: strict mode, boilerplate, output capture, testing section
-- `write-code-nushell` — minimal: core idioms only, typed params, native error model
+- `coder-bash` — fully featured: strict mode, boilerplate, output capture, testing section
+- `coder-nushell` — minimal: core idioms only, typed params, native error model
 
 ## Naming
 
-Skill directory and `name` frontmatter field must follow: `write-code-<lang>`.
-`<lang>` is lowercase, hyphenated if needed (e.g. `write-code-bash`, `write-code-nushell`).
+Skill directory and `name` frontmatter field must follow: `coder-<lang>`.
+`<lang>` is lowercase, hyphenated if needed (e.g. `coder-bash`, `coder-nushell`).
 
 ## Split contract: what belongs where
 
@@ -65,11 +65,11 @@ Four layers: generic SKILL.md → generic module/script-rules.md → lang SKILL.
 
 ```md
 ---
-name: write-code-<lang>
+name: coder-<lang>
 description: |
   <Lang> code writing guidelines: <2-3 key topics>.
   Always load when asked to draft/write/edit/refactor/review <lang> code files.
-  Requires write-code-generic skill.
+  Requires coder-generic skill.
 metadata:
   maintainers: [<github-user>]
 ---
@@ -81,7 +81,7 @@ Do not name required skills explicitly in the Goal sentence — they are listed 
 Use a short phrase like "building on generic conventions" or
 "building on generic & language conventions".
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 [Module/script identification paragraph: explain what module code and script code look like in
 this language — observable signals (extension, shebang, entry guard). Then conditional loads:]
@@ -96,7 +96,7 @@ If working on **script code**: read <./script-rules.md>.
 [lang-specific soft recommendations — omit section if none]
 
 ## Testing
-[name known testing system(s); load write-code-<testing-skill> when tests are wanted;
+[name known testing system(s); load coder-<testing-skill> when tests are wanted;
 if no testing skill exists, say so and instruct agent to ask user]
 
 ## Section separators
@@ -112,7 +112,7 @@ For these, ship a **single `SKILL.md`**:
 - Omit `module-rules.md`, `script-rules.md`, the module/script identification paragraph,
   and the conditional loads.
 - State in the body that all files are module-like and script rules are N/A.
-  Mirror the `write-code-generic` note for the same concept.
+  Mirror the `coder-generic` note for the same concept.
 - Keep the required `## Testing` section and description-frontmatter requirements.
 
 ## Required companion file structure
@@ -194,16 +194,16 @@ Good:
 
 ## Rules
 
-- Never restate a rule already in `write-code-generic` in a lang skill.
-  If the rule is generic, it belongs in `write-code-generic` — move it there instead.
+- Never restate a rule already in `coder-generic` in a lang skill.
+  If the rule is generic, it belongs in `coder-generic` — move it there instead.
 - Before placing a new rule in a lang skill, verify it is truly lang-specific.
   If unsure, ask: does this rule apply identically to a second unrelated language?
-  If yes, it belongs in `write-code-generic`.
+  If yes, it belongs in `coder-generic`.
 - Prose rules are allowed in lang skills only when genuinely lang-specific.
-  When a lang skill adds a code example for a rule that already exists verbatim in `write-code-generic`,
+  When a lang skill adds a code example for a rule that already exists verbatim in `coder-generic`,
   omit the prose restatement — the generic skill owns it.
   If the prose captures a lang-specific nuance not present in generic, keep it.
-- Lang skills must not reference files from other skills by path (e.g. `write-code-generic/script-rules.md`).
+- Lang skills must not reference files from other skills by path (e.g. `coder-generic/script-rules.md`).
   The module/script distinction in a lang skill must be described in lang-specific terms — signals
   observable in that language (file extension, shebang, entry guard). The agent infers which ref
   to load from that description.

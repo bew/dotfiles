@@ -1,7 +1,7 @@
 # Rust module code rules
 
 Rules for module code — `.rs` files imported via `mod` and `use`.
-These extend `write-code-rust` (which extends the generic module rules).
+These extend `coder-rust` (which extends the generic module rules).
 All generic module rules still apply.
 
 ## Rules

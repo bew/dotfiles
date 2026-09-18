@@ -1,5 +1,5 @@
 ---
-name: write-code-bash
+name: coder-bash
 description: |
   Bash code writing guidelines: shebang, strict mode, bash idioms, and full boilerplate.
   Always load when asked to draft/write/edit/refactor/review bash code files.
@@ -9,9 +9,9 @@ metadata:
 
 ## Goal
 
-Write bash scripts following strict-mode conventions and bash idioms, building on `write-code-generic` rules.
+Write bash scripts following strict-mode conventions and bash idioms, building on `coder-generic` rules.
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 In bash, **module code** is a `.sh` file sourced by other scripts (no shebang).
 **Script code** is an executable run directly: no file extension, shebang + `main "$@"` at end.
@@ -128,6 +128,6 @@ set -o pipefail
 
 The standard testing system for bash scripts in this repo is **Bats** (Bash Automated Testing System).
 
-Load `write-code-bats` skill when writing or running tests for a bash script.
+Load `coder-bats` skill when writing or running tests for a bash script.
 
 When writing a bash script, propose the companion `.bats` test file — do not wait to be asked.

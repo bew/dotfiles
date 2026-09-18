@@ -1,5 +1,5 @@
 ---
-name: write-code-pytest
+name: coder-pytest
 description: |
   pytest test writing guidelines: fixtures, naming, test structure, and assertions.
   Always load when asked to draft/write/edit/refactor/review pytest test files (test_*.py).
@@ -12,7 +12,7 @@ metadata:
 Write pytest tests that are readable, type-annotated, and well-scoped,
 building on generic & language conventions.
 
-REQUIRES: load `write-code-generic` and `write-code-python` skills first.
+REQUIRES: load `coder-generic` and `coder-python` skills first.
 
 ## Running tests
 

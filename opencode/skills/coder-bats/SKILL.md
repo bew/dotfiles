@@ -1,5 +1,5 @@
 ---
-name: write-code-bats
+name: coder-bats
 description: |
   Bats test file writing guidelines: file structure, test naming, setup conventions, and helpers.
   Always load when asked to draft/write/edit/refactor/review .bats test files.
@@ -11,8 +11,8 @@ metadata:
 
 Write well-structured Bats test files following consistent naming, setup, and assertion conventions.
 
-REQUIRES: load `write-code-generic` skill first.
-REQUIRES: load `write-code-bash` skill — function bodies in `@test` blocks and helpers follow bash conventions.
+REQUIRES: load `coder-generic` skill first.
+REQUIRES: load `coder-bash` skill — function bodies in `@test` blocks and helpers follow bash conventions.
 
 NOTE: Bats test files are written in bash, but can end-to-end test scripts/tools in any language — not just bash.
 

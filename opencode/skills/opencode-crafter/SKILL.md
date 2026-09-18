@@ -118,8 +118,8 @@ This applies across all phases, including `Phase:Ship`.
 
 Before writing any artefact prose: read <./refs/rules-for-writing.md> and <./refs/rules-for-steps-phases-headers.md>.
 If skill includes a script: read <./refs/skills-related/with-script.md>.
-If artefact includes a companion script (any language, any artefact type): load `write-code-generic`
-and the appropriate lang-specific `write-code-*` skill before writing any script content — including on language rewrites.
+If artefact includes a companion script (any language, any artefact type): load `coder-generic`
+and the appropriate lang-specific `coder-*` skill before writing any script content — including on language rewrites.
 
 Write all draft files to `$draftpath` as soon as they exist.
 **Writing files early is critical** — protects draft content from context compression in long sessions.

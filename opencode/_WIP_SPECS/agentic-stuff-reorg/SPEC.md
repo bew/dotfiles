@@ -141,7 +141,7 @@ Name is provisional — see Open Questions.
 | `opencode/skills/opencode-test-runner` | `opencode-specific/skills/opencode-test-runner` | Same |
 | All other `opencode/skills/*` | `agent-agnostic/skills/*` | Generic; slugs unchanged |
 
-Slugs with no change (all moving to `agent-agnostic/`): `write-code-*`, `write-spec*`, `caveman*`, `agent-blocker`, `agent-stuck`, `bew-*`, `karpathy-guidelines`, `gh-read-file`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `incremental-write`, `write-github-issue`, `grill-me-*`.
+Slugs with no change (all moving to `agent-agnostic/`): `coder-*`, `write-spec*`, `caveman*`, `agent-blocker`, `agent-stuck`, `bew-*`, `karpathy-guidelines`, `gh-read-file`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `incremental-write`, `write-github-issue`, `grill-me-*`.
 
 Skills marked for split (generic core extracted, OC wrapper stays in `opencode-specific/`):
 - `diff-to-commits-drafts`: agnostic core = four-phase workflow + grouping/drafting logic; OC-specific = `task` tool invocation, PLAN/BUILD mode guard, slash-command trigger.
@@ -241,11 +241,11 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 | `read-man-page` | agent-agnostic | `manq` local script; any agent with shell exec can use it. |
 | `reflect-code-skills` | agent-agnostic | Post-session reflection + pattern extraction; no OC primitives. |
 | `reflect-script-skills` (nested) | agent-agnostic | Same as parent; `write-script-*` refs are compositional, not OC-specific. |
-| `write-code-bash` | agent-agnostic | Bash idioms + boilerplate; no OC primitives. |
-| `write-code-bats` | agent-agnostic | Bats test conventions; no OC primitives. |
-| `write-code-generic` | agent-agnostic | Language-agnostic coding conventions; no OC primitives. |
-| `write-code-meta` | agent-agnostic | Rules for authoring `write-code-<lang>` skills; generic skill-library concept. |
-| `write-code-nushell` | agent-agnostic | Nushell idioms; no OC primitives. |
+| `coder-bash` | agent-agnostic | Bash idioms + boilerplate; no OC primitives. |
+| `coder-bats` | agent-agnostic | Bats test conventions; no OC primitives. |
+| `coder-generic` | agent-agnostic | Language-agnostic coding conventions; no OC primitives. |
+| `coder-meta` | agent-agnostic | Rules for authoring `coder-<lang>` skills; generic skill-library concept. |
+| `coder-nushell` | agent-agnostic | Nushell idioms; no OC primitives. |
 | `write-github-issue` | agent-agnostic | Issue drafting methodology; depends only on `bew-communication-style` (also agnostic). |
 | `write-spec` | agent-agnostic | Spec drafting methodology; uses `_WIP_SPECS/` file paths only. |
 | `write-spec-noninteractive` | agent-agnostic | Explicitly designed for cross-tool use (Perplexity, ChatGPT). |
@@ -281,7 +281,7 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 
 ### Analysis Summary
 
-**Agent-agnostic (ready to move as-is):** `agent-blocker`, `agent-stuck`, `bew-communication-style`, `bew-inline-callout-style`, `caveman`, `caveman-review`, `gh-read-file`, `grill-me-full`, `grill-me-medium`, `grill-me-original`, `incremental-write` (move as-is, fix examples), `karpathy-guidelines`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `write-code-bash`, `write-code-bats`, `write-code-generic`, `write-code-meta`, `write-code-nushell`, `write-github-issue`, `write-spec`, `write-spec-noninteractive`, `write-spec-noninteractive-standalone`
+**Agent-agnostic (ready to move as-is):** `agent-blocker`, `agent-stuck`, `bew-communication-style`, `bew-inline-callout-style`, `caveman`, `caveman-review`, `gh-read-file`, `grill-me-full`, `grill-me-medium`, `grill-me-original`, `incremental-write` (move as-is, fix examples), `karpathy-guidelines`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `coder-bash`, `coder-bats`, `coder-generic`, `coder-meta`, `coder-nushell`, `write-github-issue`, `write-spec`, `write-spec-noninteractive`, `write-spec-noninteractive-standalone`
 
 **Split (extract generic core, keep OC wrapper):** `diff-to-commits-drafts`, `draft-commit-message`
 

@@ -1,7 +1,7 @@
 # Rust script code rules
 
 Rules for script code — binary crate entrypoints (files with `fn main()`).
-These extend `write-code-rust` (which extends the generic script rules).
+These extend `coder-rust` (which extends the generic script rules).
 All generic script rules still apply.
 
 ## Entrypoint

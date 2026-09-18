@@ -1,5 +1,5 @@
 ---
-name: write-code-rust
+name: coder-rust
 description: |
   Rust code writing guidelines: idioms, type derivation, dependency management,
   test construction, and pre-commit checks.
@@ -14,7 +14,7 @@ metadata:
 Write Rust code that is idiomatic, well-annotated, and passes clippy on the first build,
 building on generic conventions.
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 In Rust, **module code** is any `.rs` file that is imported via `mod` and `use` — it exports
 types and functions for other code to consume. Module files never contain `fn main()`.

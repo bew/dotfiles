@@ -1,5 +1,5 @@
 ---
-name: write-code-nix
+name: coder-nix
 description: |
   Nix code writing guidelines: expression files, derivations, builder idioms, and verification.
   Always load when asked to draft/write/edit/refactor/review Nix code:
@@ -12,7 +12,7 @@ metadata:
 
 Write idiomatic Nix code that evaluates and builds, building on generic conventions.
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 NOTE: This skill covers general Nix expression files and reusable module option conventions.
 It will later expand with dedicated pages for other Nix areas:

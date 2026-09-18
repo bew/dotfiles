@@ -1,10 +1,10 @@
 ---
-name: write-code-generic
+name: coder-generic
 description: |
   General code writing guidelines: structure, naming, comments, error handling, and organization.
   Always load when the task drafts/writes/edits/refactors/reviews ANY code file — regardless of language, framework, or tool; module or script; including config-as-code.
   Applies to large files and small mechanical edits alike — do not skip based on perceived triviality.
-  Load this before any write-code-* skill.
+  Load this before any coder-* skill.
   Language-specific skills build on top of it.
 metadata:
   maintainers: [bew]

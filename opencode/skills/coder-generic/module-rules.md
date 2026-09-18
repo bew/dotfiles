@@ -1,7 +1,7 @@
 # Module code rules
 
 Rules for module code — files imported, required, or sourced by other code.
-These extend `write-code-generic`. All generic rules still apply.
+These extend `coder-generic`. All generic rules still apply.
 
 ## Rules
 

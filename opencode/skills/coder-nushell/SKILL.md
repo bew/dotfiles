@@ -1,5 +1,5 @@
 ---
-name: write-code-nushell
+name: coder-nushell
 description: |
   Nushell code writing guidelines: idioms, types, entry point, error handling.
   Always load when asked to draft/write/edit/refactor/review Nushell (.nu) code files.
@@ -12,7 +12,7 @@ metadata:
 Write Nushell code using native idioms: typed parameters, structured data,
 and proper error handling.
 
-REQUIRES: load `write-code-generic` skill first.
+REQUIRES: load `coder-generic` skill first.
 
 In Nushell, **module code** is any `.nu` file loaded via `use` or `source` by other code —
 no shebang, uses `export def` to expose public commands.
