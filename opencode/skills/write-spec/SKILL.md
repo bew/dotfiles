@@ -36,6 +36,18 @@ Current status tags: `DRAFT`, `MAYBE-READY`, `READY`, `ABANDONED`
 Default on creation: `DRAFT`.
 Update in-place as spec evolves.
 
+## Interaction conventions
+
+Apply in every phase.
+
+**`tell me more`**, **`tell me about …`**, or **`explain …`**:
+The user wants an explanation in chat output only — not a spec edit.
+Treat it as informational:
+- Do not edit `$specpath`.
+- Do not add Open Questions entries or change the status tag.
+- Answer in chat, then pause and wait for the user to resume.
+Whether anything is later folded into the spec is the user's explicit call.
+
 ## 1. `Phase:Discover` — Gather inputs & establish `$specpath`
 
 When entering `Phase:Discover`: read <./refs/phases/discover.md> for full instructions.

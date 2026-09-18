@@ -7,6 +7,9 @@ No subagent — review happens in the same session.
 
 Read full `$specpath` before starting.
 
+If the user says 'tell me more' (or a listed alias): answer in output only — make no spec edits.
+Pause until the user resumes.
+
 Check each of the following, flag any issues:
 
 - All Open Questions (per-section and Global) are either resolved or explicitly marked non-blocking

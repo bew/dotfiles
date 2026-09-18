@@ -69,6 +69,8 @@ Each entry must include:
 - **Blocking** or **Non-blocking** — must this be resolved before implementation starts?
 - Brief rationale: what is blocking the decision, or what tradeoff makes it non-obvious.
 
+Within each Open Questions subsection, list **Blocking** entries before **Non-blocking** ones.
+
 Remove or strike questions once resolved — do not let stale entries accumulate.
 
 Example:

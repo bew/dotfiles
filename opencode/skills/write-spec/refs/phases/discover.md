@@ -3,6 +3,8 @@
 Gather all inputs needed to write the spec.
 Do not begin drafting until all required inputs are answered or explicitly waived.
 
+If the user says 'tell me more' (or a listed alias): answer in output only — make no spec edits.
+
 ## Required inputs
 
 1. **Name** — what is this spec about? (may be a system, concept, protocol, format, etc.)

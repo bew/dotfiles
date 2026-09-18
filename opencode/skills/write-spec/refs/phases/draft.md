@@ -11,6 +11,10 @@ Before writing anything: list the sections that will be created
 If the chosen design has meaningful sub-variants, include the optional design-options section in the list.
 
 Ask: *Sections look right? Say 'next' to start writing.*
+Print the `<mode banner>`: `Mode: incremental (one section per turn)`.
+The `incremental` mode is the default — one section per turn, pausing after each.
+Say 'step by step' to assert it.
+Say 'fill the rest'/'write all' to batch the rest.
 Adjust section list if user requests changes.
 
 Once confirmed, write the file: H1 with status tag + skill loader meta-paragraph
@@ -84,28 +88,66 @@ Different concerns belong in separate files
 
 ## Filling
 
-Fill one section at a time, then pause.
+### Modes
+
+Two fill modes exist.
+
+**incremental** (default) — fill exactly one section per turn, then STOP and wait for user input.
+A plain 'next' confirm enters it.
+Never fill a second section in the same turn, even if it is small or the design feels settled.
+The pause is mandatory; never skip or batch it.
+
+**batch** — fill all remaining sections in one pass, with no per-section pause.
+Reached only via the exit aliases below; sticky until a trigger alias re-enables incremental.
+The initial skeleton write is its own step and is not affected by the mode.
+
+Trigger aliases (each means *confirm + enter/assert incremental mode*):
+'step by step', 'go incrementally', 'step-by-step', 'section by section', 'incr', 'incr mode'.
+
+Exit aliases (each switches from incremental to batch, sticky):
+'fill the rest', 'write all'.
+In batch mode the user may say a trigger alias (e.g. 'step by step') to re-enable incremental.
+
+### Fill loop
+
+Every prompt starts with the active `<mode banner>`.
+In incremental mode, print `Mode: incremental (one section per turn)`.
+In batch mode, print `Mode: batch`.
+
 NOTE: Earlier sections may be edited freely at any point, if needed.
 
 Add open questions to the section's own `### Open Questions` subsection immediately — do not defer.
 
 On edit failure: re-read `$specpath`, locate current state, resume.
 
-After filling a section:
+After filling a section (incremental mode only):
 - Note what was written and any open questions surfaced.
-- Print:
+- Tell user:
+  > <mode banner>
+  >
   > Feedback on this section?
 - List the remaining sections still to fill.
 - Print:
-  > Say 'next' or similar to continue with next section; or give specific section to work on.
+  > Say 'next' or similar to continue with the next section.
+  > Say 'fill the rest'/'write all' to switch to batch mode.
+
+In batch mode, skip the per-section prompt above — fill all remaining sections,
+then run the *After all sections are filled* steps.
 
 The user's response should be handled as feedback by default.
-Only 'next' or similar can be interpreted as signal to move on.
+Only 'next' or a trigger alias can be interpreted as signal to move on.
+'fill the rest'/'write all' switches to batch mode (sticky) for the remaining sections.
+
+If the user says 'tell me more' (or a listed alias): answer in output only.
+Do not edit `$specpath`, do not treat it as section feedback, do not advance,
+and do not switch to a different mode.
+Then re-issue the prompt and wait.
 
 After all sections are filled:
-
 1. Prune empty `### Open Questions` subsections — remove any that have no entries.
 2. Tell user:
+   > <mode banner>
+   >
    > Draft written to `$specpath` — open to inspect and share review feedback.
 
 ## Refinement
@@ -129,6 +171,9 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 
 ## Rules
 
+- In `incremental` mode, never fill more than one section per turn.
+  The pause after each section is mandatory — do not skip it nor batch it.
+- `incremental` is the default/canonical mode.
 - Never write full rewrite when targeted edit is requested. Surgical edits only.
 - Never paper over unresolved decisions. Surface them in Open Questions.
 - Never mix terminology once terms are defined.
