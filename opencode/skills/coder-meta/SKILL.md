@@ -47,7 +47,9 @@ Four layers: generic SKILL.md → generic module/script-rules.md → lang SKILL.
 
 | Concern | Belongs in |
 |---|---|
-| Function naming, comments, constants, whitespace, type annotations | generic `SKILL.md` |
+| Function naming, constants, whitespace, type annotations | generic `SKILL.md` |
+| Doc-comment content ownership (contract vs inline vs omit), param/return doc policy | generic `SKILL.md` |
+| Doc-comment syntax/placement for the language | lang `SKILL.md` |
 | Module/script distinction, conditional load instructions | generic `SKILL.md` |
 | No top-level side effects, no `exit`, minimal public API | generic `module-rules.md` |
 | Script entrypoint header, `main` entry point, no top-level logic | generic `script-rules.md` |
@@ -177,7 +179,8 @@ script error handling is richer (multiple helpers, fail/print_err/usage_and_exit
 which skill to load for writing tests.
 If no testing skill exists yet, say so explicitly and ask the user.
 
-Optional SKILL.md sections (add when relevant): `## Output capture`, `## Subcommands`.
+Optional SKILL.md sections (add when relevant): `## Output capture`, `## Subcommands`,
+`## Doc comments`, `## Reference docs`.
 
 ## Description frontmatter requirements
 

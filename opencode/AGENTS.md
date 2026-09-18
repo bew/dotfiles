@@ -101,6 +101,8 @@ Applies in Markdown, but also in other places like code comments, skill triggers
 
 IMPORTANT: Every sentence must start on its own line within the current paragraph, bullet, or
 list item (semantic line breaks).
+Do not chain multiple sentences on a single line unless they fit the remaining line width without
+wrapping.
 
 ## Markdown rules
 

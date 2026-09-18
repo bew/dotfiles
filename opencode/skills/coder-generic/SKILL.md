@@ -37,26 +37,44 @@ All extend the rules below.
 ## Rules
 
 - Use descriptive function names with a verb (e.g. `parse_args`, `check_format`).
-- Add a short comment above every function explaining its purpose or why it exists.
-  One line is enough for simple helpers.
-  A few lines for non-obvious ones.
-- Inline comments inside function bodies must explain *why*, not *what*.
-  Skip comments that restate what the code already says (unless said code is non-trivial).
-  Write them when the intent, constraint, or reason is not obvious from the code alone.
-  Exception: structural signpost comments are allowed when a function body or file has multiple
-  sections/phases/logical-blocks of code — they aid navigation without restating code.
-  For non-trivial code blocks (loops with inner computation, iterator chains, match arms with
-  branching logic), add a comment for each logical phase — not just one for the block as a whole.
 - Top-level constants: SCREAMING_SNAKE_CASE, defined at top of file after header/imports.
 - No trailing whitespace — no trailing spaces or tabs at the end of any line,
   and no lines that contain only whitespace.
 - Use type annotations for parameters and variables whenever the language supports it.
   Prefer explicit types over implicit ones — they serve as inline documentation.
-- Sentences in comments start on a new line.
-  Do not chain multiple sentences on a single line unless they fit the remaining line width
-  without wrapping.
 - When a function receives 4 or more related data inputs, prefer to group them into a named
   struct/record/object rather than passing them as individual parameters. (ask user if unsure)
+
+## Comments & docs rules
+
+### Function documentation
+
+- Every function has documentation (doc comment, docstring, or leading comment — in the
+  form the language uses) stating:
+  * its contract: goal, parameters, return
+  * any non-obvious behavior, refusal condition, or idempotency guarantee a caller must know.
+  One line is enough for simple helpers; a few lines for non-obvious ones.
+- Document every parameter unless it is truly obvious from the name and signature.
+  Document the return when it is not obvious.
+- When the language has dedicated syntax for parameter/return docs, place their description
+  after the type.
+- Implementation details and their rationale never go in the function doc.
+  Put them in an inline comment next to the relevant code.
+- Never document widely-known language/tool/framework default/expected behavior.
+  Only non-obvious quirks a caller needs belong in the doc.
+
+### Inline comments
+
+- Inline comments inside function bodies must explain *why*, not *what*.
+  Skip comments that restate what the code already says (unless said code is non-trivial).
+  Write them when the intent, constraint, or reason is not obvious from the code alone.
+  Exception: structural signpost comments are allowed when a function body or file has multiple
+  sections/phases/logical-blocks of code — they aid navigation without restating code.
+- For non-trivial code blocks (loops with inner computation, iterator chains, match arms with
+  branching logic), add an inline comment for each logical phase not just one for a whole block.
+- Sentences in comments start on a new line (semantic line breaks! + Follow lang max line width).
+  Do not chain multiple sentences on a single line unless they fit the remaining line width
+  without wrapping.
 
 ## Guidelines
 
