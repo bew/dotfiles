@@ -79,6 +79,15 @@ Do not output the doc content inline.
 - Do not inline file contents — reference by path only.
 - Only reference URLs that were confirmed in the session (appeared in user messages or tool results).
   Never reference URLs invented or hallucinated by the agent.
+- When instructing the reader to load a skill, use one of two forms:
+  ``load `foo` skill`` for an unconditional load, or
+  ``load `foo` skill when <condition>`` for a conditional one.
+  Conditional refs must carry the `when <condition>` clause.
+  Write these refs verbatim — caveman mode must not compress `load` or `skill` away.
+  Skill mentions that are not load instructions (e.g. in `What was done`) stay prose.
+  Governs skill names only, not raw skill dir/file paths — those stay plain path refs.
+  Never write a bare or ambiguous ref (e.g. ``see `foo` `` or a bare `` `foo` — why `` bullet).
+  Sentence-initial `Load` is fine.
 - Keep the doc readable by a human.
   Do not assume the reader is an agent.
 - Never write to a path outside the resolved Output dir without explicit user confirmation.

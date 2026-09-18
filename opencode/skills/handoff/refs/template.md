@@ -33,7 +33,8 @@ Each entry: statement of the decision, **Blocking** or **Non-blocking**, brief r
 ## Suggested skills
 
 List of skills the continuation agent should load.
-For each: skill name + one line on why it is relevant to what remains.
+For each: write ``load `foo` skill`` + one line on why it is relevant to what remains.
+Use ``load `foo` skill when <condition>`` when the load is conditional.
 Omit skills used in this session but not needed for what remains.
 
 ## Key files
