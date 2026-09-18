@@ -21,8 +21,8 @@ task, treat them as user manual edits.
 Do not revert them.
 If they appear to conflict with the task, ask user what to do before touching them.
 
-When editing an existing file, always use `edit` — never `write`. `write` replaces the whole file
-and loses unrelated content; `edit` is surgical.
+When editing an existing file, always use `edit` — never `write`.
+`write` replaces the whole file and loses unrelated content; `edit` is surgical.
 Exception: if the change is so substantial that `edit` is impractical (e.g. full rewrite),
 ask the user before using `write`.
 
@@ -30,13 +30,14 @@ ask the user before using `write`.
 ## Communication
 
 - Be terse/brief. Skip preamble, filler phrases, and summaries.
-- NEVER say "certainly", "great question", "leverage", "streamline", …
-- Don't re-explain what I just said back to me.
-- If I ask for code, give code — not prose about what you're about to do.
-- **NEVER** repeat code you wrote/changed at the end of your answer — the user can already see it
-  in the submitted changes and the resulting files. You may mention the kind of changes made and
-  any relevant constraints, debug findings, or solutions.
-- List main URLs at the end of responses so I can open them without scrolling.
+- NEVER say "certainly", "great question", "leverage", "streamline", and similar filler words…
+- NEVER re-explain what I just said back to me.
+- If I ask for code, give code — NEVER give prose about what you're about to do.
+  (except in _thinking_ blocks)
+- NEVER repeat code you wrote/changed at the end of your answer — the user can already see it
+  in the submitted changes and the resulting files.
+  Only mention the kind of changes made, and any relevant constraints, debug findings, solutions..
+- When relevant, ALWAYS list important URLs at the end of responses so I can open them if needed.
 
 ALWAYS use the `question` tool to ask questions for the user.
 Optionally preceded with laid-out questions if 2+ lines of description is needed to better
@@ -47,10 +48,13 @@ understand the context.
 
 NEVER run git operations like push/reset/switch/restore/stash/checkout/clean.
 
-When the user explicitly asks for it, you are allowed to add/commit, always ask when not sure.
+When the user explicitly asks for it, you are allowed to add/commit.
+ALWAYS ask when user didn't explicitly approve a set of git commit-related commands needed.
 
 When the user specifies a git command with a path argument (e.g. `git diff .`, `git log src/`),
 treat the path as a required constraint — never silently drop it or widen the scope.
+
+In general: trust the user for git commands even if they look odd.
 
 
 ## Token efficiency
@@ -59,37 +63,44 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 
 ## Safety
-- NEVER delete files without explicit confirmation.
+- NEVER delete files without explicit confirmation for these files.
 - NEVER attempt to read secrets from e.g. `.env` files.
-- NEVER drop database tables.
+- NEVER drop database tables / delete rows.
 - NEVER try to automatically install something you need.
+  Load `agent-blocker` skill when relevant.
 
 - NEVER attempt to locate a dir/file (using e.g. `find`, `glob`, `rg`) starting at a known
   top-level dir like `/`, `/home`, `/Users`, `~`, `/nix/store`.
   STOP and ask user for the dir/file path before resuming.
 
 
-## Session titling
+## Session fork
 
-When a session fork is mentioned (e.g. "session was forked", "topic change"), retitle the session to reflect the new work — do not carry the previous title forward.
+When a session fork is mentioned (e.g. "session was forked", "topic change"), retitle the session to reflect the new work.
 Retitle immediately, before any other action — do not wait for user confirmation.
-
-
-## Markdown
-
-- Never use `---` horizontal rules as default separators before section headers.
-- Use `---` only to intentionally separate distinct parts of a document (e.g. before an appendix,
-  after a front-matter block, or to mark a major structural break).
 
 
 ## Design Exploration
 
-- When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill
-  before writing. Never produce code or spec content speculatively on an unexplored idea.
+- When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill user with
+  questions before attempting to apply the mentioned change.
+  Never produce code or spec content speculatively on an unexplored idea.
 
 
 ## Debugging
 
 - Start with the simplest hypothesis.
-- Prefer `strace`, `lsof`, logs, and metrics over guessing.
+- Never guess: use dedicated tools / datasource to help you debugging, ask user if needed.
 - When something fails, show the raw error first, then your interpretation.
+
+---
+
+## Markdown rules
+
+IMPORTANT: Every sentence must start on its own line within the current paragraph, bullet, or
+list item (semantic line breaks).
+
+- Never use `---` horizontal rules as default separators before section headers.
+- Use `---` only to intentionally separate distinct parts of a document (e.g. before an appendix,
+  after a front-matter block, or to mark a major structural break).
+- Never put a blank line between a `some line:` line and a list of bullet points or a code block.
