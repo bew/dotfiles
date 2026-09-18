@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+
+# Read-only recon report for extracting part of a git repo into its own repo.
+# Usage: recon SOURCE_ROOT PATH...
+
+set -euo pipefail
+
+# Print message to stderr.
+function echo_err() {
+    echo >&2 "$*"
+}
+
+# Print formatted error to stderr and exit 1.
+function fail() {
+    local msg="$1"
+    echo_err "!! ERROR: $msg"
+    exit 1
+}
+
+# Print usage to stderr and exit with given status.
+function usage_and_exit() {
+    local status="$1"
+    cat >&2 <<'EOF'
+Usage: recon SOURCE_ROOT PATH...
+
+Read-only recon report for extracting part of a git repo into its own repo.
+Prints repo state, part files, history depth, renames, prior locations, and consumers.
+
+EXAMPLES:
+  recon /path/to/repo nix/dynpaths-flake         - Report on a single part directory
+  recon /path/to/repo dir/one dir/two            - Report on multiple part paths
+EOF
+    exit "$status"
+}
+
+# Print a section header.
+function section() {
+    local title="$1"
+    printf '\n== %s ==\n' "$title"
+}
+
+# Run a git command in the source repo, tolerating failures (non-git dirs, no commits).
+function git_src() {
+    local srcroot="$1"
+    shift
+    git -C "$srcroot" "$@" 2>/dev/null || true
+}
+
+# Print a count of lines for a git command, tolerating failure (prints 0).
+function git_count() {
+    local srcroot="$1"
+    shift
+    local count
+    count=$(git_src "$srcroot" "$@" | wc -l)
+    echo "${count:-0}"
+}
+
+# Print repo state: gitfile (worktree/submodule), dirs, branch, dirty count.
+function report_repo_state() {
+    local srcroot="$1"
+
+    section "Repo state"
+
+    if [[ -f "$srcroot/.git" ]]; then
+        echo "NOTE: .git is a gitfile -> worktree or submodule"
+        echo "  content: $(<"$srcroot/.git")"
+    fi
+
+    echo "git-dir:    $(git_src "$srcroot" rev-parse --git-dir)"
+    echo "common-dir: $(git_src "$srcroot" rev-parse --git-common-dir)"
+    echo "branch:     $(git_src "$srcroot" symbolic-ref --short HEAD)"
+    echo "dirty files: $(git_count "$srcroot" status --porcelain)"
+}
+
+# Print tracked files and total size for a part path.
+function report_part_files() {
+    local srcroot="$1"
+    local part="$2"
+
+    local files
+    files=$(git_src "$srcroot" ls-files -- "$part")
+
+    if [[ -z "$files" ]]; then
+        echo "  (no tracked files under '$part')"
+        return
+    fi
+
+    echo "  tracked files:"
+    echo "$files" | sed 's/^/    /'
+    echo "  count: $(echo "$files" | wc -l)"
+}
+
+# Print history depth, renames, prior locations, and earliest commit for a part path.
+function report_part_history() {
+    local srcroot="$1"
+    local part="$2"
+
+    echo "  current-branch commits: $(git_count "$srcroot" log --oneline -- "$part")"
+    echo "  all-branch commits:     $(git_count "$srcroot" log --all --oneline -- "$part")"
+
+    local first
+    # head closes the pipe early -> SIGPIPE expected
+    set +o pipefail
+    first=$(git_src "$srcroot" log --format='%h %s' --reverse -- "$part" | head -n1)
+    set -o pipefail
+    echo "  earliest commit:        ${first:-(none)}"
+
+    local renames
+    renames=$(git_src "$srcroot" log --name-status --diff-filter=R --format= -- "$part")
+    if [[ -n "$renames" ]]; then
+        echo "  renames:"
+        echo "$renames" | sed 's/^/    /'
+    fi
+
+    local base
+    base=$(basename "$part")
+    local prior
+    prior=$(git_src "$srcroot" log --all --oneline --name-only -- "*$base*")
+    if [[ -n "$prior" ]]; then
+        echo "  history under other paths matching '*$base*':"
+        # cap output; head closes the pipe early -> SIGPIPE expected
+        set +o pipefail
+        echo "$prior" | head -n 20 | sed 's/^/    /'
+        set -o pipefail
+    fi
+}
+
+# Print repo consumers of a part path in source files and lockfiles.
+function report_consumers() {
+    local srcroot="$1"
+    local part="$2"
+
+    local hits=""
+    if command -v rg >/dev/null 2>&1; then
+        hits=$(rg -n -- "$part" "$srcroot" 2>/dev/null || true)
+    else
+        hits=$(git_src "$srcroot" grep -n -- "$part")
+    fi
+
+    if [[ -n "$hits" ]]; then
+        echo "  references to '$part':"
+        # cap output; head closes the pipe early -> SIGPIPE expected
+        set +o pipefail
+        echo "$hits" | head -n 20 | sed 's/^/    /'
+        set -o pipefail
+    else
+        echo "  no references to '$part'"
+    fi
+
+    local lockfile
+    for lockfile in flake.lock package-lock.json Cargo.lock go.sum poetry.lock; do
+        if [[ -f "$srcroot/$lockfile" ]] && grep -qF -- "$part" "$srcroot/$lockfile" 2>/dev/null; then
+            echo "  lockfile hit: $lockfile"
+        fi
+    done
+}
+
+# Entry point.
+function main() {
+    if [[ $# -lt 2 ]]; then
+        usage_and_exit 1
+    fi
+
+    local srcroot="$1"
+    shift
+
+    if [[ ! -d "$srcroot" ]]; then
+        fail "source root '$srcroot' is not a directory"
+    fi
+
+    report_repo_state "$srcroot"
+
+    local part
+    for part in "$@"; do
+        section "Part: $part"
+        report_part_files "$srcroot" "$part"
+        report_part_history "$srcroot" "$part"
+        report_consumers "$srcroot" "$part"
+    done
+}
+
+main "$@"
