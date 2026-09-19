@@ -50,8 +50,8 @@
     // Messages: general nav
     "messages_first": "alt+g",
     "messages_last": "ctrl+g", // FAIL: OC doesn't recognize this
-    "messages_next": "none",
-    "messages_previous": "none",
+    "messages_next": "alt+n",
+    "messages_previous": "alt+p",
     "messages_line_up": "none", // scroll 1 line
     "messages_line_down": "none", // scroll 1 line
     "messages_last_user": "none", // jump to last user-authored message
@@ -134,7 +134,7 @@
     "dialog.select.home": "home",
     "dialog.select.end": "end",
     "dialog.select.submit": "return,ctrl+space", // (ctrl+j not recognized..)
-    "dialog.prompt.submit": "return,ctrl+j",
+    "dialog.prompt.submit": "return",
     "dialog.mcp.toggle": "space",
     // FIXME: nav broken for `#…` autocomplete, but works for `/…` or `@…` 👀
     // TICKET: https://github.com/JosXa/opencode-snippets/issues/36
