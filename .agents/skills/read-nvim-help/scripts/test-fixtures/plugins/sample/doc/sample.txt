@@ -1,0 +1,12 @@
+*sample.txt*   Synthetic Plugin Help
+
+==============================================================================
+SAMPLE USAGE                                               *sample-usage*
+
+Sample plugin body line one. *dup-tag*
+Sample plugin body line two.
+
+------------------------------------------------------------------------------
+SAMPLE OPTIONS                                             *sample-options*
+
+Sample option body.

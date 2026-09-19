@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+# Query Neovim help docs: resolve tags, sections and titles across runtime doc
+# dirs by delegating to a Lua backend run inside `nvim -l`.
+#
+# Usage: nvimq <tag|toc|section|find> [options]   (see `nvimq --help`)
+
+import argparse
+import json
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+
+SCRIPT_NAME = "nvimq"
+BACKEND_NAME = "nvimq_backend.lua"
+DOC_ROOT_ENV = "NVIMQ_DOC_ROOT"
+SCOPES = ("core", "plugin", "all")
+NVIM_TIMEOUT_S = 60
+
+LINES_RANGE_RE = re.compile(r"^(\d+)(?:-(\d+))?$")
+
+
+class ScriptError(Exception):
+    """Raised when the script cannot complete the requested query."""
+
+
+def print_err(msg: str) -> None:
+    """Print msg to stderr."""
+    print(msg, file=sys.stderr)
+
+
+# ------------------------------------------------------------------------------
+# Argument parsing
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse argv into a namespace with a `command` attribute."""
+    parser = argparse.ArgumentParser(
+        prog=SCRIPT_NAME,
+        description="Read Neovim help docs in targeted chunks.",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    tag_p = sub.add_parser("tag", help="print the block around a tag definition")
+    tag_p.add_argument("tag", help="tag name, e.g. lsp")
+    tag_p.add_argument(
+        "--lines", metavar="A-B", help="rendered line range within the block"
+    )
+    tag_p.add_argument(
+        "-S", dest="scope", choices=SCOPES, default="all", help="doc scope filter"
+    )
+
+    toc_p = sub.add_parser("toc", help="list a help file's sections")
+    toc_p.add_argument("file", help="help file stem, e.g. lsp (or lsp.txt)")
+    toc_p.add_argument(
+        "-L", dest="max_depth", type=int, metavar="N", help="max section depth"
+    )
+    toc_p.add_argument(
+        "-S", dest="scope", choices=SCOPES, default="all", help="doc scope filter"
+    )
+
+    sec_p = sub.add_parser("section", help="print sections of a help file")
+    sec_p.add_argument("target", metavar="FILE[:NAME]", help="file, optional section")
+    sec_p.add_argument("names", nargs="*", metavar="NAME", help="extra sections")
+    sec_p.add_argument(
+        "--lines", metavar="A-B", help="print only rendered lines A-B"
+    )
+    sec_p.add_argument(
+        "-S", dest="scope", choices=SCOPES, default="all", help="doc scope filter"
+    )
+
+    find_p = sub.add_parser("find", help="search tags and section titles")
+    find_p.add_argument("pattern", help="substring, glob, or regex")
+    find_p.add_argument(
+        "-S", dest="scope", choices=SCOPES, default="all", help="doc scope filter"
+    )
+
+    return parser.parse_args()
+
+
+# ------------------------------------------------------------------------------
+# Request building
+
+
+def parse_lines_range(raw: str) -> list[int]:
+    """Parse an `A-B` (or `A`) rendered-line range, 1-based inclusive."""
+    match = LINES_RANGE_RE.fullmatch(raw.strip())
+    if match is None:
+        raise ScriptError(f"invalid --lines range '{raw}': expected A-B")
+    start = int(match.group(1))
+    end = int(match.group(2)) if match.group(2) is not None else start
+    if start < 1 or end < start:
+        raise ScriptError(f"invalid --lines range '{raw}': expected 1 <= A <= B")
+    return [start, end]
+
+
+def build_request(args: argparse.Namespace) -> dict:
+    """Translate parsed args into the JSON request the Lua backend expects.
+
+    Optional keys are omitted rather than set to null, since the backend's JSON
+    decoder maps null to a sentinel that would defeat nil checks.
+    """
+    request: dict = {"command": args.command, "scope": args.scope}
+    match args.command:
+        case "tag":
+            request["tag"] = args.tag
+            if args.lines:
+                request["lines"] = parse_lines_range(args.lines)
+        case "toc":
+            request["file"] = args.file
+            if args.max_depth is not None:
+                request["max_depth"] = args.max_depth
+        case "section":
+            request["target"] = args.target
+            request["names"] = list(args.names)
+            if args.lines:
+                request["lines"] = parse_lines_range(args.lines)
+        case "find":
+            request["pattern"] = args.pattern
+        case _:
+            raise ScriptError(f"unknown command: {args.command}")
+    return request
+
+
+# ------------------------------------------------------------------------------
+# Backend invocation
+
+
+def backend_path() -> str:
+    """Return the absolute path to the Lua backend next to this script."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), BACKEND_NAME)
+
+
+def run_backend(request: dict) -> int:
+    """Run the Lua backend under nvim, relaying its streams; return its exit code.
+
+    Adds `--clean` when `NVIMQ_DOC_ROOT` is set so fixture runs ignore the user
+    config; without the override the config is loaded to pick up plugin docs.
+    """
+    nvim = shutil.which("nvim")
+    if nvim is None:
+        raise ScriptError(
+            f"`nvim` not found on PATH; install it or set {DOC_ROOT_ENV}"
+        )
+    cmd = [nvim, "--headless"]
+    if os.environ.get(DOC_ROOT_ENV):
+        cmd.append("--clean")
+    cmd += ["-l", backend_path(), json.dumps(request)]
+    try:
+        proc = subprocess.run(cmd, timeout=NVIM_TIMEOUT_S)
+    except subprocess.TimeoutExpired as exc:
+        raise ScriptError(f"nvim backend timed out after {NVIM_TIMEOUT_S}s") from exc
+    except OSError as exc:
+        raise ScriptError(f"could not launch nvim: {exc}") from exc
+    return proc.returncode
+
+
+def main() -> int:
+    args = parse_args()
+    return run_backend(build_request(args))
+
+
+if __name__ == "__main__":
+    # Behave like a normal Unix tool when a downstream `| head` closes the pipe.
+    if hasattr(signal, "SIGPIPE"):
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    try:
+        sys.exit(main())
+    except ScriptError as exc:
+        print_err(f"!! ERROR: {exc}")
+        sys.exit(1)

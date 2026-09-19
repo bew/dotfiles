@@ -1,0 +1,13 @@
+core.txt	core.txt	/*core.txt*
+core-intro	core.txt	/*core-intro*
+intro	core.txt	/*intro*
+core-inline	core.txt	/*core-inline*
+'opt'	core.txt	/*'opt'*
+core-paren()	core.txt	/*core-paren()*
+core-alpha	core.txt	/*core-alpha*
+alpha-inline	core.txt	/*alpha-inline*
+core-h3	core.txt	/*core-h3*
+core-sub-alpha	core.txt	/*core-sub-alpha*
+core-beta	core.txt	/*core-beta*
+core-sub-beta	core.txt	/*core-sub-beta*
+core-gamma	core.txt	/*core-gamma*

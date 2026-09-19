@@ -1,0 +1,4 @@
+sample.txt	sample.txt	/*sample.txt*
+sample-usage	sample.txt	/*sample-usage*
+sample-options	sample.txt	/*sample-options*
+dup-tag	sample.txt	/*dup-tag*

@@ -1,0 +1,11 @@
+*other.txt*   Synthetic Second Plugin Help
+
+==============================================================================
+OTHER USAGE                                                *other-usage*
+
+Other body line one with *dup-tag* anchor.
+
+Implicit example: >lua
+  local y = 2
+  print(y)
+

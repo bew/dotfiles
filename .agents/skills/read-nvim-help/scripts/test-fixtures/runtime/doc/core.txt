@@ -1,0 +1,64 @@
+*core.txt*   Synthetic Core Help
+
+==============================================================================
+INTRO                                                    *core-intro* *intro*
+
+Welcome to the synthetic core help file.
+This line carries an inline anchor *core-inline* and *core-paren()* for tests.
+A reference |core-ref| stays inline. *'opt'*
+Filler line one.
+Filler line two.
+
+------------------------------------------------------------------------------
+ALPHA SECTION                                              *core-alpha*
+
+Alpha body line one.
+Alpha body line two with *alpha-inline* anchor.
+Alpha body line three.
+
+VIM.LSP.EXAMPLE()                                          *core-h3*
+
+Text under an h3 tag heading.
+
+Parameters: ~
+    • {opts}  (`table`) Options.
+
+Example: >lua
+  local x = 1
+  if x then
+    print(x)
+  end
+<
+
+Bare sample: >
+  echo hello
+  echo world
+<
+
+Vim sample: >vim
+  :set number
+<
+
+------------------------------------------------------------------------------
+SUB ALPHA                                                  *core-sub-alpha*
+
+Sub alpha body line one.
+Sub alpha body line two.
+
+==============================================================================
+BETA SECTION                                               *core-beta*
+
+Beta body line one.
+Beta body line two.
+Beta body line three.
+Beta body line four.
+
+------------------------------------------------------------------------------
+SUB BETA                                                   *core-sub-beta*
+
+Sub beta body line one.
+
+==============================================================================
+GAMMA                                                      *core-gamma*
+
+Gamma body line one.
