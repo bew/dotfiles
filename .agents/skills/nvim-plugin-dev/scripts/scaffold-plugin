@@ -1,0 +1,96 @@
+#!/usr/bin/env nu
+
+# scaffold-plugin — create a Neovim plugin package skeleton under a plugins root.
+# Usage: scaffold-plugin [-d <plugins-root>] <name>
+
+const MODULE_STUB = "local M = {}\n\nreturn M\n"
+
+const STYLUA_TOML = "# (NOTE: The file is used to find root of a Lua project, to avoid loading too much)\n# Reference: https://github.com/JohnnyMorganz/StyLua\nindent_type = \"Spaces\"\nindent_width = 2\ncall_parentheses = \"Input\"\n"
+
+# Print formatted error to stderr and exit 1.
+def fail [msg: string]: nothing -> nothing {
+    print --stderr $"!! ERROR: ($msg)"
+    exit 1
+}
+
+# Print usage to stderr and exit with given status.
+def usage_and_exit [status: int]: nothing -> nothing {
+    print --stderr 'Usage: scaffold-plugin [-d <plugins-root>] <name>
+
+Create a Neovim plugin package skeleton at <plugins-root>/<name>.nvim/
+containing lua/<name>.lua, stylua.toml, and an empty tests/ directory.
+
+<plugins-root> defaults to $NVIM_BEW_MYPLUGINS_PATH.
+A trailing .nvim on <name> is stripped automatically.
+The target is never overwritten: the script errors if it already exists.
+
+OPTIONS:
+  -d <path>    plugins root directory (overrides NVIM_BEW_MYPLUGINS_PATH)
+  -h, --help   show this help and exit
+
+EXAMPLES:
+  scaffold-plugin my-thing
+  scaffold-plugin -d ./nvim-myplugins my-thing'
+    exit $status
+}
+
+# Validate the plugin name, which becomes a path segment and module namespace.
+# Assumes a trailing .nvim has already been stripped by the caller.
+def check_name [name: string]: nothing -> nothing {
+    if ($name | is-empty) {
+        usage_and_exit 1
+    }
+
+    if ($name =~ '[/\s]') {
+        fail $"invalid plugin name '($name)': must not contain '/' or whitespace"
+    }
+
+    if ($name | str starts-with '.') {
+        fail $"invalid plugin name '($name)': must not start with '.'"
+    }
+
+    if ($name | str starts-with '-') {
+        fail $"invalid plugin name '($name)': must not start with '-'"
+    }
+}
+
+# Create a Neovim plugin package skeleton under a plugins root.
+#
+# <plugins-root> is taken from -d/--dir, else $NVIM_BEW_MYPLUGINS_PATH.
+# A trailing .nvim on <name> is stripped automatically.
+# The target is never overwritten: the script errors if it already exists.
+def main [
+    name: string         # plugin name (a trailing .nvim is stripped)
+    --dir(-d): string    # plugins root directory (overrides the env var)
+]: nothing -> nothing {
+    # Normalize an explicit .nvim suffix so '<name>.nvim.nvim' is never created.
+    let stripped_name = ($name | str replace --regex '\.nvim$' '')
+
+    check_name $stripped_name
+
+    let plugins_root = if ($dir | is-not-empty) {
+        $dir
+    } else {
+        $env.NVIM_BEW_MYPLUGINS_PATH? | default ''
+    }
+
+    if ($plugins_root | is-empty) {
+        fail "no plugins root given: set NVIM_BEW_MYPLUGINS_PATH or pass -d <path>"
+    }
+
+    let plugpath = $"($plugins_root)/($stripped_name).nvim"
+
+    if ($plugpath | path exists) {
+        fail $"target already exists: ($plugpath)"
+    }
+
+    let lua_dir = ($plugpath | path join 'lua')
+    let tests_dir = ($plugpath | path join 'tests')
+
+    mkdir $lua_dir $tests_dir
+
+    $MODULE_STUB | save --raw ($lua_dir | path join $"($stripped_name).lua")
+    $STYLUA_TOML | save --raw ($plugpath | path join 'stylua.toml')
+
+    print $"created ($plugpath)"
+}
