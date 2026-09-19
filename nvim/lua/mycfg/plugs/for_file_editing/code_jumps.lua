@@ -6,6 +6,7 @@ local Plug = PluginSystem.get_plugin_declarator {
   default_tags = { t.editing },
 }
 
+local A = require"mylib.action_system"
 local K = require"mylib.keymap_system"
 local U = require"mylib.utils"
 
@@ -302,4 +303,21 @@ Plug {
     -- word matches uses `MatchWord` (using `MatchParen` for words is too flashy!)
     U.hl.set("MatchWord", { underline = true })
   end
+}
+
+Plug {
+  source = myplug"content-overview.nvim",
+  desc = "Better LSP document-symbol overview: structural kinds only, colored [Kind] prefixes",
+  tags = {t.content_ui, "lsp"},
+  on_load = function()
+    -- N: Content overview (LSP document symbols, or Treesitter TOC where `gO` is overridden)
+    my_actions.show_content_overview = A.mk_action {
+      default_desc = "Show content overview",
+      n = function()
+        require"content-overview".show()
+      end,
+    }
+    K.toplevel_map{mode="n", key="go", action=my_actions.show_content_overview}
+    K.local_leader_map{mode="n", key="co", action=my_actions.show_content_overview}
+  end,
 }
