@@ -117,6 +117,7 @@ Plug.telescope {
       -- N/I: Select actions
       ["<CR>"] = tel_actions.select_default,
       ["<C-j>"] = tel_actions.select_default,
+      ["<M-CR>"] = tel_actions.select_default,
       -- FIXME: multi-selection not handled properly :/
       --   -> All builtin select_* actions use the selected entry instead of
       --   picker:get_multi_selection() 😖
