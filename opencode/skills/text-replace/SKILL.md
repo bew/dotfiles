@@ -17,23 +17,42 @@ metadata:
 Replace text in files or streams using `sd`.
 Prefer `sd` over `sed -i`, `perl -pi`, or `awk` for edits.
 Default to exact literal matches; reach for regex only when literal matching is insufficient.
+Prefer whole-word matching when replacing a word, keyword, or identifier (see <§word-boundaries>).
 
 Read <./refs/regex.md> before any replacement that is not a plain literal (`-F`) match.
 
 ## Exact replacement
 
 ```sh
-sd -F 'OLD' 'NEW' FILE...
+sd -F 'OLD' 'NEW' FILE...          # literal substring
+sd -F -f w 'OLD' 'NEW' FILE...     # literal whole word — for word, keyword, or identifier
 ```
 
 - `-F` makes `OLD`/`NEW` literal — no metacharacters, no capture expansion.
 - Files are modified **in place** by default — no backup written.
 - Omit `FILE...` to read stdin and write stdout.
-- Add `-f w` to match whole words only (`sd -F -f w 'foo' 'X'` leaves `foobar` alone).
+- Whole-word matching (`-f w`): see <§word-boundaries>.
 - Separate a leading-dash pattern with `--`: `sd -F -- '-x-' 'Y' file.txt`.
 - Single-quote patterns so the shell does not expand globs or `$`.
 
 Prefer `-F` even when the text looks regex-safe — it documents intent and removes surprises.
+
+## Word boundaries
+<!-- §word-boundaries -->
+
+Use whole-word matching by default when replacing a word, keyword, or identifier —
+unless the edit is inside a word.
+Add `-f w`:
+
+```sh
+sd -F -f w 'foo' 'bar' FILE...    # foo -> bar; foobar, my_foo untouched
+```
+
+Without `-f w`, `FIND` matches every substring occurrence.
+`foo` also rewrites `foobar`, `food`, and `foo_bar` — the most common bulk-edit bug.
+
+Drop `-f w` only when the edit is inside a word
+(renaming a prefix, or a literal that is itself a fragment).
 
 ## Planning the rewrite
 
@@ -89,7 +108,7 @@ fd -e md . docs/ | xargs sd -F 'old' 'new'
 - NEVER run an unreviewed replace across many files or a whole repo.
 - Use `-F` for literal text.
   Without it, regex metacharacters (`.`, `*`, `(`, `$`, `?`, `+`) change meaning.
-- Use `-f w` when the text can appear as a substring of another token.
+- Use `-f w` by default for word, keyword, or identifier replacements (see <§word-boundaries>).
 - Quote patterns in single quotes.
 - After bulk edits, run the project's formatter/linter/tests if code was touched.
 
@@ -98,5 +117,7 @@ fd -e md . docs/ | xargs sd -F 'old' 'new'
 - `sd` overwrites files with no backup — rely on VCS, not on `sd`, for recovery.
 - `sd` exits `0` even when `FIND` matches nothing — a silent no-op.
   Confirm the rewrite landed with an `rg -c` recount.
+- `-f w` only matches when `FIND` starts and ends with a word character.
+  `sd -F -f w '-x-'` silently matches nothing.
 - Without `-F`, `FIND` is a regex (see <./refs/regex.md>) — `.` matches any char, `$` is an anchor.
 - Stdin mode writes to stdout only; it never edits files.
