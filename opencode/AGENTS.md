@@ -92,6 +92,13 @@ Retitle immediately, before any other action — do not wait for user confirmati
 - Never guess: use dedicated tools / datasource to help you debugging, ask user if needed.
 - When something fails, show the raw error first, then your interpretation.
 
+
+## opencode path alias
+
+`~/.config/opencode` is a symlink to `~/.dot/opencode` — the same directory, not a copy.
+`<repo>/opencode/…` and `~/.config/opencode/…` are the same file on disk (same inode).
+Never treat them as separate copies or sources of truth.
+
 ---
 
 ## General prose rules
