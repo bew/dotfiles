@@ -1,4 +1,3 @@
-
 # General rules for all interactions
 
 
@@ -109,4 +108,8 @@ wrapping.
 - Never use `---` horizontal rules as default separators before section headers.
 - Use `---` only to intentionally separate distinct parts of a document (e.g. before an appendix,
   after a front-matter block, or to mark a major structural break).
-- Never put a blank line between a `some line:` line and a list of bullet points or a code block.
+- Never put a blank line between a `some line:` line and a list of bullets or a code block.
+- Never state how many items a list or set contains (e.g. "four themes:", "three options:", "the two main reasons").
+  The count goes stale when items change, and the update is easily missed.
+- Use bullets for any list whose length may grow
+- Inline enumerations ("a, b, and c") are allowed only for a small, known-not-to-change set of few items.
