@@ -13,6 +13,8 @@ K.toplevel_buf_map{mode="n", key="o",     action="<cr>", desc="Jump to current"}
 K.toplevel_buf_map{mode="n", key="<M-o>", action=jump_to_current_stay_in_qf, desc="Jump to current, stay in qf"}
 K.toplevel_buf_map{mode="n", key="<M-j>", action="j"..jump_to_current_stay_in_qf, desc="Jump to next, stay in qf"}
 K.toplevel_buf_map{mode="n", key="<M-k>", action="k"..jump_to_current_stay_in_qf, desc="Jump to prev, stay in qf"}
+K.toplevel_buf_map{mode="n", key="J", action="<C-d>", desc="Page down"}
+K.toplevel_buf_map{mode="n", key="K", action="<C-u>", desc="Page up"}
 -- TODO: jump to next/previous entry, skipping 'context' lines
 -- IDEA: Might be able to it in a plugin-agnostic way, by checking if entries have mixed provenance,
 --   and jump between entries that have a known provenance 🤔
