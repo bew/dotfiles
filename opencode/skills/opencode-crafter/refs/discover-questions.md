@@ -41,3 +41,15 @@ For snippets additionally:
 - Trigger name? any aliases?
 - Expand inline, or use `<append>`/`<prepend>` blocks?
 - Shell command output injection needed (`` !`cmd` ``)?
+
+For skill-standalone additionally (derive) — only when explicitly requested:
+- Which base skill? Locate `$sourcepath`; ask the user if ambiguous across scopes.
+- Confirm the strict-portable strip policy — read <./skills-related/standalone-anatomy.md>.
+- Does the base skill have `scripts/`? If yes: refuse to derive; ask the user how to proceed.
+- Confirm output name `<base>-standalone`.
+- Target tool (Perplexity, ChatGPT, raw prompt) — informs output-instruction wording.
+
+For skill-standalone additionally (sync):
+- Present the semantic diff between the base skill and the standalone.
+- Confirm which divergences to mirror; filter each against the standalone constraints.
+- If the base gained a `scripts/` dir: refuse and ask the user how to proceed.

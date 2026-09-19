@@ -1,7 +1,8 @@
 ---
 name: opencode-artefact-rules
 description: |
-  Quality criteria and review checklist for OpenCode artefacts (skills, agents, commands).
+  Quality criteria and review checklist for OpenCode artefacts
+  (skills, skill-standalone, agents, commands).
   Invoked by opencode-reviewer agent.
   Not for direct use.
 metadata:
@@ -37,5 +38,6 @@ Check these first, regardless of artefact type.
 Based on artefact type, read the appropriate file for additional criteria:
 
 - skill: read <./refs/skills.md>
+- skill-standalone: read <./refs/skill-standalone.md>
 - agent: read <./refs/agents.md>
 - command: read <./refs/commands.md>

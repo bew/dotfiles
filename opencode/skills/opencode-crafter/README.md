@@ -2,6 +2,8 @@
 
 Guides an OC agent through a structured, phase-based workflow to **create or update** OpenCode
 artefacts: skills, agents, commands, and snippets.
+Can also derive **standalone skill variants** (`skill-standalone`) on explicit request —
+single-file, tool-less exports of existing skills.
 
 Handles the full lifecycle — from classifying the right artefact type, through discovery,
 drafting, optional script work, review, and final install.
@@ -16,6 +18,7 @@ drafting, optional script work, review, and final install.
 | 3.5 | `Phase:Scripts` _(if needed)_ | POC & iterate on scripts via subagent |
 | 4 | `Phase:Review` | Review & refine with user via subagent |
 | 5 | `Phase:Ship` | Copy to `$installpath` (new artefacts only) |
+| 6 | `Phase:PropagateChange` _(if variants exist)_ | Propagate change to skill variants |
 
 Full phase logic is in [`SKILL.md`](./SKILL.md).
 
@@ -45,6 +48,7 @@ Agents must be installed at `~/.config/opencode/agents/` (global) or `.opencode/
 > Add retitle support to the crafter skill
 > Edit the agent-stuck skill to handle a new case
 > Create a new agent for reviewing OpenCode artefacts
+> Make a standalone version of the write-spec skill for Perplexity
 
 ## Reference files
 
@@ -55,6 +59,8 @@ Companion docs loaded on demand by the agent (not read upfront):
 | [`refs/classify-new.md`](./refs/classify-new.md) | Artefact type decision rules & gate checks |
 | [`refs/discover-questions.md`](./refs/discover-questions.md) | `Phase:Discover` question set |
 | [`refs/skills-related/anatomy.md`](./refs/skills-related/anatomy.md) | Full skill spec: layout, frontmatter, progressive disclosure |
+| [`refs/skills-related/standalone-anatomy.md`](./refs/skills-related/standalone-anatomy.md) | Standalone spec: layout, transforms, sync |
+| [`refs/skills-related/variants.md`](./refs/skills-related/variants.md) | Variant concept, `VARIANT` file, known types |
 | [`refs/skills-related/skill-phases.md`](./refs/skills-related/skill-phases.md) | Skill-specific phase structure & crafter integration |
 | [`refs/rules-for-steps-phases-headers.md`](./refs/rules-for-steps-phases-headers.md) | Phase naming, named steps, gates, reference integrity |
 | [`refs/skills-related/with-script.md`](./refs/skills-related/with-script.md) | Extra rules when skill includes scripts |
@@ -63,4 +69,5 @@ Companion docs loaded on demand by the agent (not read upfront):
 | [`refs/phases/scripts.md`](./refs/phases/scripts.md) | `Phase:Scripts` subagent handoff instructions |
 | [`refs/phases/review.md`](./refs/phases/review.md) | `Phase:Review` subagent handoff instructions |
 | [`refs/phases/ship.md`](./refs/phases/ship.md) | `Phase:Ship` copy & cleanup instructions |
+| [`refs/phases/propagate-change.md`](./refs/phases/propagate-change.md) | Propagation phase |
 | [`refs/rules-for-writing.md`](./refs/rules-for-writing.md) | Tone, formatting, length targets for artefact prose |

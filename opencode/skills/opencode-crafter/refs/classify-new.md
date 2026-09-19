@@ -11,6 +11,15 @@ Use decision table below to confirm right artefact type.
 - Agent needs to use skill-associated files/scripts/references
 - Task is reusable across sessions
 
+**A skill-standalone is appropriate when…**:
+- User explicitly requests a standalone / self-contained / tool-less export variant
+- Target is ad-hoc loading into Perplexity, ChatGPT, or a raw prompt
+- Source skill has no `scripts/` (scripts block derivation)
+
+A `skill-standalone` is always derived from a base skill — never authored from scratch.
+The base skill is an input (`$sourcepath`), not an update target.
+Read <./skills-related/standalone-anatomy.md> for the full spec.
+
 **A command is appropriate when…**:
 - Task is a fixed prompt template run on demand
 - Want a `/shortcut` that injects context (args, shell output, files)
@@ -23,6 +32,7 @@ Use decision table below to confirm right artefact type.
 
 NOTE: Only **skills** support companion Markdown/asset files (`refs/`, `scripts/`, `assets/`, `templates/`).
 Agents and commands use a single `.md` file — all content must be self-contained.
+`skill-standalone` uses a single `SKILL.md` + provenance `README.md` + `VARIANT` marker only.
 Tools and plugins are scripts (`.ts`/`.js`) — no companion files.
 
 **A tool is appropriate when…**:

@@ -28,6 +28,16 @@ Directory with `SKILL.md` + optional resources.
 └── templates/   ← scaffolds the agent fills in
 ```
 
+## Skill variants
+<!-- §skill-variants -->
+
+A skill variant is a skill derived from a base skill, identified by naming:
+a sibling directory named `<base-name>-<suffix>` (e.g. `foo-standalone`, `foo-lite`).
+
+Detection: for a base skill `<base-name>`, every sibling dir matching `<base-name>-*`.
+
+Read <./variants.md> when a skill variant is detected.
+
 ## Phases
 
 For complex skills with 3+ distinct concerns, structure workflow as named **phases** rather than a flat Steps list.

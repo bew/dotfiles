@@ -17,6 +17,7 @@ The reviewer handles all conformance checks.
 Invoke via `task` tool. Pass in prompt:
 - Artefact type and name
 - `$draftpath` (reviewer reads and edits files there)
+- For `skill-standalone`: `$sourcepath` (base skill) so the reviewer can check the mirror
 - Path to writing rules file: `./refs/rules-for-writing.md`
 - Path to steps/phases/headers rules file: `./refs/rules-for-steps-phases-headers.md`
   NOTE: these are crafter-root-relative paths — pass as literal strings in the task prompt; reviewer resolves them from the crafter skill directory.
@@ -33,3 +34,6 @@ Ask: *Ready to write `<name>` to `$installpath` ?* (skip for updates — `$draft
 
 IMPORTANT: Must receive explicit user confirmation (e.g. "yes", "ship", "proceed") before entering `Phase:Ship`.
 Review Q&A answers do NOT count as ship confirmation. Do not skip this gate.
+
+For updates: after the user confirms the update is validated, proceed to `Phase:PropagateChange`
+if variants exist (see `SKILL.md`).

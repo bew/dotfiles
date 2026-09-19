@@ -66,6 +66,6 @@ Check phased skills for:
 - Each phase has ``## N. `Phase:Foo` — small description`` section heading in `SKILL.md`
 - Extracted phases: single trigger line in `SKILL.md` body pointing to ref file; full instructions in `refs/phases/<name>.md`
 - Phase gate present at end of each phase's section (inline body or ref file)
-- Optional phases marked `_(if needed)_` with a skip condition
+- Optional phases marked `_(if <condition>)_` with a skip condition; prefer a descriptive condition
 - Progressive disclosure conditions applied correctly
 - Named steps used wherever required (see <../rules-for-steps-phases-headers.md§when-named-steps>)

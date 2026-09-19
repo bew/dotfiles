@@ -8,6 +8,10 @@ description: |
   or any SKILL.md file.
   Including when the request is phrased as a direct file edit.
 
+  Can also derive a standalone (single-file, tool-less) variant of an existing skill,
+  on explicit request only — e.g. "make a standalone version of skill X",
+  "self-contained skill for Perplexity".
+
   Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
   "edit the W agent", "write a plugin to …", "create a tool for …", "update crafter skill".
   Guides user through discovery, drafting, and iterative refinement.
@@ -16,6 +20,7 @@ description: |
 # OpenCode Crafter
 
 Design & create OpenCode artefacts: **skills**, **agents**, **commands**, **tools**, **plugins**, **snippets**.
+Can also derive a **standalone skill variant** (`skill-standalone`) on explicit request.
 
 Phases:
 
@@ -25,16 +30,19 @@ Phases:
 3.5. `Phase:Scripts` _(if needed)_ — POC & iterate on scripts via subagent
 4. `Phase:Review` — Review & refine with user via subagent
 5. `Phase:Ship` — Copy from `$draftpath` to `$installpath` (new artefacts only)
+6. `Phase:PropagateChange` _(if variants exist)_ — propagate change to skill variants
 
 **For new artefact**:
 `Phase:Classify` → `Phase:Discover` → `Phase:Draft` → (`Phase:Scripts`) → `Phase:Review` → `Phase:Ship`
 
 **For updating existing artefact**:
 `Phase:Classify` → `Phase:Discover` → `Phase:Draft` → (`Phase:Scripts`) → `Phase:Review`
+→ (`Phase:PropagateChange`)
 
 Paths used throughout:
 - `$draftpath` — where files are edited during crafting session.
 - `$existingpath` — path where an existing artefact already lives (updates only).
+- `$sourcepath` — base skill dir a `skill-standalone` is derived from.
 - `$installpath` — final install location, inferred from artefact type & scope (project vs global).
 - `$OC_configroot` — resolved OpenCode config root (global or project-scoped `.opencode`).
 - `$AGENTS_configroot` — resolved agents config root (project `.agents`;
@@ -75,11 +83,16 @@ If creating new artefact: read <./refs/classify-new.md> for type decision rules 
 
 Based on artefact type, read one of following references for full spec of that type:
 - skill: <./refs/skills-related/anatomy.md>
+- skill-standalone: <./refs/skills-related/standalone-anatomy.md>
 - command: <./refs/command-anatomy.md>
 - agent: <./refs/agent-anatomy.md>
 - tool: <./refs/tool-anatomy.md>
 - plugin: <./refs/plugin-anatomy.md>
 - snippet: load `snippets` skill for full spec
+
+For `skill-standalone`: `$sourcepath` is the base skill — an input, not an update target.
+- Derive (new): target `<base-name>-standalone` does not exist.
+- Sync (update): target exists; update it in place after a validated base-skill change.
 
 Ready to move to `Phase:Discover`? (say 'next' or similar to proceed)
 
@@ -97,6 +110,9 @@ Resolve config roots via `<./scripts/resolve-artefact-path>` — pick scope matc
 - `$OC_configroot`: `resolve-artefact-path --get opencode:global` or `--get opencode:project`
 - `$AGENTS_configroot`: `resolve-artefact-path --get agents:global` or `--get agents:project`
 - `$existingpath` (updates): shorten with `resolve-artefact-path --artefact <path>`
+- `$sourcepath` (base skill, for `skill-standalone` / variants): the user provides the base name;
+  locate its dir under `$OC_configroot/skills/` or `$AGENTS_configroot/skills/`,
+  then shorten with `resolve-artefact-path --artefact <path>`.
 
 Use the script output as-is — do not convert to absolute path.
 (shell will understand correctly)
@@ -111,6 +127,9 @@ This applies across all phases, including `Phase:Ship`.
 
 - New artefact: `$draftpath` = `/tmp/opencode_crafter/<type>-<name>/`.
 - Update: `$draftpath` = `$existingpath` (path where artefact already lives) — no copy needed.
+- `skill-standalone` derive: `$draftpath` = `/tmp/opencode_crafter/skill-standalone-<base-name>/`;
+  `$installpath` = `<base-parent>/<base-name>-standalone/` (sibling of `$sourcepath`).
+- `skill-standalone` sync: `$draftpath` = `$installpath` = the existing standalone dir.
 
 **For skills**: before writing frontmatter, detect current user: `git config github.user || echo "no user found"`
 - New skill: add `metadata.maintainers: [$currentuser]` to frontmatter.
@@ -149,9 +168,10 @@ Do not apply structural rewrites speculatively, even if the intent seems clear.
 Iterate until user explicitly confirms draft is ready.
 Then proceed to `Phase:Scripts` (for skill, if scripts needed) or `Phase:Review`.
 
-## 3.5. `Phase:Scripts` (if needed) — Script POC & iterate via subagent
+## 3.5. `Phase:Scripts` _(if needed)_ — Script POC & iterate via subagent
 
 Skip if artefact does not include a script (only skills support companion scripts).
+Always skip for `skill-standalone` — if the base has scripts, refuse and ask the user.
 If skill includes a script: read <./refs/phases/scripts.md> for full instructions.
 
 ## 4. `Phase:Review` — Review & iterate with user via subagent
@@ -161,10 +181,19 @@ A request to "review" or "check" a draft is a cue to load `opencode-crafter` and
 not to perform a manual read and summarize.
 
 When entering `Phase:Review`: read <./refs/phases/review.md> for full instructions.
-After subagent returns & user confirms (update path): retitle session with `done:` prefix (see `§session-titling`).
+After subagent returns & user confirms: retitle with `done:` prefix (see `§session-titling`).
+For updates: proceed to `Phase:PropagateChange` if variants exist — retitle `done:` there instead.
 
 ## 5. `Phase:Ship` — Write (new artefacts only)
 
 Skip this phase for updates — `$draftpath` = `$installpath`, files are already in place.
 When entering `Phase:Ship` (new artefact only): read <./refs/phases/ship.md> for full instructions.
 After ship confirmed: retitle with `done:` prefix (see `§session-titling`).
+
+## 6. `Phase:PropagateChange` _(if variants exist)_ — Propagate change to skill variants
+
+Skip unless: the artefact just updated is a skill, and it has at least one `<name>-*` sibling
+(a skill variant — see <./refs/skills-related/variants.md>).
+When entering `Phase:PropagateChange`: read <./refs/phases/propagate-change.md>
+for full instructions.
+After propagation confirmed: retitle with `done:` prefix (see `§session-titling`).

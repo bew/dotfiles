@@ -110,7 +110,9 @@ Rule: agent never auto-advances. Always wait for user confirmation before enteri
 
 ## Optional phases
 
-Mark optional phases with a `_(if needed)_` suffix in the overview list.
+Mark optional phases with a `_(if <condition>)_` suffix in the overview list and on the phase header.
+Prefer a descriptive condition (e.g. `_(if variants exist)_`); `_(if needed)_` is fine when the
+condition is obvious from the skip line.
 Include a skip condition immediately before or inside the phase entry.
 
 ```md
