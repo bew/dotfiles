@@ -17,7 +17,8 @@ Bulleted list of completed work.
 Each item: what changed + which file/artefact + why.
 Reference files by path.
 Do not inline file contents.
-If work is already captured in a commit, spec, or issue: reference that artifact instead of repeating it.
+If work is already captured in a commit, spec, or issue:
+reference that artefact instead of repeating it.
 
 ## What remains
 
@@ -37,11 +38,12 @@ For each: write ``load `foo` skill`` + one line on why it is relevant to what re
 Use ``load `foo` skill when <condition>`` when the load is conditional.
 Omit skills used in this session but not needed for what remains.
 
-## Key files
+## Key artefacts
 
-Paths directly relevant to what remains.
-One-line description per file.
-Omit files the continuation agent won't need to touch.
+Artefacts directly relevant to what remains: local/remote files, reference URLs,
+docs, specs, issues, PRs, etc.
+One-line description per entry, with a locator (path or URL) where known.
+Omit artefacts the continuation agent won't need.
 
 ---
 

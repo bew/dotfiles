@@ -17,8 +17,8 @@ Determine the following values from whatever is available in context
   Extract from user message or context.
   Default: `(none)` — produce a generic full-session handoff.
 - **Output dir** (`$outputdir`): where to write the file.
-  Default: git repo root (`git rev-parse --show-toplevel`).
-  If not in a git repo, fall back to current working directory.
+  Default: current working directory.
+  If the cwd appears unrelated to the handoff content, ask the user for the target dir.
 
 Ask the user for any input that cannot be inferred and that meaningfully affects the output.
 Do not ask for Focus if the session topic is unambiguous.
@@ -40,8 +40,10 @@ $outputdir: <resolved path>
 
 Compute vars:
 - `$date` — run `date +%Y%m%d`.
+- `$existing` — list existing `HANDOFF-*` files in `$outputdir`.
 - `$slug` — derive from Focus, session title, or dominant topic.
-  Kebab-case, max ~5 words. Never use `session` as a slug — always derive from actual content.
+  Kebab-case, max ~5 words.
+  Never use `session` as a slug — always derive from actual content.
 - `$filename` — `HANDOFF-$date-$slug.md`
 
 Scan the current session for material to include in the handoff doc.
@@ -61,12 +63,14 @@ Do not exclude blockers or prerequisites from other areas.
 
 ## Step 2 — Write
 
-Before writing: check that `$outputdir/$filename` does not already exist.
-If it does: tell the user and ask how to resolve (different slug, abort, or explicit overwrite).
-Never silently overwrite an existing handoff file.
+If `$filename` already exists: adapt the filename (e.g. append a numeric suffix)
+so nothing is overwritten.
 
-Write the handoff doc to `$outputdir/$filename` using the `write` tool.
+Write the handoff doc to `$outputdir/$filename` using the `write` tool,
+without asking for confirmation.
 Read <./refs/template.md> for the required doc structure.
+
+If the write fails (e.g. output dir does not exist): tell the user and ask how to proceed.
 
 After writing, tell the user:
 
@@ -77,7 +81,8 @@ Do not output the doc content inline.
 ## Rules
 
 - Do not inline file contents — reference by path only.
-- Only reference URLs that were confirmed in the session (appeared in user messages or tool results).
+- Only reference URLs that were confirmed in the session
+  (appeared in user messages or tool results).
   Never reference URLs invented or hallucinated by the agent.
 - When instructing the reader to load a skill, use one of two forms:
   ``load `foo` skill`` for an unconditional load, or
@@ -90,8 +95,8 @@ Do not output the doc content inline.
   Sentence-initial `Load` is fine.
 - Keep the doc readable by a human.
   Do not assume the reader is an agent.
-- Never write to a path outside the resolved Output dir without explicit user confirmation.
-- Never overwrite an existing handoff file — resolve conflicts before writing.
-- The handoff file must not be git-tracked.
-- Run commands to get missing information (git rev-parse / date) in one tool call, not multiple.
+- Never write to a path outside the resolved `$outputdir` without explicit user confirmation.
+- On filename collision, adapt the filename rather than overwriting.
+- Run commands to get missing information (date, existing HANDOFF list)
+  in one tool call, not multiple.
 - Use caveman mode when writing the handoff doc to reduce words without losing signal.
