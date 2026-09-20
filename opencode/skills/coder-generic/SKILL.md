@@ -2,8 +2,10 @@
 name: coder-generic
 description: |
   General code writing guidelines: structure, naming, comments, error handling, and organization.
-  Always load when the task drafts/writes/edits/refactors/reviews ANY code file — regardless of language, framework, or tool; module or script; including config-as-code.
-  Applies to large files and small mechanical edits alike — do not skip based on perceived triviality.
+  Always load when the task drafts/writes/edits/refactors/reviews ANY code file —
+  regardless of language, framework, or tool; module or script; including config-as-code.
+  Applies to large files and small mechanical edits alike —
+  do not skip based on perceived triviality.
   Load this before any coder-* skill.
   Language-specific skills build on top of it.
 metadata:
@@ -37,7 +39,13 @@ All extend the rules below.
 ## Rules
 
 - Use descriptive function names with a verb (e.g. `parse_args`, `check_format`).
+- Name a value for what it represents, not for its storage.
+  When two values share a representation but differ in meaning, give each its own unambiguous
+  name (e.g. a window handle vs its index, a buffer number vs its name).
+  Never use a bare ambiguous noun (`win`, `buf`, `tab`) where a qualified name exists.
 - Top-level constants: SCREAMING_SNAKE_CASE, defined at top of file after header/imports.
+- Document each top-level constant: its purpose, and its unit when it carries one
+  (e.g. "milliseconds", "bytes").
 - No trailing whitespace — no trailing spaces or tabs at the end of any line,
   and no lines that contain only whitespace.
 - Never install or declare a package, or silently substitute a stdlib/hand-rolled alternative for a
@@ -52,6 +60,8 @@ All extend the rules below.
 
 **Structured data**
 - Represent structured data with a named type — never a loose map/dict/associative array.
+- Use a library's own named type when it exists and semantically matches the value;
+  otherwise declare a custom boundary type for the fields you actually consume.
 - Model external/wire data with a dedicated named type (struct, record, class, or language
   equivalent).
   Keep wire types (matching the serialized schema) distinct from in-process domain types.
@@ -64,6 +74,8 @@ All extend the rules below.
 - Prefer the most specific type that expresses what a value *is*.
   A loose primitive — string, number, boolean, map, or top/`any` type — hides meaning and lets
   invalid states pass.
+- Never write a bare map/dict, `any`, or top type where a named type can be written.
+  Reuse a standard/builtin named type from the language or an imported library when one fits.
 - Encode absence in the type (optional/nullable) instead of a sentinel
   such as `""`, `-1`, or `null`.
 - Represent a closed set of values with a dedicated type (enum or equivalent), not a bare primitive.
@@ -79,6 +91,9 @@ All extend the rules below.
   One line is enough for simple helpers; a few lines for non-obvious ones.
 - Document every parameter unless it is truly obvious from the name and signature.
   Document the return when it is not obvious.
+- Document obscure positional parameters at their use sites, but remember that named arguments
+  are self-documenting: prefer APIs that take named/structured arguments over long positional
+  lists (see Guidelines).
 - When the language has dedicated syntax for parameter/return docs, place their description
   after the type.
 - Implementation details and their rationale never go in the function doc.
@@ -95,15 +110,26 @@ All extend the rules below.
   sections/phases/logical-blocks of code — they aid navigation without restating code.
 - For non-trivial code blocks (loops with inner computation, iterator chains, match arms with
   branching logic), add an inline comment for each logical phase not just one for a whole block.
+- For an assignment that changes state (module, object, or global), write WHY the mutation
+  happens when it is not obvious from the guarding condition.
 - Sentences in comments start on a new line (semantic line breaks! + Follow lang max line width).
   Do not chain multiple sentences on a single line unless they fit the remaining line width
   without wrapping.
+
+### Dated notes
+
+- Mark missing, incorrect, or surprising behaviour in a dependency with a dated note:
+  `@YYYY-MM <note>` (month precision), e.g. `@2026-09 missing type annotation`.
+  Use it where the behaviour may change later and the note should be re-checked.
+- Do not proactively re-check or update the date/note unless asked.
 
 ## Guidelines
 
 - Prefer `get_*` for functions that compute/return a value.
 - Prefer `check_*` for validation functions.
 - Prefer `parse_*` for argument/input parsing.
+- When designing an API, prefer named/structured arguments over a long positional list —
+  named args are self-documenting and remove call-site ambiguity.
 - Section separators may be used when file has 5+ functions/structs/enums.
   Usually not needed for smaller files.
   Format: (example for language with '//' prefix for comments)
