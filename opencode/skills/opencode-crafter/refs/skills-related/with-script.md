@@ -53,5 +53,8 @@ Test files (one per script) are alongside their script in `scripts/`.
 If additional files are needed (e.g. fixture files), place them in `scripts/test-fixtures/`.
 One `.bats` file per script (split only for very complex scripts).
 
+Test files and fixtures are internal QA artefacts — not part of the skill's documented interface.
+Never reference them from `SKILL.md`, reference files, phase guides, or any other docs.
+
 Keep scripts and tests in `$draftpath` during iteration.
 `Phase:Ship` copies them to final `$installpath` alongside other skill-related files.

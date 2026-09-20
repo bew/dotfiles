@@ -44,9 +44,9 @@ Use extra notes from task prompt for behavior details SKILL draft intentionally 
       Load any language-specific skill from `available_skills` matching script's language.
       If none available, follow conventions in **Script conventions** section below.
    b. Make it executable: `chmod +x $draftpath/scripts/<name>`.
-   c. Draft bats test file at `$draftpath/scripts/tests/<name>.bats`.
+   c. Draft bats test file at `$draftpath/scripts/<name>.bats`.
       Load bats-specific skill from `available_skills` if one exists; otherwise use common bats best practices.
-   d. Run: `bats $draftpath/scripts/tests/<name>.bats`. Show raw output. Fix failures. Re-run until all pass.
+   d. Run: `bats $draftpath/scripts/<name>.bats`. Show raw output. Fix failures. Re-run until all pass.
 5. Show script & test output to user; ask for feedback. Apply with `edit`. Re-run tests after any script change.
 6. Repeat step 5 until user confirms.
 
@@ -61,7 +61,7 @@ Use extra notes from task prompt for behavior details SKILL draft intentionally 
   environment beyond standard tools.
 - Tests must cover: happy path, at least one edge case, at least one failure mode.
 - One `.bats` file per script (split only for very complex scripts).
-- Fixture files (if any) in `$draftpath/scripts/tests/` alongside test file — no `fixtures/` subdir.
+- Fixture files (if any) in `$draftpath/scripts/test-fixtures/`.
 - Always run tests before asking user to review.
 - Re-run tests after any script change before showing results.
 - Clarification questions: batch all pending questions in single `question` call per round. No round limit — keep asking until everything is clear.

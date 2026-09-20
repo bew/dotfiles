@@ -10,6 +10,7 @@
 5. **Resources** — Are needed resource directories (`refs/`, `scripts/`, etc.) identified?
    List all files under `$skilldir` except `SKILL.md` (use `glob`); verify each has a conditional load trigger in `SKILL.md` or another ref file.
    Flag any file with no corresponding trigger — it is unreachable dead weight.
+   Exempt test-related files (e.g. `scripts/*.bats`, `scripts/test-fixtures/**`) and `README.md` — they are not part of the runtime interface and are intentionally unreferenced.
 6. **Scope** — Does skill do more than one job? If so, flag it.
 7. **Progressive disclosure** — Is context loaded at right tier?
    - Is anything in `SKILL.md` only needed in specific sub-scenario? If so, flag as candidate for extraction.

@@ -24,6 +24,7 @@ Directory with `SKILL.md` + optional resources.
 │ (optional resources)
 ├── refs/        ← docs the agent reads during execution
 ├── scripts/     ← executable helpers the agent can run
+│   └── *.bats, test-fixtures/  ← script tests (internal; never referenced in docs)
 ├── assets/      ← static files used verbatim in output
 └── templates/   ← scaffolds the agent fills in
 ```

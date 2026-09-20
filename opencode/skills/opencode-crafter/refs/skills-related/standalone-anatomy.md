@@ -13,7 +13,7 @@ to trigger at runtime — paste it into a foreign tool manually.
 ## Constraints
 
 - Single `SKILL.md` + `README.md` + `VARIANT`.
-  No `refs/`, `scripts/`, `assets/`, `templates/`, `tests/`.
+  No `refs/`, `scripts/`, `assets/`, or `templates/`.
 - No OC mechanics: `write`, `edit`, `read`, `bash`, git, filesystem paths/folders,
   subagents, `skill` tool, `question` tool.
 - No interactive loop: phase gates and mid-pass checkpoints removed.
@@ -104,7 +104,7 @@ Source: `<base-name>` at `<base-parent>/`.
 
 ## Verification
 
-- No `refs/`, `scripts/`, `assets/`, `templates/`, `tests/` dirs.
+- No `refs/`, `scripts/`, `assets/`, or `templates/` dirs.
 - No OC tool names, git, filesystem paths/folders, subagents.
 - No phase gates or mid-pass checkpoints.
 - No dangling `./refs/` or `§slug` references.

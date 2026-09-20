@@ -3,7 +3,7 @@
 Apply the universal criteria first. Then check the following.
 
 1. **Single-file layout** — `SKILL.md` + `README.md` + `VARIANT` only.
-   Flag any `refs/`, `scripts/`, `assets/`, `templates/`, `tests/`.
+   Flag any `refs/`, `scripts/`, `assets/`, or `templates/`.
 2. **No OC mechanics** — body must not invoke OC tool names (`write`, `edit`, `read`, `bash`), git,
    filesystem paths/folders, subagents, `skill` tool, `question` tool.
 3. **No interactive loop** — no phase gates, no mid-pass checkpoints.
