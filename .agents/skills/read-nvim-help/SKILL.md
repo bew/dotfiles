@@ -35,8 +35,10 @@ Resolve `./scripts/nvimq` to absolute path before invoking.
 <skill-dir>/scripts/nvimq <subcommand> [options]
 ```
 
-The script runs one `nvim --headless` instance (via `nvim -l`) that resolves runtime doc
-paths and parses help files with nvim's bundled `vimdoc` treesitter parser.
+The Python front-end owns indexing, selection and markdown rendering.
+It drives one `nvim --headless` instance (via `nvim -l`) over a JSON-lines pipe;
+that backend only resolves runtime doc paths and parses help files with nvim's bundled
+`vimdoc` treesitter parser, returning raw facts.
 Requires `python3` and a loadable nvim config (plugin docs included).
 
 ### Subcommands

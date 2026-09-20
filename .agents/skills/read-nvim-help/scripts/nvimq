@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Query Neovim help docs: resolve tags, sections and titles across runtime doc
-# dirs by delegating to a Lua backend run inside `nvim -l`.
+# dirs by driving a stateless `nvim -l` fact service and rendering in Python.
 #
 # Usage: nvimq <tag|toc|section|find> [options]   (see `nvimq --help`)
 
@@ -8,18 +8,268 @@ import argparse
 import json
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
 import sys
+import time
+from dataclasses import asdict, dataclass
+from typing import TypedDict, cast
 
 SCRIPT_NAME = "nvimq"
 BACKEND_NAME = "nvimq_backend.lua"
 DOC_ROOT_ENV = "NVIMQ_DOC_ROOT"
 SCOPES = ("core", "plugin", "all")
 NVIM_TIMEOUT_S = 60
-
+DEFAULT_TAG_WINDOW = 40
 LINES_RANGE_RE = re.compile(r"^(\d+)(?:-(\d+))?$")
+GLOB_SPECIAL = "^$()%.[]+-"
+HEADING_PREFIXES = {1: "## ", 2: "### ", 3: "#### "}
+
+
+# ------------------------------------------------------------------------------
+# Wire types (the JSON protocol)
+#
+# Requests are dataclasses serialized with `asdict`; responses are TypedDicts,
+# since `json.loads` hands back plain dicts that are converted immediately.
+
+
+class DocDirWire(TypedDict):
+    """Wire form of one resolved doc dir."""
+
+    path: str
+    scope: str
+
+
+class HeadingWire(TypedDict):
+    """Wire form of a heading in the lean heading list (no raw line)."""
+
+    level: int
+    start_row: int
+    heading_row: int
+    title: str
+    tags: list[str]
+
+
+class AstHeadingWire(HeadingWire):
+    """Wire form of an AST heading block (adds the discriminator and raw line)."""
+
+    type: str
+    line: str
+
+
+class AstTextWire(TypedDict):
+    """Wire form of an AST run of plain text rows."""
+
+    type: str
+    start_row: int
+    lines: list[str]
+
+
+class AstCodeWire(TypedDict):
+    """Wire form of an AST fenced code block."""
+
+    type: str
+    opener_row: int
+    opener_col: int
+    opener_line: str
+    code_start: int
+    lang: str
+    lines: list[str]
+
+
+AstBlockWire = AstHeadingWire | AstTextWire | AstCodeWire
+
+
+@dataclass
+class BackendRequest:
+    """A backend request; unset optional fields are sent as null and ignored."""
+
+    kind: str
+    path: str | None = None
+    pattern: str | None = None
+    names: list[str] | None = None
+
+
+class ResponseWire(TypedDict, total=False):
+    """Wire form of a backend response; carries one payload or `error`."""
+
+    error: str
+    dirs: list[DocDirWire]
+    lines: list[str]
+    line_count: int
+    headings: list[HeadingWire]
+    blocks: list[AstBlockWire]
+
+
+# ------------------------------------------------------------------------------
+# Domain types
+
+
+@dataclass
+class DocDir:
+    """One resolved doc directory and its scope."""
+
+    path: str
+    scope: str
+
+
+@dataclass
+class Doc:
+    """An indexed help file."""
+
+    stem: str
+    path: str
+    scope: str
+
+
+@dataclass
+class Heading:
+    """A section heading in the lean heading list (toc/find)."""
+
+    level: int
+    start_row: int
+    heading_row: int
+    title: str
+    tags: list[str]
+    end_row: int | None = None
+
+
+@dataclass
+class AstHeading:
+    """An AST heading block, carrying the raw title line."""
+
+    level: int
+    start_row: int
+    heading_row: int
+    title: str
+    tags: list[str]
+    line: str
+
+
+@dataclass
+class AstText:
+    """An AST run of plain text rows."""
+
+    start_row: int
+    lines: list[str]
+
+
+@dataclass
+class AstCode:
+    """An AST fenced code block, keeping its raw (still-indented) source rows."""
+
+    opener_row: int
+    opener_col: int
+    opener_line: str
+    code_start: int
+    lang: str
+    lines: list[str]
+
+
+AstBlock = AstHeading | AstText | AstCode
+
+
+@dataclass
+class TagEntry:
+    """One tag-to-doc mapping from a tags file."""
+
+    name: str
+    doc: Doc
+
+
+@dataclass
+class Index:
+    """The full help index built from the resolved doc dirs."""
+
+    docs: dict[str, Doc]
+    order: list[Doc]
+    tags: list[TagEntry]
+    tags_by_doc: dict[str, list[TagEntry]]
+
+
+@dataclass
+class TagCandidate:
+    """A tag entry paired with its anchor row (`None` if the anchor is missing)."""
+
+    entry: TagEntry
+    row: int | None
+
+
+@dataclass
+class DocFacts:
+    """Per-file facts gathered by `find` before matching."""
+
+    doc: Doc
+    lines: list[str]
+    headings: list[Heading]
+    entries: list[TagEntry]
+
+
+@dataclass
+class FindResult:
+    """One `find` hit."""
+
+    stem: str
+    line: int
+    name: str
+
+
+# ------------------------------------------------------------------------------
+# Wire conversion
+
+
+def doc_dir_from_wire(wire: DocDirWire) -> DocDir:
+    """Convert a wire doc dir to a `DocDir`."""
+    return DocDir(path=wire["path"], scope=wire["scope"])
+
+
+def heading_from_wire(wire: HeadingWire) -> Heading:
+    """Convert a lean wire heading (from the heading list) to a `Heading`."""
+    return Heading(
+        level=wire["level"],
+        start_row=wire["start_row"],
+        heading_row=wire["heading_row"],
+        title=wire["title"],
+        tags=wire["tags"],
+    )
+
+
+def ast_heading_from_wire(wire: AstHeadingWire) -> AstHeading:
+    """Convert a wire AST heading block to an `AstHeading`."""
+    return AstHeading(
+        level=wire["level"],
+        start_row=wire["start_row"],
+        heading_row=wire["heading_row"],
+        title=wire["title"],
+        tags=wire["tags"],
+        line=wire["line"],
+    )
+
+
+def ast_block_from_wire(wire: AstBlockWire) -> AstBlock:
+    """Convert a wire AST block to its dataclass form.
+
+    The `type` discriminator selects the concrete block; `heading` and `code`
+    payloads are cast, since a union member's extra keys are not narrowed by
+    the discriminator check.
+    """
+    kind = wire["type"]
+    if kind == "heading":
+        return ast_heading_from_wire(cast(AstHeadingWire, wire))
+    if kind == "code":
+        code = cast(AstCodeWire, wire)
+        return AstCode(
+            opener_row=code["opener_row"],
+            opener_col=code["opener_col"],
+            opener_line=code["opener_line"],
+            code_start=code["code_start"],
+            lang=code["lang"],
+            lines=code["lines"],
+        )
+    text = cast(AstTextWire, wire)
+    return AstText(start_row=text["start_row"], lines=text["lines"])
 
 
 class ScriptError(Exception):
@@ -29,6 +279,132 @@ class ScriptError(Exception):
 def print_err(msg: str) -> None:
     """Print msg to stderr."""
     print(msg, file=sys.stderr)
+
+
+# ------------------------------------------------------------------------------
+# Backend process
+
+
+def backend_path() -> str:
+    """Return the absolute path to the Lua backend next to this script."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), BACKEND_NAME)
+
+
+class Backend:
+    """Drives one persistent `nvim -l` fact service over JSON lines."""
+
+    def __init__(self) -> None:
+        """Locate nvim and start the backend process."""
+        nvim = shutil.which("nvim")
+        if nvim is None:
+            raise ScriptError(
+                f"`nvim` not found on PATH; install it or set {DOC_ROOT_ENV}"
+            )
+        cmd = [nvim, "--headless"]
+        if os.environ.get(DOC_ROOT_ENV):
+            # Fixture runs ignore the user config; otherwise it is loaded so
+            # plugin docs are on the runtimepath.
+            cmd.append("--clean")
+        cmd += ["-l", backend_path()]
+        try:
+            self._proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
+        except OSError as exc:
+            raise ScriptError(f"could not launch nvim: {exc}") from exc
+        self._closed = False
+
+    def request(self, payload: BackendRequest) -> ResponseWire:
+        """Send one request and return the decoded response.
+
+        Raises ScriptError on timeout, backend exit, or an `{error=...}` reply.
+        """
+        assert self._proc.stdin is not None
+        try:
+            line = json.dumps(asdict(payload)) + "\n"
+            self._proc.stdin.write(line.encode())
+            self._proc.stdin.flush()
+        except (BrokenPipeError, OSError) as exc:
+            raise ScriptError(f"nvim backend stopped responding: {exc}") from exc
+        response = self._read_response()
+        error = response.get("error")
+        if error is not None:
+            raise ScriptError(str(error))
+        return response
+
+    def _read_response(self) -> ResponseWire:
+        """Read the next JSON response line, skipping non-JSON startup noise."""
+        assert self._proc.stdout is not None
+        deadline = time.monotonic() + NVIM_TIMEOUT_S
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise ScriptError(f"nvim backend timed out after {NVIM_TIMEOUT_S}s")
+            ready, _, _ = select.select([self._proc.stdout], [], [], remaining)
+            if not ready:
+                raise ScriptError(f"nvim backend timed out after {NVIM_TIMEOUT_S}s")
+            raw = self._proc.stdout.readline()
+            if not raw:
+                raise ScriptError("nvim backend exited unexpectedly")
+            text = raw.decode("utf-8").strip()
+            if not text:
+                continue
+            try:
+                response = json.loads(text)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(response, dict):
+                return cast(ResponseWire, response)
+
+    def close(self) -> None:
+        """Close stdin and wait for the backend, killing it if it lingers."""
+        if self._closed:
+            return
+        self._closed = True
+        if self._proc.stdin is not None:
+            try:
+                self._proc.stdin.close()
+            except OSError:
+                pass
+        try:
+            self._proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self._proc.kill()
+            self._proc.wait()
+
+    def doc_dirs(self) -> list[DocDir]:
+        """Return resolved doc dirs, in runtimepath order."""
+        response = self.request(BackendRequest(kind="doc_dirs"))
+        return [doc_dir_from_wire(wire) for wire in response["dirs"]]
+
+    def read(self, path: str) -> list[str]:
+        """Return the raw lines of a help file."""
+        return self.request(BackendRequest(kind="read", path=path))["lines"]
+
+    def headings(self, path: str) -> tuple[int, list[Heading]]:
+        """Return `(line_count, headings)` for a help file, without body blocks."""
+        response = self.request(BackendRequest(kind="headings", path=path))
+        return response["line_count"], [
+            heading_from_wire(wire) for wire in response["headings"]
+        ]
+
+    def parse(self, path: str) -> tuple[int, list[Heading], list[AstBlock]]:
+        """Return `(line_count, headings, blocks)` for a help file."""
+        response = self.request(BackendRequest(kind="parse", path=path))
+        return (
+            response["line_count"],
+            [heading_from_wire(wire) for wire in response["headings"]],
+            [ast_block_from_wire(wire) for wire in response["blocks"]],
+        )
+
+    def match(self, pattern: str, names: list[str]) -> set[str]:
+        """Return the subset of names matching pattern as a Vim regex."""
+        response = self.request(
+            BackendRequest(kind="match", pattern=pattern, names=names)
+        )
+        return set(response["matches"])
 
 
 # ------------------------------------------------------------------------------
@@ -80,10 +456,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-# ------------------------------------------------------------------------------
-# Request building
-
-
 def parse_lines_range(raw: str) -> list[int]:
     """Parse an `A-B` (or `A`) rendered-line range, 1-based inclusive."""
     match = LINES_RANGE_RE.fullmatch(raw.strip())
@@ -96,70 +468,510 @@ def parse_lines_range(raw: str) -> list[int]:
     return [start, end]
 
 
-def build_request(args: argparse.Namespace) -> dict:
-    """Translate parsed args into the JSON request the Lua backend expects.
+# ------------------------------------------------------------------------------
+# Index building
 
-    Optional keys are omitted rather than set to null, since the backend's JSON
-    decoder maps null to a sentinel that would defeat nil checks.
-    """
-    request: dict = {"command": args.command, "scope": args.scope}
-    match args.command:
-        case "tag":
-            request["tag"] = args.tag
-            if args.lines:
-                request["lines"] = parse_lines_range(args.lines)
-        case "toc":
-            request["file"] = args.file
-            if args.max_depth is not None:
-                request["max_depth"] = args.max_depth
-        case "section":
-            request["target"] = args.target
-            request["names"] = list(args.names)
-            if args.lines:
-                request["lines"] = parse_lines_range(args.lines)
-        case "find":
-            request["pattern"] = args.pattern
-        case _:
-            raise ScriptError(f"unknown command: {args.command}")
-    return request
+
+def build_file_index(dirs: list[DocDir]) -> tuple[dict[str, Doc], list[Doc]]:
+    """Map lowercased help stems to files, first doc dir (runtimepath) winning."""
+    docs: dict[str, Doc] = {}
+    order: list[Doc] = []
+    for dir_entry in dirs:
+        try:
+            names = sorted(os.listdir(dir_entry.path))
+        except OSError:
+            continue
+        for name in names:
+            if not name.lower().endswith(".txt"):
+                continue
+            stem = name[:-4]
+            key = stem.lower()
+            if key in docs:
+                continue
+            doc = Doc(
+                stem=stem,
+                path=f"{dir_entry.path}/{name}",
+                scope=dir_entry.scope,
+            )
+            docs[key] = doc
+            order.append(doc)
+    return docs, order
+
+
+def build_tag_index(
+    dirs: list[DocDir], docs: dict[str, Doc]
+) -> tuple[list[TagEntry], dict[str, list[TagEntry]]]:
+    """Parse every tags file, keeping entries whose help file is indexed."""
+    tags: list[TagEntry] = []
+    tags_by_doc: dict[str, list[TagEntry]] = {}
+    for dir_entry in dirs:
+        tags_path = f"{dir_entry.path}/tags"
+        if not os.path.isfile(tags_path):
+            continue
+        try:
+            with open(tags_path, encoding="utf-8", errors="replace") as handle:
+                raw_lines = handle.read().splitlines()
+        except OSError:
+            continue
+        for raw in raw_lines:
+            parts = raw.split("\t")
+            if len(parts) < 3:
+                continue
+            filename = parts[1]
+            if not filename.lower().endswith(".txt"):
+                continue
+            doc = docs.get(filename[:-4].lower())
+            if doc is None:
+                continue
+            entry = TagEntry(name=parts[0], doc=doc)
+            tags.append(entry)
+            tags_by_doc.setdefault(doc.path, []).append(entry)
+    return tags, tags_by_doc
+
+
+def build_index(backend: Backend) -> Index:
+    """Build the full help index from the backend's resolved doc dirs."""
+    dirs = backend.doc_dirs()
+    docs, order = build_file_index(dirs)
+    tags, tags_by_doc = build_tag_index(dirs, docs)
+    return Index(docs=docs, order=order, tags=tags, tags_by_doc=tags_by_doc)
 
 
 # ------------------------------------------------------------------------------
-# Backend invocation
+# Selection helpers
 
 
-def backend_path() -> str:
-    """Return the absolute path to the Lua backend next to this script."""
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), BACKEND_NAME)
+def lookup_doc(index: Index, file_arg: str, scope: str) -> Doc:
+    """Resolve a bare stem or `<stem>.txt` to a help file within scope."""
+    stem = file_arg
+    if stem.lower().endswith(".txt"):
+        stem = stem[:-4]
+    doc = index.docs.get(stem.lower())
+    if doc is None:
+        raise ScriptError(f"help file not found: {file_arg}")
+    if scope != "all" and doc.scope != scope:
+        raise ScriptError(f"help file not found: {file_arg} in scope '{scope}'")
+    return doc
 
 
-def run_backend(request: dict) -> int:
-    """Run the Lua backend under nvim, relaying its streams; return its exit code.
+def strip_markers(raw: str) -> str:
+    """Strip a fully wrapped `|...|` or `*...*` help marker from a name.
 
-    Adds `--clean` when `NVIMQ_DOC_ROOT` is set so fixture runs ignore the user
-    config; without the override the config is loaded to pick up plugin docs.
+    Only a fully wrapped argument is stripped, so a bare regex/glob is left
+    intact.
     """
-    nvim = shutil.which("nvim")
-    if nvim is None:
+    trimmed = raw.strip()
+    for pattern in (r"\|(.*)\|", r"\*(.*)\*"):
+        match = re.fullmatch(pattern, trimmed)
+        if match and match.group(1) != "":
+            return match.group(1).strip()
+    return trimmed
+
+
+def resolve_section(headings: list[Heading], name: str) -> Heading:
+    """Resolve a name to a heading: ordinal, exact title, tag, or title substring."""
+    key = strip_markers(name).lower()
+    if re.fullmatch(r"\d+", key):
+        ordinal = int(key)
+        if 1 <= ordinal <= len(headings):
+            return headings[ordinal - 1]
         raise ScriptError(
-            f"`nvim` not found on PATH; install it or set {DOC_ROOT_ENV}"
+            f"section number {ordinal} out of range (1-{len(headings)})"
         )
-    cmd = [nvim, "--headless"]
-    if os.environ.get(DOC_ROOT_ENV):
-        cmd.append("--clean")
-    cmd += ["-l", backend_path(), json.dumps(request)]
-    try:
-        proc = subprocess.run(cmd, timeout=NVIM_TIMEOUT_S)
-    except subprocess.TimeoutExpired as exc:
-        raise ScriptError(f"nvim backend timed out after {NVIM_TIMEOUT_S}s") from exc
-    except OSError as exc:
-        raise ScriptError(f"could not launch nvim: {exc}") from exc
-    return proc.returncode
+    for heading in headings:
+        if heading.title.lower() == key:
+            return heading
+    for heading in headings:
+        for tag in heading.tags:
+            if tag.lower() == key:
+                return heading
+    for heading in headings:
+        if key in heading.title.lower():
+            return heading
+    raise ScriptError(f"no section matching '{name}'")
 
 
-def main() -> int:
+def build_tag_keys(query: str) -> list[str]:
+    """Return lookup keys for a tag, most specific form first.
+
+    Keys, in order: the marker-stripped query; its `()` variant (both ways,
+    since Lua-function tags are indexed as `name()`); then the query quoted as
+    `'name'`, since option tags are indexed with quotes (`'number'`).
+    """
+    base = strip_markers(query)
+    keys: list[str] = []
+
+    def push(key: str) -> None:
+        if key != "":
+            keys.append(key.lower())
+
+    push(base)
+    if base.endswith("()"):
+        push(base[:-2])
+    else:
+        push(base + "()")
+    if not (base.startswith("'") and base.endswith("'")):
+        push(f"'{base}'")
+    return keys
+
+
+def find_tag_row(lines: list[str], name: str) -> int | None:
+    """Return the 0-based row holding the `*name*` anchor, or None."""
+    needle = f"*{name}*"
+    for index, line in enumerate(lines):
+        if needle in line:
+            return index
+    return None
+
+
+def compute_end_rows(headings: list[Heading], line_count: int) -> None:
+    """Fill each heading's `end_row` (row before the next same-or-higher level)."""
+    for index, heading in enumerate(headings):
+        end_row = line_count - 1
+        for other in headings[index + 1 :]:
+            if other.level <= heading.level:
+                end_row = other.start_row - 1
+                break
+        heading.end_row = end_row
+
+
+# ------------------------------------------------------------------------------
+# Rendering
+
+
+def strip_leading(line: str) -> str:
+    """Strip leading whitespace from a line."""
+    return re.sub(r"^\s+", "", line)
+
+
+def common_indent(code_lines: list[str]) -> int:
+    """Return the smallest leading-whitespace width across non-blank lines."""
+    minimum: int | None = None
+    for line in code_lines:
+        if re.search(r"\S", line):
+            indent = len(re.match(r"[ \t]*", line).group(0))
+            if minimum is None or indent < minimum:
+                minimum = indent
+    return minimum if minimum is not None else 0
+
+
+def deindent(line: str, count: int) -> str:
+    """Remove up to `count` leading whitespace characters from a line."""
+    removed = 0
+    index = 0
+    while removed < count and index < len(line):
+        char = line[index]
+        if char not in " \t":
+            break
+        removed += 1
+        index += 1
+    return line[index:]
+
+
+def render_heading(heading: AstHeading) -> str:
+    """Render one AST heading block as a markdown heading line."""
+    line = strip_leading(heading.line)
+    if heading.level == 4:
+        return "#### " + re.sub(r"\s*~\s*$", "", line)
+    return HEADING_PREFIXES[heading.level] + line
+
+
+def render_blocks_to_rows(blocks: list[AstBlock], line_count: int) -> list[list[str]]:
+    """Map each source row to its rendered output lines.
+
+    Heading rulers and explicit `<` close markers map to no output; a code
+    block's closing fence attaches to its last code row.
+    """
+    rows: list[list[str]] = [[] for _ in range(line_count)]
+
+    def put(row: int, lines: list[str]) -> None:
+        if 0 <= row < line_count:
+            rows[row] = lines
+
+    for block in blocks:
+        if isinstance(block, AstHeading):
+            put(block.heading_row, [render_heading(block)])
+        elif isinstance(block, AstCode):
+            opener = block.opener_row
+            opener_out: list[str] = []
+            # Bytes before the `>` opener are prose that shares the opener row.
+            prose = block.opener_line[: block.opener_col].rstrip()
+            if prose:
+                opener_out.append(prose)
+            opener_out.append("```" + block.lang)
+            put(opener, opener_out)
+            code_lines = block.lines
+            indent = common_indent(code_lines)
+            last = opener
+            for offset, line in enumerate(code_lines):
+                row = block.code_start + offset
+                put(row, [deindent(line, indent)])
+                last = row
+            rows[last].append("```")
+        else:
+            for offset, line in enumerate(block.lines):
+                put(block.start_row + offset, [line])
+    return rows
+
+
+def flatten(rows: list[list[str]], from_row: int, to_row: int) -> list[str]:
+    """Concatenate rendered output for source rows `from_row..to_row`."""
+    out: list[str] = []
+    last = min(to_row, len(rows) - 1)
+    for row in range(from_row, last + 1):
+        out.extend(rows[row])
+    return out
+
+
+def slice_lines(items: list[str], first: int, last: int) -> list[str]:
+    """Return items[first..last] (1-based, inclusive), skipping out-of-range."""
+    return [items[index - 1] for index in range(first, last + 1) if index <= len(items)]
+
+
+def emit(lines: list[str]) -> None:
+    """Write rendered lines to stdout, one per line."""
+    if not lines:
+        return
+    sys.stdout.write("\n".join(lines) + "\n")
+    sys.stdout.flush()
+
+
+# ------------------------------------------------------------------------------
+# Matching
+
+
+def glob_to_regex(glob: str) -> re.Pattern[str]:
+    """Convert a lowercased glob to an anchored Python regex."""
+    escaped = "".join("\\" + char if char in GLOB_SPECIAL else char for char in glob)
+    escaped = escaped.replace("*", ".*").replace("?", ".")
+    return re.compile("^" + escaped + "$")
+
+
+# ------------------------------------------------------------------------------
+# Subcommand handlers
+
+
+def cmd_tag(backend: Backend, index: Index, args: argparse.Namespace) -> None:
+    """Print the rendered block around the first in-scope matching tag."""
+    query = args.tag
+    matches: list[TagEntry] = []
+    for key in build_tag_keys(query):
+        matches = [entry for entry in index.tags if entry.name.lower() == key]
+        if matches:
+            break
+
+    scoped = [
+        entry
+        for entry in matches
+        if args.scope == "all" or entry.doc.scope == args.scope
+    ]
+    if not scoped:
+        if matches:
+            raise ScriptError(
+                f"tag '{query}' exists only outside scope '{args.scope}'"
+            )
+        raise ScriptError(f"unknown tag: {query}")
+
+    # Collapse entries that resolve to the same anchor row (e.g. `LSP` and `lsp`
+    # share a line), so only genuinely distinct definitions trigger a warning.
+    lines_cache: dict[str, list[str]] = {}
+    seen: set[str] = set()
+    unique: list[TagCandidate] = []
+    for entry in scoped:
+        path = entry.doc.path
+        if path not in lines_cache:
+            lines_cache[path] = backend.read(path)
+        lines = lines_cache[path]
+        row = find_tag_row(lines, entry.name)
+        fallback = "nil:" + entry.name.lower()
+        key = f"{path}\0{row if row is not None else fallback}"
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(TagCandidate(entry=entry, row=row))
+
+    if len(unique) > 1:
+        print_err(f"!! WARNING: tag '{query}' is ambiguous ({len(unique)} matches):")
+        for candidate in unique:
+            doc = candidate.entry.doc
+            print_err(f"   {doc.stem}.txt ({doc.scope})")
+
+    chosen = unique[0]
+    entry = chosen.entry
+    if chosen.row is None:
+        raise ScriptError(
+            f"tag '{entry.name}' indexed in {entry.doc.stem}.txt"
+            " but its anchor was not found"
+        )
+    anchor = chosen.row
+    line_count, _headings, blocks = backend.parse(entry.doc.path)
+    rows = render_blocks_to_rows(blocks, line_count)
+    last_row = line_count - 1
+
+    window = DEFAULT_TAG_WINDOW
+    if args.lines:
+        last_wanted = args.lines[1]
+        while True:
+            to_row = min(last_row, anchor + window - 1)
+            rendered = flatten(rows, anchor, to_row)
+            if len(rendered) >= last_wanted or to_row >= last_row:
+                break
+            window += DEFAULT_TAG_WINDOW
+        rendered = slice_lines(rendered, args.lines[0], args.lines[1])
+    else:
+        to_row = min(last_row, anchor + window - 1)
+        rendered = flatten(rows, anchor, to_row)
+    emit(rendered)
+
+
+def cmd_toc(backend: Backend, index: Index, args: argparse.Namespace) -> None:
+    """List a help file's headings with source-line counts."""
+    if args.max_depth is not None and args.max_depth < 1:
+        raise ScriptError("-L must be a positive integer")
+    doc = lookup_doc(index, args.file, args.scope)
+    line_count, headings = backend.headings(doc.path)
+    compute_end_rows(headings, line_count)
+
+    out = [f"{doc.stem}.txt"]
+    for heading in headings:
+        if args.max_depth is not None and heading.level > args.max_depth:
+            continue
+        assert heading.end_row is not None
+        indent = "  " * (heading.level - 1)
+        count = heading.end_row - heading.start_row + 1
+        out.append(f"{indent}{heading.title}  ({count} lines)")
+    emit(out)
+
+
+def cmd_section(backend: Backend, index: Index, args: argparse.Namespace) -> None:
+    """Print whole file or selected sections, sliced by rendered line range."""
+    file_part = args.target
+    inline_name: str | None = None
+    match = re.match(r"^([^:]*):(.*)$", args.target)
+    if match:
+        file_part = match.group(1)
+        inline_name = match.group(2)
+    names: list[str] = []
+    if inline_name:
+        names.append(inline_name)
+    names.extend(args.names)
+
+    doc = lookup_doc(index, file_part, args.scope)
+    line_count, headings, blocks = backend.parse(doc.path)
+    compute_end_rows(headings, line_count)
+    rows = render_blocks_to_rows(blocks, line_count)
+
+    rendered: list[str] = []
+    if not names:
+        rendered = flatten(rows, 0, line_count - 1)
+    else:
+        for position, name in enumerate(names):
+            heading = resolve_section(headings, name)
+            assert heading.end_row is not None
+            if position > 0:
+                rendered.append("")
+            rendered.extend(flatten(rows, heading.start_row, heading.end_row))
+
+    if args.lines:
+        rendered = slice_lines(rendered, args.lines[0], args.lines[1])
+    emit(rendered)
+
+
+def cmd_find(backend: Backend, index: Index, args: argparse.Namespace) -> None:
+    """Search tag names and heading titles across in-scope help files."""
+    pattern = strip_markers(args.pattern)
+    lowered = pattern.lower()
+    glob = glob_to_regex(lowered)
+    scoped_docs = [
+        doc
+        for doc in index.order
+        if args.scope == "all" or doc.scope == args.scope
+    ]
+
+    # TODO: this issues one read + one headings query per file (N round-trips
+    # over the pipe); a batched `headings_many` backend method could collapse it.
+    # Collect all facts first so the Vim regex runs in a single backend call.
+    doc_data: list[DocFacts] = []
+    all_names: list[str] = []
+    for doc in scoped_docs:
+        lines = backend.read(doc.path)
+        _line_count, headings = backend.headings(doc.path)
+        entries = index.tags_by_doc.get(doc.path, [])
+        doc_data.append(
+            DocFacts(doc=doc, lines=lines, headings=headings, entries=entries)
+        )
+        all_names.extend(entry.name for entry in entries)
+        all_names.extend(heading.title for heading in headings)
+
+    regex_matches = backend.match(pattern, all_names) if all_names else set()
+
+    def matches(name: str) -> bool:
+        lowered_name = name.lower()
+        if lowered in lowered_name:
+            return True
+        if glob.match(lowered_name):
+            return True
+        return name in regex_matches
+
+    results: list[FindResult] = []
+    for facts in doc_data:
+        for entry in facts.entries:
+            if not matches(entry.name):
+                continue
+            row = find_tag_row(facts.lines, entry.name)
+            if row is not None:
+                results.append(
+                    FindResult(stem=facts.doc.stem, line=row + 1, name=entry.name)
+                )
+        for heading in facts.headings:
+            if matches(heading.title):
+                results.append(
+                    FindResult(
+                        stem=facts.doc.stem,
+                        line=heading.heading_row + 1,
+                        name=heading.title,
+                    )
+                )
+
+    results.sort(key=lambda item: (item.stem.lower(), item.line, item.name))
+
+    seen: set[str] = set()
+    out: list[str] = []
+    for result in results:
+        key = f"{result.stem}\0{result.line}\0{result.name}"
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(f"{result.stem}.txt:{result.line}: {result.name}")
+    emit(out)
+
+
+# ------------------------------------------------------------------------------
+# Entry point
+
+
+def main() -> bool:
+    """Build the index and dispatch the requested subcommand."""
     args = parse_args()
-    return run_backend(build_request(args))
+    if getattr(args, "lines", None):
+        args.lines = parse_lines_range(args.lines)
+    backend = Backend()
+    try:
+        index = build_index(backend)
+        match args.command:
+            case "tag":
+                cmd_tag(backend, index, args)
+            case "toc":
+                cmd_toc(backend, index, args)
+            case "section":
+                cmd_section(backend, index, args)
+            case "find":
+                cmd_find(backend, index, args)
+            case _:
+                raise ScriptError(f"unknown command: {args.command}")
+    finally:
+        backend.close()
+    return True
 
 
 if __name__ == "__main__":
@@ -167,7 +979,7 @@ if __name__ == "__main__":
     if hasattr(signal, "SIGPIPE"):
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     try:
-        sys.exit(main())
+        sys.exit(0 if main() else 1)
     except ScriptError as exc:
         print_err(f"!! ERROR: {exc}")
         sys.exit(1)
