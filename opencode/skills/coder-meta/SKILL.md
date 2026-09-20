@@ -191,8 +191,9 @@ script error handling is richer (multiple helpers, fail/print_err/usage_and_exit
 which skill to load for writing tests.
 If no testing skill exists yet, say so explicitly and ask the user.
 
-Optional SKILL.md sections (add when relevant): `## Output capture`, `## Subcommands`,
-`## Doc comments`, `## Reference docs`.
+Optional SKILL.md sections — this list is **not exhaustive**; add any top-level section a
+topic warrants. Examples: `## Output capture`, `## Subcommands`, `## Doc comments`,
+`## Reference docs`, `## Dependencies`.
 
 ## Description frontmatter requirements
 

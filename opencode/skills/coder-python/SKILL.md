@@ -26,6 +26,8 @@ Do not add it automatically; do not flag its presence as an issue.
 If working on **module code**: read <./module-rules.md>.
 If working on **script code**: read <./script-rules.md>.
 
+A **Python project** means a directory or repo containing a `pyproject.toml`.
+
 ## Rules
 
 ### Docstrings
@@ -43,7 +45,7 @@ def split_lines(text: str) -> list[str]:
     return [line.rstrip() for line in text.splitlines() if line.strip()]
 
 # Good — multi-line
-def load_config(path: str) -> dict:
+def load_config(path: Path) -> Config:
     """
     Load and return config from the given JSON file.
 
@@ -52,14 +54,13 @@ def load_config(path: str) -> dict:
     ...
 
 # Accepted — multi-line but first line on same line as """.
-def load_config(path: str) -> dict:
+def load_config(path: Path) -> Config:
     """Load and return config from the given JSON file.
 
     Raises FileNotFoundError if path does not exist.
     Raises json.JSONDecodeError if file content is not valid JSON.
     """
-    with open(path) as f:
-        return json.load(f)
+    return Config.model_validate_json(path.read_text())
 
 # Bad — comment above instead of docstring inside
 # Split text into non-empty lines
@@ -77,7 +78,7 @@ def split_lines(text: str) -> list[str]:
 
 ```python
 # Good
-def get_type_info(schema: dict) -> tuple[str, str | None]:
+def get_type_info(schema: Schema) -> tuple[str, str | None]:
     ...
 
 # Bad
@@ -86,23 +87,24 @@ def get_type_info(schema: Dict) -> Tuple[str, Optional[str]]:
     ...
 ```
 
-### Proper typing over loose values
+### Type choices
 
-Always prefer proper typing instead of loose strings or defaults.
-When a value may legitimately be absent, encode it in the type — do not paper over it.
+**Structured data** — use **pydantic** models (`from pydantic import BaseModel`) by default
+in a Python project:
+- Convert to/from dicts and JSON with `model_validate()`/`model_validate_json()` on input
+  and `model_dump()`/`model_dump_json()` on output.
+- Use `TypedDict` only when a `dict` shape is genuinely unavoidable (pydantic unusable).
 
-```python
-# Good — absence is visible to the type checker and callers must handle None
-def find_rev(url: str) -> str | None:
-    ...
+**Paths** — use `pathlib.Path` (or `PurePath` for lexical-only work), never `str`:
+- Convert only at boundaries: `Path(...)` when receiving a string (e.g. argparse),
+  and `str(path)` when an API demands a string (but most accept `Path`!).
+- Use Path operations (`/`, `read_text`, `write_text`, ...) instead of `os.path.*`.
 
-# Bad — "" is invisible for the type checker and callers must know to check for ""
-def find_rev(url: str) -> str:
-    ...
-```
+**Closed sets** — use an `enum` instead of a bare `str`/`int`.
 
-Let the empty / not-found case surface through a `X | None` return type that the type
-checker can verify. The type checker is always available — use it.
+**Aliases** — use `typing.NewType` when values must be genuinely distinct,
+e.g. `UserId = NewType("UserId", str)`:
+- Use a plain `type` alias (e.g. `type UserId = str`, Python 3.12+) when only a name is wanted.
 
 ### Exceptions
 
@@ -132,6 +134,10 @@ except Exception as exc:
   path into a shell-hook template that itself contains braces (`${...}`, `%{...}`), where
   an f-string would be mutilated by the braces.
 - Interpolation targets must be `str` — wrap non-str values explicitly with `str(...)`.
+
+## Dependencies
+
+- This skill recommends **pydantic** for Python projects.
 
 ## Testing
 

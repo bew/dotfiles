@@ -40,10 +40,33 @@ All extend the rules below.
 - Top-level constants: SCREAMING_SNAKE_CASE, defined at top of file after header/imports.
 - No trailing whitespace — no trailing spaces or tabs at the end of any line,
   and no lines that contain only whitespace.
+- Never install or declare a package, or silently substitute a stdlib/hand-rolled alternative for a
+  recommended package, without asking the user first.
+
+## Types
+
+**Naming**
+- Name types for their role, not generically (e.g. `BackendRequest` rather than `Request`;
+  `AstHeading` rather than `Heading`).
+- Give values that share a primitive representation but differ in meaning distinct named types.
+
+**Structured data**
+- Represent structured data with a named type — never a loose map/dict/associative array.
+- Model external/wire data with a dedicated named type (struct, record, class, or language
+  equivalent).
+  Keep wire types (matching the serialized schema) distinct from in-process domain types.
+- When a function receives 4 or more related data inputs, group them into a named
+  struct/record/object rather than passing them as individual parameters. (ask user if unsure)
+
+**Other**
 - Use type annotations for parameters and variables whenever the language supports it.
   Prefer explicit types over implicit ones — they serve as inline documentation.
-- When a function receives 4 or more related data inputs, prefer to group them into a named
-  struct/record/object rather than passing them as individual parameters. (ask user if unsure)
+- Prefer the most specific type that expresses what a value *is*.
+  A loose primitive — string, number, boolean, map, or top/`any` type — hides meaning and lets
+  invalid states pass.
+- Encode absence in the type (optional/nullable) instead of a sentinel
+  such as `""`, `-1`, or `null`.
+- Represent a closed set of values with a dedicated type (enum or equivalent), not a bare primitive.
 
 ## Comments & docs rules
 
