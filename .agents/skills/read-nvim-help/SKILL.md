@@ -5,6 +5,7 @@ description: |
   Load when looking up `:help` topics, nvim options, keymaps, Ex commands, Lua API (`vim.*`),
   or plugin docs (nvim-cmp, oil, lazy.nvim, which-key, …), or when asked anything answered by
   nvim runtime docs.
+  Triggers on `:h <tag>` cross-references (e.g. `:h api-indexing`).
   Do NOT read `$VIMRUNTIME/doc/*.txt` raw, and do NOT open interactive `:help`, without loading
   this skill first.
 metadata:
@@ -80,6 +81,9 @@ Prints the file name (`lsp.txt`) first, then one line per section.
 Section names are case-insensitive and matched by title, tag, or title substring.
 `*...*` and `|...|` markers are stripped.
 A bare number selects the 1-based ordinal in `toc` order (all heading levels).
+Passing only the file (no section name) prints the whole file.
+Use the whole-file form only when the whole file is really needed — it costs a lot of tokens.
+Prefer `tag`, or one `section` at a time.
 
 **`find`** — search tags and section titles across all help files.
 The pattern is matched as regex, glob, or substring (any hit wins).
@@ -103,7 +107,6 @@ Help file names accept a bare stem (`lsp`) or `stem.txt`; output always prints `
 ## Output format
 
 `section` and `tag` render help text as markdown-ish output:
-
 - `=`-ruled titles become `## Title`; `-`-ruled titles become `### Title`; tag-headings and
   `~` column headings become `#### Title`; anchors are kept.
 - Ruler lines (`====`, `----`) and `~` delimiters are dropped.
@@ -126,6 +129,7 @@ Help file names accept a bare stem (`lsp`) or `stem.txt`; output always prints `
 - Never read `$VIMRUNTIME/doc/*.txt` or plugin `doc/*.txt` files directly — full files are huge.
 - Never open interactive `:help`; it bypasses token control.
 - Never spawn bare `nvim` to look something up — `nvimq` already resolves all doc paths.
+- A reference written as `:h <tag>` is an input form: strip the `:h ` prefix and resolve the tag.
 
 ## Guidelines
 
