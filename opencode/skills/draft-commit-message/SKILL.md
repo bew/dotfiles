@@ -114,7 +114,8 @@ WARNING: This diff mixes distinct concerns. Consider splitting into separate com
 ### Subject line
 
 Must complete "When applied, this commit will `<subject>`".
-72 chars max. Imperative mood. No trailing period.
+72 chars max (enforced by the `check-line-width` skill, not by eye).
+Imperative mood. No trailing period.
 Use style from *Step 2*.
 When identifiers appear literally in code, backtick them in the subject too (see **Formatting**).
 Capitalize the first word of the subject (after the `prefix: ` part, if any).
@@ -188,8 +189,11 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Start each sentence on its own line — never run several sentences back-to-back on one line.
   Sentences stay in the same paragraph; only a blank line splits paragraphs. This is a hard rule.
   After writing the body, verify no line contains more than one sentence.
-- Fit into 72 chars, use newlines as needed (compress text a little, should still be ~prose).
+- Fit the subject and every body line into 72 chars, use newlines as needed
+  (compress text a little, should still be ~prose).
   Never join two sentences on one line to satisfy the limit — see the sentence-break rule above.
+- Never count or estimate line width by hand — use the `check-line-width` skill, the only authority.
+  Loop until clean: draft → check subject+body at 72 → fix flagged lines → repeat until `(OK)`.
 
 Always blank line between subject and body, and between paragraphs.
 

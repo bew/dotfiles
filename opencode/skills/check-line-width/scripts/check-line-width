@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Report lines longer than a given limit in one or more files.
-# Usage: check-long-lines <limit> <file>...
+# Usage: check-line-width <limit> <file>...
 # Output: lines grouped by file; each hit shows 15 chars before the limit,
 #         a '┃' marker at the limit column, then the overflow.
 
@@ -20,16 +20,16 @@ def print_err(msg: str) -> None:
 
 def usage_and_exit(status: int) -> None:
     print_err(
-        "Usage: check-long-lines <limit> <file>... [-]\n"
+        "Usage: check-line-width <limit> <file>... [-]\n"
         "\n"
         "Report lines that exceed <limit> characters, by file.\n"
         "Pass '-' to read standard input instead of a file\n"
         "('-' may appear at most once)\n"
         "\n"
         "EXAMPLES:\n"
-        "  check-long-lines 100 src/foo.ts src/bar.ts\n"
-        "  check-long-lines 80 README.md\n"
-        "  printf '...' | check-long-lines 80 -"
+        "  check-line-width 100 src/foo.ts src/bar.ts\n"
+        "  check-line-width 80 README.md\n"
+        "  printf '...' | check-line-width 80 -"
     )
     sys.exit(status)
 

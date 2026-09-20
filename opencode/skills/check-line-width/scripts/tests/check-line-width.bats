@@ -1,15 +1,15 @@
-# Test suite for `check-long-lines` script
+# Test suite for `check-line-width` script
 #
 # % Uses BATS testing system
 # docs: https://bats-core.readthedocs.io/
 # repo: https://github.com/bats-core/bats-core
 #
-# Run tests with: `bats check-long-lines.bats [--filter foobar]`
+# Run tests with: `bats check-line-width.bats [--filter foobar]`
 
 bats_require_minimum_version 1.5.0
 
 SCRIPT_DIR="$(dirname "$BATS_TEST_FILENAME")"
-SCRIPT_PATH="$SCRIPT_DIR/../check-long-lines"
+SCRIPT_PATH="$SCRIPT_DIR/../check-line-width"
 
 # Create a temp file with known content and a fake HOME for all tests.
 # Mocking HOME ensures display_path() never touches the real home directory.
