@@ -13,3 +13,8 @@ Example: These paths are equivalent, they all resolve to the exact same file on 
 - `~/.config/opencode/skills/foo/SKILL.md`
 - `~/.dot/opencode/skills/foo/SKILL.md`
 - `<repo>/opencode/skills/foo/SKILL.md`
+
+## Nix formatting
+
+Never run `nixfmt` (or any formatter) on Nix files in this repo.
+Match the existing hand formatting instead.

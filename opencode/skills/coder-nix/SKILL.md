@@ -55,6 +55,16 @@ All files are module-like: generic module rules apply, script rules are N/A.
 - Aggregate a developer profile with `pkgs.buildEnv { name = "..."; paths = [...]; }`
   listing the tools the profile should expose.
 
+## Packaging a new package
+
+- If the repo has no existing package location, ASK the user where to put the new package
+  before writing anything.
+  Common locations: `nix/pkgs/<tool>/package.nix`, `pkgs/<tool>/package.nix`.
+- Wire the new package into the repo's `flake.nix` when one exists (add it to the `packages` output).
+- Format the new package with `nixfmt` (RFC-style), automatically after writing it.
+  EXCEPTION: in bew's dotfiles repo (`~/.dot`), never run `nixfmt` —
+  mimic the repo's existing hand formatting (see that repo's `AGENTS.md`).
+
 ## Reusable modules
 
 For a Nix module that declares its own options:
@@ -92,7 +102,7 @@ For the rest, ASK the user before running; they are heavier and may need network
 2. `nix flake check` — full flake checks.
 
 Do NOT auto-run the heavier checks. Report status and let the user decide.
-Do NOT use `nixfmt` unless explicitly requested by user.
+Formatting is covered by `## Packaging a new package` above.
 
 ## Testing
 
