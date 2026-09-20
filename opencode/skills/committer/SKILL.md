@@ -1,5 +1,5 @@
 ---
-name: draft-commit-message
+name: committer
 description: |
   Load the commit drafter ONLY when the user explicitly asks to draft or generate a commit message.
   Do NOT auto-load speculatively.

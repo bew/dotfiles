@@ -1,7 +1,7 @@
 ---
-name: diff-to-commits-drafts
+name: diff-to-commits
 description: |
-  Load when the /diff-to-commits-drafts command triggers.
+  Load when the /diff-to-commits command triggers.
   Splits a diff into logical commits and drafts each commit message interactively,
   one group at a time.
 metadata:
@@ -85,10 +85,10 @@ Do not proceed until user has switched modes and re-requested.
 For each confirmed group in order (or all in one go, if requested):
 
 1. Announce: "Drafting commit for group: **<group name>**".
-2. Load the `draft-commit-message` skill.
+2. Load the `committer` skill.
 3. Follow its steps — scope the diff to this group's files.
    Pass the group name as focus hint.
-4. Complete the full draft-commit-message iteration loop until user confirms the message.
+4. Complete the full committer iteration loop until user confirms the message.
 5. Record the confirmed subject line and full message for this group.
 6. Proceed to the next group.
 

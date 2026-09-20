@@ -122,7 +122,7 @@ By design, composition produces a **single merged dir** that the agent sees as `
 
 ### Convention
 
-**Agent-agnostic skills**: kebab-case, no agent-system prefix (e.g. `write-spec`, `caveman`, `draft-commit-message`).
+**Agent-agnostic skills**: kebab-case, no agent-system prefix (e.g. `write-spec`, `caveman`, `committer`).
 
 **Agent-specific meta-skills**: carry agent-system prefix (e.g. `opencode-crafter`, `opencode-artefact-rules`).
 
@@ -144,8 +144,8 @@ Name is provisional — see Open Questions.
 Slugs with no change (all moving to `agent-agnostic/`): `coder-*`, `write-spec*`, `caveman*`, `agent-blocker`, `agent-stuck`, `bew-*`, `karpathy-guidelines`, `gh-read-file`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `incremental-write`, `write-github-issue`, `grill-me-*`.
 
 Skills marked for split (generic core extracted, OC wrapper stays in `opencode-specific/`):
-- `diff-to-commits-drafts`: agnostic core = four-phase workflow + grouping/drafting logic; OC-specific = `task` tool invocation, PLAN/BUILD mode guard, slash-command trigger.
-- `draft-commit-message`: agnostic core = diff analysis procedure, style detection, subject/body rules; OC-specific = `task` tool for subagent dispatch, `question` tool calls, PLAN/BUILD mode guards.
+- `diff-to-commits`: agnostic core = four-phase workflow + grouping/drafting logic; OC-specific = `task` tool invocation, PLAN/BUILD mode guard, slash-command trigger.
+- `committer`: agnostic core = diff analysis procedure, style detection, subject/body rules; OC-specific = `task` tool for subagent dispatch, `question` tool calls, PLAN/BUILD mode guards.
 
 `incremental-write` was initially classified split but decided to move as-is to `agent-agnostic/`; OC-specific examples will be fixed in place when moving.
 
@@ -225,8 +225,8 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 | `bew-inline-callout-style` | agent-agnostic | Inline callout conventions; OC path in example text is incidental. |
 | `caveman` | agent-agnostic | Compression rules + auto-clarity; `/caveman` trigger is illustrative, not OC-registered. |
 | `caveman-review` | agent-agnostic | Code review format; zero OC dependency. |
-| `diff-to-commits-drafts` | **split** | Core: four-phase workflow, grouping, drafting. OC wrapper: `task` tool, PLAN/BUILD mode, slash-command trigger. |
-| `draft-commit-message` | **split** | Core: style detection, subject/body rules. OC wrapper: `task` tool for subagent, `question` tool, PLAN/BUILD guards. |
+| `diff-to-commits` | **split** | Core: four-phase workflow, grouping, drafting. OC wrapper: `task` tool, PLAN/BUILD mode, slash-command trigger. |
+| `committer` | **split** | Core: style detection, subject/body rules. OC wrapper: `task` tool for subagent, `question` tool, PLAN/BUILD guards. |
 | `gh-read-file` | agent-agnostic | Pure `gh` CLI workflow; no OC primitives. |
 | `git-track-new-file` | opencode-specific | Entire skill wraps `git_track_new_file` OC tool primitive. |
 | `grill-me-full` | agent-agnostic | Socratic interview methodology; not registered in `available_skills` (manual-only). |
@@ -264,8 +264,8 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 
 | Command | Verdict | Key evidence |
 |---|---|---|
-| `diff-to-commits-drafts` | opencode-specific | 2-line dispatcher to named skill; zero standalone logic. |
-| `draft-commit-message` | opencode-specific | Same — pure skill dispatcher shim. |
+| `diff-to-commits` | opencode-specific | 2-line dispatcher to named skill; zero standalone logic. |
+| `committer` | opencode-specific | Same — pure skill dispatcher shim. |
 | `draft-pr-description` | **has-generic-logic** | Self-contained: embeds full workflow, style rules, output format inline. Only OC seams: `$ARGUMENTS` slot + `bew-communication-style` skill load. Generic equivalent: standalone "PR description drafter" system prompt. |
 | `reflect-friction` | opencode-specific | Dispatches to `opencode-reflect-friction` skill; no extractable logic. |
 | `retitle` | **has-generic-logic** | Title generation logic (≤80 chars, multi-subject disambiguation, subject rules) is self-contained. OC seam: `retitle_session` tool call from plugin. Generic equivalent: "session titler" prompt + any agent's rename action. |
@@ -283,7 +283,7 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 
 **Agent-agnostic (ready to move as-is):** `agent-blocker`, `agent-stuck`, `bew-communication-style`, `bew-inline-callout-style`, `caveman`, `caveman-review`, `gh-read-file`, `grill-me-full`, `grill-me-medium`, `grill-me-original`, `incremental-write` (move as-is, fix examples), `karpathy-guidelines`, `read-man-page`, `reflect-code-skills`, `reflect-script-skills`, `coder-bash`, `coder-bats`, `coder-generic`, `coder-meta`, `coder-nushell`, `write-github-issue`, `write-spec`, `write-spec-noninteractive`, `write-spec-noninteractive-standalone`
 
-**Split (extract generic core, keep OC wrapper):** `diff-to-commits-drafts`, `draft-commit-message`
+**Split (extract generic core, keep OC wrapper):** `diff-to-commits`, `committer`
 
 **OC-specific (stay in `opencode-specific/`):** `git-track-new-file`, `opencode-artefact-rules`, `opencode-reflect-friction`, `opencode-test-runner`, `opencode-crafter` (deferred)
 
@@ -291,7 +291,7 @@ Verdicts: `opencode-specific` | `agent-agnostic` | `split` (has extractable gene
 
 **Non-skill artefacts with generic logic → future skills/prompts:** `draft-pr-description` command, `retitle` command, `why-you` command
 
-**Fully OC-specific non-skill artefacts:** `opencode-reviewer` agent, `opencode-simulated-test-runner` agent, `diff-to-commits-drafts` command, `draft-commit-message` command, `reflect-friction` command, `plugins/retitle.ts`, `tools/git-track-new-file.ts`, `snippets/*`
+**Fully OC-specific non-skill artefacts:** `opencode-reviewer` agent, `opencode-simulated-test-runner` agent, `diff-to-commits` command, `committer` command, `reflect-friction` command, `plugins/retitle.ts`, `tools/git-track-new-file.ts`, `snippets/*`
 
 ### Resolved decisions from Analysis
 
