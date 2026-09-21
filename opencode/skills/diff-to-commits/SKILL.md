@@ -17,7 +17,8 @@ Determine the following values from whatever is available in context
 - **Path**: a path or glob to narrow the diff (e.g. `src/`, `*.ts`). Default: `.`
 - **Diff type**: infer from any available wording — "staged" means staged changes; anything else
   (including "unstaged", "current diff", or no mention) means unstaged. Default: unstaged.
-- **Hints**: any remaining free-form guidance from the user — carry forward for use in later phases.
+- **Hints**: any remaining free-form guidance from the user — apply where relevant
+  (e.g. diff scope in `Phase:Explore`, focus in `Phase:Draft`).
 
 Resolve the diff source string:
 - Staged + path: `git diff --staged -- <path>`
@@ -35,7 +36,7 @@ Hints: <free-form hints, or "(none)">
 1. `Phase:Explore` — analyse diff via subagent
 2. `Phase:Group` — propose groupings, iterate until confirmed
 3. `Phase:Draft` — draft commit message per group, one by one
-4. `Phase:Summary` — staging guidance for all groups
+4. `Phase:Summary` — recap of confirmed commits
 
 ## 1. `Phase:Explore` — analyse diff via subagent
 
@@ -43,11 +44,15 @@ Read `Diff source` and `Working directory` from context (resolved in *Setup*).
 
 NOTE: Subagents do not inherit the parent's cwd — pass `Working directory` explicitly in the prompt.
 
+NOTE: If the user explicitly asks to re-explore (e.g. after committing part of the diff),
+you MUST re-invoke `explore-diff` with the full prompt below — never analyse it inline.
+
 Invoke the `explore-diff` subagent via the `task` tool with this prompt
 (substitute resolved values):
 
 > Diff source: `<diff source>`
 > Working directory: `<working directory>`
+> Hints: `<hints, or omit this line if none>`
 > Purpose: commit grouping — split this diff into logical, self-contained commit candidates.
 > For each concern: include label, what changed (specific), inferred intent,
 > and representative files (list individual files when few, top-level dir when many).
@@ -87,7 +92,7 @@ For each confirmed group in order (or all in one go, if requested):
 1. Announce: "Drafting commit for group: **<group name>**".
 2. Load the `committer` skill.
 3. Follow its steps — scope the diff to this group's files.
-   Pass the group name as focus hint.
+   Pass the group name and any relevant `Hints` as focus hint.
 4. Complete the full committer iteration loop until user confirms the message.
 5. Record the confirmed subject line and full message for this group.
 6. Proceed to the next group.
@@ -96,25 +101,14 @@ Do not advance to the next group until user confirms the current commit message.
 
 Ready to move to `Phase:Summary`? (say 'next' or similar to proceed)
 
-## 4. `Phase:Summary` — staging guidance for all groups
+## 4. `Phase:Summary` — recap of confirmed commits
 
-Output a recap table:
+For each group, output its full confirmed message:
 
-| Group | Commit subject |
-|---|---|
-| `<group 1>` | `<subject>` |
-| `<group 2>` | `<subject>` |
+```md
+**<groupname>**:
 
-Then, for each group, output the staging + commit commands:
-
-```sh
-# <group name>
-git add <file1> <file2> ...
-git commit -F - <<'EOF'
-<subject line>
-
-<body if any>
-EOF
+<full commit message>
 ```
 
 Do not run any git commands automatically.
