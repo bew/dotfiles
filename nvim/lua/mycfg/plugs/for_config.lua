@@ -55,6 +55,35 @@ Plug {
 }
 
 Plug {
+  source = myplug"live-messages.nvim",
+  desc = "Append-only :messages buffer with inline annotations and markers",
+  tags = {"utils", "debug"},
+  on_load = function()
+    require"live-messages".setup {
+      default_split = "vertical",
+      on_attach = function(_ctx)
+        K.toplevel_buf_map {
+          mode = "n", key = "<leader>mm", desc = "Insert message marker",
+          action = function()
+            vim.ui.input({ prompt = "Marker label: " }, function(label)
+              require"live-messages".actions.mark(label)
+            end)
+          end,
+        }
+        K.toplevel_buf_map {
+          mode = "n", key = "]m", desc = "Next marker",
+          action = require"live-messages".actions.goto_next_marker,
+        }
+        K.toplevel_buf_map {
+          mode = "n", key = "[m", desc = "Prev marker",
+          action = require"live-messages".actions.goto_prev_marker,
+        }
+      end,
+    }
+  end,
+}
+
+Plug {
   source = gh"ii14/neorepl.nvim",
   desc = "Neovim REPL for lua and vim script",
   defer_load = { on_event = "VeryLazy" },

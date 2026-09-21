@@ -1,0 +1,5 @@
+# (NOTE: The file is used to find root of a Lua project, to avoid loading too much)
+# Reference: https://github.com/JohnnyMorganz/StyLua
+indent_type = "Spaces"
+indent_width = 2
+call_parentheses = "Input"
