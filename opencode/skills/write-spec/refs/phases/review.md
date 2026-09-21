@@ -14,6 +14,8 @@ Check each of the following, flag any issues:
 
 - All Open Questions (per-section and Global) are either resolved or explicitly marked non-blocking
   with a one-line reason (or longer explanation if this is still in-flux).
+  Deferred OQs are intentionally retained during drafting;
+  a deferred Blocking OQ still blocks readiness until resolved.
 - All content sections are fully written — no `SKELETON TODO` placeholders remain
   (Introduction and Terminology, if present, included)
 - If Terminology section exists: all terms used in spec are defined there before first use

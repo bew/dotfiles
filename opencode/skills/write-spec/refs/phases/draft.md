@@ -129,26 +129,12 @@ In batch mode, print `Mode: batch`.
 
 NOTE: Earlier sections may be edited freely at any point, if needed.
 
-Add open questions to the section's own `### Open Questions` subsection immediately — do not defer.
+Add open questions to the section's `### Open Questions` subsection immediately — never hold back.
 
 On edit failure: re-read `$specpath`, locate current state, resume.
 
 After filling a section (incremental mode only):
-- Replace that section's `SKELETON TODO` placeholder with its body — never leave the comment behind.
-- Note what was written and any open questions surfaced.
-- Tell user:
-  > <mode banner>
-  >
-  > Feedback on this section?
-- List the remaining sections still to fill — headings only, no overview lines.
-- Print:
-  > Say 'next' or similar to continue with the next section.
-  > Say 'fill the rest'/'write all' to switch to batch mode.
-
-Only when the user explicitly asks what sections are next, list upcoming sections with each section's
-`SKELETON TODO` overview line, so the user sees planned content, not just headings.
-Such a request is informational: do not treat it as section feedback, do not advance, do not switch mode.
-A question that merely contains the word 'next' is not the confirm token — answer it, then re-issue the prompt and wait.
+read <../incremental-round.md> and run the stop-at-section round.
 
 In batch mode, skip the per-section prompt above — fill all remaining sections
 (replacing each `SKELETON TODO` as you go), then run the *After all sections are filled* steps.
@@ -193,6 +179,10 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - In `incremental` mode, never fill more than one section per turn.
   The pause after each section is mandatory — do not skip it nor batch it.
   A user answer that names or selects several sections is a queue, not a batch authorization.
+- In `incremental` mode, run the stop-at-section round after each filled section.
+  See <../incremental-round.md>; never run it in `batch` mode.
+- Resolving an OQ: apply the answer wherever it affects content (may span sections),
+  then remove the entry if fully answered.
 - `incremental` is the default/canonical mode.
 - Never ask the user to choose a starting fill mode.
   `incremental` is always the entry mode (the user can switch later via aliases).

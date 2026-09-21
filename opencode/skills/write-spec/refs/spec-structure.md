@@ -72,6 +72,8 @@ Each entry must include:
 Within each Open Questions subsection, list **Blocking** entries before **Non-blocking** ones.
 
 Remove or strike questions once resolved — do not let stale entries accumulate.
+Deferred OQs are intentionally retained and may be revisited later —
+keeping them is not a review failure.
 
 Example:
 
