@@ -137,13 +137,11 @@ in {
     >&2 echo "Copying no-deps files"
 
     cp $src/rc/* $out/rc/
+    cp -R $src/functions $out/
 
     # FIXME: this should be part of a sort of activation?
     # Or can I detect it's not set and suggest to run the activation command for that if it's not?
     cp $src/fast-theme--bew.ini $out/
-
-    ###cp -R $src/completions $out/  # nothing important there
-    ###cp -R $src/fpath $out/        # nothing important there
 
     >&2 echo "Patching config-specific env vars in .zshenv"
     substitute $src/zshenv $out/.zshenv \

@@ -11,7 +11,11 @@
 #
 # NOTE: The docs for the completion system is in man zshcompsys.
 
-fpath=($ZSH_MY_CONF_DIR/completions/ $fpath)
+fpath=(
+  "$ZSH_MY_CONF_DIR/functions/"
+  $fpath
+)
+
 # Add system completions if available
 # (allows to have 'pacman' completions in nix's zsh for example)
 [[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*(N))
