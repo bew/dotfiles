@@ -11,6 +11,8 @@ Before writing anything: list the sections that will be created
 If the chosen design has meaningful sub-variants, include the optional design-options section in the list.
 
 Ask: *Sections look right? Say 'next' to start writing.*
+Do not ask which fill mode to start in — `incremental` is always the starting mode.
+The mode lines below are passive info, not a question.
 Print the `<mode banner>`: `Mode: incremental (one section per turn)`.
 The `incremental` mode is the default — one section per turn, pausing after each.
 Say 'step by step' to assert it.
@@ -177,6 +179,8 @@ During iteration, if user introduces a new idea, constraint, or design angle not
   The pause after each section is mandatory — do not skip it nor batch it.
   A user answer that names or selects several sections is a queue, not a batch authorization.
 - `incremental` is the default/canonical mode.
+- Never ask the user to choose a starting fill mode.
+  `incremental` is always the entry mode (the user can switch later via aliases).
 - Never write full rewrite when targeted edit is requested. Surgical edits only.
 - Never paper over unresolved decisions. Surface them in Open Questions.
 - Never mix terminology once terms are defined.
