@@ -18,9 +18,9 @@ Update in-place with `edit` whenever status changes.
 
 A spec is `MAYBE-READY` when **all** of the following hold:
 
-1. Introduction is complete prose — no placeholders, no skeleton headings.
-   Terminology section (if present) is also complete prose.
-2. All `FIXME:` callouts have been addressed or converted to Open Questions entries.
+1. All content sections are fully written — no `SKELETON TODO` placeholders remain
+   (Introduction and Terminology, if present, included).
+2. All `FIXME:` / `TODO:` callouts have been addressed or converted to Open Questions entries.
 3. All Open Questions entries (per-section and Global) are marked **Blocking** or **Non-blocking**.
 4. No **Blocking** Open Questions remain unresolved.
    Global entries default to **Non-blocking**; they must be escalated to Blocking explicitly during review to block readiness.

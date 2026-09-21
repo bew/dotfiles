@@ -20,10 +20,16 @@ Say 'fill the rest'/'write all' to batch the rest.
 Adjust section list if user requests changes.
 
 Once confirmed, write the file: H1 with status tag + skill loader meta-paragraph
-(for any non-READY status) + all confirmed section headings, empty bodies.
-Each main section (`##`) that may surface open questions gets an empty `### Open Questions` subsection.
+(for any non-READY status) + all confirmed content section headings, each carrying a `SKELETON TODO` placeholder.
+Each `##` section that may surface open questions also gets an empty `### Open Questions` subsection.
 Use `write` tool for this initial creation only.
 All subsequent changes use `edit` only — never overwrite the file again.
+
+Each content section placeholder is a `<!-- SKELETON TODO: <1–2 line overview> -->`
+comment directly under its heading.
+Derive the overview from what Discovery established and <../spec-structure.md> section guidance.
+Scale to complexity: 1 line for trivial/obvious sections, 2 when content is non-obvious.
+Structural fixtures (`### Open Questions`, `## Global Open Questions` default entry) are not content bodies — no `SKELETON TODO` for them.
 
 H1 format:
 ```md
@@ -39,12 +45,15 @@ Skeleton example (sections with OQ subsections):
 > agents MUST load one of the spec-writing skill first.
 
 ## Introduction
+<!-- SKELETON TODO: <1–2 line overview> -->
 
 ## <Domain Section>
+<!-- SKELETON TODO: <1–2 line overview> -->
 
 ### Open Questions
 
 ## <Another Decision Section>
+<!-- SKELETON TODO: <1–2 line overview> -->
 
 ### Open Questions
 
@@ -125,18 +134,24 @@ Add open questions to the section's own `### Open Questions` subsection immediat
 On edit failure: re-read `$specpath`, locate current state, resume.
 
 After filling a section (incremental mode only):
+- Replace that section's `SKELETON TODO` placeholder with its body — never leave the comment behind.
 - Note what was written and any open questions surfaced.
 - Tell user:
   > <mode banner>
   >
   > Feedback on this section?
-- List the remaining sections still to fill.
+- List the remaining sections still to fill — headings only, no overview lines.
 - Print:
   > Say 'next' or similar to continue with the next section.
   > Say 'fill the rest'/'write all' to switch to batch mode.
 
-In batch mode, skip the per-section prompt above — fill all remaining sections,
-then run the *After all sections are filled* steps.
+Only when the user explicitly asks what sections are next, list upcoming sections with each section's
+`SKELETON TODO` overview line, so the user sees planned content, not just headings.
+Such a request is informational: do not treat it as section feedback, do not advance, do not switch mode.
+A question that merely contains the word 'next' is not the confirm token — answer it, then re-issue the prompt and wait.
+
+In batch mode, skip the per-section prompt above — fill all remaining sections
+(replacing each `SKELETON TODO` as you go), then run the *After all sections are filled* steps.
 
 The user's response should be handled as feedback by default.
 Only 'next' or a trigger alias can be interpreted as signal to move on.
@@ -196,6 +211,11 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - Always include `### Open Questions` subsections in main sections that may surface design decisions.
   Never add OQ subsections to Introduction or Terminology (if present) — they are not decision surfaces.
   Empty OQ subsections serve as drafting placeholders — prune them before leaving `Phase:Draft` (see *Filling* above).
+- Every content section in the skeleton carries a `<!-- SKELETON TODO: <1–2 line overview> -->` placeholder.
+  Never leave a content section body without one.
+  A section added or renamed after the skeleton write also needs one.
+- Filling a section replaces its `SKELETON TODO` placeholder with the section body.
+  Never leave a `SKELETON TODO` placeholder behind in a filled section.
 - Always include Alternatives & Tradeoffs section comparing proposed design
   against simpler alternative.
 - When omitting a section, flag it explicitly: name section and state reason it was skipped.

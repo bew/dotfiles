@@ -14,8 +14,8 @@ Check each of the following, flag any issues:
 
 - All Open Questions (per-section and Global) are either resolved or explicitly marked non-blocking
   with a one-line reason (or longer explanation if this is still in-flux).
-- Introduction is prose (not skeleton placeholders)
-- Terminology section (if present) is complete prose (not skeleton placeholders)
+- All content sections are fully written — no `SKELETON TODO` placeholders remain
+  (Introduction and Terminology, if present, included)
 - If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
@@ -27,6 +27,7 @@ Check each of the following, flag any issues:
 - Skill loader meta-paragraph present for non-READY statuses, absent for `READY`
 
 `FIXME:` / `TODO:` callouts are allowed — they signal work still to be done, not a review failure.
+By contrast, a leftover `SKELETON TODO` placeholder is a review failure — it means a section was never filled.
 If a callout is not specific to its surrounding text, suggest moving it to Open Questions instead.
 
 Report review findings to user as a short list: items that need attention vs. items that look good.
