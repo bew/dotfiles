@@ -21,8 +21,10 @@ Determine the following values from whatever is available in context
 - **Working directory**: from user context. Default: <from env block in system prompt>.
 - **Scope**: a path, glob, or area to narrow the diff (e.g. `src/adapters/`, `*.ts`).
   Default: none (full diff).
-- **Diff type**: infer from any available wording — "staged" means staged changes; anything else
-  (including "unstaged", "current diff", or no mention) means staged. Default: staged.
+- **Diff type**: infer from any available wording — "staged" means staged changes;
+  "unstaged" or "current diff" mean unstaged.
+  No mention defaults to staged.
+  A caller (e.g. `diff-to-commits`) may pass the resolved value in context — use it as-is.
 - **Focus**: free-text note to guide writing (intent, emphasis, context).
   If user context looks like a diff scope — treat it as scope instead.
   Both scope and focus may be present simultaneously.
@@ -70,7 +72,8 @@ Ask user via `question` tool — construct the question text dynamically:
 - Mention the found files by name.
 - Option 1: "Use these unstaged changes" — re-run `explore-diff` with `git diff -- <scope>` as diff source.
 - Option 2: "Abort" — stop.
-If user picks option 1: retry `explore-diff` with `git diff -- <scope>` as diff source and the same workdir, then continue to *Step 2*.
+If user picks option 1: set `Diff type` to `unstaged`, retry `explore-diff` with
+`git diff -- <scope>` as diff source and the same workdir, then continue to *Step 2*.
 If user picks option 2: stop.
 
 Use subagent summary as the sole basis for *Step 2* and *Step 3*.
@@ -259,8 +262,11 @@ If user picks "🚀 Use as-is and commit":
 **Stage** per diff-type:
 - diff-type **staged**: do not run `git add`.
   The staged content is the contract established in Step 1 — commit it as-is.
-- diff-type **unstaged**: ask via `question` tool which (set of) files to stage (list them),
-  wait for confirmation, `git add` only the confirmed files.
+- diff-type **unstaged**: list the exact file set in a `question` call and require an explicit
+  yes before `git add`.
+  A commit approval ("use as-is and commit", "ok; commit", …) never implies staging approval —
+  the staging set must be confirmed on its own, even when the user already asked to commit.
+  `git add` only the confirmed files.
   If some files need hunk-level _partial_ add: do NOT `git add` — follow <§partial-adds>.
 
 **Verify staged set** — always run `git diff --cached --stat` before committing.

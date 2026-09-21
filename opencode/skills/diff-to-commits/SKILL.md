@@ -87,12 +87,17 @@ NOTE: If user asks to commit at any point and the session is in PLAN mode: stop 
 Output: "Cannot commit in PLAN mode — switch to BUILD mode first, then ask again."
 Do not proceed until user has switched modes and re-requested.
 
+NOTE: Approvals are distinct and each must be explicit: grouping (`Phase:Group`), the commit
+message (committer loop), and the staging set + commit (committer *Step 4*).
+A user "commit" never waives the staging-set confirmation — never `git add` without it.
+
 For each confirmed group in order (or all in one go, if requested):
 
 1. Announce: "Drafting commit for group: **<group name>**".
 2. Load the `committer` skill.
 3. Follow its steps — scope the diff to this group's files.
-   Pass the group name and any relevant `Hints` as focus hint.
+   Pass the group name and any relevant `Hints` as focus hint; pass the resolved
+   `Diff type` explicitly.
 4. Complete the full committer iteration loop until user confirms the message.
 5. Record the confirmed subject line and full message for this group.
 6. Proceed to the next group.
