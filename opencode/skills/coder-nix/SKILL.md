@@ -45,6 +45,10 @@ All files are module-like: generic module rules apply, script rules are N/A.
   (e.g. `lib.platforms.unix`).
 - Expose reusable packages through `callPackage ./path { }`.
   The callPackage function's curried args become its dependencies, injected by the caller.
+- When asked to use Nix code from another flake, add that flake as an input in `flake.nix`
+  and consume its outputs directly.
+  Never add a flake input on your own — only when user asks.
+  If how-to-use is unsure or eval breaks: Inspect input's outputs via `nix flake show <flakeref>`.
 
 ## Guidelines
 
@@ -60,7 +64,8 @@ All files are module-like: generic module rules apply, script rules are N/A.
 - If the repo has no existing package location, ASK the user where to put the new package
   before writing anything.
   Common locations: `nix/pkgs/<tool>/package.nix`, `pkgs/<tool>/package.nix`.
-- Wire the new package into the repo's `flake.nix` when one exists (add it to the `packages` output).
+- Wire the new package into the repo's `flake.nix` when one exists
+  (add it to the `packages` output).
 - Format the new package with `nixfmt` (RFC-style), automatically after writing it.
   EXCEPTION: in bew's dotfiles repo (`~/.dot`), never run `nixfmt` —
   mimic the repo's existing hand formatting (see that repo's `AGENTS.md`).
