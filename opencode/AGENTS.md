@@ -55,6 +55,8 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 In general: trust the user for git commands even if they look odd.
 
+NEVER `git add` or commit files matching `HANDOFF-*` — handoff artefacts must never be git-tracked.
+
 
 ## Token efficiency
 
