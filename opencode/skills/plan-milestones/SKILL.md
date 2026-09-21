@@ -18,7 +18,18 @@ vertical slice, progressing make-it-work → make-it-right → make-it-fast.
 Determine the following from whatever is in context (user message, prior context, or defaults):
 - **$specpath**: where the project spec lives (file path, directory, or glob).
   Required — stop and ask user if absent.
-- **$milestonesfile**: path to write or update. Default: `MILESTONES.md` at repo root.
+- **$milestonesfile**: path to write or update.
+  Resolve placement:
+  - `$milestonesfile` already exists → reuse it, no question.
+  - `$specpath` is a single file at the repo root → `MILESTONES.md` at repo root, no question.
+    Repo root = `git rev-parse --show-toplevel`.
+  - Otherwise → ask user (use the `question` tool when available).
+    Options (first recommended):
+    - **Next to the spec** — `MILESTONES.md` in the spec's directory.
+      Single file → its parent dir; directory → inside it; glob → common parent dir of matches.
+    - **At repo root** — `MILESTONES.md` at the repo root.
+    When repo root is unresolved (not a git repo), offer only **Next to the spec**;
+    user may type a custom path.
 - **$hints**: any remaining free-form text from the user (scope, constraints, focus area).
   Default: `(none)`.
 
