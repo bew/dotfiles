@@ -13,7 +13,7 @@ metadata:
 
 Produce a well-formed git commit message for a diff, then iterate until user is satisfied.
 
-## Setup — resolve inputs
+## 0. `Phase:Setup` — resolve inputs
 
 Determine the following values from whatever is available in context
 (prior command output, user message, session prompt, or defaults):
@@ -37,12 +37,12 @@ Diff type: staged | unstaged
 Focus: <free-text, or "(none)">
 ```
 
-## Step 1 — Analyse diff via `explore-diff`
+## 1. `Phase:Analyse` — analyse diff via `explore-diff`
 
 IMPORTANT: Never run `git diff` or `git diff --cached` directly for diff analysis —
 not even to inspect the diff before routing to `explore-diff`.
 Raw bash diff output in context does not substitute for an `explore-diff` result.
-Exception: the staged-only `git diff --cached --stat` check at commit time (see *Step 4*).
+Exception: the staged-only `git diff --cached --stat` check at commit time (see `Phase:Commit`).
 
 If `explore-diff` was already invoked in the last few messages and the result is still visible
 in context: check whether it covers the current diff (it may have a broader scope).
@@ -50,10 +50,10 @@ If yes, extract the relevant concerns from it — skip subagent invocation.
 
 Otherwise, invoke the `explore-diff` subagent via the `task` tool.
 
-Pass this task (adapt based on *Setup* values):
+Pass this task (adapt based on `Phase:Setup` values):
 
-> Diff source: `<git diff [--staged] -- <scope>>` (use values from *Setup*).
-> Working directory: `<working directory from Setup>`
+> Diff source: `<git diff [--staged] -- <scope>>` (use values from `Phase:Setup`).
+> Working directory: `<working directory from Phase:Setup>`
 > Purpose: commit message drafting.
 > For each concern: include label, what changed (specific), inferred intent,
 > and the representative file(s) or directory(ies) most useful as git log pathspecs
@@ -70,13 +70,14 @@ If subagent reports a `FALLBACK:` block (staged diff was empty, unstaged files f
 Read the list of files from the report.
 Ask user via `question` tool — construct the question text dynamically:
 - Mention the found files by name.
-- Option 1: "Use these unstaged changes" — re-run `explore-diff` with `git diff -- <scope>` as diff source.
+- Option 1: "Use these unstaged changes" — re-run `explore-diff`
+  with `git diff -- <scope>` as the diff source.
 - Option 2: "Abort" — stop.
 If user picks option 1: set `Diff type` to `unstaged`, retry `explore-diff` with
-`git diff -- <scope>` as diff source and the same workdir, then continue to *Step 2*.
+`git diff -- <scope>` as diff source and the same workdir, then continue to `Phase:Style`.
 If user picks option 2: stop.
 
-Use subagent summary as the sole basis for *Step 2* and *Step 3*.
+Use subagent summary as the sole basis for `Phase:Style` and `Phase:Draft`.
 
 ### Partial adds
 <!-- §partial-adds -->
@@ -89,26 +90,29 @@ It never means selecting a subset of files — that is normal whole-file staging
 The agent must never run interactive `git add -p`.
 Tell the user to stage the relevant hunks themselves (`git add -p <paths>`), then continue.
 Do not block on staging — draft the message for the intended changes in parallel.
-The staged set is verified at commit time (see *Step 4*).
+The staged set is verified at commit time (see `Phase:Commit`).
 
-## Step 2 — Detect commit style
+## 2. `Phase:Style` — detect commit style
 
 A **subsystem dir** is inferred from a concern's label + paths:
 Pick the dir naming the component:
 .. not too shallow (not repo root or containers like `src/`),
 .. not too deep (not the leaf file's parent).
-If the concern touches both code & test paths, use code path(s) only; if test-only, use test path(s).
+If the concern touches both code & test paths, use code path(s) only.
+If test-only, use test path(s).
 
 Run `git log --oneline -5` scoped to a path per the following, then inspect results:
 - **Single concern**: scope = subsystem dir.
   If empty → `git log --oneline -10` (no pathspec).
 - **2+ concerns**: scope = deepest common ancestor of all changed paths, if meaningful
   (not repo root or a broad container).
-  If no meaningful common ancestor: run `git log --oneline -5 -- <subsystem dir>` per concern; merge non-empty results.
+  If no meaningful common ancestor: run `git log --oneline -5 -- <subsystem dir>` per concern.
+  Merge non-empty results.
   If no results for common ancestor or per-concern logs → `git log --oneline -10` (no pathspec).
 
 Inspect results to derive commit prefix & style:
-- If majority follow `<type>(<maybe-topic/scope>): <subject>` (conventional commits): use that format.
+- If majority follow `<type>(<maybe-topic/scope>): <subject>` (conventional commits):
+  use that format.
 - If majority follow `<topic>(<maybe-sub-scope>): <subject>` (scoped commits): use that format.
 - Otherwise: Default to scoped commits style:
   Derive a short lowercase topic word from the concern labels or paths
@@ -118,7 +122,7 @@ Inspect results to derive commit prefix & style:
 
 For topic sub-scope (if needed), use `:` as inner separator (e.g: `hl:foo` or `skl:crafter`).
 
-## Step 3 — Write the commit message
+## 3. `Phase:Draft` — write the commit message
 
 If summary has 2+ distinct concerns, output this before the message:
 ```
@@ -133,7 +137,7 @@ WARNING: This diff mixes distinct concerns. Consider splitting into separate com
 Must complete "When applied, this commit will `<subject>`".
 72 chars max (enforced by the `check-line-width` skill, not by eye).
 Imperative mood. No trailing period.
-Use style from *Step 2*.
+Use style from `Phase:Style`.
 When identifiers appear literally in code, backtick them in the subject too (see **Formatting**).
 Capitalize the first word of the subject (after the `prefix: ` part, if any).
 
@@ -165,12 +169,22 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 **Form** — choose what fits best:
 - **Paragraph(s) only** — when a short paragraph names all concerns clearly enough on its own.
   Use when bullets would just restate what the paragraph already said.
+- **Bullets only** — when each concern maps cleanly to one line and prose glue adds nothing.
 - **Paragraph(s) + bullets** — when each concern benefits from its own line for clarity or detail.
   One bullet per semantic concern.
-- Default to paragraph(s) + bullets when unsure; the iteration step lets the user trim.
+- Default to paragraph(s) + bullets when unsure; `Phase:Iterate` lets the user trim.
+
+**Detail** — set the level from the diff, not by habit:
+- Default: terse.
+  Cut hedging, restatement, and anything the subject already says.
+- Expand only when a reader could not act on the message without the extra context
+  (a tradeoff, a non-obvious constraint, a coordination requirement).
+- State the mechanism only when it is the point of the change (a deliberate tradeoff).
+  Omit internal library choices, fallback chains, and field names otherwise.
 
 **Paragraph(s) rules**:
-- One paragraph per semantic concern. Never mix unrelated topics in a single paragraph.
+- One paragraph per semantic concern.
+  Never mix unrelated topics in a single paragraph.
   BAD: one paragraph spanning worktrees layout, config extraction, and a cache split.
   GOOD: one paragraph per concern, each standing alone.
 - A paragraph can be as simple as 1-2 lines, don't attempt to 'fill the void' with words.
@@ -180,13 +194,11 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
   mention what Z actually means in practice.
   Think: does the reader know what the result means after this sentence?
 - Express intent and tradeoff — not which artifacts were touched.
-  "Document the shell-alias subdir tradeoff, wrt…" over "Add a comment and inline notes to the file."
-- Omit file paths from paragraph prose. Paths are redundant — they are already visible in
+  "Document the shell-alias subdir tradeoff" over "Add a comment and inline notes to the file."
+- Omit file paths from paragraph prose.
+  Paths are redundant — they are already visible in
   `git show`. Only mention a path when the path itself carries meaning (e.g. a naming convention
   being established for the first time).
-- Describe *what* the result enables, not *how* it works internally.
-  Omit implementation mechanism (library choices, fallback chains, internal field names) unless
-  the mechanism is itself the point of the change — i.e. a deliberate tradeoff worth recording.
 - When listing items that follow a clear pattern, express the pattern rather than enumerating
   all members (e.g. "opencode/agents + global/project scopes" over four individual strings).
 
@@ -204,7 +216,8 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
   (variable names, command names, flags).
 - Do not backtick-quote technical terms or scope names.
 - Start each sentence on its own line — never run several sentences back-to-back on one line.
-  Sentences stay in the same paragraph; only a blank line splits paragraphs. This is a hard rule.
+  Sentences stay in the same paragraph; only a blank line splits paragraphs.
+  This is a hard rule.
   After writing the body, verify no line contains more than one sentence.
 - Fit the subject and every body line into 72 chars, use newlines as needed
   (compress text a little, should still be ~prose).
@@ -225,43 +238,69 @@ the terminal output:
 ---
 ```
 
-## Step 4 — Iterate
+## 4. `Phase:Iterate` — iterate with user
 
-After outputting the message, iterate with user, and use the `question` tool.
+After outputting the message, offer refinements via a single `question` tool call with three
+questions, in this order.
+Use these headers verbatim: `Next step`, `Refine subject`, `Refine body`.
+Derive every option from the message as written — omit any that do not apply.
 
-Always include one or both of these options based on BUILD/PLAN mode (labels to be used verbatim):
-- "✅ Looks good" — reply `Done` & stop.
-- "🚀 Use as-is and commit" — commit & stop.
-  (omit this option if in PLAN mode)
+### Question 1 — `Next step`
 
-IMPORTANT: Use these labels verbatim.
-Do NOT combine or conflate them (e.g. "Looks good — proceed to commit" is not allowed).
-They are distinct: one approves, one commits.
+Single-select.
 
-Inspect the message and derive concrete, message-specific suggestions.
-Add them as additional options in the SAME `question` tool call:
-- Always add 1–2 alternative subject options when they would be meaningfully different
-  (e.g. different framing, tighter wording, or different root-cause emphasis).
-  Label format: "Alt subject: <wording>".
-- If it has a bullet list: add structural variant option(s)
-  (e.g. "Drop the bullets, fold key points into the paragraph",
-  "Expand the X bullet with more detail")
-- If it has a paragraph: add paragraph-level change option(s)
-  (e.g. "Drop the paragraph, lead with the bullets directly",
-  "Tighten the paragraph — it's repeating the subject")
-- If the subject is near the 72 chars limit: add "Shorten subject — trim `<the verbose part>`"
-  or alternative subject wording that could fit.
-- If the body feels long: add "Shorten body — trim `<specific area>`"
-- Omit options that don't apply to the message as written
+- "✅ Looks good" — approve the message as written.
+- "🚀 Use as-is and commit" — commit the message as written.
+- "Refine & 🔎 preview" — apply the selected subject/body edits, re-output, stay in the loop.
+- "Refine & 🚀 commit" — apply the selected subject/body edits, then commit.
 
-Apply any requested change and re-output.
-Repeat until user says 'looks good' / 'use as-is' or equivalent.
+Omit the two commit options in PLAN mode.
+Use these labels verbatim — do not combine or conflate them.
 
-If user picks "🚀 Use as-is and commit":
+### Question 2 — `Refine subject`
+
+Multiselect.
+
+- "Keep subject as-is" — no subject change.
+- Subject variants — 1+ alternative wordings when meaningfully different
+  (different framing, tighter wording, different root-cause emphasis).
+  Label: "Alt subject: <wording>".
+- Prefix variants — when the commit type/prefix is uncertain, offer 1+ alternatives.
+  Label: "Prefix: <current> → <alternative>".
+- Adjusters — up to 1-3 options to mention or remove something.
+  Label: "Mention <X>" / "Remove <X>".
+
+### Question 3 — `Refine body`
+
+Multiselect.
+
+- "Keep body as-is" — no body change.
+- Form options — when the body's shape could differ
+  (e.g. "Bullets only", "Paragraph(s) only", "Drop the bullets, fold into the paragraph").
+- Detail options — "Terser", "More detailed", "Less impl details".
+- Adjusters — up to 1-3 options to drop, expand, or re-emphasize a part.
+  Label: "Expand <X>" / "Drop <X>".
+
+### Apply the result
+
+Only one pick per category makes sense (one subject, one prefix, one form).
+If the user picks more than one per category, ask which to apply.
+
+Variant/adjuster picks override "keep as-is".
+
+- "✅ Looks good": stop.
+- "🚀 Use as-is and commit": go to `Phase:Commit`.
+- "⚙️ Refine & preview 🔎": apply the selected edits, re-output, repeat `Phase:Iterate`.
+- "⚙️ Refine & commit 🚀": apply the selected edits, then go to `Phase:Commit`.
+
+Edits selected alongside "✅ Looks good" → treat as "⚙️ Refine & preview 🔎".
+Edits selected alongside "🚀 Use as-is and commit" → treat as "⚙️ Refine & commit 🚀".
+
+## 5. `Phase:Commit` — stage, verify, and commit
 
 **Stage** per diff-type:
 - diff-type **staged**: do not run `git add`.
-  The staged content is the contract established in Step 1 — commit it as-is.
+  The staged content is the contract established in `Phase:Analyse` — commit it as-is.
 - diff-type **unstaged**: list the exact file set in a `question` call and require an explicit
   yes before `git add`.
   A commit approval ("use as-is and commit", "ok; commit", …) never implies staging approval —
@@ -285,5 +324,5 @@ git commit -F - <<'EOF'
 EOF
 ```
 
-Do NOT run `git commit` before reaching this step — never commit speculatively without user approval
-for THIS commit.
+Do NOT run `git commit` before reaching this phase — never commit speculatively
+without user approval for THIS commit.
