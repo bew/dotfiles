@@ -1,0 +1,15 @@
+Variant type: noninteractive
+
+Additional constraints:
+- Derived from `write-spec`: reuses its spec structure, section order, prose rules,
+  open-questions format, alternatives conventions, and readiness criteria 1–6
+  (criterion 7 is always deferred).
+- No interactive loop: no phase gates; the full pass runs without pausing.
+- All mid-pass questions are batched into a `## Questions for you` block at the end.
+- Conflicting or ambiguous design signals surface in the deferred questions,
+  never resolved silently.
+- Path model simplified to `<slug>/SPEC.md` (no `$basedir`/`$specdir`/`$specpath`).
+- Spec lifecycle is `DRAFT` only; `READY`/`ABANDONED` are set manually by the user
+  (promotion/rename script dropped; `MAYBE-READY` unused).
+- Supports Create and Update modes.
+- Keeps `refs/` — progressive disclosure retained, not a standalone export.

@@ -1,0 +1,4 @@
+Variant type: standalone
+
+Additional constraints:
+- Derived from `write-spec-noninteractive`, not `write-spec`.
