@@ -46,7 +46,7 @@ Scan the available session material for content to include in the handoff.
 4. **Open threads**: unresolved work not captured elsewhere.
 5. **Open questions**: decisions surfaced but not settled.
 6. **Skills and tools referenced**: names the continuation may need.
-   List what you can identify; flag that tool-less generation may have missed some.
+   List what you can identify.
 
 If Focus was given: weight surfacing toward that area.
 Do not exclude blockers or prerequisites from other areas.
@@ -66,7 +66,8 @@ Structure the doc per *Handoff doc structure* below.
 
 The handoff doc must contain the following sections in order.
 Open with the Tool-access notice.
-Omit a section only if genuinely not applicable — state why.
+Omit any section that has no qualifying content — do not keep an empty heading
+or write filler (e.g. "none", "N/A", "nothing to report").
 In the output doc these are top-level `##` headings.
 
 ### Tool-access notice
@@ -109,11 +110,10 @@ Omit items used in this session but not needed for what remains.
 
 ### Key artefacts
 
-Artefacts directly relevant to what remains:
+Artefacts the continuation agent must open or act on:
 local/remote files, reference URLs, docs, specs, issues, PRs.
-
 One-line description per entry, with a locator (path or URL) where known.
-Omit artefacts the continuation agent won't need.
+Never restate information already covered in another section.
 
 ### Optional sections
 
@@ -133,4 +133,11 @@ Include only if applicable.
   Do not assume the reader is an agent.
 - Prefer writing to a local file when a file tool is available;
   emit inline only when it is not.
+- Never include meta-commentary about the handoff doc itself
+  (e.g. "no other files were referenced", "findings are consolidated above",
+  "this section does not apply"). State content, not commentary about the doc.
+- Never reference the skill or template that produced this handoff
+  (e.g. the `handoff` / `handoff-standalone` `SKILL.md`, or the doc-structure template)
+  merely as tooling. If that skill is itself the subject of the work,
+  reference it as content in the relevant section.
 - Write terse — cut words without losing signal.

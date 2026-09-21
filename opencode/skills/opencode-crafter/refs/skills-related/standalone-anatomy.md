@@ -18,7 +18,9 @@ to trigger at runtime — paste it into a foreign tool manually.
   subagents, `skill` tool, `question` tool.
 - No interactive loop: phase gates and mid-pass checkpoints removed.
   Phase names are kept — they are conceptual, not OC-specific.
-- Output is inline (fenced block) — never "write to `<path>`".
+- Output is inline (fenced block) by default — never "write to `<path>`".
+  A variant may declare an opportunistic file-write in `Additional constraints`
+  when the base's deliverable is a file; state the exception explicitly there.
 - No companion command.
 - No scripts: if the base has `scripts/`, refuse and ask the user how to proceed.
 
@@ -109,7 +111,7 @@ Source: `<base-name>` at `<base-parent>/`.
 - No OC tool names, git, filesystem paths/folders, subagents.
 - No phase gates or mid-pass checkpoints.
 - No dangling `./refs/` or `§slug` references.
-- Output instructions are inline-output style.
+- Output instructions are inline-output style, or a declared exception in `VARIANT`.
 - `name` matches directory name and equals `<base-name>-standalone`.
 - `README.md` present with a source pointer.
 - `VARIANT` file present, starting with `Variant type: standalone`.

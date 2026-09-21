@@ -5,5 +5,5 @@ Additional constraints:
 - Handoff doc opens with a tool-access notice instructing the reader to suggest skills
   and tools and to ask the user.
 - `$date` taken from context when available, else omitted (`HANDOFF-$slug.md` fallback).
-- Writes the handoff to a local file when a file tool is available,
-  else emits it inline.
+- Declared exception to the inline-output default: writes the handoff to a local file
+  when a file tool is available, else emits it inline.

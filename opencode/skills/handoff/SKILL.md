@@ -99,4 +99,11 @@ Do not output the doc content inline.
 - On filename collision, adapt the filename rather than overwriting.
 - Run commands to get missing information (date, existing HANDOFF list)
   in one tool call, not multiple.
+- Never include meta-commentary about the handoff doc itself
+  (e.g. "no other files were referenced", "findings are consolidated above",
+  "this section does not apply"). State content, not commentary about the doc.
+- Never reference the skill or template that produced this handoff
+  (e.g. the `handoff` / `handoff-standalone` `SKILL.md`, its `refs/template.md`)
+  merely as tooling. If that skill is itself the subject of the work,
+  reference it as content in the relevant section.
 - Use caveman mode when writing the handoff doc to reduce words without losing signal.

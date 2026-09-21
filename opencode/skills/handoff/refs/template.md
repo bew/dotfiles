@@ -1,7 +1,8 @@
 # Handoff Doc Template
 
 The handoff doc must contain the following sections in order.
-Omit a section only if genuinely not applicable — state why.
+Omit any section that has no qualifying content — do not keep an empty heading
+or write filler (e.g. "none", "N/A", "nothing to report").
 
 ---
 
@@ -40,10 +41,10 @@ Omit skills used in this session but not needed for what remains.
 
 ## Key artefacts
 
-Artefacts directly relevant to what remains: local/remote files, reference URLs,
-docs, specs, issues, PRs, etc.
+Artefacts the continuation agent must open or act on:
+local/remote files, reference URLs, docs, specs, issues, PRs, etc.
 One-line description per entry, with a locator (path or URL) where known.
-Omit artefacts the continuation agent won't need.
+Never restate information already covered in another section.
 
 ---
 
