@@ -1,10 +1,12 @@
 ---
-description: Stage the files related to the task just finished, then draft a commit message. Optional hint narrows the scope.
+description: Draft a commit for the task just finished, scoped to its files. Optional hint narrows the scope.
 subtask: false # shared context!
 ---
 
-Stage only the files related to the task we just finished (`git add` those specific paths).
-Then draft a commit message.
+FIRST: Load the `committer` skill and follow its instructions.
+
+- Scope: the files changed by the task we just finished, inferred from this session.
+- Diff type: unstaged
 
 ## User context
 
