@@ -3,7 +3,7 @@
 A skill variant is a skill derived from a base skill, living as a sibling directory
 named `<base-name>-<suffix>` (see <./anatomy.md§skill-variants>).
 
-A variant carries two companion files:
+A variant carries companion files:
 - `VARIANT` — declares its type and constraints (format below).
 - `README.md` — explains the diff from the base skill to human readers.
 
@@ -12,9 +12,25 @@ every sibling dir matching `<base-name>-*`.
 
 ## `VARIANT` file
 
-- Known variant type: the file contains only the type token, e.g. `standalone`.
-  Its constraints are looked up from the type spec.
-- Unknown variant type: the file lists the variant's constraints, one per line.
+Format:
+```
+Variant type: <type>
+
+Additional constraints:
+- <constraint additional to the variant type spec>
+```
+
+No extra constraints:
+```
+Variant type: <type>
+
+Additional constraints: (none)
+```
+
+- Header: `Variant type: <type>` — names the variant type, e.g. `standalone`.
+- Constraints block: `Additional constraints:` then bullets, each additional to the
+  variant type spec.
+- Unknown type: no type spec exists — list every constraint the variant must follow.
 
 Read the `VARIANT` file during propagation to learn how to update that variant.
 

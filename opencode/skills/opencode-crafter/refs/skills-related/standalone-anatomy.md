@@ -53,7 +53,8 @@ metadata:
 4. Strip OC mechanics per the transform table below.
 5. Inline any `§slug` cross-refs; ensure no dangling references remain.
 6. Keep phase names and section structure — do not flatten phases.
-7. Adapt `description`; write `README.md` and `VARIANT` (containing `standalone`).
+7. Adapt `description`; write `README.md` and `VARIANT` (`Variant type: standalone`
+   plus an `Additional constraints:` block, additional to this variant type spec).
 
 ## Transform table
 
@@ -97,7 +98,7 @@ Source: `<base-name>` at `<base-parent>/`.
 | | `<base-name>` | `<base-name>-standalone` |
 |---|---|---|
 | File structure | `SKILL.md` + resources | Single `SKILL.md` |
-| Variant marker | none | `VARIANT` (`standalone`) |
+| Variant marker | none | `VARIANT` (`Variant type: standalone`) |
 | Progressive disclosure | Loads refs on demand | All content inline |
 | Interactive loop | Phase gates | None |
 ```
@@ -111,4 +112,4 @@ Source: `<base-name>` at `<base-parent>/`.
 - Output instructions are inline-output style.
 - `name` matches directory name and equals `<base-name>-standalone`.
 - `README.md` present with a source pointer.
-- `VARIANT` file present, containing `standalone`.
+- `VARIANT` file present, starting with `Variant type: standalone`.
