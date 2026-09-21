@@ -130,6 +130,9 @@ All extend the rules below.
 - Prefer `parse_*` for argument/input parsing.
 - When designing an API, prefer named/structured arguments over a long positional list —
   named args are self-documenting and remove call-site ambiguity.
+- When writing or extracting a helper function, design it for reuse by default.
+  Make its boundary general rather than shaped to the current call site.
+  If a reusable shape is too complex or the boundary is unclear, ask the user before guessing.
 - Section separators may be used when file has 5+ functions/structs/enums.
   Usually not needed for smaller files.
   Format: (example for language with '//' prefix for comments)
