@@ -65,7 +65,7 @@ def usage_and_exit(status: int) -> None:
 def main() -> bool:
     args = parse_args()
     ...
-    # [call helpers / match args.command]
+    # [call helpers / match args.subcmd]
     ...
     return True
 
@@ -85,15 +85,30 @@ if __name__ == "__main__":
   (Never use `parse_known_args()` as a workaround for subcommand arguments)
 - Each subcommand must dispatch to a dedicated `cmd_<name>()` function.
   Never inline subcommand logic in the dispatch block.
+- Configure subparsers with `add_subparsers(dest="subcmd", required=True, title="subcmd",
+  metavar="<subcmd>")`.
+  `title` gives the subcommands their own labeled help section instead of the generic
+  "positional arguments" heading, and `metavar` replaces the expanded `{a,b}` list in the usage
+  line with a clean token.
+  Give each `add_parser(...)` a `help="…"` for the listing line and a `description="…"` for its
+  own `-h`.
 
 ```python
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
 
-    sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("refresh")
+    sub = parser.add_subparsers(dest="subcmd", required=True, title="subcmd", metavar="<subcmd>")
+    sub.add_parser(
+        "refresh",
+        help="refresh the cache",
+        description="Refresh the cache.",
+    )
 
-    hook_cmd = sub.add_parser("hook")
+    hook_cmd = sub.add_parser(
+        "hook",
+        help="emit the shell hook",
+        description="Emit the shell hook for the given language.",
+    )
     hook_cmd.add_argument("lang", choices=["zsh"], help="shell language")
 
     return parser.parse_args()
@@ -110,13 +125,13 @@ def cmd_hook(args: argparse.Namespace) -> None:
 def main() -> bool:
     args = parse_args()
     ...
-    match args.command:
+    match args.subcmd:
         case "refresh":
             cmd_refresh()
         case "hook":
             cmd_hook(args)
         case _:
-            raise ScriptError(f"Unknown command: {args.command}")
+            raise ScriptError(f"Unknown subcommand: {args.subcmd}")
     ...
     return True
 ```
