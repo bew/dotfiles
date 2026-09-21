@@ -60,6 +60,9 @@ In general: trust the user for git commands even if they look odd.
 
 NEVER `git add` or commit files matching `HANDOFF-*` — handoff artefacts must never be git-tracked.
 
+Committing a task's finished work counts as the user signalling `done` —
+treat it as explicit confirmation for any skill that waits on that signal.
+
 
 ## Token efficiency
 
