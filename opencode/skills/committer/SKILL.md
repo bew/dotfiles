@@ -37,9 +37,10 @@ Focus: <free-text, or "(none)">
 
 ## Step 1 — Analyse diff via `explore-diff`
 
-IMPORTANT: Never run `git diff` or `git diff --cached` directly — not even to inspect
-the diff before routing to `explore-diff`.
+IMPORTANT: Never run `git diff` or `git diff --cached` directly for diff analysis —
+not even to inspect the diff before routing to `explore-diff`.
 Raw bash diff output in context does not substitute for an `explore-diff` result.
+Exception: the staged-only `git diff --cached --stat` check at commit time (see *Step 4*).
 
 If `explore-diff` was already invoked in the last few messages and the result is still visible
 in context: check whether it covers the current diff (it may have a broader scope).
@@ -73,6 +74,19 @@ If user picks option 1: retry `explore-diff` with `git diff -- <scope>` as diff 
 If user picks option 2: stop.
 
 Use subagent summary as the sole basis for *Step 2* and *Step 3*.
+
+### Partial adds
+<!-- §partial-adds -->
+
+A **partial add** stages only part of a file's changes, leaving the rest unstaged.
+
+Use it when a file must be committed with only some of its changes staged.
+It never means selecting a subset of files — that is normal whole-file staging.
+
+The agent must never run interactive `git add -p`.
+Tell the user to stage the relevant hunks themselves (`git add -p <paths>`), then continue.
+Do not block on staging — draft the message for the intended changes in parallel.
+The staged set is verified at commit time (see *Step 4*).
 
 ## Step 2 — Detect commit style
 
@@ -241,19 +255,29 @@ Apply any requested change and re-output.
 Repeat until user says 'looks good' / 'use as-is' or equivalent.
 
 If user picks "🚀 Use as-is and commit":
-- When diff-type is **staged**: run the commit directly via the multiline heredoc form:
-  ```sh
-  git commit -F - <<'EOF'
-  <subject line>
 
-  <body if any>
-  EOF
-  ```
-  Do NOT inspect unstaged changes, do NOT run `git diff`, do NOT `git add` anything.
+**Stage** per diff-type:
+- diff-type **staged**: do not run `git add`.
   The staged content is the contract established in Step 1 — commit it as-is.
-- When diff-type is **unstaged**: ask via `question` tool which files to stage (list them),
-  wait for confirmation, `git add` only the confirmed files, then run the same
-  multiline heredoc commit form above.
+- diff-type **unstaged**: ask via `question` tool which (set of) files to stage (list them),
+  wait for confirmation, `git add` only the confirmed files.
+  If some files need hunk-level _partial_ add: do NOT `git add` — follow <§partial-adds>.
+
+**Verify staged set** — always run `git diff --cached --stat` before committing.
+Inspect staged content only; never inspect unstaged changes.
+- Staged set matches the message intent: continue below.
+- Mismatch (missing hunks, extra changes): abort, report the mismatch, ask the user to fix staging.
+  Do not commit.
+  After the user fixes staging: re-run `git diff --cached --stat` and re-check before committing.
+
+**Commit** via the multiline heredoc form:
+```sh
+git commit -F - <<'EOF'
+<subject line>
+
+<body if any>
+EOF
+```
 
 Do NOT run `git commit` before reaching this step — never commit speculatively without user approval
 for THIS commit.
