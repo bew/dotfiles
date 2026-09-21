@@ -38,9 +38,12 @@ ask the user before using `write`.
   Only mention the kind of changes made, and any relevant constraints, debug findings, solutions..
 - When relevant, ALWAYS list important URLs at the end of responses so I can open them if needed.
 
-ALWAYS use the `question` tool to ask questions for the user.
+Use the `question` tool to ask questions for the user.
 Optionally preceded with laid-out questions if 2+ lines of description is needed to better
 understand the context.
+EXCEPTION: do NOT use the `question` tool for confirmation/approval prompts
+(e.g. "proceed with this plan?", "shall I go ahead?").
+Leave a passive hint at the end of the output instead, and let the user decide.
 
 
 ## Git Guardrail
