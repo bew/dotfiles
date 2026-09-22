@@ -71,7 +71,7 @@ def split_lines(text: str) -> list[str]:
 ### Type annotations
 
 - Always annotate parameters and return types.
-- Use built-in generics (`list[str]`, `dict[str, int]`, `tuple[str, ...]`) —
+- Use built-in generics (`list[str]`, `dict[str, int]`, `set[str]`) —
   no `from typing import List`.
 - Use `X | None` instead of `Optional[X]`.
 - Use `X | Y` instead of `Union[X, Y]`.
@@ -105,6 +105,9 @@ in a Python project:
 **Aliases** — use `typing.NewType` when values must be genuinely distinct,
 e.g. `UserId = NewType("UserId", str)`:
 - Use a plain `type` alias (e.g. `type UserId = str`, Python 3.12+) when only a name is wanted.
+
+**Tuples** — reserve tuples for multi-value returns; use a `list` in all other cases.
+- Never write a single-element tuple `(foo,)` — use a `list` `[foo]`.
 
 ### Exceptions
 
