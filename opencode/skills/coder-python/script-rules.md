@@ -10,17 +10,17 @@ These extend the generic script rules. All generic script rules still apply.
 - No top-level imperative code outside the `if __name__ == "__main__":` block.
   Top-level code is: imports, constants, class/function definitions, and the entrypoint guard.
 - Define helper functions above `main`, never below it.
-  Keep the order: helpers, then `main`.
+  Keep the order: helpers, then `main`, then `cli_main`.
 
 ## Error handling
 
 - Define a `ScriptError(Exception)` class at the top of the script, right after imports/constants.
 - Raise `ScriptError` (or a subclass) from any function that hits an error the script should report.
 - `main()` returns `bool` — `True` on success, `False` on failure.
-  Exit via `sys.exit(0 if main() else 1)`.
-- In `main`, wrap the dispatch in `try`/`except ScriptError` (plus any distinct concrete
+- `cli_main()` wraps the call to `main` in `try`/`except ScriptError` (plus any distinct concrete
   exceptions the handlers raise, e.g. `OSError`, `json.JSONDecodeError`); on catch, print to
-  stderr and return `False`.
+  stderr and return `1`.
+  Both entry paths exit via `sys.exit(cli_main())`.
 - The `try` body must never raise a type outside the caught set — e.g. raise `ScriptError`
   for unknown commands rather than `ValueError`.
 
@@ -72,13 +72,38 @@ def main() -> bool:
     return True
 
 
-if __name__ == "__main__":
+def cli_main() -> int:
+    """Console-script entry point; return the process exit status."""
     try:
-        sys.exit(0 if main() else 1)
+        return 0 if main() else 1
     except ScriptError as exc:
         print_err(f"!! ERROR: {exc}")
-        sys.exit(1)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(cli_main())
 ```
+
+## Console-script entry points
+
+- When the script is exposed as a `[project.scripts]` entry point, that entry point must return
+  an `int` exit code: setuptools' generated wrapper calls `sys.exit(entry_point())`.
+  Pointing it at `main()` (which returns `bool`) inverts the codes — `True` becomes exit 1.
+- Define `cli_main() -> int` returning `0 if main() else 1`, and point the entry point at it:
+- Name the module defining the entry point `cli_<tool>.py`, and place it in the `cli` package
+  (`src/cli/cli_<tool>.py`) — never in the shared library package.
+  Point the entry point at `cli.cli_<tool>:cli_main`.
+
+```toml
+[project.scripts]
+my-script = "cli.cli_my_script:cli_main"
+```
+
+- Reuse `cli_main` in the direct-execution guard (`sys.exit(cli_main())`) so both paths exit
+  identically.
+- `cli_main` owns the `ScriptError` handling: the console-script wrapper bypasses the
+  `if __name__ == "__main__"` guard, so error handling must not live there.
 
 ## CLI subcommand parsing
 
