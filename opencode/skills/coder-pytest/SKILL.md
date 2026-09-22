@@ -41,6 +41,12 @@ Run tests actively during development — after each meaningful change, not as a
   (e.g. `test_can_be_used_as_dict_key`).
 - No section-comment dividers (`# ---`) inside test files.
 
+### Docstrings
+
+- Give the test file a module-level docstring describing what it covers.
+  Test files are exempt from the module-code rule against top-level docstrings.
+- Give every test function and fixture a one-line docstring stating the behaviour it covers.
+
 ### Fixtures
 
 - Always annotate fixture return types.
@@ -85,9 +91,11 @@ Run tests actively during development — after each meaningful change, not as a
 # Good
 @pytest.fixture
 def sample_config() -> dict[str, str]:
+    """Provide a minimal test config."""
     return {"env": "test"}
 
 def test_loads_config(sample_config: dict[str, str]) -> None:
+    """Load config from a sample dict and expose its env."""
     result = load_config(sample_config)
     assert result["env"] == "test"
 
