@@ -19,6 +19,8 @@ They are module code — read <./module-rules.md> instead.
 - Always add a top-level comment at the start of a script entrypoint file: short description of what it does,
   optionally how to use it (keep to 1-2 lines), and links to inspiration or upstream sources if any.
 - Always split code into functions — no top-level logic outside `main`.
+- Define helper functions above `main`, never below it.
+  `main` is the last function defined before an eventual entrypoint call.
 - Always provide an entry point: call `main` at the end of the file, forwarding all args.
 - Always exit with error message to stderr and an error status code (usually `1`).
   Never let scripts silently succeed on failure.

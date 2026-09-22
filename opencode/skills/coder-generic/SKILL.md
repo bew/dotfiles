@@ -51,6 +51,12 @@ All extend the rules below.
 - Never install or declare a package, or silently substitute a stdlib/hand-rolled alternative for a
   recommended package, without asking the user first.
 
+## Code layout
+
+- When a function signature does not fit the line width, put each parameter on its own line,
+  with a trailing comma after the last one.
+  Never pack multiple parameters onto a wrapped line.
+
 ## Types
 
 **Naming**

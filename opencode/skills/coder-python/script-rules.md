@@ -9,6 +9,8 @@ These extend the generic script rules. All generic script rules still apply.
 - Use `if __name__ == "__main__":` as the entrypoint guard.
 - No top-level imperative code outside the `if __name__ == "__main__":` block.
   Top-level code is: imports, constants, class/function definitions, and the entrypoint guard.
+- Define helper functions above `main`, never below it.
+  Keep the order: helpers, then `main`.
 
 ## Error handling
 

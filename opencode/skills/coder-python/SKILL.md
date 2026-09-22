@@ -135,6 +135,21 @@ except Exception as exc:
   an f-string would be mutilated by the braces.
 - Interpolation targets must be `str` — wrap non-str values explicitly with `str(...)`.
 
+### Code layout
+
+- Wrap an over-long function signature one parameter per line, with a trailing comma after the
+  last parameter:
+
+  ```python
+  def test_ask_yes_no_returns_answer(
+      monkeypatch: pytest.MonkeyPatch,
+      default: bool,
+      answer: str,
+      expected: bool,
+  ) -> None:
+      ...
+  ```
+
 ## Dependencies
 
 - This skill recommends **pydantic** for Python projects.
