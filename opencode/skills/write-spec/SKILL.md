@@ -18,11 +18,12 @@ capturing design decisions, interface shape, invariants, and open questions.
 
 ## Phases
 
-Three phases, always in order:
+Phases, in order (`Explore` is optional):
 
 1. `Phase:Discover` — gather inputs; establish `$basedir`, `$specdir`, `$specpath`
-2. `Phase:Draft` — confirm section structure; write spec; fill sections iteratively
-3. `Phase:Review` — in-context review; assess readiness; optionally promote to `_SPECS/`
+2. `Phase:Explore` _(if design uncertain)_ — delegate to the `design-exploration` skill
+3. `Phase:Draft` — confirm section structure; write spec; fill sections iteratively
+4. `Phase:Review` — in-context review; assess readiness; optionally promote to `_SPECS/`
 
 **Paths used throughout:**
 
@@ -52,10 +53,18 @@ Whether anything is later folded into the spec is the user's explicit call.
 
 When entering `Phase:Discover`: read <./refs/phases/discover.md> for full instructions.
 
-## 2. `Phase:Draft` — Write skeleton; fill sections iteratively
+## 2. `Phase:Explore` — Delegate deep design maturation _(if design uncertain)_
+
+Optional phase. Delegate deep, pre-spec design maturation to the `design-exploration` skill.
+Enter when the design is genuinely uncertain — competing models, an undefined central concept.
+Skip straight to `Phase:Draft` when the design is settled enough to choose a section skeleton.
+
+When entering `Phase:Explore`: read <./refs/phases/explore.md> for full instructions.
+
+## 3. `Phase:Draft` — Write skeleton; fill sections iteratively
 
 When entering `Phase:Draft`: read <./refs/phases/draft.md> for full instructions.
 
-## 3. `Phase:Review` — In-context review pass
+## 4. `Phase:Review` — In-context review pass
 
 When entering `Phase:Review`: read <./refs/phases/review.md> for full instructions.

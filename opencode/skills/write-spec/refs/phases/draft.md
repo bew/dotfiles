@@ -4,6 +4,15 @@ Write the spec to `$specpath`, filling sections iteratively.
 Read <../spec-structure.md> for section order and Open Questions format.
 Read <../writing-guidelines.md> for prose style, Interface / How to use conventions, and naming discipline.
 
+## Exploration companion
+
+`EXPLORATION-BRIEF.md` and `EXPLORATION-<topic>.md` files may exist in `$specdir`
+(see `Phase:Explore`).
+If exploration files live elsewhere (e.g. `_WIP_EXPLORATIONS/<slug>/`),
+move them into `$specdir` before drafting.
+Read them before drafting — settled `Decisions` feed the spec, `Open threads` seed Open Questions.
+Do not duplicate exploration prose into the spec; the spec is authoritative once it exists.
+
 ## Initial Skeleton
 
 Before writing anything: list the sections that will be created
@@ -173,6 +182,8 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - Ask: *"This looks like new scope — do a quick discover loop before writing it in?"*
 - Do not silently absorb new inputs into spec content.
 - If user confirms: return to `Phase:Discover` for the new scope, then resume `Phase:Draft`.
+- If the new scope is a deep design fork rather than a spec-input gap,
+  offer re-entry to `Phase:Explore` (re-entrant mode) instead.
 
 ## Rules
 

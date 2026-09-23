@@ -21,6 +21,22 @@ rather than asking each one explicitly.
 Once all required inputs are answered or waived, proactively move to path derivation
 and signal readiness to draft — do not keep asking follow-up questions.
 
+## Next phase
+
+Always present both options to the user at the end of `Discover`:
+
+- `Phase:Explore` — deep design maturation via the `design-exploration` skill.
+- `Phase:Draft` — go straight to the spec skeleton.
+
+Recommend one, with a one-line reason:
+
+- Design genuinely uncertain (competing models, undefined central concept) → recommend `Explore`;
+  a skeleton now would lock structure before the crux is resolved.
+- Design settled enough to pick a section skeleton → recommend `Draft`;
+  exploration adds a loop without changing the structure.
+
+Recommend, but let the user choose.
+
 ## Path derivation
 
 Once inputs are confirmed:
@@ -43,4 +59,4 @@ Promotion to `_SPECS/` happens later, at the end of `Phase:Review`.
 If the spec's name or slug needs to change later (name was temporary, concept was renamed, etc.):
 Read <../rename.md> for steps — it handles git-tracked and plain directories via a script.
 
-Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
+Ready to move to `Phase:Explore` or `Phase:Draft`? (say 'next' or similar to proceed)

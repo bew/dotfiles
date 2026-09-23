@@ -9,13 +9,20 @@ Related artifacts (examples, experiments, reference impls, external links) go ne
 
 ```
 $basedir/
-└── <slug>/              ← $specdir
-    ├── SPEC.md          ← $specpath — the spec
-    ├── <related-file>   ← any companion files, no nesting required
-    └── <sub-dir>/       ← sub-directories if grouping is useful
+└── <slug>/                    ← $specdir
+    ├── SPEC.md                ← $specpath — the spec
+    ├── EXPLORATION-BRIEF.md   ← hub: exploration motivation + topic index
+    ├── EXPLORATION-<topic>.md ← one per exploration topic
+    ├── <related-file>         ← any companion files, no nesting required
+    └── <sub-dir>/             ← sub-directories if grouping is useful
 ```
 
 Everything lives alongside `SPEC.md` — no separate subdirectory convention.
+
+Exploration files are pre-spec design material (see `Phase:Explore`).
+A topic freezes in the hub once folded into `SPEC.md`; re-entry may revive it,
+or start a new topic file when the direction is completely different.
+`SPEC.md` is authoritative once it exists.
 
 ## Section order
 
