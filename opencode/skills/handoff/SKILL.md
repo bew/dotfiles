@@ -3,10 +3,16 @@ name: handoff
 description: |
   Produces a structured handoff document from the current session
   so another agent or human can continue the work.
+  Defers context compression until the handoff doc is written.
   Not for direct use — invoked via command only.
 metadata:
   maintainers: [bew]
 ---
+
+IMPORTANT: Do not invoke `compress` while producing this handoff.
+If a context compression is due, write the handoff doc first, then compress.
+Keep compression blocked even when the PLAN-mode guard halts the write —
+release it only once the handoff doc has actually been written.
 
 ## Setup — resolve inputs
 
@@ -63,6 +69,10 @@ Do not exclude blockers or prerequisites from other areas.
 
 ## Step 2 — Write
 
+NOTE: If the session is in PLAN mode: stop immediately.
+Output: "Cannot write the handoff doc in PLAN mode — switch to BUILD mode first, then re-run."
+Do not proceed until the user has switched modes and re-requested.
+
 If `$filename` already exists: adapt the filename (e.g. append a numeric suffix)
 so nothing is overwritten.
 
@@ -80,6 +90,8 @@ Do not output the doc content inline.
 
 ## Rules
 
+- Always write the handoff doc with the `write` tool.
+  Never output the handoff content inline in the conversation.
 - Do not inline file contents — reference by path only.
 - Only reference URLs that were confirmed in the session
   (appeared in user messages or tool results).
