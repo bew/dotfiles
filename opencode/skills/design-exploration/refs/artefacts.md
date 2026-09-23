@@ -1,8 +1,14 @@
 # Exploration Artefacts
 
-The explorations dir holds a hub brief and one file per topic.
+Exploration starts in a mode resolved at `Phase:Setup`.
 
-## `EXPLORATION-BRIEF.md`
+## Modes
+
+- `dedicated` — a dedicated dir holding a brief hub plus one `EXPLORATION-<topic>.md`
+  per topic; used when a caller supplies a dir or several topics are expected.
+- `adhoc` — no brief; `EXPLORATION-<topic>.md` files live in the working dir.
+
+## `EXPLORATION-BRIEF.md` (`dedicated` only)
 
 ```md
 # <$name> — exploration brief
@@ -47,9 +53,25 @@ Each topic's file is `EXPLORATION-<topic>.md`.
 - <unresolved question>
 ```
 
+In `adhoc` mode the same sections apply, with these changes: a `## Motivation`
+section leads each file, and the file's status lives in the H1 tag:
+```md
+# <topic> — [active]
+
+## Motivation
+
+<context, problem, scope — derived from the user's instructions>
+
+## Findings
+
+...
+```
+
 ## Status vocabularies
 
-Topic status (recorded in the brief index only, as `(<status>)`):
+Topic status:
+- `dedicated` — recorded in the brief index as `(<status>)`.
+- `adhoc` — recorded in the file's H1 as `# <topic> — [<status>]`.
 - `active` — currently being explored.
 - `frozen` — settled; no further exploration expected.
 - `revived` — previously frozen, reopened for more exploration.
@@ -64,4 +86,5 @@ Decision status (topic `Decisions`):
 - `superseded` — replaced by a later decision.
 - `reversed` — explicitly undone.
 
-Never rename a topic file or add an in-file freeze marker; status lives in the brief index only.
+Never rename a topic file. In `dedicated` mode status lives only in the brief index;
+in `adhoc` mode it lives only in the H1 tag.
