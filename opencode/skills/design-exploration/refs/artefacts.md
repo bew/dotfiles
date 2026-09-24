@@ -42,16 +42,32 @@ Each topic's file is `EXPLORATION-<topic>.md`.
 
 ## Candidate directions
 
-- **<candidate>** — <one-line sketch>. _(active)_
+- (active) **<candidate>** — <short gist>
+- (deferred) **<candidate>** — <short gist>; expanded below
+
+### <candidate>
+
+<free-form expansion: rationale, tradeoffs, sub-variants — as long as needed>
 
 ## Decisions
 
-- **<decision>** — <what and why>. _(settled)_
+- (settled) **<decision>** — <short gist>
+
+### <decision>
+
+<free-form expansion — as long as needed>
 
 ## Open threads
 
 - <unresolved question>
 ```
+
+The bullet list under `Candidate directions` / `Decisions` is the canonical index:
+one bullet per item, status leading, short gist.
+An item may be expanded into a `### <item>` subsection placed after the list —
+the bullet stays, and the expansion may run to any length the item needs.
+Only add an expansion when the user asks for it, or when a few rounds were spent
+exploring that item and the detail is worth preserving.
 
 In `adhoc` mode the same sections apply, with these changes: a `## Motivation`
 section leads each file, and the file's status lives in the H1 tag:
@@ -79,7 +95,7 @@ Topic status:
 Candidate direction status (topic `Candidate directions`):
 - `active` — still on the table; being pursued.
 - `deferred` — weighed but no verdict yet; parked for later.
-- `rejected` — dropped; append a one-line reason.
+- `rejected` — dropped; give the reason in the bullet gist (expand below if needed).
 
 Decision status (topic `Decisions`):
 - `settled` — current, agreed.
