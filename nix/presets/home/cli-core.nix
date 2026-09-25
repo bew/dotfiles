@@ -30,7 +30,6 @@ in {
     cliPkgs.fzf
     stable.bat
     stable.fd
-    stable.trashy
     stable.jq
     stable.yq
     stable.sd # nicer sed for ~simple search/replace
@@ -41,20 +40,21 @@ in {
 
     stable.less
 
+    stable.bats # Bash-based testing tool, useful everywhere
+
     stable.yazi
     stable.ncdu
     stable.htop
     stable.tealdeer # tldr, examples for many programs (offline once DB cached)
 
-    stable.entr
-    stable.tokei
+    stable.entr # Run arbitrary commands when files change
+    stable.tokei # Count your code, quickly.
 
     stable.units # gnu's unit converter, has MANY units (https://www.gnu.org/software/units/)
     # Best alias: units -1 --compact FROM-UNIT TO-UNIT
 
     # network tools
     (mypkglib.linkBins "doggo-as-dig" { dig = "${stable.doggo}/bin/doggo"; }) # nicer `dig`
-    stable.netcat-openbsd # for `nc`
     stable.xh # httpie but fasterrr
     bleedingedge.resterm # nice TUI REST HTTP client
   ];

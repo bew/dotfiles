@@ -7,15 +7,15 @@ in {
     # Setup minimal bash config to proxy to zsh when SHLVL==1 and interactive
     ../../../cli-others/bash_minimal/proxy_to_zsh.home-module.nix
 
-    ./cli-core.nix
+    ../../presets/home/cli-core.nix
     ../../presets/home/nix-tools.nix
-    ./cli-tech-python-simple.nix
+    ../../presets/home/cli-tech-python-simple.nix
   ];
 
   home.packages = [
 
     stable.nushell
-    stable.bats # Cool bash testing system
+    stable.trashy
 
     # AI
     bleedingedge.opencode # ✨ 🤔
@@ -24,6 +24,7 @@ in {
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
     stable.libtree # a better & more secure `ldd` (see: 20240331T1410)
     stable.strace
+    stable.netcat-openbsd # for `nc`
 
     # Extra - one-of
     stable.ouch # ~universal {,de}compression utility
