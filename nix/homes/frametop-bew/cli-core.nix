@@ -10,6 +10,7 @@ let
   # FIXME: remove this! (but where to put that comment above??)
   cliPkgs = {
     fzf = mypkgs.fzf-bew;
+    eza = mypkgs.eza-bew;
   };
 
 in {
@@ -25,19 +26,7 @@ in {
   ];
 
   home.packages = [
-    # alternative ls, more colors!
-    (stable.eza.overrideAttrs (final: prev: {
-      doCheck = false;
-      patches = prev.patches ++ [
-        (pkgs.fetchpatch {
-          # Commit: fix(color-scale): use file size unit custom color when not using color scale
-          # PR: https://github.com/eza-community/eza/pull/975
-          url = "https://github.com/eza-community/eza/commit/c7493753fbf8d572703a782941cf134357dd740a.patch";
-          hash = "sha256-lmXGt20l6o5tbNXDicq17sBCt36qckV8XX7EJ2Gi3vQ=";
-        })
-      ];
-    }))
-
+    cliPkgs.eza # alternative ls, more colors!
     cliPkgs.fzf
     stable.bat
     stable.fd

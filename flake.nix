@@ -207,6 +207,9 @@
       fzf-bew = stable.callPackage ./fzf/package-bew.nix {};
       fzf-bew-bin = mypkglib.linkSingleBin mypkgs.fzf-bew;
 
+      eza-bew = stable.callPackage ./cli-others/eza/package-bew.nix {};
+      eza-bew-bin = mypkglib.linkSingleBin mypkgs.eza-bew;
+
       nvim-minimal = useStandalonePkg toolConfigs.nvim-minimal;
       nvim-bew = useStandalonePkg toolConfigs.nvim-bew;
 

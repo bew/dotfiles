@@ -163,40 +163,21 @@ fi
 # for easier completion (`rmt<compl>`)
 alias rmtrash=trash
 
+
 # ls
 
-alias ls-backend=eza
+if cfg::has-bin eza; then
+  # eza-specific aliases
+  alias eza="eza --group-directories-first"
+  alias ltre="eza -la --tree --git-ignore --classify=auto"
+  alias lltre="eza -l --tree --git-ignore --classify=auto"
+
+  alias ls-backend="eza"
+else
+  alias ls-backend="command ls"
+fi
+
 alias ls="ls-backend --group-directories-first --color=auto --classify=auto"
-
-alias eza="eza --group-directories-first"
-# Config eza colors to shades of grey instead of a distractful bright colors
-# Read more at `man 5 eza_colors`
-EZA_COLORS=""
-EZA_COLORS+="da=38;5;243:" # darker
-EZA_COLORS+="uu=38;5;239:gu=38;5;239:" # darker user/group that is me
-EZA_COLORS+="un=38;5;250:gn=38;5;250:" # white(visible!) user/group that is not me / am not part of
-EZA_COLORS+="uR=38;5;124:gR=38;5;124:" # dark red user/group that is 'root'
-# Color file sizes by order of magnitude
-EZA_COLORS+="nb=38;5;239:ub=38;5;241:"    #  0  -> <1KB : grey
-EZA_COLORS+="nk=38;5;29:uk=38;5;100:"     # 1KB -> <1MB : green
-EZA_COLORS+="nm=38;5;26:um=38;5;32:"      # 1MB -> <1GB : blue
-EZA_COLORS+="ng=38;5;130:ug=38;5;166;1:"  # 1GB -> <1TB : orange
-EZA_COLORS+="nt=38;5;160:ut=38;5;197;1:"  # 1TB -> +++  : red
-# Darker permissions (shades of grey)
-EZA_COLORS+="ur=38;5;240:uw=38;5;244:ux=38;5;248:ue=38;5;248:" # user permissions
-EZA_COLORS+="gr=38;5;240:gw=38;5;244:gx=38;5;248:" # group permissions
-EZA_COLORS+="tr=38;5;240:tw=38;5;244:tx=38;5;248:" # other permissions
-EZA_COLORS+="xa=38;5;24:" # xattr marker ('@')
-EZA_COLORS+="xx=38;5;240:" # punctuation ('-')
-# TODO: Enable git column with darker colors as well?
-# FIXME(feature request): Ask to make configurable git symbols
-#   (e.g. I don't like `N` for untracked => would prefer `U` (grey);
-#    and instead of `U` for conflicts => would prefer `X` (red))
-export EZA_COLORS
-
-alias ltre="eza -la --tree --git-ignore --classify=auto"
-alias lltre="eza -l --tree --git-ignore --classify=auto"
-
 alias ll="ls -l"
 alias la="ll -a"
 alias l="la"
