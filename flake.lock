@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789686902,
-        "narHash": "sha256-9Zgm1Pqo0Lzmhjr2SA88Rtf66OSUiJUPmTc3u0LyaC8=",
+        "lastModified": 1790377302,
+        "narHash": "sha256-445238Tr1UFLJGwMrEWsg3X5uIH/oQ7nMWcJmiGLnQg=",
         "owner": "bew",
         "repo": "nix-dynpaths",
-        "rev": "ba12fdbc373663e65ca12a6272a3dfdbd4f2a75d",
+        "rev": "15979a468bdb295138bd866bb17c6dfe815bdc0f",
         "type": "github"
       },
       "original": {
