@@ -52,8 +52,8 @@ in {
   });
 
   deps.plugins = {
-    zsh-autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair/";
-    zsh-autoenv = let
+    autopair = "${pkgs.zsh-autopair}/share/zsh/zsh-autopair/";
+    autoenv = let
       # @2026-05-06 the licence in nixpkgs was changed to 'unfree', because the repo doesn't have a
       # license.. (ref: https://github.com/NixOS/nixpkgs/commit/ce5e5116a00c234decb2098ddcfa2fa62243ae57)
       # SOLUTION(WORKAROUND): patch the pkg to change back the licence 👀
@@ -117,49 +117,33 @@ in {
     diralias = "${diralias-pkg}/share/zsh/plugins/diralias/";
   };
 
-  outputs.zdotdir = let
-    plugins = cfg.deps.plugins;
-  in runCommandLocal "zsh-bew-zdotdir" {
-    src = lib.fileset.toSource {
-      root = ./.;
-      fileset = lib.fileset.unions [
-        (lib.fileset.fileFilter (f: ! f.hasExt "nix") ./.) # skip all nix files
-        ./rc
-        ./fast-theme--bew.ini
-        ./zshrc
-        ./zshenv
-        ./zlogin
+  dir.zdotdir.content = {
+    "rc" = ./rc;
+    "functions" = ./functions;
+    "fast-theme--bew.ini" = ./fast-theme--bew.ini;
+    ".zshrc" = ./zshrc;
+
+    # `.zshenv` must embed the store path of the dir it lives in (ZSH_MY_CONF_DIR).
+    # Referencing `outputs.dirs.zdotdir` here would be a self-reference cycle
+    # (dir -> .zshenv -> dir): instead we inject `builtins.placeholder "out"`, a
+    # constant token at eval time that the dir build resolves to its own `$out`.
+    ".zshenv" = {
+      source = ./zshenv;
+      replacements = [
+        { from = "ZSH_MY_CONF_DIR="; to = "ZSH_MY_CONF_DIR=${builtins.placeholder "out"} #"; }
+        { from = "ZSH_CONFIG_ID="; to = "ZSH_CONFIG_ID=${cfg.ID} #"; }
+        { from = "source ~/.dot/shell/env.sh"; to = "source ${../shell/env.sh}"; }
       ];
     };
-  } /* sh */ ''
-    mkdir -p $out $out/rc
 
-    >&2 echo "Copying no-deps files"
-
-    cp $src/rc/* $out/rc/
-    cp -R $src/functions $out/
-
-    # FIXME: this should be part of a sort of activation?
-    # Or can I detect it's not set and suggest to run the activation command for that if it's not?
-    cp $src/fast-theme--bew.ini $out/
-
-    >&2 echo "Patching config-specific env vars in .zshenv"
-    substitute $src/zshenv $out/.zshenv \
-      --replace-fail "ZSH_MY_CONF_DIR=" "ZSH_MY_CONF_DIR=$out #" \
-      --replace-fail "ZSH_CONFIG_ID=" "ZSH_CONFIG_ID=${cfg.ID} #" \
-      \
-      --replace-fail "source ~/.dot/shell/env.sh" "source ${../shell/env.sh}"
-    # NOTE(!!!): last one is _TEMPORARY_ until we find a better way to inject cross-shell env script..
-
-    >&2 echo "Patching binaries and plugins in .zshrc"
-    substitute $src/zshrc $out/.zshrc \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__zsh_hooks=" "_ZSH_PLUGIN_SRCREF__zsh_hooks=${plugins.zsh-hooks} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__zi="        "_ZSH_PLUGIN_SRCREF__zi=${plugins.zi} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__F_Sy_H="    "_ZSH_PLUGIN_SRCREF__F_Sy_H=${plugins.F-Sy-H} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__autopair="  "_ZSH_PLUGIN_SRCREF__autopair=${plugins.zsh-autopair} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__autoenv="   "_ZSH_PLUGIN_SRCREF__autoenv=${plugins.zsh-autoenv} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__gitstatus=" "_ZSH_PLUGIN_SRCREF__gitstatus=${plugins.gitstatus} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__zconvey="   "_ZSH_PLUGIN_SRCREF__zconvey=${plugins.zconvey} #" \
-      --replace-fail "_ZSH_PLUGIN_SRCREF__diralias="   "_ZSH_PLUGIN_SRCREF__diralias=${plugins.diralias} #"
-  '';
+    "plugins-sources.zsh" = {
+      source = ./plugins-sources.zsh;
+      replacements = let
+        mkPluginReplacement = name: pluginDrv: {
+          from = "PLUGINS_SOURCES[${name}]=";
+          to = "PLUGINS_SOURCES[${name}]=${pluginDrv} #";
+        };
+      in lib.mapAttrsToList mkPluginReplacement cfg.deps.plugins;
+    };
+  };
 }

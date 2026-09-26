@@ -10,14 +10,10 @@ in {
   _class = "tool.zsh"; # type of nix module
 
   options = {
-    outputs.zdotdir = lib.mkOption {
-      description = "ZSH's config folder, with .zsh{rc,env} entrypoints";
-      type = ty.package;
-    };
     outputs.zdotdir-hash = lib.mkOption {
       description = "The Nix hash of the built 'zdotdir' output";
       type = ty.singleLineStr;
-      default = builtins.substring 0 32 (builtins.baseNameOf cfg.outputs.zdotdir);
+      default = builtins.substring 0 32 (builtins.baseNameOf cfg.outputs.dirs.zdotdir);
       readOnly = true;
     };
   };
@@ -25,6 +21,8 @@ in {
   config = {
     package = lib.mkDefault pkgs.zsh;
     toolName = "zsh";
+
+    dynamicConfig.isSupported = true;
 
     # FIXME: What exactly to expose to the zsh config?
     #   - Whole env with whole packages of dependencies?
@@ -41,13 +39,13 @@ in {
       meta.mainProgram = "zsh";
       postBuild = /* sh */ ''
         makeWrapper ${cfg.package}/bin/zsh $out/bin/zsh \
-          --set ZDOTDIR ${outs.zdotdir} \
+          --set ZDOTDIR ${outs.dirs.zdotdir} \
           --set ZSH_CONFIG_HASH ${outs.zdotdir-hash} \
           --set SHELL_CLI_ENV ${outs.deps.bins}
 
         # Add useful paths in the package (for easy introspection)
         mkdir -p $out/useful-paths
-        ln -s ${outs.zdotdir} $out/useful-paths/zdotdir
+        ln -s ${outs.dirs.zdotdir} $out/useful-paths/zdotdir
         ln -s ${outs.deps.bins} $out/useful-paths/bins-dependancies
       '';
     };
@@ -71,12 +69,14 @@ in {
         outs.deps.bins
       ];
       home.file.".zshrc".text = ''
-        ZDOTDIR=${outs.zdotdir}
+        ZDOTDIR=${outs.dirs.zdotdir}
         ZSH_CONFIG_HASH=${outs.zdotdir-hash}
-        source ${outs.zdotdir}/.zshrc
+        source ${outs.dirs.zdotdir}/.zshrc
       '';
       home.file.".zshenv".text = ''
-        source ${outs.zdotdir}/.zshenv
+        # NOTE: ZDOTDIR is NOT set here, to ensure the current ~/.zshrc gets loaded
+        # (otherwise only $ZDOTDIR/.zshrc gets loaded)
+        source ${outs.dirs.zdotdir}/.zshenv
       '';
       # FIXME: Add `.zlogin` ?
     };

@@ -46,41 +46,13 @@ function cfg::check-dependencies() {
   fi
 }
 
-{
-  local _zsh_plugins_srcrefs=()
-  # _ZSH_PLUGIN_SRCREF_* vars are used to specify from where the plugin should be init from
-  # (can be a path for things that are sourced, or a `org/repo` for things that reference a GH repo)
-  # NOTE: These lines may be rewritten by config manager.
-  _ZSH_PLUGIN_SRCREF__zsh_hooks=$ZSH_MY_CONF_DIR/third-party/zsh-hooks
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zsh_hooks
-  _ZSH_PLUGIN_SRCREF__zi=$ZSH_MY_CONF_DIR/third-party/zi
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zi
-  _ZSH_PLUGIN_SRCREF__F_Sy_H=z-shell/F-Sy-H
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__F_Sy_H
-  _ZSH_PLUGIN_SRCREF__autopair=hlissner/zsh-autopair
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autopair
-  _ZSH_PLUGIN_SRCREF__autoenv=Tarrasch/zsh-autoenv
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__autoenv
-  _ZSH_PLUGIN_SRCREF__gitstatus=romkatv/gitstatus
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__gitstatus
-  _ZSH_PLUGIN_SRCREF__zconvey=z-shell/zconvey
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__zconvey
-  _ZSH_PLUGIN_SRCREF__diralias=bew/diralias
-  _zsh_plugins_srcrefs+=$_ZSH_PLUGIN_SRCREF__diralias
-  # Check plugin folders exist if paths (start with `/`)
-  for plugin_path in "${_zsh_plugins_srcrefs[@]}"; do
-    if [[ "${plugin_path[1]}" == "/" ]] && ! [[ -d "$plugin_path" ]]; then
-      >&2 echo ":: Plugin folder '$plugin_path' does not exist (expect some broken stuff!)"
-    fi
-  done
-  unset _zsh_plugins_srcrefs plugin_path
-}
-
 #-------------------------------------------------------------
 # Load and configure plugins
 
+source $ZSH_MY_CONF_DIR/plugins-sources.zsh
+
 # zinit (old project names: zi, zplugin)
-source $_ZSH_PLUGIN_SRCREF__zi/zi.zsh
+source ${PLUGINS_SOURCES[zi]}/zi.zsh
 # copy zi function as zinit (not as alias, since zoxide overrides zi's target)
 unalias zinit
 functions -c zi zinit
@@ -91,7 +63,7 @@ mkdir -p "$FAST_WORK_DIR" # necessary to exist, otherwise it falls back to ~/.ca
 # | => to avoid the selected theme to be saved in ~/.cache (tmpfs => empty on boot)
 # \__ ref: https://github.com/z-shell/F-Sy-H/issues/25 (by me)
 zinit ice lucid wait # lazy load
-zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H
+zinit light ${PLUGINS_SOURCES[F-Sy-H]}
 # Note: to activate/update my custom theme, run:
 #   fast-theme $ZSH_MY_CONF_DIR/fast-theme--bew.ini
 # TODO: find a way to not have this manual action on first start?
@@ -101,22 +73,22 @@ zinit light $_ZSH_PLUGIN_SRCREF__F_Sy_H
 AUTOPAIR_INHIBIT_INIT=1
 # lazy load, need to call `autopair-init` on-load, which MUST be called after loading my keymaps!
 zinit ice lucid wait atload"autopair-init" nocd
-zinit light $_ZSH_PLUGIN_SRCREF__autopair
+zinit light ${PLUGINS_SOURCES[autopair]}
 
 # Git branch in prompt (using fast gitstatusd daemon)
 GITSTATUS_CACHE_DIR=$ZSH_DATA_DIR/plugin--gitstatus
 # \__ to avoid binary auto install in ~/.cache (tmpfs => empty on boot)
-zinit light $_ZSH_PLUGIN_SRCREF__gitstatus
+zinit light ${PLUGINS_SOURCES[gitstatus]}
 gitstatus_start MY
 
 # Ability to send command between shells :)
 zinit ice wait"0" silent # load plugin async & silently
-zinit light $_ZSH_PLUGIN_SRCREF__zconvey
+zinit light ${PLUGINS_SOURCES[zconvey]}
 zstyle ":plugin:zconvey" greeting "none"
 
 # My helper to manage directory aliases externally, for multiple tools ✨
 # Don't lazy-load so aliases are immediately available on first prompt
-zinit light $_ZSH_PLUGIN_SRCREF__diralias
+zinit light ${PLUGINS_SOURCES[diralias]}
 
 #-------------------------------------------------------------
 # Init additional 'external plugins'
@@ -136,7 +108,7 @@ eval "$(zoxide init zsh)"
 # https://github.com/Tarrasch/zsh-autoenv
 # (note: cannot lazy load, otherwise autoenv's script is NOT loaded BEFORE direnv stuff for CWD on
 # shell launch)
-zinit light $_ZSH_PLUGIN_SRCREF__autoenv
+zinit light ${PLUGINS_SOURCES[autoenv]}
 # NOTE: Must be loaded AFTER direnv, so that autoenv's chpwd hook is BEFORE direnv's chpwd hook
 # This ensures that PATH changes done by autoenv are not reverted when leaving a direnv-dir
 # (the autoenv plugin appends to the list of chpwd hooks, so we need to prepend ourself first)
@@ -149,7 +121,7 @@ fi
 # Setup Hooks
 
 # better zsh-hooks
-source $_ZSH_PLUGIN_SRCREF__zsh_hooks/zsh-hooks.plugin.zsh
+source ${PLUGINS_SOURCES[zsh-hooks]}/zsh-hooks.plugin.zsh
 
 # precmd_hook
 hooks-define-hook precmd_hook
