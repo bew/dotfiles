@@ -11,7 +11,7 @@ in {
     withRuby = false;
   };
 
-  nvimDir."init.vim".text = /* vim */ ''
+  dir.nvimdir.content."init.vim".text = /* vim */ ''
     set shiftwidth=2 expandtab
     set mouse=nv
     set iskeyword+=-
@@ -40,9 +40,9 @@ in {
     " colorscheme (NOTE: need my colorscheme in nvimDir!)
     colorscheme bew256-dark
   '';
-  nvimDir."colors/bew256-dark.vim".source = ./colors/bew256-dark.vim;
+  dir.nvimdir.content."colors/bew256-dark.vim" = ./colors/bew256-dark.vim;
 
-  nvimDir."plugin/foo.lua".text = /* lua */ ''
+  dir.nvimdir.content."plugin/foo.lua".text = /* lua */ ''
     vim.notify "hello from config! (ID: ${cfg.ID})"
   '';
 }

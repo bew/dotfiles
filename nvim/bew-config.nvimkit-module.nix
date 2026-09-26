@@ -78,7 +78,7 @@ in {
     terraform-ls.pkg = pkgs.terraform-ls;
   };
 
-  nvimDirSource = ./.;
+  dir.nvimdir.source = ./.;
   initFile = "init.lua";
 
   env.NVIM_BEW_MYPLUGINS_PATH = toString (cfg.lib.mkLink ../nvim-myplugins);
