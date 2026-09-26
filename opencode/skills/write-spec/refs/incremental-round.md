@@ -21,7 +21,7 @@ Does not apply to `batch` mode.
 6. **Continue instructions** — print:
    > Say 'next' or similar to continue with the next section.
    > Say 'what's next' to list upcoming sections with their planned content.
-   > Say 'fill the rest'/'write all' to switch to batch mode.
+   > Say 'batch all' to switch to batch mode.
 
 ## OQ round
 

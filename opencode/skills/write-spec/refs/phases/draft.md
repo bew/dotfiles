@@ -25,7 +25,7 @@ The mode lines below are passive info, not a question.
 Print the `<mode banner>`: `Mode: incremental (one section per turn)`.
 The `incremental` mode is the default — one section per turn, pausing after each.
 Say 'step by step' to assert it.
-Say 'fill the rest'/'write all' to batch the rest.
+Say 'batch all' to batch the rest.
 Adjust section list if user requests changes.
 
 Once confirmed, write the file: H1 with status tag + skill loader meta-paragraph
@@ -127,7 +127,7 @@ Trigger aliases (each means *confirm + enter/assert incremental mode*):
 'step by step', 'go incrementally', 'step-by-step', 'section by section', 'incr', 'incr mode'.
 
 Exit aliases (each switches from incremental to batch, sticky):
-'fill the rest', 'write all'.
+'fill the rest', 'write all', 'batch all'.
 In batch mode the user may say a trigger alias (e.g. 'step by step') to re-enable incremental.
 
 ### Fill loop
@@ -150,7 +150,7 @@ In batch mode, skip the per-section prompt above — fill all remaining sections
 
 The user's response should be handled as feedback by default.
 Only 'next' or a trigger alias can be interpreted as signal to move on.
-'fill the rest'/'write all' switches to batch mode (sticky) for the remaining sections.
+'batch all' switches to batch mode (sticky) for the remaining sections.
 
 If the user says 'tell me more' (or a listed alias): answer in output only.
 Do not edit `$specpath`, do not treat it as section feedback, do not advance,
