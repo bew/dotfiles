@@ -10,6 +10,7 @@ let
       inherit meta;
       baseModules = [
         ./kit-modules/toolkit-base.kit-module.nix
+        ./toolkit-modules/dir.toolkit-module.nix
         flakeInputs.dynpaths.modules.kitsys.dynpaths
         baseModule
       ];
