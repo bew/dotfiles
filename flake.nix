@@ -124,13 +124,13 @@
       };
     };
 
-    mkDynamicBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configImports }: let
+    mkBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configs }: let
       sys = forSys system;
       pkgs = sys.pkgsets.${defaultPkgsetName};
     in import "${flakeInputs.homeManager}/modules" {
       inherit pkgs;
       configuration = {
-        imports = configImports ++ [
+        imports = configs ++ [
           {
             home.username = username;
             home.homeDirectory = homeDir;
@@ -139,9 +139,8 @@
           flakeInputs.dynpaths.modules.generic.dynpaths
           flakeInputs.dynpaths.modules.homeManager.dynpathsChecker
           {
-            # Configure my dotfiles root, so that direct links created with
-            # `config.dynpaths.mkLink` point to my repo (editable!).
-            dynpaths.mode = "dynamic";
+            # Configure my dotfiles root, so that when `dynpaths.mode = "dynamic"`, direct links
+            # created with `config.dynpaths.mkLink` point to my repo (editable!).
             dynpaths.roots.dots = {
               nixStorePath = flakeInputs.self;
               realPath = "${homeDir}/.dot";
@@ -158,24 +157,26 @@
     };
 
   in {
-    homeConfig.frametop-bew = mkDynamicBewHomeConfig rec {
+    homeConfig.frametop-bew = mkBewHomeConfig rec {
       system = "x86_64-linux";
       username = "bew";
       homeDir = "/home/${username}";
       defaultPkgsetName = "stable";
-      configImports = [
+      configs = [
         ./nix/homes/frametop-bew
+        { dynpaths.mode = "dynamic"; } # editable dots!
         { home.stateVersion = "21.05"; }
       ];
     };
 
-    homeConfig.work-mac = mkDynamicBewHomeConfig rec {
+    homeConfig.work-mac = mkBewHomeConfig rec {
       system = "aarch64-darwin";
       username = "benoitlesellierdechezelles";
       homeDir = "/Users/${username}";
       defaultPkgsetName = "stable";
-      configImports = [
+      configs = [
         ./nix/homes/work-mac
+        { dynpaths.mode = "dynamic"; } # editable dots!
         { home.stateVersion = "26.05"; }
       ];
     };
