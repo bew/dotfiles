@@ -97,7 +97,8 @@ Retitle immediately, before any other action — do not wait for user confirmati
 ## Debugging
 
 - Start with the simplest hypothesis.
-- Never guess: use dedicated tools / datasource to help you debugging, ask user if needed.
+- ALWAYS reproduce the issue first (unless user asked otherwise), ask user if needed.
+- NEVER guess: use dedicated tools / datasource to help you debugging, ask user if needed.
 - When something fails, show the raw error first, then your interpretation.
 
 

@@ -3,7 +3,7 @@ name: read-man-page
 description: |
   Token-efficient man page reading.
   Load when looking up CLI tool docs, flags, options, usage examples, config formats.
-  Do NOT use bash to run `man` directly without loading this skill first.
+  Do NOT run any `man` command (direct/wrapped/piped) without loading this skill first.
 ---
 
 # Man Page Reader
