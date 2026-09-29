@@ -60,7 +60,7 @@
     "messages_copy": "<leader>y", // copy last answer
     "messages_undo": "none", // Use `/undo` instead
     "messages_redo": "none", // Use `/redo` instead
-    "messages_toggle_conceal": "<leader>h", // toggle raw/pretty markdown rendering
+    "messages_toggle_conceal": "<leader>r", // toggle raw/pretty markdown rendering
 
     "variant_cycle": "ctrl+t",
     "model_list": "<leader>m", // or `/models`
