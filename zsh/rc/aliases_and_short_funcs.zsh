@@ -210,21 +210,80 @@ alias ....="cd ../../..;"
 #   inside a ,
 #   where I can preview (below prompt in message area) the directory I'm targeting as I add dots..
 
-alias cdt="cd /tmp;"
+# Shared core for cdot/cdt/cdgit: cd into <root>/<subdir> (<root> itself when <subdir> is omitted).
+# Can pass `--label <label>` to override root name shown in error messages (defaults to <root>).
+function cdsubdir() {
+  # zparseopts flags:
+  # * -D strips matched opts from $@
+  # * -E keeps parsing past non-options
+  # * `--` ends zparseopts' own opts
+  # * `-label:=label_opt` matches `--label <val>`
+  #
+  # zparseopts always stores parsed result into an array:
+  # * label_opt[1]=opt name
+  # * label_opt[2]=value
+  local -a label_opt
+  zparseopts -D -E -- -label:=label_opt || return 1
 
+  local root="$1"
+  local subdir="${2:-}" # may be unset/empty
+  local label="${label_opt[2]:-$root}"
+  [[ -n "$root" ]] || {
+    >&2 echo "cdsubdir: <root> is required!"
+    return 1
+  }
+  [[ -d "$root/$subdir" ]] || {
+    >&2 echo "$label/$subdir doesn't exist 🤔"
+    return 1
+  }
+  cd "$root/$subdir"
+}
+
+# Shared completer core: offer dirs under <root>, relative to it.
+function _cdsubdir::completer() {
+  local root="$1"
+  [[ -n "$root" && -d "$root" ]] || return 1
+  _directories -W "$root"
+}
+
+# Completer for cdsubdir used directly: complete <root>, then <subdir> under it.
+# note: doesn't handle `--label <val>` (only ever passed by the wrappers)
+function _cdsubdir() {
+  if (( CURRENT == 2 )); then
+    _directories
+  else
+    local root="${words[2]}"
+    root="${root/#\~/$HOME}" # `-W` doesn't expand `~`, so do it here
+    if [[ -d "$root" ]]; then
+      _directories -W "$root"
+    else
+      zle -M "⚠️ '$root' doesn't exist!"
+    fi
+  fi
+  return 0 # no matches -> don't fallback to default completers
+}
+compdef _cdsubdir cdsubdir
+
+# cd to /tmp, or to a subdir of it
+function cdt() {
+  cdsubdir /tmp "$1"
+}
+function _cdt() { _cdsubdir::completer /tmp }
+compdef _cdt cdt
+
+# cd to my dotfiles repo, or to a subdir of it
 function cdot() {
   local dotfiles_path=$(readlink ~/.dot)
-  [[ -n "$dotfiles_path" ]] || {
-    echo "~/.dot does not exist???"
-    return
-  }
-  cd $dotfiles_path
+  [[ -n "$dotfiles_path" ]] || { echo "~/.dot does not exist???"; return }
+  cdsubdir --label '~dot' "$dotfiles_path" "$1"
 }
 # note: the function version ensures that the symlink is not registered in cd history / zoxide..
 # (avoids implicit duplication with the realpath of dotfiles repo)
-alias dot=cdot
+alias dot=cdot cdd=cdot
 # note: `cdot` is more logical (think: `cd` then `dot`),
 #   but `dot` is easier to type on my ortholinear keyboard.. So I need both ¯\_(ツ)_/¯
+function _cdot() { _cdsubdir::completer $(readlink ~/.dot) }
+compdef _cdot cdot
 
 
 # git
@@ -237,8 +296,16 @@ alias goback="git go -"
 
 alias ghh="gh pr checkout"
 
-alias cdgit='git rev-parse && cd "$(git rev-parse --show-toplevel)"'
+# cd to the git root, or to a subdir of it
+function cdgit() {
+  local git_root
+  git_root=$(git rev-parse --show-toplevel) || return 1
+  cdsubdir --label 'git-root' "$git_root" "$1"
+}
 alias cdg=cdgit
+
+function _cdgit() { _cdsubdir::completer "$(git rev-parse --show-toplevel)" }
+compdef _cdgit cdgit
 
 # Clone git repository and cd to it
 #
