@@ -25,3 +25,23 @@ SCRIPT_PATH="$SCRIPT_DIR/echolines"
     run -0 --keep-empty-lines "$SCRIPT_PATH" "" aaa "" bbb ""
     [[ "$output" == $'\naaa\n\nbbb\n\n' ]]
 }
+
+@test "cli: -n prefixes each line with its 1-based line number" {
+    run -0 --keep-empty-lines "$SCRIPT_PATH" -n foo bar baz
+    [[ "$output" == $'1: foo\n2: bar\n3: baz\n' ]]
+}
+
+@test "cli: -n numbers empty-string arguments too" {
+    run -0 --keep-empty-lines "$SCRIPT_PATH" -n "" aaa ""
+    [[ "$output" == $'1: \n2: aaa\n3: \n' ]]
+}
+
+@test "cli: -n alone prints nothing" {
+    run -0 --keep-empty-lines "$SCRIPT_PATH" -n
+    [[ "$output" == "" ]]
+}
+
+@test "edge: -n as a later argument is printed literally" {
+    run -0 --keep-empty-lines "$SCRIPT_PATH" a -n b
+    [[ "$output" == $'a\n-n\nb\n' ]]
+}

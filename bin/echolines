@@ -1,8 +1,26 @@
 #!/usr/bin/env bash
 # Print each argument on its own line, unchanged.
+# With -n (as first argument), prefix each line with its 1-based line number.
 
 set -euo pipefail # Safe, strict script execution
 
-for arg in "$@"; do
-  printf "%s\n" "$arg"
-done
+function main() {
+  local numbered=false
+  if [[ "${1:-}" == "-n" ]]; then
+    numbered=true
+    shift
+  fi
+
+  local lineno=0
+  for arg in "$@"; do
+    # `lineno++` would return status 1 on the first line (result 0), aborting under set -e
+    lineno=$((lineno + 1))
+    if $numbered; then
+      printf "%d: %s\n" "$lineno" "$arg"
+    else
+      printf "%s\n" "$arg"
+    fi
+  done
+}
+
+main "$@"
