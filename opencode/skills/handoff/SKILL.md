@@ -86,16 +86,14 @@ After writing, tell the user:
 
 > Handoff doc written to `<full path>` — open to inspect.
 
-Do not output the doc content inline.
+NEVER output the doc content inline.
 
 ## Rules
 
-- Always write the handoff doc with the `write` tool.
+- ALWAYS write the handoff doc with the `write` tool.
   Never output the handoff content inline in the conversation.
 - Do not inline file contents — reference by path only.
-- Only reference URLs that were confirmed in the session
-  (appeared in user messages or tool results).
-  Never reference URLs invented or hallucinated by the agent.
+- ONLY reference URLs that were confirmed valid in the session.
 - When instructing the reader to load a skill, use one of two forms:
   ``load `foo` skill`` for an unconditional load, or
   ``load `foo` skill when <condition>`` for a conditional one.
@@ -103,19 +101,20 @@ Do not output the doc content inline.
   Write these refs verbatim — caveman mode must not compress `load` or `skill` away.
   Skill mentions that are not load instructions (e.g. in `What was done`) stay prose.
   Governs skill names only, not raw skill dir/file paths — those stay plain path refs.
-  Never write a bare or ambiguous ref (e.g. ``see `foo` `` or a bare `` `foo` — why `` bullet).
+  NEVER write a bare or ambiguous ref (e.g. ``see `foo` `` or a bare `` `foo` — why `` bullet).
   Sentence-initial `Load` is fine.
 - Keep the doc readable by a human.
   Do not assume the reader is an agent.
-- Never write to a path outside the resolved `$outputdir` without explicit user confirmation.
+- NEVER write to a path outside the resolved `$outputdir` without explicit user confirmation.
 - On filename collision, adapt the filename rather than overwriting.
 - Run commands to get missing information (date, existing HANDOFF list)
   in one tool call, not multiple.
-- Never include meta-commentary about the handoff doc itself
+- NEVER include meta-commentary about the handoff doc itself
   (e.g. "no other files were referenced", "findings are consolidated above",
-  "this section does not apply"). State content, not commentary about the doc.
-- Never reference the skill or template that produced this handoff
+  "this section does not apply").
+  State content, not commentary about the doc.
+- NEVER reference the skill or template that produced this handoff
   (e.g. the `handoff` / `handoff-standalone` `SKILL.md`, its `refs/template.md`)
-  merely as tooling. If that skill is itself the subject of the work,
-  reference it as content in the relevant section.
+  merely as tooling.
+  If that skill is itself the subject of the work, reference it as content in the relevant section.
 - Use caveman mode when writing the handoff doc to reduce words without losing signal.
