@@ -9,6 +9,10 @@ After all sections are filled, check:
 - Terminology section (if present) is complete prose (no skeleton placeholders)
 - If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
+- No project-global doc content restated — concepts and terms documented there
+  are referenced, not redefined
+- Gaps are inline-defined and recorded; promote gaps carry a capture instruction
+  in the deferred questions
 - `## Global Open Questions` section is present at end of spec
 - No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
 - `FIXME:` callouts are allowed as design signals — they do not block readiness.

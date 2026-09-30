@@ -40,6 +40,10 @@ Collect inputs (infer what you can; defer the rest to `Phase:Defer`):
 - **Slug** — short kebab-case identifier; derive from name if not given.
 - **Problem** — what does it solve, and for whom?
 - **Inspirations** — prior art, external systems, or prior sessions that shaped the design.
+- **Project-global docs** — survey the conventional project-global docs
+  (`CONTEXT.md`, `CONTEXT-MAP.md`, `PROJECT-SPEC.md`, `docs/**`) for concepts and terms
+  already defined; the spec references them instead of restating them
+  (see <./refs/project-global-docs.md>).
 - **Terminology section preference** (via Global OQ) — infer candidate terms;
    decided in `Phase:Defer`.
 
@@ -68,6 +72,7 @@ Read <./refs/spec-structure.md> for:
 ## 4. `Phase:Fill` — fill sections
 
 Read <./refs/writing-guidelines.md> for prose style, Interface / How to use section rules, and naming discipline.
+Read <./refs/project-global-docs.md> for how the spec references project-global concepts and terms.
 Read <./refs/terminology-and-key-concepts.md> for terminology entry format.
 Read <./refs/open-questions.md> for spec open question format and placement.
 Read <./refs/alternatives-and-tradeoffs.md> for how to write the Alternatives & Tradeoffs section.
@@ -83,6 +88,12 @@ In both modes:
 - Add spec open questions to the relevant section's `### Open Questions` subsection immediately as they arise.
   Do not defer spec open questions to the end — they belong in the spec.
 - Never write a full rewrite when a targeted edit is requested. Surgical edits only.
+- Reference project-global concepts and terms, don't restate them
+  — see <./refs/project-global-docs.md>.
+- On a gap (a concept or term no project-global doc defines): inline-define it in the spec
+  and record it (Open Question or `FIXME:` callout), then add the own-it/promote question
+  to the deferred questions block.
+  Promote: list a capture instruction for adding the concept or term to the project-global docs.
 - When omitting a section: name it and state why.
 - When a config field's value may depend on runtime state:
   note the uncertainty in the spec and add a spec open question
@@ -107,3 +118,6 @@ and list the inferred candidates in the batched deferred questions
 so the user can confirm, reject, or extend them.
 If user confirms: update the spec (two-pass — insert section, fill it, re-check readiness).
 If user declines: no changes needed — mark the Global OQ entry as resolved.
+
+Include confirming the project-global docs set
+(`CONTEXT.md`, `CONTEXT-MAP.md`, `PROJECT-SPEC.md`, `docs/**`) among the deferred questions.

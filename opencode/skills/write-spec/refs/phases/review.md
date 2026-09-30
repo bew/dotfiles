@@ -20,6 +20,9 @@ Check each of the following, flag any issues:
   (Introduction and Terminology, if present, included)
 - If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
+- No project-global doc content restated — concepts and terms documented there
+  are referenced, not redefined
+- Gaps are inline-defined and recorded; promoted gaps carry a `task-capture-handoff` capture
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
 - `## Global Open Questions` section is present at end of spec
 - No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)

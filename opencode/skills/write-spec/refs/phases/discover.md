@@ -21,6 +21,14 @@ rather than asking each one explicitly.
 Once all required inputs are answered or waived, proactively move to path derivation
 and signal readiness to draft — do not keep asking follow-up questions.
 
+## Project-global docs
+
+Survey the docs that define project-global concepts and terms.
+Read <../project-global-docs.md> for identification and the reference rule.
+
+Confirm the candidate set with the user, then note concepts and terms already documented there.
+The spec references those concepts and terms instead of restating them.
+
 ## Next phase
 
 Always present both options to the user at the end of `Discover`:

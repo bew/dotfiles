@@ -29,6 +29,9 @@ whether the term is:
   that the spec relies on.
   May include a reference URL (e.g. linking to a base protocol).
 
+A term or concept already defined in a project-global doc is not redefined here —
+reference the doc instead (see <./project-global-docs.md>).
+
 Each entry may carry a marker to indicate its relationship to this spec.
 Markers are **not required** — use them only when they add clarity:
 

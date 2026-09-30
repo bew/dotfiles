@@ -3,6 +3,7 @@
 Write the spec to `$specpath`, filling sections iteratively.
 Read <../spec-structure.md> for section order and Open Questions format.
 Read <../writing-guidelines.md> for prose style, Interface / How to use conventions, and naming discipline.
+Read <../project-global-docs.md> for how the spec references project-global concepts and terms.
 
 ## Exploration companion
 
@@ -202,6 +203,10 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - Never mix terminology once terms are defined.
   If Terminology section exists, use exact names from there everywhere.
 - Terminology section (if present): define all terms there before using them elsewhere in spec.
+- Reference project-global concepts and terms, don't restate them — see <../project-global-docs.md>.
+- On a gap (a concept or term no project-global doc defines): inline-define it in the spec
+  and record it (Open Question or `FIXME:` callout), then ask the user to own it or promote it.
+  Promote: load `task-capture-handoff` skill and emit one capture per gap, immediately.
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
   Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
 - The skill loader meta-paragraph (between H1 and first section) is required
