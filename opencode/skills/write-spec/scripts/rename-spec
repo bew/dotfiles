@@ -42,6 +42,4 @@ def main [
 
   print ""
   print "Next: update $slug / $specdir / $specpath in your session, and update the H1 in SPEC.md if the name changed."
-  print "Consider committing the rename now (before further edits, to keep history clean):"
-  print $"  git add -A && git commit -m \"rename spec: ($from | path basename) -> ($to | path basename)\""
 }

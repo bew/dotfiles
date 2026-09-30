@@ -5,6 +5,9 @@
 - One sentence per line.
   Long sentences may wrap, but next sentence always starts on a new line.
 - Keep sentences direct and relatively short — prefer clarity over verbosity.
+- Break prose into paragraphs by logical grouping to ease reading by human.
+  Start a new paragraph when the topic or sub-point shifts.
+  Never stack a long run of sentences into one unbroken block — big paragraphs are prohibited.
 - Introduction: full prose, no compression.
 - Terminology & Key Concepts (if present): follows general prose rules above.
   Should read well — bullets and concise phrasing are allowed but not the default.

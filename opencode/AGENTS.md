@@ -126,6 +126,11 @@ list item (semantic line breaks).
 Do not chain multiple sentences on a single line unless they fit the remaining line width without
 wrapping.
 
+Group prose into paragraphs by logical grouping to ease reading by human.
+Start a new paragraph when the topic or sub-point shifts.
+Never stack a long run of sentences into one unbroken block.
+Big paragraphs are prohibited.
+
 ## Markdown rules
 
 - Never use `---` horizontal rules as default separators before section headers.
