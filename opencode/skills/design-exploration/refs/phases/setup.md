@@ -34,8 +34,9 @@ In `dedicated` mode:
 - Otherwise: distill the user's instructions into `Motivation`
   (context, problem, scope, out-of-scope), and write `$briefpath` with an empty topic list.
 - On an `adhoc` upgrade, also: move the existing `EXPLORATION-*.md` files into `$explodir`,
-  add each to the brief index with the status from its H1 tag, and rewrite the H1
-  to the `dedicated` form (`# <topic> — exploration`).
+  add each to the brief index with the status from its H1 tag, rewrite the H1
+  to the `dedicated` form (`# <topic> — exploration`), and convert each file's
+  `## Motivation` section into the leading description paragraph (drop the section).
 
 In `adhoc` mode: nothing is written yet — `Phase:Explore` creates `$topicpath`
 with its `## Motivation`.

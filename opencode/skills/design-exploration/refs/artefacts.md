@@ -32,6 +32,8 @@ Each topic's file is `EXPLORATION-<topic>.md`.
 ```md
 # <topic> — exploration
 
+<a few lines stating what this topic is about>
+
 ## Findings
 
 - <observation, fact, or constraint discovered>
@@ -61,6 +63,11 @@ Each topic's file is `EXPLORATION-<topic>.md`.
 
 - <unresolved question>
 ```
+
+Every topic file opens with a short description under the H1 — a few lines stating what the
+topic is about, so the file reads on its own without the brief.
+In `dedicated` mode this is a leading paragraph; in `adhoc` mode `## Motivation` already fills
+that role.
 
 The bullet list under `Candidate directions` / `Decisions` is the canonical index:
 one bullet per item, status leading, short gist.

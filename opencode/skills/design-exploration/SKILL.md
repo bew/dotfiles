@@ -46,6 +46,10 @@ Apply in every phase.
 - Don't pre-create empty sections — fill them as content lands.
 - Do not mandate `incremental-write` — its skeleton-first ceremony fights the fluid loop.
 - Record decisions as they land; keep `Open threads` current.
+- **Never echo the file.** After writing or updating any exploration file (`$topicpath`
+  or `$briefpath`), do not reproduce its content inline. Reply with a short overview
+  (what the file now holds, where it lives) and only the actionable items — open forks,
+  decisions awaiting the user's call.
 
 ## 1. `Phase:Setup` — resolve identity, mode & path; seed files
 
