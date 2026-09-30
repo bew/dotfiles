@@ -58,10 +58,8 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 In general: trust the user for git commands even if they look odd.
 
-NEVER `git add` or commit files matching `HANDOFF-*` — handoff artefacts must never be git-tracked.
-
-Committing a task's finished work counts as the user signalling `done` —
-treat it as explicit confirmation for any skill that waits on that signal.
+NEVER `git add` or commit files matching `HANDOFF-*` or `TASK-*`.
+These handoff artefacts must never be git-tracked.
 
 
 ## Token efficiency
@@ -87,11 +85,20 @@ When a session fork is mentioned (e.g. "session was forked", "topic change"), re
 Retitle immediately, before any other action — do not wait for user confirmation.
 
 
+## Session lifecycle
+
+Commit finished task = user signals `done` — confirmation for any skill waiting on that signal.
+
+Session started from `HANDOFF-*`/`TASK-*` file (referenced in first user message):
+- On start: follow the file content as instructions for the session
+- Once work delivered/done: starting file is obsolete, mention as passive hint it can be deleted.
+
+
 ## Design Exploration
 
-- When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill user with
-  questions before attempting to apply the mentioned change.
-  Never produce code or spec content speculatively on an unexplored idea.
+When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill user with
+questions before attempting to apply the mentioned change.
+Never produce code or spec content speculatively on an unexplored idea.
 
 
 ## Debugging
