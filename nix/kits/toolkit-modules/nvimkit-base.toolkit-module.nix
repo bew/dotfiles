@@ -9,16 +9,13 @@ let
 
   makeNvimWrapperPkg =
     { extraWrapperParams ? "", fyiExtraDirs ? {} }:
-    let
-      binName = if cfg.useDefaultBinName then "nvim" else outs.NVIM_APPNAME;
-    in
     mypkglib.replaceBinsInPkg {
       name = "nvim-with-config-${cfg.ID}";
       copyFromPkg = cfg.package;
       nativeBuildInputs = [ pkgs.makeWrapper ];
-      meta.mainProgram = binName;
+      meta.mainProgram = "nvim";
       postBuild = /* sh */ ''
-        makeWrapper ${cfg.package}/bin/nvim $out/bin/${binName} \
+        makeWrapper ${cfg.package}/bin/nvim $out/bin/nvim \
           --prefix PATH : ${outs.deps.bins}/bin \
           ${lib.concatStringsSep " " (
             lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}") cfg.env
@@ -52,12 +49,6 @@ in {
       description = "Env vars to set for this config";
       type = ty.attrsOf ty.str;
       default = {};
-    };
-
-    useDefaultBinName = lib.mkOption {
-      description = "Whether outputs should use the default bin name or a config-specific one";
-      type = ty.bool;
-      default = false;
     };
 
     deps.plugins = lib.mkOption {
