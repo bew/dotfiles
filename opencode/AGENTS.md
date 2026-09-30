@@ -37,6 +37,8 @@ ask the user before using `write`.
   in the submitted changes and the resulting files.
   Only mention the kind of changes made, and any relevant constraints, debug findings, solutions..
 - When relevant, ALWAYS list important URLs at the end of responses so I can open them if needed.
+- When I say "tell me more …" (anywhere), I want an INLINE explanation of X in the conversation —
+  NOT more explanation embedded in a planned edit, a spec, or any tool call output.
 
 Use the `question` tool to ask questions for the user.
 Optionally preceded with laid-out questions if 2+ lines of description is needed to better
@@ -141,3 +143,11 @@ Big paragraphs are prohibited.
   The count goes stale when items change, and the update is easily missed.
 - Use bullets for any list whose length may grow
 - Inline enumerations ("a, b, and c") are allowed only for a small, known-not-to-change set of few items.
+- Never put sentence punctuation (comma, colon, semicolon, period) inside a formatting span
+  (bold, italics, quotes, code, link text).
+  That punctuation joins or ends the surrounding sentence, so it stays outside the span's delimiters.
+  Wrong: `**foo bar:**`, `"this thing," "this other thing"`.
+  Correct: `**foo bar**:`, `"this thing", "this other thing"`.
+- Carve-out: punctuation owned by the span's own content stays inside.
+  Test: drop the surrounding sentence — if the punctuation still belongs to the span, keep it in.
+  Examples: the `?` in `She asked "why?"`, the `;` in `` `foo();` ``, the `.` in `He said "I am done."`.
