@@ -16,8 +16,9 @@
   # index manipulation (staging area)
 
   a  = add
-  ap = add -p
   an = add -N
+  ap = add -p
+  apd = ap .
 
   com   = commit
   comp  = com -p
@@ -123,6 +124,7 @@
 
   reb  = rebase
   rebi = rebase -i
+  rebi-up = rebi @{u}
   # Do not changes commit dates of rebased commits
   # NOTE: the entire history of the rebased branch will be composed of new commits.
   # (posts where I found that mentioned it's not 100% reliable for all commit types, so this is
