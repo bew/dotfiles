@@ -124,7 +124,7 @@ For topic sub-scope (if needed), use `:` as inner separator (e.g: `hl:foo` or `s
 
 ## 3. `Phase:Draft` — write the commit message
 
-If summary has 2+ distinct concerns, output this before the message:
+If summary has 2+ distinct concerns, output this before the message block (before first `---` line):
 ```
 WARNING: This diff mixes distinct concerns. Consider splitting into separate commits:
 - <concern 1 label>
@@ -242,44 +242,43 @@ the terminal output:
 
 After outputting the message, offer refinements via a single `question` tool call with three
 questions, in this order.
-Use these headers verbatim: `Next step`, `Refine subject`, `Refine body`.
+Use these headers verbatim: `Refine subject`, `Refine body`, `Next step`.
 Derive every option from the message as written — omit any that do not apply.
 
-### Question 1 — `Next step`
+### Question 1 — `Refine subject`
 
-Single-select.
-
-- "✅ Looks good" — approve the message as written.
-- "🚀 Use as-is and commit" — commit the message as written.
-- "Refine & 🔎 preview" — apply the selected subject/body edits, re-output, stay in the loop.
-- "Refine & 🚀 commit" — apply the selected subject/body edits, then commit.
-
-Omit the two commit options in PLAN mode.
-Use these labels verbatim — do not combine or conflate them.
-
-### Question 2 — `Refine subject`
-
-Multiselect.
+This is a MULTI-select question.
 
 - "Keep subject as-is" — no subject change.
-- Subject variants — 1+ alternative wordings when meaningfully different
+- Subject variants — 2+ alternative wordings that are meaningfully different
   (different framing, tighter wording, different root-cause emphasis).
   Label: "Alt subject: <wording>".
-- Prefix variants — when the commit type/prefix is uncertain, offer 1+ alternatives.
+- Prefix variants — when the commit type/prefix is uncertain, offer 2+ alternatives.
   Label: "Prefix: <current> → <alternative>".
 - Adjusters — up to 1-3 options to mention or remove something.
   Label: "Mention <X>" / "Remove <X>".
 
-### Question 3 — `Refine body`
+### Question 2 — `Refine body`
 
-Multiselect.
+This is a MULTI-select question.
 
 - "Keep body as-is" — no body change.
 - Form options — when the body's shape could differ
   (e.g. "Bullets only", "Paragraph(s) only", "Drop the bullets, fold into the paragraph").
 - Detail options — "Terser", "More detailed", "Less impl details".
 - Adjusters — up to 1-3 options to drop, expand, or re-emphasize a part.
-  Label: "Expand <X>" / "Drop <X>".
+  Label: "Expand <X>" / "Drop <X>" / "Don't talk about <X>".
+
+### Question 3 — `Next step`
+
+This is a SINGLE-select question.
+
+- "🔎 Preview" — re-output, stay in the loop.
+- "🚀 Commit" — commit with message.
+- "📥 Stage only" — stage the intended files, do NOT commit.
+
+Omit the commit and stage options in PLAN mode — both are mutations (see `Phase:Commit`).
+Use these labels verbatim — do not combine or conflate them.
 
 ### Apply the result
 
@@ -288,22 +287,25 @@ If the user picks more than one per category, ask which to apply.
 
 Variant/adjuster picks override "keep as-is".
 
-- "✅ Looks good": stop.
-- "🚀 Use as-is and commit": go to `Phase:Commit`.
-- "⚙️ Refine & preview 🔎": apply the selected edits, re-output, repeat `Phase:Iterate`.
-- "⚙️ Refine & commit 🚀": apply the selected edits, then go to `Phase:Commit`.
+All options apply any selected subject/body edits first.
 
-Edits selected alongside "✅ Looks good" → treat as "⚙️ Refine & preview 🔎".
-Edits selected alongside "🚀 Use as-is and commit" → treat as "⚙️ Refine & commit 🚀".
+- "🔎 Preview": apply the selected edits, re-output, repeat `Phase:Iterate`.
+- "🚀 Commit": apply the selected edits, then go to `Phase:Commit`.
+- "📥 Stage only": apply the selected edits if any, then run the staging + verify steps of
+  `Phase:Commit` (file-set confirmation + `git add`), then stop — do not commit.
 
 ## 5. `Phase:Commit` — stage, verify, and commit
+
+NOTE: If the session is in PLAN mode: stop immediately.
+Output: "Cannot stage/commit in PLAN mode — switch to BUILD mode first, then resume."
+Do not proceed until the user has switched modes.
 
 **Stage** per diff-type:
 - diff-type **staged**: do not run `git add`.
   The staged content is the contract established in `Phase:Analyse` — commit it as-is.
 - diff-type **unstaged**: list the exact file set in a `question` call and require an explicit
   yes before `git add`.
-  A commit approval ("use as-is and commit", "ok; commit", …) never implies staging approval —
+  A commit approval ("🚀 commit", "ok; commit", …) never implies staging approval —
   the staging set must be confirmed on its own, even when the user already asked to commit.
   `git add` only the confirmed files.
   If some files need hunk-level _partial_ add: do NOT `git add` — follow <§partial-adds>.
