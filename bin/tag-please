@@ -1,0 +1,232 @@
+#!/usr/bin/env python3
+# Tag the current commit as a release, syncing the local VERSION file.
+# Prompts for a new tag or a semver bump, commits VERSION, then tags.
+
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+from typing import NoReturn
+
+C_RESET = "\033[0m"
+C_ERROR = "\033[1;91m"   # bright bold red
+C_WARNING = "\033[1;93m" # bright bold yellow
+C_TAG = "\033[1;95m"     # bright bold magenta
+C_DEFAULT = "\033[1;34m" # bold blue
+
+BUMP_KEYWORDS = {"m", "minor", "M", "major", "p", "patch"}
+
+
+class ScriptError(Exception):
+    """Raised when the script encounters an error."""
+
+
+def print_err(msg: str) -> None:
+    """Print msg to stderr."""
+    print(msg, file=sys.stderr)
+
+
+def print_section_line(text: str) -> None:
+    """Print a section header, preceded by a blank line and prefixed with `:: `."""
+    print()
+    print(f":: {text}")
+
+
+def print_action_line(text: str) -> None:
+    """Print an action log line prefixed with `→ `."""
+    print(f"→ {text}")
+
+
+def usage_and_exit(status: int) -> NoReturn:
+    """Print usage to stderr and exit with status."""
+    print_err("Usage: tag-please")
+    print_err("")
+    print_err("Bump VERSION, commit, and tag a release in the current git repository.")
+    print_err("Must be run from the repository root. Aborts if the worktree is dirty.")
+    print_err("The detected last tag must start with `v`.")
+    print_err("")
+    print_err("Prompts for a new tag, or a bump keyword:")
+    print_err("  m / minor   bump minor version (default on empty input)")
+    print_err("  M / major   bump major version")
+    print_err("  p / patch   bump patch version")
+    print_err("  q           abort without changes")
+    print_err("")
+    print_err("A semver bump keyword is confirmed before any changes.")
+    sys.exit(status)
+
+
+def paint(text: str, code: str) -> str:
+    """Wrap text in an ANSI color, or return it plain when stdout is not a terminal."""
+    if sys.stdout.isatty():
+        return f"{code}{text}{C_RESET}"
+    return text
+
+
+def run_process(
+    cmd: list[str],
+    capture_output: bool = False,
+) -> subprocess.CompletedProcess[str]:
+    """Run cmd; when capture_output is set, capture stdout/stderr instead of inheriting them."""
+    try:
+        return subprocess.run(cmd, capture_output=capture_output, text=True)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ScriptError(f"could not run `{cmd[0]}`: {exc}") from exc
+
+
+def capture_git(args: list[str]) -> str:
+    """Run a read-only git subcommand and return its stdout; raise ScriptError on failure."""
+    proc = run_process(["git", *args], capture_output=True)
+    if proc.returncode != 0:
+        raise ScriptError(f"git {args[0]} failed: {proc.stderr.strip()}")
+    return proc.stdout
+
+
+def run_git(args: list[str]) -> None:
+    """Run a git subcommand, inheriting its output; raise ScriptError on failure."""
+    proc = run_process(["git", *args])
+    if proc.returncode != 0:
+        raise ScriptError(f"git {args[0]} failed")
+
+
+def check_deps() -> None:
+    """Raise ScriptError when a required external command is missing."""
+    if shutil.which("git") is None:
+        raise ScriptError("git is required but not found in PATH")
+
+
+def warn(msg: str) -> None:
+    """Print a warning to stderr without exiting."""
+    print_err(paint(f"!! WARNING: {msg}", C_WARNING))
+
+
+def get_last_tag() -> str:
+    """Return the most recent reachable tag, or an empty string when there is none."""
+    proc = run_process(["git", "describe", "--tags", "--abbrev=0"], capture_output=True)
+    if proc.returncode != 0:
+        return ""
+    return proc.stdout.strip()
+
+
+def parse_semver(tag: str) -> tuple[int, int, int]:
+    """Parse a `v`-prefixed semver tag into its three numeric components."""
+    parts = tag.removeprefix("v").split(".")[:3]
+    try:
+        values = [int(part) for part in parts]
+    except ValueError as exc:
+        raise ScriptError(f"last tag '{tag}' is not a numeric semver") from exc
+    while len(values) < 3:
+        values.append(0)
+    return values[0], values[1], values[2]
+
+
+def resolve_tag(tag_input: str, last_tag: str) -> str:
+    """Resolve user input to a concrete tag; bump keywords are computed from the last tag."""
+    if tag_input not in BUMP_KEYWORDS:
+        return tag_input
+
+    major, minor, patch = parse_semver(last_tag)
+    match tag_input:
+        case "m" | "minor":
+            minor, patch = minor + 1, 0
+        case "M" | "major":
+            major, minor, patch = major + 1, 0, 0
+        case "p" | "patch":
+            patch += 1
+
+    return f"v{major}.{minor}.{patch}"
+
+
+def prompt_input(prompt_text: str) -> str:
+    """Read one line of input, showing the prompt only on a terminal."""
+    try:
+        return input(prompt_text if sys.stdin.isatty() else "")
+    except EOFError:
+        return ""
+
+
+def main() -> bool:
+    if len(sys.argv) > 1:
+        usage_and_exit(1)
+
+    check_deps()
+
+    last_tag_raw = get_last_tag()
+    had_tag = last_tag_raw != ""
+    if had_tag:
+        last_tag = last_tag_raw
+    else:
+        warn("no previous tag detected; assuming v0.0.0")
+        last_tag = "v0.0.0"
+
+    if had_tag and not last_tag.startswith("v"):
+        raise ScriptError(f"last tag '{last_tag}' does not start with 'v'")
+
+    print(f"Last tag: {paint(last_tag, C_TAG)}")
+
+    porcelain = capture_git(["status", "--porcelain"])
+    if porcelain.strip():
+        print_err("")
+        print_err(paint("!! ERROR: git worktree is dirty.", C_ERROR))
+        print_err(porcelain.strip())
+        print_err("")
+        print_err("Aborting.")
+        return False
+
+    if had_tag:
+        print_section_line(f"Commits since {paint(last_tag, C_TAG)}:")
+        run_git(["--no-pager", "log", "--oneline", f"{last_tag}..HEAD"])
+    else:
+        print_section_line("All commits:")
+        run_git(["--no-pager", "log", "--oneline"])
+
+    minor_hint = paint("[minor]", C_DEFAULT)
+    tag_prompt = f"New tag, or bump m=minor M=major p=patch (q to abort, {minor_hint}): "
+    while True:
+        raw_tag = prompt_input(tag_prompt)
+        if raw_tag == "q":
+            print("Aborted.")
+            return True
+        tag_input = raw_tag or "m"
+        new_tag = resolve_tag(tag_input, last_tag)
+
+        if tag_input not in BUMP_KEYWORDS:
+            break
+
+        confirm_hint = paint("[Y/n]", C_DEFAULT)
+        answer = prompt_input(f"Release as {paint(new_tag, C_TAG)}? {confirm_hint}: ")
+        if answer.strip().lower() in {"", "y", "yes"}:
+            break
+        print()
+
+    print_section_line(f"Releasing as {paint(new_tag, C_TAG)}")
+
+    version = new_tag.removeprefix("v")
+    print_action_line(f"Writing VERSION {paint(version, C_TAG)}")
+    Path("VERSION").write_text(f"{version}\n")
+
+    print_action_line("Staging VERSION")
+    run_git(["add", "VERSION"])
+
+    commit_default = f"misc: release {new_tag}"
+    raw_commit = prompt_input(f"Commit message [{paint(commit_default, C_DEFAULT)}]: ")
+    commit_msg = raw_commit or commit_default
+    print_action_line("Committing VERSION")
+    run_git(["commit", "-m", commit_msg])
+
+    sha = capture_git(["rev-parse", "--short", "HEAD"]).strip()
+    print_action_line(f"Tagging {paint(new_tag, C_TAG)} at {sha}")
+    run_git(["tag", new_tag])
+    return True
+
+
+def cli_main() -> int:
+    """Console entry point; return the process exit status."""
+    try:
+        return 0 if main() else 1
+    except ScriptError as exc:
+        print_err(paint(f"!! ERROR: {exc}", C_ERROR))
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(cli_main())
