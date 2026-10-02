@@ -14,15 +14,17 @@ silently, and control returns immediately.
 
 ## What it does
 
-Exposes a `git_track_new_file` tool the agent calls after any tool call that creates new files:
-`write`, `cp`, `mv`, `curl -o`, `mkdir`, etc.
-The companion skill (`skills/git-track-new-file/`) tells the agent when to invoke it.
+Exposes a `git_track_new_file` tool that registers newly created files with git.
+The companion skill (`skills/git-track-new-file/`) tells the agent when to invoke it and which paths to skip.
 
 ## Skip rules
 
-Files are silently skipped when:
+Mechanical skips — files are silently skipped when:
 - Path matches a secret pattern: `/tmp/`, `.env*`, `*.key`, `*.pem`, `*.secret`, `*.p12`, `*.pfx`
 - File would be ignored by git (checked via `git check-ignore -q`)
+
+Agent-judgment skips live in the companion skill, which is the single source for paths the agent should not track.
+They are not enforced in code; `.gitignore` remains the mechanical backstop.
 
 ## Symlink handling
 

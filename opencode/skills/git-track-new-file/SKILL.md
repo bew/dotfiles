@@ -2,7 +2,7 @@
 name: git-track-new-file
 description: |
   Load whenever new files or directories are created in a git repo — via write, bash, or any
-  other tool. Ensures `git_track_new_file` is called so new files are git-tracked for the user.
+  other tool — so new files that should be tracked are registered with `git_track_new_file`.
 metadata:
   maintainers: [bew]
 ---
@@ -11,7 +11,8 @@ Current working directory git status: !`git rev-parse --git-dir >/dev/null && ec
 
 If `NOT_GIT_REPO`: skip silently — do not call `git_track_new_file`.
 
-Call `git_track_new_file` with the absolute path of each new file or directory, then continue.
+Call `git_track_new_file` with the absolute path of each new file or directory that should be tracked, then continue.
+Use judgment: skip paths that must not be tracked — e.g. `HANDOFF-*`/`TASK-*` artefacts — or where tracking is unwanted.
 
 ## Triggers
 

@@ -61,10 +61,9 @@ async function intentAdd(filePath: string): Promise<boolean> {
 
 export default tool({
   description:
-    "ALWAYS call this after creating any new file or directory in the repository — "
-    + "whether via `write`, `bash` (cp, mv, curl -o, mkdir, tar, unzip), or any other tool. "
-    + "Runs `git add -N` so the file is git-tracked for the user immediately. "
-    + "Skips gitignored paths, secrets, and /tmp automatically.",
+    "Call this on a newly created file or directory to git-track it for the user (runs `git add -N`). "
+    + "Gitignored paths, secrets, and /tmp are skipped automatically. "
+    + "See the `git-track-new-file` skill for when to call this and which paths to skip.",
   args: {
     path: tool.schema.string().describe("Absolute path to the new file or directory"),
   },
