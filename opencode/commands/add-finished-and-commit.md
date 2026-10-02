@@ -5,7 +5,9 @@ subtask: false # shared context!
 
 FIRST: Load the `committer` skill and follow its instructions.
 
-- Scope: the files changed by the task we just finished, inferred from this session.
+- Scope: infer from the session work items.
+  If a commit occurred earlier in the session, treat it as the boundary —
+  scope is the changes made since then.
 - Diff type: unstaged
 
 ## User context

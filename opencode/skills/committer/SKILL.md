@@ -20,6 +20,8 @@ Determine the following values from whatever is available in context
 
 - **Working directory**: from user context. Default: <from env block in system prompt>.
 - **Scope**: a path, glob, or area to narrow the diff (e.g. `src/adapters/`, `*.ts`).
+  May also be "session work items" when the caller scopes by the work done in the current session
+  (see <§multi-task-scope>).
   Default: none (full diff).
 - **Diff type**: infer from any available wording — "staged" means staged changes;
   "unstaged" or "current diff" mean unstaged.
@@ -32,10 +34,33 @@ Determine the following values from whatever is available in context
 State resolved values:
 ```text
 Working directory: <resolved absolute dir>
-Scope: <path/glob, or "(none)">
+Scope: <path/glob, session work items, or "(none)">
 Diff type: staged | unstaged
 Focus: <free-text, or "(none)">
 ```
+
+### Multi-task scope
+<!-- §multi-task-scope -->
+
+Applies only when the caller scopes to **session work items** instead of a path/glob.
+The committer drafts a single commit, so several work items need a choice.
+
+Enumerate work items from session context:
+- A work item is a distinct piece of work in the session.
+- If a commit occurred earlier in the session, use it as the boundary —
+  enumarate work items since then.
+
+When the agent detects 2+ distinct work items:
+read <./refs/multi-task-scope.md> and follow it.
+
+Do not ask when there is a single work item, or a caller-provided path/glob.
+In the single-work-item case, still resolve `Scope` to that item's files/areas.
+
+Before `Phase:Analyse`, `Scope` must be concrete files/areas.
+The literal `session work items` only triggers this subsection — it is never a valid pathspec.
+
+`diff-to-commits` passes an explicit group scope, so this does not apply there
+(no recursion when this skill delegates back to it).
 
 ## 1. `Phase:Analyse` — analyse diff via `explore-diff`
 
