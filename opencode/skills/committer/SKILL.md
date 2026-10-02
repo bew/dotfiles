@@ -298,24 +298,27 @@ This is a MULTI-select question.
 
 This is a SINGLE-select question.
 
-- "🔎 Preview" — re-output, stay in the loop.
 - "🚀 Commit" — commit with message.
+- "🔎 Preview" — re-output, stay in the loop.
 - "📥 Stage only" — stage the intended files, do NOT commit.
 
 Omit the commit and stage options in PLAN mode — both are mutations (see `Phase:Commit`).
 Use these labels verbatim — do not combine or conflate them.
+
+No answer for this question always means "🔎 Preview".
+(but keep it as second option when asking, after commit)
 
 ### Apply the result
 
 Only one pick per category makes sense (one subject, one prefix, one form).
 If the user picks more than one per category, ask which to apply.
 
-Variant/adjuster picks override "keep as-is".
+Variant/adjuster picks override "keep … as-is".
 
 All options apply any selected subject/body edits first.
 
-- "🔎 Preview": apply the selected edits, re-output, repeat `Phase:Iterate`.
 - "🚀 Commit": apply the selected edits, then go to `Phase:Commit`.
+- "🔎 Preview": apply the selected edits, re-output, repeat `Phase:Iterate`.
 - "📥 Stage only": apply the selected edits if any, then run the staging + verify steps of
   `Phase:Commit` (file-set confirmation + `git add`), then stop — do not commit.
 
