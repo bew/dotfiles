@@ -3,6 +3,16 @@ This is the config dir for [opencode][opencode] ✨
 [opencode]: https://opencode.ai/
 
 
+## Docs
+
+- [`MY_AI_STUFF.md`](./MY_AI_STUFF.md) — catalogue of every skill, agent, command,
+  and plugin, with a dependency graph for the complex ones.
+- [`DIR_AGENTS.md`](./DIR_AGENTS.md) — directory layout and maintenance rules for
+  agents.
+- [`NOTES-opencode2.md`](./NOTES-opencode2.md) — running notes on OpenCode V2
+  behaviour.
+
+
 ## Local plugin dependencies
 
 Local plugins under `plugins/` import packages such as `@opencode/plugin`.

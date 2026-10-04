@@ -14,6 +14,12 @@ Example: These paths are equivalent, they all resolve to the exact same file on 
 - `~/.dot/opencode/skills/foo/SKILL.md`
 - `<repo>/opencode/skills/foo/SKILL.md`
 
+## opencode/ directory
+
+`opencode/` is the global OpenCode config (see the alias above).
+Before working on anything under it, read `opencode/DIR_AGENTS.md`
+for the layout and the docs to keep in sync.
+
 ## Nix formatting
 
 Never run `nixfmt` (or any formatter) on Nix files in this repo.
