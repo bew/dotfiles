@@ -37,6 +37,7 @@ require"mycfg.plugs".boot_plugins {
 
 require"mycfg.diagnostics_setup"
 require"mycfg.lsp_setup"
+require"mycfg.treesitter_setup"
 
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Briefly highlight yanked text",
