@@ -410,9 +410,11 @@ alias rg='rg -n'
 
 if cfg::has-bin opencode; then
   alias oc=opencode
+elif cfg::has-bin opencode2; then
+  alias oc=opencode2
 fi
 # Resume last opencode session
-alias occ="opencode --continue"
+alias occ="oc --continue"
 
 # curl
 
