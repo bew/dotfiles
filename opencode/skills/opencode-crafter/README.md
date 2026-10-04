@@ -1,7 +1,7 @@
 # opencode-crafter
 
 Guides an OC agent through a structured, phase-based workflow to **create or update** OpenCode
-artefacts: skills, agents, commands, and snippets.
+artefacts: skills, agents, commands, oc-tools, oc-plugins, and snippets.
 Can also derive **standalone skill variants** (`skill-standalone`) on explicit request —
 single-file, tool-less exports of existing skills.
 
@@ -66,6 +66,8 @@ Companion docs loaded on demand by the agent (not read upfront):
 | [`refs/skills-related/with-script.md`](./refs/skills-related/with-script.md) | Extra rules when skill includes scripts |
 | [`refs/agent-anatomy.md`](./refs/agent-anatomy.md) | Agent spec: model, tools, permissions |
 | [`refs/command-anatomy.md`](./refs/command-anatomy.md) | Command spec: args, injection, subagent |
+| [`refs/oc-tool-anatomy.md`](./refs/oc-tool-anatomy.md) | oc-tool spec: registration |
+| [`refs/oc-plugin-anatomy.md`](./refs/oc-plugin-anatomy.md) | oc-plugin spec: layout, conventions, doc links |
 | [`refs/phases/scripts.md`](./refs/phases/scripts.md) | `Phase:Scripts` subagent handoff instructions |
 | [`refs/phases/review.md`](./refs/phases/review.md) | `Phase:Review` subagent handoff instructions |
 | [`refs/phases/ship.md`](./refs/phases/ship.md) | `Phase:Ship` copy & cleanup instructions |

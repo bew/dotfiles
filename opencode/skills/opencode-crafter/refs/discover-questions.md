@@ -37,6 +37,18 @@ For commands additionally:
 - Shell output or file content injection needed?
 - Run in subagent session to avoid polluting context?
 
+For oc-tools additionally:
+- What should the tool be called, and what inputs does it take?
+- What does it return to the agent?
+- Any side effects or failure modes the agent should know about?
+- Should the agent be able to call it from generated scripts (when it writes code to chain tools),
+  or only directly? (default: both)
+
+For oc-plugins additionally:
+- Which events or domains does it hook?
+- Does it also register tools, or only hooks?
+- Any global behavior it must intercept?
+
 For snippets additionally:
 - Trigger name? any aliases?
 - Expand inline, or use `<append>`/`<prepend>` blocks?

@@ -34,18 +34,18 @@ If criteria loop finds new gaps: return to *Review*.
 that read poorly as a compact list item):
 Steps must NOT have sub-steps — flatten or regroup if needed.
 Def with: `## Step N — Name` (header, no backticks, no `Phase:` prefix)
-Ref with: `*Step N*` or `*Name*` (italic)
+Ref with: `*Step:Name*` (italic)
 
 ```md
 ## Step 1 — Setup
 
 Read inputs. Validate. Load files.
-If input missing: stop. Do not proceed to *Step 2*.
+If input missing: stop. Do not proceed to *Step:Review*.
 
 ## Step 2 — Review
 
 Evaluate criteria, surface gaps, apply fixes.
-If new gaps found: return to *Step 2*.
+If new gaps found: return to *Step:Review*.
 ```
 
 Pick one form per artefact — do not mix list and section form in the same artefact.
@@ -71,6 +71,8 @@ Avoid generic names: ~~`Phase1`~~, ~~`Phase:Processing`~~.
 
 **Step names**: plain title-case word(s), no prefix — `Setup`, `Review`, `Output`.
 Avoid generic names: ~~`Step1`~~, ~~`Processing`~~.
+
+**Step references**: use `*Step:Name*` (italic), e.g. `*Step:Review*`.
 
 ## Named headers
 

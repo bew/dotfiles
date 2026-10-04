@@ -2,7 +2,7 @@
 name: opencode-artefact-rules
 description: |
   Quality criteria and review checklist for OpenCode artefacts
-  (skills, skill-standalone, agents, commands).
+  (skills, skill-standalone, agents, commands, oc-tools, oc-plugins).
   Invoked by opencode-reviewer agent.
   Not for direct use.
 metadata:
@@ -41,3 +41,5 @@ Based on artefact type, read the appropriate file for additional criteria:
 - skill-standalone: read <./refs/skill-standalone.md>
 - agent: read <./refs/agents.md>
 - command: read <./refs/commands.md>
+- oc-tool: read <./refs/oc-plugins.md> (same implementation as `oc-plugin`)
+- oc-plugin: read <./refs/oc-plugins.md>

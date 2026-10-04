@@ -2,7 +2,7 @@
 name: opencode-crafter
 description: |
   Load when user asks to create, update, edit, or refactor any OpenCode (OC)
-  artefact: skills, agents, commands, tools, plugins, or snippets.
+  artefact: skills, agents, commands, oc-tools, oc-plugins, or snippets.
 
   Must load before editing any existing file under a skill/, agents/, commands/ dir,
   or any SKILL.md file.
@@ -13,13 +13,13 @@ description: |
   "self-contained skill for Perplexity".
 
   Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
-  "edit the W agent", "write a plugin to …", "create a tool for …", "update crafter skill".
+  "edit the W agent", "write an (oc) plugin to …", "create an (oc) tool for …", "update crafter skill".
   Guides user through discovery, drafting, and iterative refinement.
 ---
 
 # OpenCode Crafter
 
-Design & create OpenCode artefacts: **skills**, **agents**, **commands**, **tools**, **plugins**, **snippets**.
+Design & create OpenCode artefacts: **skills**, **agents**, **commands**, **oc-tools**, **oc-plugins**, **snippets**.
 Can also derive a **standalone skill variant** (`skill-standalone`) on explicit request.
 
 Phases:
@@ -86,8 +86,8 @@ Based on artefact type, read one of following references for full spec of that t
 - skill-standalone: <./refs/skills-related/standalone-anatomy.md>
 - command: <./refs/command-anatomy.md>
 - agent: <./refs/agent-anatomy.md>
-- tool: <./refs/tool-anatomy.md>
-- plugin: <./refs/plugin-anatomy.md>
+- oc-tool: <./refs/oc-tool-anatomy.md>
+- oc-plugin: <./refs/oc-plugin-anatomy.md>
 - snippet: load `snippets` skill for full spec
 
 For `skill-standalone`: `$sourcepath` is the base skill — an input, not an update target.

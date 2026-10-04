@@ -2,7 +2,7 @@
 
 Markdown file defining a reusable prompt template, triggered by `/name` in TUI.
 
-Official documentation: https://opencode.ai/docs/commands/
+Official documentation: https://opencode.ai/v2/docs/commands/
 
 ## Install paths
 
