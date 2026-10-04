@@ -288,8 +288,10 @@ compdef _cdot cdot
 
 # git
 
-alias gnp="git --no-pager"
-alias git_watch="watch --color -- git --no-pager -c color.ui=always"
+alias git::no-pager="git --no-pager"
+alias gnp=git::no-pager
+
+alias git::watch-output="watch --color -- git --no-pager -c color.ui=always"
 
 alias gomain="git go main"
 alias goback="git go -"
