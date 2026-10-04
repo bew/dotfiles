@@ -1,0 +1,23 @@
+# Bun from the `pkgs` nix registry alias; provisioned transiently so actions work from any directory.
+bun := "nix run pkgs#bun --"
+
+
+# List available actions.
+_default:
+    @just --list
+
+
+# Run the tests of a local plugin, e.g. `just test git-track-new-file`.
+test plugin:
+    {{bun}} test plugins/{{plugin}}
+
+
+# Update local-plugin dependencies within their declared ranges, then report newer versions.
+update-local-plugins-deps:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo >&2 "Updating local plugin dependencies in $PWD ..."
+    {{bun}} update
+    echo >&2
+    echo >&2 "Newer versions available outside current constraints (bump package.json to adopt):"
+    {{bun}} outdated

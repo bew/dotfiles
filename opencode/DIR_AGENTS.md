@@ -70,7 +70,8 @@ A catalogue that drifts from reality is worse than none.
 - `agents/<name>.md` — agents.
 - `commands/<name>.md` — commands.
 - `plugins/<name>/` — local plugins; their npm deps live in the root
-  `package.json` + `bun.lock`, installed by `./update-local-plugins-deps`.
+  `package.json` + `bun.lock`, installed by `just update-local-plugins-deps`;
+  run their tests with `just test <name>`.
 - `opencode.jsonc` — main config (settings, `plugins`, agents, …).
 - `cli.json` — CLI/TUI-only settings.
 - `AGENTS.md` — the global system-prompt instructions (this dir is their root).
