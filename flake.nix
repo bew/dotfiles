@@ -44,6 +44,9 @@
 
     systems.url = "github:nix-systems/default";
     devshell.url = "github:numtide/devshell";
+
+    llm-agents.url = "github:numtide/llm-agents.nix";
+    # note: no follows to ensure we get their pre-built binaries (through their cache)
   };
 
   # TO-EXPERIMENT(?): flake-parts (https://github.com/hercules-ci/flake-parts) to
@@ -56,6 +59,7 @@
       mypkgs = self.packages.${system};
       stable = flakeInputs.nixpkgsStable.legacyPackages.${system};
       bleedingedge = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
+      llm-agents = flakeInputs.llm-agents.packages.${system};
     };
     forSys = system: let pkgsets = pkgsetsForSys system; in rec {
       inherit (pkgsets) mypkgs stable bleedingedge;

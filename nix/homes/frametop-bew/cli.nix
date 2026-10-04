@@ -10,15 +10,15 @@ in {
     ../../presets/home/cli-core.nix
     ../../presets/home/nix-tools.nix
     ../../presets/home/cli-tech-python-simple.nix
+
+    # AI setup!
+    ../../../opencode/oc-bew.home-module.nix
   ];
 
   home.packages = [
 
     stable.nushell
     stable.trashy
-
-    # AI
-    bleedingedge.opencode # ✨ 🤔
 
     # Extra - system (?)
     stable.cpulimit # Limit CPU usage, especially useful for CPU-intensive tasks
