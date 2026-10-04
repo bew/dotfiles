@@ -71,6 +71,9 @@ These handoff artefacts must never be git-tracked.
 
 ## Safety
 - NEVER delete files without explicit confirmation for these files.
+- NEVER combine `rm` with any other command in one shell invocation
+  (e.g. `rm ... && build`, `rm ...; check`).
+  Run `rm` on its own, as a separate call.
 - NEVER attempt to read secrets from e.g. `.env` files.
 - NEVER drop database tables / delete rows.
 - NEVER try to automatically install something you need.
