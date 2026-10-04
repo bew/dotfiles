@@ -1,25 +1,18 @@
 ---
 description: |
-  Refines draft OpenCode artefacts (skills, agents, commands, prompts) through focused user feedback.
+  Refines draft OpenCode artefacts (skills, agents, commands, prompts, oc-tools, oc-plugins) through focused user feedback.
   Invoked by opencode-crafter skill during review iteration.
   Not for direct use.
 mode: subagent # isolated context!
 hidden: true
 permissions:
-  skill:
-    "*": deny
-    "opencode-artefact-rules": allow
-    "opencode-test-runner": allow
-  task:
-    "*": deny
-    "opencode-simulated-test-runner": allow
-  read: allow
-  edit: allow
-  glob: allow
-  grep: allow
-  question: allow
-  bash: allow
-  external_directory: allow # $draftpath may be outside config dir (e.g. /tmp/ for new artefacts)
+  - {action: skill, resource: "*", effect: deny}
+  - {action: skill, resource: opencode-artefact-rules, effect: allow}
+  - {action: skill, resource: opencode-test-runner, effect: allow}
+  - {action: subagent, resource: "*", effect: deny}
+  - {action: subagent, resource: opencode-simulated-test-runner, effect: allow}
+  # $draftpath may be outside config dir (e.g. /tmp/ for new artefacts)
+  - {action: external_directory, resource: "*", effect: allow}
 ---
 
 # Artefact Reviewer
@@ -46,7 +39,7 @@ Repeat steps 1–3 until quality criteria are fully satisfied.
 
 ## 3. `Phase:Testing` — Run tester (structural changes only)
 
-Skills and agents only — skip entirely for commands and snippets.
+Skills, agents, oc-tools, and oc-plugins — skip entirely for commands and snippets.
 Skip if changes are purely non-structural (style fixes, wording tweaks, path renames, typos).
 Run if changes are structural (new steps, new flows, new criteria, logic changes, added conditions).
 If unsure: ask user via `question` tool before proceeding.

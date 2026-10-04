@@ -6,16 +6,12 @@ description: |
 mode: subagent # isolated context!
 hidden: true
 permissions:
-  skill:
-    "*": deny
-    "opencode-test-runner": allow
-  read: allow
-  glob: allow
-  grep: allow
-  question: allow
-  task: allow
-  edit: deny
-  bash: ask
+  - {action: skill, resource: "*", effect: deny}
+  - {action: skill, resource: opencode-test-runner, effect: allow}
+  - {action: edit, resource: "*", effect: deny}
+  - {action: shell, resource: "*", effect: ask}
+  - {action: subagent, resource: "*", effect: allow}
+  - {action: question, resource: "*", effect: allow}
 ---
 
 # Simulated Artefact Tester

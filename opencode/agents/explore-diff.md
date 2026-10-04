@@ -17,23 +17,20 @@ description: |
   - optionally: which fields to extract per concern (e.g. "include user-facing impact, skip risks")
 mode: subagent # isolated context!
 permissions:
-  bash:
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git status*": allow
-    "git -C * diff*": allow
-    "git -C * log*": allow
-    "git -C * show*": allow
-    "git -C * status*": allow
-    "*": deny
-  read: allow
-  glob: allow
-  grep: allow
-  edit: deny
-  task: deny
-  webfetch: deny
-  websearch: deny
+  - {action: edit, resource: "*", effect: deny}
+  - {action: subagent, resource: "*", effect: deny}
+  - {action: webfetch, resource: "*", effect: deny}
+  - {action: websearch, resource: "*", effect: deny}
+  - {action: shell, resource: "*", effect: deny}
+  # allow specific git actions
+  - {action: shell, resource: "git diff*", effect: allow}
+  - {action: shell, resource: "git log*", effect: allow}
+  - {action: shell, resource: "git show*", effect: allow}
+  - {action: shell, resource: "git status*", effect: allow}
+  - {action: shell, resource: "git -C * diff*", effect: allow}
+  - {action: shell, resource: "git -C * log*", effect: allow}
+  - {action: shell, resource: "git -C * show*", effect: allow}
+  - {action: shell, resource: "git -C * status*", effect: allow}
 ---
 
 # Diff Explorer

@@ -6,15 +6,9 @@ description: |
 mode: subagent # isolated context!
 hidden: true
 permissions:
-  skill: allow
-  task: deny
-  read: allow
-  write: allow
-  edit: allow
-  glob: allow
-  grep: allow
-  question: allow
-  bash: allow
+  - {action: subagent, resource: "*", effect: ask}
+  - {action: edit, resource: "*", effect: allow}
+  - {action: shell, resource: "*", effect: allow}
 ---
 
 # Skill Script Crafter

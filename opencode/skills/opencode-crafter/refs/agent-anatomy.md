@@ -2,7 +2,9 @@
 
 Markdown file configuring a specialised AI assistant.
 
-Official documentation: https://opencode.ai/docs/agents/
+Official documentations:
+- https://opencode.ai/v2/docs/agents/
+- https://opencode.ai/v2/docs/permissions/
 
 ## Install paths
 
@@ -12,31 +14,16 @@ Filename (without `.md`) becomes agent name, usable via `@mention`.
 
 ## Frontmatter
 
-```yaml
+```md
 ---
-description: string         # required — shown in @ autocomplete; drives auto-invocation
-mode: primary | subagent | all   # default: all
-hidden: true                # hide from @ autocomplete (internal subagents only)
-model: provider/model-id    # optional override
-temperature: 0.0–1.0        # optional
-max_steps: integer          # optional — cap agentic iterations
+description: string # required, drives auto-invocation
+mode: primary | subagent | all # default: all
+hidden: true # removes agent from listings and the subagent catalog, can still be called by name
+# model: provider/model-id # optional override
+# temperature: 0.0–1.0     # optional
+# max_steps: integer       # optional — cap agentic iterations
 color: "#FF5733" | primary | accent | …   # optional UI colour
-permissions:
-  read: allow | ask | deny
-  edit: allow | ask | deny
-  bash: allow | ask | deny
-  task: allow | ask | deny
-  skill: allow | ask | deny
-  question: allow | ask | deny
-  glob: allow | ask | deny
-  grep: allow | ask | deny
-  list: allow | ask | deny
-  webfetch: allow | ask | deny
-  websearch: allow | ask | deny
-  lsp: allow | ask | deny
-  todowrite: allow | ask | deny
-  external_directory: allow | ask | deny
-  doom_loop: allow | ask | deny
+permissions: [] # ordered rule list — see "Permissions" below
 ---
 ```
 
@@ -53,7 +40,7 @@ read <./with-precise-inputs.md> for the `## Setup` pattern and input rules.
 | Mode | Usage |
 |---|---|
 | `primary` | Main agent; cycle with Tab or `switch_agent` keybind |
-| `subagent` | Invoked via `task` tool (or `@mention`, if not hidden); runs in a child session with isolated context |
+| `subagent` | Invoked via `subagent` tool (or `@mention`, if not hidden); runs in a child session with isolated context |
 | `all` | Can be used as either (default) |
 
 **Convention**: always annotate the `mode:` line:
@@ -69,13 +56,66 @@ Navigate with:
 - `Right` / `Left` — cycle child sessions
 - `Up` — return to parent
 
-## Task permissions
+## Permissions
 
-Control which subagents may be invoked via `task` tool using glob patterns:
+`permissions` is an ORDERED list of rules; the last matching rule wins.
+Each rule is an inline flow map `{action, resource, effect}`.
+A malformed value drops the agent — it never registers.
 
+Every agent — custom included — starts from this ordered base policy:
 ```yaml
-permissions:
-  task:
-    "*": deny
-    "skill-reviewer": allow
+- {action: "*", resource: "*", effect: allow}
+- {action: external_directory, resource: "*", effect: ask}
+- {action: read, resource: "*.env", effect: ask}
+- {action: read, resource: "*.env.*", effect: ask}
+- {action: read, resource: "*.env.example", effect: allow}
 ```
+Agent rules append after this base — they refine it, never replace it.
+So all tools are `allow` by default; a rule is only useful to restrict or to prompt.
+`question` is on by default — declare it only to `deny` it (shipped `general` does), never to enable it.
+
+OpenCode also pre-allows `external_directory` for its managed tool-output, shell-output, temp, and global config dirs — these appear in every agent's resolved rules.
+
+Shipped agents append their own defaults on top of the base policy:
+
+| Agent | Appended policy |
+|---|---|
+| `build` | `question` allow (redundant with base) |
+| `plan` | `question` allow; `edit` deny except `~/.opencode/plan/*` |
+| `general` | `question` deny; `subagent` deny |
+| `explore` | deny all, then allow `read`/`glob`/`grep`/`webfetch`/`websearch`; `external_directory` + `.env` ask |
+| `title`, `summary` | deny all |
+| `compaction` | none — base policy only |
+
+Example:
+```md
+---
+# ...
+permissions:
+  - {action: shell, resource: "*", effect: deny}
+  # Deny shell by default, except for `git diff*` commands
+  - {action: shell, resource: "git diff*", effect: allow}
+  - {action: subagent, resource: "*", effect: deny}
+---
+```
+
+| Action | Covers |
+|---|---|
+| `read` | file reads |
+| `edit` | edit, write, patch |
+| `glob`, `grep` | file/content search |
+| `shell` | command execution |
+| `subagent` | invoking subagents via the `subagent` tool |
+| `skill` | loading skills |
+| `question` | asking the user |
+| `webfetch`, `websearch` | network access |
+| `external_directory` | paths outside the project |
+| `execute`, `<server>_<tool>` | direct tool execution, MCP tools |
+
+Effects: `allow`, `ask`, `deny`.
+The base `* allow` rule matches every action, so an unlisted tool resolves to `allow`.
+`ask` only comes from an explicit rule (e.g. the base `external_directory` and `.env` rules).
+
+`hidden` removes the agent from listings, interactive discovery, and the subagent catalog.
+A hidden agent can still be launched by a caller that names it explicitly via the `subagent` tool.
+So `hidden` is fine for launch-by-name-only agents — the model cannot discover it on its own.
