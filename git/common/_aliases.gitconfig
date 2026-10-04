@@ -22,6 +22,7 @@
 
   com   = commit
   comp  = com -p
+  com-skip-hooks = com --no-verify
   comdry-run = com --dry-run --untracked-files=no
   # Edit (replace) last commit (should not be used if already pushed!)
   comedit-last = com --amend
@@ -92,12 +93,14 @@
   f = fetch
 
   m = merge
-  ch = "!f() { echo 'NOPE! use: g go … or g restore …'; return 1; }; f"
-  sw = "!f() { echo 'NOPE! use: g go …'; return 1; }; f"
   go = switch
   # Go home (main)
   goh = switch main
   gomain = switch main
+  goback = switch -
+  # old alias guards
+  ch = "!f() { echo 'NOPE! use: g go … or g restore …'; return 1; }; f"
+  sw = "!f() { echo 'NOPE! use: g go …'; return 1; }; f"
 
   sth = stash
   sth-staged = stash push --staged
@@ -158,6 +161,8 @@
   # ref: https://blog.gitbutler.com/git-tips-2-new-stuff-in-git/#safe-force-pushing
   ph-force-safe = push --force-with-lease
   phf = ph-force-safe
+  ph-skip-hooks = push --no-verify
+
   pl = pull
   rem = remote -v
 
