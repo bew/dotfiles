@@ -1,8 +1,9 @@
 node_modules/
-package.json
-package-lock.json
-bun.lock
 logs/
+
+# Contains the locally auto-generated password for basic-auth to the running OC service
+# (note: new in v2!)
+service.json
 
 # NOTE: opencode-snippets plugin supports both snippet/ (preferred) & snippets/ (my preference)
 # And there is a bug where even if snippets/config.jsonc exists it'll re-create snippet/config.jsonc..
