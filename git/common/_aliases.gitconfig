@@ -234,6 +234,11 @@
 
   show-with-stat = !git show --patch-with-stat --summary
 
+  # Show the diffstat + summary of the changes introduced by a single commit
+  # (commit header + diffstat, but no patch)
+  # (note: pager is disabled in [pager] section below, after [alias] section)
+  stat-commit = show --stat --summary
+
   repo-info = !onefetch
 
   # --- Info aliases on current branch
@@ -315,6 +320,7 @@
   list-configs = false
   last-log = false
   stat = false
+  stat-commit = false
   branch = false
 
 # vim:set ft=gitconfig:
