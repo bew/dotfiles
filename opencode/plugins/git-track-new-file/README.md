@@ -19,6 +19,9 @@ runs silently, and control returns immediately.
 Exposes a `git_track_new_file` tool that registers newly created files with git.
 The companion skill (`skills/git-track-new-file/`) tells the agent when to invoke it and which paths to skip.
 
+The result is a one-line status — `tracked`, `skipped (<reason>)`, or `failed (<git error>)` —
+with the path rendered as `<repo>/<path-relative-to-repo-root>`.
+
 The tool is registered with `options.codemode`, so it also appears in the Code
 Mode catalog.
 
@@ -31,11 +34,15 @@ Mechanical skips — files are silently skipped when:
 Agent-judgment skips live in the companion skill, which is the single source for paths the agent should not track.
 They are not enforced in code; `.gitignore` remains the mechanical backstop.
 
-## Symlink handling
+## Repo discovery / cwd
 
-If `git add -N` fails with an "outside repository" error (common when
-`~/.config/opencode` is symlinked into a dotfiles repo), the tool resolves the
-real path via `realpath` and retries once.
+Git commands are anchored with `git -C <file's directory>`, so repo discovery
+does not depend on the process cwd. This matters because V2 runs global plugins
+in a shared server process whose cwd is not the session's project directory.
+
+Anchoring also covers symlinked paths (e.g. `~/.config/opencode` symlinked into
+a dotfiles repo) without needing `realpath` resolution or an "outside
+repository" retry.
 
 ## Layout
 
