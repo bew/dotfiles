@@ -3,7 +3,7 @@ description: Auto-retitle the current session from the conversation
 ---
 
 Analyze conversation and generate concise, descriptive title (max 80 chars).
-Then call `retitle_session` tool to set new title.
+Then call `opencode.session_rename` tool to set new title.
 
 If custom title is provided, use it directly.
 
