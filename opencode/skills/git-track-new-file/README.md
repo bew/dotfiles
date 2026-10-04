@@ -1,6 +1,6 @@
 # git-track-new-file skill
 
-Companion skill for the `git-track-new-file` tool artefact.
+Companion skill for the `git-track-new-file` plugin.
 
 The tool handles the mechanics (`git add -N`, secret/gitignore skips, symlink resolution).
 This skill owns when to call it and which paths to skip, and gates on whether the current directory is a git repository at all.
