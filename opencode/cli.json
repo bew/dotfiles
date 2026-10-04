@@ -1,0 +1,220 @@
+// NOTE: The `cli.json` actually supports comments (but opencode2 doesn't know about / support `cli.jsonc` for some reason)
+//
+// WARNING: When this file is saved in neovim WHILE an // opencode2 is running, the file gets
+// replaced with the default config ⚠️
+// (Neovim saves file atomically via `tmp file + mv`, OC2 watcher might not handle that correctly..)
+//
+// vim:set ft=jsonc:
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "opencode",
+    "mode": "dark"
+  },
+  "diffs": {
+    "wrap": "word",
+    "view": "unified"
+  },
+  "terminal": {
+    "title": false,
+    "copy": "select"
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": true, // it's actually nice!
+    "thinking": "show",
+    "grouping": "none",
+    "markdown": "rendered"
+  },
+  "animations": true,
+  "debug": {
+    "devtools": true,
+    "turn_tokens": true
+  },
+  "tabs": {
+    "mode": "on",
+    "scope": "cwd",
+    "layout": "horizontal",
+    "indicators": "status"
+  },
+  "scroll": {
+    "speed": 2,
+    "acceleration": false
+  },
+  "mouse": true,
+  "prompt": {
+    "editor": true
+  },
+  "leader": {
+    "timeout": 3000
+  },
+
+  // Keybinds (migrated from V1 tui.jsonc; see https://opencode.ai/v2/docs/cli/keybinds)
+  "keybinds": {
+    // Global - general
+    "leader": "alt+space",
+    "command.palette.show": "ctrl+space,<leader>alt+space",
+    "app.exit": "ctrl+q",
+    "terminal.suspend": "ctrl+z",
+
+    // Global: _visual_ toggles
+    "session.toggle.thinking": "<leader>t",
+    "theme.switch": "none",
+    "session.sidebar.toggle": "none",
+    "opencode.status": "none",
+    "terminal.title.toggle": "none",
+    // Dropped (V1-only, already disabled): `tool_details`, `tips_toggle`
+
+    // (Prompt) History
+    "prompt.history.previous": "up,ctrl+p", // prev used prompt
+    "prompt.history.next": "down,ctrl+n", // next used prompt
+
+    // Session: general actions
+    "session.interrupt": "escape",
+    "session.new": "<leader>n",
+    "session.list": "<leader>l",
+    // Session: Disable other session actions (other ways to trigger)
+    "session.rename": "none", // Use /rename or my own /retitle to auto-rename
+    "session.timeline": "none",
+    "session.fork": "none",
+    "session.export": "none",
+    "session.share": "none",
+    "session.unshare": "none",
+    "session.compact": "none",
+    // Queued prompts
+    "session.queued_prompts": "<leader>q", // Manage queued prompts
+    "queued_prompt.delete": "ctrl+d", // Delete queued prompt
+    // Session Navigation
+    "open.menu": "ctrl+o", // Open recent sessions and projects
+    "session.tab.next": "alt+z", // Switch to next open session tab
+    "session.tab.previous": "alt+a", // Switch to previous open session tab
+    "session.tab.close": "<leader>d,alt+d", // Close current session tab
+    "session.tab.reopen": "alt+shift+t", // Reopen last closed session tab
+
+    // Messages: page/half-page nav
+    "session.page.up": "pageup,ctrl+alt+u", // (`ctrl+u` used for `input.delete.to.line.start`)
+    "session.page.down": "pagedown,ctrl+alt+d", // (`ctrl+d` used for `app.exit`)
+    "session.half.page.up": "none",
+    "session.half.page.down": "none",
+
+    // Messages: general nav
+    "session.first": "alt+g",
+    "session.last": "ctrl+g", // FAIL: OC doesn't recognize this
+    "session.message.next": "alt+n",
+    "session.message.previous": "alt+p",
+    "session.message.user.next": "none", // Navigate to next user message
+    "session.message.user.previous": "none", // Navigate to previous user message
+    "session.line.up": "none", // scroll 1 line
+    "session.line.down": "none", // scroll 1 line
+    "session.messages_last_user": "none", // jump to last user-authored message
+
+    // Messages: general actions
+    "messages.copy": "<leader>y", // copy last answer
+    "session.undo": "none", // Use `/undo` instead
+    "session.redo": "none", // Use `/redo` instead
+    // Dropped: V1 `messages_toggle_conceal` (`<leader>h`, raw/pretty markdown) — no V2 keybind; use the `session.markdown` setting.
+
+    "variant.cycle": "ctrl+t",
+    "model.list": "<leader>m", // or `/models`
+    "model.cycle_favorite": "alt+x,ctrl+x",
+    "model.cycle_favorite_reverse": "none",
+    "model.cycle_recent": "alt+shift+x", // (let's try)
+    "model.cycle_recent_reverse": "none",
+
+    "agent.list": "<leader>a",
+    "agent.cycle": "ctrl+a",
+    "agent.cycle.reverse": "ctrl+shift+a",
+
+    "prompt.skills": "<leader>k", // select skill from list (inserts `/<skill-name>`)
+
+    // Prompt stash ✨
+    "prompt.stash": "<leader>s",
+    "prompt.stash.pop": "<leader>shift+s",
+    "prompt.stash.list": "<leader>#",
+
+    "prompt.editor": "ctrl+alt+e,<leader>e",
+    "prompt.clear": "ctrl+c",
+    "prompt.paste": "ctrl+v", // note: uses host clipboard directly to paste text or image
+    // V2 swap kept: Enter=newline, Alt+Enter=submit (so `prompt.queue` is freed below)
+    "input.newline": "alt+o,return,shift+return", // (note: newline inserted at cursor, not at eol)
+    "input.submit": "alt+return", // 🤔 (!!) ctrl+j / ctrl+return not recognized 👀
+    "prompt.queue": "none",
+
+    "input.move.left": "left,alt+h",
+    "input.move.down": "down,alt+j",
+    "input.move.up": "up,alt+k",
+    "input.move.right": "right,alt+l",
+    "input.select.left": "shift+left,shift+alt+h",
+    "input.select.down": "shift+down,shift+alt+j",
+    "input.select.up": "shift+up,shift+alt+k",
+    "input.select.right": "shift+right,shift+alt+l",
+
+    "input.line.home": "home",
+    "input.line.end": "end",
+    "input.select.line.home": "shift+home",
+    "input.select.line.end": "shift+end",
+
+    "input.buffer.home": "none",
+    "input.buffer.end": "none",
+    "input.select.buffer.home": "none",
+    "input.select.buffer.end": "none",
+    "input.undo": "alt+u",
+    "input.redo": "alt+shift+u",
+    "input.word.forward": "alt+w,alt+right",
+    "input.word.backward": "alt+b,alt+left",
+    "input.select.word.forward": "alt+shift+w,alt+shift+right",
+    "input.select.word.backward": "alt+shift+b,alt+shift+left", // (!!) alt+shift+b not recognized, does alt+b instead (but alt+shift+w works..)
+
+    // Input keybinds to delete stuff
+    "input.backspace": "backspace",
+    "input.delete": "none",
+    "input.delete.word.forward": "none",
+    "input.delete.word.backward": "ctrl+w,ctrl+backspace,alt+backspace",
+    "input.delete.to.line.start": "ctrl+u",
+    "input.delete.to.line.end": "none",
+    "input.delete.line": "none",
+
+    // Dialog/Autocomplete keybinds
+    "dialog.select.prev": "alt+k,up",
+    "dialog.select.next": "alt+j,down",
+    "dialog.select.page_up": "pageup",
+    "dialog.select.page_down": "pagedown",
+    "dialog.select.home": "home",
+    "dialog.select.end": "end",
+    "dialog.select.submit": "return,ctrl+space", // (ctrl+j not recognized..)
+    "dialog.prompt.submit": "return",
+    "dialog.mcp.toggle": "space",
+    // FIXME: nav broken for `#…` autocomplete, but works for `/…` or `@…` 👀
+    // TICKET: https://github.com/JosXa/opencode-snippets/issues/36
+    "prompt.autocomplete.prev": "alt+k,up",
+    "prompt.autocomplete.next": "alt+j,down",
+    "prompt.autocomplete.hide": "escape",
+    "prompt.autocomplete.select": "tab,alt+return", // (default: return)
+    "prompt.autocomplete.complete": "return,alt+return", // (default: tab) (used for /foo @foo but not #foo 🤷)
+    "permission.prompt.fullscreen": "ctrl+f",
+    "plugins.toggle": "space",
+    "dialog.plugins.install": "none",
+
+    // NOTE: The following commands were not previously in this config.
+    // Values are the V2 default bindings (which the client already applies), listed
+    // here as a discoverable reference. Tweak a value, set it to "none" to disable,
+    // or delete the line to fall back to the built-in default.
+    // Source: https://opencode.ai/v2/docs/cli/keybinds
+
+    // Diff viewer
+    "diff.open": "<leader>D", // Open diff viewer
+    "diff.next_hunk": "]", // Jump to next diff hunk
+    "diff.previous_hunk": "[", // Jump to previous diff hunk
+    "diff.next_file": "n,alt+down", // Jump to next diff file
+    "diff.previous_file": "p,alt+up", // Jump to previous diff file
+    "diff.toggle_file_tree": "t", // Toggle diff viewer file tree
+    "diff.single_patch": "s", // Toggle single patch view
+    "diff.switch_source": "d", // Choose the diff review scope
+    "diff.toggle_view": "v", // Toggle diff viewer split or unified view
+    "diff.mark_reviewed": "m", // Toggle selected diff file reviewed
+
+    // Prompt
+    "prompt.submit": "none", // Submit prompt
+    "prompt.editor_context.clear": "none", // Clear editor context
+  }
+}

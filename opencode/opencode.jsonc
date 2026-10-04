@@ -1,4 +1,4 @@
-// DOC: https://opencode.ai/docs/
+// DOC: https://opencode.ai/v2/docs/
 //
 // NOTE: Zen models pricing: https://opencode.ai/docs/zen/#pricing
 {
@@ -10,7 +10,11 @@
   "default_agent": "plan",
   "small_model": "opencode/big-pickle", // Free model (not very smart..)
 
-  "plugin": [
+  // Allow nested subagents: reviewer (depth 1) spawns simulated-test-runner (depth 2).
+  // Default is 1, which would block that. 5 leaves headroom for future nesting.
+  "subagent_depth": 5,
+
+  "plugins": [
     // Plugin for Dynamic Context Pruning
     // see: https://github.com/Opencode-DCP/opencode-dynamic-context-pruning
     // Gives /dcp command, but should be used automatically by the models
