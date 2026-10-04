@@ -3,6 +3,8 @@ description: Aggressively shrink context by collapsing blocks into one lean summ
 subtask: false # shared context!
 ---
 
+<compress triggered manually>
+
 Goal: aggressively shrink the context window.
 Replace chosen context items with one lean summary, dropping their detail.
 
