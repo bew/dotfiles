@@ -3,7 +3,114 @@
 Catalogue of every OpenCode skill, agent, command, and plugin in my config, grouped by topic then the rest 🚀
 
 > [!NOTE]
-> A dependency graph of the complex skills is at the end.
+> The catalogue of skills, agents, commands, and plugins follows the graph below.
+
+## Dependency graph
+
+Not a full view of the catalogue — only the complex skills and their direct dependencies are shown.
+
+```mermaid
+flowchart LR
+  subgraph craft[Crafting OC artefacts]
+    oc_crafter["opencode-crafter"]
+    oc_reviewer["opencode-reviewer"]
+    script_crafter["opencode-skill-script-crafter"]
+    artefact_rules["opencode-artefact-rules"]
+    test_runner["opencode-test-runner"]
+    sim_test_runner["opencode-simulated-test-runner"]
+    oc_crafter -->|delegates| oc_reviewer
+    oc_crafter -->|delegates| script_crafter
+    oc_reviewer -->|needs| artefact_rules
+    oc_reviewer -->|invokes| sim_test_runner
+    sim_test_runner -->|uses| test_runner
+    oc_reviewer -. fallback .-> test_runner
+  end
+
+  subgraph code[Coding]
+    coder_generic["coder-generic"]
+    coder_bash["coder-bash"]
+    coder_bats["coder-bats"]
+    coder_python["coder-python"]
+    coder_pytest["coder-pytest"]
+    coder_lua["coder-lua"]
+    coder_nix["coder-nix"]
+    coder_nushell["coder-nushell"]
+    coder_rust["coder-rust"]
+    coder_meta["coder-meta"]
+    coder_bash -->|needs| coder_generic
+    coder_bash -->|uses| coder_bats
+    coder_bats -->|needs| coder_generic
+    coder_python -->|needs| coder_generic
+    coder_python -->|uses| coder_pytest
+    coder_pytest -->|needs| coder_generic
+    coder_pytest -->|needs| coder_python
+    coder_lua -->|needs| coder_generic
+    coder_nix -->|needs| coder_generic
+    coder_nushell -->|needs| coder_generic
+    coder_rust -->|needs| coder_generic
+    coder_meta -->|needs| coder_generic
+    oc_crafter -->|uses| coder_generic
+    script_crafter -->|uses| coder_generic
+  end
+
+  subgraph spec[Spec and planning]
+    write_spec["write-spec"]
+    spec_noninter["write-spec-noninteractive"]
+    spec_ni_std["write-spec-noninteractive-standalone"]
+    design_explore["design-exploration"]
+    plan_milestones["plan-milestones"]
+    write_spec -->|delegates| design_explore
+    spec_noninter -->|derived from| write_spec
+    spec_ni_std -->|derived from| spec_noninter
+  end
+
+  subgraph commit[Commits]
+    committer["committer"]
+    diff2commits["diff-to-commits"]
+    explore_diff["explore-diff"]
+    check_width["check-line-width"]
+    committer -->|uses| explore_diff
+    committer -->|uses| check_width
+    diff2commits -->|uses| explore_diff
+    diff2commits -->|uses| committer
+  end
+
+  subgraph trig[Trigger commands]
+    cmd_commit["/commit"]
+    cmd_add_commit["/add-finished-and-commit"]
+    cmd_bew_commit["/bew-commit"]
+    cmd_diff2commits["/diff-to-commits"]
+    cmd_handoff["/handoff"]
+    cmd_friction["/reflect-friction"]
+    cmd_commit -->|triggers| committer
+    cmd_add_commit -->|triggers| committer
+    cmd_bew_commit -->|triggers| committer
+    cmd_diff2commits -->|triggers| diff2commits
+    cmd_handoff -->|triggers| handoff
+    cmd_friction -->|triggers| reflect_frict
+  end
+
+  subgraph misc[Misc]
+    handoff["handoff"]
+    handoff_std["handoff-standalone"]
+    git_track_skill["git-track-new-file skill"]
+    git_track_plug["git-track-new-file plugin"]
+    github_issue["write-github-issue"]
+    draft_gh["draft-github-issue-pr"]
+    bew_comm_style["bew-communication-style"]
+    cav["caveman"]
+    snippets["snippets skill"]
+    reflect_frict["opencode-reflect-friction"]
+    handoff_std -->|derived from| handoff
+    git_track_skill -->|uses| git_track_plug
+    github_issue -->|needs| bew_comm_style
+    draft_gh -->|needs| bew_comm_style
+    draft_gh -->|uses| explore_diff
+    draft_gh -. supersedes .-> github_issue
+    explore_diff -. loads .-> cav
+    oc_crafter -. loads .-> snippets
+  end
+```
 
 ## Crafting OC artefacts
 
@@ -166,113 +273,3 @@ Skills scoped to this dotfiles repo (under `<repo>/.agents/skills/`), not the gl
 - Skill `read-nvim-help` (has script) — Token-efficient incremental Neovim/Vim help reading via its `nvimq` script.
 
 No dotfiles-specific agents or commands exist yet.
-
-## Dependency graph
-
-Not a full view of the catalogue — only the complex skills and their direct dependencies are shown.
-
-```mermaid
-flowchart LR
-  subgraph craft[Crafting OC artefacts]
-    oc_crafter["opencode-crafter"]
-    oc_reviewer["opencode-reviewer"]
-    script_crafter["opencode-skill-script-crafter"]
-    artefact_rules["opencode-artefact-rules"]
-    test_runner["opencode-test-runner"]
-    sim_test_runner["opencode-simulated-test-runner"]
-    oc_crafter -->|delegates| oc_reviewer
-    oc_crafter -->|delegates| script_crafter
-    oc_reviewer -->|needs| artefact_rules
-    oc_reviewer -->|invokes| sim_test_runner
-    sim_test_runner -->|uses| test_runner
-    oc_reviewer -. fallback .-> test_runner
-  end
-
-  subgraph code[Coding]
-    coder_generic["coder-generic"]
-    coder_bash["coder-bash"]
-    coder_bats["coder-bats"]
-    coder_python["coder-python"]
-    coder_pytest["coder-pytest"]
-    coder_lua["coder-lua"]
-    coder_nix["coder-nix"]
-    coder_nushell["coder-nushell"]
-    coder_rust["coder-rust"]
-    coder_meta["coder-meta"]
-    coder_bash -->|needs| coder_generic
-    coder_bash -->|uses| coder_bats
-    coder_bats -->|needs| coder_generic
-    coder_python -->|needs| coder_generic
-    coder_python -->|uses| coder_pytest
-    coder_pytest -->|needs| coder_generic
-    coder_pytest -->|needs| coder_python
-    coder_lua -->|needs| coder_generic
-    coder_nix -->|needs| coder_generic
-    coder_nushell -->|needs| coder_generic
-    coder_rust -->|needs| coder_generic
-    coder_meta -->|needs| coder_generic
-    oc_crafter -->|uses| coder_generic
-    script_crafter -->|uses| coder_generic
-  end
-
-  subgraph spec[Spec and planning]
-    write_spec["write-spec"]
-    spec_noninter["write-spec-noninteractive"]
-    spec_ni_std["write-spec-noninteractive-standalone"]
-    design_explore["design-exploration"]
-    plan_milestones["plan-milestones"]
-    write_spec -->|delegates| design_explore
-    spec_noninter -->|derived from| write_spec
-    spec_ni_std -->|derived from| spec_noninter
-  end
-
-  subgraph commit[Commits]
-    committer["committer"]
-    diff2commits["diff-to-commits"]
-    explore_diff["explore-diff"]
-    check_width["check-line-width"]
-    committer -->|uses| explore_diff
-    committer -->|uses| check_width
-    diff2commits -->|uses| explore_diff
-    diff2commits -->|uses| committer
-  end
-
-  subgraph misc[Misc]
-    handoff["handoff"]
-    handoff_std["handoff-standalone"]
-    git_track_skill["git-track-new-file skill"]
-    git_track_plug["git-track-new-file plugin"]
-    github_issue["write-github-issue"]
-    draft_gh["draft-github-issue-pr"]
-    bew_comm_style["bew-communication-style"]
-    cav["caveman"]
-    snippets["snippets skill"]
-    reflect_frict["opencode-reflect-friction"]
-    handoff_std -->|derived from| handoff
-    git_track_skill -->|uses| git_track_plug
-    github_issue -->|needs| bew_comm_style
-    draft_gh -->|needs| bew_comm_style
-    draft_gh -->|uses| explore_diff
-    draft_gh -. supersedes .-> github_issue
-    explore_diff -. loads .-> cav
-    oc_crafter -. loads .-> snippets
-  end
-
-  subgraph trig[Trigger commands]
-    cmd_commit["/commit"]
-    cmd_add_commit["/add-finished-and-commit"]
-    cmd_bew_commit["/bew-commit"]
-    cmd_diff2commits["/diff-to-commits"]
-    cmd_handoff["/handoff"]
-    cmd_friction["/reflect-friction"]
-    cmd_commit -->|triggers| committer
-    cmd_add_commit -->|triggers| committer
-    cmd_bew_commit -->|triggers| committer
-    cmd_diff2commits -->|triggers| diff2commits
-    cmd_handoff -->|triggers| handoff
-    cmd_friction -->|triggers| reflect_frict
-  end
-
-  classDef trigger fill:#e8e8ff,stroke:#556,stroke-width:1px
-  class cmd_commit,cmd_add_commit,cmd_bew_commit,cmd_diff2commits,cmd_handoff,cmd_friction trigger
-```
