@@ -50,12 +50,26 @@ All extend the rules below.
   and no lines that contain only whitespace.
 - Never install or declare a package, or silently substitute a stdlib/hand-rolled alternative for a
   recommended package, without asking the user first.
+- Validate unknown input once, at the boundary that owns it.
+  Pass typed values inward instead of re-checking what a schema, constructor, or internal type
+  already guarantees.
+- Do not extract a single-use helper preemptively.
+  Inline it at the call site unless it is reused, hides a genuinely complex boundary, or names a
+  concept that improves the caller.
+- Prefer early returns.
+  Avoid `else`: handle the guard or exceptional case first and let the main path read straight
+  through.
+- Prefer immutable bindings.
+  Avoid reassignment; derive a result rather than mutating a variable.
 
 ## Code layout
 
 - When a function signature does not fit the line width, put each parameter on its own line,
   with a trailing comma after the last one.
   Never pack multiple parameters onto a wrapped line.
+- In brace-delimited languages, always use block braces for control-flow bodies, even when the
+  body is a single statement or `return` — braces leave room for a comment above the line to
+  document its behavior.
 
 ## Types
 
@@ -139,6 +153,17 @@ All extend the rules below.
 - When writing or extracting a helper function, design it for reuse by default.
   Make its boundary general rather than shaped to the current call site.
   If a reusable shape is too complex or the boundary is unclear, ask the user before guessing.
+- Make the main function read as the happy path.
+  Move validation and supporting detail into small named helpers when that clarifies the main path.
+- Avoid unnecessary destructuring.
+  Access fields with dot notation when it preserves the qualifying name and context.
+- Do not use exceptions for expected outcomes; return a value instead.
+  Reserve exceptions for truly exceptional failures.
+- Before adding complexity for a speculative or vanishingly unlikely race, security, or edge case,
+  surface the concrete failure mode, its likelihood, and the complexity cost, and get buy-in first.
+- In tests, prefer exercising the real implementation.
+  Avoid mocks unless there is no alternative.
+- Prefer functional collection transforms over manual index loops where the language supports them.
 - Section separators may be used when file has 5+ functions/structs/enums.
   Usually not needed for smaller files.
   Format: (example for language with '//' prefix for comments)
