@@ -22,7 +22,7 @@
   "session": {
     "sidebar": "hide",
     "scrollbar": true, // it's actually nice!
-    "thinking": "show",
+    "thinking": "hide",
     "grouping": "none",
     "markdown": "rendered"
   },
@@ -213,7 +213,7 @@
     "diff.toggle_view": "v", // Toggle diff viewer split or unified view
     "diff.mark_reviewed": "m", // Toggle selected diff file reviewed
 
-    // Prompt
+    // Prompt (FIXME: what is this?)
     "prompt.submit": "none", // Submit prompt
     "prompt.editor_context.clear": "none", // Clear editor context
   }

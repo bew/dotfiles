@@ -2,6 +2,12 @@
 
 <!-- NOTE: posted on https://gist.github.com/bew/fad7939851511010ddf9d2de7f6c2a94, to share on OC Discord -->
 
+BUG: When I have 2 opencode instances opened in same dir, with tabs scoped to the directory, when I close a session in one instance it also closes the tab for it in the other instance, even if it's the current session the other instance was on,  where an LLM was outputting stuff:
+RESULT: the other instance still has the session open but no tab for it anymore ^^
+And closing all tabs in the first instance makes the other instance not have a tab bar anymore even if there is a visible session active (I can interact with it no problem)..
+EXPECTED: → Honestly I'd expect session tabs closes to be per instance. When I open an instance I get all the active sessions but I can close the ones I don't need in this instance.
+IDEA: Maybe there needs to be a concept of a 'DONE' session, so that it doesn't pop up when I open an instance (but I can still access it in the session list) :thinking:
+
 BAD++: When I load opencode2 with a cli.jsonc it works (and its options are correctly respected)
 UNTIL I attempt to save the cli.jsonc again while the opencode2 instance is running, at which
 point the entire content is replaced with the default config.. (loosing all my personal config 😱)
@@ -12,6 +18,12 @@ BAD: shell command output is 'muted'
 AND there is no way to override that color in e.g. a custom colorscheme
 👉 I want a dedicated theme color so I can color it as I want 🤔 (make it more visible!)
 BAD: long shell command run for a block is truncated..
+
+BAD: When a subagent timeouts / gets interrupted I have no way to see that subagent's session without asking the agent to restart it.. Clicking on it allows to show why it stopped but that's not
+enough..
+
+BAD: Cannot open subagent's session timeline when watching a subagent's timeline
+(opening the command-palette doesn't work at all..)
 
 BAD: Can't have an AGENTS.md in my opencode config dir to hint the agent how to work in this directory tree, since I already have an AGENTS.md for the system prompt 👀😅
 → idea: enforce use of SYSTEM.md for the system prompt? (with auto-migration if it doesn't exist already)

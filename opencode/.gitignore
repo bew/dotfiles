@@ -4,6 +4,8 @@ logs/
 # Contains the locally auto-generated password for basic-auth to the running OC service
 # (note: new in v2!)
 service.json
+# Same, made by `bun dev` in opencode's repo
+service-*.json
 
 # NOTE: opencode-snippets plugin supports both snippet/ (preferred) & snippets/ (my preference)
 # And there is a bug where even if snippets/config.jsonc exists it'll re-create snippet/config.jsonc..
