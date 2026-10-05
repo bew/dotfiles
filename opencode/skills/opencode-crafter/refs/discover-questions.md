@@ -10,6 +10,10 @@ For all artefact types:
 
 For skills additionally:
 - What inputs does agent receive? What should it produce?
+- Is it inspired by an external skill?
+  If so, note the remote GitHub ref (owner/repo, path, revision); read
+  <./reference-study.md> and run its isolated recon (*Step:Recon*) before these questions,
+  then seed the questions with the recon's candidate needs questions.
 - Trigger style: when and how does the skill load?
   Read <./skills-related/trigger-styles.md> for the full style catalogue and discovery questions.
   If skill has a companion command trigger: read <./skills-related/with-command-trigger.md>.
@@ -17,7 +21,8 @@ For skills additionally:
   If yes: read <./with-precise-inputs.md> for the `## Setup` pattern.
   For each input: does it have a default, or is it required (skill stops if absent)?
 - Does skill compute values that are referenced across multiple steps (e.g. a path, slug, or dir)?
-  If yes: read <./with-computed-vars.md> for the declaration block pattern, naming guidelines, and rules.
+  If yes: read <./with-computed-vars.md> for the declaration block pattern, naming
+  guidelines, and rules.
 - Any reference docs, scripts, or templates needed?
 - Any sub-scenarios where only part of instructions applies?
   If yes: apply progressive disclosure — read <./skills-related/anatomy.md§progressive-disclosure>

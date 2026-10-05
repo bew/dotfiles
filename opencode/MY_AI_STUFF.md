@@ -172,8 +172,8 @@ flowchart LR
   - Full lifecycle: Classify → Discover → Draft → (Scripts) → Review → Ship, then (PropagateChange) when variants exist.
   - Delegates review to `opencode-reviewer` and script drafting to `opencode-skill-script-crafter`.
   - Pulls in `coder-generic` + a matching `coder-*` skill for script writing as needed.
-  - Can derives a standalone (single-file, tool-less) skill variant on request.
-  - Can take inspiration from an existing skill (e.g. from a Github URL).
+  - Can derive a standalone (single-file, tool-less) skill variant on request.
+  - Can take inspiration from an existing skill (e.g. from a GitHub URL).
 
 - Agent [`opencode-reviewer`](./agents/opencode-reviewer.md) (*MultiPhase, NoAutoload, Meta*) — Refines a draft OC artefact through focused user feedback; applies trivial edits directly and iterates with user on the rest.
 

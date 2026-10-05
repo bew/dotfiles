@@ -12,6 +12,9 @@ description: |
   on explicit request only — e.g. "make a standalone version of skill X",
   "self-contained skill for Perplexity".
 
+  Can author a skill from an external GitHub skill taken as inspiration — e.g.
+  "write a skill inspired by <GitHub link>", "take ideas from <repo> and make our own".
+
   Triggers examples: "create skill to …", "draft a command to …", "add Y to OC cmd Z",
   "edit the W agent", "write an (oc) plugin to …", "create an (oc) tool for …", "update crafter skill".
   Guides user through discovery, drafting, and iterative refinement.
@@ -99,6 +102,9 @@ Ready to move to `Phase:Discover`? (say 'next' or similar to proceed)
 ## 2. `Phase:Discover` — Gather reqs through focused questions
 
 Read <./refs/discover-questions.md> for full question set.
+
+If the user points at a remote GitHub skill as inspiration: read
+<./refs/reference-study.md> and follow it.
 
 Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 

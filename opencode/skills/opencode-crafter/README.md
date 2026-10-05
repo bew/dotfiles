@@ -49,6 +49,7 @@ Agents must be installed at `~/.config/opencode/agents/` (global) or `.opencode/
 > - Edit the agent-stuck skill to handle a new case
 > - Create a new agent for reviewing OpenCode artefacts
 > - Make a standalone version of the write-spec skill for Perplexity
+> - Write a skill inspired by this external GitHub skill …
 
 ## Reference files
 
@@ -58,6 +59,7 @@ Companion docs loaded on demand by the agent (not read upfront):
 |---|---|
 | [`refs/classify-new.md`](./refs/classify-new.md) | Artefact type decision rules & gate checks |
 | [`refs/discover-questions.md`](./refs/discover-questions.md) | `Phase:Discover` question set |
+| [`refs/reference-study.md`](./refs/reference-study.md) | Recon + deep study of an external GitHub skill taken as inspiration |
 | [`refs/skills-related/anatomy.md`](./refs/skills-related/anatomy.md) | Full skill spec: layout, frontmatter, progressive disclosure |
 | [`refs/skills-related/standalone-anatomy.md`](./refs/skills-related/standalone-anatomy.md) | Standalone spec: layout, transforms, sync |
 | [`refs/skills-related/variants.md`](./refs/skills-related/variants.md) | Variant concept, `VARIANT` file, known types |
