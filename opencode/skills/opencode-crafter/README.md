@@ -43,12 +43,12 @@ Agents must be installed at `~/.config/opencode/agents/` (global) or `.opencode/
 
 ## Usage examples
 
-> Create a skill that monitors my git log and summarizes recent changes
-> Draft a command to summarize the current PR diff
-> Add retitle support to the crafter skill
-> Edit the agent-stuck skill to handle a new case
-> Create a new agent for reviewing OpenCode artefacts
-> Make a standalone version of the write-spec skill for Perplexity
+> - Create a skill that monitors my git log and summarizes recent changes
+> - Draft a command to summarize the current PR diff
+> - Add retitle support to the crafter skill
+> - Edit the agent-stuck skill to handle a new case
+> - Create a new agent for reviewing OpenCode artefacts
+> - Make a standalone version of the write-spec skill for Perplexity
 
 ## Reference files
 
