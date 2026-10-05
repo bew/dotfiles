@@ -10,9 +10,12 @@
   "default_agent": "plan",
   "small_model": "opencode/big-pickle", // Free model (not very smart..)
 
-  // Allow nested subagents: reviewer (depth 1) spawns simulated-test-runner (depth 2).
-  // Default is 1, which would block that. 5 leaves headroom for future nesting.
-  "subagent_depth": 5,
+  "experimental": {
+    // Allow nested subagents, e.g: reviewer (depth 1) spawns simulated-test-runner (depth 2).
+    // Default is 1, which would block that.
+    // Using 5 leaves headroom for deeper nesting needs ;)
+    "subagent_depth": 5,
+  },
 
   "plugins": [
     // Plugin for Dynamic Context Pruning
