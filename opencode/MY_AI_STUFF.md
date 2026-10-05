@@ -11,47 +11,54 @@ Complex skills and their direct dependencies first, then the remaining skills an
 
 Prefix legend:
 - `@` → Agent
+- `§` → Skill
 - `/` → Command
 - `(plugin)` → Plugin
-- no prefix → Skill
 
 ### Complex skills
 
 ```mermaid
 flowchart LR
+  %% Referenced by the craft/spec subgraphs but not members of them.
+  sk_cav["§caveman"]
+  sk_bew_callout["§bew-inline-callout-style"]
+  sk_task_capture["§task-capture-handoff"]
+
   subgraph craft[Crafting OC artefacts]
-    sk_crafter["opencode-crafter"]
+    sk_crafter["§opencode-crafter"]
     ag_reviewer["@opencode-reviewer"]
     ag_script_crafter["@opencode-skill-script-crafter"]
-    sk_artefact_rules["opencode-artefact-rules"]
-    sk_test_runner["opencode-test-runner"]
+    sk_artefact_rules["§opencode-artefact-rules"]
+    sk_test_runner["§opencode-test-runner"]
     ag_sim_test_runner["@opencode-simulated-test-runner"]
     sk_crafter -->|delegates| ag_reviewer
-    sk_crafter -->|delegates| ag_script_crafter
+    sk_crafter -. can use .-> ag_script_crafter
+    sk_crafter -->|loads| sk_cav
+    sk_crafter -. can reference .-> sk_bew_callout
     ag_reviewer -->|needs| sk_artefact_rules
-    ag_reviewer -->|invokes| ag_sim_test_runner
+    ag_reviewer -. can invoke .-> ag_sim_test_runner
     ag_sim_test_runner -->|uses| sk_test_runner
     ag_reviewer -. fallback .-> sk_test_runner
   end
 
   subgraph code[Coding]
-    sk_coder_generic["coder-generic"]
-    sk_coder_bash["coder-bash"]
-    sk_coder_bats["coder-bats"]
-    sk_coder_python["coder-python"]
-    sk_coder_pytest["coder-pytest"]
-    sk_coder_lua["coder-lua"]
-    sk_coder_nix["coder-nix"]
-    sk_coder_nushell["coder-nushell"]
-    sk_coder_rust["coder-rust"]
-    sk_coder_ts["coder-ts"]
-    sk_coder_zsh["coder-zsh"]
-    sk_coder_meta["coder-meta"]
+    sk_coder_generic["§coder-generic"]
+    sk_coder_bash["§coder-bash"]
+    sk_coder_bats["§coder-bats"]
+    sk_coder_python["§coder-python"]
+    sk_coder_pytest["§coder-pytest"]
+    sk_coder_lua["§coder-lua"]
+    sk_coder_nix["§coder-nix"]
+    sk_coder_nushell["§coder-nushell"]
+    sk_coder_rust["§coder-rust"]
+    sk_coder_ts["§coder-ts"]
+    sk_coder_zsh["§coder-zsh"]
+    sk_coder_meta["§coder-meta"]
     sk_coder_bash -->|needs| sk_coder_generic
-    sk_coder_bash -->|uses| sk_coder_bats
+    sk_coder_bash -. can load .-> sk_coder_bats
     sk_coder_bats -->|needs| sk_coder_generic
     sk_coder_python -->|needs| sk_coder_generic
-    sk_coder_python -->|uses| sk_coder_pytest
+    sk_coder_python -. can load .-> sk_coder_pytest
     sk_coder_pytest -->|needs| sk_coder_generic
     sk_coder_pytest -->|needs| sk_coder_python
     sk_coder_lua -->|needs| sk_coder_generic
@@ -60,23 +67,24 @@ flowchart LR
     sk_coder_rust -->|needs| sk_coder_generic
     sk_coder_ts -->|needs| sk_coder_generic
     sk_coder_zsh -->|needs| sk_coder_generic
-    sk_coder_meta -->|needs| sk_coder_generic
-    sk_crafter -->|uses| sk_coder_generic
+    sk_coder_meta -. references .-> sk_coder_generic
+    sk_crafter -. can load .-> sk_coder_generic
     ag_script_crafter -->|uses| sk_coder_generic
   end
 
   subgraph spec[Spec and planning]
-    sk_write_spec["write-spec<br/>(Has variants)"]
-    sk_design_explore["design-exploration"]
-    sk_plan_milestones["plan-milestones"]
-    sk_write_spec -->|delegates| sk_design_explore
+    sk_write_spec["§write-spec<br/>(Has variants)"]
+    sk_design_explore["§design-exploration"]
+    sk_plan_milestones["§plan-milestones"]
+    sk_write_spec -. can delegate .-> sk_design_explore
+    sk_write_spec -. can use .-> sk_task_capture
   end
 
   subgraph commit[Commits]
-    sk_committer["committer"]
-    sk_diff2commits["diff-to-commits"]
+    sk_committer["§committer"]
+    sk_diff2commits["§diff-to-commits"]
     ag_explore_diff["@explore-diff"]
-    sk_check_width["check-line-width"]
+    sk_check_width["§check-line-width"]
     sk_committer -->|uses| ag_explore_diff
     sk_committer -->|uses| sk_check_width
     sk_committer -. can load .-> sk_diff2commits
@@ -102,38 +110,43 @@ flowchart LR
   ag_explore_diff["@explore-diff"]
 
   subgraph otherskills[Non-complex skills]
-    sk_agent_blocker["agent-blocker"]
-    sk_agent_stuck["agent-stuck"]
-    sk_gh_read_file["gh-read-file"]
-    sk_incremental_write["incremental-write"]
-    sk_karpathy["karpathy-guidelines"]
-    sk_read_man_page["read-man-page"]
-    sk_text_replace["text-replace"]
-    sk_bew_callout["bew-inline-callout-style"]
+    sk_agent_blocker["§agent-blocker"]
+    sk_agent_stuck["§agent-stuck"]
+    sk_gh_read_file["§gh-read-file"]
+    sk_incremental_write["§incremental-write"]
+    sk_karpathy["§karpathy-guidelines"]
+    sk_read_man_page["§read-man-page"]
+    sk_text_replace["§text-replace"]
+    sk_bew_callout["§bew-inline-callout-style"]
   end
 
   subgraph misc[Misc]
-    sk_handoff["handoff<br/>(Has variants)"]
-    sk_git_track_skill["git-track-new-file skill"]
+    sk_handoff["§handoff<br/>(Has variants)"]
+    sk_task_capture["§task-capture-handoff"]
+    sk_git_track_skill["§git-track-new-file skill"]
     plug_git_track["(plugin) git-track-new-file"]
-    sk_github_issue["write-github-issue"]
-    sk_draft_gh["draft-github-issue-pr"]
-    sk_bew_comm_style["bew-communication-style"]
-    sk_cav["caveman"]
-    sk_reflect_frict["opencode-reflect-friction"]
+    sk_github_issue["§write-github-issue"]
+    sk_draft_gh["§draft-github-issue-pr"]
+    sk_bew_comm_style["§bew-communication-style"]
+    sk_cav["§caveman"]
+    sk_reflect_frict["§opencode-reflect-friction"]
     sk_git_track_skill -->|uses| plug_git_track
     sk_github_issue -->|needs| sk_bew_comm_style
     sk_draft_gh -->|needs| sk_bew_comm_style
     sk_draft_gh -->|uses| ag_explore_diff
     sk_draft_gh -. supersedes .-> sk_github_issue
     ag_explore_diff -. loads .-> sk_cav
+    sk_handoff -. can load .-> sk_cav
+    sk_task_capture -. can load .-> sk_cav
   end
 
   subgraph trig2[Trigger commands]
     cmd_handoff["/handoff"]
     cmd_friction["/reflect-friction"]
+    cmd_task_capture["/task-capture-handoff"]
     cmd_handoff -->|triggers| sk_handoff
     cmd_friction -->|triggers| sk_reflect_frict
+    cmd_task_capture -->|triggers| sk_task_capture
   end
 
   subgraph othercmds[Other commands]
@@ -247,6 +260,10 @@ flowchart LR
 - Skill `opencode-reflect-friction` — Reviews session friction (main conversation + subagents) and suggests artefact improvements; only on explicit request.
 
 - Command `/reflect-friction` — **triggers `opencode-reflect-friction`**.
+
+- Skill `task-capture-handoff` — Captures one deferred, explicitly-named task from the session as a small `TASK-*` note for a future user or agent to pick up.
+
+- Command `/task-capture-handoff` — **triggers `task-capture-handoff`**.
 
 ## Writing & issues
 

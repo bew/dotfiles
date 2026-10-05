@@ -56,26 +56,29 @@ A catalogue that drifts from reality is worse than none.
 
 - Two `flowchart LR` graphs, in this order:
   1. `### Complex skills` — the artefact groups with real dependencies (Crafting
-     OC artefacts, Coding, Spec and planning, Commits) plus their trigger commands.
+     OC artefacts, Coding, Spec and planning, Commits), their trigger commands,
+     and the cross-graph nodes they reference at the top level.
   2. `### Remaining skills and commands` — the Misc group, the non-complex skills,
      and the remaining trigger and other commands.
 - Each graph groups nodes into themed subgraphs and labels every edge.
   Solid `-->|label|` edges are hard dependencies (needs / uses / delegates /
   invokes / triggers).
-  Dotted `-. label .->` edges are light links; phrase an optional load as
-  `can …` (e.g. `can load`).
+  Dotted `-. label .->` edges are light links; phrase a soft, optional
+  relationship as `can …` (e.g. `can load`, `can delegate`, `can use`,
+  `can reference`, `can invoke`).
 - Node IDs are prefixed by artefact kind — `sk_` skill, `ag_` agent, `cmd_`
   command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
   `ag_explore_diff`).
   The real name goes in the quoted display label.
-- In the display label, mirror how each kind is invoked: agents take `@`
-  (`@explore-diff`), commands take `/` (`/commit`), plugins take `(plugin)`
-  (`(plugin) git-track-new-file`), and skills take no prefix (`coder-generic`).
+- Prefix each display label by kind: agents take `@` (`@explore-diff`),
+  commands take `/` (`/commit`), skills take `§` (`§coder-generic`), plugins
+  take `(plugin)` (`(plugin) git-track-new-file`).
 - A node used by both graphs is declared independently in each (e.g.
   `ag_explore_diff`); the graphs do not share state.
 - A node referenced by a subgraph but not belonging to it is declared outside
-  every subgraph (e.g. the duplicated `ag_explore_diff`), so it does not render
-  inside the wrong group.
+  every subgraph, so it does not render inside the wrong group (e.g. the
+  cross-graph `sk_cav`, `sk_bew_callout`, and `sk_task_capture` in the complex
+  graph, or `ag_explore_diff` in the remaining graph).
 - Do not add `~~~` invisible links — Mermaid does not honour them.
 - Do not add `classDef` styling for trigger commands; nodes use the default style.
 - The graphs are still a partial view: dotfiles-specific artefacts and third-party
