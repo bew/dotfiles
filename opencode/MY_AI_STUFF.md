@@ -123,7 +123,7 @@ flowchart LR
   subgraph misc[Misc]
     sk_handoff["§handoff<br/>(Has variants)"]
     sk_task_capture["§task-capture-handoff"]
-    sk_git_track_skill["§git-track-new-file skill"]
+    sk_git_track_skill["§git-track-new-file"]
     plug_git_track["(plugin) git-track-new-file"]
     sk_github_issue["§write-github-issue"]
     sk_draft_gh["§draft-github-issue-pr"]
@@ -159,7 +159,7 @@ flowchart LR
 
 ## Crafting OC artefacts
 
-- Skill `opencode-crafter` (multi-phased, has script) — Creates, updates, and refactors any OC artefact: skills, agents, commands, oc-tools, oc-plugins.
+- Skill [`opencode-crafter`](./skills/opencode-crafter/) (multi-phased, has script) — Creates, updates, and refactors any OC artefact: skills, agents, commands, oc-tools, oc-plugins.
 
   - Full lifecycle: Classify → Discover → Draft → (Scripts) → Review → Ship, then (PropagateChange) when variants exist.
   - Delegates review to `opencode-reviewer` and script drafting to `opencode-skill-script-crafter`.
@@ -167,142 +167,140 @@ flowchart LR
   - Can derives a standalone (single-file, tool-less) skill variant on request.
   - Can take inspiration from an existing skill (e.g. from a Github URL).
 
-- Agent `opencode-reviewer` — Refines a draft OC artefact through focused user feedback; applies trivial edits directly and iterates with you on the rest.
+- Agent [`opencode-reviewer`](./agents/opencode-reviewer.md) — Refines a draft OC artefact through focused user feedback; applies trivial edits directly and iterates with user on the rest.
 
   Invoked by `opencode-crafter` at `Phase:Review` to find gaps and iterate with the user.
 
-- Skill `opencode-artefact-rules` — Quality criteria and review checklist for OC artefacts, one reference per type.
+- Skill [`opencode-artefact-rules`](./skills/opencode-artefact-rules/) — Quality criteria and review checklist for OC artefacts, one reference per type.
 
   Used for `opencode-reviewer`'s `Phase:Review` — the reviewer loads it to check every criterion for the artefact type.
 
-- Agent `opencode-simulated-test-runner` — Runs an isolated simulated test on a draft artefact.
+- Agent [`opencode-simulated-test-runner`](./agents/opencode-simulated-test-runner.md) — Runs an isolated simulated test on a draft artefact.
 
   Invoked by `opencode-reviewer` at `Phase:Testing` (structural changes only), with no prior review context.
 
-- Skill `opencode-test-runner` — Dry-run testing instructions: generate test cases, narrate them, iterate with reviewer on failures.
+- Skill [`opencode-test-runner`](./skills/opencode-test-runner/) — Dry-run testing instructions: generate test cases, narrate them, iterate with reviewer on failures.
 
   Used for `opencode-simulated-test-runner`'s test pass (entered from `opencode-reviewer`'s `Phase:Testing`) — runs isolated simulated tests on a draft.
 
-- Agent `opencode-skill-script-crafter` — Drafts, tests, and iterates on a skill's scripts.
+- Agent [`opencode-skill-script-crafter`](./agents/opencode-skill-script-crafter.md) — Drafts, tests, and iterates on a skill's scripts.
 
   Invoked by `opencode-crafter` at `Phase:Scripts` (when needed) to POC and harden scripts in isolation.
 
-- Plugin `opencode-snippets` — Hashtag-based snippet expansion (`#snippet`), with shell substitution, includes, forms, and skill rendering.
-
 ## Coding
 
-- Skill `coder-generic` — General code rules for any language: structure, naming, types, comments, error handling.
+- Skill [`coder-generic`](./skills/coder-generic/) — General code rules for any language: structure, naming, types, comments, error handling.
 
   - Splits into `module-rules.md` (imported code) and `script-rules.md` (standalone executables).
   - Loaded before any language skill; every `coder-<lang>` requires it.
 
-- Skills by language/tech: `coder-bash`, `coder-bats`, `coder-python`, `coder-pytest`, `coder-lua`, `coder-nix`, `coder-nushell`, `coder-rust`, `coder-ts`, `coder-zsh`.
+- Skills by language/tech: [`coder-bash`](./skills/coder-bash/), [`coder-bats`](./skills/coder-bats/), [`coder-python`](./skills/coder-python/), [`coder-pytest`](./skills/coder-pytest/), [`coder-lua`](./skills/coder-lua/), [`coder-nix`](./skills/coder-nix/), [`coder-nushell`](./skills/coder-nushell/), [`coder-rust`](./skills/coder-rust/), [`coder-ts`](./skills/coder-ts/), [`coder-zsh`](./skills/coder-zsh/).
 
-- Skill `coder-meta` — Rules for writing new `coder-<lang>` skills.
+- Skill [`coder-meta`](./skills/coder-meta/) — Rules for writing new `coder-<lang>` skills.
 
 ## Specs & planning
 
-- Skill `write-spec` (multi-phased, has script) — Interactive methodology for drafting and refining specs, design docs, architecture notes, RFCs.
+- Skill [`write-spec`](./skills/write-spec/) (multi-phased, has script) — Interactive methodology for drafting and refining specs, design docs, architecture notes, RFCs.
 
   - Phases: Discover → Explore (optional) → Draft → Review.
   - Delegates deep, pre-spec design maturation to `design-exploration`.
 
   Variants:
-  * `write-spec-noninteractive` — non-interactive pass for tool-less chat contexts; no phase gates, questions batched at the end.
-  * `write-spec-noninteractive-standalone` — self-contained (inlined) variant of the non-interactive one.
+  * [`write-spec-noninteractive`](./skills/write-spec-noninteractive/) — non-interactive pass for tool-less chat contexts; no phase gates, questions batched at the end.
+  * [`write-spec-noninteractive-standalone`](./skills/write-spec-noninteractive-standalone/) — self-contained (inlined) variant of the non-interactive one.
 
-- Skill `design-exploration` (multi-phased) — Methodology for maturing a design before a spec exists.
+- Skill [`design-exploration`](./skills/design-exploration/) (multi-phased) — Methodology for maturing a design before a spec exists.
 
   - Phases: Setup → Explore → Wrap.
   - Runs in single-topic or multi-topic mode.
 
   Used for `write-spec`'s optional `Phase:Explore` when the design is genuinely uncertain.
 
-- Skill `plan-milestones` (multi-phased) — Plans, creates, and refines project milestones (`MILESTONES.md`).
+- Skill [`plan-milestones`](./skills/plan-milestones/) (multi-phased) — Plans, creates, and refines project milestones (`MILESTONES.md`).
 
   - Phases: Discover → Draft → Discuss → Finalize.
 
 ## Commits
 
-- Skill `committer` (multi-phased) — Drafts a commit message from a diff, only when explicitly asked.
+- Skill [`committer`](./skills/committer/) (multi-phased) — Drafts a commit message from a diff, with interactive refinement with user.
 
   - Phases: Setup → Analyse → Style → Draft → Commit.
   - Routes diff analysis through `explore-diff`; wraps with `check-line-width`.
-  - Iterates the message with you, offering subject/body refinement suggestions.
+  - Iterates the message with user, offering subject/body refinement suggestions.
 
-- Skill `diff-to-commits` (multi-phased) — Interactive process to splits a diff (default to unstaged changes) into logical commits and drafts each message with user, one group at a time.
+- Skill [`diff-to-commits`](./skills/diff-to-commits/) (multi-phased) — Interactive process to splits a diff (default to unstaged changes) into logical commits and drafts each message with user, one group at a time.
 
   - Phases: Explore → Group → Draft → Summary.
   - Uses `explore-diff` for analysis, then the `committer` skill for each message.
 
-- Skill `check-line-width` (has script) — Checks line length / column overflow from a file or stdin; the only authority on wrapping.
+- Skill [`check-line-width`](./skills/check-line-width/) (has script) — Checks line length / column overflow from a file or stdin; the only authority on wrapping.
 
   Used explicitly by `committer` to validate message wrapping, and relied on implicitly by `opencode-crafter` / `opencode-reviewer` when writing or reviewing artefacts (via `coder-generic`'s line-width rule).
 
-- Agent `explore-diff` — Generic diff/patch explorer; defaults to a summary of concerns, but can be driven to return any structure the caller asks for.
+- Agent [`explore-diff`](./agents/explore-diff.md) — Generic diff/patch explorer; defaults to a summary of concerns, but can be driven to return any structure the caller asks for.
 
   Used explicitly by `committer` (`Phase:Analyse`) and `diff-to-commits` (`Phase:Explore`) to analyse a diff without polluting shared context.
 
-- Command `/commit` — **triggers `committer`**.
-- Command `/bew-commit` — (alias of `/commit`, useful when `/commit` is hijacked by a repo).
-- Command `/add-finished-and-commit` — **triggers `committer`**: draft a commit for the task just finished, scoped to its files.
-- Command `/diff-to-commits` — **triggers `diff-to-commits`**.
+- Command [`/commit`](./commands/commit.md) — **triggers `committer`**.
+- Command [`/bew-commit`](./commands/bew-commit.md) — (alias of `/commit`, useful when `/commit` is hijacked by a repo).
+- Command [`/add-finished-and-commit`](./commands/add-finished-and-commit.md) — **triggers `committer`**: draft a commit for the task just finished, scoped to its files.
+- Command [`/diff-to-commits`](./commands/diff-to-commits.md) — **triggers `diff-to-commits`**.
 
 ## Handoff & session
 
-- Skill `handoff` — Produces a structured handoff document from the session so another agent or human can continue in a fresh session.
+- Skill [`handoff`](./skills/handoff/) — Produces a structured handoff document from the session so another agent or human can continue in a fresh session.
 
   Variants:
-  * `handoff-standalone` — self-contained, tool-less variant; skill refs become plain recommendations.
+  * [`handoff-standalone`](./skills/handoff-standalone/) — self-contained, tool-less variant; skill refs become plain recommendations.
 
-- Command `/handoff` — **triggers `handoff`**.
+- Command [`/handoff`](./commands/handoff.md) — **triggers `handoff`**.
 
-- Skill `opencode-reflect-friction` — Reviews session friction (main conversation + subagents) and suggests artefact improvements; only on explicit request.
+- Skill [`opencode-reflect-friction`](./skills/opencode-reflect-friction/) — Reviews session friction (main conversation + subagents) and suggests artefact improvements; only on explicit request.
 
-- Command `/reflect-friction` — **triggers `opencode-reflect-friction`**.
+- Command [`/reflect-friction`](./commands/reflect-friction.md) — **triggers `opencode-reflect-friction`**.
 
-- Skill `task-capture-handoff` — Captures one deferred, explicitly-named task from the session as a small `TASK-*` note for a future user or agent to pick up.
+- Skill [`task-capture-handoff`](./skills/task-capture-handoff/) — Captures one deferred, explicitly-named task from the session as a small `TASK-*` note for a future user or agent to pick up.
 
-- Command `/task-capture-handoff` — **triggers `task-capture-handoff`**.
+- Command [`/task-capture-handoff`](./commands/task-capture-handoff.md) — **triggers `task-capture-handoff`**.
 
 ## Writing & issues
 
-- Skill `bew-communication-style` — Style reference for writing prose in bew's voice (PRs, issues, posts, emails, chat).
-- Skill `bew-inline-callout-style` — Convention for inline callout markers in prose and artefact files; reference-only.
-- Skill `draft-github-issue-pr` (multi-phased) — Drafts GitHub issues and PRs, conforming to the target repo's templates and guidelines in bew's voice.
+- Skill [`bew-communication-style`](./skills/bew-communication-style/) — Style reference for writing prose in bew's voice (PRs, issues, posts, emails, chat).
+- Skill [`bew-inline-callout-style`](./skills/bew-inline-callout-style/) — Convention for inline callout markers in prose and artefact files; reference-only.
+- Skill [`draft-github-issue-pr`](./skills/draft-github-issue-pr/) (multi-phased) — Drafts GitHub issues and PRs, conforming to the target repo's templates and guidelines in bew's voice.
 
   - Phases: Classify → ContribGuidelines → PreDraft → Draft → VerifyClaims → (IssueFirst) → Submit.
   - Layers the repo's required template/guideline items over the personal shapes (`for-pr` / `for-issue-feature` / `for-issue-bug`).
   - PR-centric: drafts an issue just-in-time only when the repo requires one before a PR.
   - Uses `bew-communication-style` for voice; delegates diff analysis to `explore-diff`.
 
-- Skill `write-github-issue` — Legacy issue-only drafter, kept for comparison; superseded by `draft-github-issue-pr`.
+- Skill [`write-github-issue`](./skills/write-github-issue/) — Legacy issue-only drafter, kept for comparison; superseded by `draft-github-issue-pr`.
 
   Uses `bew-communication-style` for voice and tone. Auto-trigger removed from its description.
 
-- Skill `caveman` — Compressed communication mode; ~75% fewer tokens, full technical accuracy.
+- Skill [`caveman`](./skills/caveman/) — Compressed communication mode; ~75% fewer tokens, full technical accuracy.
 
 ## Other Skills
 
-- `agent-blocker` — Load on environment/runtime hard errors (missing command, version mismatch, permission/auth failure, unreachable network, independently broken tests, failed tool/subagent launch).
-- `agent-stuck` — Load when a human decision or strategy change is needed; track consecutive identical failures, load at the third.
-- `gh-read-file` — Read one explicitly referenced file from GitHub via the authenticated `gh` CLI.
-- `git-track-new-file` — Load right after creating a file/dir so the `git_track_new_file` tool git-tracks it; companion to the local `git-track-new-file` plugin.
-- `incremental-write` — Write structured files incrementally: skeleton first, then targeted edits per section.
-- `karpathy-guidelines` — Behavioral guidelines to avoid overcomplication, keep changes surgical, surface assumptions.
-- `read-man-page` (has script) — Token-efficient incremental man page reading via its `manq` script.
-- `text-replace` — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
+- [`agent-blocker`](./skills/agent-blocker/) — Load on environment/runtime hard errors (missing command, version mismatch, permission/auth failure, unreachable network, independently broken tests, failed tool/subagent launch).
+- [`agent-stuck`](./skills/agent-stuck/) — Load when a human decision or strategy change is needed; track consecutive identical failures, load at the third.
+- [`gh-read-file`](./skills/gh-read-file/) — Read one explicitly referenced file from GitHub via the authenticated `gh` CLI.
+- [`git-track-new-file`](./skills/git-track-new-file/) — Load right after creating a file/dir so the `git_track_new_file` tool git-tracks it; companion to the local `git-track-new-file` plugin.
+- [`incremental-write`](./skills/incremental-write/) — Write structured files incrementally: skeleton first, then targeted edits per section.
+- [`karpathy-guidelines`](./skills/karpathy-guidelines/) — Behavioral guidelines to avoid overcomplication, keep changes surgical, surface assumptions.
+- [`read-man-page`](./skills/read-man-page/) (has script) — Token-efficient incremental man page reading via its `manq` script.
+- [`text-replace`](./skills/text-replace/) — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
 
 ## Other Commands
 
-- `/why-you` — Reflect on the root cause of a decision, without acting.
-- `/retitle` — Auto-retitle the current session from the conversation.
-- `/dcp-compress-aggressive` — Aggressively shrink context by collapsing blocks into one lean summary.
-- `/smarter-take-over-for-better-suggestions` — A smarter model takes over after a weaker model's suggestions.
+- [`/why-you`](./commands/why-you.md) — Reflect on the root cause of a decision, without acting.
+- [`/retitle`](./commands/retitle.md) — Auto-retitle the current session from the conversation.
+- [`/dcp-compress-aggressive`](./commands/dcp-compress-aggressive.md) — Aggressively shrink context by collapsing blocks into one lean summary.
+- [`/smarter-take-over-for-better-suggestions`](./commands/smarter-take-over-for-better-suggestions.md) — A smarter model takes over after a weaker model's suggestions.
 
 ## Other Plugins
 
-- `git-track-new-file` (local) — Registers the `git_track_new_file` tool, which runs `git add -N` on new files/dirs, skipping gitignored paths, secrets, and `/tmp`.
+- [`git-track-new-file`](./plugins/git-track-new-file/) (local) — Registers the `git_track_new_file` tool, which runs `git add -N` on new files/dirs, skipping gitignored paths, secrets, and `/tmp`.
 
   Companion skill `git-track-new-file` tells the agent when to call it.
 
@@ -315,8 +313,8 @@ flowchart LR
 
 Skills scoped to this dotfiles repo (under `<repo>/.agents/skills/`), not the global config:
 
-- Skill `coder-lua-for-nvim` — Neovim Lua conventions for this repo's `nvim/lua/**`; requires `coder-generic` + `coder-lua`.
-- Skill `nvim-plugin-dev` (has script) — Neovim plugin authoring under `nvim-myplugins/`; requires `coder-generic`, `coder-lua`, `coder-lua-for-nvim`.
-- Skill `read-nvim-help` (has script) — Token-efficient incremental Neovim/Vim help reading via its `nvimq` script.
+- Skill [`coder-lua-for-nvim`](../.agents/skills/coder-lua-for-nvim/) — Neovim Lua conventions for this repo's `nvim/lua/**`; requires `coder-generic` + `coder-lua`.
+- Skill [`nvim-plugin-dev`](../.agents/skills/nvim-plugin-dev/) (has script) — Neovim plugin authoring under `nvim-myplugins/`; requires `coder-generic`, `coder-lua`, `coder-lua-for-nvim`.
+- Skill [`read-nvim-help`](../.agents/skills/read-nvim-help/) (has script) — Token-efficient incremental Neovim/Vim help reading via its `nvimq` script.
 
 No dotfiles-specific agents or commands exist yet.

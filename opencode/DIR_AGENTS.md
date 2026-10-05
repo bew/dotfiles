@@ -13,8 +13,8 @@ settings that apply to every OpenCode session on this machine.
 ## Maintenance
 
 Whenever you add, remove, or rename a skill, command, or agent, update
-`MY_AI_STUFF.md` to match: its entry description and the dependency-graph nodes
-and edges.
+`MY_AI_STUFF.md` to match: its entry (definition link and description) and the
+dependency-graph nodes and edges.
 A catalogue that drifts from reality is worse than none.
 
 ## MY_AI_STUFF.md format
@@ -25,12 +25,26 @@ A catalogue that drifts from reality is worse than none.
   Commits, Handoff & session, Writing & issues), then unmatched entries fall under
   `## Other Skills`, `## Other Commands`, and `## Other Plugins`.
   Omit an `Other …` group when it would be empty.
-- Each entry is ``- <Type> `<name>` — <one-line description>``, where `<Type>` is
-  Skill / Agent / Command / Plugin.
+- Each entry is ``- <Type> [`<name>`](<path>) — <one-line description>``, where
+  `<Type>` is Skill / Agent / Command / Plugin.
 - A command that only loads a skill and adds no behavior has no description — its
   whole entry is ``**triggers `skill`**``.
   A command that adds behavior (e.g. a default scope) keeps a short description.
 - Annotate a skill's name with `(multi-phased)` and/or `(has script)` when true.
+
+### Links
+
+- Every entry's name links to its definition, so the catalogue is one click from
+  the source.
+- Link target by kind: skills and local plugins point at their directory
+  (`./skills/<name>/`, `./plugins/<name>/`); agents and commands point at their
+  file (`./agents/<name>.md`, `./commands/<name>.md`).
+- Give in-repo target paths an explicit `./` prefix.
+- Link the names in the compact `Skills by language/tech:` line and in each
+  `Variants:` bullet too.
+- A dotfiles-specific skill points across to the repo skills dir
+  (`../.agents/skills/<name>/`).
+- Third-party plugins have no local definition — leave them unlinked.
 
 ### Sub-blocks
 
