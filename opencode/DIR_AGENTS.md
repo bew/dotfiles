@@ -7,13 +7,14 @@ settings that apply to every OpenCode session on this machine.
 ## Read first
 
 - `README.md` — overview of this config dir and its local plugin dependencies.
-- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, and plugin, with a
-  dependency graph for the complex ones.
+- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, and plugin, with
+  dependency graphs for the complex artefacts and the remaining ones.
 
 ## Maintenance
 
 Whenever you add, remove, or rename a skill, command, or agent, update
-`MY_AI_STUFF.md` to match: its entry description and the dependency-graph edges.
+`MY_AI_STUFF.md` to match: its entry description and the dependency-graph nodes
+and edges.
 A catalogue that drifts from reality is worse than none.
 
 ## MY_AI_STUFF.md format
@@ -51,18 +52,30 @@ A catalogue that drifts from reality is worse than none.
 - List dotfiles-specific artefacts (from `<repo>/.agents/` and `<repo>/.opencode/`)
   in their own section, separate from the global config.
 
-### Mermaid graph
+### Mermaid graphs
 
-- The graph is `flowchart LR`, groups nodes into themed subgraphs, and labels every
-  edge: needs / uses / delegates / invokes / derived from / loads / fallback /
-  triggers.
+- Two `flowchart LR` graphs, in this order:
+  1. `### Complex skills` — the artefact groups with real dependencies (Crafting
+     OC artefacts, Coding, Spec and planning, Commits) plus their trigger commands.
+  2. `### Remaining skills and commands` — the Misc group, the non-complex skills,
+     and the remaining trigger and other commands.
+- Each graph groups nodes into themed subgraphs and labels every edge:
+  needs / uses / delegates / invokes / loads / fallback / triggers.
   Use solid `-->|label|` for hard dependencies and dotted `-. label .->` for soft
   loads or fallbacks.
-- It is a partial view — add an intro noting it does not show every artefact.
-- Node IDs are descriptive but short: no single letters and no full names, ≤15
-  chars, and `2` for "to" (e.g. `diff2commits`).
+- Node IDs are prefixed by artefact kind — `sk_` skill, `ag_` agent, `cmd_`
+  command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
+  `ag_explore_diff`).
   The real name goes in the quoted display label.
-- Style trigger-command nodes with `classDef trigger`.
+- A node used by both graphs is declared independently in each (e.g.
+  `ag_explore_diff`); the graphs do not share state.
+- A node referenced by a subgraph but not belonging to it is declared outside
+  every subgraph (e.g. the duplicated `ag_explore_diff`), so it does not render
+  inside the wrong group.
+- Do not add `~~~` invisible links — Mermaid does not honour them.
+- Do not add `classDef` styling for trigger commands; nodes use the default style.
+- The graphs are still a partial view: dotfiles-specific artefacts and third-party
+  plugins are not shown. Keep the intro noting the scope.
 
 ## Layout
 

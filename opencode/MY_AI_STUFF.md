@@ -3,11 +3,13 @@
 Catalogue of every OpenCode skill, agent, command, and plugin in my config, grouped by topic then the rest 🚀
 
 > [!NOTE]
-> The catalogue of skills, agents, commands, and plugins follows the graph below.
+> The catalogue of skills, agents, commands, and plugins follows the graphs below.
 
-## Dependency graph
+## Dependency graphs
 
-Not a full view of the catalogue — only the complex skills and their direct dependencies are shown.
+Complex skills and their direct dependencies first, then the remaining skills and commands.
+
+### Complex skills
 
 ```mermaid
 flowchart LR
@@ -36,6 +38,8 @@ flowchart LR
     sk_coder_nix["coder-nix"]
     sk_coder_nushell["coder-nushell"]
     sk_coder_rust["coder-rust"]
+    sk_coder_ts["coder-ts"]
+    sk_coder_zsh["coder-zsh"]
     sk_coder_meta["coder-meta"]
     sk_coder_bash -->|needs| sk_coder_generic
     sk_coder_bash -->|uses| sk_coder_bats
@@ -48,6 +52,8 @@ flowchart LR
     sk_coder_nix -->|needs| sk_coder_generic
     sk_coder_nushell -->|needs| sk_coder_generic
     sk_coder_rust -->|needs| sk_coder_generic
+    sk_coder_ts -->|needs| sk_coder_generic
+    sk_coder_zsh -->|needs| sk_coder_generic
     sk_coder_meta -->|needs| sk_coder_generic
     sk_crafter -->|uses| sk_coder_generic
     ag_script_crafter -->|uses| sk_coder_generic
@@ -73,16 +79,32 @@ flowchart LR
 
   subgraph trig[Trigger commands]
     cmd_commit["/commit"]
+    cmd_bew_commit["/bew-commit"]
     cmd_add_commit["/add-finished-and-commit"]
     cmd_diff2commits["/diff-to-commits"]
-    cmd_handoff["/handoff"]
-    cmd_friction["/reflect-friction"]
     cmd_commit -->|triggers| sk_committer
-    cmd_add_commit -->|triggers| sk_committer
     cmd_bew_commit -->|triggers| sk_committer
+    cmd_add_commit -->|triggers| sk_committer
     cmd_diff2commits -->|triggers| sk_diff2commits
-    cmd_handoff -->|triggers| sk_handoff
-    cmd_friction -->|triggers| sk_reflect_frict
+  end
+```
+
+### Remaining skills and commands
+
+```mermaid
+flowchart LR
+  %% explore-diff is duplicated from the complex graph; it is not part of any group.
+  ag_explore_diff["explore-diff"]
+
+  subgraph otherskills[Non-complex skills]
+    sk_agent_blocker["agent-blocker"]
+    sk_agent_stuck["agent-stuck"]
+    sk_gh_read_file["gh-read-file"]
+    sk_incremental_write["incremental-write"]
+    sk_karpathy["karpathy-guidelines"]
+    sk_read_man_page["read-man-page"]
+    sk_text_replace["text-replace"]
+    sk_bew_callout["bew-inline-callout-style"]
   end
 
   subgraph misc[Misc]
@@ -102,16 +124,19 @@ flowchart LR
     ag_explore_diff -. loads .-> sk_cav
   end
 
-  %% Invisible layout spine: force the section order as written
-  %% (craft → code → spec → commit → trig → misc).
-  sk_coder_generic ~~~ sk_write_spec
-  sk_write_spec ~~~ sk_committer
-  sk_committer ~~~ cmd_commit
-  cmd_commit ~~~ sk_handoff
+  subgraph trig2[Trigger commands]
+    cmd_handoff["/handoff"]
+    cmd_friction["/reflect-friction"]
+    cmd_handoff -->|triggers| sk_handoff
+    cmd_friction -->|triggers| sk_reflect_frict
+  end
 
-  %% Invisible links pinning `misc`'s root nodes after a late-ranked group.
-  sk_test_runner ~~~ sk_git_track_skill
-  sk_test_runner ~~~ sk_draft_gh
+  subgraph othercmds[Other commands]
+    cmd_why_you["/why-you"]
+    cmd_retitle["/retitle"]
+    cmd_dcp_aggressive["/dcp-compress-aggressive"]
+    cmd_smarter_takeover["/smarter-take-over-for-better-suggestions"]
+  end
 ```
 
 ## Crafting OC artefacts
@@ -153,7 +178,7 @@ flowchart LR
   - Splits into `module-rules.md` (imported code) and `script-rules.md` (standalone executables).
   - Loaded before any language skill; every `coder-<lang>` requires it.
 
-- Skills by language/tech: `coder-bash`, `coder-bats`, `coder-python`, `coder-pytest`, `coder-lua`, `coder-nix`, `coder-nushell`, `coder-rust`.
+- Skills by language/tech: `coder-bash`, `coder-bats`, `coder-python`, `coder-pytest`, `coder-lua`, `coder-nix`, `coder-nushell`, `coder-rust`, `coder-ts`, `coder-zsh`.
 
 - Skill `coder-meta` — Rules for writing new `coder-<lang>` skills.
 
