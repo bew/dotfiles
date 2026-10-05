@@ -102,6 +102,13 @@ All extend the rules below.
 
 ## Comments & docs rules
 
+### Semantic line breaks
+
+- Every comment — file header, function documentation, and inline — uses semantic line breaks:
+  each sentence starts on its own line.
+- Keep comment lines within about 100 columns.
+  When a language skill states its own max width, that one wins.
+
 ### Function documentation
 
 - Every function has documentation (doc comment, docstring, or leading comment — in the
@@ -132,9 +139,6 @@ All extend the rules below.
   branching logic), add an inline comment for each logical phase not just one for a whole block.
 - For an assignment that changes state (module, object, or global), write WHY the mutation
   happens when it is not obvious from the guarding condition.
-- Sentences in comments start on a new line (semantic line breaks! + Follow lang max line width).
-  Do not chain multiple sentences on a single line unless they fit the remaining line width
-  without wrapping.
 
 ### Dated notes
 
