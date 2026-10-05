@@ -12,113 +12,115 @@ Not a full view of the catalogue — only the complex skills and their direct de
 ```mermaid
 flowchart LR
   subgraph craft[Crafting OC artefacts]
-    oc_crafter["opencode-crafter"]
-    oc_reviewer["opencode-reviewer"]
-    script_crafter["opencode-skill-script-crafter"]
-    artefact_rules["opencode-artefact-rules"]
-    test_runner["opencode-test-runner"]
-    sim_test_runner["opencode-simulated-test-runner"]
-    oc_crafter -->|delegates| oc_reviewer
-    oc_crafter -->|delegates| script_crafter
-    oc_reviewer -->|needs| artefact_rules
-    oc_reviewer -->|invokes| sim_test_runner
-    sim_test_runner -->|uses| test_runner
-    oc_reviewer -. fallback .-> test_runner
+    sk_crafter["opencode-crafter"]
+    ag_reviewer["opencode-reviewer"]
+    ag_script_crafter["opencode-skill-script-crafter"]
+    sk_artefact_rules["opencode-artefact-rules"]
+    sk_test_runner["opencode-test-runner"]
+    ag_sim_test_runner["opencode-simulated-test-runner"]
+    sk_crafter -->|delegates| ag_reviewer
+    sk_crafter -->|delegates| ag_script_crafter
+    ag_reviewer -->|needs| sk_artefact_rules
+    ag_reviewer -->|invokes| ag_sim_test_runner
+    ag_sim_test_runner -->|uses| sk_test_runner
+    ag_reviewer -. fallback .-> sk_test_runner
   end
 
   subgraph code[Coding]
-    coder_generic["coder-generic"]
-    coder_bash["coder-bash"]
-    coder_bats["coder-bats"]
-    coder_python["coder-python"]
-    coder_pytest["coder-pytest"]
-    coder_lua["coder-lua"]
-    coder_nix["coder-nix"]
-    coder_nushell["coder-nushell"]
-    coder_rust["coder-rust"]
-    coder_meta["coder-meta"]
-    coder_bash -->|needs| coder_generic
-    coder_bash -->|uses| coder_bats
-    coder_bats -->|needs| coder_generic
-    coder_python -->|needs| coder_generic
-    coder_python -->|uses| coder_pytest
-    coder_pytest -->|needs| coder_generic
-    coder_pytest -->|needs| coder_python
-    coder_lua -->|needs| coder_generic
-    coder_nix -->|needs| coder_generic
-    coder_nushell -->|needs| coder_generic
-    coder_rust -->|needs| coder_generic
-    coder_meta -->|needs| coder_generic
-    oc_crafter -->|uses| coder_generic
-    script_crafter -->|uses| coder_generic
+    sk_coder_generic["coder-generic"]
+    sk_coder_bash["coder-bash"]
+    sk_coder_bats["coder-bats"]
+    sk_coder_python["coder-python"]
+    sk_coder_pytest["coder-pytest"]
+    sk_coder_lua["coder-lua"]
+    sk_coder_nix["coder-nix"]
+    sk_coder_nushell["coder-nushell"]
+    sk_coder_rust["coder-rust"]
+    sk_coder_meta["coder-meta"]
+    sk_coder_bash -->|needs| sk_coder_generic
+    sk_coder_bash -->|uses| sk_coder_bats
+    sk_coder_bats -->|needs| sk_coder_generic
+    sk_coder_python -->|needs| sk_coder_generic
+    sk_coder_python -->|uses| sk_coder_pytest
+    sk_coder_pytest -->|needs| sk_coder_generic
+    sk_coder_pytest -->|needs| sk_coder_python
+    sk_coder_lua -->|needs| sk_coder_generic
+    sk_coder_nix -->|needs| sk_coder_generic
+    sk_coder_nushell -->|needs| sk_coder_generic
+    sk_coder_rust -->|needs| sk_coder_generic
+    sk_coder_meta -->|needs| sk_coder_generic
+    sk_crafter -->|uses| sk_coder_generic
+    ag_script_crafter -->|uses| sk_coder_generic
   end
 
   subgraph spec[Spec and planning]
-    write_spec["write-spec"]
-    spec_noninter["write-spec-noninteractive"]
-    spec_ni_std["write-spec-noninteractive-standalone"]
-    design_explore["design-exploration"]
-    plan_milestones["plan-milestones"]
-    write_spec -->|delegates| design_explore
-    spec_noninter -->|derived from| write_spec
-    spec_ni_std -->|derived from| spec_noninter
+    sk_write_spec["write-spec<br/>(Has variants)"]
+    sk_design_explore["design-exploration"]
+    sk_plan_milestones["plan-milestones"]
+    sk_write_spec -->|delegates| sk_design_explore
   end
 
   subgraph commit[Commits]
-    committer["committer"]
-    diff2commits["diff-to-commits"]
-    explore_diff["explore-diff"]
-    check_width["check-line-width"]
-    committer -->|uses| explore_diff
-    committer -->|uses| check_width
-    diff2commits -->|uses| explore_diff
-    diff2commits -->|uses| committer
+    sk_committer["committer"]
+    sk_diff2commits["diff-to-commits"]
+    ag_explore_diff["explore-diff"]
+    sk_check_width["check-line-width"]
+    sk_committer -->|uses| ag_explore_diff
+    sk_committer -->|uses| sk_check_width
+    sk_diff2commits -->|uses| ag_explore_diff
+    sk_diff2commits -->|uses| sk_committer
   end
 
   subgraph trig[Trigger commands]
     cmd_commit["/commit"]
     cmd_add_commit["/add-finished-and-commit"]
-    cmd_bew_commit["/bew-commit"]
     cmd_diff2commits["/diff-to-commits"]
     cmd_handoff["/handoff"]
     cmd_friction["/reflect-friction"]
-    cmd_commit -->|triggers| committer
-    cmd_add_commit -->|triggers| committer
-    cmd_bew_commit -->|triggers| committer
-    cmd_diff2commits -->|triggers| diff2commits
-    cmd_handoff -->|triggers| handoff
-    cmd_friction -->|triggers| reflect_frict
+    cmd_commit -->|triggers| sk_committer
+    cmd_add_commit -->|triggers| sk_committer
+    cmd_bew_commit -->|triggers| sk_committer
+    cmd_diff2commits -->|triggers| sk_diff2commits
+    cmd_handoff -->|triggers| sk_handoff
+    cmd_friction -->|triggers| sk_reflect_frict
   end
 
   subgraph misc[Misc]
-    handoff["handoff"]
-    handoff_std["handoff-standalone"]
-    git_track_skill["git-track-new-file skill"]
-    git_track_plug["git-track-new-file plugin"]
-    github_issue["write-github-issue"]
-    draft_gh["draft-github-issue-pr"]
-    bew_comm_style["bew-communication-style"]
-    cav["caveman"]
-    snippets["snippets skill"]
-    reflect_frict["opencode-reflect-friction"]
-    handoff_std -->|derived from| handoff
-    git_track_skill -->|uses| git_track_plug
-    github_issue -->|needs| bew_comm_style
-    draft_gh -->|needs| bew_comm_style
-    draft_gh -->|uses| explore_diff
-    draft_gh -. supersedes .-> github_issue
-    explore_diff -. loads .-> cav
-    oc_crafter -. loads .-> snippets
+    sk_handoff["handoff<br/>(Has variants)"]
+    sk_git_track_skill["git-track-new-file skill"]
+    plug_git_track["git-track-new-file plugin"]
+    sk_github_issue["write-github-issue"]
+    sk_draft_gh["draft-github-issue-pr"]
+    sk_bew_comm_style["bew-communication-style"]
+    sk_cav["caveman"]
+    sk_reflect_frict["opencode-reflect-friction"]
+    sk_git_track_skill -->|uses| plug_git_track
+    sk_github_issue -->|needs| sk_bew_comm_style
+    sk_draft_gh -->|needs| sk_bew_comm_style
+    sk_draft_gh -->|uses| ag_explore_diff
+    sk_draft_gh -. supersedes .-> sk_github_issue
+    ag_explore_diff -. loads .-> sk_cav
   end
+
+  %% Invisible layout spine: force the section order as written
+  %% (craft → code → spec → commit → trig → misc).
+  sk_coder_generic ~~~ sk_write_spec
+  sk_write_spec ~~~ sk_committer
+  sk_committer ~~~ cmd_commit
+  cmd_commit ~~~ sk_handoff
+
+  %% Invisible links pinning `misc`'s root nodes after a late-ranked group.
+  sk_test_runner ~~~ sk_git_track_skill
+  sk_test_runner ~~~ sk_draft_gh
 ```
 
 ## Crafting OC artefacts
 
-- Skill `opencode-crafter` (multi-phased, has script) — Creates, updates, and refactors any OC artefact: skills, agents, commands, oc-tools, oc-plugins, snippets.
+- Skill `opencode-crafter` (multi-phased, has script) — Creates, updates, and refactors any OC artefact: skills, agents, commands, oc-tools, oc-plugins.
 
   - Full lifecycle: Classify → Discover → Draft → (Scripts) → Review → Ship, then (PropagateChange) when variants exist.
   - Delegates review to `opencode-reviewer` and script drafting to `opencode-skill-script-crafter`.
-  - Pulls in `coder-generic` + a matching `coder-*` skill for script writing as needed, and the `snippets` spec for snippet work.
+  - Pulls in `coder-generic` + a matching `coder-*` skill for script writing as needed.
   - Can derives a standalone (single-file, tool-less) skill variant on request.
   - Can take inspiration from an existing skill (e.g. from a Github URL).
 
@@ -143,8 +145,6 @@ flowchart LR
   Invoked by `opencode-crafter` at `Phase:Scripts` (when needed) to POC and harden scripts in isolation.
 
 - Plugin `opencode-snippets` — Hashtag-based snippet expansion (`#snippet`), with shell substitution, includes, forms, and skill rendering.
-
-  Loaded by `opencode-crafter` for snippet work (the `snippets` spec).
 
 ## Coding
 
@@ -201,7 +201,7 @@ flowchart LR
   Used explicitly by `committer` (`Phase:Analyse`) and `diff-to-commits` (`Phase:Explore`) to analyse a diff without polluting shared context.
 
 - Command `/commit` — **triggers `committer`**.
-- Command `/bew-commit` — **triggers `committer`** (duplicate, useful when `/commit` is hijacked by a repo).
+- Command `/bew-commit` — (alias of `/commit`, useful when `/commit` is hijacked by a repo).
 - Command `/add-finished-and-commit` — **triggers `committer`**: draft a commit for the task just finished, scoped to its files.
 - Command `/diff-to-commits` — **triggers `diff-to-commits`**.
 
