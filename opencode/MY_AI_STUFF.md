@@ -9,17 +9,23 @@ Catalogue of every OpenCode skill, agent, command, and plugin in my config, grou
 
 Complex skills and their direct dependencies first, then the remaining skills and commands.
 
+Prefix legend:
+- `@` → Agent
+- `/` → Command
+- `(plugin)` → Plugin
+- no prefix → Skill
+
 ### Complex skills
 
 ```mermaid
 flowchart LR
   subgraph craft[Crafting OC artefacts]
     sk_crafter["opencode-crafter"]
-    ag_reviewer["opencode-reviewer"]
-    ag_script_crafter["opencode-skill-script-crafter"]
+    ag_reviewer["@opencode-reviewer"]
+    ag_script_crafter["@opencode-skill-script-crafter"]
     sk_artefact_rules["opencode-artefact-rules"]
     sk_test_runner["opencode-test-runner"]
-    ag_sim_test_runner["opencode-simulated-test-runner"]
+    ag_sim_test_runner["@opencode-simulated-test-runner"]
     sk_crafter -->|delegates| ag_reviewer
     sk_crafter -->|delegates| ag_script_crafter
     ag_reviewer -->|needs| sk_artefact_rules
@@ -69,7 +75,7 @@ flowchart LR
   subgraph commit[Commits]
     sk_committer["committer"]
     sk_diff2commits["diff-to-commits"]
-    ag_explore_diff["explore-diff"]
+    ag_explore_diff["@explore-diff"]
     sk_check_width["check-line-width"]
     sk_committer -->|uses| ag_explore_diff
     sk_committer -->|uses| sk_check_width
@@ -79,11 +85,9 @@ flowchart LR
 
   subgraph trig[Trigger commands]
     cmd_commit["/commit"]
-    cmd_bew_commit["/bew-commit"]
     cmd_add_commit["/add-finished-and-commit"]
     cmd_diff2commits["/diff-to-commits"]
     cmd_commit -->|triggers| sk_committer
-    cmd_bew_commit -->|triggers| sk_committer
     cmd_add_commit -->|triggers| sk_committer
     cmd_diff2commits -->|triggers| sk_diff2commits
   end
@@ -94,7 +98,7 @@ flowchart LR
 ```mermaid
 flowchart LR
   %% explore-diff is duplicated from the complex graph; it is not part of any group.
-  ag_explore_diff["explore-diff"]
+  ag_explore_diff["@explore-diff"]
 
   subgraph otherskills[Non-complex skills]
     sk_agent_blocker["agent-blocker"]
@@ -110,7 +114,7 @@ flowchart LR
   subgraph misc[Misc]
     sk_handoff["handoff<br/>(Has variants)"]
     sk_git_track_skill["git-track-new-file skill"]
-    plug_git_track["git-track-new-file plugin"]
+    plug_git_track["(plugin) git-track-new-file"]
     sk_github_issue["write-github-issue"]
     sk_draft_gh["draft-github-issue-pr"]
     sk_bew_comm_style["bew-communication-style"]

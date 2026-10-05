@@ -67,6 +67,9 @@ A catalogue that drifts from reality is worse than none.
   command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
   `ag_explore_diff`).
   The real name goes in the quoted display label.
+- In the display label, mirror how each kind is invoked: agents take `@`
+  (`@explore-diff`), commands take `/` (`/commit`), plugins take `(plugin)`
+  (`(plugin) git-track-new-file`), and skills take no prefix (`coder-generic`).
 - A node used by both graphs is declared independently in each (e.g.
   `ag_explore_diff`); the graphs do not share state.
 - A node referenced by a subgraph but not belonging to it is declared outside
