@@ -7,7 +7,7 @@ settings that apply to every OpenCode session on this machine.
 ## Read first
 
 - `README.md` — overview of this config dir and its local plugin dependencies.
-- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, and plugin, with
+- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, and tool, with
   dependency graphs for the complex artefacts and the remaining ones.
 
 ## Maintenance
@@ -22,21 +22,44 @@ A catalogue that drifts from reality is worse than none.
 ### Grouping and entries
 
 - Entries are grouped by topic (Crafting OC artefacts, Coding, Specs & planning,
-  Commits, Handoff & session, Writing & issues), then unmatched entries fall under
-  `## Other Skills`, `## Other Commands`, and `## Other Plugins`.
-  Omit an `Other …` group when it would be empty.
-- Each entry is ``- <Type> [`<name>`](<path>) — <one-line description>``, where
-  `<Type>` is Skill / Agent / Command / Plugin.
+  Commits, Handoff & session, Writing & issues), then unmatched skills/commands
+  fall under `## Miscellaneous`.
+  Tools live under `## Tools & Plugins`, and repo-specific artefacts under
+  `## Repo-specific artefacts`.
+- Each entry is ``- <Type> [`<name>`](<path>) (*<tags>*) — <one-line description>``,
+  where `<Type>` is Skill / Agent / Command / Tool.
+- Tags go in an optional parenthesis right after the link, comma-separated and
+  italicised (`*<tags>*`), drawn from the vocabulary below; omit the parenthesis
+  when an artefact has no tag.
 - A command that only loads a skill and adds no behavior has no description — its
   whole entry is ``**triggers `skill`**``.
   A command that adds behavior (e.g. a default scope) keeps a short description.
-- Annotate a skill's name with `(multi-phased)` and/or `(has script)` when true.
+
+### Tags
+
+Tag an artefact only when the property holds; no tag is mandatory.
+
+- `MultiPhase` — defines named sequential phases; implies `Interactive`.
+- `Interactive` — a non-`MultiPhase` artefact that asks the user questions in its
+  normal workflow (setup-only prompts and "ask if unsure" do not count).
+- `Meta` — an artefact exclusively about reflecting on the model's own work, or
+  about editing/planning/authoring OC artefacts.
+- `Trigger` — a command that triggers a skill/agent (graph-only; catalogue entries
+  already say ``**triggers `skill`**``).
+- `NoAutoload` — never loaded by description matching; explicit or external
+  invocation only.
+  Skills, agents, and tools without `NoAutoload` are `CanAutoload` by default and
+  carry no tag for it.
+- `HasVariants` — ships named variants (the catalogue's `Variants:` bullets).
+- `HasScript` — ships a script under `scripts/`.
+
+The same vocabulary is mirrored in `MY_AI_STUFF.md`'s `Tag legend`.
 
 ### Links
 
 - Every entry's name links to its definition, so the catalogue is one click from
   the source.
-- Link target by kind: skills and local plugins point at their directory
+- Link target by kind: skills and tools point at their directory
   (`./skills/<name>/`, `./plugins/<name>/`); agents and commands point at their
   file (`./agents/<name>.md`, `./commands/<name>.md`).
 - Give in-repo target paths an explicit `./` prefix.
@@ -86,14 +109,17 @@ A catalogue that drifts from reality is worse than none.
   relationship as `can …` (e.g. `can load`, `can delegate`, `can use`,
   `can reference`, `can invoke`).
 - Node IDs are prefixed by artefact kind — `sk_` skill, `ag_` agent, `cmd_`
-  command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
+  command, `tool_` tool — then the short name (e.g. `sk_coder_generic`,
   `ag_explore_diff`).
   The real name goes in the quoted display label.
-- Prefix each display label by kind, followed by a space: agents take `@`
+- A display label is `<b><prefix> <name></b>`, the name in bold: agents take `@`
   (`@ explore-diff`), commands take `/` (`/ commit`), skills take `§`
-  (`§ coder-generic`), plugins take `(plugin)` (`(plugin) git-track-new-file`).
+  (`§ coder-generic`), tools take `(tool)` (`(tool) git-track-new-file`).
+- When the artefact has tags, append them on a second line: `<br/><i>` … `</i>`
+  around the comma-separated tags, not bold (e.g.
+  `<b>§ committer</b><br/><i>MultiPhase</i>`).
 - Each graph carries a single `legend` node titled `Prefix legend`, with one line
-  per prefix (`@ → Agent`, `§ → Skill`, `/ → Command`, `(plugin) → Plugin`),
+  per prefix (`@ → Agent`, `§ → Skill`, `/ → Command`, `(tool) → Tool`),
   left-aligned (`style legend text-align:left,fill:none`).
 - A node used by both graphs is declared independently in each (e.g.
   `ag_explore_diff`); the graphs do not share state.
