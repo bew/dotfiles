@@ -309,6 +309,14 @@ flowchart LR
 
   Companion skill `git-track-new-file` tells the agent when to call it.
 
+- Tool [`ui-tester`](./plugins/ui-tester/) — Local TUI playground plugin; `/ui-tester` arms it and shows a settings panel that toggles a bright debug widget into every published UI slot.
+
+  TUI entry `tui.tsx` exercises the slot API. The panel is one component on two surfaces — docked (host session panel) or floating (`app`-slot overlay, `alt+f`), both with background-coloured camera corner marks. While shown it pushes an input mode so the prompt stops receiving typing. Placement is one of `append`, `prepend`, `before`, `after`, `replace`.
+
+- Tool [`account-switcher`](./plugins/account-switcher/) — Local TUI plugin; shows the active account per integration in the prompt footer and home screen, and clicking opens a picker that switches the active credential.
+
+  Reads `CredentialEntry.label` (never the secret); refreshes on `credential.updated`, `credential.switched`, and `integration.updated`.
+
 ### Important third-party plugins
 
 - `@tarquinen/opencode-dcp` — Dynamic Context Pruning: manages context dynamically to optimize tokens for long sessions (smarter than simple summarization).
