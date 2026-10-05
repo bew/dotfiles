@@ -70,10 +70,15 @@ A catalogue that drifts from reality is worse than none.
 
 - Two `flowchart LR` graphs, in this order:
   1. `### Complex skills` — the artefact groups with real dependencies (Crafting
-     OC artefacts, Coding, Spec and planning, Commits), their trigger commands,
-     and the cross-graph nodes they reference at the top level.
-  2. `### Remaining skills and commands` — the Misc group, the non-complex skills,
-     and the remaining trigger and other commands.
+     OC artefacts, Coding, Spec and planning, Commits), with each group's trigger
+     commands folded in, and the cross-graph nodes they reference at the top level.
+  2. `### Remaining skills and commands` — the `Misc` group (with the trigger
+     commands for the skills it holds), the standalone skills, and the standalone
+     commands.
+- A trigger command lives in the group of the artefact it triggers, never in a
+  dedicated trigger group.
+- `Standalone` groups hold artefacts with no dependency edges — no edges to or from
+  any other node in the graph.
 - Each graph groups nodes into themed subgraphs and labels every edge.
   Solid `-->|label|` edges are hard dependencies (needs / uses / delegates /
   invokes / triggers).
@@ -84,9 +89,12 @@ A catalogue that drifts from reality is worse than none.
   command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
   `ag_explore_diff`).
   The real name goes in the quoted display label.
-- Prefix each display label by kind: agents take `@` (`@explore-diff`),
-  commands take `/` (`/commit`), skills take `§` (`§coder-generic`), plugins
-  take `(plugin)` (`(plugin) git-track-new-file`).
+- Prefix each display label by kind, followed by a space: agents take `@`
+  (`@ explore-diff`), commands take `/` (`/ commit`), skills take `§`
+  (`§ coder-generic`), plugins take `(plugin)` (`(plugin) git-track-new-file`).
+- Each graph carries a single `legend` node titled `Prefix legend`, with one line
+  per prefix (`@ → Agent`, `§ → Skill`, `/ → Command`, `(plugin) → Plugin`),
+  left-aligned (`style legend text-align:left,fill:none`).
 - A node used by both graphs is declared independently in each (e.g.
   `ag_explore_diff`); the graphs do not share state.
 - A node referenced by a subgraph but not belonging to it is declared outside

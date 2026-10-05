@@ -20,17 +20,19 @@ Prefix legend:
 ```mermaid
 flowchart LR
   %% Referenced by the craft/spec subgraphs but not members of them.
-  sk_cav["§caveman"]
-  sk_bew_callout["§bew-inline-callout-style"]
-  sk_task_capture["§task-capture-handoff"]
+  sk_cav["§ caveman"]
+  sk_bew_callout["§ bew-inline-callout-style"]
+  sk_task_capture["§ task-capture-handoff"]
+  legend["<b>Prefix legend</b><br/>@ → Agent<br/>§ → Skill<br/>/ → Command<br/>(plugin) → Plugin"]
+  style legend text-align:left,fill:none
 
   subgraph craft[Crafting OC artefacts]
-    sk_crafter["§opencode-crafter"]
-    ag_reviewer["@opencode-reviewer"]
-    ag_script_crafter["@opencode-skill-script-crafter"]
-    sk_artefact_rules["§opencode-artefact-rules"]
-    sk_test_runner["§opencode-test-runner"]
-    ag_sim_test_runner["@opencode-simulated-test-runner"]
+    sk_crafter["§ opencode-crafter"]
+    ag_reviewer["@ opencode-reviewer"]
+    ag_script_crafter["@ opencode-skill-script-crafter"]
+    sk_artefact_rules["§ opencode-artefact-rules"]
+    sk_test_runner["§ opencode-test-runner"]
+    ag_sim_test_runner["@ opencode-simulated-test-runner"]
     sk_crafter -->|delegates| ag_reviewer
     sk_crafter -. can use .-> ag_script_crafter
     sk_crafter -->|loads| sk_cav
@@ -42,18 +44,18 @@ flowchart LR
   end
 
   subgraph code[Coding]
-    sk_coder_generic["§coder-generic"]
-    sk_coder_bash["§coder-bash"]
-    sk_coder_bats["§coder-bats"]
-    sk_coder_python["§coder-python"]
-    sk_coder_pytest["§coder-pytest"]
-    sk_coder_lua["§coder-lua"]
-    sk_coder_nix["§coder-nix"]
-    sk_coder_nushell["§coder-nushell"]
-    sk_coder_rust["§coder-rust"]
-    sk_coder_ts["§coder-ts"]
-    sk_coder_zsh["§coder-zsh"]
-    sk_coder_meta["§coder-meta"]
+    sk_coder_generic["§ coder-generic"]
+    sk_coder_bash["§ coder-bash"]
+    sk_coder_bats["§ coder-bats"]
+    sk_coder_python["§ coder-python"]
+    sk_coder_pytest["§ coder-pytest"]
+    sk_coder_lua["§ coder-lua"]
+    sk_coder_nix["§ coder-nix"]
+    sk_coder_nushell["§ coder-nushell"]
+    sk_coder_rust["§ coder-rust"]
+    sk_coder_ts["§ coder-ts"]
+    sk_coder_zsh["§ coder-zsh"]
+    sk_coder_meta["§ coder-meta"]
     sk_coder_bash -->|needs| sk_coder_generic
     sk_coder_bash -. can load .-> sk_coder_bats
     sk_coder_bats -->|needs| sk_coder_generic
@@ -73,29 +75,26 @@ flowchart LR
   end
 
   subgraph spec[Spec and planning]
-    sk_write_spec["§write-spec<br/>(Has variants)"]
-    sk_design_explore["§design-exploration"]
-    sk_plan_milestones["§plan-milestones"]
+    sk_write_spec["§ write-spec<br/>(Has variants)"]
+    sk_design_explore["§ design-exploration"]
+    sk_plan_milestones["§ plan-milestones"]
     sk_write_spec -. can delegate .-> sk_design_explore
     sk_write_spec -. can use .-> sk_task_capture
   end
 
   subgraph commit[Commits]
-    sk_committer["§committer"]
-    sk_diff2commits["§diff-to-commits"]
-    ag_explore_diff["@explore-diff"]
-    sk_check_width["§check-line-width"]
+    sk_committer["§ committer"]
+    sk_diff2commits["§ diff-to-commits"]
+    ag_explore_diff["@ explore-diff"]
+    sk_check_width["§ check-line-width"]
+    cmd_commit["/ commit"]
+    cmd_add_commit["/ add-finished-and-commit"]
+    cmd_diff2commits["/ diff-to-commits"]
     sk_committer -->|uses| ag_explore_diff
     sk_committer -->|uses| sk_check_width
     sk_committer -. can load .-> sk_diff2commits
     sk_diff2commits -->|uses| ag_explore_diff
     sk_diff2commits -->|uses| sk_committer
-  end
-
-  subgraph trig[Trigger commands]
-    cmd_commit["/commit"]
-    cmd_add_commit["/add-finished-and-commit"]
-    cmd_diff2commits["/diff-to-commits"]
     cmd_commit -->|triggers| sk_committer
     cmd_add_commit -->|triggers| sk_committer
     cmd_diff2commits -->|triggers| sk_diff2commits
@@ -107,29 +106,23 @@ flowchart LR
 ```mermaid
 flowchart LR
   %% explore-diff is duplicated from the complex graph; it is not part of any group.
-  ag_explore_diff["@explore-diff"]
-
-  subgraph otherskills[Non-complex skills]
-    sk_agent_blocker["§agent-blocker"]
-    sk_agent_stuck["§agent-stuck"]
-    sk_gh_read_file["§gh-read-file"]
-    sk_incremental_write["§incremental-write"]
-    sk_karpathy["§karpathy-guidelines"]
-    sk_read_man_page["§read-man-page"]
-    sk_text_replace["§text-replace"]
-    sk_bew_callout["§bew-inline-callout-style"]
-  end
+  ag_explore_diff["@ explore-diff"]
+  legend["<b>Prefix legend</b><br/>@ → Agent<br/>§ → Skill<br/>/ → Command<br/>(plugin) → Plugin"]
+  style legend text-align:left,fill:none
 
   subgraph misc[Misc]
-    sk_handoff["§handoff<br/>(Has variants)"]
-    sk_task_capture["§task-capture-handoff"]
-    sk_git_track_skill["§git-track-new-file"]
+    sk_handoff["§ handoff<br/>(Has variants)"]
+    sk_task_capture["§ task-capture-handoff"]
+    sk_git_track_skill["§ git-track-new-file"]
     plug_git_track["(plugin) git-track-new-file"]
-    sk_github_issue["§write-github-issue"]
-    sk_draft_gh["§draft-github-issue-pr"]
-    sk_bew_comm_style["§bew-communication-style"]
-    sk_cav["§caveman"]
-    sk_reflect_frict["§opencode-reflect-friction"]
+    sk_github_issue["§ write-github-issue"]
+    sk_draft_gh["§ draft-github-issue-pr"]
+    sk_bew_comm_style["§ bew-communication-style"]
+    sk_cav["§ caveman"]
+    sk_reflect_frict["§ opencode-reflect-friction"]
+    cmd_handoff["/ handoff"]
+    cmd_friction["/ reflect-friction"]
+    cmd_task_capture["/ task-capture-handoff"]
     sk_git_track_skill -->|uses| plug_git_track
     sk_github_issue -->|needs| sk_bew_comm_style
     sk_draft_gh -->|needs| sk_bew_comm_style
@@ -138,22 +131,27 @@ flowchart LR
     ag_explore_diff -. loads .-> sk_cav
     sk_handoff -. can load .-> sk_cav
     sk_task_capture -. can load .-> sk_cav
-  end
-
-  subgraph trig2[Trigger commands]
-    cmd_handoff["/handoff"]
-    cmd_friction["/reflect-friction"]
-    cmd_task_capture["/task-capture-handoff"]
     cmd_handoff -->|triggers| sk_handoff
     cmd_friction -->|triggers| sk_reflect_frict
     cmd_task_capture -->|triggers| sk_task_capture
   end
 
-  subgraph othercmds[Other commands]
-    cmd_why_you["/why-you"]
-    cmd_retitle["/retitle"]
-    cmd_dcp_aggressive["/dcp-compress-aggressive"]
-    cmd_smarter_takeover["/smarter-take-over-for-better-suggestions"]
+  subgraph otherskills[Standalone skills]
+    sk_agent_blocker["§ agent-blocker"]
+    sk_agent_stuck["§ agent-stuck"]
+    sk_gh_read_file["§ gh-read-file"]
+    sk_incremental_write["§ incremental-write"]
+    sk_karpathy["§ karpathy-guidelines"]
+    sk_read_man_page["§ read-man-page"]
+    sk_text_replace["§ text-replace"]
+    sk_bew_callout["§ bew-inline-callout-style"]
+  end
+
+  subgraph othercmds[Standalone commands]
+    cmd_why_you["/ why-you"]
+    cmd_retitle["/ retitle"]
+    cmd_dcp_aggressive["/ dcp-compress-aggressive"]
+    cmd_smarter_takeover["/ smarter-take-over-for-better-suggestions"]
   end
 ```
 
