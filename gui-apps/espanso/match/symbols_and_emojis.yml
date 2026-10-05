@@ -151,5 +151,8 @@ matches:
   - trigger: "!<!" # 1-token reversed arrow
     replace: '←'
 
-  - trigger: "!<>!" # 2-token left-right arrows
+  - trigger: "!<>!" # 1-token left-right arrows
+    replace: '↔'
+
+  - trigger: "!<->!" # 2-token left-right arrows
     replace: '←→'
