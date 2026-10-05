@@ -3,6 +3,13 @@
 
 ORIGINAL_PATH=$PATH
 
+# ------------------ options (subset, see also rc/options.zsh)
+
+# Don't error on unmatched globs (e.g. `echo foo?bar` prints as-is instead of 'zsh: no match').
+# Set in zshenv so it also applies to non-interactive shells, e.g. AI agents calling
+# `zsh -c '...'` without quoting properly.
+setopt NO_nomatch
+
 # ------------------ shell config
 
 # FIXME: ⚠ ⚠ This is not reproducible, should NOT load anything from ~/...  ⚠ ⚠
