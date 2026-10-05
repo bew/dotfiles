@@ -5,11 +5,11 @@ let
 in {
   imports = [
     ../../presets/home/common.nix
-
     ../../presets/home/cli-core.nix
-
     ../../presets/home/nix-tools.nix
-
     ../../presets/home/cli-neovim.nix
+
+    # AI setup!
+    ../../../opencode/oc-bew.home-module.nix
   ];
 }
