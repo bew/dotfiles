@@ -2,8 +2,8 @@
 name: write-github-issue
 description: |
   Guidelines for drafting a GitHub issue in bew's voice.
-  Load when asked to write, draft, or review a GitHub issue (feature request, bug report,
-  question, or other type).
+  Legacy issue-only drafter, superseded by `draft-github-issue-pr`; kept for comparison.
+  Not auto-triggered.
 metadata:
   maintainers: [bew]
 ---

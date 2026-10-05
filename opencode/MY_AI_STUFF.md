@@ -115,9 +115,16 @@ Catalogue of every OpenCode skill, agent, command, and plugin in my config, grou
 
 - Skill `bew-communication-style` — Style reference for writing prose in bew's voice (PRs, issues, posts, emails, chat).
 - Skill `bew-inline-callout-style` — Convention for inline callout markers in prose and artefact files; reference-only.
-- Skill `write-github-issue` — Guidelines for drafting a GitHub issue in bew's voice.
+- Skill `draft-github-issue-pr` (multi-phased) — Drafts GitHub issues and PRs, conforming to the target repo's templates and guidelines in bew's voice.
 
-  Uses `bew-communication-style` for voice and tone.
+  - Phases: Classify → ContribGuidelines → PreDraft → Draft → VerifyClaims → (IssueFirst) → Submit.
+  - Layers the repo's required template/guideline items over the personal shapes (`for-pr` / `for-issue-feature` / `for-issue-bug`).
+  - PR-centric: drafts an issue just-in-time only when the repo requires one before a PR.
+  - Uses `bew-communication-style` for voice; delegates diff analysis to `explore-diff`.
+
+- Skill `write-github-issue` — Legacy issue-only drafter, kept for comparison; superseded by `draft-github-issue-pr`.
+
+  Uses `bew-communication-style` for voice and tone. Auto-trigger removed from its description.
 
 - Skill `caveman` — Compressed communication mode; ~75% fewer tokens, full technical accuracy.
 
@@ -236,6 +243,7 @@ flowchart LR
     git_track_skill["git-track-new-file skill"]
     git_track_plug["git-track-new-file plugin"]
     github_issue["write-github-issue"]
+    draft_gh["draft-github-issue-pr"]
     bew_comm_style["bew-communication-style"]
     cav["caveman"]
     snippets["snippets skill"]
@@ -243,6 +251,9 @@ flowchart LR
     handoff_std -->|derived from| handoff
     git_track_skill -->|uses| git_track_plug
     github_issue -->|needs| bew_comm_style
+    draft_gh -->|needs| bew_comm_style
+    draft_gh -->|uses| explore_diff
+    draft_gh -. supersedes .-> github_issue
     explore_diff -. loads .-> cav
     oc_crafter -. loads .-> snippets
   end
