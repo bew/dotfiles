@@ -140,6 +140,8 @@ The same vocabulary is mirrored in `MY_AI_STUFF.md`'s `Tag legend`.
 - `plugins/<name>/` — local plugins; their npm deps live in the root
   `package.json` + `bun.lock`, installed by `just update-local-plugins-deps`;
   run their tests with `just test <name>`.
+- `plugin-docs/` — notes on building plugins (common + TUI + server), gathered
+  while writing `plugins/ui-tester/`.
 - `opencode.jsonc` — main config (settings, `plugins`, agents, …).
 - `cli.json` — CLI/TUI-only settings.
 - `AGENTS.md` — the global system-prompt instructions (this dir is their root).
