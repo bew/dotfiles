@@ -1,8 +1,9 @@
 ---
 name: committer
 description: |
-  Load the commit drafter ONLY when the user explicitly asks to draft or generate a commit message.
-  Do NOT auto-load speculatively.
+  Load the commit drafter whenever a commit is about to be created — including when
+  committing is part of a larger requested flow (e.g. publish, ship, push this).
+  Never author a commit message inline; run this draft/iterate flow first.
   Covers the full drafting process: diff analysis via explore-diff (defaults to staged changes),
   commit style detection, message writing, and eventual iteration loop.
 metadata:
@@ -298,6 +299,11 @@ This is a MULTI-select question.
 
 This is a SINGLE-select question.
 
+Prepend a scope recap to the question text, above the options:
+`Scope recap (adjust if needed): <resolved scope>`
+Read the current resolved `Scope` (post multi-task resolution and any rescope) — files/areas,
+never the literal `session work items`.
+
 - "🚀 Commit" — commit with message.
 - "🔎 Preview" — re-output, stay in the loop.
 - "📥 Stage only" — stage the intended files, do NOT commit.
@@ -307,6 +313,27 @@ Use these labels verbatim — do not combine or conflate them.
 
 No answer for this question always means "🔎 Preview".
 (but keep it as second option when asking, after commit)
+
+**Rescope** — a custom answer that adjusts scope. Recognised verbs:
+- `rescope: <x>` / `only <x>` — replace the scope with `<x>`.
+- `include <x>` / `incl <x>` / `add <x>` / `also <x>` — add `<x>` to the scope.
+- `skip <x>` / `remove <x>` — drop `<x>` from the scope.
+- `<x>` is one or more comma-separated paths/areas/globs, or concern labels.
+Any other custom answer is not a rescope — treat it as "🔎 Preview".
+
+NOTE: `add` is a scope verb here — it never approves staging.
+Staging is approved only in `Phase:Commit`.
+
+On rescope:
+- Update `Scope` by replace/add/drop per the verb.
+- Filter the current `explore-diff` concerns to those overlapping the updated scope.
+  A concern-label `<x>` selects or drops that concern directly.
+- If the filtered set is empty, or a concern-label `<x>` matches no concern:
+  stop, report the gap, and ask how to proceed.
+- If an added or replaced path (`include` / `incl` / `add` / `also` / `only` / `rescope:`) is absent
+  from the analysed diff: stop, report the gap, and ask whether to re-run `Phase:Analyse`.
+- Re-run `Phase:Style` for the rescoped concerns, then `Phase:Draft`, then re-enter `Phase:Iterate`.
+- Discard any unapplied subject/body refinements — the new draft starts fresh.
 
 ### Apply the result
 
@@ -321,6 +348,8 @@ All options apply any selected subject/body edits first.
 - "🔎 Preview": apply the selected edits, re-output, repeat `Phase:Iterate`.
 - "📥 Stage only": apply the selected edits if any, then run the staging + verify steps of
   `Phase:Commit` (file-set confirmation + `git add`), then stop — do not commit.
+- Custom answer matching **Rescope** verbs: follow the associated **Rescope** rules.
+  The draft is rebuilt from the rescoped concerns (note: edits suggestions might still be relevant).
 
 ## 5. `Phase:Commit` — stage, verify, and commit
 

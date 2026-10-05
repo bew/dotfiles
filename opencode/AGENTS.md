@@ -55,6 +55,10 @@ NEVER run git operations like push/reset/switch/restore/stash/checkout/clean.
 When the user explicitly asks for it, you are allowed to add/commit.
 ALWAYS ask when user didn't explicitly approve a set of git commit-related commands needed.
 
+Every `git commit` is preceded by the `committer` skill's draft/iterate phase —
+never author the commit message inline, even when the commit itself was already approved
+(e.g. as part of a publish/ship flow).
+
 When the user specifies a git command with a path argument (e.g. `git diff .`, `git log src/`),
 treat the path as a required constraint — never silently drop it or widen the scope.
 
