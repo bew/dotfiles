@@ -79,6 +79,7 @@ flowchart LR
     sk_check_width["check-line-width"]
     sk_committer -->|uses| ag_explore_diff
     sk_committer -->|uses| sk_check_width
+    sk_committer -. can load .-> sk_diff2commits
     sk_diff2commits -->|uses| ag_explore_diff
     sk_diff2commits -->|uses| sk_committer
   end

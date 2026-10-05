@@ -59,10 +59,11 @@ A catalogue that drifts from reality is worse than none.
      OC artefacts, Coding, Spec and planning, Commits) plus their trigger commands.
   2. `### Remaining skills and commands` — the Misc group, the non-complex skills,
      and the remaining trigger and other commands.
-- Each graph groups nodes into themed subgraphs and labels every edge:
-  needs / uses / delegates / invokes / loads / fallback / triggers.
-  Use solid `-->|label|` for hard dependencies and dotted `-. label .->` for soft
-  loads or fallbacks.
+- Each graph groups nodes into themed subgraphs and labels every edge.
+  Solid `-->|label|` edges are hard dependencies (needs / uses / delegates /
+  invokes / triggers).
+  Dotted `-. label .->` edges are light links; phrase an optional load as
+  `can …` (e.g. `can load`).
 - Node IDs are prefixed by artefact kind — `sk_` skill, `ag_` agent, `cmd_`
   command, `plug_` plugin — then the short name (e.g. `sk_coder_generic`,
   `ag_explore_diff`).
