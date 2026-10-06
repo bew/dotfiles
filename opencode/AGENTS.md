@@ -118,6 +118,13 @@ Never produce code or spec content speculatively on an unexplored idea.
 - When something fails, show the raw error first, then your interpretation.
 
 
+## Subagents
+
+The in-context subagent list is NOT exhaustive.
+When a skill names a subagent to use for your need, invoke it by name as-is.
+(never assume it will not work because it's not listed)
+
+
 ## opencode path alias
 
 `~/.config/opencode` is a symlink to `~/.dot/opencode` — the same directory, not a copy.
