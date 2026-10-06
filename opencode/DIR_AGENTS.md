@@ -17,6 +17,27 @@ Whenever you add, remove, or rename a skill, command, or agent, update
 dependency-graph nodes and edges.
 A catalogue that drifts from reality is worse than none.
 
+## Commits
+
+Commit subjects in this directory use a scoped-commit prefix:
+
+`oc[(<scope>[:<sub-scope>])]: <subject>`
+
+- `oc` is this directory's short prefix.
+- Add `(<scope>)` when the change is confined to one area — normally the skill,
+  command, or subdir it touches (e.g. `oc(crafter)`, `oc(coder)`, `oc(docs)`,
+  `oc(tui)`, `oc(cfg)`).
+- Add a `<sub-scope>` after `:` for a nested area (e.g. `oc(coder:py)` for the
+  Python coder skill).
+- Join multiple areas with `,` when one commit spans them (e.g. `oc,git`).
+- Scope words are lowercase kebab-case, matching the artefact or subdir name.
+- Use `misc` for small changes with no clear area.
+- When adding a new skill, use the bare prefix with `Init`.
+  (e.g. `oc: Init coder-ts skill`, `oc: Init task-capture-handoff skill for deferred tasks`)
+
+The `committer` skill's `Phase:Style` derives the prefix from recent `git log`,
+so this is the convention it lands on.
+
 ## MY_AI_STUFF.md format
 
 ### Grouping and entries
