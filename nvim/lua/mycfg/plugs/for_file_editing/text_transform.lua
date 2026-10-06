@@ -547,6 +547,7 @@ Plug {
         Rule{start_pair = [[']], end_pair = [[']], not_filetypes = {"rust"}}
           -- Always insert second S-quote unless preceded by text (alphanumeric)
           :insert_pair_when(cond.not_preceded_by_regex"%w") -- to write `it's`
+          :insert_pair_when(cond.not_preceded_by_text"^^") -- to write `^^'`
           :end_pair_moves_right_when(cond.never)
           -- builtin behavior is normally using cond.smart_move_right()
       )
