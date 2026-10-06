@@ -49,6 +49,14 @@ Treat it as informational:
 - Answer in chat, then pause and wait for the user to resume.
 Whether anything is later folded into the spec is the user's explicit call.
 
+**Asking about Open Questions** (via the `question` tool):
+The last message the user sees before the `question` batch must carry enough context
+to understand every question in it — the tool's own titles are easy to miss.
+- Name the section and the OQ entry each question refers to.
+- When one batch asks several OQs, contextualize all of them — not just the first.
+- Never emit an OQ `question` call with no contextualizing message before it.
+This applies to OQ asks only, not to every question batch.
+
 ## 1. `Phase:Discover` — Gather inputs & establish `$specpath`
 
 When entering `Phase:Discover`: read <./refs/phases/discover.md> for full instructions.

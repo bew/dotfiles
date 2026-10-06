@@ -11,8 +11,7 @@ Does not apply to `batch` mode.
    never leave the comment behind.
 2. **Report** — note what was written and any Open Questions surfaced.
 3. **OQ round** — ask about the OQs surfaced in this section (see *OQ round* below).
-   Skip this step when the section surfaced no OQ, or when the `question` tool is unavailable.
-   When unavailable, do not ask the OQs in chat instead — go straight to *Feedback prompt*.
+   Skip this step when the section surfaced no OQ.
 4. **Feedback prompt** — print:
    > <mode banner>
    >
@@ -26,6 +25,8 @@ Does not apply to `batch` mode.
 ## OQ round
 
 Emit one `question` tool call with one question per OQ entry surfaced in this section.
+The last message before the call must contextualize every question —
+name each OQ's section and entry (see <../SKILL.md> — Interaction conventions).
 If the tool accepts only one question per call, issue them sequentially within the same OQ round.
 Options per question:
 - All relevant candidate resolutions inferable from the spec context — any number.

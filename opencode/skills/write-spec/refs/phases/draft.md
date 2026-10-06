@@ -123,6 +123,8 @@ treat it as an ordered queue, not a batch: still fill exactly one section per tu
 **batch** — fill all remaining sections in one pass, with no per-section pause.
 Reached only via the exit aliases below; sticky until a trigger alias re-enables incremental.
 The initial skeleton write is its own step and is not affected by the mode.
+Per-section OQs are not asked on the fly;
+the OQs surfaced in the batch fill are asked once, after the fill (see *Batch OQ round*).
 
 Trigger aliases (each means *confirm + enter/assert incremental mode*):
 'step by step', 'go incrementally', 'step-by-step', 'section by section', 'incr', 'incr mode'.
@@ -159,11 +161,25 @@ and do not switch to a different mode.
 Then re-issue the prompt and wait.
 
 After all sections are filled:
-1. Prune empty `### Open Questions` subsections — remove any that have no entries.
-2. Tell user:
+1. In `batch` mode, run the *Batch OQ round* below.
+2. Prune empty `### Open Questions` subsections — remove any that have no entries.
+3. Tell user:
    > <mode banner>
    >
    > Draft written to `$specpath` — open to inspect and share review feedback.
+
+### Batch OQ round
+
+Runs once in `batch` mode, after all remaining sections are filled.
+Ask the OQs not yet asked: every per-section `### Open Questions` entry
+from sections filled in this batch pass, plus every `## Global Open Questions` entry
+(including the TKC entry).
+Do not re-ask OQs already asked in an earlier incremental round.
+Emit one `question` tool call, one question per OQ.
+The last message before the call must contextualize every question —
+name each OQ's section and entry (see <../../SKILL.md> — Interaction conventions).
+Construct options and apply answers exactly as in the incremental OQ round —
+see <../incremental-round.md> — OQ round.
 
 ## Refinement
 
