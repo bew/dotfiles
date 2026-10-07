@@ -43,6 +43,11 @@ All extend the rules below.
   When two values share a representation but differ in meaning, give each its own unambiguous
   name (e.g. a window handle vs its index, a buffer number vs its name).
   Never use a bare ambiguous noun (`win`, `buf`, `tab`) where a qualified name exists.
+- Never inline a non-trivial expression as a control gate.
+  Bind it to a named value that states what the expression means — the name self-documents the gate,
+  so it reads as the concept rather than the mechanics
+  (e.g. `needs_merged_policy` instead of `len(policies) > 0`).
+  Add a comment explaining the gate when the condition is not fairly obvious.
 - Top-level constants: SCREAMING_SNAKE_CASE, defined at top of file after header/imports.
 - Document each top-level constant: its purpose, and its unit when it carries one
   (e.g. "milliseconds", "bytes").
