@@ -59,6 +59,35 @@ Load `bew-communication-style` before writing any prose.
 - Name real APIs, keys, and paths only as the code shows them.
 - Cut filler, restated tasks, and summary paragraphs.
 
+## Alert blocks
+
+Use GitHub alert blocks for asides, caveats, and "why not X" notes, instead of leaving them flat
+in the body:
+- `> [!NOTE]` — neutral context, or a "why not X" aside.
+- `> [!IMPORTANT]` — something the reader must not miss, that's particularly special for the context.
+- `> [!WARNING]` — a sharp caveat.
+- `> [!CAUTION]` — a risk or destructive outcome.
+
+Default to at most 1-2 alert blocks per issue or PR.
+More are allowed only when each carries a distinct, load-bearing aside, and you can justify why it
+needs its own block.
+
+A block is for a discrete aside, not for main body prose: never move an ordinary paragraph into a
+block just to emphasise it.
+
+## Links
+
+Link a named entity at its first mention, by type:
+- External project, tool, or repo — inline markdown link to its canonical URL.
+- Prior issue or PR in the same repo — `#N` is enough; GitHub auto-links it.
+- File path — usually omit it; an issue or PR rarely needs one.
+  Mention a path only when it is load-bearing, e.g. to point at a specific line or line range to
+  show something (can be used in an issue mentioning a defect identified in a specific function/..).
+  When you do, use a GitHub permalink pinned to the commit SHA of the `main` branch (or a specific
+  branch depending on the context of the report):
+  `https://github.com/<owner>/<repo>/blob/<sha>/<path>#L<start>-L<end>`
+  The link must be on its own line (so Github renders it properly).
+
 ## Iteration loop
 
 This phase is a stop-and-wait loop, not one shot.

@@ -11,14 +11,13 @@ One sentence per line.
 - **The ask** — state plainly what you want.
   A question ("is there a way?") or a request ("it would help to have…").
 - **Alternatives** — 2–3 concrete implementation paths, with brief rationale.
-  Name real APIs, hooks, or options.
+  Name real mechanisms like APIs/hooks/options/….
 - **Optional broader angle** — only if the ask may belong upstream or has wider scope.
   One short paragraph.
 
 Guidelines:
 - Do not apologize for raising the issue.
-- Do not over-explain why it is a good idea.
-  Let the problem speak.
+- Do not over-explain why it is a good idea (let the problem speak).
 - Avoid "I think", "maybe", "perhaps" hedges that dilute the ask.
 - If unsure which alternative is best, say so.
 - When a PR ships alongside the issue, say so, e.g. `👉 I'm about to open a PR for this 😉`.
