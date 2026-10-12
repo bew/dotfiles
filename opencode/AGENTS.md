@@ -41,9 +41,10 @@ ask the user before using `write`.
   NOT more explanation embedded in a planned edit, a spec, or any tool call output.
 
 Use the `question` tool to ask questions for the user.
+This covers genuine choices and decisions, not only free-form questions.
 Optionally preceded with laid-out questions if 2+ lines of description is needed to better
 understand the context.
-EXCEPTION: do NOT use the `question` tool for confirmation/approval prompts
+EXCEPTION: do NOT use the `question` tool for simple go/no-go/yes/no confirmation/approval prompts
 (e.g. "proceed with this plan?", "shall I go ahead?").
 Leave a passive hint at the end of the output instead, and let the user decide.
 
