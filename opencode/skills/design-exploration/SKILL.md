@@ -8,6 +8,8 @@ description: |
   - an important design is genuinely uncertain (competing models, an undefined central concept)
     and writing a spec would be premature
   - an existing design forks and deeper exploration of a topic is wanted
+  - "write explo …"
+  - editing an EXPLORATION-<topic>.md file
 metadata:
   maintainers: [bew]
 ---
