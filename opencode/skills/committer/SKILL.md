@@ -150,14 +150,6 @@ For topic sub-scope (if needed), use `:` as inner separator (e.g: `hl:foo` or `s
 
 ## 3. `Phase:Draft` — write the commit message
 
-If summary has 2+ distinct concerns, output this before the message block (before first `---` line):
-```
-WARNING: This diff mixes distinct concerns. Consider splitting into separate commits:
-- <concern 1 label>
-- <concern 2 label>
-- …
-```
-
 ### Subject line
 
 Must complete "When applied, this commit will `<subject>`".
@@ -253,9 +245,15 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 
 Always blank line between subject and body, and between paragraphs.
 
-Output raw commit message (and warning if applicable) — no markdown fencing, no extra commentary.
-Surround the message with 2 `---` delimiter lines & blank lines (above/below) so it stands out in
-the terminal output:
+This phase composes the message only — it does not render it.
+`Phase:Iterate` renders the message and drives the loop.
+
+## 4. `Phase:Iterate` — render and iterate with user
+
+This phase is REQUIRED whenever a draft is produced — never end the turn at `Phase:Draft`.
+
+Render the message composed in `Phase:Draft` (raw, no markdown fencing, no extra commentary), surrounded by 2 `---` delimiter lines with blank lines above/below so it stands out in the
+output:
 ```
 ---
 
@@ -263,11 +261,15 @@ the terminal output:
 
 ---
 ```
+If the diff mixes 2+ distinct concerns, prepend a warning block before the message block (before the first `---` line):
+```
+WARNING: This diff mixes distinct concerns. Consider splitting into separate commits:
+- <concern 1 label>
+- <concern 2 label>
+- …
+```
 
-## 4. `Phase:Iterate` — iterate with user
-
-After outputting the message, offer refinements via a single `question` tool call with three
-questions, in this order.
+Then, in the same turn, offer refinements via a single `question` tool call with three questions, in this order.
 Use these headers verbatim: `Refine subject`, `Refine body`, `Next step`.
 Derive every option from the message as written — omit any that do not apply.
 
@@ -281,7 +283,7 @@ This is a MULTI-select question.
   Label: "Alt subject: <wording>".
 - Prefix variants — when the commit type/prefix is uncertain, offer 2+ alternatives.
   Label: "Prefix: <current> → <alternative>".
-- Adjusters — up to 1-3 options to mention or remove something.
+- Adjusters — up to 1-3 options to mention or remove a topic.
   Label: "Mention <X>" / "Remove <X>".
 
 ### Question 2 — `Refine body`
@@ -295,6 +297,8 @@ This is a MULTI-select question.
 - Adjusters — up to 1-3 options to drop, expand, or re-emphasize a part.
   Label: "Expand <X>" / "Drop <X>" / "Don't talk about <X>".
 
+NOTE: `drop …` means to remove something, not fold it and reword it in a different shape.
+
 ### Question 3 — `Next step`
 
 This is a SINGLE-select question.
@@ -305,7 +309,7 @@ Read the current resolved `Scope` (post multi-task resolution and any rescope) �
 never the literal `session work items`.
 
 - "🚀 Commit" — commit with message.
-- "🔎 Preview" — re-output, stay in the loop.
+- "🔎 Preview" — re-render, stay in the loop.
 - "📥 Stage only" — stage the intended files, do NOT commit.
 
 Omit the commit and stage options in PLAN mode — both are mutations (see `Phase:Commit`).
@@ -345,7 +349,7 @@ Variant/adjuster picks override "keep … as-is".
 All options apply any selected subject/body edits first.
 
 - "🚀 Commit": apply the selected edits, then go to `Phase:Commit`.
-- "🔎 Preview": apply the selected edits, re-output, repeat `Phase:Iterate`.
+- "🔎 Preview": apply the selected edits, re-render, repeat `Phase:Iterate`.
 - "📥 Stage only": apply the selected edits if any, then run the staging + verify steps of
   `Phase:Commit` (file-set confirmation + `git add`), then stop — do not commit.
 - Custom answer matching **Rescope** verbs: follow the associated **Rescope** rules.
