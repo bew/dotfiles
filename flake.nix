@@ -161,6 +161,7 @@
     };
 
   in {
+    homelib = { inherit mkBewHomeConfig; };
     homeConfig.frametop-bew = mkBewHomeConfig rec {
       system = "x86_64-linux";
       username = "bew";
