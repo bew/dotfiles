@@ -109,6 +109,9 @@ For a Nix module that declares its own options:
 
 - Always define `ty = lib.types` binding, use it in all option types
 - Define `cfg = config.<root>` binding when the declared options share a root owned by this module
+- When a module defines new options, put declarations in a dedicated `options = { ... };` block and
+  settings in a dedicated `config = { ... };` block.
+  Never use inline `options.*` or `config.*` assignments at the module root.
 
 Example module:
 ```nix
@@ -118,13 +121,14 @@ let
   ty = lib.types;
   cfg = config.foo;
 in {
-  options {
+  options = {
     foo.enable = lib.mkEnableOption "my super feature";
     foo.bar = lib.mkOption {
       description = ''some description'';
       type = ty.enum ["hello" "world"];
     };
   };
+
   config = lib.mkIf cfg.enable {
     something.being.configured = cfg.bar;
   };
