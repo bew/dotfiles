@@ -14,9 +14,9 @@ Write idiomatic Nix code that evaluates and builds, building on generic conventi
 
 REQUIRES: load `coder-generic` skill first.
 
-NOTE: This skill covers general Nix expression files and reusable module option conventions.
-It will later expand with dedicated pages for other Nix areas:
-Nix packaging (derivations), flake-related topics, etc.
+NOTE: This skill covers general Nix expression files, reusable module option conventions,
+and flake per-system outputs.
+It will later expand with dedicated pages for other Nix areas: Nix packaging (derivations), etc.
 
 Nix is an expression language — there is no module/script split.
 Every file is an expression; the last expression is the file's value.
@@ -49,6 +49,39 @@ All files are module-like: generic module rules apply, script rules are N/A.
   and consume its outputs directly.
   Never add a flake input on your own — only when user asks.
   If how-to-use is unsure or eval breaks: Inspect input's outputs via `nix flake show <flakeref>`.
+
+## Flake per-system outputs
+
+Keep three things separate: the system list, the `genAttrs` wrapper, the per-system common bindings.
+
+```nix
+let
+  lib = nixpkgs.lib;
+  systems = [
+    "aarch64-darwin"
+    "x86_64-linux"
+  ];
+
+  forSystems = lib.genAttrs systems;
+  scopeForSys = system: {
+    inherit system;
+    pkgs = nixpkgs.legacyPackages.${system};
+  };
+in {
+  packages = forSystems (system: with (scopeForSys system); {
+    foo = pkgs.callPackage ./pkgs/foo/package.nix { };
+  });
+}
+```
+
+- `systems` is either a list of system strings, or a `nix-systems/*` flake input.
+  A `nix-systems` input is a path to a `.nix` file: use `lib.genAttrs (import systems)`.
+  A local list is not importable: use `lib.genAttrs systems` directly.
+  Never apply `import` to the list form.
+- `scopeForSys` holds the bindings that `with` injects, so output blocks stay flat.
+  Add a binding only when several outputs need it; extra bindings shadow outer names.
+- note: Unless using flake-utils/flake-parts, do not rename `forSystems` to flake-utils'
+  `eachSystem` or flake-parts' `withSystem`; they work differently. (ask if unclear!)
 
 ## Guidelines
 

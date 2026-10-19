@@ -53,7 +53,7 @@
   #   define my toplevel flake in multiples files & auto-merge packages, homeConfig, homeModules, {tool,…}ConfigModules...
   outputs = { self, systems, devshell, ... }@flakeInputs: let
     lib = flakeInputs.nixpkgsStable.lib;
-    eachSystem = lib.genAttrs (import systems);
+    forSystems = lib.genAttrs (import systems);
 
     pkgsetsForSys = system: {
       mypkgs = self.packages.${system};
@@ -61,7 +61,7 @@
       bleedingedge = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
       llm-agents = flakeInputs.llm-agents.packages.${system};
     };
-    forSys = system: let pkgsets = pkgsetsForSys system; in rec {
+    scopeForSys = system: let pkgsets = pkgsetsForSys system; in rec {
       inherit (pkgsets) mypkgs stable bleedingedge;
       inherit pkgsets;
 
@@ -129,7 +129,7 @@
     };
 
     mkBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configs }: let
-      sys = forSys system;
+      sys = scopeForSys system;
       pkgs = sys.pkgsets.${defaultPkgsetName};
     in import "${flakeInputs.homeManager}/modules" {
       inherit pkgs;
@@ -199,7 +199,7 @@
     # - a `zsh` bin, with my config (may be editable?)
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
-    packages = eachSystem (system: with (forSys system); let
+    packages = forSystems (system: with (scopeForSys system); let
       useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
@@ -222,10 +222,10 @@
     });
 
     # (useful for debugging in `nix repl`)
-    toolConfigs = eachSystem (system: with (forSys system); toolConfigs);
-    toolkits = eachSystem (system: with (forSys system); toolkits);
+    toolConfigs = forSystems (system: with (scopeForSys system); toolConfigs);
+    toolkits = forSystems (system: with (scopeForSys system); toolkits);
 
-    apps = eachSystem (system: with (forSys system); {
+    apps = forSystems (system: with (scopeForSys system); {
       # An env with all 'core' cli tools :)
       default = {
         type = "app";
@@ -291,7 +291,7 @@
       };
     });
 
-    devShells = eachSystem (system: with (forSys system); {
+    devShells = forSystems (system: with (scopeForSys system); {
       default = devshell.legacyPackages.${system}.mkShell {
         packages = [
           stable.just # for repo actions
