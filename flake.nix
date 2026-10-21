@@ -61,7 +61,7 @@
       bleedingedge = flakeInputs.nixpkgsBleedingEdge.legacyPackages.${system};
       llm-agents = flakeInputs.llm-agents.packages.${system};
     };
-    scopeForSys = system: let pkgsets = pkgsetsForSys system; in rec {
+    commonsForSys = system: let pkgsets = pkgsetsForSys system; in rec {
       inherit (pkgsets) mypkgs stable bleedingedge;
       inherit pkgsets;
 
@@ -129,7 +129,7 @@
     };
 
     mkBewHomeConfig = { system, username, homeDir, defaultPkgsetName, configs }: let
-      sys = scopeForSys system;
+      sys = commonsForSys system;
       pkgs = sys.pkgsets.${defaultPkgsetName};
     in import "${flakeInputs.homeManager}/modules" {
       inherit pkgs;
@@ -200,7 +200,7 @@
     # - a `zsh` bin, with my config (may be editable?)
     # - a `zsh-special-config` bin, for a zsh with a specialized config (bin only)
     # - a `fzf` bin, for fzf with my config
-    packages = forSystems (system: with (scopeForSys system); let
+    packages = forSystems (system: with (commonsForSys system); let
       useStandalonePkg = config: config.outputs.toolPkg.standalone;
     in {
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
@@ -223,10 +223,10 @@
     });
 
     # (useful for debugging in `nix repl`)
-    toolConfigs = forSystems (system: with (scopeForSys system); toolConfigs);
-    toolkits = forSystems (system: with (scopeForSys system); toolkits);
+    toolConfigs = forSystems (system: with (commonsForSys system); toolConfigs);
+    toolkits = forSystems (system: with (commonsForSys system); toolkits);
 
-    apps = forSystems (system: with (scopeForSys system); {
+    apps = forSystems (system: with (commonsForSys system); {
       # An env with all 'core' cli tools :)
       default = {
         type = "app";
@@ -292,7 +292,7 @@
       };
     });
 
-    devShells = forSystems (system: with (scopeForSys system); {
+    devShells = forSystems (system: with (commonsForSys system); {
       default = devshell.legacyPackages.${system}.mkShell {
         packages = [
           stable.just # for repo actions

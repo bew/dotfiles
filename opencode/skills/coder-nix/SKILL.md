@@ -63,14 +63,17 @@ let
   ];
 
   forSystems = lib.genAttrs systems;
-  scopeForSys = system: {
+  commonsForSys = system: {
     inherit system;
     pkgs = nixpkgs.legacyPackages.${system};
   };
-in {
-  packages = forSystems (system: with (scopeForSys system); {
-    foo = pkgs.callPackage ./pkgs/foo/package.nix { };
-  });
+in
+{
+  packages = forSystems (
+    system: with (commonsForSys system); {
+      foo = pkgs.callPackage ./pkgs/foo/package.nix { };
+    }
+  );
 }
 ```
 
@@ -78,7 +81,7 @@ in {
   A `nix-systems` input is a path to a `.nix` file: use `lib.genAttrs (import systems)`.
   A local list is not importable: use `lib.genAttrs systems` directly.
   Never apply `import` to the list form.
-- `scopeForSys` holds the bindings that `with` injects, so output blocks stay flat.
+- `commonsForSys` holds the bindings that `with` injects, so output blocks stay flat.
   Add a binding only when several outputs need it; extra bindings shadow outer names.
 - note: Unless using flake-utils/flake-parts, do not rename `forSystems` to flake-utils'
   `eachSystem` or flake-parts' `withSystem`; they work differently. (ask if unclear!)
@@ -110,7 +113,7 @@ For a Nix module that declares its own options:
 - Always define `ty = lib.types` binding, use it in all option types
 - Define `cfg = config.<root>` binding when the declared options share a root owned by this module
 - When a module defines new options, put declarations in a dedicated `options = { ... };` block and
-  settings in a dedicated `config = { ... };` block.
+  config consequences in a dedicated `config = { ... };` block.
   Never use inline `options.*` or `config.*` assignments at the module root.
 
 Example module:
@@ -122,14 +125,13 @@ let
   cfg = config.foo;
 in {
   options = {
-    foo.enable = lib.mkEnableOption "my super feature";
     foo.bar = lib.mkOption {
       description = ''some description'';
       type = ty.enum ["hello" "world"];
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     something.being.configured = cfg.bar;
   };
 }
