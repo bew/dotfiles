@@ -41,6 +41,7 @@ in {
     stable.less
 
     stable.bats # Bash-based testing tool, useful everywhere
+    stable.nushell # useful for simple scripting
 
     stable.yazi
     stable.ncdu
