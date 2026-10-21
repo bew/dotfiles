@@ -154,6 +154,7 @@ flowchart LR
     sk_karpathy["<b>§ karpathy-guidelines</b>"]
     sk_read_man_page["<b>§ read-man-page</b><br/><i>HasScript</i>"]
     sk_text_replace["<b>§ text-replace</b>"]
+    sk_work_mode["<b>§ work-mode</b>"]
     sk_bew_callout["<b>§ bew-inline-callout-style</b><br/><i>NoAutoload</i>"]
   end
 
@@ -298,6 +299,7 @@ flowchart LR
 - Skill [`karpathy-guidelines`](./skills/karpathy-guidelines/) — Behavioral guidelines to avoid overcomplication, keep changes surgical, surface assumptions.
 - Skill [`read-man-page`](./skills/read-man-page/) (*HasScript*) — Token-efficient incremental man page reading via its `manq` script.
 - Skill [`text-replace`](./skills/text-replace/) — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
+- Skill [`work-mode`](./skills/work-mode/) — Controls agent workflow: One unit at a time with hard stops; either execution units or read-only walkthrough slices.
 - Command [`/why-you`](./commands/why-you.md) (*Meta*) — Reflect on the root cause of a decision, without acting.
 - Command [`/retitle`](./commands/retitle.md) — Auto-retitle the current session from the conversation.
 - Command [`/dcp-compress-aggressive`](./commands/dcp-compress-aggressive.md) — Aggressively shrink context by collapsing blocks into one lean summary.
