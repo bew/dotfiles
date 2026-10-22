@@ -1,6 +1,4 @@
 // DOC: https://opencode.ai/v2/docs/
-//
-// NOTE: Zen models pricing: https://opencode.ai/docs/zen/#pricing
 {
   "$schema": "https://opencode.ai/config.json",
 
