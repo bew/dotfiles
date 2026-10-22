@@ -33,14 +33,14 @@ Place the block:
 Each var is defined in the step/phase that computes it.
 State derivation logic there; later steps reference by name, do not re-derive.
 
-Example step defining `$slug` and `$specpath`:
+Example step defining `$slug` and `$reportdir`:
 ```md
-## Step 2 — Resolve spec path
+## Step 2 — Resolve report location
 
-Ask user for a short slug (kebab-case, e.g. `auth-flow`).
+Ask user for a short slug (kebab-case, e.g. `q3-audit`).
 Derive:
 - `$slug` — the confirmed slug.
-- `$specpath` — `_WIP_SPECS/$slug/SPEC.md`
+- `$reportdir` — `reports/$slug/`
 ```
 
 ## When to declare a var

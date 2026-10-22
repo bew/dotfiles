@@ -9,7 +9,7 @@ description: |
     and writing a spec would be premature
   - an existing design forks and deeper exploration of a topic is wanted
   - "write explo …"
-  - editing an EXPLORATION-<topic>.md file
+  - editing an `EXPLO-BRIEF.md` or `EXPLO-<topic>.md` file
 metadata:
   maintainers: [bew]
 ---
@@ -31,10 +31,10 @@ exploration files so a spec can later be written from settled ground.
 **Vars used throughout**: (output them in context once known!)
 - `$mode` — `adhoc` (no brief; topic files in the working dir) or `dedicated` (dir + brief).
 - `$explodir` — directory for the exploration files (`adhoc`: the cwd).
-- `$briefpath` — `$explodir/EXPLORATION-BRIEF.md`; `dedicated` mode only.
+- `$briefpath` — `$explodir/EXPLO-BRIEF.md`; `dedicated` mode only.
 - `$topic` — current topic label, kebab-case lowercase.
-- `$topicpath` — `$explodir/EXPLORATION-$topic.md`.
-- `$name` — the design's human-readable name.
+- `$topicpath` — `$explodir/EXPLO-$topic.md`.
+- `$title` — the design's human-readable name.
 - `$slug` — the design's kebab-case slug.
 
 ## Interaction conventions

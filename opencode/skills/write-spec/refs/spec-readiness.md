@@ -1,18 +1,21 @@
 # Spec Readiness
 
-Criteria for assessing whether a spec is ready to leave `_WIP_SPECS/`.
+Criteria for assessing whether a spec is ready to leave the draft state.
 
 ## Status tags
 
 | Tag | Meaning |
 |---|---|
+| `DISCOVERY` | Inputs being gathered; discovery notes live in `DISCOVERY.md` |
+| `EXPLO` | Deep design maturation delegated to `design-exploration` |
 | `DRAFT` | Active work-in-progress; sections may be skeletal or incomplete |
 | `MAYBE-READY` | Passes readiness criteria; awaiting author confirmation or final review |
-| `READY` | Confirmed ready; lives in `_SPECS/` |
-| `ABANDONED` | No longer being pursued; kept for reference |
+| `READY` | Confirmed ready |
+| `ABANDONED` | No longer being pursued; lives under `SPEC-KO-<slug>/` |
 
-Status tag lives in H1: `# [STATUS] <Name>`
-Update in-place with `edit` whenever status changes.
+The H1 of each spec file carries its status tag; `manage-spec` keeps the tag, the file that
+carries it, and the directory name in sync — read <./lifecycle.md>.
+Never edit the tag or move the directory by hand.
 
 ## Readiness criteria
 
@@ -27,25 +30,25 @@ A spec is `MAYBE-READY` when **all** of the following hold:
 5. Alternatives & Tradeoffs section is present and compares against at least one simpler alternative.
 6. Naming discipline holds: no synonym drift.
    If Terminology section exists, all terms are defined there before use.
-7. Author (user) has reviewed the spec and explicitly agreed it reflects current design intent.
 
 A spec does NOT need to be implementation-complete to be `MAYBE-READY`.
 It needs to be design-stable enough that an implementer could start from it.
+
+`READY` adds one gate on top of those criteria: the author (user) has reviewed the spec and
+explicitly agreed it reflects current design intent.
+`MAYBE-READY` is stamped before that agreement, so this gate blocks the move to `READY`, not the
+move to `MAYBE-READY`.
 
 ## What "ready" does NOT mean
 
 - All Open Questions resolved — non-blocking questions may remain open.
 - Implementation exists or is planned imminently.
-- The design will never change — specs can be updated after promotion.
+- The design will never change — specs can be updated after the transition to ready.
 
-## Promotion
+## Transition to ready
 
-`_WIP_SPECS/<slug>/` → `_SPECS/<slug>/` means the spec is considered stable reference material.
-Use <./rename.md> to move the directory (handles git-tracked and plain directories).
-After move, update H1 status tag to `[READY]`,
-remove the skill loader meta-paragraph (between H1 and first section),
-and update session vars.
+Moving to ready means the spec is considered stable reference material.
+Run `<skill-dir>/scripts/manage-spec ready` from `$specdir`.
+Take the new paths from its output.
 
-Demotion (`_SPECS/` → `_WIP_SPECS/`) is allowed if design reopens —
-update tag to `DRAFT` and restore the skill loader meta-paragraph after H1
-(exact text in <./phases/draft.md> H1 format).
+Going back is allowed when the design reopens — `manage-spec draft` moves it back.

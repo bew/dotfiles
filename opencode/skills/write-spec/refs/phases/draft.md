@@ -5,14 +5,26 @@ Read <../spec-structure.md> for section order and Open Questions format.
 Read <../writing-guidelines.md> for prose style, Interface / How to use conventions, and naming discipline.
 Read <../project-global-docs.md> for how the spec references project-global concepts and terms.
 
-## Exploration companion
+## Entry
 
-`EXPLORATION-BRIEF.md` and `EXPLORATION-<topic>.md` files may exist in `$specdir`
-(see `Phase:Explore`).
-If exploration files live elsewhere (e.g. `_WIP_EXPLORATIONS/<slug>/`),
-move them into `$specdir` before drafting.
+`Phase:Draft` starts from `discovery` or `explo` on first entry, and from `maybe-ready`, `ready`, or
+`abandoned` when a spec is reopened.
+The transition table in <../lifecycle.md> is the authority.
+Promote the spec first, from `$specdir`:
+```sh
+<skill-dir>/scripts/manage-spec draft
+```
+Adopt the printed `Session vars`.
+Skip the move when the spec is already in `draft`.
+
+## Inputs
+
+`DISCOVERY.md`, when present, holds the discovery notes from `Phase:Discover`, and is the first
+input for the Introduction and for section selection.
+`EXPLO-BRIEF.md` and `EXPLO-<topic>.md` files may also exist in `$specdir` (see `Phase:Explore`).
 Read them before drafting — settled `Decisions` feed the spec, `Open threads` seed Open Questions.
-Do not duplicate exploration prose into the spec; the spec is authoritative once it exists.
+Do not duplicate discovery or exploration prose into the spec; the spec is authoritative once it
+exists.
 
 ## Initial Skeleton
 
@@ -29,11 +41,11 @@ Say 'step by step' to assert it.
 Say 'batch all' to batch the rest.
 Adjust section list if user requests changes.
 
-Once confirmed, write the file: H1 with status tag + skill loader meta-paragraph
-(for any non-READY status) + all confirmed content section headings, each carrying a `SKELETON TODO` placeholder.
+Once confirmed, append the section skeleton with `edit`: the seeded `SPEC.md` already holds the
+H1 and loader, so never rewrite the file.
+Add all confirmed content section headings, each carrying a `SKELETON TODO` placeholder.
 Each `##` section that may surface open questions also gets an empty `### Open Questions` subsection.
-Use `write` tool for this initial creation only.
-All subsequent changes use `edit` only — never overwrite the file again.
+All subsequent changes use `edit` only.
 
 Each content section placeholder is a `<!-- SKELETON TODO: <1–2 line overview> -->`
 comment directly under its heading.
@@ -41,19 +53,14 @@ Derive the overview from what Discovery established and <../spec-structure.md> s
 Scale to complexity: 1 line for trivial/obvious sections, 2 when content is non-obvious.
 Structural fixtures (`### Open Questions`, `## Global Open Questions` default entry) are not content bodies — no `SKELETON TODO` for them.
 
-H1 format:
+H1 format (written by `manage-spec`; shown here only so you can recognise the file):
 ```md
 # [DRAFT] <Name>
 ```
-Immediately followed by the skill loader meta-paragraph for any non-READY status — see skeleton example below.
+Do not re-emit the H1 or the loader block — they are already in the seeded file.
 
 Skeleton example (sections with OQ subsections):
 ```md
-# [DRAFT] <Name>
-
-> IMPORTANT: Before any drafting/planning/editing of this spec,
-> agents MUST load one of the spec-writing skill first.
-
 ## Introduction
 <!-- SKELETON TODO: <1–2 line overview> -->
 
@@ -86,7 +93,6 @@ Do not add a `### Open Questions` subsection inside it.
 ### Default entries
 
 Include these entries verbatim in the skeleton:
-
 ```
 **Terminology & Key Concepts** (TKC) — Whether this section is needed for this spec.
 Non-blocking. Refer to spec-writing skill for guidance.
@@ -224,12 +230,11 @@ During iteration, if user introduces a new idea, constraint, or design angle not
   and record it (Open Question or `FIXME:` callout), then ask the user to own it or promote it.
   Promote: load `task-capture-handoff` skill and emit one capture per gap, immediately.
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
-  Do not prune it even if empty (unless spec is marked as READY) — it is a structural fixture.
-- The skill loader meta-paragraph (between H1 and first section) is required
-  for all non-READY statuses.
-  It is removed only on promotion to READY.
-  If refining a spec with a non-READY status, ensure the meta-paragraph is
-  present (add it if missing).
+  Do not prune it even if empty — it is a structural fixture.
+  `Phase:Review` prunes it only when the spec transitions to `READY`.
+- The skill loader meta-paragraph (between H1 and first section) is owned by `manage-spec`,
+  which adds, updates, and removes it as the state changes.
+  Never edit it by hand; if it looks wrong, rerun the state command or `--fix`.
 - Always include `### Open Questions` subsections in main sections that may surface design decisions.
   Never add OQ subsections to Introduction or Terminology (if present) — they are not decision surfaces.
   Empty OQ subsections serve as drafting placeholders — prune them before leaving `Phase:Draft` (see *Filling* above).

@@ -4,14 +4,14 @@ Exploration starts in a mode resolved at `Phase:Setup`.
 
 ## Modes
 
-- `dedicated` — a dedicated dir holding a brief hub plus one `EXPLORATION-<topic>.md`
+- `dedicated` — a dedicated dir holding a brief hub plus one `EXPLO-<topic>.md`
   per topic; used when a caller supplies a dir or several topics are expected.
-- `adhoc` — no brief; `EXPLORATION-<topic>.md` files live in the working dir.
+- `adhoc` — no brief; `EXPLO-<topic>.md` files live in the working dir.
 
-## `EXPLORATION-BRIEF.md` (`dedicated` only)
+## `EXPLO-BRIEF.md` (`dedicated` only)
 
 ```md
-# <$name> — exploration brief
+# <$title> — exploration brief
 
 ## Motivation
 
@@ -25,9 +25,9 @@ Exploration starts in a mode resolved at `Phase:Setup`.
 Update `Motivation` as the brief evolves; keep the topic index current.
 The index is the single source of truth for each topic's status.
 Append new topics; never reorder the list. Update a topic's status in place.
-Each topic's file is `EXPLORATION-<topic>.md`.
+Each topic's file is `EXPLO-<topic>.md`.
 
-## `EXPLORATION-<topic>.md`
+## `EXPLO-<topic>.md`
 
 ```md
 # <topic> — exploration

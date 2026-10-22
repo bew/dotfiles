@@ -213,6 +213,8 @@ flowchart LR
 
   - Phases: Discover → Explore (optional) → Draft → Review.
   - Delegates deep, pre-spec design maturation to `design-exploration`.
+  - Lifecycle owned by `scripts/manage-spec` (replaces the former `scripts/rename-spec`): spec dirs move between `SPEC-DRAFT-<slug>/`, `SPEC-READY-<slug>/`, and `.SPEC-ARCHIVE/<state>/` as the H1 status tag changes.
+  - State model, transition table, and tool usage live in [`refs/lifecycle.md`](./skills/write-spec/refs/lifecycle.md).
 
   Variants:
   * [`write-spec-noninteractive`](./skills/write-spec-noninteractive/) (*MultiPhase, NoAutoload*) — non-interactive pass for tool-less chat contexts; no phase gates, questions batched at the end.

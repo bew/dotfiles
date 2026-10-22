@@ -25,11 +25,13 @@ Check each of the following, flag any issues:
 - Gaps are inline-defined and recorded; promoted gaps carry a `task-capture-handoff` capture
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
 - `## Global Open Questions` section is present at end of spec
-- No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
+- No empty `### Open Questions` subsections remain (the Global section is exempt while the spec is
+  in progress — it is pruned only when the spec reaches `READY`, see *Transition to ready*)
 - Any OQ entries present follow correct format (see <../spec-structure.md>)
 - Prose in touched sections follows sentence-per-line format
-- Status tag in H1 reflects current state
-- Skill loader meta-paragraph present for non-READY statuses, absent for `READY`
+- `manage-spec` output agrees with the file: the H1 status tag and the loader paragraph match the
+  state the tool reports.
+  Both are tool-owned — report a mismatch instead of editing them to "fix" it.
 
 `FIXME:` / `TODO:` callouts are allowed — they signal work still to be done, not a review failure.
 By contrast, a leftover `SKELETON TODO` placeholder is a review failure — it means a section was never filled.
@@ -40,32 +42,33 @@ Work through fixes collaboratively before assessing readiness.
 
 ## Readiness assessment
 
-Read <../spec-readiness.md> to evaluate whether spec qualifies for promotion.
+Read <../spec-readiness.md> to evaluate whether the spec qualifies for `MAYBE-READY`.
 
 After review pass is clean, assess readiness:
-- If criteria met: update status tag to `[MAYBE-READY]` in `$specpath` H1
+- If criteria met: run `<skill-dir>/scripts/manage-spec maybe-ready` from `$specdir`
 - Surface assessment to user with brief rationale
 
-## Promotion offer
+## Transition to ready
 
-Promotion means the spec is considered stable reference material — design intent is settled enough
-that it no longer needs to live in the work-in-progress area.
+Transition means the spec is considered stable reference material — design intent is settled enough
+that it no longer needs to live under the work-in-progress prefix.
 It does not mean implementation is done or the design will never change.
 
-Only offer promotion if spec is assessed `[MAYBE-READY]` or better.
+Only offer the transition if spec is assessed `[MAYBE-READY]` or better.
 
-Offer: *Spec looks ready. Promote to `_SPECS/<slug>/`? This moves the directory and updates status to `[READY]`.*
+Offer: *Spec looks ready. Transition it to ready with `manage-spec ready`?*
 
 If user confirms:
-1. Read <../rename.md> — run `<skill-dir>/scripts/rename-spec $basedir/<slug>/ _SPECS/<slug>/`
-2. Update H1 in `$specpath` (now at `_SPECS/<slug>/SPEC.md`) to `[READY]`
-3. Remove the skill loader meta-paragraph (between H1 and first section).
-4. Update `$basedir`, `$specdir`, `$specpath` in session to reflect new location
-5. Report new path to user
+1. Read <../lifecycle.md> — run `<skill-dir>/scripts/manage-spec ready` from `$specdir`
+2. Take the new `$specdir`, `$specpath` from the printed `Session vars`
+3. Prune `## Global Open Questions` if it holds no entries — a READY spec no longer carries it
 
-If user declines: leave in `_WIP_SPECS/`, status stays `[MAYBE-READY]`.
+`manage-spec` also updates the H1 tag and removes the skill loader meta-paragraph.
+Do not repeat those edits by hand.
+
+If user declines: stay in the work-in-progress state, tag stays `[MAYBE-READY]`.
 
 NOTE: `## Global Open Questions` entries default to **Non-blocking**.
 If a review pass judges a Global entry as critical, escalate it to **Blocking**.
 
-Do not offer promotion if any blocking Open Questions remain unresolved.
+Do not offer a transition to ready if any blocking Open Questions remain unresolved.

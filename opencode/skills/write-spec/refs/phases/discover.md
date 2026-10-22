@@ -7,9 +7,12 @@ If the user says 'tell me more' (or a listed alias): answer in output only — m
 
 ## Required inputs
 
+A settled design or an already approved plan waives `Phase:Explore`, never `Phase:Discover`.
+Writing `SPEC.md` directly is the failure mode this phase prevents.
+
 1. **Name** — what is this spec about? (may be a system, concept, protocol, format, etc.)
    The name might be temporary or not yet settled — that's fine;
-   it can be renamed later (see Renaming below).
+   it can be renamed later (see Renaming and state changes below).
 2. **Slug** — short kebab-case identifier derived from the name; used as `$slug` and directory name.
    Suggest a slug from the name; let user confirm or override.
 3. **Problem** — what does it solve, and for whom?
@@ -18,7 +21,7 @@ If the user says 'tell me more' (or a listed alias): answer in output only — m
 If user has supplied most context inline, confirm/waive inputs quickly
 rather than asking each one explicitly.
 
-Once all required inputs are answered or waived, proactively move to path derivation
+Once all required inputs are answered or waived, proactively create the spec directory
 and signal readiness to draft — do not keep asking follow-up questions.
 
 ## Project-global docs
@@ -45,26 +48,39 @@ Recommend one, with a one-line reason:
 
 Recommend, but let the user choose.
 
-## Path derivation
+The chosen phase moves the spec:
+`Phase:Explore` runs `manage-spec explo`; `Phase:Draft` runs `manage-spec draft`.
+Both run from `$specdir` and print the `Session vars` to adopt.
 
-Once inputs are confirmed:
+## Creating the spec directory
 
+Once inputs are confirmed, run from the project directory:
+```sh
+<skill-dir>/scripts/manage-spec init <slug> [<title>]
 ```
-$basedir  = _WIP_SPECS/             (default; relative to project root or cwd)
-$slug     = <confirmed-slug>
-$specdir  = $basedir/<slug>/
-$specpath = $specdir/SPEC.md
-```
 
-Tell user the resolved `$specpath` before proceeding.
-Create `$specdir` if it does not exist.
+It prints a `Session vars` block holding `$slug`, `$specdir`, and `$specpath`,
+and creates `SPEC-DRAFT-<slug>/` in the `discovery` state.
+Use the printed values for the rest of the session.
+Tell the user the printed `$specpath` before proceeding.
 
-NOTE: `$basedir` is `_WIP_SPECS/` unless user explicitly requests `_SPECS/` at this stage.
-Promotion to `_SPECS/` happens later, at the end of `Phase:Review`.
+Every spec starts in the `discovery` state; later states are reached through `manage-spec`,
+never by hand — read <../lifecycle.md>.
 
-## Renaming
+## Discovery notes
 
-If the spec's name or slug needs to change later (name was temporary, concept was renamed, etc.):
-Read <../rename.md> for steps — it handles git-tracked and plain directories via a script.
+`$specpath` is the file `init` seeded; record the confirmed inputs (name, problem, inspirations,
+and any constraint the user stated) there, below the loader paragraph.
+These notes are `Phase:Draft`'s first input.
+`DISCOVERY.md` stays editable from every later state — promoting the spec never moves or rewrites
+it.
+
+When the user already has a written brief or exploration material, point `DISCOVERY.md` at it
+instead of copying it.
+
+## Renaming and state changes
+
+Read <../lifecycle.md> for the state table, the transition table, and the tool usage.
+`manage-spec` owns the H1 tag, the loader paragraph, and the directory name.
 
 Ready to move to `Phase:Explore` or `Phase:Draft`? (say 'next' or similar to proceed)

@@ -1,0 +1,1061 @@
+#!/usr/bin/env python3
+# Create spec directories and move a spec between lifecycle states, keeping its
+# directory name, H1 status tag, and skill-loader paragraph in sync.
+
+import argparse
+import re
+import subprocess
+import sys
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+
+H1_TAG_PATTERN = re.compile(r"^#\s+\[(?P<tag>[A-Z][A-Z-]*)\]\s*(?P<title>.*)$")
+H1_BARE_PATTERN = re.compile(r"^#\s+(?P<title>.*)$")
+
+SPEC_FILENAME = "SPEC.md"
+DISCOVERY_FILENAME = "DISCOVERY.md"
+# Files that may carry the H1 status tag, in authority order: SPEC.md wins when it exists.
+TAG_FILENAMES = (SPEC_FILENAME, DISCOVERY_FILENAME)
+
+DRAFT_PREFIX = "SPEC-DRAFT-"
+READY_PREFIX = "SPEC-READY-"
+KO_PREFIX = "SPEC-KO-"
+LEGACY_CONTAINERS = ("_WIP_SPECS", "_SPECS")
+
+# H1 tags another tool may prepend to a spec heading, above the tag `manage-spec` wrote.
+# Seeing one leftmost means the heading has a second owner, so `manage-spec` must not rewrite it.
+FOREIGN_MARKERS = frozenset({"CLAIMED", "DONE"})
+
+LOADER_PARAGRAPH = (
+    "> IMPORTANT: Before any drafting/planning/editing of this spec,",
+    "> agents MUST load one of the spec-writing skills first.",
+)
+
+# Extra blockquote lines appended to the loader while a spec sits in the explo state.
+# Contiguous `>` lines keep it part of the same strippable loader block.
+EXPLO_POINTER_PARAGRAPH = (
+    ">",
+    "> IMPORTANT: This spec is still in exploration.",
+    "> Exploration material lives in `EXPLO-BRIEF.md`;",
+    "> the `design-exploration` skill owns it until the spec is promoted to draft.",
+)
+
+# Specs written before the plural wording carry the singular line. Accepting it lets a rewrite
+# normalise the loader instead of stacking a second blockquote above the stale one.
+LEGACY_LOADER_PARAGRAPH = (
+    "> agents MUST load one of the spec-writing skill first.",
+)
+
+# The exact lines `manage-spec` owns above the spec body. Stripping matches these verbatim,
+# so a body that legitimately opens with another blockquote survives.
+LOADER_LINES = frozenset({*LOADER_PARAGRAPH, *EXPLO_POINTER_PARAGRAPH, *LEGACY_LOADER_PARAGRAPH})
+
+EXPLO_PREFIX = "EXPLO-"
+EXPLO_BRIEF_FILENAME = f"{EXPLO_PREFIX}BRIEF.md"
+LEGACY_EXPLO_PREFIX = "EXPLORATION-"
+# Only a reference ending in `.md` names an exploration file; prose about exploration does not.
+LEGACY_EXPLO_REFERENCE = re.compile(r"EXPLORATION-([A-Za-z0-9_.-]+\.md)")
+
+
+class State(str, Enum):
+    """Closed set of spec lifecycle states."""
+
+    DISCOVERY = "discovery"
+    EXPLO = "explo"
+    DRAFT = "draft"
+    MAYBE_READY = "maybe-ready"
+    READY = "ready"
+    ABANDONED = "abandoned"
+
+
+# Pre-spec states: `DISCOVERY.md` may carry the tag and no `SPEC.md` exists yet.
+PRE_SPEC_STATES = {State.DISCOVERY, State.EXPLO}
+
+# States whose directory carries the draft prefix.
+DRAFT_PREFIX_STATES = PRE_SPEC_STATES | {State.DRAFT, State.MAYBE_READY}
+
+# States whose directory carries the abandoned prefix.
+KO_PREFIX_STATES = {State.ABANDONED}
+
+# H1 status tag owned by each state.
+STATE_TAGS = {
+    State.DISCOVERY: "DISCOVERY",
+    State.EXPLO: "EXPLO",
+    State.DRAFT: "DRAFT",
+    State.MAYBE_READY: "MAYBE-READY",
+    State.READY: "READY",
+    State.ABANDONED: "ABANDONED",
+}
+TAG_STATES = {tag: state for state, tag in STATE_TAGS.items()}
+
+# Allowed target states per source state, excluding the universal targets below.
+# `discovery` is never a target: the state only exists at `init`, and `DISCOVERY.md` stays
+# editable from every later state.
+TRANSITIONS = {
+    State.DISCOVERY: {State.EXPLO, State.DRAFT},
+    State.EXPLO: {State.DRAFT},
+    State.DRAFT: {State.EXPLO, State.MAYBE_READY, State.READY},
+    State.MAYBE_READY: {State.DRAFT, State.EXPLO, State.READY},
+    State.READY: {State.DRAFT, State.MAYBE_READY, State.EXPLO},
+    State.ABANDONED: {State.DRAFT, State.EXPLO},
+}
+
+# Targets reachable from every state without being listed per source state.
+UNIVERSAL_TARGETS = {State.ABANDONED}
+
+
+class ScriptError(Exception):
+    """Raised for errors the script reports instead of a traceback."""
+
+
+@dataclass(frozen=True)
+class SpecContext:
+    """A spec directory and the paths derived from it."""
+
+    specdir: Path
+    slug: str
+    dir_state: State | None
+    project_root: Path
+
+    @property
+    def specpath(self) -> Path:
+        """Path of the spec file inside the spec directory."""
+        return self.specdir / SPEC_FILENAME
+
+    @property
+    def tagpath(self) -> Path | None:
+        """Path of the file carrying the status tag, or None when the dir holds neither file."""
+        for filename in TAG_FILENAMES:
+            candidate = self.specdir / filename
+            if candidate.exists():
+                return candidate
+        return None
+
+
+@dataclass(frozen=True)
+class SessionVars:
+    """The session variables a caller carries while working on a spec."""
+
+    slug: str
+    specdir: str
+    specpath: str
+
+
+def print_err(msg: str) -> None:
+    """Print msg to stderr."""
+    print(msg, file=sys.stderr)
+
+
+def get_spec_context() -> SpecContext:
+    """Resolve the spec owning the current working directory.
+
+    Raises ScriptError when the cwd is not a recognised spec directory.
+    """
+    specdir = Path.cwd()
+    parent = specdir.parent
+
+    if specdir.name.startswith(DRAFT_PREFIX):
+        # Four states share this prefix, so the directory name cannot name the state.
+        return SpecContext(
+            specdir=specdir,
+            slug=specdir.name.removeprefix(DRAFT_PREFIX),
+            dir_state=None,
+            project_root=parent,
+        )
+
+    if specdir.name.startswith(KO_PREFIX):
+        return SpecContext(
+            specdir=specdir,
+            slug=specdir.name.removeprefix(KO_PREFIX),
+            dir_state=State.ABANDONED,
+            project_root=parent,
+        )
+
+    if specdir.name.startswith(READY_PREFIX):
+        return SpecContext(
+            specdir=specdir,
+            slug=specdir.name.removeprefix(READY_PREFIX),
+            dir_state=State.READY,
+            project_root=parent,
+        )
+
+    raise ScriptError(
+        f"not inside a spec directory (cwd: {specdir}).\n"
+        f"   Expected {DRAFT_PREFIX}<slug>/, {READY_PREFIX}<slug>/, or {KO_PREFIX}<slug>/."
+    )
+
+
+def get_legacy_context(source_dir: Path) -> SpecContext:
+    """Resolve a spec directory written in the legacy `_WIP_SPECS/` or `_SPECS/` layout.
+
+    Raises ScriptError when the directory does not sit directly under a legacy container.
+    """
+    container = source_dir.parent
+    if container.name not in LEGACY_CONTAINERS:
+        raise ScriptError(
+            f"not a legacy spec directory: {source_dir}\n"
+            f"   Expected <dir>/{LEGACY_CONTAINERS[0]}/<slug>/ or <dir>/{LEGACY_CONTAINERS[1]}/<slug>/."
+        )
+
+    return SpecContext(
+        specdir=source_dir,
+        slug=source_dir.name,
+        dir_state=None,
+        project_root=container.parent,
+    )
+
+
+def get_target_dir(state: State, slug: str, project_root: Path) -> Path:
+    """Return the directory a spec occupies in the given state."""
+    if state in DRAFT_PREFIX_STATES:
+        prefix = DRAFT_PREFIX
+    elif state in KO_PREFIX_STATES:
+        prefix = KO_PREFIX
+    else:
+        prefix = READY_PREFIX
+    return project_root / f"{prefix}{slug}"
+
+
+def read_spec_lines(specpath: Path) -> list[str]:
+    """Read the spec file as lines, raising ScriptError when it is absent."""
+    if not specpath.exists():
+        raise ScriptError(f"no {specpath.name} in {specpath.parent}; nothing changed.")
+
+    lines = specpath.read_text().splitlines()
+    # A leading blank line must not push the H1 out of position: the rewrite anchors on lines[0].
+    first_content = next((index for index, line in enumerate(lines) if line.strip()), len(lines))
+    return lines[first_content:]
+
+
+def get_tag_lines(context: SpecContext) -> tuple[Path, list[str]]:
+    """Return the tag-carrying file and its lines, raising when the spec has neither file."""
+    tagpath = context.tagpath
+    if tagpath is None:
+        raise ScriptError(
+            f"no {SPEC_FILENAME} or {DISCOVERY_FILENAME} in {context.specdir}; nothing changed."
+        )
+    return tagpath, read_spec_lines(tagpath)
+
+
+def parse_h1_tag(header: str) -> str | None:
+    """Return the H1 status tag, or None when the header carries no `[TAG]` prefix."""
+    match = H1_TAG_PATTERN.match(header)
+    return match.group("tag") if match else None
+
+
+def parse_h1_title(header: str) -> str:
+    """Return the H1 title, with any status tag and leading hashes stripped."""
+    tagged = H1_TAG_PATTERN.match(header)
+    if tagged:
+        return tagged.group("title")
+    bare = H1_BARE_PATTERN.match(header)
+    return bare.group("title") if bare else header
+
+
+def get_unknown_tag_error(tag: str, tagpath: Path) -> ScriptError:
+    """Return the refusal for an H1 tag outside the `manage-spec` vocabulary.
+
+    A marker another tool prepended is called out as such, so the caller stops and asks for a
+    tag reset instead of stripping a tag it does not own.
+    """
+    message = (
+        f"unknown status tag [{tag}] in {tagpath}.\n"
+        f"   Expected one of: {', '.join(STATE_TAGS.values())}."
+    )
+    if tag in FOREIGN_MARKERS:
+        message += (
+            f"\n   [{tag}] sits ahead of the spec tag, so another tool wrote it and this "
+            f"heading has a second owner."
+            f"\n   Stop and ask the user to reset the tag before running manage-spec again."
+        )
+    return ScriptError(message)
+
+
+def resolve_tag_state(tag: str, tagpath: Path) -> State:
+    """Return the lifecycle state a known H1 status tag names.
+
+    Raises ScriptError when the tag belongs to another tool's vocabulary.
+    """
+    state = TAG_STATES.get(tag)
+    if state is None:
+        raise get_unknown_tag_error(tag, tagpath)
+    return state
+
+
+def get_current_state(tag: str | None, context: SpecContext) -> State:
+    """Resolve the current state from the H1 tag, falling back to the directory name."""
+    if tag is None:
+        if context.dir_state is None:
+            raise ScriptError(
+                f"cannot derive the current state of {context.specdir}.\n"
+                f"   The H1 of {context.tagpath} carries no status tag, and the directory "
+                f"name does not name a state."
+            )
+        return context.dir_state
+
+    return resolve_tag_state(tag, context.tagpath or context.specdir)
+
+
+def check_dir_matches_tag(
+    context: SpecContext,
+    tag_state: State,
+    override: bool,
+    *,
+    repair_hint: str,
+) -> None:
+    """Refuse when the directory name disagrees with the H1 tag.
+
+    The H1 tag is authoritative: an override skips the check and the caller then works from the
+    state the tag names. Repairing the directory name is `rename --fix`'s job.
+    `repair_hint` completes the error message with the way out available to this command.
+    """
+    expected_dir = get_target_dir(tag_state, context.slug, context.project_root)
+    if expected_dir == context.specdir or override:
+        return
+
+    raise ScriptError(
+        f"directory name and H1 status tag disagree.\n"
+        f"   Directory:   {context.specdir}\n"
+        f"   Tag implies: {expected_dir}\n"
+        f"   The H1 tag wins: {repair_hint}"
+    )
+
+
+def check_transition_allowed(from_state: State, to_state: State) -> None:
+    """Refuse a state change the transition table does not allow."""
+    allowed = TRANSITIONS[from_state] | UNIVERSAL_TARGETS
+    if to_state in allowed:
+        return
+
+    raise ScriptError(
+        f"transition {from_state.value} → {to_state.value} is not allowed.\n"
+        f"   Allowed from {from_state.value}: "
+        f"{', '.join(sorted(state.value for state in allowed))}."
+    )
+
+
+def check_target_absent(target_dir: Path) -> None:
+    """Refuse to collide with an existing spec directory."""
+    if target_dir.exists():
+        raise ScriptError(
+            f"target directory already exists: {target_dir}\n"
+            f"   Move or remove it first; merging two specs is a manual decision."
+        )
+
+
+def find_taken_specdirs(slug: str, project_root: Path) -> list[Path]:
+    """Return every existing spec dir for a slug, across all states."""
+    # States share prefixes, so dedupe the candidate paths instead of reporting one per state.
+    candidates = {get_target_dir(state, slug, project_root) for state in State}
+    return sorted(specdir for specdir in candidates if specdir.exists())
+
+
+def get_git_root(path: Path) -> Path | None:
+    """Return the repository root containing path, or None outside a repo."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(path), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    return Path(result.stdout.strip())
+
+
+def run_git(repo_root: Path, *args: str) -> str:
+    """Run a git command and return its stdout, raising ScriptError on failure."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ScriptError(f"could not run git {' '.join(args)}: {exc}") from exc
+
+    if result.returncode != 0:
+        raise ScriptError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout
+
+
+def strip_loader_paragraph(lines: list[str]) -> list[str]:
+    """Drop the skill-loader blockquote plus the blank lines around it."""
+    body = list(lines)
+    while body and not body[0].strip():
+        body.pop(0)
+    if not body or body[0] not in LOADER_LINES:
+        return body
+
+    while body and body[0] in LOADER_LINES:
+        body.pop(0)
+    while body and not body[0].strip():
+        body.pop(0)
+    return body
+
+
+def get_preamble_lines(tag: str, title: str) -> list[str]:
+    """Return the H1 line plus the loader block the given tag carries."""
+    lines = [f"# [{tag}] {title}"]
+    if tag == STATE_TAGS[State.READY]:
+        return lines
+
+    lines.extend(["", *LOADER_PARAGRAPH])
+    if tag == STATE_TAGS[State.EXPLO]:
+        lines.extend(EXPLO_POINTER_PARAGRAPH)
+    return lines
+
+
+def rewrite_spec_file(specpath: Path, tag: str, new_title: str | None = None) -> None:
+    """Rewrite the H1 tag and keep the loader block consistent with it."""
+    lines = read_spec_lines(specpath)
+    header = lines[0] if lines else ""
+    title = new_title if new_title is not None else parse_h1_title(header)
+    body = strip_loader_paragraph(lines[1:])
+
+    body_block = ["", *body] if body else []
+    specpath.write_text("\n".join([*get_preamble_lines(tag, title), *body_block]) + "\n")
+
+
+def write_spec_seed(specpath: Path, tag: str, title: str) -> None:
+    """Create a carrier file holding the H1 tag and the loader block, with no body."""
+    specpath.write_text("\n".join(get_preamble_lines(tag, title)) + "\n")
+
+
+def strip_h1_tag(specpath: Path) -> None:
+    """Replace a tagged H1 with its bare title and drop the state-specific loader block."""
+    lines = read_spec_lines(specpath)
+    title = parse_h1_title(lines[0] if lines else "")
+    body = strip_loader_paragraph(lines[1:])
+
+    body_block = ["", *body] if body else []
+    specpath.write_text("\n".join([f"# {title}", *body_block]) + "\n")
+
+
+def move_spec_dir(source: Path, target: Path, project_root: Path) -> None:
+    """Move the spec dir, preferring `git mv` so a tracked spec keeps its history.
+
+    Raises ScriptError carrying both paths when the move fails, because the caller has already
+    rewritten the H1 tag by then.
+    """
+    target.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        repo_root = get_git_root(project_root)
+        if repo_root is not None:
+            relative_source = source.relative_to(repo_root)
+            tracked = run_git(repo_root, "ls-files", "--", str(relative_source))
+            if tracked.strip():
+                # Staged move: the whole directory travels in one rename.
+                run_git(
+                    repo_root, "mv", "--", str(relative_source), str(target.relative_to(repo_root))
+                )
+                prune_empty_container(source.parent)
+                return
+
+        source.rename(target)
+    except (OSError, ScriptError) as exc:
+        raise ScriptError(
+            f"could not move {source} to {target}: {exc}\n"
+            f"   The status tag was already rewritten to the target state, and the directory\n"
+            f"   did not move. Fix the cause, then repair the directory name from inside it:\n"
+            f"      cd {source} && manage-spec <target-state> --fix"
+        ) from exc
+
+    prune_empty_container(source.parent)
+
+
+def prune_empty_container(container: Path) -> None:
+    """Delete a legacy container dir that a move left empty."""
+    if container.name not in LEGACY_CONTAINERS or any(container.iterdir()):
+        return
+
+    container.rmdir()
+    print(f"Removed empty {container.name}/")
+
+
+def get_session_vars(context: SpecContext) -> SessionVars:
+    """Return the caller's session variables, with paths relative to the base dir."""
+    specdir_rel = context.specdir.relative_to(context.project_root)
+    # The carrier follows the state: DISCOVERY.md before a SPEC.md exists, SPEC.md after.
+    carrier = context.tagpath or context.specpath
+    return SessionVars(
+        slug=context.slug,
+        specdir=f"{specdir_rel}/",
+        specpath=str(carrier.relative_to(context.project_root)),
+    )
+
+
+def get_var_items(session_vars: SessionVars) -> list[tuple[str, str]]:
+    """Return the session variables as ordered `(name, value)` pairs."""
+    return [
+        ("slug", session_vars.slug),
+        ("specdir", session_vars.specdir),
+        ("specpath", session_vars.specpath),
+    ]
+
+
+def print_var_block(header: str, items: list[tuple[str, str]]) -> None:
+    """Print the vars header followed by one bullet per variable."""
+    print(header)
+    for name, value in items:
+        print(f"- ${name} = {value}")
+
+
+def report_new_vars(session_vars: SessionVars) -> None:
+    """Report every session variable as newly created."""
+    items = get_var_items(session_vars)
+    print_var_block(f"Session vars: {len(items)} new", items)
+
+
+def report_changed_vars(previous: SessionVars, current: SessionVars) -> None:
+    """Report only the session variables whose value changed."""
+    pairs = zip(get_var_items(current), get_var_items(previous), strict=True)
+    changed = [
+        (name, value) for (name, value), (_, previous_value) in pairs if value != previous_value
+    ]
+
+    if not changed:
+        print("Session vars: unchanged")
+        return
+
+    print_var_block(f"Session vars: {len(changed)} changed", changed)
+
+
+def check_slug(slug: str) -> None:
+    """Refuse a slug that is empty or carries whitespace, a path separator, or a leading dash."""
+    if not slug or re.search(r"[\s/]", slug) or slug.startswith("-"):
+        raise ScriptError(
+            f"invalid slug {slug!r}; "
+            f"use a bare slug with no whitespace, path separator, or leading dash."
+        )
+
+
+def check_title(title: str) -> None:
+    """Refuse a title that has no space, since a single word reads as a slug."""
+    if not re.search(r"\s", title):
+        raise ScriptError(
+            f"invalid title {title!r}; a title needs more than one word.\n"
+            f"   A single word is read as a slug — pass the title as two or more words."
+        )
+
+
+def check_outside_spec_dir(project_root: Path) -> None:
+    """Refuse to create a spec inside another spec dir or a legacy container."""
+    try:
+        get_spec_context()
+    except ScriptError:
+        inside_spec = False
+    else:
+        inside_spec = True
+
+    # Legacy containers hold specs without being spec dirs themselves.
+    inside_container = (
+        project_root.name in LEGACY_CONTAINERS
+        or project_root.parent.name in LEGACY_CONTAINERS
+    )
+    if not (inside_spec or inside_container):
+        return
+
+    raise ScriptError(
+        f"cannot create a spec at {project_root}: that location sits inside a spec tree.\n"
+        f"   Run `init` from the project directory, not from inside a spec or its containers."
+    )
+
+
+def cmd_init(slug: str, title: str | None) -> None:
+    """Create a spec directory in the discovery state, under the current directory.
+
+    Seeds `DISCOVERY.md` with the H1 tag and the loader block; the draft skeleton stays with
+    `Phase:Draft`.
+    """
+    check_slug(slug)
+    if title is not None:
+        check_title(title)
+    project_root = Path.cwd()
+    check_outside_spec_dir(project_root)
+    specdir = get_target_dir(State.DISCOVERY, slug, project_root)
+
+    # A slug may only exist once across every state, otherwise two specs drift apart.
+    taken = find_taken_specdirs(slug, project_root)
+    if taken:
+        existing = taken[0]
+        # An abandoned spec is not editable in place, so pointing at its directory is not enough.
+        is_abandoned = existing.name.startswith(KO_PREFIX)
+        way_out = (
+            "run `manage-spec draft` from inside it to revive it, or pick another slug."
+            if is_abandoned
+            else "cd into it instead, or pick another slug."
+        )
+        raise ScriptError(
+            f"spec {slug!r} already exists at {existing}; nothing changed.\n"
+            f"   {way_out}"
+        )
+
+    specdir.mkdir()
+    write_spec_seed(specdir / DISCOVERY_FILENAME, STATE_TAGS[State.DISCOVERY], title or slug)
+
+    session_vars = get_session_vars(
+        SpecContext(
+            specdir=specdir,
+            slug=slug,
+            dir_state=State.DISCOVERY,
+            project_root=project_root,
+        )
+    )
+    report_new_vars(session_vars)
+    print("")
+    print(f"Next: write the discovery notes at {session_vars.specpath}")
+
+
+def warn_secondary_carrier(context: SpecContext) -> None:
+    """Warn when the non-authoritative carrier still holds a status tag."""
+    if context.tagpath is None or context.tagpath.name != SPEC_FILENAME:
+        return
+
+    discoverypath = context.specdir / DISCOVERY_FILENAME
+    if not discoverypath.exists():
+        return
+
+    lines = read_spec_lines(discoverypath)
+    if parse_h1_tag(lines[0] if lines else "") is None:
+        return
+
+    print_err(f"!! WARNING: {discoverypath} also carries a status tag.")
+    print_err(f"   {SPEC_FILENAME} wins, so the tag there is ignored; review both files.")
+
+
+def cmd_transition(state_name: str, fix: bool) -> None:
+    """Move the spec to another lifecycle state, rewriting the tag and paragraph.
+
+    `fix` repairs a directory name that disagrees with the H1 tag before transitioning.
+    """
+    context = get_spec_context()
+    target_state = State(state_name)
+
+    tag_path, lines = get_tag_lines(context)
+    tag = parse_h1_tag(lines[0] if lines else "")
+
+    if tag is None:
+        if fix:
+            raise ScriptError(
+                f"cannot repair the directory name: the H1 of {tag_path} carries no status tag.\n"
+                f"   Give it a status tag, or move the spec dir by hand."
+            )
+        print("NOTE: H1 has no status tag; using the directory name as the current state.")
+    current_state = get_current_state(tag, context)
+    if tag is not None:
+        check_dir_matches_tag(
+            context,
+            current_state,
+            fix,
+            repair_hint="rerun with --fix to repair the directory name.",
+        )
+
+    warn_secondary_carrier(context)
+    previous_vars = get_session_vars(context)
+
+    # Repair first: every later step derives the target directory from the tag.
+    if fix and tag is not None:
+        expected_dir = get_target_dir(current_state, context.slug, context.project_root)
+        if expected_dir != context.specdir:
+            check_target_absent(expected_dir)
+            move_spec_dir(context.specdir, expected_dir, context.project_root)
+            context = SpecContext(
+                specdir=expected_dir,
+                slug=context.slug,
+                dir_state=current_state,
+                project_root=context.project_root,
+            )
+            # The repair moved the directory, so every path bound so far is stale.
+            tag_path, lines = get_tag_lines(context)
+
+    if current_state == target_state:
+        print(f"State: {target_state.value} (already current)")
+        report_changed_vars(previous_vars, get_session_vars(context))
+        return
+
+    check_transition_allowed(current_state, target_state)
+
+    target_dir = get_target_dir(target_state, context.slug, context.project_root)
+    needs_move = target_dir != context.specdir
+    if needs_move:
+        check_target_absent(target_dir)
+
+    title = parse_h1_title(lines[0] if lines else "")
+    needs_spec_file = target_state not in PRE_SPEC_STATES and tag_path.name != SPEC_FILENAME
+
+    if needs_spec_file:
+        # Leaving the pre-spec carrier: SPEC.md becomes the tag authority from now on.
+        write_spec_seed(context.specpath, STATE_TAGS[target_state], title)
+        strip_h1_tag(tag_path)
+    else:
+        rewrite_spec_file(tag_path, STATE_TAGS[target_state])
+
+    if needs_move:
+        move_spec_dir(context.specdir, target_dir, context.project_root)
+
+    new_context = SpecContext(
+        specdir=target_dir,
+        slug=context.slug,
+        dir_state=target_state,
+        project_root=context.project_root,
+    )
+    print(f"State: {target_state.value}")
+    report_changed_vars(previous_vars, get_session_vars(new_context))
+
+
+def cmd_rename(target: str, new_title: str | None, fix: bool) -> None:
+    """Rename the spec slug or its H1 title; a spaced argument is a title.
+
+    `fix` also repairs a directory name that disagrees with the H1 tag, since the target is
+    derived from the tag.
+    """
+    is_title_form = " " in target
+    if is_title_form and new_title is not None:
+        raise ScriptError(
+            f"two titles given: {target!r} and {new_title!r}.\n"
+            f"   Pass a slug and a title, or a single title."
+        )
+
+    new_slug = None
+    if is_title_form:
+        new_title = target
+    else:
+        new_slug = target
+        check_slug(new_slug)
+
+    if new_title is not None:
+        check_title(new_title)
+
+    context = get_spec_context()
+    tag_path, lines = get_tag_lines(context)
+    tag = parse_h1_tag(lines[0] if lines else "")
+    current_state = get_current_state(tag, context)
+    if tag is not None:
+        check_dir_matches_tag(
+            context,
+            current_state,
+            fix,
+            repair_hint="rerun with --fix to repair the directory name.",
+        )
+
+    target_slug = new_slug if new_slug is not None else context.slug
+    target_dir = get_target_dir(current_state, target_slug, context.project_root)
+    is_retitle_only = target_dir == context.specdir
+    if is_retitle_only and new_title is None:
+        raise ScriptError(f"already named {target_slug}; nothing changed.")
+    if not is_retitle_only:
+        taken = find_taken_specdirs(target_slug, context.project_root)
+        if taken:
+            raise ScriptError(
+                f"spec {target_slug!r} already exists at {taken[0]}; nothing changed.\n"
+                f"   Pick another slug, or rename that spec instead."
+            )
+
+    rewrite_spec_file(tag_path, STATE_TAGS[current_state], new_title)
+    if not is_retitle_only:
+        move_spec_dir(context.specdir, target_dir, context.project_root)
+
+    new_context = SpecContext(
+        specdir=target_dir,
+        slug=target_slug,
+        dir_state=current_state,
+        project_root=context.project_root,
+    )
+    if is_retitle_only:
+        print(f"Retitled: {new_title}")
+    else:
+        print(f"Renamed: {context.slug} -> {target_slug}")
+    report_changed_vars(get_session_vars(context), get_session_vars(new_context))
+
+
+def cmd_rebase(new_base: str) -> None:
+    """Move the spec dir under another base directory inside the project.
+
+    The base is resolved against the project root and must already exist.
+    Files, tag, and state are left untouched.
+    """
+    context = get_spec_context()
+    base_dir = (context.project_root / new_base).resolve()
+
+    if not base_dir.is_dir():
+        raise ScriptError(
+            f"base directory does not exist: {base_dir}\n"
+            f"   Create it first; `rebase` never creates directories."
+        )
+
+    is_inside_project = (
+        base_dir == context.project_root or context.project_root in base_dir.parents
+    )
+    if not is_inside_project:
+        raise ScriptError(
+            f"base directory is outside the project: {base_dir}\n"
+            f"   Rebase only moves a spec within {context.project_root}."
+        )
+
+    if base_dir == context.specdir.parent:
+        raise ScriptError(f"spec is already under {base_dir}; nothing changed.")
+
+    target_dir = base_dir / context.specdir.name
+    check_target_absent(target_dir)
+
+    previous_vars = get_session_vars(context)
+    move_spec_dir(context.specdir, target_dir, context.project_root)
+
+    new_context = SpecContext(
+        specdir=target_dir,
+        slug=context.slug,
+        dir_state=context.dir_state,
+        project_root=context.project_root,
+    )
+    print(
+        f"Rebased: {context.specdir.relative_to(context.project_root)}"
+        f" -> {target_dir.relative_to(context.project_root)}"
+    )
+    report_changed_vars(previous_vars, get_session_vars(new_context))
+
+
+def get_legacy_state(tag_path: Path) -> State:
+    """Return the state a legacy spec's H1 tag names, defaulting to draft when it has none."""
+    lines = read_spec_lines(tag_path)
+    tag = parse_h1_tag(lines[0] if lines else "")
+    if tag is None:
+        print("NOTE: H1 has no status tag; migrating as draft.")
+        return State.DRAFT
+
+    return resolve_tag_state(tag, tag_path)
+
+
+def move_file(source: Path, target: Path, project_root: Path) -> None:
+    """Move one file, preferring `git mv` so a tracked file keeps its history."""
+    try:
+        repo_root = get_git_root(project_root)
+        if repo_root is not None:
+            relative_source = source.relative_to(repo_root)
+            if run_git(repo_root, "ls-files", "--", str(relative_source)).strip():
+                run_git(
+                    repo_root, "mv", "--", str(relative_source), str(target.relative_to(repo_root))
+                )
+                return
+    except ValueError:
+        # A file outside the repository falls through to a plain move.
+        pass
+
+    source.rename(target)
+
+
+def collect_legacy_explo_renames(specdir: Path) -> list[tuple[Path, Path]]:
+    """Return the `EXPLORATION-*` files to rename, refusing to overwrite an `EXPLO-*` file."""
+    renames = []
+    for path in sorted(specdir.iterdir()):
+        if not path.is_file() or not path.name.startswith(LEGACY_EXPLO_PREFIX):
+            continue
+
+        target = path.with_name(EXPLO_PREFIX + path.name.removeprefix(LEGACY_EXPLO_PREFIX))
+        if target.exists():
+            raise ScriptError(
+                f"cannot rename {path.name}: {target.name} already exists.\n"
+                f"   Merge the two files by hand first; `migrate` never overwrites."
+            )
+        renames.append((path, target))
+    return renames
+
+
+def rewrite_explo_references(specdir: Path) -> int:
+    """Point references to the old exploration filenames at the new ones; return the count."""
+    changed = 0
+    for path in sorted(specdir.glob("*.md")):
+        text = path.read_text()
+        updated = LEGACY_EXPLO_REFERENCE.sub(r"EXPLO-\1", text)
+        if updated == text:
+            continue
+        path.write_text(updated)
+        changed += 1
+    return changed
+
+
+def migrate_legacy_explo_files(specdir: Path, project_root: Path) -> None:
+    """Rename `EXPLORATION-*` files to `EXPLO-*` and rewrite references to the old names."""
+    for source, target in collect_legacy_explo_renames(specdir):
+        move_file(source, target, project_root)
+        print(f"Renamed: {source.name} -> {target.name}")
+
+    changed = rewrite_explo_references(specdir)
+    if changed:
+        print(f"Updated exploration references in {changed} file(s).")
+
+
+def cmd_migrate(path_arg: str | None) -> None:
+    """Move a legacy-layout spec into the current layout, keeping the state its H1 tag names."""
+    source_dir = Path(path_arg).resolve() if path_arg else Path.cwd()
+    context = get_legacy_context(source_dir)
+
+    tag_path = context.tagpath
+    if tag_path is None:
+        # An exploration-only legacy dir: no spec yet, so it enters the explo state.
+        state = State.EXPLO
+    else:
+        state = get_legacy_state(tag_path)
+
+    target_dir = get_target_dir(state, context.slug, context.project_root)
+    check_target_absent(target_dir)
+
+    # Rename the exploration files before the tag rewrite, so a collision aborts with nothing changed.
+    migrate_legacy_explo_files(source_dir, context.project_root)
+
+    if tag_path is None:
+        write_spec_seed(source_dir / DISCOVERY_FILENAME, STATE_TAGS[state], context.slug)
+        print(f"NOTE: no {SPEC_FILENAME}; seeded {DISCOVERY_FILENAME} in the {state.value} state.")
+    else:
+        rewrite_spec_file(tag_path, STATE_TAGS[state])
+
+    move_spec_dir(context.specdir, target_dir, context.project_root)
+
+    new_context = SpecContext(
+        specdir=target_dir,
+        slug=context.slug,
+        dir_state=state,
+        project_root=context.project_root,
+    )
+    old_location = context.specdir.relative_to(context.project_root)
+    new_location = new_context.specdir.relative_to(context.project_root)
+    print(f"Migrated: {old_location} -> {new_location}")
+    print(f"State: {state.value}")
+
+
+def parse_migrate_args(argv: list[str]) -> argparse.Namespace:
+    """Parse the undocumented `migrate` command, kept out of the advertised command list."""
+    parser = argparse.ArgumentParser(
+        prog="manage-spec migrate",
+        description="Move a spec out of a legacy _WIP_SPECS/ or _SPECS/ directory.",
+    )
+    parser.add_argument(
+        "path",
+        nargs="?",
+        default=None,
+        help="legacy spec directory (default: the current directory)",
+    )
+    args = parser.parse_args(argv)
+    args.command = "migrate"
+    return args
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse the command line."""
+    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
+        return parse_migrate_args(sys.argv[2:])
+
+    parser = argparse.ArgumentParser(
+        description="Create a spec directory and move a spec between lifecycle states.",
+    )
+    subcommands = parser.add_subparsers(
+        dest="command",
+        required=True,
+        title="commands",
+        metavar="<command>",
+    )
+
+    init = subcommands.add_parser(
+        "init",
+        help="create a spec directory in the discovery state",
+        description="Create a spec directory in the discovery state, under the current directory.",
+    )
+    init.add_argument("slug", help="kebab-case slug, without any SPEC- prefix")
+    init.add_argument(
+        "title",
+        nargs="?",
+        default=None,
+        help="H1 title; defaults to the slug, seeds DISCOVERY.md with the tag and the loader",
+    )
+
+    rename = subcommands.add_parser(
+        "rename",
+        help="rename the spec slug, or retitle it",
+        description=(
+            "Rename the spec slug or replace its H1 title. "
+            "A single word is read as a slug; a spaced argument is read as a title."
+        ),
+    )
+    rename.add_argument(
+        "target",
+        help="new slug (one word), or new title (two or more words)",
+    )
+    rename.add_argument(
+        "new_title",
+        nargs="?",
+        default=None,
+        help="replacement H1 title, when the first argument is a slug",
+    )
+    rename.add_argument(
+        "--fix",
+        dest="fix",
+        action="store_true",
+        help="repair a directory name that disagrees with the H1 tag",
+    )
+
+    rebase = subcommands.add_parser(
+        "rebase",
+        help="move the spec under another base directory",
+        description=(
+            "Move the spec directory under another base directory inside the project, "
+            "keeping its state and files."
+        ),
+    )
+    rebase.add_argument(
+        "new_base",
+        help="destination base directory, relative to the project root; it must exist",
+    )
+
+    # Each lifecycle state is its own command, so state and directory share one vocabulary.
+    for state in State:
+        state_parser = subcommands.add_parser(
+            state.value,
+            help=f"move the spec to the {state.value} state",
+            description=f"Move the spec to the {state.value} state.",
+        )
+        state_parser.add_argument(
+            "--fix",
+            dest="fix",
+            action="store_true",
+            help="repair a directory name that disagrees with the H1 tag",
+        )
+
+    # Undocumented on purpose: it exists to drain the pre-rename layout, not for daily use.
+    # Registering it as a subparser would advertise it in the command list, so it is parsed
+    # ahead of argparse instead.
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+
+    if args.command == "init":
+        cmd_init(args.slug, args.title)
+    elif args.command == "rename":
+        cmd_rename(args.target, args.new_title, args.fix)
+    elif args.command == "rebase":
+        cmd_rebase(args.new_base)
+    elif args.command == "migrate":
+        cmd_migrate(args.path)
+    else:
+        cmd_transition(args.command, args.fix)
+
+
+def cli_main() -> int:
+    """Console-script entry point; return the process exit status."""
+    try:
+        main()
+    except ScriptError as exc:
+        print_err(f"!! ERROR: {exc}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(cli_main())

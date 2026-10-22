@@ -4,25 +4,27 @@ Reference for section order, Alternatives & Tradeoffs, and Open Questions format
 
 ## Layout
 
-Each spec lives at `$specpath` = `$specdir/SPEC.md`, where `$specdir` = `$basedir/<slug>/`.
-Related artifacts (examples, experiments, reference impls, external links) go next to the spec file:
-
+`$specpath` is the spec file to read and edit inside `$specdir`, both printed by `manage-spec`
+(see <./lifecycle.md>).
+Related artifacts (examples, experiments, reference impls, external links) go next to the spec
+file:
 ```
-$basedir/
-└── <slug>/                    ← $specdir
-    ├── SPEC.md                ← $specpath — the spec
-    ├── EXPLORATION-BRIEF.md   ← hub: exploration motivation + topic index
-    ├── EXPLORATION-<topic>.md ← one per exploration topic
-    ├── <related-file>         ← any companion files, no nesting required
-    └── <sub-dir>/             ← sub-directories if grouping is useful
+$specdir/
+├── SPEC.md                   ← the spec
+├── DISCOVERY.md              ← discovery notes
+├── EXPLO-BRIEF.md            ← hub: exploration motivation + topic index
+├── EXPLO-<topic>.md          ← one per exploration topic
+├── <related-file>            ← any companion files, no nesting required
+└── <sub-dir>/                ← sub-directories if grouping is useful
 ```
 
-Everything lives alongside `SPEC.md` — no separate subdirectory convention.
+Everything lives alongside the spec file — no separate subdirectory convention.
+The four boxes above are the shape a spec acquires over its life, not a fixed minimum:
+a legacy spec migrated straight into `draft` may hold only `SPEC.md`.
 
-Exploration files are pre-spec design material (see `Phase:Explore`).
+`DISCOVERY.md` and the exploration files are pre-spec design material.
 A topic freezes in the hub once folded into `SPEC.md`; re-entry may revive it,
 or start a new topic file when the direction is completely different.
-`SPEC.md` is authoritative once it exists.
 
 ## Section order
 
@@ -51,7 +53,8 @@ The "Global Open Questions" tracks whether it is needed — see <./terminology-a
 9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
 10. **Related artifacts** — contextual pointers to related artifacts
 
-**Global Open Questions** — unnumbered, always appended.
+**Global Open Questions** — unnumbered, appended until the spec reaches `READY`, then pruned when
+empty (see <./phases/review.md>).
 Default entries included verbatim in skeleton (see <./phases/draft.md>).
 Entries default to **Non-blocking** and may escalate to **Blocking** during review.
 See Open Questions format below.
