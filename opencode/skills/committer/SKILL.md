@@ -304,7 +304,8 @@ NOTE: `drop …` means to remove something, not fold it and reword it in a diffe
 This is a SINGLE-select question.
 
 Prepend a scope recap to the question text, above the options:
-`Scope recap (adjust if needed): <resolved scope>`
+`Scope recap: <resolved scope>`
+Display only. To change it, answer with a scope verb (`only`, `include`, `skip`, `remove`).
 Read the current resolved `Scope` (post multi-task resolution and any rescope) — files/areas,
 never the literal `session work items`.
 
@@ -368,14 +369,20 @@ Do not proceed until the user has switched modes.
   yes before `git add`.
   A commit approval ("🚀 commit", "ok; commit", …) never implies staging approval —
   the staging set must be confirmed on its own, even when the user already asked to commit.
+  The confirmed set must cover every path of the resolved `Scope` in the analysed diff —
+  the scope recap is not that confirmation, and `(none)` makes the confirmed set the baseline.
+  A short set needs the user's word: name the missing paths and stop.
+  A path the user drops is a rescope, so update `Scope` first.
   `git add` only the confirmed files.
   If some files need hunk-level _partial_ add: do NOT `git add` — follow <§partial-adds>.
 
 **Verify staged set** — always run `git diff --cached --stat` before committing.
 Inspect staged content only; never inspect unstaged changes.
 - Staged set matches the message intent: continue below.
-- Mismatch (missing hunks, extra changes): abort, report the mismatch, ask the user to fix staging.
-  Do not commit.
+- Mismatch: an extra change, a missing hunk, or a path of the resolved `Scope` left unstaged.
+  For diff-type staged, only content beyond what `Phase:Analyse` saw counts as a mismatch.
+  Abort, report the mismatch, ask the user to fix staging.
+  Do not commit a subset of the resolved `Scope`.
   After the user fixes staging: re-run `git diff --cached --stat` and re-check before committing.
 
 **Commit** via the multiline heredoc form:
