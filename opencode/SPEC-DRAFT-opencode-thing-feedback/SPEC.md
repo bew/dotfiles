@@ -1,5 +1,8 @@
 # [DRAFT] oc-feedback
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 During agentic sessions, an agent may trigger the wrong skill, misapply an instruction, or silently skip a rule that should have applied.

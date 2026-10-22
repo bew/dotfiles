@@ -50,4 +50,4 @@ The env-override module system composes the env/arg spec from a commons plus sco
 
 ## Open threads
 
-- How is the single-bin drv composed into a package (bins + config dirs) — a separate `mkWrapkitPkg`, or the toolkit's job? See `EXPLORATION-packaging-composition.md`.
+- How is the single-bin drv composed into a package (bins + config dirs) — a separate `mkWrapkitPkg`, or the toolkit's job? See `EXPLO-packaging-composition.md`.

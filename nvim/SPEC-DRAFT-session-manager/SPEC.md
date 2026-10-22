@@ -1,5 +1,8 @@
 # [DRAFT] Session Manager Plugin
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 Neovim's built-in `:mksession` / `:source` machinery is reliable but bare.

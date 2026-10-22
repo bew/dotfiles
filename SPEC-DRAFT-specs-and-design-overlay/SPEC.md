@@ -1,7 +1,7 @@
 # [DRAFT] Specs & Design Overlay
 
 > IMPORTANT: Before any drafting/planning/editing of this spec,
-> agents MUST load one of the spec-writing skill first.
+> agents MUST load one of the spec-writing skills first.
 
 ## Introduction
 
@@ -14,7 +14,7 @@ The goal is a CLI (placeholder name `lab`) that versions all such artefacts on a
 
 Out of scope for now: ignoring the overlay artefacts, migrating artefacts already tracked on `main`, and the plumbing-based storage backend (documented as future work).
 
-Detail: [EXPLORATION-BRIEF.md](./EXPLORATION-BRIEF.md).
+Detail: [EXPLO-BRIEF.md](./EXPLO-BRIEF.md).
 
 ## Naming & IDs
 
@@ -25,7 +25,7 @@ Detail: [EXPLORATION-BRIEF.md](./EXPLORATION-BRIEF.md).
 - Manifest: `git rev-parse --git-path <tool>-manifest` (per-worktree).
 - Item path: a repo-relative path; the branch tree mirrors it exactly.
 
-Detail: [EXPLORATION-naming.md](./EXPLORATION-naming.md).
+Detail: [EXPLO-naming.md](./EXPLO-naming.md).
 
 ## Interface / How to use
 
@@ -41,7 +41,7 @@ CLI: `<tool> <cmd>`.
 - `new <path>` — start a new item (overlay, untracked).
 - `rm <path>` — delete an item from the branch (and overlay).
 
-Detail: [EXPLORATION-cli-surface.md](./EXPLORATION-cli-surface.md).
+Detail: [EXPLO-cli-surface.md](./EXPLO-cli-surface.md).
 
 ### Open Questions
 
@@ -55,7 +55,7 @@ Orphan history makes it unmergeable into `main`.
 The branch tree mirrors repo-relative paths, so an item's branch path equals its worktree path.
 `init` bootstraps the worktree and manifest.
 
-Detail: [EXPLORATION-storage-backend.md](./EXPLORATION-storage-backend.md).
+Detail: [EXPLO-storage-backend.md](./EXPLO-storage-backend.md).
 
 ### Open Questions
 
@@ -68,7 +68,7 @@ Detail: [EXPLORATION-storage-backend.md](./EXPLORATION-storage-backend.md).
 Items are files or directories (copied recursively).
 The overlay copy is authoritative on sync; if the worktree copy was independently modified, `sync` warns before overwriting.
 
-Detail: [EXPLORATION-overlay-model.md](./EXPLORATION-overlay-model.md).
+Detail: [EXPLO-overlay-model.md](./EXPLO-overlay-model.md).
 
 ### Open Questions
 
@@ -81,7 +81,7 @@ Detail: [EXPLORATION-overlay-model.md](./EXPLORATION-overlay-model.md).
 Commits happen in the worktree, never on `main` — preserving the `AGENTS.md` `HANDOFF-*` rule.
 Sync is per-item and on-demand.
 
-Detail: [EXPLORATION-cli-surface.md](./EXPLORATION-cli-surface.md), [EXPLORATION-overlay-model.md](./EXPLORATION-overlay-model.md).
+Detail: [EXPLO-cli-surface.md](./EXPLO-cli-surface.md), [EXPLO-overlay-model.md](./EXPLO-overlay-model.md).
 
 ## Visibility & Ignore
 
@@ -89,7 +89,7 @@ No artefact ignore for now; the user avoids `git add -A`.
 Ignoring the `.<tool>/` worktree dir is deferred but high priority: without it, `git add -A` stages `.<tool>/` as an embedded-repo gitlink (mode 160000).
 When added, prefer `.git/info/exclude` over a committed `.gitignore`.
 
-Detail: [EXPLORATION-visibility-and-ignore.md](./EXPLORATION-visibility-and-ignore.md).
+Detail: [EXPLO-visibility-and-ignore.md](./EXPLO-visibility-and-ignore.md).
 
 ### Open Questions
 
@@ -100,7 +100,7 @@ Detail: [EXPLORATION-visibility-and-ignore.md](./EXPLORATION-visibility-and-igno
 Items may live anywhere in the repo; the branch mirrors repo-relative paths, including nested dirs (e.g. `nvim/_WIP_SPECS/...`).
 Types are inferred by path convention: `_WIP_SPECS` → spec/exploration; `HANDOFF-*` → handoff.
 
-Detail: [EXPLORATION-overlay-model.md](./EXPLORATION-overlay-model.md).
+Detail: [EXPLO-overlay-model.md](./EXPLO-overlay-model.md).
 
 ## Design Options
 
@@ -109,7 +109,7 @@ Detail: [EXPLORATION-overlay-model.md](./EXPLORATION-overlay-model.md).
 
 Decision criteria: use D1 unless the second checkout causes practical friction; switch to D2 only if that friction is real.
 
-Detail: [EXPLORATION-storage-backend.md](./EXPLORATION-storage-backend.md).
+Detail: [EXPLO-storage-backend.md](./EXPLO-storage-backend.md).
 
 ## Alternatives & Tradeoffs
 
@@ -120,7 +120,7 @@ Detail: [EXPLORATION-storage-backend.md](./EXPLORATION-storage-backend.md).
 
 ## Related Artifacts
 
-- Exploration material lives beside this spec: `EXPLORATION-BRIEF.md` and `EXPLORATION-*.md` in this directory.
+- Exploration material lives beside this spec: `EXPLO-BRIEF.md` and `EXPLORATION-*.md` in this directory.
 - Repo tooling convention: bash scripts in `bin/` with `.bats` tests (`git-new-files`, `git-without-new-files`, `opencode-artefacts-status`).
 - Existing artefact convention this design must coexist with: `_WIP_SPECS/` dirs (some tracked on `main`) and `HANDOFF-*` files (never tracked).
 

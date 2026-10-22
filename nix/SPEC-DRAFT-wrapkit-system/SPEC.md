@@ -1,7 +1,7 @@
 # [DRAFT] wrapkit-system
 
 > IMPORTANT: Before any drafting/planning/editing of this spec,
-> agents MUST load one of the spec-writing skill first.
+> agents MUST load one of the spec-writing skills first.
 
 ## Introduction
 

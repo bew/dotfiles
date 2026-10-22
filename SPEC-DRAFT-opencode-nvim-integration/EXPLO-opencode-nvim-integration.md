@@ -45,5 +45,5 @@ diverging while the author is still actively moving?
   choice?
 - Fork vs wait vs contribute-upstream: what does the upstream roadmap say about
   multiline input, batching, and `vim.async`?
-- Relationship to `EXPLORATION-nvim-opencode-review-plugin.md`: is this experiment a
+- Relationship to `EXPLO-nvim-opencode-review-plugin.md`: is this experiment a
   stepping stone toward that review/annotation plugin, or an independent usage thread?

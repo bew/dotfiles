@@ -1,5 +1,8 @@
 # [DRAFT] do-it-'later' task manager
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 `later` — task-stashing tool for dev who context-switches constantly.

@@ -1,5 +1,8 @@
 # [DRAFT] Extension System
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 This system provides a structured way to define named integration contracts across a Neovim configuration.

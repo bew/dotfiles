@@ -1,5 +1,8 @@
 # [DRAFT] Complex Skills Rework 'v2' — Orchestrator-managed Phases & Context Handoffs
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 `opencode-crafter` has grown monolithic: long SKILL.md, deeply nested refs, phase logic tangled with artefact-type logic.

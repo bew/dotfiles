@@ -17,7 +17,7 @@ them — upstream is actively moving (OC v2 support landed recently), and Neovim
 `vim.async` support is expected to land.
 
 Out of scope: the broader "nvim + opencode review/annotation plugin" idea — that prior-art
-record lives in `EXPLORATION-nvim-opencode-review-plugin.md`; link, don't duplicate.
+record lives in `EXPLO-nvim-opencode-review-plugin.md`; link, don't duplicate.
 
 ## Topics
 

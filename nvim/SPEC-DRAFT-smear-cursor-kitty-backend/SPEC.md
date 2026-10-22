@@ -1,5 +1,8 @@
 # [MAYBE-READY] Smear-Cursor Kitty Graphics Backend
 
+> IMPORTANT: Before any drafting/planning/editing of this spec,
+> agents MUST load one of the spec-writing skills first.
+
 ## Introduction
 
 `smear-cursor.nvim` animates the Neovim cursor with a spring-damped smear trail, inspired by Neovide's animated cursor.

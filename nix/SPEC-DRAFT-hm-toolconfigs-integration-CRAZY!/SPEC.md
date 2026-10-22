@@ -1,7 +1,7 @@
 # [MAYBE-READY] `toolcfg` in Home Manager (and its `dynpaths.roots` wiring)
 
 > IMPORTANT: Before any drafting/planning/editing of this spec,
-> agents MUST load one of the spec-writing skill first.
+> agents MUST load one of the spec-writing skills first.
 
 ## Introduction
 
