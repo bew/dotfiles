@@ -166,6 +166,13 @@ Applies to every message to the user — including (relayed) reports, lists, rev
   The count goes stale when items change, and the update is easily missed.
 - Use bullets for any list whose length may grow
 - Inline enumerations ("a, b, and c") are allowed only for a small, known-not-to-change set of few items.
+- Annotate every opening code fence with an accurate language.
+  Pseudo-code and logic sketches use `pseudocode`.
+  `console` is only for a transcript: a command prefixed with `$` together with its output.
+  A bare command with no `$` prompt and no output is shell code — use `sh` (or the real shell), including
+  when it carries placeholders; a block that is pure output or a diagram stays unannotated;
+  nested markdown examples use `md`; real code uses its true language.
+  `text` is never used as a fence language.
 - Never put sentence punctuation (comma, colon, semicolon, period) inside a formatting span
   (bold, italics, quotes, code, link text).
   That punctuation joins or ends the surrounding sentence, so it stays outside the span's delimiters.
