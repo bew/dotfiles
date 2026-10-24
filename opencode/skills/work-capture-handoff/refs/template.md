@@ -4,7 +4,16 @@ The capture doc must contain the following sections in order.
 Omit any optional section that has no qualifying content — do not keep an
 empty heading or write filler (e.g. "none", "N/A", "nothing to report").
 
+The doc opens with this block, above the H1:
+```md
 ---
+created-at: <YYYYMMDDThhmm>
+---
+```
+
+Add `depends-on` directly after `created-at`, only when the capture has explicit dependencies:
+one `<kind>:<slug>` per dependency, joined with ` & `.
+Omit the key otherwise.
 
 # <title>
 

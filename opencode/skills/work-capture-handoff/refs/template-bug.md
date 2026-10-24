@@ -5,12 +5,21 @@ The capture doc must contain the following sections in order.
 Omit any optional section that has no qualifying content — do not keep an
 empty heading or write filler (e.g. "none", "N/A", "nothing to report").
 
+The doc opens with this block, above the H1:
+```md
 ---
+created-at: <YYYYMMDDThhmm>
+---
+```
+
+Add `depends-on` directly after `created-at`, only when the capture has explicit dependencies:
+one `<kind>:<slug>` per dependency, joined with ` & `.
+Omit the key otherwise.
 
 # <one-line symptom>
 
 H1 heading — the bug in one line, stated as what goes wrong.
-When the bug is confirmed, prefix the heading with `[CONFIRMED]`: `# [CONFIRMED] <symptom>`.
+When the bug is confirmed, tag the heading with a trailing `[CONFIRMED]`: `# <symptom> [CONFIRMED]`.
 Leave it untagged when the bug is still open.
 
 <description: what goes wrong, where, and why it matters.
