@@ -32,7 +32,7 @@ flowchart LR
   %% Referenced by the craft/spec subgraphs but not members of them.
   sk_cav["<b>§ caveman</b>"]
   sk_bew_callout["<b>§ bew-inline-callout-style</b><br/><i>NoAutoload</i>"]
-  sk_task_capture["<b>§ task-capture-handoff</b>"]
+  sk_work_capture["<b>§ work-capture-handoff</b>"]
   legend["<b>Prefix legend</b><br/>@ → Agent<br/>§ → Skill<br/>/ → Command<br/>(tool) → Tool"]
   style legend text-align:left,fill:none
 
@@ -89,7 +89,7 @@ flowchart LR
     sk_design_explore["<b>§ design-exploration</b><br/><i>MultiPhase</i>"]
     sk_plan_milestones["<b>§ plan-milestones</b><br/><i>MultiPhase</i>"]
     sk_write_spec -. can delegate .-> sk_design_explore
-    sk_write_spec -. can use .-> sk_task_capture
+    sk_write_spec -. can use .-> sk_work_capture
   end
 
   subgraph commit[Commits]
@@ -122,7 +122,7 @@ flowchart LR
 
   subgraph misc[Misc]
     sk_handoff["<b>§ handoff</b><br/><i>NoAutoload, HasVariants</i>"]
-    sk_task_capture["<b>§ task-capture-handoff</b>"]
+    sk_work_capture["<b>§ work-capture-handoff</b>"]
     sk_git_track_skill["<b>§ git-track-new-file</b>"]
     tool_git_track["<b>(tool) git-track-new-file</b>"]
     sk_github_issue["<b>§ write-github-issue</b><br/><i>NoAutoload</i>"]
@@ -133,6 +133,8 @@ flowchart LR
     cmd_handoff["<b>/ handoff</b><br/><i>Trigger</i>"]
     cmd_friction["<b>/ reflect-friction</b><br/><i>Trigger</i>"]
     cmd_task_capture["<b>/ task-capture-handoff</b><br/><i>Trigger</i>"]
+    cmd_idea_capture["<b>/ idea-capture-handoff</b><br/><i>Trigger</i>"]
+    cmd_bug_capture["<b>/ bug-capture-handoff</b><br/><i>Trigger</i>"]
     sk_git_track_skill -->|uses| tool_git_track
     sk_github_issue -->|needs| sk_bew_comm_style
     sk_draft_gh -->|needs| sk_bew_comm_style
@@ -140,10 +142,12 @@ flowchart LR
     sk_draft_gh -. supersedes .-> sk_github_issue
     ag_explore_diff -. loads .-> sk_cav
     sk_handoff -. can load .-> sk_cav
-    sk_task_capture -. can load .-> sk_cav
+    sk_work_capture -. can load .-> sk_cav
     cmd_handoff -->|triggers| sk_handoff
     cmd_friction -->|triggers| sk_reflect_frict
-    cmd_task_capture -->|triggers| sk_task_capture
+    cmd_task_capture -->|triggers| sk_work_capture
+    cmd_idea_capture -->|triggers| sk_work_capture
+    cmd_bug_capture -->|triggers| sk_work_capture
   end
 
   subgraph otherskills[Standalone skills]
@@ -270,9 +274,13 @@ flowchart LR
 
 - Command [`/reflect-friction`](./commands/reflect-friction.md) — **triggers `opencode-reflect-friction`**.
 
-- Skill [`task-capture-handoff`](./skills/task-capture-handoff/) — Captures one deferred, explicitly-named task from the session as a small `TASK-*` note for a future user or agent to pick up.
+- Skill [`work-capture-handoff`](./skills/work-capture-handoff/) — Captures one deferred, explicitly-named work item from the session as a small `TASK-*`, `IDEA-*`, or `BUG-*` note for a future user or agent to pick up; mode `capture-task`, `capture-idea`, or `capture-bug` selects the prefix.
 
-- Command [`/task-capture-handoff`](./commands/task-capture-handoff.md) — **triggers `task-capture-handoff`**.
+- Command [`/task-capture-handoff`](./commands/task-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-task`.
+
+- Command [`/idea-capture-handoff`](./commands/idea-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-idea`.
+
+- Command [`/bug-capture-handoff`](./commands/bug-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-bug`.
 
 ## Writing & issues
 

@@ -3,7 +3,7 @@ description: Capture one explicitly-named task from this session as a TASK-* not
 subtask: false # shared context!
 ---
 
-FIRST: Load the `task-capture-handoff` skill and follow its instructions.
+Load the `work-capture-handoff` skill in mode `capture-task`, and follow its instructions.
 
 ## User context
 

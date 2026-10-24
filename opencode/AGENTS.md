@@ -1,5 +1,6 @@
 # General rules for all interactions
 
+(note: current binary is `opencode2`, not `opencode`)
 
 ## User Identity
 
@@ -65,7 +66,7 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 In general: trust the user for git commands even if they look odd.
 
-NEVER `git add` or commit files matching `HANDOFF-*` or `TASK-*`.
+NEVER `git add` or commit files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
 These handoff artefacts must never be git-tracked.
 
 
@@ -99,7 +100,7 @@ Retitle immediately, before any other action — do not wait for user confirmati
 
 Commit finished task = user signals `done` — confirmation for any skill waiting on that signal.
 
-Session started from `HANDOFF-*`/`TASK-*` file (referenced in first user message):
+Session started from `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` file (referenced in first user message):
 - On start:
   1. follow the file content as instructions for the session
   2. edit the file (when possible, needs BUILD mode) to prefix the title with `[CLAIMED]`

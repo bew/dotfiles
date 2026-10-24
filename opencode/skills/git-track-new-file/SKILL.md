@@ -12,7 +12,8 @@ Current working directory git status: !`git rev-parse --git-dir >/dev/null && ec
 If `NOT_GIT_REPO`: skip silently — do not call `git_track_new_file`.
 
 Call `git_track_new_file` with the absolute path of each new file or directory that should be tracked, then continue.
-Use judgment: skip paths that must not be tracked — e.g. `HANDOFF-*`/`TASK-*` artefacts — or where tracking is unwanted.
+Use judgment: skip paths that must not be tracked, such as `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` artefacts.
+Skip paths where tracking is unwanted.
 
 ## Triggers
 
