@@ -271,16 +271,18 @@ WARNING: This diff mixes distinct concerns. Consider splitting into separate com
 
 Then, in the same turn, offer refinements via a single `question` tool call with three questions, in this order.
 Use these headers verbatim: `Refine subject`, `Refine body`, `Next step`.
-Derive every option from the message as written — omit any that do not apply.
+Derive every option from the message as written — omit inapplicable options only,
+never a whole question: every pass asks all three, `Keep … as-is` is always offered.
 
 ### Question 1 — `Refine subject`
 
-This is a MULTI-select question.
+This is a MULTI-select question — pass `multiple: true`.
 
 - "Keep subject as-is" — no subject change.
 - Subject variants — 2+ alternative wordings that are meaningfully different
   (different framing, tighter wording, different root-cause emphasis).
   Label: "Alt subject: <wording>".
+  On a repeat pass, always offer fresh wording — never re-offer a variant already shown.
 - Prefix variants — when the commit type/prefix is uncertain, offer 2+ alternatives.
   Label: "Prefix: <current> → <alternative>".
 - Adjusters — up to 1-3 options to mention or remove a topic.
@@ -288,7 +290,7 @@ This is a MULTI-select question.
 
 ### Question 2 — `Refine body`
 
-This is a MULTI-select question.
+This is a MULTI-select question — pass `multiple: true`.
 
 - "Keep body as-is" — no body change.
 - Form options — when the body's shape could differ
@@ -301,7 +303,7 @@ NOTE: `drop …` means to remove something, not fold it and reword it in a diffe
 
 ### Question 3 — `Next step`
 
-This is a SINGLE-select question.
+This is a SINGLE-select question — pass `multiple: false`.
 
 Prepend a scope recap to the question text, above the options:
 `Scope recap: <resolved scope>`
@@ -346,6 +348,7 @@ Only one pick per category makes sense (one subject, one prefix, one form).
 If the user picks more than one per category, ask which to apply.
 
 Variant/adjuster picks override "keep … as-is".
+Apply adjusters on top of the chosen variant (or the current wording when none).
 
 All options apply any selected subject/body edits first.
 
