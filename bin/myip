@@ -1,33 +1,47 @@
 #!/usr/bin/env bash
 
-# Safer shell script with these options
-# -e          : exit if a command exits with non-zero status
-# -u          : exit if an expanded variable does not exist
-# -o pipefail : if a command in a pipeline fail, fail the pipeline
-#               (e.g this now fails: false | true)
-set -euo pipefail
+# Print this host's public internet address(es), for IPv4 and IPv6.
+# Queries the AWS checkip endpoint once per address family.
 
-function show_ip() {
-  local json="$1"
-  local success
-  success=$(echo "$json" | jq -r .success)
-  if [[ "$success" == "true" ]]; then
-    echo -n "$(echo "$json" | jq -r .ip)"
+set -euo pipefail # Safe, strict script execution
+
+# AWS endpoint answering with the caller's bare address in plain text (no JSON payload).
+readonly CHECKIP_ENDPOINT="https://checkip.global.api.aws"
+
+# Maximum time, in seconds, allowed for a single address family lookup.
+readonly REQUEST_TIMEOUT=10
+
+# Fetch this host's public address over the given address family.
+# $1: IP family to force curl through, as "4" or "6".
+# Prints the bare address, or nothing when the lookup fails: a missing family is an expected
+# condition on many networks, so its failure is reported as an empty result rather than aborting.
+function fetch_ip() {
+  local family="$1"
+
+  curl "-${family}" -sS --max-time "$REQUEST_TIMEOUT" "$CHECKIP_ENDPOINT" 2>/dev/null || true
+}
+
+function main() {
+  echo "My public internet address(es):"
+
+  local ip4
+  ip4=$(fetch_ip 4)
+  if [[ -z "$ip4" ]]; then
+    echo >&2 "!! ERROR: no answer from $CHECKIP_ENDPOINT over IPv4"
+    exit 1
+  fi
+  echo "IPv4: $ip4"
+
+  local ip6
+  ip6=$(fetch_ip 6)
+
+  # Without native IPv6, `curl -6` silently goes through an IPv4-mapped address, so the endpoint
+  # reports the IPv4 address a second time; an answer lacking a colon is not an IPv6 literal either.
+  if [[ -n "$ip6" && "$ip6" != "$ip4" && "$ip6" == *:* ]]; then
+    echo "IPv6: $ip6"
   else
-    echo -n "failed"
+    echo "IPv6: none (no IPv6 support on this network)"
   fi
 }
 
-function myip() {
-  echo "My public internet address(es):"
-
-  local ip4_json
-  ip4_json=$(curl -s https://api4.my-ip.io/v2/ip.json)
-  echo "IPv4: $(show_ip "$ip4_json")"
-
-  local ip6_json
-  ip6_json=$(curl -s https://api6.my-ip.io/v2/ip.json)
-  echo "IPv6: $(show_ip "$ip6_json")"
-}
-
-myip
+main "$@"
