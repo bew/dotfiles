@@ -41,13 +41,19 @@ self-aware, never corporate — iterate until bew confirms.
 - No corporate language: "leverage", "streamline", "utilize", "synergy".
 - No summary paragraphs that restate what was just written.
 - Cut every sentence that adds no information. No hard length limit.
+- Prefer the shortest sentence that keeps the fact: shorten inside a sentence before dropping the
+  fact itself.
+- Flag blunt paragraphs: 3–4 long sentences in one paragraph is the trigger.
+  Deliver the prose first, list each flagged paragraph with a one-line reason, offer a rework.
+  Never shorten silently, and never block delivery on the flag.
 - Use inline backticks for identifiers: function names, paths, config keys.
 - Emoji must carry distinct emotional register — never decoration.
-  One emoji per tonal shift, not one per sentence.
-- `👉` for calls to action or key takeaways only.
+  One sentiment emoji per paragraph, not one per sentence.
+  `draft-github-comment` holds the per-emoji vocabulary (`👉`, `🤔`, `😬`, `❌`, `✅`).
+- `👉` for calls to action or key takeaways only, closing a prose paragraph.
 - `_italics_` for asides, caveats, meta-comments.
 - `**Bold**` for in-prose section shifts (not as headers).
-- Never use bullet lists for flowing reasoning — use prose + `👉`.
+- Never use bullet lists for flowing reasoning — use prose plus `👉`.
 - Numbered lists only for truly ordered sequences (repro steps, release steps).
 
 ## Guidelines
@@ -64,7 +70,7 @@ self-aware, never corporate — iterate until bew confirms.
 ## Output format guideline
 
 Flowing prose paragraphs. General structure:
-```
+```md
 <say hello — if needed>
 <main point — one or two sentences>
 
@@ -80,10 +86,9 @@ _<aside or meta-comment, if any>_
 ```
 Adjust as needed.
 
-
 ## Examples
 
-These are examples of the use of the bew-communication-style
+Examples of this style in use.
 
 
 ### GitHub comment — announcing a fork

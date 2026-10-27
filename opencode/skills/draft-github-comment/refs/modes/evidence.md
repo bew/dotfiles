@@ -12,7 +12,7 @@ Adds repro, version, logs, or a second data point to someone else's report.
 ## Rules
 
 - Version and platform on the first line.
-- Never invent a version, platform, log line, or error text.
+- Never invent a version, platform, log line, error text, or the user's own steps and workarounds.
   Ask the user for what is missing.
 - Numbered steps only where order matters.
 - Trim logs to the failing lines. Never paste a whole session.

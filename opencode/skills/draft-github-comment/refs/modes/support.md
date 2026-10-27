@@ -18,6 +18,7 @@ Any of these steps may carry a callout marker when the point should not be skimm
 - Never open with praise, or with a summary of the issue.
 - Say what the existing proposal does not cover for you.
   That is the entire value of the comment.
+- The use-case must be one you stated. Never infer your workflow from the thread.
 - Name the exact symbol, slot, path, or file when the gap is code-level.
 - Do not offer to implement unless the user asked for that.
 
