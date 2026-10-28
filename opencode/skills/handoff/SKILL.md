@@ -38,19 +38,21 @@ $outputdir: <resolved path>
 
 **Vars used throughout**: (output them in context once known!)
 - `$outputdir` — resolved output directory.
-- `$date` — today's date in `YYYYMMDD` format.
+- `$created_at` — capture timestamp, `YYYYMMDDThhmm`.
 - `$slug` — kebab-case label derived from what is being worked on.
-- `$filename` — `HANDOFF-$date-$slug.md`
+- `$filename` — `HANDOFF-$slug.md`.
 
 ## Step 1 — Scan
 
 Compute vars:
-- `$date` — run `date +%Y%m%d`.
-- `$existing` — list existing `HANDOFF-*` files in `$outputdir`.
+- `$created_at` — run `date +%Y%m%dT%H%M`.
 - `$slug` — derive from Focus, session title, or dominant topic.
   Kebab-case, max ~5 words.
   Never use `session` as a slug — always derive from actual content.
-- `$filename` — `HANDOFF-$date-$slug.md`
+- **Slug collision**: if `$outputdir` already holds `HANDOFF-$slug.md`, name that file, ask the user
+  for a different slug, and re-derive `$slug` and `$filename` from the answer.
+  Wait for the answer before writing.
+- `$filename` — `HANDOFF-$slug.md`.
 
 Scan the current session for material to include in the handoff doc.
 
@@ -73,12 +75,10 @@ NOTE: If the session is in PLAN mode: stop immediately.
 Output: "Cannot write the handoff doc in PLAN mode — switch to BUILD mode first, then re-run."
 Do not proceed until the user has switched modes and re-requested.
 
-If `$filename` already exists: adapt the filename (e.g. append a numeric suffix)
-so nothing is overwritten.
-
 Write the handoff doc to `$outputdir/$filename` using the `write` tool,
 without asking for confirmation.
 Read <./refs/template.md> for the required doc structure.
+The file opens with the frontmatter block above the first section: `created-at` set to `$created_at`.
 
 If the write fails (e.g. output dir does not exist): tell the user and ask how to proceed.
 
@@ -106,8 +106,11 @@ NEVER output the doc content inline.
 - Keep the doc readable by a human.
   Do not assume the reader is an agent.
 - NEVER write to a path outside the resolved `$outputdir` without explicit user confirmation.
-- On filename collision, adapt the filename rather than overwriting.
-- Run commands to get missing information (date, existing HANDOFF list)
+- Never overwrite an existing `HANDOFF-$slug.md`, and never append a numeric suffix.
+  A taken slug goes back to the user for a new one.
+- Every handoff carries the frontmatter block above its first section and never a dated filename.
+- Run `date` once for `$created_at` — never re-derive the timestamp later.
+- Run commands to get missing information (timestamp, existing HANDOFF list)
   in one tool call, not multiple.
 - NEVER include meta-commentary about the handoff doc itself
   (e.g. "no other files were referenced", "findings are consolidated above",

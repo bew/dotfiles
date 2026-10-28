@@ -4,7 +4,12 @@ The handoff doc must contain the following sections in order.
 Omit any section that has no qualifying content — do not keep an empty heading
 or write filler (e.g. "none", "N/A", "nothing to report").
 
+The doc opens with this block, above the first section:
+```md
 ---
+created-at: <YYYYMMDDThhmm>
+---
+```
 
 ## Context
 

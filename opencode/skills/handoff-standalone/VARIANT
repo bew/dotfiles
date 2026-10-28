@@ -2,8 +2,9 @@ Variant type: standalone
 
 Additional constraints:
 - Skill-load refs reframed as plain recommendations (target: generic tool-less chat).
-- Handoff doc opens with a tool-access notice instructing the reader to suggest skills
-  and tools and to ask the user.
-- `$date` taken from context when available, else omitted (`HANDOFF-$slug.md` fallback).
+- Handoff doc opens with the `created-at` block, then a tool-access notice instructing the reader
+  to suggest skills and tools and to ask the user.
+- `$created_at` taken from context when available, else current local time; `T0000` when only
+  a date is known.
 - Declared exception to the inline-output default: writes the handoff to a local file
   when a file tool is available, else emits it inline.

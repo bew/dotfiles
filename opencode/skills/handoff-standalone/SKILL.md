@@ -19,8 +19,9 @@ Determine these from whatever is available in context
 
 - **Focus**: what the next session will work on.
   Default: `(none)` — produce a generic full-session handoff.
-- **Date** (`$date`): today's date in `YYYYMMDD` form, if stated in context.
-  If absent: omit the date.
+- **Created at** (`$created_at`): when the handoff doc is produced, as `YYYYMMDDThhmm`.
+  Use the timestamp stated in context when there is one, otherwise the current local time.
+  If only a date is known, fill the time as `T0000`.
 
 Ask the user for any input that cannot be inferred and that meaningfully affects the output.
 Do not ask for Focus if the session topic is unambiguous.
@@ -28,9 +29,9 @@ Do not ask for Focus if the session topic is unambiguous.
 State resolved values in one line before proceeding.
 
 **Vars used throughout**:
-- `$date` — today's date in `YYYYMMDD`, or none.
+- `$created_at` — `YYYYMMDDThhmm`.
 - `$slug` — kebab-case label derived from what is being worked on.
-- `$filename` — `HANDOFF-$date-$slug.md`, or `HANDOFF-$slug.md` when `$date` is absent.
+- `$filename` — `HANDOFF-$slug.md`.
 
 ## Step 2 — Scan
 
@@ -61,11 +62,12 @@ Otherwise: emit the handoff document inline in a fenced `md` block, and give `$f
 suggested filename for the reader.
 
 Structure the doc per *Handoff doc structure* below.
+The doc opens with the frontmatter block above the first section: `created-at` set to `$created_at`.
 
 ## Handoff doc structure
 
 The handoff doc must contain the following sections in order.
-Open with the Tool-access notice.
+Open with the `created-at` block, then the Tool-access notice.
 Omit any section that has no qualifying content — do not keep an empty heading
 or write filler (e.g. "none", "N/A", "nothing to report").
 In the output doc these are top-level `##` headings.
@@ -124,7 +126,7 @@ Include only if applicable.
 
 ## Rules
 
-- Open the doc with the Tool-access notice.
+- Open the doc with the `created-at` block, then the Tool-access notice.
 - Do not inline file contents — reference by path only.
 - Only reference URLs confirmed in the session.
   Never reference invented or hallucinated URLs.
