@@ -1,19 +1,21 @@
 # OpenCode plugin reference
 
-Notes gathered while building the local `ui-tester` plugin.
-The scope is deliberately narrow: only what this plugin needed, plus links so the same ground is not re-researched.
+Notes gathered while building the local plugins.
+The scope is deliberately narrow: only what those plugins needed, plus links so the same ground is not re-researched.
 
 Plugins come in two kinds over a shared base:
 
 - `common.md` — packaging, discovery, context, events, storage, and lifecycle.
 - `tui-plugins.md` — the terminal surface: slots, keymap and commands, input modes, panels, dialogs, routes, theme.
+- `host-state-files.md` — reading and watching host-owned state files when no plugin API exists.
 - `server-plugins.md` — the server surface, pointers only (barely used here).
-- `pitfalls.md` — the traps hit while building `ui-tester`.
+- `pitfalls.md` — the traps hit while building the local plugins.
 - `overlay-slot-trick.md` — placing an element anywhere via the `app` slot.
 
 Local examples:
 
 - `../plugins/ui-tester/` — TUI plugin (slots, keymap, panels, overlay).
+- `../plugins/stash-count/` — TUI plugin (host state file watch, hover and click, host command dispatch).
 - `../plugins/git-track-new-file/` — server plugin with a tool transform.
 
 ## Sources

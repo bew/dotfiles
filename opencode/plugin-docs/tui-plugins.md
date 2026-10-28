@@ -11,6 +11,7 @@ The shared base is in `common.md`; the server side is in `server-plugins.md`.
 - `@opentui/*`, `solid-js`, and `@opencode/theme` are host-resolved peers, not installed locally.
   Do not add them to the repo `package.json`: a local copy can shadow the host instance (OpenTUI pins a `solid-js` version).
   The cost is no local typecheck.
+- Local plugins run in the host's Bun runtime, so `node:*` builtins are available (`node:fs`, `node:os`, `node:path`).
 
 ## Slots
 
@@ -55,6 +56,41 @@ context.keymap.layer(() => ({
   Return `false` from `run` to continue keyboard dispatch.
 - `enabled` gates a binding without unregistering it, so a plugin key fires only in the states the plugin owns.
 
+### Dispatching host commands
+
+`context.keymap.dispatch(id)` runs a reachable command by ID, including a command the host registered itself.
+Use it to reuse host UI instead of rebuilding it; `stash-count` dispatches `prompt.stash.list` from the count label.
+
+- A host command may exist only in some states, or carry `enabled`.
+  Dispatch then does nothing, so the plugin's own trigger condition must match the host condition.
+  The stash command is enabled only while this TUI's stash is non-empty; `stash-count` gates its render on `context.keymap.commands()` containing that command.
+  Reading the stash file is not a substitute: the file is shared by every TUI, while the host's list is per TUI.
+- Command IDs are host internals, not a documented plugin API.
+  Treat them as names that can move between releases.
+
+### Finding host commands during development
+
+There is no host-only accessor and no shipped command list.
+`context.keymap.commands()` returns every reachable command, host and plugin together, reactive when read in a Solid computation.
+Use it from a throwaway probe while crafting a plugin, not from the plugin itself.
+
+Add a temporary component that logs the IDs, mount it in a slot, reload, read the output, then remove it:
+
+```tsx
+import { createEffect } from "solid-js";
+
+createEffect(() => {
+  const commandIDs = context.keymap.commands()
+    .flatMap((command) => command.id === undefined ? [] : [command.id]);
+  console.log(commandIDs.join("\n"));
+});
+```
+
+Each entry also carries optional `title`, `description`, `group`, and `enabled`, so filter on those when the ID prefix is unknown.
+`context.keymap.shortcuts(id)` returns the formatted shortcuts for one command, which confirms a host binding without reading the binary.
+
+Once an ID is found, dispatch it from the real plugin with `context.keymap.dispatch(id)` and remove the probe.
+
 ### Slash commands
 
 `slash: { name, aliases?, arguments? }`.
@@ -79,9 +115,17 @@ The exact isolation boundary is not documented, so verify it against the host.
 
 ## Theme, layout, and input
 
-- Use semantic tokens: `theme.text.base`, `theme.text.muted`, and `theme.hue.accent[400]` for the accent.
+- Prefer semantic tokens: `theme.text.base`, `theme.text.muted`, and `theme.hue.accent[400]` for the accent.
+  Only declared tokens are contract; a runtime field such as `theme.text.default` is untyped and may render by accident.
+- `theme.hue` declares only `accent`, `interactive`, and `neutral`.
+  Other palette names such as `theme.hue.yellow` exist only when the active theme defines them.
+  Dereferencing a missing palette throws `undefined is not an object` and crashes the slot at render time.
+  Optional-chain and fall back to an ANSI color name: `theme.hue.yellow?.[400] ?? "yellow"`.
+  When a typed semantic token fits, prefer it over a raw palette name, e.g. `theme.text.feedback.warning.base`.
 - OpenTUI layout is Yoga flexbox; a box accepts `position="absolute"` with `top`, `left`, `right`, and `bottom`, plus `zIndex`, `border`, `padding`, and `backgroundColor`.
 - An `<input>` must be focused to receive keys; gate any letter bindings on its focus so typing is not swallowed as commands.
 - OpenTUI synthesises no `click`; use `onMouseDown` / `onMouseUp`.
+  Host click handlers listen on `onMouseUp`, guard `event.button === 0`, and call `stopPropagation()` so the event does not reach the surface beneath.
+  Hover uses `onMouseOver` / `onMouseOut`; the TUI has no pointer cursor, so the visual change is the affordance.
   Alt arrives as `meta` (and `option`).
   Text is selectable by default, so set `selectable={false}` on labels.

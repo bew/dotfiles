@@ -1,6 +1,6 @@
 # Pitfalls
 
-Traps hit while building the `ui-tester` plugin, kept so they are not hit again.
+Traps hit while building the local plugins, kept so they are not hit again.
 
 - A raw `useKeyboard` listener created in an `app`-slot component did not fire in that context.
   The host keymap layer is the mechanism that works: register commands with `bind` strings through `context.keymap.layer(...)`.
@@ -18,3 +18,14 @@ Traps hit while building the `ui-tester` plugin, kept so they are not hit again.
   Read the installed `node_modules/@opencode/plugin/dist/tui/*.d.ts` for the contract instead.
 - The host is the first real compile for a local `.tsx` plugin; there is no local typecheck or test harness.
   Reload, watch the TUI, and check `~/.local/share/opencode/log/opencode.log` filtering `role=cli`.
+- Theme palette names are optional at runtime even though `ResolvedTheme` types `hue` as a full record.
+  `theme.hue.yellow[400]` on a theme without that palette throws `undefined is not an object`.
+  Optional-chain the palette and fall back to an ANSI color name.
+- A slot render error is contained and names the slot: `<plugin>.tui crashed in slot <slot>: …`.
+  Use that path to identify which surface broke.
+- Theme failures can appear only on an interactive state.
+  A token first read on hover is not exercised by loading the plugin, so smoke-test hover and click.
+- A host state file can be shared across clients while the host keeps a per-client in-memory view.
+  Reading it then reports other clients' changes, and a click that dispatches the host command does
+  nothing because that client's list is empty.
+  Gate on the host command's reachability (`context.keymap.commands()`) instead.
