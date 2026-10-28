@@ -42,6 +42,11 @@ or extended after promotion.
 `maybe-ready`, `ready`, and `abandoned` may also drop straight back to `explo` when the central
 design question reopens; every other demotion goes through `draft`.
 
+`explo` → `draft` needs the user's explicit `Switch to Draft` answer to the
+`design-exploration` `Phase:Wrap` exit question.
+A frozen topic index or a settled-looking exploration never substitutes for that answer.
+This gate is skill-enforced; `manage-spec` moves `explo` → `draft` without checking it.
+
 `manage-spec` refuses anything outside this table plus the universal `abandoned` target.
 
 ## Usage
@@ -60,7 +65,8 @@ directory, where the script infers the spec from the cwd:
 `init` creates `SPEC-DRAFT-<slug>/` in the `discovery` state and always seeds `DISCOVERY.md`
 with the `[DISCOVERY]` H1, the loader paragraph, and the title (defaulting to the slug).
 It prints `$slug`, `$specdir`, `$specpath`, then the next file to write.
-When the design needs no exploration, `manage-spec draft` promotes the spec straight away.
+When the design needs no exploration, `manage-spec draft` promotes a `discovery` spec
+straight away.
 
 `rename` keeps the current state.
 A single-word argument is a new slug; a spaced argument is a new H1 title.

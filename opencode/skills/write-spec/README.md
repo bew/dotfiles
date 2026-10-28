@@ -29,7 +29,7 @@ stateDiagram-v2
     discovery --> explo
     discovery --> draft
     discovery --> abandoned
-    explo --> draft
+    explo --> draft: Switch to Draft
     explo --> abandoned
     draft --> explo: design reopens
     draft --> maybe-ready

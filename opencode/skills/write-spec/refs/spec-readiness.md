@@ -27,7 +27,8 @@ A spec is `MAYBE-READY` when **all** of the following hold:
 3. All Open Questions entries (per-section and Global) are marked **Blocking** or **Non-blocking**.
 4. No **Blocking** Open Questions remain unresolved.
    Global entries default to **Non-blocking**; they must be escalated to Blocking explicitly during review to block readiness.
-5. Alternatives & Tradeoffs section is present and compares against at least one simpler alternative.
+5. Alternatives & Tradeoffs section is present and compares against at least one simpler alternative,
+   or is dropped with its flagged omission comment — see <./spec-structure.md§alt-tradeoff-forms>.
 6. Naming discipline holds: no synonym drift.
    If Terminology section exists, all terms are defined there before use.
 

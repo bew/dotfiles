@@ -29,8 +29,8 @@ or start a new topic file when the direction is completely different.
 ## Section order
 
 Use this order.
-Omit a section only if genuinely not applicable —
-flag each omission explicitly (name section + reason).
+Omit a section only if genuinely not applicable, or when the author explicitly asks to.
+Flag each omission explicitly (name section + reason).
 
 Exception: Terminology & Key Concepts (section 2) is omitted by default.
 The "Global Open Questions" tracks whether it is needed — see <./terminology-and-key-concepts.md>.
@@ -50,7 +50,8 @@ The "Global Open Questions" tracks whether it is needed — see <./terminology-a
    implementation approaches, configuration strategies, protocol choices, library choices,
    API surface variants, algorithm selection, storage strategies, etc.
    Omit if the chosen design has no meaningful sub-variants.
-9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions; include decision criteria
+9. **Alternatives & Tradeoffs** — compares the whole spec against complete alternative directions;
+   include decision criteria. May take the compact or dropped form, see <§alt-tradeoff-forms>.
 10. **Related artifacts** — contextual pointers to related artifacts
 
 **Global Open Questions** — unnumbered, appended until the spec reaches `READY`, then pruned when
@@ -99,6 +100,22 @@ place them in the optional section 8 instead.
 Do not go deep into alternative directions — mention them and their tradeoffs
 only if they were discussed with the user during discovery.
 This section is a concise comparison, not an exhaustive exploration.
+
+### Forms
+<!-- §alt-tradeoff-forms -->
+
+Full is the drafting default.
+`Phase:Review` offers the choice when the section is missing or thin.
+
+- **Full** — write it per one of the two structures below.
+- **Compact** — bullets only: chosen design (one line), simplest alternative (one line),
+  one advantage of the alternative, one cost of the design, one-line decision criterion.
+  No code sketches, no per-option breakdown.
+  Must name a concrete cost of the proposed design — a compact form without one
+  is not a comparison.
+- **Dropped** — omit the section and flag it in place:
+  `<!-- NOTE: Alternatives & Tradeoffs — omitted: <reason> -->`
+  Requires explicit author agreement — the flag records that agreement.
 
 ### Single proposed design vs simpler alternative
 

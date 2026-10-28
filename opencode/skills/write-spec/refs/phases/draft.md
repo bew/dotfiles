@@ -10,6 +10,13 @@ Read <../project-global-docs.md> for how the spec references project-global conc
 `Phase:Draft` starts from `discovery` or `explo` on first entry, and from `maybe-ready`, `ready`, or
 `abandoned` when a spec is reopened.
 The transition table in <../lifecycle.md> is the authority.
+
+From `explo`, verify the exit signal before promoting: the `design-exploration` `Phase:Wrap`
+exit question was asked and answered with `Switch to Draft`.
+Without that answer the design is not settled — do not promote; re-enter the
+`design-exploration` `Phase:Wrap` ref, ask its exit question, and wait.
+Never promote on the strength of a frozen topic index or a completed-looking exploration.
+
 Promote the spec first, from `$specdir`:
 ```sh
 <skill-dir>/scripts/manage-spec draft
@@ -228,7 +235,8 @@ During iteration, if user introduces a new idea, constraint, or design angle not
 - Reference project-global concepts and terms, don't restate them — see <../project-global-docs.md>.
 - On a gap (a concept or term no project-global doc defines): inline-define it in the spec
   and record it (Open Question or `FIXME:` callout), then ask the user to own it or promote it.
-  Promote: load `task-capture-handoff` skill and emit one capture per gap, immediately.
+  Promote: load `work-capture-handoff` skill in mode `capture-task` and emit one capture per gap,
+  immediately.
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
   Do not prune it even if empty — it is a structural fixture.
   `Phase:Review` prunes it only when the spec transitions to `READY`.
@@ -245,6 +253,8 @@ During iteration, if user introduces a new idea, constraint, or design angle not
   Never leave a `SKELETON TODO` placeholder behind in a filled section.
 - Always include Alternatives & Tradeoffs section comparing proposed design
   against simpler alternative.
+  `Phase:Review` may swap it for the compact form or a flagged drop at the author's request
+  (see <../spec-structure.md§alt-tradeoff-forms>).
 - When omitting a section, flag it explicitly: name section and state reason it was skipped.
 - When a config field's value may depend on runtime state, ask user whether it should be a
   plain value or a function called lazily at first use.

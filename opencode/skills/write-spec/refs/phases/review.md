@@ -22,8 +22,13 @@ Check each of the following, flag any issues:
 - No terminology drift — single canonical name used everywhere for each concept
 - No project-global doc content restated — concepts and terms documented there
   are referenced, not redefined
-- Gaps are inline-defined and recorded; promoted gaps carry a `task-capture-handoff` capture
-- Alternatives & Tradeoffs section present and honest (compares against simpler alternative)
+- Gaps are inline-defined and recorded; promoted gaps carry a `work-capture-handoff` capture
+- Alternatives & Tradeoffs section present and honest (compares against simpler alternative),
+  or dropped with its flagged omission comment.
+  If missing or thin — no simpler alternative named, or no concrete cost of the proposed design —
+  offer the author the forms in <../spec-structure.md§alt-tradeoff-forms>: full, compact, dropped.
+  Write the chosen form in place.
+  Only the author decides on a drop; dropping an existing section needs explicit confirmation.
 - `## Global Open Questions` section is present at end of spec
 - No empty `### Open Questions` subsections remain (the Global section is exempt while the spec is
   in progress — it is pruned only when the spec reaches `READY`, see *Transition to ready*)

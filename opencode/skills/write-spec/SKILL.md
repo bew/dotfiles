@@ -36,7 +36,8 @@ A legacy `_WIP_SPECS/` or `_SPECS/` layout goes through `manage-spec migrate`; n
 Phases, in order (`Explore` is optional):
 
 1. `Phase:Discover` — gather inputs; create the spec dir in `discovery`; capture the paths
-2. `Phase:Explore` _(if design uncertain)_ — move to `explo`; delegate to `design-exploration`
+2. `Phase:Explore` _(if design uncertain)_ — move to `explo`; delegate to `design-exploration`;
+   leave only on its explicit `Switch to Draft` answer
 3. `Phase:Draft` — promote to `draft`; confirm structure; write spec; fill sections iteratively
 4. `Phase:Review` — in-context review; assess readiness; transition the spec
 
@@ -96,6 +97,16 @@ Enter when the design is genuinely uncertain — competing models, an undefined 
 Skip straight to `Phase:Draft` when the design is settled enough to choose a section skeleton.
 
 When entering `Phase:Explore`: read <./refs/phases/explore.md> for full instructions.
+
+`Phase:Explore` ends only on the user's explicit `Switch to Draft` answer to the
+`design-exploration` `Phase:Wrap` exit question.
+Until that answer exists, never run `manage-spec draft`.
+A frozen topic index, a completed-looking exploration, or the agent's own suggestion to exit are
+not exit signals.
+
+This gate is skill-enforced: `manage-spec draft` does not check it.
+The transition table in <./refs/lifecycle.md> is the authority for the states; this rule is the
+authority for entering `draft`.
 
 ## 3. `Phase:Draft` — Write skeleton; fill sections iteratively
 
