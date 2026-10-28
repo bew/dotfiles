@@ -56,9 +56,11 @@ inert unless the panel is shown (or, for the toggle, armed).
 
 While the panel is shown it pushes an OpenCode input mode
 (`context.keymap.mode.push("ui-tester")`).
-Layers default to the `base` mode, so pushing this stops the prompt's typing
-layers while leaving `global` layers (the host's own keys and this plugin's)
-active — "block typing only".
+Layers default to the `base` mode, so pushing this deactivates the prompt's
+typing layers while leaving `global` layers (the host's own keys and this
+plugin's) active.
+The mode isolates keymap layers only: the prompt's own text input is not a
+layer, so typed text still reaches the composer behind the panel.
 
 `alt+i` releases the mode temporarily so the prompt can be used again;
 `alt+i` again re-arms it.

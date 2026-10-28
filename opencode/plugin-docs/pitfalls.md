@@ -14,6 +14,10 @@ Traps hit while building the local plugins, kept so they are not hit again.
   Use `prepend` or `append`.
 - `ui.panel.open` returns `false` unless the current route is a session.
   A dock toggle that ignores the return value leaves the panel invisible with no way back to the floating surface.
+- An exception thrown inside a keymap command's `run` handler is swallowed:
+  no toast, no log line, and the bound key simply does nothing.
+  A stale reference left behind by a refactor therefore kills single keys
+  silently, while the rest of the plugin keeps working.
 - An `app`-slot overlay is positioned against the host main area, which stops above the bottom bars, while `useTerminalDimensions` reports the whole terminal.
   Expect drift near the bottom edge and recompute on resize.
 - Do not install the optional peers (`@opentui/*`, `solid-js`, `@opencode/theme`) just to get types; they can shadow the host instances.

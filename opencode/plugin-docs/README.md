@@ -1,16 +1,32 @@
 # OpenCode plugin reference
 
 Notes gathered while building the local plugins.
-The scope is deliberately narrow: only what those plugins needed, plus links so the same ground is not re-researched.
+This folder is not a copy of the upstream docs; it is the delta against them.
 
-Plugins come in two kinds over a shared base:
+Files:
 
-- `common.md` — packaging, discovery, context, events, storage, and lifecycle.
-- `tui-plugins.md` — the terminal surface: slots, keymap and commands, input modes, panels, dialogs, routes, theme.
+- `common.md` — the local conventions, plus pointers to the shared ground.
+- `tui-plugins.md` — TUI behaviours upstream does not state, or states in a way that misled us.
 - `host-state-files.md` — reading and watching host-owned state files when no plugin API exists.
-- `server-plugins.md` — the server surface, pointers only (barely used here).
-- `pitfalls.md` — the traps hit while building the local plugins.
+- `server-plugins.md` — pointers to the server surface, plus a local example.
+- `pitfalls.md` — traps hit while building the local plugins.
 - `overlay-slot-trick.md` — placing an element anywhere via the `app` slot.
+
+## What belongs here
+
+A line earns its place only if it is one of:
+
+- not in the official docs, or
+- in them but subtly wrong, or
+- a local convention of this repo.
+
+Everything else is a link.
+API catalogues — context members, events, storage, dialogs, routes, tabs, theme
+tokens, publish shape — live upstream and are maintained there.
+A copy here drifts silently and cannot be told apart from the real thing.
+
+The test for a new note: "would a reader who already read the upstream page learn something?"
+If not, drop it.
 
 Local examples:
 
@@ -23,7 +39,8 @@ Local examples:
 OpenCode V2 docs (`https://opencode.ai/v2/docs/`):
 
 - `build/plugins` — server plugin guide: hooks, transforms, tools, context.
-- `build/plugins/cli` — TUI plugin API: context, keymap, slots, dialogs, panels, routes, storage.
+- `build/plugins/cli` — the TUI plugin API. Authoritative for everything except the deltas in this folder.
+- `build/plugins/server` — server surface beside a TUI part.
 - `build/plugins/rpc` — custom methods and events shared with clients.
 - `cli/plugins` — registering CLI-only plugin packages in `cli.json`.
 - `cli/config` — `cli.json` settings reference.
@@ -45,7 +62,7 @@ OpenTUI docs (`https://opentui.com/docs/`):
 
 Types and mirrors:
 
-- `../node_modules/@opencode/plugin/dist/tui/context.d.ts` — the exact TUI contract.
+- `../node_modules/@opencode/plugin/dist/tui/context.d.ts` — the exact TUI contract for the installed host version.
 - `@opencode/theme` on unpkg, `dist/tui/types.d.ts` — `ResolvedTheme` tokens.
 - `@opentui/core`, `@opentui/solid`, `solid-js` — host-resolved, not installed locally.
 - `@opencode/plugin` RPC types — the RPC surface.
