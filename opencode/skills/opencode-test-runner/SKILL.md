@@ -21,9 +21,9 @@ Report failures back to the caller.
    Use count from task description if specified, otherwise default to 2–4.
    Present all test cases to user at once.
    Ask user to add, replace, or remove any before proceeding.
-2. For each test case: narrate the full dry-run in one response.
-   Ask user to confirm the entire test case is correct before moving to the next.
-3. If any test case is wrong: report which test case failed and why, then return to caller.
+2. Run every test case in a single pass: narrate all dry-runs in one response.
+   Never stop between test cases to ask for confirmation.
+3. If any test case is wrong: report which test cases failed and why, then return to caller.
 4. When all test cases pass: report "All test cases passed." — no other output.
 
 ## Rules
