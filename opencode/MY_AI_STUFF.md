@@ -358,7 +358,6 @@ Injection recency is set to 3 messages in [`snippets/config.jsonc`](./snippets/c
 
 - [`#editedstuff`](./snippets/editedstuff.md) — Warns that I changed files; re-read recent edits and respect them (prepend). Used heavily.
 - [`#editedthis`](./snippets/editedthis.md) — Same warning, for the 1+ files I name after the snippet.
-- [`#tell-more`](./snippets/tell-more.md) — Asks for an inline explanation of the last answer.
 - [`#whats-next`](./snippets/whats-next.md) — Asks for the next step.
 - [`#anything-left`](./snippets/anything-left.md) — Asks what is left in this session only, ignoring deferred items.
 - [`#build-mode-now`](./snippets/build-mode-now.md) — Asserts that BUILD mode (write permission) applies from now on.
