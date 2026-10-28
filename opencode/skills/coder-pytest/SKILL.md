@@ -12,7 +12,8 @@ metadata:
 Write pytest tests that are readable, type-annotated, and well-scoped,
 building on generic & language conventions.
 
-REQUIRES: load `coder-generic` and `coder-python` skills first.
+REQUIRES: load `coder-generic` skill first.
+REQUIRES: load `coder-python` skill — pytest tests follow Python conventions.
 
 ## Running tests
 

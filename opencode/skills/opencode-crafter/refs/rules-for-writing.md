@@ -58,6 +58,18 @@ Use `NOTE:`, `IMPORTANT:`, `WARNING:`, `TIP:` prefixes for inline callouts.
 Same-paragraph lines are attached; blank line ends callout.
 Parenthesized form `(KEYWORD: ...)` must be one line; may appear inline in another paragraph.
 
+## Cross-skill links
+
+Every artefact is self-contained.
+Never link another skill's details from a given skill — neither its files
+(`<../other-skill/refs/foo.md>`) nor a section inside it (`<../other-skill/SKILL.md§slug>`).
+
+Restate the needed detail locally — never the other skill's rule set — or declare the dependency
+with `REQUIRES:` in `SKILL.md`.
+
+Duplication is deliberate: a skill is read alone, and a cross-skill link dangles as soon as the
+other skill is renamed, extracted to a ref file, or exported standalone.
+
 ## Length
 
 | Artefact | Target |

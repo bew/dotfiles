@@ -151,6 +151,41 @@ Omit a default section only when its content would be redundant.
 | Use for | Safety, correctness, preconditions | Style, efficiency, conventions |
 
 
+## Required skills
+
+A skill whose rules assume another skill's vocabulary or conventions declares it as a
+prerequisite — it never restates that skill's rules.
+
+Form:
+```md
+REQUIRES: load `coder-generic` skill first.
+```
+
+Rules:
+
+- Placement: immediately after the `## Goal` paragraph, as the last line of that section.
+  When the skill has no `## Goal`, place it directly after the frontmatter.
+- Keyword is exactly `REQUIRES:` — never `REQUIRED:`, `Requires:`, or `DEPENDS:`.
+- One line per required skill, in load order.
+  Never join several skills into one line.
+- List every skill the body depends on.
+  A prerequisite it needs is never left to another skill's `REQUIRES:` line.
+- Backtick the skill name.
+- Add a reason only when the dependency is not obvious from the skill name:
+  ```md
+  REQUIRES: load `coder-bash` skill — function bodies in `@test` blocks follow bash conventions.
+  ```
+- Do not name required skills in the `## Goal` sentence.
+  Use a phrase like "building on generic conventions" instead.
+- Omit the line when the skill has no prerequisite.
+
+A required skill must be in context before any body rule is applied.
+Otherwise the agent misreads the terms or conventions those rules rely on.
+
+A conditional read is not a prerequisite.
+A ref file read only in some sub-scenario uses a **Conditional instructions load** trigger, not a
+`REQUIRES:` line.
+
 ## Loading behaviour
 
 At startup, OpenCode reads only each skill's `name` and `description`.
