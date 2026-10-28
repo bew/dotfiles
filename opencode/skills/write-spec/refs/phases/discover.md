@@ -60,7 +60,10 @@ Once inputs are confirmed, run from the project directory:
 ```
 
 It prints a `Session vars` block holding `$slug`, `$specdir`, and `$specpath`,
-and creates `SPEC-DRAFT-<slug>/` in the `discovery` state.
+then the discovery-notes file to fill in, and creates `SPEC-DRAFT-<slug>/` in the `discovery`
+state.
+`SPEC.md` is seeded with the frontmatter block, the `[DISCOVERY]` H1, and the loader paragraph;
+`DISCOVERY.md` is seeded with the `# Discovery notes` heading.
 Use the printed values for the rest of the session.
 Tell the user the printed `$specpath` before proceeding.
 
@@ -69,11 +72,13 @@ never by hand — read <../lifecycle.md>.
 
 ## Discovery notes
 
-`$specpath` is the file `init` seeded; record the confirmed inputs (name, problem, inspirations,
-and any constraint the user stated) there, below the loader paragraph.
+`DISCOVERY.md` is the file `init` seeded; record the confirmed inputs (name, problem, inspirations,
+and any constraint the user stated) there, below the `# Discovery notes` heading.
 These notes are `Phase:Draft`'s first input.
 `DISCOVERY.md` stays editable from every later state — promoting the spec never moves or rewrites
 it.
+Do not write them into `$specpath`: `SPEC.md` holds the tag, the loader, and the spec body, and
+`Phase:Draft` is what fills that body.
 
 When the user already has a written brief or exploration material, point `DISCOVERY.md` at it
 instead of copying it.
@@ -81,6 +86,6 @@ instead of copying it.
 ## Renaming and state changes
 
 Read <../lifecycle.md> for the state table, the transition table, and the tool usage.
-`manage-spec` owns the H1 tag, the loader paragraph, and the directory name.
+`manage-spec` owns the H1 tag, the loader paragraph, the frontmatter block, and the directory name.
 
 Ready to move to `Phase:Explore` or `Phase:Draft`? (say 'next' or similar to proceed)

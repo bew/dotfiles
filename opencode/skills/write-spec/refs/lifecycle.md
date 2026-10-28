@@ -1,7 +1,8 @@
 # Spec Lifecycle
 
 `manage-spec` owns every state change: it rewrites the H1 status tag,
-adds or removes the skill-loader paragraph, and moves the directory.
+adds or removes the skill-loader paragraph, moves the directory,
+and preserves the frontmatter block above the H1.
 Never move a spec directory or edit its status tag by hand.
 
 ## States and directories
@@ -38,6 +39,7 @@ out of the table.
 No transition targets `discovery` — `init` creates it, and a spec never returns to it.
 `DISCOVERY.md` stays editable from every later state, so discovery notes can still be corrected
 or extended after promotion.
+It carries no status tag, so editing it never affects the state.
 
 `maybe-ready`, `ready`, and `abandoned` may also drop straight back to `explo` when the central
 design question reopens; every other demotion goes through `draft`.
@@ -62,9 +64,12 @@ directory, where the script infers the spec from the cwd:
 
 `<state>` is one of the state names above, so `manage-spec ready` moves the spec to `ready`.
 
-`init` creates `SPEC-DRAFT-<slug>/` in the `discovery` state and always seeds `DISCOVERY.md`
-with the `[DISCOVERY]` H1, the loader paragraph, and the title (defaulting to the slug).
-It prints `$slug`, `$specdir`, `$specpath`, then the next file to write.
+`init` creates `SPEC-DRAFT-<slug>/` in the `discovery` state and seeds two files:
+`SPEC.md` with the frontmatter block, the `[DISCOVERY]` H1, the loader paragraph, and the title
+(defaulting to the slug), plus `DISCOVERY.md` holding the `# Discovery notes` heading only.
+The H1 status tag lives on `SPEC.md` in every state, so it sits in one place from the first
+command on.
+It prints `$slug`, `$specdir`, `$specpath`, then the notes file to fill in.
 When the design needs no exploration, `manage-spec draft` promotes a `discovery` spec
 straight away.
 
@@ -85,7 +90,9 @@ a spec rebased into `specs/` becomes `specs/SPEC-KO-<slug>/` when abandoned, and
 collides with slugs under `specs/`.
 `migrate` is the exception: it prints the new location and state only.
 Take the values from that output; do not derive them yourself.
-`$specpath` is the file to read and edit; its name can change while `$specdir` stays put.
+`$specpath` is the file to read and edit — `SPEC.md` for every spec `init` created.
+Its name can still change while `$specdir` stays put: a spec written before `SPEC.md` carried the
+tag is retagged on `DISCOVERY.md` until its first transition or `rename` converges it onto `SPEC.md`.
 `Session vars: unchanged` means the values did not move, whether because the state shares its
 directory or because the state was already current.
 
@@ -104,8 +111,22 @@ directory.
 It also renames `EXPLORATION-BRIEF.md` / `EXPLORATION-<topic>.md` to `EXPLO-*`, and rewrites
 references to those old filenames inside the moved files.
 A collision with an existing `EXPLO-*` file aborts before anything is renamed.
-A legacy directory with no `SPEC.md` seeds `DISCOVERY.md` and enters `explo`.
+A legacy directory with no `SPEC.md` seeds `SPEC.md` and `DISCOVERY.md` and enters `explo`.
+No `created-at` is written for it: `manage-spec` never invents a timestamp for a spec that
+predates the frontmatter block.
 `migrate` is absent from `--help` on purpose: it drains the old layout, it is not a daily command.
+
+## Legacy tag carriers
+
+A spec written before `SPEC.md` carried the tag has its H1 status tag on `DISCOVERY.md`.
+Its first transition converges it: `SPEC.md` is seeded with the target tag and the loader block,
+and `DISCOVERY.md` becomes a plain notes file under the `# Discovery notes` heading.
+A `rename` converges it the same way, carrying the old or new title onto `SPEC.md`.
+That convergence does not invent a `created-at` either.
+Until then, `$specpath` stays `DISCOVERY.md` — the printed `Session vars` always name the file
+that currently carries the tag.
+`manage-spec <current-state> --fix` only repairs the directory name; it is the one command that
+leaves a legacy carrier in place.
 
 ## Guards
 
@@ -118,6 +139,9 @@ A legacy directory with no `SPEC.md` seeds `DISCOVERY.md` and enters `explo`.
   Combined with a transition, the repair runs first, then the state change.
   `manage-spec <current-state> --fix` repairs without changing the state.
 - **Target directory already exists**: refuse, always — merging two specs is a manual decision.
+- **Unclosed frontmatter**: refuse when the opening `---` on line 1 has no closing `---` line.
+  Nothing is rewritten, so the file stays as it was until the fence is closed or the opening line
+  is dropped.
 - **Staged changes**: never block a move.
   `manage-spec` has no dirty-index guard; a `git mv` simply stages the rename alongside the
   unrelated staged changes.
@@ -141,7 +165,7 @@ Exploration files live inside `$specdir` and are not managed by `manage-spec`:
 `EXPLO-BRIEF.md` as the hub, plus one `EXPLO-<topic>.md` per topic.
 The `design-exploration` skill owns their content and lifecycle.
 
-`DISCOVERY.md` is the opposite: `manage-spec` seeds it and owns its H1 and loader block.
-Everything below its loader paragraph is free-form discovery material.
-In the `explo` state the loader gains a pointer saying the `design-exploration` skill owns the
-work until promotion.
+`DISCOVERY.md` is the opposite: `manage-spec` creates it, but owns nothing below its heading.
+It starts as the `# Discovery notes` line, and everything under it is free-form discovery material
+the agent and the user edit directly.
+The file never carries the status tag, so it needs no rewrite when the state changes.

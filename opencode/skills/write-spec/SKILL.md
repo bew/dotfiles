@@ -50,7 +50,7 @@ Phases, in order (`Explore` is optional):
 
 - `$slug` — re-reported when `rename` changes it
 - `$specdir` — the spec's own directory
-- `$specpath` — the spec file to read and edit
+- `$specpath` — the spec file to read and edit, carrying the status tag (`SPEC.md`)
 
 `init` prints them first, and every command that moves or renames the spec re-reports them.
 Take them from the tool output; never derive them yourself.

@@ -6,12 +6,13 @@ Reference for section order, Alternatives & Tradeoffs, and Open Questions format
 
 `$specpath` is the spec file to read and edit inside `$specdir`, both printed by `manage-spec`
 (see <./lifecycle.md>).
+It is `SPEC.md` from `init` on.
 Related artifacts (examples, experiments, reference impls, external links) go next to the spec
 file:
 ```
 $specdir/
-├── SPEC.md                   ← the spec
-├── DISCOVERY.md              ← discovery notes
+├── SPEC.md                   ← the spec, carrying the status tag
+├── DISCOVERY.md              ← discovery notes, untagged
 ├── EXPLO-BRIEF.md            ← hub: exploration motivation + topic index
 ├── EXPLO-<topic>.md          ← one per exploration topic
 ├── <related-file>            ← any companion files, no nesting required
@@ -25,6 +26,25 @@ a legacy spec migrated straight into `draft` may hold only `SPEC.md`.
 `DISCOVERY.md` and the exploration files are pre-spec design material.
 A topic freezes in the hub once folded into `SPEC.md`; re-entry may revive it,
 or start a new topic file when the direction is completely different.
+`DISCOVERY.md` holds the gathered inputs; it never carries the status tag.
+
+## Frontmatter block
+
+`manage-spec init` opens `SPEC.md` with a fenced block above the H1:
+```md
+---
+created-at: 20261028T1759
+---
+
+# [DISCOVERY] <title>
+```
+- `created-at` — local date and time at `init`, `YYYYMMDDThhmm`.
+  No tool regenerates or invents one: a spec created before the block existed keeps none.
+- The block must open on line 1 and close on the next `---` line; a blank line separates it from
+  the H1. An unclosed fence is refused rather than guessed at.
+
+`manage-spec` preserves the block on every rewrite and never edits its keys.
+Add further keys by hand only when a consumer exists for them.
 
 ## Section order
 

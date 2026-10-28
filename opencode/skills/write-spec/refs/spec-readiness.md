@@ -13,8 +13,10 @@ Criteria for assessing whether a spec is ready to leave the draft state.
 | `READY` | Confirmed ready |
 | `ABANDONED` | No longer being pursued; lives under `SPEC-KO-<slug>/` |
 
-The H1 of each spec file carries its status tag; `manage-spec` keeps the tag, the file that
+The H1 of `SPEC.md` carries its status tag; `manage-spec` keeps the tag, the file that
 carries it, and the directory name in sync — read <./lifecycle.md>.
+A spec written before `SPEC.md` carried the tag still has it on `DISCOVERY.md` until its first
+transition converges it.
 Never edit the tag or move the directory by hand.
 
 ## Readiness criteria

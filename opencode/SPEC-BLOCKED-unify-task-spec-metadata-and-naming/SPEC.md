@@ -10,7 +10,8 @@
 > block and an undated name, and both writers emit them: `work-capture-handoff` on each new capture,
 > `handoff` (plus `handoff-standalone`) on each handoff doc.
 > `tmp-frontmatter-migration` now exists, and repairs one file or a whole directory on request.
-> The spec carriers and the `AGENTS.md` trigger on writes still do not exist,
+> `write-spec init` now emits the block on `SPEC.md` and `manage-spec` preserves it,
+> but `depends-on` is still not written for specs, and the `AGENTS.md` trigger on writes does not exist,
 > so nothing keeps the corpus converged once a file is edited.
 > Some answers diverge from the text below.
 > The writers ask for a new slug rather than suffixing the taken one.
@@ -160,7 +161,7 @@ depends-on: spec:task-scopes & task:parse-frontmatter
 - A repeated reference is the same edge; duplicates carry no additional meaning.
 - An artefact must not list itself; a self-reference is a one-node cycle (see Dependency Semantics).
 
-A spec carries the block on its carrier file, above the H1:
+A spec carries the block on `SPEC.md`, above the H1:
 
 ```md
 ---
@@ -207,14 +208,15 @@ The block belongs to the artefact file itself, never to a sidecar or an index.
 Reading one file tells that file's whole story, and nothing can go stale when it is copied or moved.
 
 For a task, an idea, or a bug, that file is the artefact file itself.
-For a spec, it is the carrier file the item reports: `DISCOVERY.md` while the spec is in `discovery` or `explo`, then `SPEC.md` from `draft` onward.
+For a spec, it is `SPEC.md`, the same file that carries the H1 tag.
+`DISCOVERY.md` sits beside it as untagged notes and never holds the block, so the block has no carrier to follow through the lifecycle: it is written once, where it stays.
 
-That carrier change is the one place the block has to be moved by something other than a human.
-`manage-spec` seeds `DISCOVERY.md` at `init`, creates `SPEC.md` on promotion to `draft`, and owns the H1 tag and loader paragraph in both.
-It therefore also carries the block across, and it must find the H1 *after* the block rather than on the first line.
+`manage-spec` owns the tag, the loader paragraph, and the block: `init` seeds `SPEC.md` with the block, and every later tag rewrite, loader change, and directory move leaves it in place above the H1.
+It must therefore find the H1 *after* the block rather than on the first line.
 It also stops encoding state in the directory name: `SPEC-<slug>/` stays fixed while the tag moves through the lifecycle.
-Promotion copies the block into `SPEC.md` and removes it from `DISCOVERY.md`; both files never carry one at the same time.
-Rewriting a tag, adding or removing the loader, and moving the directory all leave the block untouched.
+
+A spec created before the block existed keeps none: nothing knows its creation time, and no command invents one.
+Such a spec also still tags `DISCOVERY.md` until its first transition or rename converges the tag onto `SPEC.md`, and that convergence adds no block either.
 
 Ownership of the content splits by field.
 
@@ -271,7 +273,7 @@ That note is what eventually deletes the skill, not a calendar reminder nobody r
 Removal is gated on the artefacts' producers rather than on the corpus.
 `work-capture-handoff` must emit the block in the task, idea, and bug files it creates,
 `handoff` must emit it in the handoff docs it writes,
-`write-spec init` must emit it in the spec carrier, and `manage-spec` must preserve it through
+`write-spec init` must emit it on `SPEC.md`, and `manage-spec` must preserve it through
 promotion and renames.
 Once they do, the temporary skill has nothing left to repair, and deleting it leaves no gap.
 Until they do, it is the only thing holding the format in place.
@@ -333,9 +335,9 @@ A reader reports; only a deliberate human or agent edit rewrites a block, and on
   This spec is that direction, narrowed to two fields and five families.
 - `opencode/AGENTS.md` owns task, idea, bug, and handoff naming, the task and bug tag vocabularies,
   and the session lifecycle this format must not duplicate.
-- `opencode/skills/write-spec/refs/lifecycle.md` owns spec states and the carrier preference the spec block must follow.
+- `opencode/skills/write-spec/refs/lifecycle.md` owns spec states and the file that carries them.
   Its state-prefixed directory names (`SPEC-DRAFT-`, `SPEC-READY-`) must become plain `SPEC-<slug>/`, so the doc itself needs updating.
-- `opencode/skills/write-spec/scripts/manage-spec` is the tool that must stop anchoring the H1 on the first line.
+- `opencode/skills/write-spec/scripts/manage-spec` already finds the H1 after the frontmatter block, and seeds the block on `SPEC.md` at `init`.
 - `opencode/skills/work-capture-handoff/` creates task, idea, and bug files, so it must emit the
   block for the migration skill to be removable.
 - `opencode/skills/handoff/` writes handoff docs, so it carries the same obligation.

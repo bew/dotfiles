@@ -26,8 +26,8 @@ Skip the move when the spec is already in `draft`.
 
 ## Inputs
 
-`DISCOVERY.md`, when present, holds the discovery notes from `Phase:Discover`, and is the first
-input for the Introduction and for section selection.
+`DISCOVERY.md` holds the discovery notes from `Phase:Discover`, and is the first input for the
+Introduction and for section selection.
 `EXPLO-BRIEF.md` and `EXPLO-<topic>.md` files may also exist in `$specdir` (see `Phase:Explore`).
 Read them before drafting — settled `Decisions` feed the spec, `Open threads` seed Open Questions.
 Do not duplicate discovery or exploration prose into the spec; the spec is authoritative once it
@@ -65,6 +65,8 @@ H1 format (written by `manage-spec`; shown here only so you can recognise the fi
 # [DRAFT] <Name>
 ```
 Do not re-emit the H1 or the loader block — they are already in the seeded file.
+The frontmatter block above the H1 is `manage-spec`'s too: leave it untouched and start editing
+at the first `##` heading.
 
 Skeleton example (sections with OQ subsections):
 ```md

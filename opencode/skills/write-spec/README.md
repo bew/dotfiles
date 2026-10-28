@@ -14,10 +14,11 @@ A spec owns a directory whose name carries its lifecycle prefix:
 
 A spec directory holds three kinds of file:
 
-- `SPEC.md` — the spec itself.
-- `DISCOVERY.md` — the discovery notes gathered before drafting.
+- `SPEC.md` — the spec itself, and the file carrying the H1 status tag.
+- `DISCOVERY.md` — the discovery notes gathered before drafting; untagged free-form notes.
 - `EXPLO-*.md` — exploration material, owned by the `design-exploration` skill.
 
+`init` seeds both `SPEC.md` and `DISCOVERY.md`, so the tag exists from the first command on.
 Which file an agent reads or edits is decided by `manage-spec`, which prints `$specpath`.
 Never infer it from the state name.
 

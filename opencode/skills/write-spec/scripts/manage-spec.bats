@@ -35,6 +35,13 @@ function expected_spec_content() {
     printf '## Introduction\n\nBody text.\n'
 }
 
+# Print the frontmatter block `init` writes, carrying the given timestamp.
+function expected_frontmatter_block() {
+    local stamp="$1"
+
+    printf -- '---\ncreated-at: %s\n---\n\n' "$stamp"
+}
+
 # Write <PROJECT_DIR>/<dir>/SPEC.md holding the canonical fixture for the given tag.
 function setup_spec() {
     local dir_name="$1"
@@ -46,8 +53,8 @@ function setup_spec() {
     expected_spec_content "$tag" "$title" > "$specdir/SPEC.md"
 }
 
-# Print the canonical pre-spec fixture for a tag: only the loader block, no draft body.
-function expected_discovery_content() {
+# Print the canonical legacy fixture: DISCOVERY.md still carries the tag and the loader.
+function expected_legacy_discovery_content() {
     local tag="$1"
     local title="${2:-Sample Spec}"
 
@@ -59,18 +66,18 @@ function expected_discovery_content() {
         printf '> Exploration material lives in `EXPLO-BRIEF.md`;\n'
         printf '%s\n' "$EXPLO_POINTER_LINE"
     fi
-    printf '\n## Discovery notes\n\nNotes.\n'
+    printf '\nNotes.\n'
 }
 
-# Write <PROJECT_DIR>/<dir>/DISCOVERY.md holding the canonical pre-spec fixture for the tag.
-function setup_discovery_spec() {
+# Write <PROJECT_DIR>/<dir>/DISCOVERY.md holding the legacy tag-carrying fixture.
+function setup_legacy_discovery_spec() {
     local dir_name="$1"
     local tag="$2"
     local title="${3:-Sample Spec}"
     local specdir="$PROJECT_DIR/$dir_name"
 
     mkdir -p "$specdir"
-    expected_discovery_content "$tag" "$title" > "$specdir/DISCOVERY.md"
+    expected_legacy_discovery_content "$tag" "$title" > "$specdir/DISCOVERY.md"
 }
 
 # Initialise a git repo in PROJECT_DIR and commit everything currently there.
@@ -177,8 +184,8 @@ function assert_spec_tree() {
     fi
 }
 
-# Assert DISCOVERY.md carries the tag, title, and loader block of a pre-spec state.
-function assert_discovery_carrier() {
+# Assert DISCOVERY.md carries the tag, title, and loader block of a legacy carrier.
+function assert_legacy_discovery_carrier() {
     local specdir="$1"
     local tag="$2"
     local title="${3:-Sample Spec}"
@@ -186,6 +193,31 @@ function assert_discovery_carrier() {
 
     assert_file_contains "$discoverypath" "# [$tag] $title"
     assert_file_contains "$discoverypath" "$LOADER_ACTION_LINE"
+}
+
+# Assert DISCOVERY.md is a plain notes file: fixed heading, no status tag.
+function assert_discovery_notes() {
+    local specdir="$1"
+    local discoverypath="$specdir/DISCOVERY.md"
+
+    assert_file_contains "$discoverypath" "# Discovery notes"
+    assert_file_lacks "$discoverypath" "$LOADER_ACTION_LINE"
+    if grep -Eq '^# \[' "$discoverypath"; then
+        printf 'DISCOVERY.md should carry no status tag\n  in: %s\n' "$discoverypath" >&3
+        return 1
+    fi
+}
+
+# Assert the file opens with the `---` frontmatter fence and a created-at timestamp.
+function assert_created_at_block() {
+    local specpath="$1"
+    local fence_count stamp_line
+
+    fence_count="$(sed -n '1p;3p' "$specpath" | grep -c '^---$')"
+    [[ "$fence_count" -eq 2 ]]
+    stamp_line="$(sed -n '2p' "$specpath")"
+    [[ "$stamp_line" =~ ^created-at:\ [0-9]{8}T[0-9]{4}$ ]]
+    [[ "$(sed -n '4p' "$specpath")" == "" ]]
 }
 
 # Assert nothing exists at the given path.
@@ -300,19 +332,22 @@ function assert_git_status_contains() {
     assert_spec_tree "$PROJECT_DIR/SPEC-DRAFT-delta" "DRAFT" "Delta"
 }
 
-@test "migrate: seeds DISCOVERY.md for a legacy dir that has no SPEC.md" {
+@test "migrate: seeds SPEC.md and DISCOVERY.md for a legacy dir that has neither" {
     mkdir -p "$PROJECT_DIR/_WIP_SPECS/epsilon"
     printf '# Exploration brief\n\nNotes.\n' \
         > "$PROJECT_DIR/_WIP_SPECS/epsilon/EXPLO-BRIEF.md"
     cd "$PROJECT_DIR"
 
     run -0 "$SCRIPT_PATH" migrate _WIP_SPECS/epsilon
-    assert_output_contains "NOTE: no SPEC.md; seeded DISCOVERY.md in the explo state."
+    assert_output_contains "NOTE: no SPEC.md; seeded SPEC.md and DISCOVERY.md in the explo state."
     assert_output_contains "Migrated: _WIP_SPECS/epsilon -> SPEC-DRAFT-epsilon"
     assert_state "explo"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-epsilon" "EXPLO" "epsilon"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "# [EXPLO] epsilon"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "$EXPLO_POINTER_LINE"
+    # No timestamp is invented for a spec that predates the frontmatter block.
+    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "created-at"
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-epsilon"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/EXPLO-BRIEF.md" "Notes."
-    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md"
 }
 
 @test "migrate: renames EXPLORATION-* files and their references" {
@@ -356,31 +391,41 @@ function assert_git_status_contains() {
 # ------------------------------------------------------------------------------
 # Tests: init
 
-@test "init: creates a discovery directory and prints its paths" {
+@test "init: creates a discovery spec and prints its paths" {
     cd "$PROJECT_DIR"
 
     run -0 "$SCRIPT_PATH" init demo-spec
     assert_session_vars "Session vars: 3 new" \
         "- \$slug = demo-spec" \
         "- \$specdir = SPEC-DRAFT-demo-spec/" \
-        "- \$specpath = SPEC-DRAFT-demo-spec/DISCOVERY.md"
-    assert_output_contains "Next: write the discovery notes at SPEC-DRAFT-demo-spec/DISCOVERY.md"
+        "- \$specpath = SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_output_contains "Next: record the discovery notes in SPEC-DRAFT-demo-spec/DISCOVERY.md"
     [[ -d "$PROJECT_DIR/SPEC-DRAFT-demo-spec" ]]
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-demo-spec" "DISCOVERY" "demo-spec"
-    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "# [DISCOVERY] demo-spec"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "$LOADER_ACTION_LINE"
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-demo-spec"
 }
 
-@test "init: seeds DISCOVERY.md with the supplied title" {
+@test "init: writes the frontmatter block above the H1" {
+    cd "$PROJECT_DIR"
+
+    run -0 "$SCRIPT_PATH" init demo-spec "Demo Title"
+    assert_created_at_block "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "# [DISCOVERY] Demo Title"
+}
+
+@test "init: seeds SPEC.md with the supplied title and leaves DISCOVERY.md untitled" {
     cd "$PROJECT_DIR"
 
     run -0 "$SCRIPT_PATH" init demo-spec "Demo Title"
     assert_session_vars "Session vars: 3 new" \
         "- \$slug = demo-spec" \
         "- \$specdir = SPEC-DRAFT-demo-spec/" \
-        "- \$specpath = SPEC-DRAFT-demo-spec/DISCOVERY.md"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-demo-spec" "DISCOVERY" "Demo Title"
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-demo-spec/DISCOVERY.md" "## Discovery notes"
-    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md"
+        "- \$specpath = SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "# [DISCOVERY] Demo Title"
+    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "## Introduction"
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-demo-spec"
+    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-demo-spec/DISCOVERY.md" "Demo Title"
 }
 
 @test "init: refuses a slug that already exists" {
@@ -392,6 +437,7 @@ function assert_git_status_contains() {
     assert_stderr_contains "pick another slug"
     assert_output_empty
     assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-demo-spec/DISCOVERY.md"
 }
 
 @test "error: refuses invalid slugs" {
@@ -441,8 +487,8 @@ function assert_git_status_contains() {
     assert_session_vars "Session vars: 3 new" \
         "- \$slug = Demo-Spec" \
         "- \$specdir = SPEC-DRAFT-Demo-Spec/" \
-        "- \$specpath = SPEC-DRAFT-Demo-Spec/DISCOVERY.md"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-Demo-Spec" "DISCOVERY" "Demo-Spec"
+        "- \$specpath = SPEC-DRAFT-Demo-Spec/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-Demo-Spec/SPEC.md" "# [DISCOVERY] Demo-Spec"
 }
 
 @test "init: refuses to nest a spec inside a spec directory" {
@@ -537,7 +583,7 @@ function assert_git_status_contains() {
 }
 
 @test "error: refuses a stacked foreign marker on DISCOVERY.md" {
-    setup_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
     printf '# [DONE] [CLAIMED] [DISCOVERY] Sample Spec\n' > "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md"
     cd "$PROJECT_DIR/SPEC-DRAFT-sample"
 
@@ -581,7 +627,7 @@ function assert_git_status_contains() {
 }
 
 @test "transition: --fix moves a discovery tag back under the draft prefix" {
-    setup_discovery_spec "SPEC-READY-sample" "DISCOVERY"
+    setup_legacy_discovery_spec "SPEC-READY-sample" "DISCOVERY"
     cd "$PROJECT_DIR/SPEC-READY-sample"
 
     run -0 "$SCRIPT_PATH" discovery --fix
@@ -590,7 +636,9 @@ function assert_git_status_contains() {
         "- \$specdir = SPEC-DRAFT-sample/" \
         "- \$specpath = SPEC-DRAFT-sample/DISCOVERY.md"
     assert_path_missing "$PROJECT_DIR/SPEC-READY-sample"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-sample" "DISCOVERY"
+    # A same-state --fix only repairs the directory; the legacy carrier converges on a transition.
+    assert_legacy_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-sample" "DISCOVERY"
+    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md"
 }
 
 @test "transition: --fix repairs the directory and then transitions" {
@@ -603,16 +651,16 @@ function assert_git_status_contains() {
     assert_spec_tree "$PROJECT_DIR/SPEC-READY-sample" "READY"
 }
 
-@test "transition: --fix repairs and then promotes DISCOVERY.md" {
-    setup_discovery_spec "SPEC-READY-sample" "DISCOVERY"
+@test "transition: --fix repairs and then converges the legacy carrier" {
+    setup_legacy_discovery_spec "SPEC-READY-sample" "DISCOVERY"
     cd "$PROJECT_DIR/SPEC-READY-sample"
 
     run -0 "$SCRIPT_PATH" draft --fix
     assert_state "draft"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "# [DRAFT] Sample Spec"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "$LOADER_ACTION_LINE"
-    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "## Discovery notes"
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "[DISCOVERY]"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "Notes."
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-sample"
 }
 
 @test "transition: same state is a no-op" {
@@ -636,21 +684,22 @@ function assert_git_status_contains() {
     assert_path_missing "$PROJECT_DIR/SPEC-READY-sample"
 }
 
-@test "transition: discovery → explo retags DISCOVERY.md in place" {
-    setup_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
+@test "transition: discovery → explo converges the legacy carrier onto SPEC.md" {
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
     cd "$PROJECT_DIR/SPEC-DRAFT-sample"
 
     run -0 "$SCRIPT_PATH" explo
     assert_state "explo"
-    assert_output_contains "Session vars: unchanged"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-sample" "EXPLO"
-    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "$EXPLO_POINTER_LINE"
-    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "## Discovery notes"
-    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md"
+    assert_session_vars "Session vars: 1 changed" \
+        "- \$specpath = SPEC-DRAFT-sample/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "# [EXPLO] Sample Spec"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "$EXPLO_POINTER_LINE"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "Notes."
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-sample"
 }
 
-@test "transition: explo → draft promotes a fresh SPEC.md and untags DISCOVERY.md" {
-    setup_discovery_spec "SPEC-DRAFT-sample" "EXPLO"
+@test "transition: explo → draft converges a legacy EXPLO carrier onto SPEC.md" {
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "EXPLO"
     cd "$PROJECT_DIR/SPEC-DRAFT-sample"
 
     run -0 "$SCRIPT_PATH" draft
@@ -659,17 +708,13 @@ function assert_git_status_contains() {
         "- \$specpath = SPEC-DRAFT-sample/SPEC.md"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "# [DRAFT] Sample Spec"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "$LOADER_ACTION_LINE"
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "## Discovery notes"
-    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "# Sample Spec"
-    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "## Discovery notes"
+    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "## Introduction"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "Notes."
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "[EXPLO]"
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "$EXPLO_POINTER_LINE"
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-sample/DISCOVERY.md" "$LOADER_ACTION_LINE"
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-sample"
 }
 
 @test "transition: discovery → draft skips explo" {
-    setup_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
     cd "$PROJECT_DIR/SPEC-DRAFT-sample"
 
     run -0 "$SCRIPT_PATH" draft
@@ -697,6 +742,35 @@ function assert_git_status_contains() {
     assert_stderr_contains "transition draft → discovery is not allowed"
     assert_output_empty
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "## Introduction"
+}
+
+@test "transition: keeps the frontmatter block above the H1" {
+    cd "$PROJECT_DIR"
+
+    run -0 "$SCRIPT_PATH" init demo-spec "Demo Title"
+    cd "$PROJECT_DIR/SPEC-DRAFT-demo-spec"
+    run -0 "$SCRIPT_PATH" draft
+
+    assert_created_at_block "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "# [DRAFT] Demo Title"
+    local stamp_before
+    stamp_before="$(sed -n '2p' "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md")"
+    run -0 "$SCRIPT_PATH" maybe-ready
+    [[ "$(sed -n '2p' "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md")" == "$stamp_before" ]]
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-demo-spec/SPEC.md" "# [MAYBE-READY] Demo Title"
+}
+
+@test "edge: refuses an unclosed frontmatter block" {
+    mkdir -p "$PROJECT_DIR/SPEC-DRAFT-sample"
+    printf -- '---\ncreated-at: 20260101T0900\n\n# [DRAFT] Sample Spec\n' \
+        > "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md"
+    cd "$PROJECT_DIR/SPEC-DRAFT-sample"
+
+    run -1 --separate-stderr "$SCRIPT_PATH" maybe-ready
+    assert_stderr_contains "no closing"
+    assert_output_empty
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "# [DRAFT] Sample Spec"
+    assert_path_missing "$PROJECT_DIR/SPEC-READY-sample"
 }
 
 @test "transition: normalises a legacy singular loader" {
@@ -784,7 +858,7 @@ function assert_git_status_contains() {
         PROJECT_DIR="$BATS_TEST_TMPDIR/project-$index"
         mkdir -p "$PROJECT_DIR"
         case "$state" in
-            discovery|explo) setup_discovery_spec "$dir_name" "$tag" ;;
+            discovery|explo) setup_legacy_discovery_spec "$dir_name" "$tag" ;;
             *) setup_spec "$dir_name" "$tag" ;;
         esac
         cd "$PROJECT_DIR/$dir_name"
@@ -795,9 +869,10 @@ function assert_git_status_contains() {
         assert_state "abandoned"
         assert_path_missing "$PROJECT_DIR/$dir_name"
         if [[ "$state" == "discovery" || "$state" == "explo" ]]; then
-            # A freshly seeded SPEC.md has no body yet; the notes stay as an untagged sibling.
+            # The legacy carrier converges: a fresh body-less SPEC.md, notes left untagged.
             assert_file_contains "$kodir/SPEC.md" "# [ABANDONED] Sample Spec"
-            assert_file_lacks "$kodir/DISCOVERY.md" "[$tag]"
+            assert_file_lacks "$kodir/SPEC.md" "## Introduction"
+            assert_discovery_notes "$kodir"
         else
             assert_spec_tree "$kodir" "ABANDONED"
         fi
@@ -886,7 +961,7 @@ function assert_git_status_contains() {
         PROJECT_DIR="$BATS_TEST_TMPDIR/project-$index"
         mkdir -p "$PROJECT_DIR"
         case "$tag" in
-            DISCOVERY|EXPLO) setup_discovery_spec "$dir_name" "$tag" ;;
+            DISCOVERY|EXPLO) setup_legacy_discovery_spec "$dir_name" "$tag" ;;
             *) setup_spec "$dir_name" "$tag" ;;
         esac
         cd "$PROJECT_DIR/$dir_name"
@@ -993,8 +1068,8 @@ function assert_git_status_contains() {
     assert_spec_tree "$PROJECT_DIR/SPEC-DRAFT-sample" "DRAFT"
 }
 
-@test "rename: rewrites the tag on a DISCOVERY.md carrier" {
-    setup_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
+@test "rename: converges a legacy DISCOVERY.md carrier onto SPEC.md" {
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "DISCOVERY"
     cd "$PROJECT_DIR/SPEC-DRAFT-sample"
 
     run -0 "$SCRIPT_PATH" rename renamed
@@ -1002,10 +1077,24 @@ function assert_git_status_contains() {
     assert_session_vars "Session vars: 3 changed" \
         "- \$slug = renamed" \
         "- \$specdir = SPEC-DRAFT-renamed/" \
-        "- \$specpath = SPEC-DRAFT-renamed/DISCOVERY.md"
+        "- \$specpath = SPEC-DRAFT-renamed/SPEC.md"
     assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-sample"
-    assert_discovery_carrier "$PROJECT_DIR/SPEC-DRAFT-renamed" "DISCOVERY"
-    assert_path_missing "$PROJECT_DIR/SPEC-DRAFT-renamed/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-renamed/SPEC.md" "# [DISCOVERY] Sample Spec"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-renamed/DISCOVERY.md" "Notes."
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-renamed"
+}
+
+@test "rename: converges a legacy carrier on a retitle-only rename" {
+    setup_legacy_discovery_spec "SPEC-DRAFT-sample" "EXPLO"
+    cd "$PROJECT_DIR/SPEC-DRAFT-sample"
+
+    run -0 "$SCRIPT_PATH" rename "New Title"
+    assert_output_contains "Retitled: New Title"
+    assert_session_vars "Session vars: 1 changed" \
+        "- \$specpath = SPEC-DRAFT-sample/SPEC.md"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "# [EXPLO] New Title"
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-sample/SPEC.md" "$EXPLO_POINTER_LINE"
+    assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-sample"
 }
 
 @test "rename: moves an abandoned spec within the KO prefix" {

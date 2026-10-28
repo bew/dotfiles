@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # Create spec directories and move a spec between lifecycle states, keeping its
-# directory name, H1 status tag, and skill-loader paragraph in sync.
+# directory name, H1 status tag, skill-loader paragraph, and frontmatter block in sync.
 
 import argparse
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 
@@ -15,8 +16,19 @@ H1_BARE_PATTERN = re.compile(r"^#\s+(?P<title>.*)$")
 
 SPEC_FILENAME = "SPEC.md"
 DISCOVERY_FILENAME = "DISCOVERY.md"
-# Files that may carry the H1 status tag, in authority order: SPEC.md wins when it exists.
+# Files that may carry the H1 status tag, in authority order.
+# `SPEC.md` carries it for every spec `init` creates; `DISCOVERY.md` only on a legacy spec,
+# until the first command that rewrites the file converges it onto `SPEC.md`.
 TAG_FILENAMES = (SPEC_FILENAME, DISCOVERY_FILENAME)
+
+# Frontmatter block: a `---` fence, `created-at`, and a closing fence, above the H1.
+FRONTMATTER_FENCE = "---"
+CREATED_AT_KEY = "created-at"
+# strftime pattern of the block value: date digits, `T`, time digits, at minute precision.
+CREATED_AT_FORMAT = "%Y%m%dT%H%M"
+
+# Fixed H1 `init` gives `DISCOVERY.md`: the notes file carries no title and no status tag.
+DISCOVERY_HEADING = "# Discovery notes"
 
 DRAFT_PREFIX = "SPEC-DRAFT-"
 READY_PREFIX = "SPEC-READY-"
@@ -69,11 +81,8 @@ class State(str, Enum):
     ABANDONED = "abandoned"
 
 
-# Pre-spec states: `DISCOVERY.md` may carry the tag and no `SPEC.md` exists yet.
-PRE_SPEC_STATES = {State.DISCOVERY, State.EXPLO}
-
 # States whose directory carries the draft prefix.
-DRAFT_PREFIX_STATES = PRE_SPEC_STATES | {State.DRAFT, State.MAYBE_READY}
+DRAFT_PREFIX_STATES = {State.DISCOVERY, State.EXPLO, State.DRAFT, State.MAYBE_READY}
 
 # States whose directory carries the abandoned prefix.
 KO_PREFIX_STATES = {State.ABANDONED}
@@ -217,15 +226,42 @@ def get_target_dir(state: State, slug: str, project_root: Path) -> Path:
     return project_root / f"{prefix}{slug}"
 
 
-def read_spec_lines(specpath: Path) -> list[str]:
-    """Read the spec file as lines, raising ScriptError when it is absent."""
+def split_frontmatter(lines: list[str]) -> tuple[list[str], list[str]]:
+    """Split lines into the frontmatter block (fences included) and the remaining body.
+
+    The block only counts when the opening fence is the very first line and a closing fence
+    follows it; an unclosed fence is refused rather than silently read as body text.
+    """
+    if not lines or lines[0].strip() != FRONTMATTER_FENCE:
+        return [], lines
+
+    closing_index = next(
+        (index for index in range(1, len(lines)) if lines[index].strip() == FRONTMATTER_FENCE),
+        None,
+    )
+    if closing_index is None:
+        raise ScriptError(
+            f"frontmatter opened at line 1 has no closing `{FRONTMATTER_FENCE}` line.\n"
+            "   Close the block, or drop the opening fence; nothing changed."
+        )
+
+    return lines[: closing_index + 1], lines[closing_index + 1 :]
+
+
+def read_spec_parts(specpath: Path) -> tuple[list[str], list[str]]:
+    """Read a spec file into its frontmatter block and its body anchored at the H1."""
     if not specpath.exists():
         raise ScriptError(f"no {specpath.name} in {specpath.parent}; nothing changed.")
 
-    lines = specpath.read_text().splitlines()
-    # A leading blank line must not push the H1 out of position: the rewrite anchors on lines[0].
-    first_content = next((index for index, line in enumerate(lines) if line.strip()), len(lines))
-    return lines[first_content:]
+    block, body = split_frontmatter(specpath.read_text().splitlines())
+    # A leading blank line must not push the H1 out of position: the rewrite anchors on body[0].
+    first_content = next((index for index, line in enumerate(body) if line.strip()), len(body))
+    return block, body[first_content:]
+
+
+def read_spec_lines(specpath: Path) -> list[str]:
+    """Read a spec file as body lines, with any frontmatter block removed."""
+    return read_spec_parts(specpath)[1]
 
 
 def get_tag_lines(context: SpecContext) -> tuple[Path, list[str]]:
@@ -399,9 +435,10 @@ def strip_loader_paragraph(lines: list[str]) -> list[str]:
     return body
 
 
-def get_preamble_lines(tag: str, title: str) -> list[str]:
-    """Return the H1 line plus the loader block the given tag carries."""
-    lines = [f"# [{tag}] {title}"]
+def get_preamble_lines(tag: str, title: str, block: list[str] | None = None) -> list[str]:
+    """Return the frontmatter block, the H1 line, and the loader block the given tag carries."""
+    lines = [*block, ""] if block else []
+    lines.append(f"# [{tag}] {title}")
     if tag == STATE_TAGS[State.READY]:
         return lines
 
@@ -411,30 +448,71 @@ def get_preamble_lines(tag: str, title: str) -> list[str]:
     return lines
 
 
+def get_created_at_block() -> list[str]:
+    """Return the frontmatter block `init` writes, holding the current local creation time."""
+    stamp = datetime.now().strftime(CREATED_AT_FORMAT)
+    return [FRONTMATTER_FENCE, f"{CREATED_AT_KEY}: {stamp}", FRONTMATTER_FENCE]
+
+
 def rewrite_spec_file(specpath: Path, tag: str, new_title: str | None = None) -> None:
-    """Rewrite the H1 tag and keep the loader block consistent with it."""
-    lines = read_spec_lines(specpath)
+    """Rewrite the H1 tag and keep the loader block consistent with it.
+
+    An existing frontmatter block is preserved above the H1; none is added for a spec that
+    was created before the block existed.
+    """
+    block, lines = read_spec_parts(specpath)
     header = lines[0] if lines else ""
     title = new_title if new_title is not None else parse_h1_title(header)
     body = strip_loader_paragraph(lines[1:])
 
     body_block = ["", *body] if body else []
-    specpath.write_text("\n".join([*get_preamble_lines(tag, title), *body_block]) + "\n")
+    specpath.write_text("\n".join([*get_preamble_lines(tag, title, block), *body_block]) + "\n")
 
 
-def write_spec_seed(specpath: Path, tag: str, title: str) -> None:
-    """Create a carrier file holding the H1 tag and the loader block, with no body."""
-    specpath.write_text("\n".join(get_preamble_lines(tag, title)) + "\n")
+def write_spec_seed(specpath: Path, tag: str, title: str, block: list[str] | None = None) -> None:
+    """Create a carrier file holding the frontmatter block, H1 tag, and loader block."""
+    specpath.write_text("\n".join(get_preamble_lines(tag, title, block)) + "\n")
+
+
+def seed_spec_dir(specdir: Path, state: State, title: str, block: list[str] | None = None) -> None:
+    """Fill a fresh spec dir: `SPEC.md` carries the tag, `DISCOVERY.md` is an empty notes file."""
+    write_spec_seed(specdir / SPEC_FILENAME, STATE_TAGS[state], title, block)
+    (specdir / DISCOVERY_FILENAME).write_text(f"{DISCOVERY_HEADING}\n")
+
+
+def rewrite_carrier(
+    context: SpecContext,
+    tag_path: Path,
+    state: State,
+    new_title: str | None = None,
+) -> None:
+    """Write the status tag for the given state onto `SPEC.md`.
+
+    A legacy spec still tags `DISCOVERY.md`: the tag moves to `SPEC.md` and the notes file keeps
+    its body under the fixed discovery heading.
+    The title is `new_title` when given, otherwise the one already carried by the tag file.
+    """
+    if tag_path.name == SPEC_FILENAME:
+        rewrite_spec_file(tag_path, STATE_TAGS[state], new_title)
+        return
+
+    lines = read_spec_lines(tag_path)
+    title = new_title if new_title is not None else parse_h1_title(lines[0] if lines else "")
+    write_spec_seed(context.specpath, STATE_TAGS[state], title)
+    strip_h1_tag(tag_path)
 
 
 def strip_h1_tag(specpath: Path) -> None:
-    """Replace a tagged H1 with its bare title and drop the state-specific loader block."""
+    """Turn a legacy tag-carrying DISCOVERY.md into a plain discovery-notes file.
+
+    The H1 becomes the fixed discovery heading, so the spec title has one authority left:
+    the H1 of SPEC.md.
+    """
     lines = read_spec_lines(specpath)
-    title = parse_h1_title(lines[0] if lines else "")
     body = strip_loader_paragraph(lines[1:])
 
     body_block = ["", *body] if body else []
-    specpath.write_text("\n".join([f"# {title}", *body_block]) + "\n")
+    specpath.write_text("\n".join([DISCOVERY_HEADING, *body_block]) + "\n")
 
 
 def move_spec_dir(source: Path, target: Path, project_root: Path) -> None:
@@ -482,7 +560,8 @@ def prune_empty_container(container: Path) -> None:
 def get_session_vars(context: SpecContext) -> SessionVars:
     """Return the caller's session variables, with paths relative to the base dir."""
     specdir_rel = context.specdir.relative_to(context.project_root)
-    # The carrier follows the state: DISCOVERY.md before a SPEC.md exists, SPEC.md after.
+    # Every spec `init` creates is tagged on SPEC.md; DISCOVERY.md carries the tag only on a
+    # legacy spec that has not transitioned yet.
     carrier = context.tagpath or context.specpath
     return SessionVars(
         slug=context.slug,
@@ -571,8 +650,9 @@ def check_outside_spec_dir(project_root: Path) -> None:
 def cmd_init(slug: str, title: str | None) -> None:
     """Create a spec directory in the discovery state, under the current directory.
 
-    Seeds `DISCOVERY.md` with the H1 tag and the loader block; the draft skeleton stays with
-    `Phase:Draft`.
+    Seeds both carrier files: `SPEC.md` with the frontmatter block, H1 tag, and loader, and
+    `DISCOVERY.md` with the fixed discovery heading only.
+    The draft skeleton stays with `Phase:Draft`.
     """
     check_slug(slug)
     if title is not None:
@@ -598,7 +678,7 @@ def cmd_init(slug: str, title: str | None) -> None:
         )
 
     specdir.mkdir()
-    write_spec_seed(specdir / DISCOVERY_FILENAME, STATE_TAGS[State.DISCOVERY], title or slug)
+    seed_spec_dir(specdir, State.DISCOVERY, title or slug, get_created_at_block())
 
     session_vars = get_session_vars(
         SpecContext(
@@ -608,9 +688,10 @@ def cmd_init(slug: str, title: str | None) -> None:
             project_root=project_root,
         )
     )
+    discoverypath = specdir.relative_to(project_root) / DISCOVERY_FILENAME
     report_new_vars(session_vars)
     print("")
-    print(f"Next: write the discovery notes at {session_vars.specpath}")
+    print(f"Next: record the discovery notes in {discoverypath}")
 
 
 def warn_secondary_carrier(context: SpecContext) -> None:
@@ -673,7 +754,7 @@ def cmd_transition(state_name: str, fix: bool) -> None:
                 project_root=context.project_root,
             )
             # The repair moved the directory, so every path bound so far is stale.
-            tag_path, lines = get_tag_lines(context)
+            tag_path, _ = get_tag_lines(context)
 
     if current_state == target_state:
         print(f"State: {target_state.value} (already current)")
@@ -687,15 +768,9 @@ def cmd_transition(state_name: str, fix: bool) -> None:
     if needs_move:
         check_target_absent(target_dir)
 
-    title = parse_h1_title(lines[0] if lines else "")
-    needs_spec_file = target_state not in PRE_SPEC_STATES and tag_path.name != SPEC_FILENAME
-
-    if needs_spec_file:
-        # Leaving the pre-spec carrier: SPEC.md becomes the tag authority from now on.
-        write_spec_seed(context.specpath, STATE_TAGS[target_state], title)
-        strip_h1_tag(tag_path)
-    else:
-        rewrite_spec_file(tag_path, STATE_TAGS[target_state])
+    # The transition retags through the shared helper, so a legacy DISCOVERY.md carrier
+    # converges onto SPEC.md on the same step.
+    rewrite_carrier(context, tag_path, target_state)
 
     if needs_move:
         move_spec_dir(context.specdir, target_dir, context.project_root)
@@ -758,7 +833,13 @@ def cmd_rename(target: str, new_title: str | None, fix: bool) -> None:
                 f"   Pick another slug, or rename that spec instead."
             )
 
-    rewrite_spec_file(tag_path, STATE_TAGS[current_state], new_title)
+    # Capture the session vars before any write: `context.tagpath` resolves against the spec dir,
+    # so a converging rewrite would make the "before" snapshot read the new carrier.
+    previous_vars = get_session_vars(context)
+
+    # Rename retags through the shared helper: a legacy DISCOVERY.md carrier converges onto
+    # SPEC.md here too, so one file owns the tag whatever command touched it.
+    rewrite_carrier(context, tag_path, current_state, new_title)
     if not is_retitle_only:
         move_spec_dir(context.specdir, target_dir, context.project_root)
 
@@ -772,7 +853,7 @@ def cmd_rename(target: str, new_title: str | None, fix: bool) -> None:
         print(f"Retitled: {new_title}")
     else:
         print(f"Renamed: {context.slug} -> {target_slug}")
-    report_changed_vars(get_session_vars(context), get_session_vars(new_context))
+    report_changed_vars(previous_vars, get_session_vars(new_context))
 
 
 def cmd_rebase(new_base: str) -> None:
@@ -910,8 +991,11 @@ def cmd_migrate(path_arg: str | None) -> None:
     migrate_legacy_explo_files(source_dir, context.project_root)
 
     if tag_path is None:
-        write_spec_seed(source_dir / DISCOVERY_FILENAME, STATE_TAGS[state], context.slug)
-        print(f"NOTE: no {SPEC_FILENAME}; seeded {DISCOVERY_FILENAME} in the {state.value} state.")
+        seed_spec_dir(source_dir, state, context.slug)
+        print(
+            f"NOTE: no {SPEC_FILENAME}; seeded {SPEC_FILENAME} and {DISCOVERY_FILENAME} "
+            f"in the {state.value} state."
+        )
     else:
         rewrite_spec_file(tag_path, STATE_TAGS[state])
 
@@ -971,7 +1055,7 @@ def parse_args() -> argparse.Namespace:
         "title",
         nargs="?",
         default=None,
-        help="H1 title; defaults to the slug, seeds DISCOVERY.md with the tag and the loader",
+        help="H1 title; defaults to the slug",
     )
 
     rename = subcommands.add_parser(
