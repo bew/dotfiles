@@ -28,8 +28,7 @@ compose and how each placement behaves.
 ## Keybindings
 
 All panel keys are `global` keymap commands, gated with `enabled`, so they are
-inert unless the panel is shown (or, for the toggle, armed). While the text field
-is focused only `alt+f`, `alt+i`, and `esc` stay active, so typing reaches the field.
+inert unless the panel is shown (or, for the toggle, armed).
 
 - `alt+f` — show/hide the panel (while armed).
 - `alt+i` — release/re-arm the pushed input mode (see below).
@@ -37,11 +36,11 @@ is focused only `alt+f`, `alt+i`, and `esc` stay active, so typing reaches the f
 - `p` — cycle the placement mode.
 - `shift+d` — disarm: hide the panel and remove the widgets and indicator.
 - `c` — cycle the background colour.
-- `shift+c` — centre the floating panel.
-- `h`/`j`/`k`/`l` — move the floating panel one cell; `shift` moves ten.
-- `↑`/`↓` — move the settings cursor.
-- `alt+j`/`alt+k` — move the settings cursor, whether docked or floating.
-- `j`/`k` — move the settings cursor **when docked** (when floating they move the panel).
+- `shift+c` — centre the settings box on its surface.
+- `h`/`j`/`k`/`l` — move the settings box one cell; `shift` moves ten.
+  Docked, this moves the box inside the host panel; floating, it moves the
+  floating box.
+- `↑`/`↓` or `alt+j`/`alt+k` — move the settings cursor, on both surfaces.
 - `enter`/`space`/click — activate the focused row.
 - `esc` — hide the panel.
 
@@ -63,7 +62,6 @@ active — "block typing only".
 
 `alt+i` releases the mode temporarily so the prompt can be used again;
 `alt+i` again re-arms it.
-The panel also has a text field, so you can type without touching the prompt.
 
 ## Slots
 
@@ -100,7 +98,10 @@ palette; the corner marks use the matching bright palette so they stand out.
 
 Caveats:
 
-- The host panel cannot be moved or resized; only the floating box can.
+- The docked surface needs an open session: the host refuses `ui.panel.open` on
+  the home route. Pressing `d` there keeps the panel floating and shows a toast.
+- The host panel cannot be moved or resized; only the settings box inside it
+  can be shifted, with `h`/`j`/`k`/`l`. The floating box moves as a whole.
 - The floating box has a fixed footprint (`FLOAT_WIDTH` × `FLOAT_HEIGHT`), not
   fitted to its content.
 - The bottom screen corners anchor to the bottom of the host main area (above its

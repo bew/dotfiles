@@ -18,7 +18,7 @@
 //
 // While the panel is shown it pushes an OpenCode input mode, which stops the
 // prompt from receiving typing without disabling the host's global keys.
-// `alt+i` temporarily releases that mode; the panel also has a text field.
+// `alt+i` temporarily releases that mode.
 //
 // Each slot widget names the slot it was placed into, so placement modes and
 // slot composition are visible directly.
@@ -245,9 +245,12 @@ type SettingsPanelProps = {
   cornerColor: string;
   corners: boolean;
   cursor: number;
+  // Cell offset of the settings box from the centre of its surface.
+  // The docked surface moves its box with this; floating moves the whole box.
+  offsetX: number;
+  offsetY: number;
   onActivate: (row: PanelRow) => void;
   onCursor: (index: number) => void;
-  onTextFocus: (focused: boolean) => void;
 };
 
 // Label for a row, including its checked marker where it has one.
@@ -274,45 +277,45 @@ function rowLabel(props: SettingsPanelProps, row: PanelRow): string {
 function SettingsPanel(props: SettingsPanelProps) {
   const context = usePlugin();
   return (
-    <box
-      position="relative"
-      width="100%"
-      height="100%"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
+    <box position="relative" width="100%" height="100%" overflow="hidden">
       <Show when={props.corners}>
         <CameraCorners color={props.cornerColor} />
       </Show>
-      <box backgroundColor={props.color} flexDirection="column" alignItems="center" padding={1}>
-        <text fg={context.theme.text.muted}>ui-tester — {props.docked ? "docked" : "floating"}</text>
-        <text fg={context.theme.text.muted}>↑/↓ or alt+j/alt+k move · enter/click toggle</text>
-        <text fg={context.theme.text.muted}>c colour · shift+c centre · d dock</text>
-        <text fg={context.theme.text.muted}>p placement · shift+d disarm</text>
-        <text fg={context.theme.text.muted}>alt+i release · esc hide</text>
-        <text>{" "}</text>
-        <For each={PANEL_ROWS}>
-          {(row, index) => (
-            <text
-              fg={props.cursor === index() ? context.theme.hue.accent[400] : context.theme.text.base}
-              selectable={false}
-              onMouseDown={() => {
-                props.onCursor(index());
-                props.onActivate(row);
-              }}
-            >
-              {rowLabel(props, row)}
-            </text>
-          )}
-        </For>
-        <text>{" "}</text>
-        <input
-          placeholder="type here (ui-tester)"
-          width={32}
-          onFocus={() => props.onTextFocus(true)}
-          onBlur={() => props.onTextFocus(false)}
-        />
+      {/* Full-size centring box shifted by the offset: the settings box moves by
+          whole cells while its layout stays independent of that position. */}
+      <box
+        position="absolute"
+        left={props.offsetX}
+        top={props.offsetY}
+        width="100%"
+        height="100%"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <box backgroundColor={props.color} flexDirection="column" alignItems="center" padding={1}>
+          <text fg={context.theme.text.muted}>ui-tester — {props.docked ? "docked" : "floating"}</text>
+          <text fg={context.theme.text.muted}>h/j/k/l move · shift moves 10</text>
+          <text fg={context.theme.text.muted}>↑/↓ or alt+j/alt+k cursor · enter/click toggle</text>
+          <text fg={context.theme.text.muted}>c colour · shift+c centre · d dock</text>
+          <text fg={context.theme.text.muted}>p placement · shift+d disarm</text>
+          <text fg={context.theme.text.muted}>alt+i release · esc hide</text>
+          <text>{" "}</text>
+          <For each={PANEL_ROWS}>
+            {(row, index) => (
+              <text
+                fg={props.cursor === index() ? context.theme.hue.accent[400] : context.theme.text.base}
+                selectable={false}
+                onMouseDown={() => {
+                  props.onCursor(index());
+                  props.onActivate(row);
+                }}
+              >
+                {rowLabel(props, row)}
+              </text>
+            )}
+          </For>
+        </box>
       </box>
     </box>
   );
@@ -356,9 +359,12 @@ export default Plugin.define({
     const [released, setReleased] = createSignal(false);
     const [colorIndex, setColorIndex] = createSignal(0);
     const [cursor, setCursor] = createSignal(0);
-    const [textFocused, setTextFocused] = createSignal(false);
     const [floatX, setFloatX] = createSignal(0.5);
     const [floatY, setFloatY] = createSignal(0.35);
+    // Docked surface only: cell offset of the settings box from the centre of
+    // the host panel, moved with h/j/k/l. The floating surface moves instead.
+    const [dockOffsetX, setDockOffsetX] = createSignal(0);
+    const [dockOffsetY, setDockOffsetY] = createSignal(0);
     const [panelPresentation] = createSignal<PanelPresentation>("panel");
     // Widget disposers, cleared on each re-sync and on plugin teardown.
     const widgetDisposers = new Set<() => void>();
@@ -429,7 +435,6 @@ export default Plugin.define({
       setVisible(true);
       setDocked(nextDocked);
       setReleased(false);
-      setTextFocused(false);
     }
 
     // Disarm the plugin: hide the panel and the indicator.
@@ -438,7 +443,6 @@ export default Plugin.define({
       setVisible(false);
       setDocked(false);
       setReleased(false);
-      setTextFocused(false);
     }
 
     // Show/hide the panel while armed; hides the mode release with it.
@@ -449,7 +453,6 @@ export default Plugin.define({
       const next = !visible();
       if (!next) {
         setReleased(false);
-        setTextFocused(false);
       }
       setVisible(next);
     }
@@ -457,7 +460,6 @@ export default Plugin.define({
     // Switch the shown panel between docked and floating.
     function toggleDock() {
       setDocked((previous) => !previous);
-      setTextFocused(false);
     }
 
     // Advance to the next background colour.
@@ -539,12 +541,26 @@ export default Plugin.define({
         context.ui.router.register({ name: PAGE_NAME, render: () => <PageBody /> }),
       );
 
+      // Set after a refused dock, so the fallback toast fires once per attempt
+      // rather than on every re-run of the effect.
+      let dockFallbackNotified = false;
+
       // Keep the host panel open exactly while the panel is docked and shown.
+      // `panel.open` refuses outside a session route, so fall back to the
+      // floating surface instead of leaving the panel invisible.
       createEffect(() => {
         if (visible() && docked()) {
-          context.ui.panel.open(PANEL_NAME, { presentation: panelPresentation() });
+          const opened = context.ui.panel.open(PANEL_NAME, { presentation: panelPresentation() });
+          if (!opened) {
+            if (!dockFallbackNotified) {
+              dockFallbackNotified = true;
+              context.ui.toast.show({ message: "ui-tester: docked panel needs a session — staying floating" });
+            }
+            setDocked(false);
+          }
           return;
         }
+        dockFallbackNotified = false;
         context.ui.panel.close();
       });
 
@@ -558,16 +574,32 @@ export default Plugin.define({
         onCleanup(pop);
       });
 
-      // Move the floating panel by `dx`/`dy` cells, as a ratio of its range.
+      // Move the settings box by `dx`/`dy` cells.
+      // Docked: shift the box inside the host panel (the panel itself is
+      // host-owned), clamped to half the terminal so it cannot run away.
+      // Floating: move the whole box as a ratio of its movable range.
       function step(dx: number, dy: number) {
+        if (docked()) {
+          const { width, height } = dimensions();
+          const clamp = (value: number, limit: number) =>
+            Math.min(limit / 2, Math.max(-limit / 2, value));
+          setDockOffsetX((value) => clamp(value + dx, width));
+          setDockOffsetY((value) => clamp(value + dy, height));
+          return;
+        }
         const rowsFree = Math.max(1, dimensions().height - FLOAT_HEIGHT);
         const colsFree = Math.max(1, dimensions().width - FLOAT_WIDTH);
         setFloatX((value) => Math.min(1, Math.max(0, value + dx / colsFree)));
         setFloatY((value) => Math.min(1, Math.max(0, value + dy / rowsFree)));
       }
 
-      // Snap the floating panel back to the centre of the screen.
-      function centerFloat() {
+      // Snap the box back to the centre of its surface.
+      function centerBox() {
+        if (docked()) {
+          setDockOffsetX(0);
+          setDockOffsetY(0);
+          return;
+        }
         setFloatX(0.5);
         setFloatY(0.5);
       }
@@ -576,8 +608,11 @@ export default Plugin.define({
       // The toggle, the release, and escape stay `global` so they work in every
       // mode; everything else is scoped to the pushed `ui-tester` mode, so
       // releasing the mode hands the keys back to the prompt.
-      // The rest is also gated by `!textFocused()`, so typing reaches the text
-      // field instead of being swallowed as a command.
+      // Mode keys only fire while the panel is visible; nothing else competes
+      // for them because the pushed mode isolates typing from the prompt.
+      // `h`/`j`/`k`/`l` move the settings box on both surfaces: the host panel
+      // alone is fixed, so docked moves the box inside it. The cursor uses the
+      // arrow keys and `alt+j`/`alt+k`.
       context.keymap.layer(() => ({
         mode: "global",
         priority: 20,
@@ -610,127 +645,115 @@ export default Plugin.define({
           {
             id: "ui-tester.dock",
             bind: "d",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => toggleDock(),
           },
           {
             id: "ui-tester.placement",
             bind: "p",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => cyclePlacement(),
           },
           {
             id: "ui-tester.disarm",
             bind: "shift+d",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => activate("disarm"),
           },
           {
             id: "ui-tester.color",
             bind: "c",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => cycleColor(),
           },
           {
             id: "ui-tester.center",
             bind: "shift+c",
-            enabled: () => visible() && !docked() && !textFocused(),
-            run: () => centerFloat(),
+            enabled: () => visible(),
+            run: () => centerBox(),
           },
           {
             id: "ui-tester.cursor.up.alt",
             bind: "alt+k",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => moveCursor(-1),
           },
           {
             id: "ui-tester.cursor.down.alt",
             bind: "alt+j",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => moveCursor(1),
           },
           {
             id: "ui-tester.cursor.up",
             bind: "up",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => moveCursor(-1),
           },
           {
             id: "ui-tester.cursor.down",
             bind: "down",
-            enabled: () => visible() && !textFocused(),
-            run: () => moveCursor(1),
-          },
-          {
-            id: "ui-tester.cursor.up2",
-            bind: "k",
-            enabled: () => visible() && docked() && !textFocused(),
-            run: () => moveCursor(-1),
-          },
-          {
-            id: "ui-tester.cursor.down2",
-            bind: "j",
-            enabled: () => visible() && docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => moveCursor(1),
           },
           {
             id: "ui-tester.activate",
             bind: "enter",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => activateFocused(),
           },
           {
             id: "ui-tester.activate2",
             bind: "space",
-            enabled: () => visible() && !textFocused(),
+            enabled: () => visible(),
             run: () => activateFocused(),
           },
           {
             id: "ui-tester.move.left",
             bind: "h",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(-1, 0),
           },
           {
             id: "ui-tester.move.down",
             bind: "j",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(0, 1),
           },
           {
             id: "ui-tester.move.up",
             bind: "k",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(0, -1),
           },
           {
             id: "ui-tester.move.right",
             bind: "l",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(1, 0),
           },
           {
             id: "ui-tester.move.left10",
             bind: "shift+h",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(-10, 0),
           },
           {
             id: "ui-tester.move.down10",
             bind: "shift+j",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(0, 10),
           },
           {
             id: "ui-tester.move.up10",
             bind: "shift+k",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(0, -10),
           },
           {
             id: "ui-tester.move.right10",
             bind: "shift+l",
-            enabled: () => visible() && !docked() && !textFocused(),
+            enabled: () => visible(),
             run: () => step(10, 0),
           },
         ],
@@ -757,9 +780,10 @@ export default Plugin.define({
               cornerColor={cornerColor()}
               corners={false}
               cursor={cursor()}
+              offsetX={0}
+              offsetY={0}
               onActivate={activate}
               onCursor={setCursor}
-              onTextFocus={setTextFocused}
             />
           </box>
           <CameraCorners color={cornerColor()} />
@@ -784,9 +808,10 @@ export default Plugin.define({
               cornerColor={cornerColor()}
               corners={true}
               cursor={cursor()}
+              offsetX={dockOffsetX()}
+              offsetY={dockOffsetY()}
               onActivate={activate}
               onCursor={setCursor}
-              onTextFocus={setTextFocused}
             />
           );
         },

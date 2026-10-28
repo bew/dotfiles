@@ -12,6 +12,8 @@ Traps hit while building the local plugins, kept so they are not hit again.
   Putting everything in one global layer leaves the release with nothing to release.
 - `before` and `after` on the `app` slot are silently no-ops: the root has no siblings.
   Use `prepend` or `append`.
+- `ui.panel.open` returns `false` unless the current route is a session.
+  A dock toggle that ignores the return value leaves the panel invisible with no way back to the floating surface.
 - An `app`-slot overlay is positioned against the host main area, which stops above the bottom bars, while `useTerminalDimensions` reports the whole terminal.
   Expect drift near the bottom edge and recompute on resize.
 - Do not install the optional peers (`@opentui/*`, `solid-js`, `@opencode/theme`) just to get types; they can shadow the host instances.
