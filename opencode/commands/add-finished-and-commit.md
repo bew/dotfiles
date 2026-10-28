@@ -3,7 +3,7 @@ description: Draft a commit for the task just finished, scoped to its files. Opt
 subtask: false # shared context!
 ---
 
-FIRST: Load the `committer` skill and follow its instructions.
+Load the `committer` skill and follow its instructions.
 
 - Scope: infer from the session work items.
   If a commit occurred earlier in the session, treat it as the boundary —

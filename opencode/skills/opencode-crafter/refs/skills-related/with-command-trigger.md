@@ -21,7 +21,7 @@ Thin launcher — no extraction, no interpretation of `$ARGUMENTS`.
 The skill load instruction comes first, then the user context block at the end:
 
 `````md
-FIRST: Load the `<skill-name>` skill and follow its instructions.
+Load the `<skill-name>` skill and follow its instructions.
 
 ## User context
 

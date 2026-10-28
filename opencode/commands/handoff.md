@@ -3,7 +3,7 @@ description: Produce a handoff document for this session. Pass any context for t
 subtask: false # shared context!
 ---
 
-FIRST: Load the `handoff` skill and follow its instructions.
+Load the `handoff` skill and follow its instructions.
 
 ## User context
 
