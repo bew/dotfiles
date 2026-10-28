@@ -22,8 +22,24 @@ permissions:
   - {action: webfetch, resource: "*", effect: deny}
   - {action: websearch, resource: "*", effect: deny}
   - {action: shell, resource: "*", effect: deny}
+  # allow common exploration actions
+  - {action: shell, resource: "echo", effect: allow}
+  - {action: shell, resource: "head", effect: allow}
+  - {action: shell, resource: "tail", effect: allow}
+  - {action: shell, resource: "grep", effect: allow}
+  - {action: shell, resource: "rg", effect: allow}
+  - {action: shell, resource: "find", effect: allow}
+  - {action: shell, resource: "ls", effect: allow}
+  - {action: shell, resource: "wc", effect: allow}
+  - {action: shell, resource: "stat", effect: allow}
+  - {action: shell, resource: "file", effect: allow}
+  - {action: shell, resource: "diff", effect: allow}
+  - {action: shell, resource: "jq", effect: allow}
+  - {action: shell, resource: "sort", effect: allow}
+  - {action: shell, resource: "uniq", effect: allow}
   # allow specific git actions
   - {action: shell, resource: "git diff*", effect: allow}
+  - {action: shell, resource: "git ls-files*", effect: allow}
   - {action: shell, resource: "git log*", effect: allow}
   - {action: shell, resource: "git show*", effect: allow}
   - {action: shell, resource: "git status*", effect: allow}
@@ -31,6 +47,9 @@ permissions:
   - {action: shell, resource: "git -C * log*", effect: allow}
   - {action: shell, resource: "git -C * show*", effect: allow}
   - {action: shell, resource: "git -C * status*", effect: allow}
+  - {action: shell, resource: "git -C * grep*", effect: allow}
+  - {action: shell, resource: "git -C * blame*", effect: allow}
+  - {action: shell, resource: "git -C * rev-parse*", effect: allow}
 ---
 
 # Diff Explorer
