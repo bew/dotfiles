@@ -184,6 +184,23 @@ Example (small payload, exact compact match):
 }
 ```
 
+## JSON fixtures
+
+Build interpolated payloads with the `printf -v` single-quoted format from `coder-bash`,
+never with `\"` escapes.
+Skip the helper for a static payload used by one test — single-quote it inline.
+
+Define a `setup_<thing>_payload` helper when more than one test needs the payload:
+```bash
+function setup_profile_payload() {
+    local rev="$1"
+
+    # Global on purpose: the script under test reads it from the environment.
+    printf -v FAKE_PROFILE_JSON '{"profile":{"rev":"%s"}}' "$rev"
+    export FAKE_PROFILE_JSON
+}
+```
+
 ## Running tests
 
 ```bash

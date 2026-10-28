@@ -90,6 +90,27 @@ function validate_input() {
 }
 ```
 
+## Quoting and interpolation
+
+Single-quote literals that need no interpolation — nothing to escape, nothing expands:
+```bash
+payload='{"key":"value"}'
+```
+
+Build an interpolated string with `printf -v` and a single-quoted format
+when the result embeds quotes or other characters you would otherwise escape:
+```bash
+# Bad — escape soup, and a new key means new backslashes
+payload="{\"key\":\"$value\"}"
+
+# Good — single-quoted format, values pass through %s
+printf -v payload '{"key":"%s"}' "$value"
+```
+
+`printf -v` assigns without printing and does not mark the variable exported.
+Inside a function, declare the target `local` — `printf -v` writes a global otherwise.
+Add `export` when the value must reach a child process.
+
 ## Output capture
 
 When capturing command output to a local variable, declare separately from the assignment.
