@@ -7,12 +7,13 @@ settings that apply to every OpenCode session on this machine.
 ## Read first
 
 - `README.md` — overview of this config dir and its local plugin dependencies.
-- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, and tool, with
-  dependency graphs for the complex artefacts and the remaining ones.
+- `MY_AI_STUFF.md` — catalogue of every skill, agent, command, tool, and
+  snippet, with dependency graphs for the complex artefacts and the remaining
+  ones.
 
 ## Maintenance
 
-Whenever you add, remove, or rename a skill, command, or agent, update
+Whenever you add, remove, or rename a skill, command, agent, or snippet, update
 `MY_AI_STUFF.md` to match: its entry (definition link and description) and the
 dependency-graph nodes and edges.
 A catalogue that drifts from reality is worse than none.
@@ -33,7 +34,7 @@ Commit subjects in this directory use a scoped-commit prefix:
 - Scope words are lowercase kebab-case, matching the artefact or subdir name.
 - Use `misc` for small changes with no clear area.
 - When adding a new skill, use the bare prefix with `Init`.
-  (e.g. `oc: Init coder-ts skill`, `oc: Init task-capture-handoff skill for deferred tasks`)
+  (e.g. `oc: Init coder-ts skill`, `oc: Init work-capture-handoff skill for deferred work`)
 
 The `committer` skill's `Phase:Style` derives the prefix from recent `git log`,
 so this is the convention it lands on.
@@ -45,10 +46,11 @@ so this is the convention it lands on.
 - Entries are grouped by topic (Crafting OC artefacts, Coding, Specs & planning,
   Commits, Handoff & session, Writing & issues), then unmatched skills/commands
   fall under `## Miscellaneous`.
-  Tools live under `## Tools & Plugins`, and repo-specific artefacts under
-  `## Repo-specific artefacts`.
+  Tools live under `## Tools & Plugins`, snippets under `## Snippets`, and
+  repo-specific artefacts under `## Repo-specific artefacts`.
 - Each entry is ``- <Type> [`<name>`](<path>) (*<tags>*) — <one-line description>``,
-  where `<Type>` is Skill / Agent / Command / Tool.
+  where `<Type>` is Skill / Agent / Command / Tool / Snippet.
+  A snippet's `<name>` is its trigger, written as `#<filename>`.
 - Tags go in an optional parenthesis right after the link, comma-separated and
   italicised (`*<tags>*`), drawn from the vocabulary below; omit the parenthesis
   when an artefact has no tag.
@@ -82,7 +84,8 @@ The same vocabulary is mirrored in `MY_AI_STUFF.md`'s `Tag legend`.
   the source.
 - Link target by kind: skills and tools point at their directory
   (`./skills/<name>/`, `./plugins/<name>/`); agents and commands point at their
-  file (`./agents/<name>.md`, `./commands/<name>.md`).
+  file (`./agents/<name>.md`, `./commands/<name>.md`); snippets point at
+  `./snippets/<name>.md`.
 - Give in-repo target paths an explicit `./` prefix.
 - Link the names in the compact `Skills by language/tech:` line and in each
   `Variants:` bullet too.
@@ -150,14 +153,16 @@ The same vocabulary is mirrored in `MY_AI_STUFF.md`'s `Tag legend`.
   graph, or `ag_explore_diff` in the remaining graph).
 - Do not add `~~~` invisible links — Mermaid does not honour them.
 - Do not add `classDef` styling for trigger commands; nodes use the default style.
-- The graphs are still a partial view: dotfiles-specific artefacts and third-party
-  plugins are not shown. Keep the intro noting the scope.
+- The graphs are still a partial view: dotfiles-specific artefacts, snippets, and
+  third-party plugins are not shown. Keep the intro noting the scope.
 
 ## Layout
 
 - `skills/<name>/SKILL.md` — skills (some nest sub-skills and `refs/`).
 - `agents/<name>.md` — agents.
 - `commands/<name>.md` — commands.
+- `snippets/<name>.md` — hashtag prompt snippets expanded by the
+  `opencode-snippets` plugin; `#<name>` is the trigger.
 - `plugins/<name>/` — local plugins; their npm deps live in the root
   `package.json` + `bun.lock`, installed by `just update-local-plugins-deps`;
   run their tests with `just test <name>`.

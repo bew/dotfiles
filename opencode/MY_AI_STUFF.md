@@ -1,9 +1,10 @@
 # MY_AI_STUFF
 
-Catalogue of every OpenCode skill, agent, command, and tool in my config, grouped by topic then the rest 🚀
+Catalogue of every OpenCode skill, agent, command, tool, and snippet in my config, grouped by topic then the rest 🚀
 
 > [!NOTE]
 > The catalogue of skills, agents, commands, and tools follows the graphs below.
+> Snippets are listed after the tools; they are prompt fragments, not artefacts, so they stay out of the graphs.
 
 ## Dependency graphs
 
@@ -127,7 +128,9 @@ flowchart LR
     tool_git_track["<b>(tool) git-track-new-file</b>"]
     sk_github_issue["<b>§ write-github-issue</b><br/><i>NoAutoload</i>"]
     sk_draft_gh["<b>§ draft-github-issue-pr</b><br/><i>MultiPhase</i>"]
+    sk_draft_gh_comment["<b>§ draft-github-comment</b><br/><i>MultiPhase</i>"]
     sk_bew_comm_style["<b>§ bew-communication-style</b>"]
+    sk_bew_callout["<b>§ bew-inline-callout-style</b><br/><i>NoAutoload</i>"]
     sk_cav["<b>§ caveman</b>"]
     sk_reflect_frict["<b>§ opencode-reflect-friction</b><br/><i>NoAutoload, Meta</i>"]
     cmd_handoff["<b>/ handoff</b><br/><i>Trigger</i>"]
@@ -139,6 +142,8 @@ flowchart LR
     sk_github_issue -->|needs| sk_bew_comm_style
     sk_draft_gh -->|needs| sk_bew_comm_style
     sk_draft_gh -->|uses| ag_explore_diff
+    sk_draft_gh_comment -->|needs| sk_bew_comm_style
+    sk_draft_gh_comment -->|needs| sk_bew_callout
     sk_draft_gh -. supersedes .-> sk_github_issue
     ag_explore_diff -. loads .-> sk_cav
     sk_handoff -. can load .-> sk_cav
@@ -159,10 +164,10 @@ flowchart LR
     sk_read_man_page["<b>§ read-man-page</b><br/><i>HasScript</i>"]
     sk_text_replace["<b>§ text-replace</b>"]
     sk_work_mode["<b>§ work-mode</b>"]
-    sk_bew_callout["<b>§ bew-inline-callout-style</b><br/><i>NoAutoload</i>"]
   end
 
   subgraph othercmds[Standalone commands]
+    cmd_whats_going_on["<b>/ whats-going-on</b><br/><i>Meta</i>"]
     cmd_why_you["<b>/ why-you</b><br/><i>Meta</i>"]
     cmd_retitle["<b>/ retitle</b>"]
     cmd_dcp_aggressive["<b>/ dcp-compress-aggressive</b>"]
@@ -293,6 +298,12 @@ flowchart LR
   - PR-centric: drafts an issue just-in-time only when the repo requires one before a PR.
   - Uses `bew-communication-style` for voice; delegates diff analysis to `explore-diff`.
 
+- Skill [`draft-github-comment`](./skills/draft-github-comment/) (*MultiPhase*) — Drafts a comment on an existing GitHub issue, PR, or discussion in my voice, in `support` / `evidence` / `clarify` mode, and publishes only on `publish` or `send it`.
+
+  - Phases: Thread → Draft → Publish.
+  - Reads the whole thread first, and stops when the point is already covered.
+  - Keeps the draft in a file; loads `bew-communication-style` and `bew-inline-callout-style` for voice and markers.
+
 - Skill [`write-github-issue`](./skills/write-github-issue/) (*NoAutoload*) — Legacy issue-only drafter, kept for comparison; superseded by `draft-github-issue-pr`.
 
   Uses `bew-communication-style` for voice and tone. Auto-trigger removed from its description.
@@ -310,6 +321,7 @@ flowchart LR
 - Skill [`read-man-page`](./skills/read-man-page/) (*HasScript*) — Token-efficient incremental man page reading via its `manq` script.
 - Skill [`text-replace`](./skills/text-replace/) — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
 - Skill [`work-mode`](./skills/work-mode/) — Controls agent workflow: One unit at a time with hard stops; either execution units or read-only walkthrough slices.
+- Command [`/whats-going-on`](./commands/whats-going-on.md) (*Meta*) — Status report on current findings and in-flight work, then resume the interrupted work.
 - Command [`/why-you`](./commands/why-you.md) (*Meta*) — Reflect on the root cause of a decision, without acting.
 - Command [`/retitle`](./commands/retitle.md) — Auto-retitle the current session from the conversation.
 - Command [`/dcp-compress-aggressive`](./commands/dcp-compress-aggressive.md) — Aggressively shrink context by collapsing blocks into one lean summary.
@@ -329,10 +341,32 @@ flowchart LR
 
   Reads `CredentialEntry.label` (never the secret); refreshes on `credential.updated`, `credential.switched`, and `integration.updated`.
 
+- Tool [`stash-count`](./plugins/stash-count/) — Local TUI plugin; shows the OpenCode prompt-stash count in the prompt footer and home screen, hidden unless the current TUI has stashed prompts of its own.
+
+  Reads `prompt-stash.jsonl` from the OpenCode state directory and watches its parent directory; no stash API exists in the TUI plugin context, so visibility comes from the host's `prompt.stash.list` command instead of the shared file.
+
 ### Important third-party plugins
 
 - `@tarquinen/opencode-dcp` — Dynamic Context Pruning: manages context dynamically to optimize tokens for long sessions (smarter than simple summarization).
 - `opencode-snippets` — In-prompt hashtag-based snippet expansion (e.g. `#editedstuff`); used heavily!
+
+## Snippets
+
+Hashtag prompt fragments expanded in place by the `opencode-snippets` plugin; the trigger is `#<filename>` and the source is [`snippets/`](./snippets/).
+Several wrap their text in `<prepend>` so the note lands ahead of the prompt instead of reading as part of my request.
+Injection recency is set to 3 messages in [`snippets/config.jsonc`](./snippets/config.jsonc).
+
+- [`#editedstuff`](./snippets/editedstuff.md) — Warns that I changed files; re-read recent edits and respect them (prepend). Used heavily.
+- [`#editedthis`](./snippets/editedthis.md) — Same warning, for the 1+ files I name after the snippet.
+- [`#tell-more`](./snippets/tell-more.md) — Asks for an inline explanation of the last answer.
+- [`#whats-next`](./snippets/whats-next.md) — Asks for the next step.
+- [`#anything-left`](./snippets/anything-left.md) — Asks what is left in this session only, ignoring deferred items.
+- [`#build-mode-now`](./snippets/build-mode-now.md) — Asserts that BUILD mode (write permission) applies from now on.
+- [`#forked`](./snippets/forked.md) — Warns that the session was forked and the topic changes (prepend).
+- [`#reloaded`](./snippets/reloaded.md) — Warns that skills and other OC artefacts were reloaded (prepend).
+- [`#updated`](./snippets/updated.md) — Warns that the environment was updated (prepend).
+- [`#handled-forget-now`](./snippets/handled-forget-now.md) — Declares an item handled elsewhere, so drop it.
+- [`#hello`](./snippets/hello.md) — Smoke test: greets me.
 
 ## Repo-specific artefacts
 
