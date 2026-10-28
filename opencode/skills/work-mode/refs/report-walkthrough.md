@@ -1,6 +1,6 @@
 # Walkthrough report
 
-Written at the stop of a walkthrough slice, or when showing a slice plan.
+Written at the stop of a walkthrough slice, at a slice plan, or at a phase gate.
 
 Short sentences, one idea each.
 Use bullets for anything enumerable.
@@ -43,6 +43,16 @@ The opening and closing lines follow the template.
   On the last slice, it says what the walkthrough did not cover, and drops the continue invitation.
 - A slice that yields before it is explained closes by naming the same slice and what is left of
   it, never the following slice.
+- At a phase gate, the report closes on the phase's exit signal instead of the next slice.
+  These phase rules override the last-slice and yield rules above.
+  The report says the mode ends with the phase, in one sentence.
+  That sentence is never a question and never restates the gate's invitation.
+  A phase with no exit signal closes on the normal rules, and still says the mode ends with the
+  phase.
+  When the signal is a choice question or a confirmation, the skill's own emission, with any
+  prelude it requires, follows the report, and the report never restates it.
+- At a phase gate reached with a slice unfinished, the explanation names that slice and says it is
+  dropped.
 
 ## Slice plan
 
