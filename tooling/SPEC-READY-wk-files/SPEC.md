@@ -4,7 +4,9 @@
 
 A devtree project accumulates planning material as plain markdown.
 
-Task notes sit at the project root as `TASK-<timestamp>-<slug>.md`, handoff documents as `HANDOFF-<date>-<slug>.md`, and larger pieces of work live in spec directories seeded and moved by `manage-spec`, each holding a `DISCOVERY.md`, a `SPEC.md`, and one `EXPLO-<topic>.md` per exploration topic.
+Task notes sit at the project root as `TASK-<slug>.md`, idea notes and bug reports as `IDEA-<slug>.md` and `BUG-<slug>.md`, handoff documents as `HANDOFF-<slug>.md`, and larger pieces of work live in spec directories seeded and moved by `manage-spec`, each holding a `DISCOVERY.md`, a `SPEC.md`, and one `EXPLO-<topic>.md` per exploration topic.
+
+A date segment in a capture name, as in `TASK-20261001T1110-fix-parser.md`, is the legacy form that older files still carry; the timestamp now lives in the file's frontmatter.
 
 Every one of those files declares what it is in its filename and where it stands in the first line of its H1 heading.
 
@@ -28,12 +30,13 @@ The two backends stay separate on purpose.
 `wk` keeps wrapping `bd` and stays unaware of this addition, so file-backed management ships as a command of its own instead of a namespace inside the beads frontend.
 A unified surface over both stores is a plausible future, and deliberately not this spec.
 
-Scope is one project at a time: the project reachable from the current directory.
+Scope is one project at a time: the tree of the project reachable from the current directory.
+A listing starts where the caller stands and widens to the project root on request, while an id names its item from anywhere in the project.
 Cross-devtree listing, and any synchronisation between the two stores, are out of scope.
 
 ## Naming & IDs
 
-Four kinds exist: `task`, `handoff`, `spec`, and `explo`.
+The kinds are `task`, `handoff`, `idea`, `bug`, `spec`, and `explo`.
 An id names one item: `[kind]:[name]` or `[kind]:[name]:[part]`.
 
 The walk is the scan an item comes from: it starts at the nearest git root and descends recursively.
@@ -41,17 +44,23 @@ Placement / Scope defines exactly what it skips.
 
 | Kind | Artefact | Id |
 |------|----------|-----|
-| `task` | `TASK-<date>-<slug>.md` anywhere under the walk | `task:fix-parser` |
-| `handoff` | `HANDOFF-<date>-<slug>.md` anywhere under the walk | `handoff:beads-shared-server` |
+| `task` | `TASK-<slug>.md` anywhere under the walk | `task:fix-parser` |
+| `handoff` | `HANDOFF-<slug>.md` anywhere under the walk | `handoff:beads-shared-server` |
+| `idea` | `IDEA-<slug>.md` anywhere under the walk | `idea:ask-for-each-mode` |
+| `bug` | `BUG-<slug>.md` anywhere under the walk | `bug:parser-drops-eof` |
 | `spec` | `SPEC-DRAFT-<slug>/`, `SPEC-READY-<slug>/`, `SPEC-KO-<slug>/`, or legacy `_SPECS/<slug>/` | `spec:wk-files` |
 | `spec` | that spec's `EXPLO-BRIEF.md` | `spec:wk-files:explo` |
 | `explo` | a standalone `EXPLO-<slug>.md` outside any spec directory | `explo:devtree-hook` |
 
-The name drops three things: the kind prefix, one leading date or timestamp token, and the `.md` suffix.
-`TASK-20261001T1110-fix-parser.md` is `task:fix-parser`, not `task:TASK-20261001T1110-fix-parser` and not `task:20261001T1110-fix-parser`: the kind token already carries the type, and a date is metadata rather than identity.
+The name drops three things: the kind prefix, an optional leading date or timestamp token, and the `.md` suffix.
+`TASK-fix-parser.md` is `task:fix-parser`, and so is the legacy `TASK-20261001T1110-fix-parser.md`: the kind token already carries the type, and a date is metadata rather than identity.
 
-The date is kept as metadata — parse `20261001T1110` and `20260920` down to the calendar day, discard the time, and expose it on `show`.
-It does not order any listing; a listing is grouped by status and then sorted by kind and name.
+The timestamp comes from the `created-at` field of the frontmatter block a capture opens with, falling back to a leading date token in a legacy name.
+Parse `20261001T1110` and `20260920` down to the calendar day, discard the time, and expose it on `show`.
+When a legacy name and a block disagree, the block wins; the filename token is read only when the block is absent.
+
+The timestamp orders rows, but never decides a status or a section: rows sort by status, then by directory, then by `created-at` newest first, then by name.
+An item with neither a block nor a date token sorts after the others in its directory, keeping name order among its peers.
 
 A spec id is its slug and survives everything the lifecycle does to it — the `DISCOVERY.md` to `SPEC.md` carrier change, and the directory moves between the draft, ready, and retired prefixes.
 Path, carrier, and status change; the id does not.
@@ -82,92 +91,201 @@ Slug uniqueness is a corpus invariant, not a lookup strategy: within one kind, n
 A duplicate reaches the user as an error naming every colliding path, and the repair is a rename by hand — e.g. two `SPEC-<slug>/` directories, or a slug present in both `_SPECS/<slug>/` and `SPEC-DRAFT-<slug>/`, which `manage-spec migrate` resolves.
 
 It is fatal only where it can affect the answer.
-A `--type` filter that excludes the colliding kind, or a query that never names those items, runs normally; an unfiltered `ls`, or any id resolving to the shared slug, fails instead of returning an answer it cannot name honestly.
+A `--type` filter that excludes the colliding kind, or a query that never names those items, runs normally; an unfiltered listing, or any id resolving to the shared slug, fails instead of returning an answer it cannot name honestly.
 So a listing never prints two rows under one id, and a corpus with a duplicate stays usable everywhere the duplicate is irrelevant.
 
 ## Interface / How to use
 
-`wkf` exposes queries at the top level and every mutation under `do`.
+`wkf` exposes the listing verbs and the item verbs at the top level, and every mutation under `do`.
+
+The listings answer different questions: `status` curates and groups, `ls` lists everything outside the archive.
 
 ```console
 $ wkf --help
 Usage: wkf <command> [options]
 
 COMMANDS:
-  ls                     list items
+  status                 grouped listing, the default view
+  ls                     flat listing, archived excluded
   draft|ready|claimed|done|abandoned
-                         list one status group (ls --filter sugar)
+                         list one status group (status --filter sugar)
   show <id|path>         report one item
   do <action> <id|path>  apply a mutation
 
 OPTIONS:
+  --by-dir               group by directory first (status default)
+  --by-status            group by status first (status only)
   --filter <tokens>      draft, ready, claimed, done, abandoned, archived; prefix `+` to add
-  --type <kinds>         comma-separated: task, handoff, spec, explo
+  --type <kinds>         comma-separated: task, handoff, idea, bug, spec, explo
+  --all                  list from the project root instead of the current directory
   --json                 machine-readable output (any command)
 
 actions: claim, finish, abandon, undo, reset, archive
 ```
 
+Both listings show the invocation directory and everything below it, and `--all` widens that to the whole project.
+The item commands ignore the current directory, so an id or a path names the same item from anywhere in the project.
+Scope is a listing concern; see Placement / Scope for the tree itself.
+
+### `status`
+
+Bare `wkf status` answers "what is where": it groups by directory, and each directory holds its items under status headings.
+
+Both levels always print, even when a directory holds a single group, so a heading never hides the shape of the answer.
+Every heading names its axis, `Dir: <label>` for a directory section and `Status: <group>` for a status section, on both levels and on both axes.
+A section's body sits one rail deeper than its heading: an outer heading starts at the margin, the inner headings under it start with `│ `, and the tables under those start with `│ │ `.
+Two inner sections are separated by a `├───` junction line, whose length reaches the body depth of the section that follows.
+Outer sections are separated by a blank line, and the output opens and closes with one.
+
+```console
+$ wkf status
+
+Dir: Current dir
+│ Status: ready
+│ │ ID                               STATUS  CREATED
+│ │ spec:cross-devtree-task-routing  READY   2026-10-14
+│ │ task:promote-devtree-tooling     READY   2026-09-30
+├───
+│ Status: claimed
+│ │ ID               STATUS   CREATED
+│ │ task:fix-parser  CLAIMED  2026-10-05
+├───
+│ Status: draft
+│ │ ID                STATUS  CREATED
+│ │ task:draft-notes  -       2026-09-30
+
+Dir: ./tooling
+│ Status: claimed
+│ │ ID             STATUS   CREATED
+│ │ spec:wk-files  CLAIMED  -
+
+elsewhere: 2 ready, 5 draft · not archived: 3 done, 2 abandoned · archived: 1 done, 4 abandoned
+
+```
+
+The default selection is the live groups: `draft`, `ready`, and `claimed`.
+
+`--by-dir` is the default axis and `--by-status` swaps them:
+```console
+$ wkf status --by-status
+
+Status: ready
+│ Dir: Current dir
+│ │ ID                               STATUS  CREATED
+│ │ spec:cross-devtree-task-routing  READY   2026-10-14
+│ │ task:promote-devtree-tooling     READY   2026-09-30
+
+Status: claimed
+│ Dir: Current dir
+│ │ ID               STATUS   CREATED
+│ │ task:fix-parser  CLAIMED  2026-10-05
+├───
+│ Dir: ./tooling
+│ │ ID             STATUS   CREATED
+│ │ spec:wk-files  CLAIMED  -
+
+Status: draft
+│ Dir: Current dir
+│ │ ID                STATUS  CREATED
+│ │ task:draft-notes  -       2026-09-30
+
+```
+
+A status section keeps the same order whether it is outer or inner: `ready`, `claimed`, `draft`, then `done` and `abandoned` when a filter selects them.
+The order does not depend on which axis is outer, so the two views agree row for row.
+
+A directory section is the item's immediate parent directory, with no roll-up: no merging a chain of single-child directories, and a spec groups under the parent of its spec directory, so `tooling/SPEC-DRAFT-wk-files/SPEC.md` sits under `tooling`.
+Directory sections appear in ascending order of their root-anchored path, so a listing reads top-down through the tree.
+
+A directory heading reads `Dir: ` followed by the directory named with as little decoration as possible: `Current dir` for the directory `wkf` was invoked in, `Project root` for the root (when the current directory is the root, or when `--all` reached it), and `./<path>` for every other directory, the leading `./` marking it as a path below the root.
+
+The status column carries the raw tag, never a group name, so a row says which tag put it in its section.
+
 ### `ls`
 
-Bare `wkf ls` lists work that is in flight or waiting: the `draft`, `ready`, and `claimed` groups, each under its own heading with a table under it.
+`ls` answers "what is there" with one flat table and no headings.
+
+It has no default selection: every item in scope appears, terminal work included, so a row is either present or excluded by an explicit token.
+The only thing it leaves out is the archive, which `--filter archived` reaches like any other selection.
 
 ```console
 $ wkf ls
-ready
-  ID                             STATUS  DATE
-  spec:cross-devtree-task-routing READY   2026-10-14
-  task:promote-devtree-tooling   READY   2026-09-30
-
-claimed
-  ID                STATUS
-  spec:wk-files     CLAIMED
-  task:fix-parser   CLAIMED
-
-draft
-  ...
-
-3 done, 2 abandoned not yet archived; archived: 1 done, 4 abandoned
+ID                               STATUS   DIR       CREATED
+spec:cross-devtree-task-routing  READY    /         2026-10-14
+task:promote-devtree-tooling     READY    /         2026-09-30
+task:fix-parser                  CLAIMED  /         2026-10-05
+spec:wk-files                    CLAIMED  /tooling  -
+task:draft-notes                 -        /         2026-09-30
+task:old-thing                   DONE     /         2026-08-11
 ```
 
-Finished and retired work is hidden, and the last line counts it: the `done` and `abandoned` items still in the project but not yet archived, then the same two categories under `.ARCHIVED/`.
-Splitting the line that way keeps archiving visible as outstanding work: those items are over, but not yet filed.
-The footer is phrased in groups rather than tags, because the tag that produced a `done` item differs by kind and the count does not.
-The footer appears only when something was hidden.
+Rows sort by status in group order, then by directory, then by `created-at` newest first, then by name.
+Reading the table top to bottom therefore walks the same sequence `status` uses, with the headings removed and the directory promoted into its own column.
 
-The status column carries the raw tag, never a group name, so a row says which tag put it in its section.
+`ls` takes one optional positional token naming a group, which is `--filter` with that value:
+```console
+$ wkf ls ready          # same as: wkf ls --filter ready
+```
+
+### Closers
+
+`status` closes with one line of labelled segments, in a fixed order, carrying only the segments that apply to it:
+
+```console
+elsewhere: 2 ready, 5 draft · not archived: 3 done, 2 abandoned · archived: 1 done, 4 abandoned
+```
+
+`elsewhere` counts what the scope excludes — the items above the invocation directory — per selected group, in
+the section order, omitting groups with nothing there.
+It is scope information, not a hidden state: those items exist and a wider run would show them.
+Archived work is never part of it.
+
+`not archived` counts the terminal items still in the project, so the segment's job is reminding that
+archiving is outstanding.
+
+`archived` counts the work already filed under `.ARCHIVED/`, in the same two groups, so the archive stays
+visible without ever being listed.
+
+A segment with nothing to count is dropped, and the line disappears when all three are empty.
+A flat `ls` prints no closer at all: it lists every non-archived item in scope, so a count would restate rows already on screen.
 
 ### Filters
 
 `--filter` takes a comma-separated list of tokens and prints only what they select.
+It works the same way on both listings; the only difference is how the result is presented.
 An unknown token exits non-zero and lists the valid ones.
 
 ```console
+$ wkf status --filter ready,claimed
 $ wkf ls --filter ready,claimed
-$ wkf ready   # same as: wkf ls --filter ready
+$ wkf ready   # same as: wkf status --filter ready
 ```
 
 The tokens are `draft`, `ready`, `claimed`, `done`, `abandoned`, and `archived`.
-The first five are status groups; `archived` is a location filter selecting everything under `.ARCHIVED/`, finished and retired items alike.
+Every token but `archived` names a status group; `archived` is a location filter selecting everything under `.ARCHIVED/`, done and abandoned items alike.
+No listing reaches the archive unless a token selects it, so archived items never appear as rows on their own, in tables or in JSON.
+The closing line counts them; it never lists them.
 `started` is accepted as an alias for `claimed`, so output and filters read the same whether a caller learned the older vocabulary or the current one.
 
 There is no `implemented` token: no artefact carries that state any more, and `done` is the only name for a shipped item.
 
-A plain list replaces the default set, so `--filter done` shows finished work and nothing else.
-Prefixing a token with `+` adds it to the default set instead:
+A plain list replaces the base selection, so `--filter done` shows finished work and nothing else.
+The base differs by verb — the live groups for `status`, every non-archived item for `ls` — and prefixing a token with `+` adds to it instead:
 ```console
-$ wkf ls --filter +done          # the default set + done items (not-archived)
-$ wkf ls --filter +archived      # the default set + archived items
-$ wkf ls --filter +done,+archived
+$ wkf status --filter +done          # live groups + done items
+$ wkf status --filter +archived      # live groups + archived items
+$ wkf ls --filter +archived          # everything + archived items
 ```
 
-`--type` takes a comma-separated list of kinds — `task`, `handoff`, `spec`, `explo` — and narrows by what an
+`--type` takes a comma-separated list of kinds — `task`, `handoff`, `idea`, `bug`, `spec`, `explo` — and narrows by what an
 item is rather than by where it stands.
-The two filters compose, so `wkf ls --type spec --filter ready` is "specs awaiting work".
+The two filters compose, so `wkf status --type spec --filter ready` is "specs awaiting work".
+The selection is computed once and drives the whole answer, including the `elsewhere` counts: narrowing by type never
+leaves a count describing items the tables cannot show.
 
 ```console
 $ wkf ls --type spec
-$ wkf ls --type task,handoff
+$ wkf status --type task,handoff
 ```
 
 The group verbs exist for the questions actually asked; they are sugar over one lookup, not a second code path.
@@ -185,11 +303,23 @@ id:      task:fix-parser
 kind:    task
 status:  CLAIMED
 groups:  claimed
-date:    2026-10-05
-path:    tasks/TASK-20261005T0900-fix-parser.md
+created: 2026-10-05
+path:    /TASK-fix-parser.md
 ```
 
-A spec also lists the parts it holds:
+`depends-on` follows `created` when the block names one:
+```console
+$ wkf show task:wire-up
+id:         task:wire-up
+kind:       task
+status:     READY
+groups:     ready
+created:    2026-09-20
+depends-on: task:deep-modules
+path:       /TASK-wire-up.md
+```
+
+A spec carries neither field and lists the parts it holds instead:
 ```console
 $ wkf show spec:wk-files
 id:      spec:wk-files
@@ -197,13 +327,15 @@ kind:    spec
 status:  DRAFT
 groups:  draft
 parts:   explo, spec
-path:    SPEC-DRAFT-wk-files/SPEC.md
+path:    /tooling/SPEC-DRAFT-wk-files/SPEC.md
 ```
 
 `status` is the raw leftmost tag and prints `-` when the artefact carries none; `groups` is a list because a brief matches two groups at once, and a handoff has a group without ever having a tag.
 
+`depends-on` is echoed as the file writes it, and `wkf` neither resolves nor enforces it.
+
 `parts` names the artefacts present in the spec directory — `discovery`, `spec`, `explo` — so the caller sees what exists without a second listing.
-The path already points at the carrier in use, so `show` does not repeat it as a separate field.
+The path points at the carrier in use, printed as one root-anchored location; the structured form splits that same location into a directory and the remainder below it.
 
 ### `do`
 
@@ -211,10 +343,10 @@ Every mutation is a `do` action, applied to one or more items in the order given
 
 ```console
 $ wkf do claim task:fix-parser
-task:fix-parser: CLAIMED (was open)
+task:fix-parser: CLAIMED (was -)
 
-$ wkf do claim spec:wk-files
-spec:wk-files: CLAIMED (was READY)
+$ wkf do claim spec:beads-shared-server
+spec:beads-shared-server: CLAIMED (was -)
 
 $ wkf do finish task:fix-parser task:other task:rest
 task:fix-parser: DONE (was CLAIMED)
@@ -246,7 +378,7 @@ A spec carrying a `wkf` marker stays outside `manage-spec`'s reach until a `rese
 `archive` files a terminal item away, and deletes nothing:
 ```console
 $ wkf do archive task:old-thing
-task:old-thing: archived to .ARCHIVED/done/ (was DONE)
+task:old-thing: archived to /.ARCHIVED/done/ (was DONE)
 ```
 
 `started` and `finished` are accepted as aliases for `claim` and `finish`.
@@ -255,16 +387,21 @@ See Write Invariants for what each action may touch.
 
 ## Status Model
 
-Three vocabularies feed one set of groups.
+Separate vocabularies feed one set of groups.
 The file owner writes the tag; `wkf` only maps it.
 
 | Kind | On disk | Group |
 |------|---------|-------|
-| task | no tag | draft |
-| task | `[READY]` | ready |
-| task | `[CLAIMED]` | claimed |
-| task | `[DONE]` | done |
-| task | `[ABANDONED]` | abandoned |
+| task, idea | no tag | draft |
+| task, idea | `[READY]` | ready |
+| task, idea | `[CLAIMED]` | claimed |
+| task, idea | `[DONE]` | done |
+| task, idea | `[ABANDONED]` | abandoned |
+| bug | no tag | draft |
+| bug | `[CONFIRMED]` | ready |
+| bug | `[FIXING]` | claimed |
+| bug | `[FIXED]` | done |
+| bug | `[WONTFIX]` | abandoned |
 | handoff | no status convention at all | ready |
 | spec | `DISCOVERY`, `EXPLO`, `DRAFT`, `MAYBE-READY` | draft |
 | spec | `READY` | ready |
@@ -277,6 +414,32 @@ absence of a tag means waiting for work rather than unfinished material.
 
 `maybe-ready` belongs to `draft` rather than `ready`, because a proposal not yet accepted for work is still
 draft material.
+
+### Bug vocabulary
+
+A bug reports something broken, so its tags name the repair rather than the generic work states.
+
+| On disk | Group | Task alias |
+|---------|-------|------------|
+| no tag | draft | — |
+| `[CONFIRMED]` | ready | `[READY]` |
+| `[FIXING]` | claimed | `[CLAIMED]` |
+| `[FIXED]` | done | `[DONE]` |
+| `[WONTFIX]` | abandoned | `[ABANDONED]` |
+
+An untagged bug is open and untriaged: it has been reported, not accepted for work.
+`[CONFIRMED]` means someone reproduced or otherwise accepted it, and like `[READY]` it belongs to the
+reporter or triage rather than to `wkf`.
+
+`wkf` writes only the bug tags: `claim` prepends `[FIXING]`, `finish` `[FIXED]`, and `abandon`
+`[WONTFIX]`.
+It accepts the task tags on read as aliases, so a bug a human tagged `[CLAIMED]` still reports as
+claimed, but no action ever writes that spelling onto a bug.
+The reverse does not hold: `[FIXING]` and its siblings are not status tags on a task or an idea.
+
+Ownership stays kind-scoped.
+`reset` and `undo` remove only the tags `wkf` wrote for that kind — the bug tags on a bug, the task
+tags on a task or an idea — and never touch `[CONFIRMED]`, which no action owns.
 
 ### Two writers, one heading
 
@@ -324,25 +487,28 @@ The groups are `draft`, `ready`, `claimed`, `done`, and `abandoned`.
 `archived` is not a group: it selects by where an item lives (`.ARCHIVED/`), not by what state it is in.
 
 The tool's vocabulary has one name per end state, which is `done`, whatever tag produced it.
-A task reaches it by `[DONE]` and a spec by the `[DONE]` marker `wkf` prepends, so the mapping is uniform and no second end-state name exists.
+A task or idea reaches it by `[DONE]`, a bug by `[FIXED]`, and a spec by the `[DONE]` marker `wkf` prepends.
+Abandonment works the same way: `[ABANDONED]` on a task or idea, `[WONTFIX]` on a bug.
+The tag spelling varies by kind, but the group does not, so no second end-state name exists.
 
 ## Write Invariants
 
 ### What may be written
 
-Tasks accept every action.
-Specs accept `claim`, `finish`, `undo`, `reset`, and `archive`, the five that add or remove a `wkf`-owned marker without rewriting the tag `manage-spec` wrote.
+Tasks, ideas, and bugs accept every action.
+Specs accept `claim`, `finish`, `undo`, `reset`, and `archive`, the actions that add or remove a `wkf`-owned marker without rewriting the tag `manage-spec` wrote.
 
 Specs never accept `abandon`: retirement is a lifecycle state, `manage-spec abandoned` writes it, and the directory then stays where it is until the item is archived.
 Naming `manage-spec` rather than writing an abandonment tag keeps the spec's own vocabulary single-authored.
 
-Handoffs define no status, legacy specs are on their way out, and exploration status lives in a brief index owned by the exploration workflow, so all three refuse every action.
+Handoffs define no status, legacy specs are on their way out, and exploration status lives in a brief index owned by the exploration workflow, so each refuses every action.
 Each refusal names the owner rather than failing silently.
 
 ### Transitions
 
 A transition prepends a tag and leaves the existing ones in place.
-`claim` writes `[CLAIMED]`, `finish` writes `[DONE]`, and `abandon` writes `[ABANDONED]`.
+On a task or idea `claim` writes `[CLAIMED]`, `finish` writes `[DONE]`, and `abandon` writes
+`[ABANDONED]`; on a bug the same actions write `[FIXING]`, `[FIXED]`, and `[WONTFIX]`.
 
 ```md
 # [READY] Fix the parser                 # wkf do claim
@@ -352,14 +518,16 @@ A transition prepends a tag and leaves the existing ones in place.
 
 A spec follows the same shape, with its `manage-spec` tag at the bottom of the stack and untouched.
 
-`reset` is not a transition but a removal: it drops every tag `wkf` wrote — `[CLAIMED]`, `[DONE]`, `[ABANDONED]` — and leaves whatever was underneath.
+`reset` is not a transition but a removal: it drops every tag `wkf` wrote for that kind — `[CLAIMED]`,
+`[DONE]`, `[ABANDONED]` on a task or idea; `[FIXING]`, `[FIXED]`, `[WONTFIX]` on a bug — and leaves
+whatever was underneath.
 
 ```md
 # [DONE] [CLAIMED] [READY] wk-files — File-backed work items   # wkf do reset
 # [READY] wk-files — File-backed work items
 ```
 
-`undo` is the same removal one step deep: it drops the leftmost tag when `wkf` owns it, leaving the next one in its place.
+`undo` is the same removal one step deep: it drops the leftmost tag when `wkf` owns it for that kind, leaving the next one in its place.
 
 ```md
 # [DONE] [CLAIMED] [READY] wk-files — File-backed work items   # wkf do undo
@@ -380,7 +548,7 @@ An action refuses rather than no-ops, and a refusal exits non-zero.
 - `finish` refuses an item already done or abandoned.
 - `abandon` refuses an item already abandoned or done.
 - `finish` on a never-claimed item is allowed, and warns that the claim trail is missing.
-- `reset` refuses an item carrying no `wkf` tag, since there is nothing to clear.
+- `reset` refuses an item carrying no `wkf` tag for its kind, since there is nothing to clear.
 - `undo` refuses an item whose leftmost tag is not `wkf`-owned, naming the owner of the tag that is there, so a spec's lifecycle tag is never removed by the wrong tool.
 - `undo` refuses more than one id as a usage error rather than acting on the first.
 - Every action refuses an archived item: the archive is read-only, and getting something back out is a manual move.
@@ -389,7 +557,7 @@ An action refuses rather than no-ops, and a refusal exits non-zero.
 ### Archiving
 
 `archive` accepts a terminal item — `done` or `abandoned` — and moves it under the walk root, to `<root>/.ARCHIVED/<group>/`.
-A task moves as its file; a spec moves with its directory and its tags untouched, so the whole artefact travels together.
+A task, idea, or bug moves as its file; a spec moves with its directory and its tags untouched, so the whole artefact travels together.
 
 Nothing is deleted, so there is no confirmation prompt and no `--force`.
 An item still `draft`, `ready`, or `claimed` refuses, which keeps archiving from becoming the shortcut past a status the user cares about; `abandon` remains the deliberate way to retire work that will not be finished.
@@ -416,28 +584,79 @@ An item appears in the same shape everywhere:
   "kind": "task",
   "status": "CLAIMED",
   "groups": ["claimed"],
-  "date": "2026-10-05",
-  "path": "tasks/TASK-20261005T0900-fix-parser.md"
+  "created": "2026-10-05",
+  "depends-on": ["task:deep-modules"],
+  "dir": "/",
+  "subpath": "TASK-fix-parser.md"
 }
 ```
 
 `status` is the raw leftmost tag, `null` when the artefact carries none, and `groups` is always a list because a brief matches two groups at once.
-A spec additionally carries `parts`, and a brief carries no `date`.
+`dir` is the directory holding the item, anchored at the project root: `/` for one at the root, `/tasks` for a directory below it.
+`subpath` is what sits below `dir` — the filename for a task, the spec directory and its carrier for a spec — so `dir` plus `/` plus `subpath` is the full location and neither field repeats the other.
+They are not halves of a naive split: a spec's `dir` is the parent of its spec directory, while the spec directory itself sits inside `subpath`.
+The directory heading labels `Current dir` and `Project root` are presentation for `dir`, so they never reach a script.
+A spec additionally carries `parts`; a brief carries no `created`, and any item carries `depends-on` only when the file names one.
 
 ### `ls --json`
 
 ```json
+{ "items": [] }
+```
+
+The list is the whole answer: `ls` hides nothing, so no closing facts travel beside it.
+Each item carries its `dir` and `subpath`, so a client can sort or regroup the table without re-deriving paths.
+
+### `status --json`
+
+The grouped answer nests in the order it prints, one shape per axis, and adds the facts its human closing line reports.
+
+By directory, the default:
+```json
 {
-  "items": [],
+  "dirs": [
+    {
+      "dir": "/",
+      "statuses": [
+        { "status": "ready", "items": [] },
+        { "status": "claimed", "items": [] },
+        { "status": "draft", "items": [] }
+      ]
+    },
+    { "dir": "/tooling", "statuses": [ { "status": "claimed", "items": [] } ] }
+  ],
   "hidden": {
     "project": { "done": 3, "abandoned": 2 },
     "archived": { "done": 1, "abandoned": 4 }
-  }
+  },
+  "elsewhere": [ { "status": "ready", "count": 2 }, { "status": "draft", "count": 5 } ]
 }
 ```
 
-`hidden` is the footer's distinction in structured form: `project` counts terminal items still awaiting an archive, `archived` counts the ones already filed.
-A script therefore learns that housekeeping is outstanding without a second query.
+`--by-status` swaps the two levels and nothing else:
+```json
+{
+  "statuses": [
+    { "status": "ready", "dirs": [ { "dir": "/", "items": [] } ] },
+    { "status": "claimed", "dirs": [ { "dir": "/", "items": [] }, { "dir": "/tooling", "items": [] } ] },
+    { "status": "draft", "dirs": [ { "dir": "/", "items": [] } ] }
+  ],
+  "hidden": {
+    "project": { "done": 3, "abandoned": 2 },
+    "archived": { "done": 1, "abandoned": 4 }
+  },
+  "elsewhere": [ { "status": "ready", "count": 2 }, { "status": "draft", "count": 5 } ]
+}
+```
+
+Both nesting arrays keep the printed order, and a group with no items is not emitted.
+
+`hidden` is the closing line's second and third segments in structured form: `project` counts the terminal items the selection left in the project, `archived` counts the same under `.ARCHIVED/`, and each half keeps `done` and `abandoned` apart.
+
+`elsewhere` is the first segment: the out-of-scope counts as `status` and `count` pairs, in section order, omitting groups with nothing there, and empty when the scope already covers the project.
+It exists because a script running in a subdirectory otherwise has no way to know that the project holds more work than the answer shows.
+
+`ls --json` carries neither key: it lists every item in scope, so there is no hidden state to report, and the archive it excludes is a destination the caller asks for rather than a count to chase.
 
 ### `show --json`
 
@@ -471,7 +690,7 @@ One item object, with no wrapper.
 }
 ```
 
-`archive` adds the destination `path` the item now lives at, and `undo` and `reset` report the tag they uncovered as `to`.
+`archive` adds the destination as the same `dir` and `subpath` pair an item carries, and `undo` and `reset` report the tag they uncovered as `to`.
 The array length always matches the number of ids given, so a caller pairs inputs and results by position and never has to infer where a run stopped.
 
 ### Errors
@@ -488,13 +707,26 @@ A caller reads the exit code for success and the object for the reason, and no v
 ## Placement / Scope
 
 `wkf` manages one project: the tree rooted at the nearest git root above the current directory.
-Invoking it from any depth inside that tree finds the same root, and every path it prints is relative to that root.
+Invoking it from any depth inside that tree finds the same root, and every path it prints is anchored at that root.
 A second project means a second invocation, not a wider walk.
 
+### Listing scope
+
+A listing starts where the caller stands: `status` and `ls` show the invocation directory and everything below it.
+Bare `wkf status` in a subdirectory answers "what is here", which is the question a caller standing there is asking, and the `elsewhere` segment says how much sits elsewhere so the narrower answer is never mistaken for the whole project.
+
+`--all` widens the listing to the project root, and is the only way to see the rest of the tree without changing directory.
+It changes scope alone: the walk, the ids, and the filters are the same either way.
+
+Addressing is project-wide in every case.
+An id resolves against the whole project, and `show` and `do` accept an id or a path from any directory, so `wkf do claim task:fix-parser` works from a nested directory the listing would not have shown.
+Scope belongs to the listing question, not to the item space: an item does not stop existing because the caller stands somewhere else.
+
 The walk is a recursive descent from that root, and it defines the item set: an artefact the walk does not reach does not exist as far as `wkf` is concerned.
+It is independent of the current directory, which keeps the item set — and with it slug uniqueness — identical for everyone in the project.
 
 It skips `.git/`, every directory whose name begins with a dot, and every path git reports as ignored.
-`.ARCHIVED/` is the single dot-directory the walk enters, because archived items are still items — the default listing hides them by count, not by blindness, and `--filter archived` has to find them.
+`.ARCHIVED/` is the single dot-directory the walk enters, because archived items are still items — the closing line counts them rather than listing them, and `--filter archived` has to find them.
 The exemption is by name at the location archiving writes to, not a licence to descend into any dotted directory that happens to exist.
 
 A nested repository is a boundary: a directory holding its own `.git` belongs to another project, so the walk does not enter it.
@@ -505,7 +737,7 @@ There is no depth limit, and the walk is as deep as the project.
 No git root above the current directory means no project, and `wkf` refuses with a message saying so.
 Guessing a root from the current directory would drop the ignore rules the walk relies on, and silently widen a walk that the user never asked for.
 
-An artefact becomes an item only when its name is one of the recognised forms: `TASK-<date>-<slug>.md`, `HANDOFF-<date>-<slug>.md`, or a standalone `EXPLO-<slug>.md` anywhere under the walk; a spec directory named `SPEC-DRAFT-<slug>/`, `SPEC-READY-<slug>/`, `SPEC-KO-<slug>/`, or legacy `_SPECS/<slug>/`.
+An artefact becomes an item only when its name is one of the recognised forms: `TASK-<slug>.md`, `HANDOFF-<slug>.md`, `IDEA-<slug>.md`, `BUG-<slug>.md`, each also matching with a legacy date segment before the slug, or a standalone `EXPLO-<slug>.md` anywhere under the walk; a spec directory named `SPEC-DRAFT-<slug>/`, `SPEC-READY-<slug>/`, `SPEC-KO-<slug>/`, or legacy `_SPECS/<slug>/`.
 Everything else the walk passes is content: notes, READMEs, and the files inside a spec directory that are not its carrier.
 
 Arguments resolve by probing the filesystem, never by syntax — the algorithm is in Naming & IDs.
@@ -517,6 +749,15 @@ Within one directory the case cannot arise, because the filesystem already forbi
 
 Location and state stay separate on purpose: an item moves between spec directory prefixes as `manage-spec` changes its tag, and `wkf` follows it by re-reading the walk rather than by remembering a path.
 The walk is therefore stateless — nothing is cached between invocations, and a file moved by hand is picked up on the next run at its new place.
+
+## Alternatives & Tradeoffs
+
+Two alternatives were weighed and lost.
+
+Folding the file surface into the beads frontend as one `wk` command with a file mode would give one grammar and one help text, but it would force a bead-shaped vocabulary onto artefacts whose status is a heading tag, and a file rule could then reach into the passthrough.
+One listing verb with filters, instead of `status` and `ls`, would shrink the surface to a single command, but it cannot keep "what is here" and "what did I do here" apart without turning them into options on a verb whose name promises neither.
+
+The design keeps a separate command, two listing verbs, and headings as the only status carrier.
 
 ## Related artifacts
 
@@ -533,4 +774,3 @@ This spec was drafted inside the harness repo (`devtree-harness`), and the entri
 `devtree-harness:SPEC-DRAFT-beads-out-of-tree-storage/SPEC.md` — the pattern of storing beads workspaces outside the project repo, the alternative `wkf` does not need, since its store is the markdown files already committed to the project.
 
 `~/.config/opencode/skills/write-spec/scripts/manage-spec` and its `refs/lifecycle.md` — the owner of spec lifecycle, defining the six states, the draft/ready/retired directory prefixes, and the refusal of a `[CLAIMED]` or `[DONE]` marker that `reset` exists to lift.
-

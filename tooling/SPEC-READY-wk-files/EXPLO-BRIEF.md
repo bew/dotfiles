@@ -26,7 +26,7 @@ ships as its own command (`wkf`) rather than merging into the existing grammar.
 ## Topics
 
 - (frozen) `item-taxonomy` — which artefacts are items, how type and status are derived, and which tool owns status.
-- (frozen) `status-model` — the tag stack vs a canonical tag, and how three vocabularies surface as one `--filter`.
+- (frozen) `status-model` — the tag stack vs a canonical tag, and how the status vocabularies surface as one `--filter`.
 - (frozen) `surface-shape` — verbs, filters, ids, grouped output, and how a path is accepted where an id is.
 - (frozen) `actions` — the mutation verbs: what may be written, on which families, and what a transition means.
 - (frozen) `json-output` — machine-readable output for every subcommand, and what each verb emits.
