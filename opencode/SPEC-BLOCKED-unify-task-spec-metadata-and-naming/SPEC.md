@@ -6,14 +6,28 @@
 > **BLOCKER**: This spec depends on the `wkf` tool being available, working, and supporting this block format.
 > Until that holds, the format is unvalidated and nothing below counts as settled.
 
+> **PARTIALLY IMPLEMENTED**: every task, idea, bug, and handoff file in this repo already carries the
+> block and an undated name, and both writers emit them: `work-capture-handoff` on each new capture,
+> `handoff` (plus `handoff-standalone`) on each handoff doc.
+> `tmp-frontmatter-migration` now exists, and repairs one file or a whole directory on request.
+> The spec carriers and the `AGENTS.md` trigger on writes still do not exist,
+> so nothing keeps the corpus converged once a file is edited.
+> Some answers diverge from the text below.
+> The writers ask for a new slug rather than suffixing the taken one.
+> The migration skill takes a missing timestamp from the file's modification time rather than from
+> current local time, and it stops on a spec carrier instead of renaming the directory, leaving that
+> to `manage-spec`.
+> Its retirement note is git-tracked, an explicit exception to the `TASK-*` no-commit rule.
+> None of this unblocks the spec — the format stays unvalidated until `wkf` supports it.
+
 ## Introduction
 
-The goal is one naming scheme shared by tasks and specs, where a name is an identity that survives status changes.
-`TASK-<slug>.md` and `SPEC-<slug>/` are the only valid shapes, and state lives in the H1 tag rather than in the name.
+The goal is one naming scheme shared by tasks, ideas, bugs, and specs, where a name is an identity that survives status changes.
+`TASK-<slug>.md`, `IDEA-<slug>.md`, `BUG-<slug>.md`, and `SPEC-<slug>/` are the only valid shapes, and state lives in the H1 tag rather than in the name.
 A name therefore means the same thing to a human, a reference, and a tool, and it keeps meaning it for the whole life of the artefact.
 
-Task and spec artefacts in this repo declare themselves through their names and their headings.
-A task file is named `TASK-<timestamp>-<slug>.md` and carries its state as an H1 tag such as `[CLAIMED]`.
+Task, idea, bug, handoff, and spec artefacts in this repo declare themselves through their names and their headings.
+A task file used to be named `TASK-<timestamp>-<slug>.md` and to carry its state as an H1 tag such as `[CLAIMED]`; idea, bug, and handoff files followed the same shape.
 Those naming and tagging conventions are project-global and live in `AGENTS.md`.
 A spec's identity is the slug in its directory name, and its state is the H1 tag that `manage-spec` owns, as documented in `refs/lifecycle.md` of the `write-spec` skill.
 The directory name also carries a state prefix, so advancing a spec renames its directory and invalidates every path that pointed at it.
@@ -31,8 +45,8 @@ This spec defines a minimal block, written as YAML-like frontmatter, for the two
 The block stays deliberately small.
 It carries no status, type, title, or ownership, because each of those already has an authority in the filename, the H1 tag, or `manage-spec`, and a second authority drifts.
 
-Scope is tasks and specs.
-Handoffs and exploration files stay out until the format has proven itself on those two families.
+Scope is tasks, ideas, bugs, handoffs, and specs.
+Exploration files stay out until the format has proven itself on those families.
 
 The design is inspired by the `wkf` work in the `devtree-harness` repo, which addresses work items as `[kind]:[slug]` and records a single frontmatter format as a deferred direction.
 
@@ -41,7 +55,8 @@ The design is inspired by the `wkf` work in the `devtree-harness` repo, which ad
 An artefact that adopts the block drops the date or datetime token from its name.
 `TASK-20261022T0855-parse-frontmatter.md` becomes `TASK-parse-frontmatter.md`.
 
-The kind prefix stays and is the whole prefix: `TASK-` for a task file, `SPEC-` for a spec directory.
+The kind prefix stays and is the whole prefix:
+`TASK-` for a task file, `IDEA-` for an idea file, `BUG-` for a bug file, `SPEC-` for a spec directory.
 Nothing else sits between that prefix and the slug, so `SPEC-DRAFT-` and `SPEC-READY-` are not valid.
 
 The reason is single ownership.
@@ -58,20 +73,23 @@ The address is `<kind>:<slug>`, which is exactly what a `depends-on` reference s
 
 ```
 TASK-do-something-interesting.md → task:do-something-interesting
+IDEA-try-a-different-cache.md    → idea:try-a-different-cache
+BUG-parser-drops-eof.md          → bug:parser-drops-eof
 SPEC-task-scopes/                → spec:task-scopes
 ```
 
 Specs carry no date, but their directory name does carry state, so adoption there drops the state prefix and adds the block.
-A state-prefixed directory is valid only while unmigrated, on the same terms as a dated task name.
+A state-prefixed directory is valid only while unmigrated, on the same terms as a dated name.
 `DISCOVERY.md` and `SPEC.md` keep their names.
 
-Handoffs and exploration files keep their dated names, because they do not carry the block in this version.
+Exploration files already carry no date token, and stay without the block for now.
 
 Adoption is one atomic step: insert the block and rename the file together.
 A dated name is valid only while the artefact is unmigrated, and a block on a dated file is an error.
 Migration is rolling, happening on each write rather than in one sweep, so the corpus converges instead of flipping in a single commit.
 
-When two dated names collapse to the same slug, the earliest `created-at` keeps the bare slug and each later one takes a numeric suffix in `created-at` order: `fix-parser`, `fix-parser-2`, `fix-parser-3`.
+When two dated names collapse to the same slug, the earliest `created-at` keeps the bare slug
+and each later one takes a numeric suffix in `created-at` order: `fix-parser`, `fix-parser-2`, `fix-parser-3`.
 A suffix assigned at adoption is permanent.
 
 ## Interface / How to use
@@ -102,9 +120,12 @@ It is 13 characters wide, local time, at minute precision, with no seconds and n
 
 `20261022T0855` means 22 October 2026, 08:55 local time.
 
-The shape is inherited from the timestamp token task filenames use today.
+The shape is inherited from the timestamp token task filenames used to carry.
 Adoption moves the value out of the name and into this field unchanged, so no timestamp is reinterpreted on the way.
 Keeping the width fixed also lets the values sort lexicographically.
+
+A dated name carrying only `YYYYMMDD` fills the time as `T0000`, because the name never held one.
+A file with no date token at all takes its modification time.
 
 The field is the sole carrier of creation time once an artefact has the block.
 The name no longer holds a date, so there is nothing to drift against (see Naming & IDs).
@@ -121,7 +142,7 @@ depends-on: spec:task-scopes
 ### `depends-on`
 
 The value is a sequence of references on a single line, separated by ` & `: one space, an ampersand, one space.
-Each reference is `<kind>:<slug>`, and the only kinds are `task` and `spec`.
+Each reference is `<kind>:<slug>`, and the only kinds are `task`, `idea`, `bug`, and `spec`.
 Anything else is invalid, whether unknown or a family this format does not cover yet.
 
 ```yaml
@@ -185,7 +206,7 @@ The order siblings appear in carries no execution order.
 The block belongs to the artefact file itself, never to a sidecar or an index.
 Reading one file tells that file's whole story, and nothing can go stale when it is copied or moved.
 
-For a task, that file is the task file.
+For a task, an idea, or a bug, that file is the artefact file itself.
 For a spec, it is the carrier file the item reports: `DISCOVERY.md` while the spec is in `discovery` or `explo`, then `SPEC.md` from `draft` onward.
 
 That carrier change is the one place the block has to be moved by something other than a human.
@@ -212,7 +233,7 @@ No reader may cache status into this block.
 ## Adoption tooling
 
 The format needs a vehicle.
-The corpus is dated and blockless today, and the skills that create tasks and specs know nothing about these fields.
+A corpus may still carry dated names and blockless files, and the skills that create tasks, ideas, bugs, handoffs, and specs are only beginning to know these fields.
 
 That vehicle is a temporary skill under `opencode/skills/`, named with a `tmp-` prefix: `tmp-frontmatter-migration`.
 
@@ -222,10 +243,10 @@ Temporary is structural, not cosmetic.
 - It appears in no index, README, or `DIR_AGENTS.md` listing.
 - Its description exists only so the runtime can trigger it, and is not documentation.
 
-It must run whenever a task file or a spec carrier file is created or updated.
+It must run whenever a task, idea, bug, handoff, or spec carrier file is created or updated.
 Nothing fires it automatically: a skill loads because the agent chooses to load it, not because a file changed.
 The requirement therefore lands on agents through `AGENTS.md`, which states that such a write goes through this skill.
-It never applies to reads, and it leaves handoffs and explorations alone.
+It never applies to reads, and it leaves explorations alone.
 
 One pass over an artefact does the following:
 
@@ -243,11 +264,15 @@ When it cannot decide, it aborts without writing and names the file.
 An unparsable existing block, a collision it cannot resolve, and a spec carrier it cannot identify are all abort cases.
 A half-migrated artefact is worse than an unmigrated one.
 
-The skill ships with a `TASK-*` note that records the retirement condition rather than a date: no dated task or spec name remains, and every artefact carries a block.
+The skill ships with a `TASK-*` note that records the retirement condition rather than a date:
+no dated task, idea, bug, handoff, or spec name remains, and every artefact carries a block.
 That note is what eventually deletes the skill, not a calendar reminder nobody reads.
 
 Removal is gated on the artefacts' producers rather than on the corpus.
-`task-capture-handoff` and `write-spec init` must emit the block in the files they create, and `manage-spec` must preserve it through promotion and renames.
+`work-capture-handoff` must emit the block in the task, idea, and bug files it creates,
+`handoff` must emit it in the handoff docs it writes,
+`write-spec init` must emit it in the spec carrier, and `manage-spec` must preserve it through
+promotion and renames.
 Once they do, the temporary skill has nothing left to repair, and deleting it leaves no gap.
 Until they do, it is the only thing holding the format in place.
 
@@ -290,7 +315,7 @@ The failure cases are distinguishable and each has one report:
 | `created-at` off the 13-character shape | malformed: created-at |
 | `depends-on` with an empty value | malformed: depends-on |
 | references joined by a bare space | malformed: depends-on |
-| kind outside `task` and `spec` | error: unknown kind |
+| kind outside `task`, `idea`, `bug`, and `spec` | error: unknown kind |
 | dependency cycle, including a self-reference | error: cycle |
 | reference to a missing or abandoned artefact | error: unsatisfiable |
 
@@ -304,12 +329,16 @@ A reader reports; only a deliberate human or agent edit rewrites a block, and on
 ## Related artifacts
 
 - `SPEC-DRAFT-wk-files/` in the `devtree-harness` repo is the source of the addressing scheme.
-  Its item taxonomy defines `[kind]:[slug]` and records a single metadata format as a deferred direction; this spec is that direction, narrowed to two fields and two families.
-- `opencode/AGENTS.md` owns task and handoff naming, the `[CLAIMED]`/`[DONE]` tags, and the session lifecycle this format must not duplicate.
+  Its item taxonomy defines `[kind]:[slug]` and records a single metadata format as a deferred direction.
+  This spec is that direction, narrowed to two fields and five families.
+- `opencode/AGENTS.md` owns task, idea, bug, and handoff naming, the task and bug tag vocabularies,
+  and the session lifecycle this format must not duplicate.
 - `opencode/skills/write-spec/refs/lifecycle.md` owns spec states and the carrier preference the spec block must follow.
   Its state-prefixed directory names (`SPEC-DRAFT-`, `SPEC-READY-`) must become plain `SPEC-<slug>/`, so the doc itself needs updating.
 - `opencode/skills/write-spec/scripts/manage-spec` is the tool that must stop anchoring the H1 on the first line.
-- `opencode/skills/task-capture-handoff/` creates task files, so it must emit the block for the migration skill to be removable.
+- `opencode/skills/work-capture-handoff/` creates task, idea, and bug files, so it must emit the
+  block for the migration skill to be removable.
+- `opencode/skills/handoff/` writes handoff docs, so it carries the same obligation.
 - `./DISCOVERY.md` records the inputs and constraints this spec was drafted from.
 
 ## Global Open Questions
