@@ -47,7 +47,7 @@ local GeneralPurposeStatusline = {
         local mc = require"multicursor-nvim"
         local enabled_count = mc.numEnabledCursors()
         local disabled_count = mc.numDisabledCursors()
-        vim.notify("in component provider! enabled? " .. tostring(disabled_count > 0) .. " enabled:"..tostring(enabled_count) .. " disabled:"..tostring(disabled_count))
+        -- vim.notify("in component provider! enabled? " .. tostring(disabled_count > 0) .. " enabled:"..tostring(enabled_count) .. " disabled:"..tostring(disabled_count))
         local ret = _f(enabled_count, "cursors")
         if disabled_count > 0 then
           ret = ret .. U.fmt.str_concat(" (+", disabled_count, " off)")
