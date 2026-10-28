@@ -8,6 +8,12 @@
   "default_agent": "plan",
   "small_model": "opencode/big-pickle", // Free model (not very smart..)
 
+  "permissions": [
+    // BAD: OC removed the default rule to ask before doing anything in non-current directory 🤬
+    // TRACKING: https://github.com/anomalyco/opencode/issues/54524
+    { "action": "external_directory", "resource": "*", "effect": "ask" }
+  ],
+
   "experimental": {
     // Allow nested subagents, e.g: reviewer (depth 1) spawns simulated-test-runner (depth 2).
     // Default is 1, which would block that.
