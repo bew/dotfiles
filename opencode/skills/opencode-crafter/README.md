@@ -66,6 +66,7 @@ Companion docs loaded on demand by the agent (not read upfront):
 | [`refs/skills-related/skill-phases.md`](./refs/skills-related/skill-phases.md) | Skill-specific phase structure & crafter integration |
 | [`refs/rules-for-steps-phases-headers.md`](./refs/rules-for-steps-phases-headers.md) | Phase naming, named steps, gates, reference integrity |
 | [`refs/skills-related/with-script.md`](./refs/skills-related/with-script.md) | Extra rules when skill includes scripts |
+| [`refs/skills-related/with-script-python-split.md`](./refs/skills-related/with-script-python-split.md) | Python script split into `scripts/lib/`: layout, entry shim, pytest suite |
 | [`refs/agent-anatomy.md`](./refs/agent-anatomy.md) | Agent spec: model, tools, permissions |
 | [`refs/command-anatomy.md`](./refs/command-anatomy.md) | Command spec: args, injection, subagent |
 | [`refs/oc-tool-anatomy.md`](./refs/oc-tool-anatomy.md) | oc-tool spec: registration |
