@@ -58,6 +58,15 @@ All extend the rules below.
 - Validate unknown input once, at the boundary that owns it.
   Pass typed values inward instead of re-checking what a schema, constructor, or internal type
   already guarantees.
+- Where the language has exceptions, name exception types with an `Error` suffix.
+  Give the project one base type that the entry point catches.
+- Size an error hierarchy by how the caller reacts, not by call site.
+  Two or three types are enough when "nothing changed" and "partially applied" are reported
+  differently; never one type per raising function.
+- An error carries the facts the raiser holds and the caller does not: the offending value, the
+  state reached, the path tried.
+  Name them in the message, so a failure at the top of the stack is diagnosable without a
+  debugger.
 - Do not extract a single-use helper preemptively.
   Inline it at the call site unless it is reused, hides a genuinely complex boundary, or names a
   concept that improves the caller.
@@ -69,6 +78,12 @@ All extend the rules below.
 
 ## Code layout
 
+- A file is a module: it holds several related items that change together.
+  Fold a one-class or two-function file into its nearest owner.
+- Group files by what changes together, not by kind.
+  A directory per kind pays off only once each kind holds several modules.
+- Keep data types inert: they may guard their own shape when the check needs nothing external.
+  Put the behaviour over them in a separate module, which may live in the same file.
 - When a function signature does not fit the line width, put each parameter on its own line,
   with a trailing comma after the last one.
   Never pack multiple parameters onto a wrapped line.
@@ -157,8 +172,19 @@ All extend the rules below.
 - Prefer `get_*` for functions that compute/return a value.
 - Prefer `check_*` for validation functions.
 - Prefer `parse_*` for argument/input parsing.
+- Name parameters and locals after the value they hold, not the container they came in.
+  `block`, `data`, `payload`, `info`, `stuff` describe nothing a reader can act on; write
+  `frontmatter_lines`, `body_lines`, `request_body`. If the name would fit any value of the same
+  type, it is too vague.
+- Never name a value with a verb or an action (`block`, `process`, `handle`, `decode`)
+  unless the value controls one: a flag that switches behaviour (`force`, `dry_run`, `with_git`)
+  is named after the behaviour it enables. Any other verb reads as work being done, so the reader
+  hunts for a call that never happens. Reserve the verb for the functions that do the work.
 - When designing an API, prefer named/structured arguments over a long positional list —
   named args are self-documenting and remove call-site ambiguity.
+- Once a call passes more than two arguments, name every argument after the first, where the
+  language supports named arguments. Two arguments read positionally; three do not, and the reader
+  would otherwise need the signature to know what each one is.
 - When writing or extracting a helper function, design it for reuse by default.
   Make its boundary general rather than shaped to the current call site.
   If a reusable shape is too complex or the boundary is unclear, ask the user before guessing.
