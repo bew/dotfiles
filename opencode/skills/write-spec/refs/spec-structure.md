@@ -39,7 +39,8 @@ created-at: 20261028T1759
 # [DISCOVERY] <title>
 ```
 - `created-at` — local date and time at `init`, `YYYYMMDDThhmm`.
-  No tool regenerates or invents one: a spec created before the block existed keeps none.
+  A migrated legacy spec is stamped from the oldest file it still holds, or from the migration
+  time when it holds none.
 - The block must open on line 1 and close on the next `---` line; a blank line separates it from
   the H1. An unclosed fence is refused rather than guessed at.
 

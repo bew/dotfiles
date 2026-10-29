@@ -344,8 +344,8 @@ function assert_git_status_contains() {
     assert_state "explo"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "# [EXPLO] epsilon"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "$EXPLO_POINTER_LINE"
-    # No timestamp is invented for a spec that predates the frontmatter block.
-    assert_file_lacks "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "created-at"
+    # The stamp comes from the oldest file the legacy dir still holds, not from the clock.
+    assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/SPEC.md" "created-at: "
     assert_discovery_notes "$PROJECT_DIR/SPEC-DRAFT-epsilon"
     assert_file_contains "$PROJECT_DIR/SPEC-DRAFT-epsilon/EXPLO-BRIEF.md" "Notes."
 }

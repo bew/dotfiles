@@ -112,8 +112,9 @@ It also renames `EXPLORATION-BRIEF.md` / `EXPLORATION-<topic>.md` to `EXPLO-*`, 
 references to those old filenames inside the moved files.
 A collision with an existing `EXPLO-*` file aborts before anything is renamed.
 A legacy directory with no `SPEC.md` seeds `SPEC.md` and `DISCOVERY.md` and enters `explo`.
-No `created-at` is written for it: `manage-spec` never invents a timestamp for a spec that
-predates the frontmatter block.
+Its `created-at` is the oldest file timestamp the legacy directory still holds, so the stamp
+records when the spec was written rather than when it was migrated; a directory holding no file
+falls back to the migration time.
 `migrate` is absent from `--help` on purpose: it drains the old layout, it is not a daily command.
 
 ## Legacy tag carriers
@@ -146,6 +147,13 @@ leaves a legacy carrier in place.
   `manage-spec` has no dirty-index guard; a `git mv` simply stages the rename alongside the
   unrelated staged changes.
 
+Every refusal above prints `!! ERROR: <reason>` to stderr and exits non-zero without changing
+anything: no tagged file, no moved directory.
+A refusal that got as far as reading the spec says so explicitly, ending its reason with
+`nothing changed.`
+
+The exception is a change that fails after part of it landed.
+Its error carries one extra indented line naming the command that repairs the damage.
 If a move fails after the tag was rewritten, the script says so and prints both paths;
 the spec then sits in a directory that disagrees with its tag until
 `manage-spec <target-state> --fix` (or `rename <new-slug> --fix`) repairs it.

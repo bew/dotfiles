@@ -57,7 +57,12 @@ The transition table in `refs/lifecycle.md` is the authority; this diagram only 
 the skill-loader paragraph, and moves the directory.
 The agent never moves a directory or edits the status tag itself.
 
-`scripts/manage-spec.bats` covers the tool with `bats`.
+`scripts/manage-spec.bats` covers the whole tool end to end with `bats`.
+`scripts/lib/` holds the implementation, split by concern; `scripts/tests/` covers it with pytest:
+
+```sh
+cd scripts && nix run pkgs#python3Packages.pytest -- -q
+```
 
 ## Headings another tool marked
 
