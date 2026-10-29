@@ -102,9 +102,13 @@ in a Python project:
 
 **Closed sets** — use an `enum` instead of a bare `str`/`int`.
 
-**Aliases** — use `typing.NewType` when values must be genuinely distinct,
-e.g. `UserId = NewType("UserId", str)`:
-- Use a plain `type` alias (e.g. `type UserId = str`, Python 3.12+) when only a name is wanted.
+**Aliases** — define every type alias with the `type` statement (Python 3.12+):
+- `type Slug = str`, `type Action = MakeDir | WriteFile | RemoveDir`, `type Pair[T] = tuple[T, T]`.
+- Never write a bare assignment alias like `Action = MakeDir | WriteFile`: it reads as a runtime
+  value, and a type checker treats it as one.
+- Use `typing.NewType` when values must be genuinely distinct,
+  e.g. `UserId = NewType("UserId", str)`.
+  `type UserId = str` only renames the type; any `str` still passes where a `UserId` is expected.
 
 **Tuples** — reserve tuples for multi-value returns; use a `list` in all other cases.
 - Never write a single-element tuple `(foo,)` — use a `list` `[foo]`.
@@ -115,6 +119,8 @@ e.g. `UserId = NewType("UserId", str)`:
 - Narrow to the concrete exceptions the guarded region can raise:
   `OSError`/`subprocess.SubprocessError` for subprocess, `json.JSONDecodeError` for json,
   `FileNotFoundError` for file access, `ScriptError` or another project exception, etc.
+- Include the facts the caller cannot recover: the argument, the path, the state reached.
+  Format them with `!r` when type or whitespace matters, not with `str()`.
 
 ```python
 # Good — concrete types, chained with `from exc`
@@ -155,7 +161,9 @@ except Exception as exc:
 
 ## Dependencies
 
-- This skill recommends **pydantic** for Python projects.
+- This skill recommends **pydantic** for structured data in a Python project.
+- Type checking: **pyrefly**. Linting and formatting: **ruff**.
+  Run them after a change unless the project configures its own equivalent.
 
 ## Testing
 
