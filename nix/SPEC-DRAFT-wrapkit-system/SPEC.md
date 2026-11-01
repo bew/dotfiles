@@ -10,7 +10,7 @@ wrapkit-system is a module system that turns a binary into a `makeWrapper`-wrapp
 The motivation comes from the dotfiles repo.
 Binaries are wrapped today once per toolkit: `nix/kits/toolkit-modules/tmuxkit-base.toolkit-module.nix`, `zshkit-base.toolkit-module.nix`, and `nvimkit-base.toolkit-module.nix`.
 Each hand-rolls a `makeWrapper` invocation inside its `outputs.toolPkg.standalone`, and shares only the low-level `mypkglib.replaceBinsInPkg` helper (`nix/mypkglib.nix`).
-The results have drifted: the `env` option is `{set, set-default}` for tmuxkit, a plain `attrsOf str` for nvimkit, and absent for zshkit; only nvimkit exposes a second result variant (`toolPkg.configured`); `prefix` and `add-flags` are hand-emitted rather than modeled.
+The results have drifted: the `env` option is `{set, set-default}` for tmuxkit, a plain `attrsOf str` for nvimkit, and absent for zshkit; only nvimkit exposes a second result variant (`toolPkg.configured`); `prepend` and `beforeArgs` are hand-emitted rather than modeled.
 
 wrapkit-system addresses these problems, in priority order:
 - composable environment overrides, so a shared default can be overridden per consumer;
@@ -102,14 +102,14 @@ tmuxWrapped = wrapkit.mkWrapkitBin {
     # commons: shared defaults
     {
       env.TMUX_CONFIG_ENTRYPOINT.set = entrypoint;
-      env.TERMINFO_DIRS.prefix = [ "${pkgs.tmux.terminfo}/share/terminfo" ];
+      env.TERMINFO_DIRS.prepend = [ "${pkgs.tmux.terminfo}/share/terminfo" ];
       env.TMUX_PLUGIN_RESURRECT_PATH.set = "${resurrect}/share/tmux-plugins/resurrect";
-      flags.add-flags = [ "-f" entrypoint ];
+      flags.beforeArgs = [ "-f" entrypoint ];
     }
     # per-result override: higher module priority
     {
       env.TMUX_CONFIG_ENTRYPOINT.set = "over"; # only `set` is overridden; other commons actions survive
-      flags.append-flags = [ "-d" ];
+      flags.afterArgs = [ "-d" ];
     }
   ];
 };
@@ -122,30 +122,26 @@ Every action maps to a `makeWrapper` flag (see Wrapper schema for the authoritat
 
 ```nix
 env.FOO = {
-  sep = ":";                                # shared separator for the prefix/suffix variants (default ":")
-  set = "hello";                            # --set FOO hello
-  set-default = "fallback";                 # --set-default FOO fallback
-  unset = false;                            # --unset FOO
-  prefix = [ "/a" "/b" ];                   # --prefix FOO : /a:/b
-  suffix = [ "/c" ];                        # --suffix FOO : /c
-  prefix-each = [ "/d" "/e" ];              # one --prefix-each FOO : <val> per element
-  suffix-each = [ "/f" ];                   # one --suffix-each FOO : <val> per element
-  prefix-contents = [ ./extra-paths ];      # --prefix-contents FOO : <file>
-  suffix-contents = [ ./more-paths ];       # --suffix-contents FOO : <file>
+  sep = ":";                             # shared separator for the prepend/append variants (default ":")
+  set = "hello";                         # --set FOO hello
+  setDefault = "fallback";               # --set-default FOO fallback
+  unset = false;                         # --unset FOO
+  prepend = [ "/a" "/b" ];               # --prefix FOO : /a:/b
+  append = [ "/c" ];                     # --suffix FOO : /c
+  prependFromFile = [ ./extra-paths ];   # one --prefix-contents FOO : <file contents> per file
+  appendFromFile = [ ./more-paths ];     # one --suffix-contents FOO : <file contents> per file
 };
 ```
 
-`prefix`/`suffix` and their variants are lists of strings joined by the VAR's `sep`; the `-contents` variants take file paths.
+`prepend`/`append` are lists of strings joined by the VAR's `sep`; the `prependFromFile`/`appendFromFile` variants take file paths and emit one operation per file.
 
 ### The `flags` option
 
 `flags` models the args passed to the wrapped program itself.
 
 ```nix
-flags.add-flags = [ "--config" cfg ];   # --add-flags, verbatim (shell-interpreted)
-flags.append-flags = [ "-d" ];          # --append-flags, verbatim
-flags.add-flag = [ "--foo" ];           # --add-flag, single arg (shell-quoted)
-flags.append-flag = [ "--bar" ];        # --append-flag, single arg (shell-quoted)
+flags.beforeArgs = [ "--config" cfg ];     # --add-flags, verbatim (shell-interpreted)
+flags.afterArgs = [ "-d" ];                # --append-flags, verbatim
 ```
 
 ### Process control
@@ -199,7 +195,7 @@ The consumer is a **result** (`profiles.foo.<result-using-us>`): something that 
 The **effective env** for a result is the commons merged with the result's scoped override.
 
 Merging uses **module priority, per action**.
-An override that sets one action for a VAR (e.g. `env.FOO.set`) leaves the commons' other actions for that VAR (e.g. `env.FOO.prefix`) inherited.
+An override that sets one action for a VAR (e.g. `env.FOO.set`) leaves the commons' other actions for that VAR (e.g. `env.FOO.prepend`) inherited.
 This is what makes overrides composable rather than wholesale replacements.
 
 The merge happens **inside `mkWrapkitBin`**.
@@ -225,17 +221,15 @@ The wrapper schema is the typed model of the full `makeWrapper` surface, so ever
 Mapping to `makeWrapper` flags (source: `pkgs/build-support/setup-hooks/make-wrapper.sh`):
 
 Environment variables, keyed by `VAR` under `env`:
-- `sep` (`str`, default `":"`) — the shared separator reused by every prefix/suffix variant for this VAR; not itself a flag.
+- `sep` (`str`, default `":"`) — the shared separator reused by every prepend/append variant for this VAR; not itself a flag.
 - `set` (`nullOr str`, default `null`) → `--set VAR VAL`.
-- `set-default` (`nullOr str`, default `null`) → `--set-default VAR VAL`.
+- `setDefault` (`nullOr str`, default `null`) → `--set-default VAR VAL`.
 - `unset` (`bool`, default `false`) → `--unset VAR`.
-- `prefix` / `suffix` (`listOf str`) → one `--prefix` / `--suffix VAR <sep> VAL`, with the list joined by `sep`.
-- `prefix-each` / `suffix-each` (`listOf str`) → one `--prefix-each` / `--suffix-each VAR <sep> VAL` per element.
-- `prefix-contents` / `suffix-contents` (`listOf path`) → the `--prefix-contents` / `--suffix-contents VAR <sep> FILE` variants.
+- `prepend` / `append` (`listOf str`) → one `--prefix` / `--suffix VAR <sep> VAL`, with the list joined by `sep`.
+- `prependFromFile` / `appendFromFile` (`listOf path`) → one `--prefix-contents` / `--suffix-contents VAR <sep> FILE` per file.
 
 Flags for the wrapped invocation, under `flags`:
-- `add-flags` / `append-flags` (`listOf str`) — verbatim, shell-interpreted → `--add-flags` / `--append-flags`.
-- `add-flag` / `append-flag` (`listOf str`) — single arg, shell-quoted → `--add-flag` / `--append-flag`.
+- `beforeArgs` / `afterArgs` (`listOf str`) — verbatim, shell-interpreted → `--add-flags` / `--append-flags`.
 
 Process control, top-level:
 - `argv0` (`null | "inherit" | "resolve" | str`, default `null`) → no flag / `--inherit-argv0` / `--resolve-argv0` / `--argv0 NAME`.
@@ -243,10 +237,9 @@ Process control, top-level:
 - `run` (`listOf str`, default `[ ]`) → `--run COMMAND` per element.
 
 Schema notes:
-- A per-VAR `sep` avoids repeating the separator across the prefix/suffix variants.
-- `--prefix` treats its VAL as one de-duplicated, order-preserving unit, while `--prefix-each` emits one operation per element; the schema preserves that distinction.
-- `--add-flag` and `--add-flags` differ only in shell quoting (single arg vs verbatim), so the schema keeps them distinct.
-- The per-action model is what lets an override set `env.FOO.set` while inheriting a commons `env.FOO.prefix`.
+- A per-VAR `sep` avoids repeating the separator across the prepend/append variants.
+- `prepend` / `append` join their list into one de-duplicated value; the `prependFromFile` / `appendFromFile` variants emit one `--prefix-contents` / `--suffix-contents` operation per file, whose VAL is the file's contents.
+- The per-action model is what lets an override set `env.FOO.set` while inheriting a commons `env.FOO.prepend`.
 
 ### Open Questions
 
