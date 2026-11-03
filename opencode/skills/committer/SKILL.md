@@ -221,12 +221,14 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
   all members (e.g. "opencode/agents + global/project scopes" over four individual strings).
 
 **Bullet rules**:
+- A bullet is an **assertion** or an **enumeration**.
+  An assertion states a change or its consequence: a full sentence ending in a period.
+  An enumeration names one part of the thing the prose introduced: a fragment with no trailing
+  period, under a lead-in line ending in `:`, with no blank line before the list.
 - Answer "what changed and why" — not "which file changed".
-- Do not prefix bullets with file paths or directory names. One short clause per bullet.
+- One clause per bullet. Do not prefix with a file path unless the path is the item itself.
 - Omit file paths unless the path itself is meaningful.
 - Collapse minor cleanups into one trailing bullet: `- Minor: <comma-separated list>.`
-- Omit the Minor bullet entirely if items are purely structural (doc cross-references,
-  ordering notes, inline prose clarifications) with no behavioral significance.
 - Do not bullet things already said in subject or paragraph.
 
 **Formatting**:
