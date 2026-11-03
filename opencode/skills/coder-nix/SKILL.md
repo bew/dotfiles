@@ -32,6 +32,7 @@ All files are module-like: generic module rules apply, script rules are N/A.
 - Use `inherit x;` and `inherit (parent) a b;` to reuse bindings.
 - Interpolate values into strings with `${expr}`.
 - Use `''...''` for multi-line / indented strings — leading whitespace is stripped.
+- Prefer `''...''` over `"..."` when the string contains `"` — it avoids `\"` escapes.
 - Escape literal `$` in `''...''` as `\${`. Required when the string embeds shell code,
   where `$var`, `${var}`, and `$(cmd)` must survive to run in the build phase.
 - Wrap paths interpolated into shell strings in `lib.escapeShellArg`.

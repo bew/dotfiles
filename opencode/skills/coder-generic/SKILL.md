@@ -129,6 +129,12 @@ All extend the rules below.
 - Keep comment lines within about 100 columns.
   When a language skill states its own max width, that one wins.
 
+### File header
+
+- A file-level header comment gives a short overview of the file's role, not how it works.
+- Never name the file itself (or its own path) in its header — the path is already visible
+  wherever the file is used.
+
 ### Function documentation
 
 - Every function has documentation (doc comment, docstring, or leading comment — in the
@@ -166,6 +172,15 @@ All extend the rules below.
   `@YYYY-MM <note>` (month precision), e.g. `@2026-09 missing type annotation`.
   Use it where the behaviour may change later and the note should be re-checked.
 - Do not proactively re-check or update the date/note unless asked.
+
+### Planning references
+
+- Never reference planning or task-tracking artefacts in a comment: milestone or step IDs
+  (such as `M3` or `Phase 2`), task, sprint, or backlog item IDs.
+  They are volatile where the code is not, and mean nothing to a reader who lacks the plan.
+- The rule targets references to the plan, not statements about the code's own state.
+  A comment that the code is incomplete or partial is fine,
+  e.g. `NOTE: this is incomplete, the rest of the implementation will come later`.
 
 ## Guidelines
 
