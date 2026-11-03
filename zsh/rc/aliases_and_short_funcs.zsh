@@ -291,6 +291,10 @@ compdef _cdot cdot
 alias git::no-pager="git --no-pager"
 alias gnp=git::no-pager
 
+# ssh debugging..
+alias git::debug-ssh="GIT_SSH_COMMAND='ssh -v' git"
+alias git::test-ssh-github="ssh git@github.com"
+
 alias git::watch-output="watch --color -- git --no-pager -c color.ui=always"
 
 alias gomain="git go main"
@@ -453,8 +457,6 @@ function curl_auth_json() {
 alias ssh="TERM=xterm-256color ssh"
 
 alias ssh-password-only="ssh -o PubkeyAuthentication=no"
-
-alias ssh-keygen-ed25519="ssh-keygen -t ed25519"
 
 
 # sudo
