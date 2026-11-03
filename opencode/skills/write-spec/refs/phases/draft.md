@@ -235,6 +235,8 @@ During iteration, if user introduces a new idea, constraint, or design angle not
   If Terminology section exists, use exact names from there everywhere.
 - Terminology section (if present): define all terms there before using them elsewhere in spec.
 - Reference project-global concepts and terms, don't restate them — see <../project-global-docs.md>.
+- A sibling spec is referenced by slug — `` `<spec:wk-init>` `` — never as a `SPEC-<STATE>-<slug>/`
+  path. See <../spec-structure.md§cross-spec-references>.
 - On a gap (a concept or term no project-global doc defines): inline-define it in the spec
   and record it (Open Question or `FIXME:` callout), then ask the user to own it or promote it.
   Promote: load `work-capture-handoff` skill in mode `capture-task` and emit one capture per gap,

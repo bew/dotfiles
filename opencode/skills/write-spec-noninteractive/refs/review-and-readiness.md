@@ -11,6 +11,10 @@ After all sections are filled, check:
 - No terminology drift — single canonical name used everywhere for each concept
 - No project-global doc content restated — concepts and terms documented there
   are referenced, not redefined
+- Cross-spec references are written by slug — `` `<spec:wk-init>` `` — and match a directory that
+  exists, `SPEC-*-<slug>/`; no `SPEC-<STATE>-<slug>/` path stands in for one
+  (see <./spec-structure.md§cross-spec-references>).
+  Without filesystem access, defer the existence check to the questions block.
 - Gaps are inline-defined and recorded; promote gaps carry a capture instruction
   in the deferred questions
 - `## Global Open Questions` section is present at end of spec

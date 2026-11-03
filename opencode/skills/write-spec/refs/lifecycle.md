@@ -77,6 +77,7 @@ straight away.
 A single-word argument is a new slug; a spaced argument is a new H1 title.
 Passing a slug plus a title changes both.
 A title must be more than one word, otherwise it would read as a slug.
+A new slug also orphans every reference to the old one — see *Cross-spec refs sweep* below.
 
 `rebase` moves the spec directory under another base directory, keeping its state and every file.
 `<new-base>` is resolved against the project root, must already exist, and must sit inside the
@@ -98,6 +99,23 @@ directory or because the state was already current.
 
 After a command that moves the spec, the current working directory is gone.
 `cd` from the project root into the printed `$specdir` before running the next command.
+
+## Cross-spec refs sweep
+<!-- §cross-spec-ref-sweep -->
+
+`rename` changes the slug that sibling specs point at, so every `<spec:old-slug>` goes stale the
+moment it runs.
+Refs live in specs and in the notes kept beside them, so sweep from the project root:
+
+```sh
+rg -n -F '<spec:old-slug>' --glob '*.md'
+```
+
+Update every hit whose subject is the renamed spec, wherever the file sits.
+Keep the old slug only where the sentence records the previous name — a spec documenting the rename
+describes history, and rewriting it would lose the record.
+The sweep covers `<spec:…>` refs only — `migrate` rewrites the legacy `EXPLORATION-*` file
+references itself.
 
 ## Legacy layouts
 

@@ -90,6 +90,8 @@ In both modes:
 - Never write a full rewrite when a targeted edit is requested. Surgical edits only.
 - Reference project-global concepts and terms, don't restate them
   — see <./refs/project-global-docs.md>.
+- A sibling spec is referenced by slug — `` `<spec:wk-init>` `` — never as a `SPEC-<STATE>-<slug>/`
+  path — see <./refs/spec-structure.md§cross-spec-references>.
 - On a gap (a concept or term no project-global doc defines): inline-define it in the spec
   and record it (Open Question or `FIXME:` callout), then add the own-it/promote question
   to the deferred questions block.

@@ -114,3 +114,30 @@ When a companion file is already referenced from another section
 
 Each entry: name + one-line description of relevance.
 Omit if nothing meaningful to note.
+
+## Cross-spec reference format
+<!-- §cross-spec-references -->
+
+A spec points at a sibling spec by slug, never by path:
+`` `<spec:wk-init>` ``, not `SPEC-DRAFT-wk-init/SPEC.md`.
+
+The form is `<spec:` followed by the target's slug and `>`, e.g. `` `<spec:wk-init>` `` targets the
+`wk-init` spec.
+The slug is state-independent: the target's status tag may move from `[DRAFT]` to `[READY]`, and the
+reference holds unchanged.
+A reader finds the target by its slug — in the repo's layout, the directory name carries it.
+
+Wrap the reference in backticks: an unquoted `<spec:…>` reads as markup to MDX/JSX-style renderers,
+and the reference can vanish.
+
+Carry the relationship in ordinary prose, not in the placeholder:
+"depends on `` `<spec:wk-init>` ``", "owned by `` `<spec:devtree-daemons>` ``".
+There is no `<spec:slug:depends>` form.
+
+A reference is a promise that the target exists.
+Resolve a dangling reference before finishing the fill pass.
+Where the target cannot be checked — a tool without filesystem access — reference only the specs
+named in the inputs and raise the rest in the deferred questions.
+When a spec is renamed, every reference to its old slug goes stale: search the project root for
+`<spec:old-slug>`, update the hits whose subject is the renamed spec, and keep only the sentences
+that record the previous name.

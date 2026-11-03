@@ -22,6 +22,9 @@ Check each of the following, flag any issues:
 - No terminology drift — single canonical name used everywhere for each concept
 - No project-global doc content restated — concepts and terms documented there
   are referenced, not redefined
+- Cross-spec references are written by slug — `` `<spec:wk-init>` `` — and match a directory that
+  exists, `SPEC-*-<slug>/`; no `SPEC-<STATE>-<slug>/` path stands in for one
+  (see <../spec-structure.md§cross-spec-references>)
 - Gaps are inline-defined and recorded; promoted gaps carry a `work-capture-handoff` capture
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative),
   or dropped with its flagged omission comment.

@@ -244,6 +244,32 @@ When a companion file is already referenced from another section
 Each entry: name + one-line description of relevance.
 Omit if nothing meaningful to note.
 
+### Cross-spec references
+
+A spec points at a sibling spec by slug, never by path:
+`` `<spec:wk-init>` ``, not `SPEC-DRAFT-wk-init/SPEC.md`.
+
+The form is `<spec:` followed by the target's slug and `>`, e.g. `` `<spec:wk-init>` `` targets the
+`wk-init` spec.
+The slug is state-independent: the target's status tag may move from `[DRAFT]` to `[READY]`, and the
+reference holds unchanged.
+A reader finds the target by its slug — in the repo's layout, the directory name carries it.
+
+Wrap the reference in backticks: an unquoted `<spec:…>` reads as markup to MDX/JSX-style renderers,
+and the reference can vanish.
+
+Carry the relationship in ordinary prose, not in the placeholder:
+"depends on `` `<spec:wk-init>` ``", "owned by `` `<spec:devtree-daemons>` ``".
+There is no `<spec:slug:depends>` form.
+
+A reference is a promise that the target exists.
+Resolve a dangling reference before finishing the pass.
+Where the target cannot be checked — a tool without filesystem access — reference only the specs
+named in the inputs and raise the rest in the deferred questions.
+When a spec is renamed, every reference to its old slug goes stale: search the project root for
+`<spec:old-slug>`, update the hits whose subject is the renamed spec, and keep only the sentences
+that record the previous name.
+
 ### Open Questions format
 
 Two kinds of open questions exist in a spec:
@@ -279,6 +305,9 @@ After all sections are filled, check:
 - Terminology section (if present) is complete prose (no skeleton placeholders)
 - If Terminology section exists: all terms used in spec are defined there before first use
 - No terminology drift — single canonical name used everywhere for each concept
+- Cross-spec references are written by slug — `` `<spec:wk-init>` `` — and name a spec that exists;
+  a `SPEC-<STATE>-<slug>/` path never stands in for one.
+  Without filesystem access, defer the existence check to the deferred questions.
 - `## Global Open Questions` section is present at end of spec
 - No empty `### Open Questions` subsections remain (Global section is exempt — it is always present)
 - `FIXME:` callouts are allowed as design signals — they do not block readiness.
