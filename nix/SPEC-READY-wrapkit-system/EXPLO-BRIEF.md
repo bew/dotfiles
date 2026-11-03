@@ -2,11 +2,11 @@
 
 ## Motivation
 
-Pre-spec exploration feeding a future `SPEC.md` in this directory.
+Pre-spec exploration that fed the `SPEC.md` in this directory.
 Records findings and the design discussion; feeds the spec later.
 
 - **Name**: wrapkit-system.
-- **Slug / dir**: `nix/_WIP_SPECS/wrapkit-system/`.
+- **Slug / dir**: `nix/SPEC-READY-wrapkit-system/`.
 - **Scope**: one spec covering both the module-system design and the standalone-flake packaging.
 - **Nature**: both a kit (own eval, ID, outputs, `lib.extendWith`) and a set of embeddable modules that plug into existing evals.
 - **Problems solved**, in priority order: composable env overrides; unify wrapped-drv outputs; reusability outside dotfiles.
@@ -33,7 +33,7 @@ Records findings and the design discussion; feeds the spec later.
   Proposed the three models and the concern split (generator vs env-override system).
   User asked to write exploration docs before the spec; chose index-only for now.
 - Round 3 — pluggability clarified.
-  `profiles.*` is external to wrapkit; wrapkit plugs in via constructors (`mkWrapkitEnvOption`, `mkWrapkitOptions`, `mkWrapkitPkg`).
+  `profiles.*` is external to wrapkit; wrapkit plugs in via constructors (`mkWrapkitWrapperOption`, `mkWrapkitOptions`, `mkWrapkitPkg`).
   Added Model D and moved the profile sketch into The design crux.
 - Round 4 — shape converged.
   Renamed `mkWrapkitPkg` to `mkWrapkitBin` (wraps one bin; accepts a path or a package via `lib.getExe`).
