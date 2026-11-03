@@ -23,33 +23,47 @@ permissions:
   - {action: websearch, resource: "*", effect: deny}
   - {action: shell, resource: "*", effect: deny}
   # allow common exploration actions
-  - {action: shell, resource: "echo", effect: allow}
-  - {action: shell, resource: "head", effect: allow}
-  - {action: shell, resource: "tail", effect: allow}
-  - {action: shell, resource: "grep", effect: allow}
-  - {action: shell, resource: "rg", effect: allow}
-  - {action: shell, resource: "find", effect: allow}
-  - {action: shell, resource: "ls", effect: allow}
-  - {action: shell, resource: "wc", effect: allow}
-  - {action: shell, resource: "stat", effect: allow}
-  - {action: shell, resource: "file", effect: allow}
-  - {action: shell, resource: "diff", effect: allow}
-  - {action: shell, resource: "jq", effect: allow}
-  - {action: shell, resource: "sort", effect: allow}
-  - {action: shell, resource: "uniq", effect: allow}
-  # allow specific git actions
+  # NOTE: the trailing ` *` covers commands with arguments, e.g. `grep -n foo`.
+  - {action: shell, resource: "echo *", effect: allow}
+  - {action: shell, resource: "head *", effect: allow}
+  - {action: shell, resource: "tail *", effect: allow}
+  - {action: shell, resource: "grep *", effect: allow}
+  - {action: shell, resource: "rg *", effect: allow}
+  - {action: shell, resource: "find *", effect: allow}
+  - {action: shell, resource: "ls *", effect: allow}
+  - {action: shell, resource: "wc *", effect: allow}
+  - {action: shell, resource: "stat *", effect: allow}
+  - {action: shell, resource: "file *", effect: allow}
+  - {action: shell, resource: "diff *", effect: allow}
+  - {action: shell, resource: "jq *", effect: allow}
+  - {action: shell, resource: "sort *", effect: allow}
+  - {action: shell, resource: "uniq *", effect: allow}
+  # allow specific read-only git actions
+  - {action: shell, resource: "git blame*", effect: allow}
+  - {action: shell, resource: "git branch*", effect: allow}
+  - {action: shell, resource: "git cat-file*", effect: allow}
   - {action: shell, resource: "git diff*", effect: allow}
-  - {action: shell, resource: "git ls-files*", effect: allow}
+  - {action: shell, resource: "git grep*", effect: allow}
   - {action: shell, resource: "git log*", effect: allow}
+  - {action: shell, resource: "git ls-files*", effect: allow}
+  - {action: shell, resource: "git ls-tree*", effect: allow}
+  - {action: shell, resource: "git merge-base*", effect: allow}
+  - {action: shell, resource: "git rev-parse*", effect: allow}
   - {action: shell, resource: "git show*", effect: allow}
   - {action: shell, resource: "git status*", effect: allow}
+  # same set, with an explicit `-C <dir>` (preferred form, see "Shell rules")
+  - {action: shell, resource: "git -C * blame*", effect: allow}
+  - {action: shell, resource: "git -C * branch*", effect: allow}
+  - {action: shell, resource: "git -C * cat-file*", effect: allow}
   - {action: shell, resource: "git -C * diff*", effect: allow}
+  - {action: shell, resource: "git -C * grep*", effect: allow}
   - {action: shell, resource: "git -C * log*", effect: allow}
+  - {action: shell, resource: "git -C * ls-files*", effect: allow}
+  - {action: shell, resource: "git -C * ls-tree*", effect: allow}
+  - {action: shell, resource: "git -C * merge-base*", effect: allow}
+  - {action: shell, resource: "git -C * rev-parse*", effect: allow}
   - {action: shell, resource: "git -C * show*", effect: allow}
   - {action: shell, resource: "git -C * status*", effect: allow}
-  - {action: shell, resource: "git -C * grep*", effect: allow}
-  - {action: shell, resource: "git -C * blame*", effect: allow}
-  - {action: shell, resource: "git -C * rev-parse*", effect: allow}
 ---
 
 # Diff Explorer
@@ -58,7 +72,12 @@ Explore diff, produce structured summary.
 Load `caveman` skill for terse output.
 
 Set `$dir` = working directory provided by caller.
-Use `git -C $dir` for all git commands.
+
+## Shell rules
+
+Run git through `git -C $dir` (or set the shell tool's `workdir`).
+Compound commands are fine; build them from these read-only tools:
+`git`, `grep`, `rg`, `ls`, `head`, `tail`, `wc`, `stat`, `file`, `diff`, `jq`, `sort`, `uniq`, `echo`.
 
 ## Input contract
 
@@ -91,7 +110,7 @@ Choose method based on diff source:
 
 **Git context** (caller mentions "staged", "commit", "branch", "HEAD", SHA, or similar git vocabulary).
 Run appropriate git command using `$dir`:
-- Unstaged changes (aka 'current diff'): `git -C $dir diff --unstaged`
+- Unstaged changes (aka 'current diff'): `git -C $dir diff`
 - Staged changes: `git -C $dir diff --staged`
 - Specific commit: `git -C $dir show <sha> --format=""`
 - Branch diff: `git -C $dir diff <base>..<head>`
