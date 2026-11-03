@@ -26,6 +26,12 @@ function setup() {
     git tag v1.2.3
 }
 
+# Drop VERSION from the test repo, committing the removal.
+function setup_repo_without_version() {
+    git rm -q VERSION
+    git commit -qm "drop VERSION"
+}
+
 # ------------------------------------------------------------------------------
 # Tests: defaults
 
@@ -48,6 +54,14 @@ function setup() {
 @test "defaults: section headers use the :: prefix" {
     run -0 "$SCRIPT_PATH" <<< 'q'
     [[ "$output" == *":: Commits since v1.2.3:"* ]]
+}
+
+@test "defaults: missing VERSION is skipped" {
+    setup_repo_without_version
+    run -0 "$SCRIPT_PATH" <<< $'\n\n'
+    [[ "$(git tag --list v1.3.0)" == "v1.3.0" ]]
+    [[ ! -e VERSION ]]
+    [[ "$(git rev-list --count HEAD)" == "2" ]]
 }
 
 @test "defaults: warns and assumes v0.0.0 when no tag exists" {
@@ -82,12 +96,12 @@ function setup() {
 }
 
 @test "cli: custom commit message is used" {
-    run -0 "$SCRIPT_PATH" <<< $'p\ny\nchore: cut release\n'
+    run -0 "$SCRIPT_PATH" <<< $'p\ny\n\nchore: cut release\n'
     [[ "$(git log -1 --format=%s)" == "chore: cut release" ]]
 }
 
 @test "cli: literal tag is not confirmed" {
-    run -0 "$SCRIPT_PATH" <<< $'v9.9.9\nchore: cut release\n'
+    run -0 "$SCRIPT_PATH" <<< $'v9.9.9\n\nchore: cut release\n'
     [[ "$(git tag --list v9.9.9)" == "v9.9.9" ]]
     [[ "$(git log -1 --format=%s)" == "chore: cut release" ]]
 }
@@ -96,6 +110,21 @@ function setup() {
     run -0 "$SCRIPT_PATH" <<< $'p\nn\nM\ny\n\n'
     [[ "$(git tag --list v2.0.0)" == "v2.0.0" ]]
     [[ "$(git tag --list v1.2.4)" == "" ]]
+}
+
+@test "cli: accepting VERSION creation writes and commits it" {
+    setup_repo_without_version
+    run -0 "$SCRIPT_PATH" <<< $'\n\ny\n'
+    [[ "$(git show HEAD:VERSION)" == "1.3.0" ]]
+    [[ -z "$(git status --porcelain)" ]]
+}
+
+@test "cli: declining VERSION update tags HEAD without a commit" {
+    run -0 "$SCRIPT_PATH" <<< $'\n\nn\n'
+    [[ "$(git tag --list v1.3.0)" == "v1.3.0" ]]
+    [[ "$(cat VERSION)" == "1.2.3" ]]
+    [[ "$(git rev-list --count HEAD)" == "1" ]]
+    [[ "$(git rev-parse v1.3.0)" == "$(git rev-parse HEAD)" ]]
 }
 
 @test "cli: q aborts without changes" {
@@ -123,6 +152,18 @@ function setup() {
 }
 
 # ------------------------------------------------------------------------------
+# Tests: edge
+
+@test "edge: VERSION already at the target is not re-committed" {
+    printf '1.3.0\n' > VERSION
+    git commit -qam "bump VERSION"
+    run -0 "$SCRIPT_PATH" <<< 'v1.3.0'
+    [[ "$(git rev-list --count HEAD)" == "2" ]]
+    [[ "$(git rev-parse v1.3.0)" == "$(git rev-parse HEAD)" ]]
+    [[ -z "$(git status --porcelain)" ]]
+}
+
+# ------------------------------------------------------------------------------
 # Tests: integration
 
 @test "integration: action log lines use the → prefix" {
@@ -132,6 +173,11 @@ function setup() {
     [[ "$output" == *"→ Staging VERSION"* ]]
     [[ "$output" == *"→ Committing VERSION"* ]]
     [[ "$output" == *"→ Tagging v1.3.0"* ]]
+}
+
+@test "integration: skipped VERSION logs the skip action" {
+    run -0 "$SCRIPT_PATH" <<< $'\n\nn\n'
+    [[ "$output" == *"→ Skipping VERSION; tagging HEAD directly"* ]]
 }
 
 @test "integration: tag points at the release commit" {

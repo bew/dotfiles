@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Tag the current commit as a release, syncing the local VERSION file.
-# Prompts for a new tag or a semver bump, commits VERSION, then tags.
+# Prompts for a new tag or a semver bump, then creates/updates VERSION and tags.
 
 import shutil
 import subprocess
@@ -15,6 +15,9 @@ C_TAG = "\033[1;95m"     # bright bold magenta
 C_DEFAULT = "\033[1;34m" # bold blue
 
 BUMP_KEYWORDS = {"m", "minor", "M", "major", "p", "patch"}
+
+# Release version file at the repository root, holding the bare version (no `v` prefix).
+VERSION_FILE = Path("VERSION")
 
 
 class ScriptError(Exception):
@@ -41,7 +44,9 @@ def usage_and_exit(status: int) -> NoReturn:
     """Print usage to stderr and exit with status."""
     print_err("Usage: tag-please")
     print_err("")
-    print_err("Bump VERSION, commit, and tag a release in the current git repository.")
+    print_err("Tag a release in the current git repository, syncing VERSION along the way.")
+    print_err("An existing VERSION is updated, a missing one may be created.")
+    print_err("Declining skips VERSION entirely and tags HEAD with no commit.")
     print_err("Must be run from the repository root. Aborts if the worktree is dirty.")
     print_err("The detected last tag must start with `v`.")
     print_err("")
@@ -144,6 +149,61 @@ def prompt_input(prompt_text: str) -> str:
         return ""
 
 
+def prompt_yes_no(question: str, default_yes: bool) -> bool:
+    """Ask question and return the answer; empty or unrecognised input yields the default."""
+    hint = paint("[Y/n]", C_DEFAULT) if default_yes else paint("[y/N]", C_DEFAULT)
+    answer = prompt_input(f"{question} {hint}: ").strip().lower()
+    if answer in {"y", "yes"}:
+        return True
+    if answer in {"n", "no"}:
+        return False
+    return default_yes
+
+
+def read_version() -> str | None:
+    """Return the version recorded in VERSION, or None when the file does not exist."""
+    if not VERSION_FILE.exists():
+        return None
+    return VERSION_FILE.read_text().strip()
+
+
+def sync_version(new_tag: str) -> None:
+    """Create or update VERSION and commit it, skipping when it is unwanted or already current."""
+    version = new_tag.removeprefix("v")
+    current_version = read_version()
+
+    if current_version == version:
+        print_action_line(f"VERSION already at {paint(version, C_TAG)}; nothing to commit")
+        return
+
+    if current_version is None:
+        should_write = prompt_yes_no(
+            f"Create VERSION with {paint(version, C_TAG)}",
+            default_yes=False,
+        )
+    else:
+        should_write = prompt_yes_no(
+            f"Update VERSION {paint(current_version, C_TAG)} to {paint(version, C_TAG)}",
+            default_yes=True,
+        )
+
+    if not should_write:
+        print_action_line("Skipping VERSION; tagging HEAD directly")
+        return
+
+    print_action_line(f"Writing VERSION {paint(version, C_TAG)}")
+    VERSION_FILE.write_text(f"{version}\n")
+
+    print_action_line("Staging VERSION")
+    run_git(["add", str(VERSION_FILE)])
+
+    commit_default = f"misc: release {new_tag}"
+    raw_commit = prompt_input(f"Commit message [{paint(commit_default, C_DEFAULT)}]: ")
+    commit_msg = raw_commit or commit_default
+    print_action_line("Committing VERSION")
+    run_git(["commit", "-m", commit_msg])
+
+
 def main() -> bool:
     if len(sys.argv) > 1:
         usage_and_exit(1)
@@ -200,18 +260,7 @@ def main() -> bool:
 
     print_section_line(f"Releasing as {paint(new_tag, C_TAG)}")
 
-    version = new_tag.removeprefix("v")
-    print_action_line(f"Writing VERSION {paint(version, C_TAG)}")
-    Path("VERSION").write_text(f"{version}\n")
-
-    print_action_line("Staging VERSION")
-    run_git(["add", "VERSION"])
-
-    commit_default = f"misc: release {new_tag}"
-    raw_commit = prompt_input(f"Commit message [{paint(commit_default, C_DEFAULT)}]: ")
-    commit_msg = raw_commit or commit_default
-    print_action_line("Committing VERSION")
-    run_git(["commit", "-m", commit_msg])
+    sync_version(new_tag)
 
     sha = capture_git(["rev-parse", "--short", "HEAD"]).strip()
     print_action_line(f"Tagging {paint(new_tag, C_TAG)} at {sha}")
