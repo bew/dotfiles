@@ -53,10 +53,7 @@ Don't pre-create empty sections — fill them as content lands.
 
 ## Conclude a topic
 
-When the user signals a topic's design is settled:
-- `dedicated`: mark the topic `frozen` in the brief index.
-- `adhoc`: set the file's H1 tag to `[frozen]`.
-- Leave any unresolved items under `Open threads`.
+When the user signals a topic's design is settled, freeze it per <../freeze.md>.
 
 Freezing the last topic does not end the exploration.
 Move to `Phase:Wrap` and ask its exit question; the user decides whether to exit.

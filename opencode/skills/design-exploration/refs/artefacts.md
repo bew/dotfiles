@@ -177,7 +177,7 @@ Topic status:
 - `dedicated` — recorded in the brief index as `(<status>)`.
 - `adhoc` — recorded in the file's H1 as `# <topic> — [<status>]`.
 - `active` — currently being explored; a topic that has never been frozen.
-- `frozen` — settled; no further exploration expected.
+- `frozen` — settled; no further exploration expected — reached only via <./freeze.md>.
 - `revived` — currently being explored after a freeze; kept distinct from `active` so a resumed
   topic still shows it was settled once.
 - `unsettled` — not settled at exit: opened but never settled, or reopened and left open.
@@ -208,7 +208,8 @@ In `dedicated` mode status lives only in the brief index; in `adhoc` mode it liv
 or in the parent's `(unexplored)` line for a topic with no file.
 In `dedicated` mode that line is a mention, never a second status record.
 A topic that never got a file of its own is `unexplored`; in `adhoc` mode its only record is a
-line in the parent topic's `## Open threads`:
+line in the parent topic's `## Open threads`, or in the `Open threads` of the topic just discussed
+when there is no parent, and in the reply alone when no topic file exists yet:
 ```md
 - (unexplored) `<topic>` — <why it was not opened>
 ```

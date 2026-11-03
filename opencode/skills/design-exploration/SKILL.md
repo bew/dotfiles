@@ -78,7 +78,8 @@ Apply in every phase.
   `Open threads`, and its directions still on the table; then every other topic that still holds
   `Open threads`, with its thread lines.
   Reporting only that topic reads as if nothing else is unfinished.
-  Threads flag, never block: a switch, a freeze, and the exit answer all stay available.
+  Threads flag, never block: an open thread withholds neither a topic switch, nor a freeze, nor the
+  exit answer.
 - **Never echo the file.** After writing or updating any exploration file (`$topicpath`
   or `$briefpath`), do not reproduce its content inline. Reply with a short overview
   (what the file now holds, where it lives) and only the actionable items — open forks,

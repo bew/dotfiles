@@ -12,7 +12,8 @@ everything is settled are not exit signals.
 Confirm every topic carries a status (`active`/`frozen`/`revived`/`unsettled`/`unexplored`),
 recorded per the mode in <../artefacts.md>.
 `active` and `revived` stay provisional until the exit answer re-records them.
-Freeze any topic the user declares settled; note genuinely unresolved `Open threads`.
+A topic the user declares settled freezes per <../freeze.md>, which decides whether that freeze is
+available at all and asks before writing a status the discussion does not support.
 
 ## Exit question
 
