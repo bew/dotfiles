@@ -122,10 +122,10 @@ All extend the rules below.
 
 ## Comments & docs rules
 
-### Semantic line breaks
+### Wrapped semantic line breaks
 
-- Every comment — file header, function documentation, and inline — uses semantic line breaks:
-  each sentence starts on its own line.
+- Every comment — file header, function documentation, and inline — uses wrapped semantic line
+  breaks: each sentence starts on its own line, and a long sentence wraps across lines.
 - Keep comment lines within about 100 columns.
   When a language skill states its own max width, that one wins.
 
