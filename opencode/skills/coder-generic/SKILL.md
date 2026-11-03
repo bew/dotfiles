@@ -185,6 +185,11 @@ All extend the rules below.
 ## Guidelines
 
 - Prefer `get_*` for functions that compute/return a value.
+  Prefix a lookup with `try_` (`try_get_*`, `try_find_*`) when finding nothing is normal rather
+  than a failure; the caller branches on the absence. Without it, absence is an error.
+  Document how absence is signalled (null/optional, exit code, empty result).
+  Only lookups qualify: a failing `parse_*`, `read_*`, or side-effecting function is a failed
+  attempt, not a miss.
 - Prefer `check_*` for validation functions.
 - Prefer `parse_*` for argument/input parsing.
 - Name parameters and locals after the value they hold, not the container they came in.
