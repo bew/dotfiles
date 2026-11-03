@@ -7,8 +7,8 @@ Records findings and the design discussion; feeds the spec later.
 
 - **Name**: wrapkit-system.
 - **Slug / dir**: `nix/SPEC-READY-wrapkit-system/`.
-- **Scope**: one spec covering both the module-system design and the standalone-flake packaging.
-- **Nature**: both a kit (own eval, ID, outputs, `lib.extendWith`) and a set of embeddable modules that plug into existing evals.
+- **Scope**: one spec covering both the module-system design and the `wraplib` export.
+- **Nature**: both a kit (its own evaluation and `lib.extendWith` support) and a set of embeddable helpers for host evals.
 - **Problems solved**, in priority order: composable env overrides; unify wrapped-drv outputs; reusability outside dotfiles.
   Deduplicating the three toolkits' makeWrapper blocks is *not* a stated goal, though it may fall out.
 - **Env schema richness**: model the full makeWrapper flag surface.
@@ -19,10 +19,11 @@ Records findings and the design discussion; feeds the spec later.
 
 ## Topics
 
-- (active) `env-override-model` — env submodule type, install sites, module-priority merge, Models A–D, external-profile pluggability.
-- (active) `wrapped-drv-generator` — `mkWrapkitBin`, `wrappedBin`/`binName`, `$out` layouts, output construction.
-- (active) `wrapper-schema` — full makeWrapper surface, `sep`, flags, process control.
-- (active) `packaging-composition` — how a single-bin drv composes into a package.
+- (frozen) `env-override-model` — env submodule type, install sites, module-priority merge, Models A–D, external-profile pluggability.
+- (frozen) `wrapped-drv-generator` — `mkWrapkitBin`, `wrappedBin`/`binName`, `$out` layouts, output construction.
+- (frozen) `wrapper-schema` — full makeWrapper surface, `sep`, flags, process control.
+- (frozen) `packaging-composition` — how a single-bin drv composes into a package.
+- (frozen) `kit-half` — kit eval shape, opinionated module (commons + per-profile overrides + per-profile wrapped drv), toolkit-vs-newKit substrate.
 
 ## Discussion log
 
@@ -50,3 +51,8 @@ Records findings and the design discussion; feeds the spec later.
 - Round 8 — `$out` layout and `binName` settled.
   `binName` is a `mkWrapkitBin` param; a non-null value (default derived from `wrappedBin`) selects `$out/bin/<binName>`, `null` selects the single-file `$out` layout.
   `wrappedBin` accepts both a path string and a derivation (`lib.getExe`).
+- Round 9 — kit half explored (topic `kit-half`, record in `EXPLO-kit-half.md`).
+  The kit is one `newKit` eval (`class = "wrapkit"`) that the per-bin mini-evals run through via `kitsys`.
+  Hosts always go through `mkWrapkitBin`, which returns `{ config; drv; }` so a host can refine the config with `lib.extendWith`; the two `throw`s become assertions.
+  The opinionated toolkit module is a separate artifact under `nix/kits/toolkit-modules/`, owning `wrapper.*` and `profiles.*`.
+  The standalone flake is dropped, its helper export folded into the kit milestone as `wraplib`.

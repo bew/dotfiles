@@ -13,7 +13,7 @@ This follows once the merge itself is proven.
 ## Tasks
 
 - Implement `mkWrapkitWrapperOption { }` returning the record option (`lib.mkOption { type = wrapperType; default = {}; }`), and use it for the base module's own `wrapper` option.
-- Expose `mkWrapkitWrapperOption` publicly (wired into the flake's `wraplib` output in M8).
+- Expose `mkWrapkitWrapperOption` publicly (part of the `wraplib` export in M7).
 
 ## References
 

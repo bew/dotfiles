@@ -12,21 +12,21 @@ The results have drifted: the `env` option is `{set, set-default}` for tmuxkit, 
 wrapkit-system addresses these problems, in priority order:
 - composable environment overrides, so a shared default can be overridden per consumer;
 - unified wrapped-drv outputs, so every tool produces the same shape;
-- reusability outside dotfiles, so the same system can be consumed as a standalone flake.
+- reusability outside dotfiles, so the same system can be consumed through the `wraplib` export.
 
 Deduplicating the toolkits' makeWrapper blocks is *not* a stated goal, though it may fall out of the unification.
 
-The system is simultaneously a **kit** (its own evaluation, IDs, outputs, and `lib.extendWith` support) and a set of **embeddable modules** that plug into existing evaluations.
-The kit half makes it usable standalone and composable with the repo's other kits; the embeddable half lets a host evaluation (a toolkit, a home, a profile system) declare a record option at a chosen site and build wrapped bins from it.
+The system is simultaneously a **kit** (its own evaluation and `lib.extendWith` support) and a set of **embeddable helpers** for host evaluations.
+The kit half makes it usable standalone and composable with the repo's other kits; the helpers let a host evaluation (a toolkit, a home, a profile system) declare a record option at a chosen site and build wrapped bins from it.
 
 Use-cases the design must serve:
 - a toolkit builds its wrapped bin from shared defaults plus tool-specific wrapper arguments;
 - a user overrides an env variable for one consumer without touching the shared default;
-- a host outside dotfiles reuses wrapkit through a standalone flake;
+- a host outside dotfiles reuses wrapkit through the `wraplib` export;
 - the same wrapped bin is emitted in either the conventional `$out/bin/<binName>` layout or a single-file `$out` layout.
 
 The design is inspired by the existing per-toolkit wrapper blocks and by the `makeWrapper` primitives themselves, which are the vocabulary the wrapper schema models.
-It follows the repo's prior art for a module exportable in several variants at once: the `dynpaths` flake, which exposes `modules.generic.dynpaths`, `modules.homeManager.dynpathsChecker`, and `modules.kitsys.dynpaths` from one source.
+The kit half builds on the repo's kit system (`nix/kit-system`), the substrate the repo's other kits share.
 It is also informed by the sibling draft `nix/SPEC-DRAFT-hm-toolconfigs-integration-CRAZY!/SPEC.md`, which proposes recomputing a tool config's outputs against per-home config via `lib.extendWith`.
 
 ## Terminology & Key Concepts
@@ -77,7 +77,7 @@ The `mkWrapkitBin` input form that passes `wrappers = [ <record value> … ]`; t
 The step that strips `null` fields (and `unset = false`) from a resolved record so it is safe to apply as a definition.
 
 **mini-eval** (new!):
-The small `lib.evalModules` invocation run by `mkWrapkitBin`, whose `output` is the wrapped bin.
+The small evaluation run by `mkWrapkitBin` through the wrapkit kit, producing the wrapped bin.
 
 **wrapper schema** (new!):
 The typed model of the full `makeWrapper` surface (env actions, flags, process control).
@@ -95,20 +95,14 @@ Identifier patterns:
 - Result names are owned by the external profile system (`profiles.<name>`); wrapkit does not name results.
 - Toolkit and tool-config IDs follow the existing `nix/kits/README.md` conventions and are external to wrapkit.
 
-The standalone flake lives in `nix/wrapkit-flake/`.
-It exposes its helper functions and the embeddable module through a `wraplib` output.
-The rest of the flake's output naming is still open — see Open Questions.
-
-### Open Questions
-
-1. What is the standalone flake's output naming, beyond its `wraplib` output?
-   Non-blocking. The directory is settled (`nix/wrapkit-flake/`); the remaining output names are deferred to the flake-packaging milestone.
+`wraplib` is the export that holds wrapkit's helper functions: `mkWrapkitBin`, `wrapperType`, `mkWrapkitWrapperOption`.
+It is exposed from `nix/kits/wrapkit/default.nix`; no module is exported.
 
 ## Interface / How to use
 
 ### `mkWrapkitBin`
 
-The primary entry point runs a mini-eval and returns its `output`.
+The primary entry point runs a mini-eval and returns `{ config; drv; }` — the evaluated config and the wrapped bin.
 It takes one of two mutually exclusive record inputs — **inline** or **layered**:
 
 ```nix
@@ -132,11 +126,13 @@ mkWrapkitBin = { wrappedBin, binName ? <derived from wrappedBin>, wrapper ? null
       if wrappers != null
       then map normalizeWrapper wrappers
       else lib.optional (wrapper != null) wrapper;
+    evaled = wrapkit.eval {
+      pkgs = pkgs;
+      config = { _module.args = { inherit wrappedBin binName; }; };
+      moreModules = map (r: { wrapper = r; }) records;
+    };
   in
-  (lib.evalModules {
-    modules = [ ./wrapkit-base.module.nix ] ++ map (r: { wrapper = r; }) records;
-    specialArgs = { inherit wrappedBin binName; } // specialArgs;
-  }).config.output;
+  { config = evaled; drv = evaled.output; };
 ```
 
 - `wrappedBin` — the binary to wrap: a path string (`"${somepkg}/bin/foo"`) or a derivation, resolved with `lib.getExe`.
@@ -144,7 +140,7 @@ mkWrapkitBin = { wrappedBin, binName ? <derived from wrappedBin>, wrapper ? null
   A non-null value selects the `$out/bin/<binName>` layout; `null` selects the single-file `$out` layout.
 - `wrapper` (inline mode) — one record written as definitions; the mini-eval merges it by ordinary module priority, and `lib.mkForce` is available.
 - `wrappers` (layered mode) — an ordered list of already-resolved record values; each becomes one definition of the base module's `wrapper` option, so the second module application merges them.
-- `specialArgs` — extra values threaded into the mini-eval (the base module injects `wrappedBin` and `binName`).
+- `specialArgs` — extra values threaded into the mini-eval (the kit injects `wrappedBin` and `binName` as module args).
 
 The two record inputs are asserted mutually exclusive.
 `normalizeWrapper` runs in layered mode only; inline mode passes the record through untouched, because a record written as definitions may legitimately use `lib.mkForce`.
@@ -154,7 +150,7 @@ A complete, non-toy wiring for tmux.
 The host's own record options — named `wrapper` and `profiles.<name>.wrapper` here — hold the shared default and the per-result override; both are resolved values, so the wiring uses layered mode:
 
 ```nix
-wrapkit = import ./wrapkit; # or a flake output
+wrapkit = import ./wrapkit; # the `wraplib` export
 
 entrypoint = "/nix/store/…/tmux.conf";
 
@@ -260,7 +256,7 @@ This is what makes overrides composable rather than wholesale replacements.
 
 The merge happens **inside `mkWrapkitBin`**, across two module applications — see Two module applications, not one.
 
-The mini-eval uses plain `lib.evalModules` for now; building it on `kitsys` is a later option (see Design options).
+The mini-eval runs through `kitsys` (`defineEval`), so it gains assertions/warnings and `config.lib.extendWith` (see Design options).
 
 ### Two module applications, not one
 
@@ -335,9 +331,9 @@ Verified in a plain mini-eval (`findings/spikes/env-merge.nix` in Related artifa
 `profiles.*` is not defined by wrapkit.
 The profile system is a separate, future concept that wrapkit plugs into via the `mkWrapkitBin` constructor, as sketched in Interface / How to use.
 
-`mkWrapkitWrapperOption` is a public export, exposed through the standalone flake's `wraplib` output alongside the embeddable module, so an external profile system installs its record options from the same schema.
+`mkWrapkitWrapperOption` is a public export, exposed through `wraplib`, so an external profile system installs its record options from the same schema.
 The commons lives at the evaluation root (`wrapper.*`); a `wrapkit` namespace was considered and set aside to keep the user-facing path short.
-The kit half is a separate, independent evaluation from the per-bin mini-evals — see Placement / Scope.
+The kit is one evaluation; `mkWrapkitBin` runs it per bin with `wrappedBin` and `binName` as module args — see Placement / Scope.
 
 ## Wrapper schema
 
@@ -437,9 +433,9 @@ A path string that does not end in a program name (a directory, or a trailing sl
 
 ## Placement / Scope
 
-wrapkit-system is delivered as both a **kit** and a set of **embeddable modules**.
-The kit half makes it usable standalone and composable with the repo's other kits (`lib.extendWith` support, IDs, outputs).
-The embeddable half supplies the base module and the `wrapper` record type that a host can install at chosen sites.
+wrapkit-system is delivered as both a **kit** and a set of **embeddable helpers**.
+The kit half makes it usable standalone and composable with the repo's other kits (`lib.extendWith` support).
+The helpers supply the `wrapper` record type and its option constructor (`mkWrapkitWrapperOption`), which a host installs at chosen sites; the base module stays internal to `mkWrapkitBin`.
 
 Where things may be defined:
 - the **commons** at the root of a host evaluation, wherever the host installed the record option (e.g. `config.wrapper.*`);
@@ -451,8 +447,8 @@ What wrapkit does and does not own:
 - wrapkit **does not** define `profiles.*`; the profile system is external.
 - wrapkit's target is a **single bin**; package/multi-bin composition (bins plus config dirs) is outside it, and is left to a later `mkWrapkitPkg` constructor rather than to each toolkit.
 
-The kit half is a separate, independent evaluation from the per-bin mini-evals.
-The two share the base module and the wrapper schema, but the kit's evaluation is not the mini-eval.
+The kit is one evaluation; each `mkWrapkitBin` call runs it with `wrappedBin` and `binName` supplied as module args.
+The mini-evals share the kit's base module and the wrapper schema rather than defining their own eval.
 
 ## Env override as a merge primitive (env default as module definition)
 
@@ -492,7 +488,7 @@ The record option comes from one constructor, used like any other option definit
 
 Where the option is declared is ordinary host code, so the commons and a per-site override are the same kind of value from the same source.
 
-`mkWrapkitWrapperOption` ships as a public export through the flake's `wraplib` output, so a host installs the option from the same source — see Environment override model.
+`mkWrapkitWrapperOption` ships as a public export through the `wraplib` export, so a host installs the option from the same source — see Environment override model.
 
 ## Design options
 
@@ -505,8 +501,8 @@ Decision criteria: use bin-dir whenever the bin must compose into `PATH`, `build
 Decision criteria: use the per-VAR submodule when typed, per-action override merging matters (the composability goal); use an ordered list when explicit operation ordering is required and wholesale replacement is acceptable.
 The per-VAR form loses strict ordering of operations within one VAR; the ordered form loses the typed per-action merge.
 
-**Mini-eval substrate** — plain `lib.evalModules` (active) vs a `kitsys` kit (later option).
-Decision criteria: use plain `lib.evalModules` for the per-bin mini-evals to keep them small and dependency-free; move to `kitsys` if the kit half needs `lib.extendWith`, IDs, or outputs shared with the mini-evals.
+**Mini-eval substrate** — `kitsys` (`defineEval`, active) vs plain `lib.evalModules`.
+Decision criteria: the mini-eval runs through `kitsys` so it gains assertions/warnings and `config.lib.extendWith`; plain `lib.evalModules` would keep it dependency-free but cannot offer `lib.extendWith`, which needs `_kitState.currentEval` — only `defineEval` initialises it.
 
 ## Alternatives & Tradeoffs
 
@@ -545,7 +541,7 @@ normalizeWrapper = record: /* the record with every null field dropped */;
 **Model D — `mkWrapkitBin` over a small internal module system (active).**
 
 ```nix
-mkWrapkitBin : { wrappedBin, binName ? <derived>, wrapper ? null, wrappers ? null } -> <derivation>;
+mkWrapkitBin : { wrappedBin, binName ? <derived>, wrapper ? null, wrappers ? null } -> { config; drv; };
 ```
 
 - Advantages: one constructor does both halves; the merge is ordinary module merge; the host stays free to keep `profiles.*` external.
@@ -557,11 +553,11 @@ Models A/B/C were deferred in favor of D, not rejected outright.
 
 ## Related artifacts
 
-- `nix/SPEC-READY-wrapkit-system/EXPLO-*.md` — the exploration docs (`BRIEF`, `env-override-model`, `wrapped-drv-generator`, `wrapper-schema`, `packaging-composition`) that feed this spec, including the full discussion log.
+- `nix/SPEC-READY-wrapkit-system/EXPLO-*.md` — the exploration docs (`BRIEF`, `env-override-model`, `wrapped-drv-generator`, `wrapper-schema`, `packaging-composition`, `kit-half`) that feed this spec, including the full discussion log.
 - `nix/SPEC-READY-wrapkit-system/findings/spikes/*.nix` — the M1 probe scripts (`env-merge`, `makewrapper-flags`, `binname-derivation`) behind the merge, flag-semantics, and `binName` conclusions recorded in this spec.
 - `nix/mypkglib.nix` — the current shared wrapped-pkg builder (`replaceBinsInPkg`); wrapkit replaces it for the single-bin case.
 - `nix/kits/toolkit-modules/{tmuxkit,zshkit,nvimkit}-base.toolkit-module.nix` — the current per-toolkit wrapper blocks whose drift this spec unifies.
 - `pkgs/build-support/setup-hooks/make-wrapper.sh` in nixpkgs — the primitives the wrapper schema models.
-- the `dynpaths` flake (`github:bew/nix-dynpaths`) — prior art for exporting one module in several variants (`generic`, `homeManager`, `kitsys`).
+- `nix/kit-system/default.nix` — `newKit`, `defineEval`, `lib.extendWith`; the kit substrate the mini-eval runs on.
 - `nix/SPEC-DRAFT-hm-toolconfigs-integration-CRAZY!/SPEC.md` — sibling draft proposing per-home output recomputation via `lib.extendWith`; informs the result/outputs API.
-- `nix/DESIGN_config_system.md` — the Kit/Module/Preset/Profile/Config vocabulary wrapkit's "kit + embeddable modules" nature fits into.
+- `nix/DESIGN_config_system.md` — the Kit/Module/Preset/Profile/Config vocabulary wrapkit's "kit + embeddable helpers" nature fits into.

@@ -8,7 +8,7 @@
 - Related: `nix/kits/toolkits.nix`, `nix/kits/toolkit-modules/{tmuxkit,zshkit,nvimkit}-base.toolkit-module.nix` — the drifted per-toolkit wrapper blocks.
 - Related: `nix/kit-system/default.nix` — `newKit`, `defineEval`, `lib.extendWith`; the kit half's substrate.
 - Related: `nix/DESIGN_config_system.md` — Kit/Module/Preset/Profile/Config vocabulary.
-- Related: the `dynpaths` flake (`github:bew/nix-dynpaths`) — prior art for one module in several variants.
+- Related: `nix/kit-system/default.nix` — `newKit`, `defineEval`, `lib.extendWith`; the kit substrate the mini-eval runs on.
 - Related: `nix/SPEC-DRAFT-hm-toolconfigs-integration-CRAZY!/SPEC.md` — sibling draft on per-home output recomputation.
 - Related: nixpkgs `pkgs/build-support/setup-hooks/make-wrapper.sh` — the primitives the wrapper schema models.
 
@@ -26,10 +26,8 @@
   Depends on: `minimal-wrap`.
 - `install-helper` (M6): `mkWrapkitWrapperOption` as a reusable record option for any install site.
   Depends on: `composition`.
-- `kit-half` (M7): wrapkit as a kit on its own evaluation (separate from the per-bin mini-evals) — IDs, outputs, `lib.extendWith`.
+- `kit-half` (M7): wrapkit as a kit on `kitsys` — `lib.extendWith` support — plus the `wraplib` export (helpers).
   Depends on: `composition`.
-- `flake-packaging` (M8): standalone flake at `nix/wrapkit-flake/` + the remaining output naming.
-  Depends on: `kit-half`.
 
 ## Out of Scope
 
@@ -37,7 +35,6 @@
 - Single-bin → package composition (`mkWrapkitPkg`): explicitly outside wrapkit's single-bin target.
 - Defining `profiles.*`: the profile system is external; wrapkit supplies only constructors.
 - Ordered-action-list env schema variant: deferred in favor of the per-VAR action submodule.
-- `kitsys` as the mini-eval substrate: plain `lib.evalModules` for now.
 - A Terminology & Key Concepts section: a spec concern (now present in the spec), not an implementation milestone.
 - CI wiring: the repo has no CI; verification is via the `nix eval`/`nix build` commands in each milestone's Proof.
 
@@ -128,7 +125,7 @@
 
 **Ordering reason**: Packages the composition mechanism as a reusable record option after the merge itself is proven.
 
-**Finished**: `mkWrapkitWrapperOption` returning the record option, used by the base module and by a host, and publicly exported (wired into the flake's `wraplib` output in M8).
+**Finished**: `mkWrapkitWrapperOption` returning the record option, used by the base module and by a host, and publicly exported (part of the `wraplib` export in M7).
 
 **Proof**:
 - `nix eval` a host eval with `{ options.wrapper = mkWrapkitWrapperOption { }; }` — observe `config.wrapper.env.FOO.set` is accepted.
@@ -139,33 +136,18 @@
 
 ## M7 — kit-half
 
-**Goal**: Wrapkit is consumable as a kit — its own evaluation, IDs, outputs, and `lib.extendWith` support — with the kit's evaluation separate from the per-bin mini-evals.
+**Goal**: Wrapkit is consumable as a kit — built on `kitsys` with `lib.extendWith` support — and exposes the `wraplib` export (helper functions).
 
-**Ordering reason**: The kit half wraps the working embeddable modules, so it follows composition and the install helper; the eval shape is already settled (a separate, independent evaluation), so the milestone is a straight build.
+**Ordering reason**: The kit half wraps the working helpers, so it follows composition and the install helper; the kit shape is settled (one `kitsys` kit the mini-evals run through), so the milestone is a straight build.
 
-**Finished**: The wrapkit kit — its own, independent evaluation distinct from the per-bin mini-evals, with ID, outputs, and `lib.extendWith` support.
+**Finished**: The wrapkit kit built on `kitsys` — the mini-evals run through it — with `lib.extendWith` support, and the `wraplib` export holding the helper functions.
 
 **Proof**:
-- `nix eval` the kit's config — observe the declared outputs resolve.
-- Extend the kit's config with `lib.extendWith` — observe the refined config re-evaluates.
-- Confirm the kit's ID and naming follow the `nix/kits/README.md` conventions.
-- Confirm the kit's evaluation is independent of the per-bin mini-evals, sharing only the base module and schema.
+- `nix eval` a `mkWrapkitBin` call — observe it returns `{ config; drv; }` and the drv builds.
+- Extend the returned config with `lib.extendWith` — observe the refined config re-evaluates.
+- `nix eval` the `wraplib` export — observe the helper functions are present.
+- Confirm each `mkWrapkitBin` call runs the one kit with `wrappedBin` and `binName` as module args.
 
 **Tasks**: [TASK-wrapkit-system-M7-kit-half.md](./TASK-wrapkit-system-M7-kit-half.md)
 
-## M8 — flake-packaging
-
-**Goal**: Wrapkit is consumable as a standalone flake at `nix/wrapkit-flake/`, with its helpers and module exposed through a `wraplib` output and the remaining output set and naming decided.
-
-**Ordering reason**: Packaging comes last, once the kit's output surface is stable; it must also settle the remaining flake output naming the spec leaves open.
-
-**Finished**: The standalone flake at `nix/wrapkit-flake/` — its `wraplib` output and the rest of its output set and naming.
-
-**Proof**:
-- `nix flake check` in `nix/wrapkit-flake/` (or `nix eval` of the flake outputs) — observe the outputs resolve.
-- `nix eval` the `wraplib` output — observe the helper functions and the embeddable module are present.
-- Build the wrapped bin through a flake output — observe it produces the same wrapped binary.
-
-**Tasks**: [TASK-wrapkit-system-M8-flake-packaging.md](./TASK-wrapkit-system-M8-flake-packaging.md)
-
-**Future work**: Migrating the three toolkits onto wrapkit (out of scope) is the eventual consumer of this packaged kit.
+**Future work**: Migrating the three toolkits onto wrapkit (out of scope) is the eventual consumer of this kit.
