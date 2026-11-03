@@ -402,26 +402,26 @@ The builder never uses `replaceBinsInPkg`/`copyFromPkg`, because it generates a 
 
 The layout is selected by `binName`.
 
-Layout 2 (default) — `$out/bin/<binName>`:
+bin-dir layout (default) — `$out/bin/<binName>`:
 
 ```nix
-output = runCommandLocal (binName or "wrapped-bin") { nativeBuildInputs = [ makeWrapper ]; } ''
+output = runCommandLocal binName { nativeBuildInputs = [ makeWrapper ]; } ''
   mkdir -p $out/bin
   makeWrapper ${wrappedBin} $out/bin/${binName} ${lib.escapeShellArgs wrapperArgs}
 '';
 ```
 
-Layout 1 — `$out` is the executable file, opted into with `binName = null`:
+single-file layout — `$out` is the executable file, opted into with `binName = null`:
 
 ```nix
-output = runCommandLocal "wrapped-bin" { nativeBuildInputs = [ makeWrapper ]; } ''
+output = runCommandLocal "${wrappedBinName}-wrapped-bin" { nativeBuildInputs = [ makeWrapper ]; } ''
   makeWrapper ${wrappedBin} $out ${lib.escapeShellArgs wrapperArgs}
 '';
 ```
 
 Layout tradeoff:
-- Layout 2 keeps `binName` effective as the command name, composes into `PATH` environments (e.g. `home.packages` / `buildEnv`), and resolves via `lib.getExe`.
-- Layout 1 is minimal (one file), but the executable's on-disk name is the hash-prefixed derivation name and it lives outside any `bin/`, so it cannot be added to `PATH` and `lib.getExe` does not resolve it.
+- bin-dir keeps `binName` effective as the command name, composes into `PATH` environments (e.g. `home.packages` / `buildEnv`), and resolves via `lib.getExe`.
+- single-file is minimal (one file), but the executable's on-disk name is the hash-prefixed derivation name and it lives outside any `bin/`, so it cannot be added to `PATH` and `lib.getExe` does not resolve it.
 
 The default `binName` is the *command name* of the resolved binary — `baseNameOf (lib.getExe wrappedBin)` when `wrappedBin` is a derivation, and `baseNameOf` of the path string otherwise.
 It is deliberately not `lib.getName`/`pname`: those differ for neovim (`neovim` vs the command `nvim`), and the command name is what a wrapper must preserve.
@@ -498,8 +498,8 @@ Where the option is declared is ordinary host code, so the commons and a per-sit
 
 Localized alternatives within the chosen direction.
 
-**Output layout** — Layout 2 (default) vs Layout 1.
-Decision criteria: use Layout 2 whenever the bin must compose into `PATH`, `buildEnv`, `home.packages`, or resolve via `lib.getExe`; use Layout 1 only when a single self-contained executable file is wanted and PATH composition is irrelevant.
+**Output layout** — bin-dir (default) vs single-file.
+Decision criteria: use bin-dir whenever the bin must compose into `PATH`, `buildEnv`, `home.packages`, or resolve via `lib.getExe`; use single-file only when a single self-contained executable file is wanted and PATH composition is irrelevant.
 
 **Env schema shape** — per-VAR action submodule (active) vs ordered action list (deferred).
 Decision criteria: use the per-VAR submodule when typed, per-action override merging matters (the composability goal); use an ordered list when explicit operation ordering is required and wholesale replacement is acceptable.

@@ -16,7 +16,7 @@
 
 - `research-merge` (M1): spike on per-action wrapper-record merge (inline definitions vs layered resolved records) + `makeWrapper` primitives; output is written findings.
   No dependency.
-- `minimal-wrap` (M2): one module with `wrapper.env.<VAR>.set` → runnable wrapped bin in Layout 2; establishes `mkWrapkit*` naming, option paths, and the minimal `wrapperType`.
+- `minimal-wrap` (M2): one module with `wrapper.env.<VAR>.set` → runnable wrapped bin in bin-dir layout; establishes `mkWrapkit*` naming, option paths, and the minimal `wrapperType`.
   Depends on: `research-merge`.
 - `wrapper-schema` (M3): full `makeWrapper` surface (all env actions, `flags`, process control) → complete arg assembly; expands `wrapperType`.
   Depends on: `minimal-wrap`.
@@ -61,9 +61,9 @@
 
 ## M2 — minimal-wrap
 
-**Goal**: A single module defining `wrapper.env.<VAR>.set` is turned by `mkWrapkitBin` into a runnable wrapped binary at `$out/bin/<binName>` (Layout 2), with the `mkWrapkit*` naming and option paths established.
+**Goal**: A single module defining `wrapper.env.<VAR>.set` is turned by `mkWrapkitBin` into a runnable wrapped binary at `$out/bin/<binName>` (bin-dir layout), with the `mkWrapkit*` naming and option paths established.
 
-**Ordering reason**: The smallest end-to-end slice that exercises the mini-eval, the base module, the argument assembly, and the Layout 2 builder together; it de-risks the plumbing before the schema grows.
+**Ordering reason**: The smallest end-to-end slice that exercises the mini-eval, the base module, the argument assembly, and the bin-dir builder together; it de-risks the plumbing before the schema grows.
 
 **Finished**: `mkWrapkitBin` (minimal `wrapper` surface); `wrapkit-base.module.nix` (declares `wrapper` + read-only `output`, injects `wrappedBin`/`binName`); the `mkWrapkit*` naming and `wrapper.env.<VAR>.<action>` option paths; `binName` resolution (default from the resolved binary; explicit required when `meta.mainProgram` is absent); a runnable wrapkit test entry point.
 
@@ -110,11 +110,11 @@
 
 ## M5 — layout-single-file
 
-**Goal**: With `binName = null`, `mkWrapkitBin` emits the executable directly as `$out` (Layout 1).
+**Goal**: With `binName = null`, `mkWrapkitBin` emits the executable directly as `$out` (single-file layout).
 
 **Ordering reason**: A second, opt-in output layout independent of the schema and composition work; it only needs the base builder from the minimal slice.
 
-**Finished**: The Layout 1 builder — `binName = null` makes `$out` the executable file.
+**Finished**: The single-file builder — `binName = null` makes `$out` the executable file.
 
 **Proof**:
 - `nix build` with `binName = null` — observe `$out` is an executable regular file and running it works.

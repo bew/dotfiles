@@ -3,7 +3,7 @@ created-at: 20261102T0050
 depends-on: task:wrapkit-system-M4-composition
 ---
 
-# TASK: install-helper
+# [DONE] [CLAIMED] TASK: install-helper
 
 Package the `wrapper` record option as `mkWrapkitWrapperOption`, so a host declares it like any other option, at any site and under any name.
 
