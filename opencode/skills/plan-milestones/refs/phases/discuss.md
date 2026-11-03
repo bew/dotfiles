@@ -1,4 +1,4 @@
-## 3. `Phase:Discuss` — iterate, surface tradeoffs, identify parallel tracks
+## 3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; choose task destination
 
 The file already exists — created at the end of `Phase:Draft` — and is the source of truth.
 Iterate on the plan with the user.
@@ -42,3 +42,10 @@ The numbering must be consistent with the dependency graph — parallel topics g
 by convention, but either order is valid.
 Update the file: graph bullets get `(M<N>)` after their `{topic}`, and each section header becomes
 `## M<N> — <topic> (draft)`.
+
+**Task destination**:
+Ask the user where the milestone tasks live:
+- **Inline in the plan** — each milestone's **Tasks** field holds the work units directly.
+- **Task files** — one file per milestone; `Phase:Finalize` writes them and links them.
+
+The answer carries into `Phase:Finalize`; it is not asked again.

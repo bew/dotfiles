@@ -67,8 +67,10 @@ Both forms share the following field definitions and prose style, in order:
    Each bullet is "run X, observe Y".
    Must be executable without ambiguity.
 
-5. **Tasks** — overview of the work units within the milestone.
-   Kept as a placeholder until actual task files or tickets exist; replaced by links when they do.
+5. **Tasks** — the milestone's work units.
+   Inline bullets by default.
+   In task-file mode: a single link to the milestone's task file, written by `Phase:Finalize`
+   (see <./phases/finalize.md>).
 
 6. **Future work** — optional, one or two sentences.
    Points to something in the **Out of Scope** section that this milestone's output would

@@ -3,7 +3,8 @@ name: plan-milestones
 description: |
   Load when user asks to plan, create, or update project milestones.
   Examples: "plan milestones", "break this into milestones", "create MILESTONES.md",
-  "write milestones for this spec", "add a milestone", "update milestones".
+  "write milestones for this spec", "add a milestone", "update milestones",
+  "generate task files for the milestones".
 metadata:
   maintainers: [bew]
 ---
@@ -11,7 +12,8 @@ metadata:
 ## Goal
 
 Produce a well-ordered `MILESTONES.md` where every milestone is a thin, independently verifiable
-vertical slice, progressing make-it-work → make-it-right → make-it-fast.
+vertical slice, progressing make-it-work → make-it-right → make-it-fast — and, when the user asks
+for them, one task file per milestone.
 
 ## Setup — resolve inputs
 
@@ -56,8 +58,8 @@ $hints:          <resolved value, or "(none)">
 
 1. `Phase:Discover` — read spec, identify capability boundaries.
 2. `Phase:Draft` — sketch milestones by topic name.
-3. `Phase:Discuss` — iterate, surface tradeoffs, identify parallel tracks.
-4. `Phase:Finalize` — readiness check + fill in the blanks.
+3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; choose task destination.
+4. `Phase:Finalize` — readiness check, fill in the blanks, and emit task files when chosen.
 
 ## 1. `Phase:Discover` — read spec, identify capability boundaries
 
@@ -76,16 +78,19 @@ read <./refs/file-format.md> and <./refs/file-draft-form.md> before the file-cre
 
 Ready to move to `Phase:Discuss`? (say 'next' or similar to proceed)
 
-## 3. `Phase:Discuss` — iterate, surface tradeoffs, identify parallel tracks
+## 3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; choose task destination
 
 When entering `Phase:Discuss`: read <./refs/phases/discuss.md> for full instructions.
+`Phase:Discuss` ends by asking where the milestone tasks live — inline, or one file per milestone.
 
 Ready to move to `Phase:Finalize`? (say 'next' or similar to proceed)
 
-## 4. `Phase:Finalize` — readiness check + fill in the blanks
+## 4. `Phase:Finalize` — readiness check, fill in the blanks, and emit task files when chosen
 
 When entering `Phase:Finalize`: read <./refs/phases/finalize.md> for full instructions.
 Read <./refs/file-final-form.md> to fill the final-form entries.
+When the `Phase:Discuss` destination is task files, `Phase:Finalize` also writes one task file
+per milestone and links it from the milestone's **Tasks** field.
 
 ## Milestone ordering rules
 
