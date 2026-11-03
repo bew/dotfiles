@@ -15,6 +15,7 @@ snip("ih", { desc = "inherit ...;" }, SU.myfmt {
   [[inherit <rest>;]],
   {
     rest = ls.choice_node(1, {
+      ls.restore_node(nil, "fields"),
       SU.myfmt {
         [[(<attrset>) <fields>]],
         {
@@ -22,7 +23,6 @@ snip("ih", { desc = "inherit ...;" }, SU.myfmt {
           fields = ls.restore_node(2, "fields"),
         },
       },
-      ls.restore_node(nil, "fields"),
     }),
   }
 }, {
