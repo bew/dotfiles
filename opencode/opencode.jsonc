@@ -11,7 +11,16 @@
   "permissions": [
     // BAD: OC removed the default rule to ask before doing anything in non-current directory 🤬
     // TRACKING: https://github.com/anomalyco/opencode/issues/54524
-    { "action": "external_directory", "resource": "*", "effect": "ask" }
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
+
+    // The global config dir lives outside most project Locations, and its files
+    // (skills/*, agents/*, commands/*, …) are read all the time. Never prompt for reads.
+    // NOTE: matching is lexical, so `*/opencode/*` covers the `~/.config/opencode`,
+    // `~/.dot/opencode` and the real `dotfiles/opencode` spellings alike.
+    { "action": "external_directory", "resource": "*/opencode/*", "effect": "allow" },
+    // ...but editing those files stays gated — `edit` is allow-all by default,
+    // and `external_directory` no longer asks for them.
+    { "action": "edit", "resource": "*/opencode/*", "effect": "ask" }
   ],
 
   "experimental": {
