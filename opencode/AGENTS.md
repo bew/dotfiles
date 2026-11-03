@@ -100,14 +100,15 @@ Retitle immediately, before any other action — do not wait for user confirmati
 
 Commit finished task = user signals `done` — confirmation for any skill waiting on that signal.
 
-Session started from `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` file (referenced in first user message):
-- On start:
-  1. follow the file content as instructions for the session
-  2. edit the file (when possible, needs BUILD mode) to prefix the title with `[CLAIMED]`
-- Once work delivered/done:
-  1. the starting file is obsolete, mention as passive hint it can be deleted.
-  2. edit the file (if possible, needs BUILD mode) to prefix the title with `[DONE]`
-     (before `[CLAIMED]` if present).
+Each `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` file that drives a piece of work — the session's
+starting file (referenced in the first user message) and every one taken up later in the session:
+- On start, follow the file content as instructions for that work.
+- Claim the file before the first edit from it:
+  prefix the title with `[CLAIMED]` (apply the marker when/once BUILD mode is active).
+  The claim is an early gate, never a wrap-up step — a late claim defeats the marker.
+- Once that work is delivered/done:
+  1. the file is obsolete, mention as passive hint it can be deleted.
+  2. prefix the title with `[DONE]` (before `[CLAIMED]` if present).
 
 
 ## Design Exploration
