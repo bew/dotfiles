@@ -235,9 +235,12 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
 - Use backticks only for identifiers that appear literally in code
   (variable names, command names, flags).
 - Do not backtick-quote technical terms or scope names.
-- Start each sentence on its own line — never run several sentences back-to-back on one line.
+- Use wrapped semantic line breaks: start each sentence on its own line, and let a long
+  sentence wrap across lines.
+  Never run several sentences back-to-back on one line.
   Sentences stay in the same paragraph; only a blank line splits paragraphs.
-  This is a hard rule.
+  This is a hard rule, and it holds under every refinement — "Terser", "Drop the bullets",
+  or any form change removes content, never merges two sentences onto one line.
   After writing the body, verify no line contains more than one sentence.
 - Fit the subject and every body line into 72 chars, use newlines as needed
   (compress text a little, should still be ~prose).
@@ -274,7 +277,8 @@ WARNING: This diff mixes distinct concerns. Consider splitting into separate com
 Then, in the same turn, offer refinements via a single `question` tool call with three questions, in this order.
 Use these headers verbatim: `Refine subject`, `Refine body`, `Next step`.
 Derive every option from the message as written — omit inapplicable options only,
-never a whole question: every pass asks all three, `Keep … as-is` is always offered.
+never a whole question: every pass asks all three, and `Keep … as-is` plus the body
+detail options are offered unless they genuinely do not apply.
 
 ### Question 1 — `Refine subject`
 
@@ -296,12 +300,15 @@ This is a MULTI-select question — pass `multiple: true`.
 
 - "Keep body as-is" — no body change.
 - Form options — when the body's shape could differ
-  (e.g. "Bullets only", "Paragraph(s) only", "Drop the bullets, fold into the paragraph").
-- Detail options — "Terser", "More detailed", "Less impl details".
+  (e.g. "Bullets only", "Paragraph(s) only", "Fold the bullets into the paragraph",
+  "Drop the bullets").
+- Detail options — offered unless they do not make sense for the body:
+  "Terser", "More detailed", "Less impl details".
 - Adjusters — up to 1-3 options to drop, expand, or re-emphasize a part.
   Label: "Expand <X>" / "Drop <X>" / "Don't talk about <X>".
 
-NOTE: `drop …` means to remove something, not fold it and reword it in a different shape.
+NOTE: `fold …` keeps the content and changes only its shape; `drop …` removes the content
+outright.
 
 ### Question 3 — `Next step`
 
