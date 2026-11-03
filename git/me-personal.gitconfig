@@ -6,4 +6,10 @@
   # some tools use this
   user = bew
 
+# This is useful when you have full control over the tags (e.g. in work environment)
+# [fetch]
+#   # Auto remove any remote-tracking refs & tags that no longer exist on the remote
+#   prune = true
+#   pruneTags = true
+
 # vim:set ft=gitconfig:

@@ -66,10 +66,8 @@
   }; f"
 
   # Inverts a previous `git add file`
-  # (same as new command `git restore --staged file` except
-  # that it also works without `file` and unstages all files)
   # NOTE: changes the index only (the staging area)
-  unstage = reset HEAD
+  unstage = restore --staged
 
   # NOTE: depends on my custom `git-new-files` script that lists files added via `git add -N`
   unstage-new-files = "!f() { \
