@@ -107,6 +107,7 @@ runs this pre-flight, in order, from first load:
 1. Load the file; follow its content as instructions for that work.
 2. Claim it — prefix the title with `[CLAIMED]`, before any read/edit of the files the work targets.
    This is an early gate, never a wrap-up step — a late claim defeats the marker.
+   note: Claim & work on at most one file at a time: never batch claim/done markers.
 3. Show the plan to the user.
 4. Refine the plan through user discussion, where it warrants.
 5. Proceed with the (refined) plan.
@@ -114,6 +115,7 @@ runs this pre-flight, in order, from first load:
 Once that work is delivered/done:
 1. The file is obsolete — mention as passive hint it can be deleted.
 2. Prefix the title with `[DONE]` (before `[CLAIMED]` if present).
+3. Stop and report once the work is verified — start the next task only on the user's go-ahead.
 
 
 ## Design Exploration
