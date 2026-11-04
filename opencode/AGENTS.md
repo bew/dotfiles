@@ -98,7 +98,8 @@ Retitle immediately, before any other action — do not wait for user confirmati
 
 ## Session lifecycle
 
-Commit finished task = user signals `done` — confirmation for any skill waiting on that signal.
+Work is done when the user signals `done` or the task's commit lands.
+Either one confirms any skill waiting on that signal.
 
 Each `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` file that drives a piece of work — the session's
 starting file (referenced in the first user message) and every one taken up later in the session:
