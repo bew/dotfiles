@@ -131,6 +131,14 @@ Never produce code or spec content speculatively on an unexplored idea.
 - When something fails, show the raw error first, then your interpretation.
 
 
+## Command runs
+
+- Never `cd` back out of a directory inside a chained command — no `cd foo; bar; cd ..` or `cd baz && cmd && cd ../..`.
+  (This is a workaround because OpenCode cannot parse the 2nd `cd` to ask permission for the real target, so the approval prompts names the wrong directory)
+  Use multiple commands instead, or absolute path to second target.
+- Use the command call's `workdir` argument when a command must run elsewhere.
+
+
 ## Subagents
 
 The in-context subagent list is NOT exhaustive.
