@@ -163,6 +163,7 @@ flowchart LR
     sk_karpathy["<b>§ karpathy-guidelines</b>"]
     sk_read_man_page["<b>§ read-man-page</b><br/><i>HasScript</i>"]
     sk_text_replace["<b>§ text-replace</b>"]
+    sk_verify_claims["<b>§ verify-claims</b>"]
     sk_work_mode["<b>§ work-mode</b>"]
   end
 
@@ -320,6 +321,7 @@ flowchart LR
 - Skill [`karpathy-guidelines`](./skills/karpathy-guidelines/) — Behavioral guidelines to avoid overcomplication, keep changes surgical, surface assumptions.
 - Skill [`read-man-page`](./skills/read-man-page/) (*HasScript*) — Token-efficient incremental man page reading via its `manq` script.
 - Skill [`text-replace`](./skills/text-replace/) — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
+- Skill [`verify-claims`](./skills/verify-claims/) — Verifies an artefact's claims against a ground-truth source; one subagent per check-group, reports verdicts only.
 - Skill [`work-mode`](./skills/work-mode/) — Controls agent workflow: One unit at a time with hard stops; either execution units or read-only walkthrough slices.
 - Command [`/whats-going-on`](./commands/whats-going-on.md) (*Meta*) — Status report on current findings and in-flight work, then resume the interrupted work.
 - Command [`/why-you`](./commands/why-you.md) (*Meta*) — Reflect on the root cause of a decision, without acting.
