@@ -4,7 +4,9 @@ description: |
   Load when user asks to plan, create, or update project milestones.
   Examples: "plan milestones", "break this into milestones", "create MILESTONES.md",
   "write milestones for this spec", "add a milestone", "update milestones",
-  "generate task files for the milestones".
+  "generate task files for the milestones", "define tasks for M3", "continue scoping tasks",
+  "order more milestones", "promote backlog items".
+  Also load on generic "plan work" phrasing.
 metadata:
   maintainers: [bew]
 ---
@@ -12,10 +14,11 @@ metadata:
 ## Goal
 
 Produce a well-ordered `MILESTONES.md` where every milestone is a thin, independently verifiable
-vertical slice, progressing make-it-work → make-it-right → make-it-fast — and, when the user asks
-for them, one task file per milestone.
+vertical slice, progressing make-it-work → make-it-right → make-it-fast.
 
 ## Setup — resolve inputs
+
+Skip `Setup` when continuing an existing plan — read <./refs/continuing-a-plan.md> instead.
 
 Determine the following from whatever is in context (user message, prior context, or defaults):
 - **$specpath**: where the project spec lives (file path, directory, or glob).
@@ -32,13 +35,21 @@ Determine the following from whatever is in context (user message, prior context
     - **At repo root** — `MILESTONES.md` at the repo root.
     When repo root is unresolved (not a git repo), offer only **Next to the spec**;
     user may type a custom path.
+- **$taskdir**: where scoped task files go.
+  Always `dirname $milestonesfile` — next to the plan, no question.
+- **$orderwindow**: how many milestones carry settled ordering.
+  Default: `5`.
+  Overridden by `$hints` or an explicit user request; "plan everything" → `all`.
+  `Phase:Discuss` may adjust it when the user asks.
 - **$hints**: any remaining free-form text from the user (scope, constraints, focus area).
   Default: `(none)`.
 
 State resolved values:
-```text
+```
 $specpath:       <resolved value>
 $milestonesfile: <resolved value>
+$taskdir:        <resolved value>
+$orderwindow:    <resolved value, or "all">
 $hints:          <resolved value, or "(none)">
 ```
 
@@ -53,13 +64,25 @@ $hints:          <resolved value, or "(none)">
   extracting a shared renderer.
 - **Deliverable**: the observable outcome that makes a milestone verifiable.
   A deliverable is done when its Verification criteria can be executed and pass.
+- **Scoped task**: a work unit with its own task file under `$taskdir` — ready to execute.
+- **Rough task**: a work unit listed inline as an idea, not yet scoped into a file.
+- **Ordering window**: the milestones whose order is settled — the next `$orderwindow` past the
+  delivery edge. They carry numbers, dependency edges, and an Ordering reason.
+  The delivery edge is the last delivered milestone; on a fresh plan it is the start.
+  The ordering rules apply as milestones are ordered — a concern belonging far ahead stays a
+  backlog topic until promoted.
+- **Backlog**: topics planned but not yet ordered. Topic name and Goal only, no numbers or edges.
+  A pinned entry carries a free-form `Pinned:` line recording an ordering constraint the user
+  already knows. Promotion consumes the line: its content moves into the milestone's Ordering
+  reason.
 
 ## Phases
 
 1. `Phase:Discover` — read spec, identify capability boundaries.
 2. `Phase:Draft` — sketch milestones by topic name.
-3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; choose task destination.
-4. `Phase:Finalize` — readiness check, fill in the blanks, and emit task files when chosen.
+3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; settle the ordering window
+   and the scoping boundary.
+4. `Phase:Finalize` — readiness check, fill in the blanks, and scope boundary tasks into files.
 
 ## 1. `Phase:Discover` — read spec, identify capability boundaries
 
@@ -78,28 +101,32 @@ read <./refs/file-format.md> and <./refs/file-draft-form.md> before the file-cre
 
 Ready to move to `Phase:Discuss`? (say 'next' or similar to proceed)
 
-## 3. `Phase:Discuss` — iterate, surface tradeoffs, find parallel tracks; choose task destination
+## 3. `Phase:Discuss` — iterate, surface tradeoffs; settle window and boundary
 
 When entering `Phase:Discuss`: read <./refs/phases/discuss.md> for full instructions.
-`Phase:Discuss` ends by asking where the milestone tasks live — inline, or one file per milestone.
+`Phase:Discuss` settles the order of the ordering window only, and ends by confirming the scoping
+boundary — which milestones get task files now.
 
 Ready to move to `Phase:Finalize`? (say 'next' or similar to proceed)
 
-## 4. `Phase:Finalize` — readiness check, fill in the blanks, and emit task files when chosen
+## 4. `Phase:Finalize` — readiness check, fill blanks, scope boundary tasks into files
 
 When entering `Phase:Finalize`: read <./refs/phases/finalize.md> for full instructions.
 Read <./refs/file-final-form.md> to fill the final-form entries.
-When the `Phase:Discuss` destination is task files, `Phase:Finalize` also writes one task file
-per milestone and links it from the milestone's **Tasks** field.
+
+## Continuing an existing plan
+
+When the user asks to continue a plan — promote backlog topics, or scope tasks for milestones
+already ordered — read <./refs/continuing-a-plan.md> and follow it.
+Examples: "order more milestones", "promote backlog items", "define tasks for M3".
 
 ## Milestone ordering rules
 
 - **M1 is always a research milestone** if any spec assumptions are unconfirmed.
-  Output is written findings (e.g. in `findings/`), not production code.
-  Investigates anything the spec marks as uncertain or "to be confirmed empirically".
-  Research milestones are not limited to M1 — a later milestone may also be a research spike
-  when a technical question blocks the next implementation step.
-  Prefer to front-load research, but do not force it when the uncertainty only surfaces later.
+  - Output is written findings (e.g. in `findings/`), not production code.
+  - It investigates whatever the spec marks uncertain or "to be confirmed empirically".
+  - Later milestones may be research spikes too, when a question blocks the next step.
+  - Prefer front-loading research; do not force it when uncertainty surfaces later.
 
 - Each milestone builds on its dependencies.
   A milestone is not started until all its dependencies are verifiable.
@@ -115,13 +142,11 @@ per milestone and links it from the milestone's **Tasks** field.
   placed after the happy-path milestone it extends.
 
 - **Refactoring is scoped by size and placement.**
-  A small or local refactor may be the first task of the milestone that requires it — it does not
-  need its own milestone.
-  A large refactor that touches multiple components or subsystems warrants its own milestone.
-  When a refactor opens a milestone alongside new feature work, it must be the first task,
-  and no other refactor may appear in the same milestone.
-  A milestone that is *entirely* a refactor is unusual — flag it and ask user for confirmation.
-  It often indicates accumulated technical debt from a poorly planned earlier sequence.
+  - Small or local: the first task of the milestone that requires it, no milestone of its own.
+  - Large or multi-component: its own milestone.
+  - Alongside feature work it must be the first task, and the only refactor in that milestone.
+  - All-refactor milestone: unusual, flag it and ask — usually technical debt from a poorly
+    planned earlier sequence.
 
 - **Shared components/subsystems that are large or multi-faceted must be explicit deliverables.**
   They need their own Goal and Proof criteria.
@@ -134,11 +159,10 @@ per milestone and links it from the milestone's **Tasks** field.
   a prior milestone that establishes and verifies it.
 
 - **Persistence layer design must be explicit if the spec does not include it.**
-  For a database: add a dedicated design milestone (with a PoC if the schema is uncertain).
-  For a cache: a dedicated design milestone is optional; the first milestone that writes to it
-  may establish the format, and a later "make it fast" milestone may refine it.
-  Read and write operations should not be split by default — treat them together unless there
-  is a concrete reason to separate.
+  - Database: a dedicated design milestone, with a PoC if the schema is uncertain.
+  - Cache: design milestone optional — the first milestone that writes to it establishes the
+    format, and a later "make it fast" milestone refines it.
+  - Read and write together by default; separate them only for a concrete reason.
 
 - Milestones are thin vertical slices.
   A component or subsystem may appear across multiple milestones as it gains behaviors.
@@ -147,44 +171,46 @@ per milestone and links it from the milestone's **Tasks** field.
 
 ## Grouping heuristics
 
-**Default: one concern per milestone.**
-Bundling two or more concerns requires explicit justification or be required by user.
+### One concern per milestone
+
+Bundling two or more concerns requires explicit justification, or the user requiring it.
 Never a silent default.
 
-**When bundling may be justified**:
-- Both concerns are small and tightly coupled (neither is verifiable without the other).
-- The shared infrastructure between them is so thin that splitting would create a milestone
-  with no standalone verifiable deliverable.
+### When bundling may be justified
 
-**When bundling is wrong**:
+- Both concerns are small and tightly coupled (neither is verifiable without the other).
+- The shared infrastructure is so thin that splitting would create a milestone with no standalone
+  verifiable deliverable.
+
+### When bundling is wrong
+
 - One concern is significantly larger or more complex than the other.
 - The concerns belong to different phases (e.g. happy path + production safety).
 - Bundling hides a deliverable that future readers would need to understand the ordering.
 
-**Splitting a single topic across milestones**:
+### Splitting a single topic across milestones
+
 A topic is not automatically one milestone just because it was one draft topic name.
 Check every topic for a natural split:
-- Distinct make-it-work / make-it-right / make-it-fast phases (see `Milestone ordering rules`).
+- Distinct make-it-work / make-it-right / make-it-fast phases.
 - Part of the topic depends on something that lands in a later milestone.
-- Core logic vs. UI: build the core components (data collection/access, processing/business
-  logic, output generation) working end-to-end without a UI first — driven by a script, test,
-  or CLI stub. Add the UI (entry form, wiring, persistence) as a later milestone.
-  Useful when the core logic is the risky/uncertain part and the UI is comparatively
-  mechanical once the core is proven.
-  Example: a milestone for data collection + processing engine + PDF generation, fully
-  working headless; a following milestone for the entry-form UI + persistence wiring on top.
-When splitting is justified: the first milestone for the topic covers the minimal happy path;
-later milestones for the same topic add safety, refactors, or performance/quality refinements,
-without changing observable behavior established by the first.
+- Core logic vs. UI: prove the core end-to-end headless, then add the UI on top.
+  Useful when the core is the risky part and the UI is mechanical once it is proven.
 
-**CI setup**:
+When splitting is justified, the first milestone for the topic covers the minimal happy path.
+Later ones add safety, refactors, or performance refinements without changing the behavior the
+first one established.
+
+### CI setup
+
 Do not defer CI past the first milestone that produces testable, non-trivial output.
 CI enables continuous regression detection at each increment — deferring it defeats the purpose
 of incremental verification.
 
-**Packaging and release tooling**:
-Packaging (nix flake, homebrew formula, release pipeline, etc.) belongs near the end,
-after the core feature set is stable.
+### Packaging and release tooling
+
+Packaging (nix flake, homebrew formula, release pipeline, etc.) belongs near the end, after the
+core feature set is stable.
 Do not bundle packaging with an unrelated feature milestone.
 
 ## What belongs / does not belong

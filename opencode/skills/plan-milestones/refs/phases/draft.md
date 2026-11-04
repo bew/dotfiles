@@ -2,6 +2,7 @@
 
 Sketch the milestones as a named list — topic names only, no numbers yet.
 Numbers crystallize only after ordering is settled in `Phase:Discuss`.
+Weigh `$hints` when proposing and placing topics — scope, constraints, focus area.
 
 IMPORTANT: During this phase, always refer to milestones by topic name.
 
@@ -45,6 +46,7 @@ Before showing the whole-plan view, do an explicit merge/split pass across the f
   something landing after the rest) per `Milestone ordering rules`.
 This pass is mandatory even when its conclusion is "no changes" — the point is that the shape
 is an explicit decision, not an unexamined default.
+It covers the whole topic list, including topics expected to land in the backlog.
 
 After grouping is tentatively settled, show the whole-plan view (see <../discussion-views.md>)
 for confirmation — create-from-scratch flow only; in update mode the existing
@@ -56,8 +58,11 @@ The user confirms this shape before `Phase:Discuss` begins.
 Once the user explicitly confirmed, write `$milestonesfile` in draft state,
 following the format in <../file-format.md> and <../file-draft-form.md>.
 For new files: write the **Sources** section first, using `$specpath` and anything tracked
-during `Phase:Discover`; then the **Dependency Graph**; then **Out of Scope** if there is
-anything to list; then a `----` line before the first milestone entry.
+during `Phase:Discover`; then the **Dependency Graph**, for the topics expected inside the
+ordering window; then **Out of Scope** if there is anything to list; then a `----` line before the
+first milestone entry.
+Topics expected past the window go in the backlog appendix after the last milestone entry, behind
+its own `----` line.
 For updates: only new or changed milestones are written as `(draft)`;
 existing entries are left untouched.
 

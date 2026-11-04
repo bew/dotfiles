@@ -27,7 +27,10 @@ block with a `-----` line, so the reader can visually tell rounds apart.
 ### Whole-plan view
 
 Whole-plan view used once, for confirmation, at the end of `Phase:Draft`.
-Once `$milestonesfile` exists, its `Dependency Graph` section replaces this view.
+It lists every topic, split at the provisional ordering-window boundary: topics expected inside the
+window first, topics bound for the backlog after a labeled break.
+Omit the break when every topic fits the window.
+Once `$milestonesfile` exists, its `Dependency Graph` and `Backlog` sections replace this view.
 
 ```md
 **Planned structure**:
@@ -38,7 +41,12 @@ Once `$milestonesfile` exists, its `Dependency Graph` section replaces this view
 - `{topic-c}`: goal.
   Parallel with `{topic-b}`.
   Depends on: `{topic-a}`.
+
+**Past the ordering window** (backlog):
 - `{topic-d}`: goal.
   Bundles `{topic-x}` + `{topic-y}`.
   Depends on: `{topic-b}`, `{topic-c}`.
 ```
+
+Edges shown here are chat-only for backlog-bound topics — the file records none until they are
+promoted.

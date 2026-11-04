@@ -26,13 +26,29 @@ Subsequent milestones replace the stub without changing observable behavior.
 NOTE: can run in parallel with M<N> — {topic-c}.
 
 **Tasks**:
+- [TASK: CLI entry point and dispatch](TASK-<namespace>-M<N>-cli-entry-and-dispatch.md)
+- [TASK: Hardcoded stub struct](TASK-<namespace>-M<N>-hardcoded-stub-struct.md)
+- [TASK: Core plumbing](TASK-<namespace>-M<N>-core-plumbing.md)
+- [TASK: Terminal output](TASK-<namespace>-M<N>-terminal-output.md)
+
+**Future work**: `--help` and man-page generation for `<subcommand>` (out of scope for now).
+```
+
+A milestone past the scoping boundary carries rough tasks instead — plain bullets, no links:
+```md
+**Tasks** (rough):
 - CLI entry point and dispatch to `<subcommand>`.
 - Hardcoded stub struct with the fields the real source will eventually provide.
-- Core plumbing: the end-to-end flow using the stub.
-- Terminal output: step summary and any conditional warning.
-
-**Future work**: `--help` and man-page generation for `<subcommand>` (out of scope for now)
-(optional field — omit when there is no relevant follow-up to flag).
 ```
-The milestone after this one replaces the stub with a real data source,
-keeping observable behavior identical.
+
+Backlog entries are not milestones — topic name plus Goal, appended after the last milestone
+entry, with an optional `Pinned:` line:
+```md
+----
+
+## Backlog
+
+- `{publish-flow}`: `<subcommand>` output reaches a remote destination, not just the terminal.
+  Pinned: must land after the destination config exists, before any packaging work.
+- `{packaging}`: installable artifact and release pipeline.
+```
