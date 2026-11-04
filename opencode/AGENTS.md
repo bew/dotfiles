@@ -102,14 +102,18 @@ Work is done when the user signals `done` or the task's commit lands.
 Either one confirms any skill waiting on that signal.
 
 Each `HANDOFF-*`/`TASK-*`/`IDEA-*`/`BUG-*` file that drives a piece of work — the session's
-starting file (referenced in the first user message) and every one taken up later in the session:
-- On start, follow the file content as instructions for that work.
-- Claim the file before the first edit from it:
-  prefix the title with `[CLAIMED]` (apply the marker when/once BUILD mode is active).
-  The claim is an early gate, never a wrap-up step — a late claim defeats the marker.
-- Once that work is delivered/done:
-  1. the file is obsolete, mention as passive hint it can be deleted.
-  2. prefix the title with `[DONE]` (before `[CLAIMED]` if present).
+starting file (referenced in the first user message) and every one taken up later in the session —
+runs this pre-flight, in order, from first load:
+1. Load the file; follow its content as instructions for that work.
+2. Claim it — prefix the title with `[CLAIMED]`, before any read/edit of the files the work targets.
+   This is an early gate, never a wrap-up step — a late claim defeats the marker.
+3. Show the plan to the user.
+4. Refine the plan through user discussion, where it warrants.
+5. Proceed with the (refined) plan.
+
+Once that work is delivered/done:
+1. The file is obsolete — mention as passive hint it can be deleted.
+2. Prefix the title with `[DONE]` (before `[CLAIMED]` if present).
 
 
 ## Design Exploration
