@@ -3,7 +3,8 @@
 The file already exists in draft state; `Phase:Finalize` completes it.
 
 **Readiness checklist**:
-- Every milestone has a single, named concern (no fat milestones).
+- Every milestone has a single, named concern (no fat milestones) — except the greenfield
+  scaffolding milestone.
 - No milestone mixes make-it-work and make-it-safe/right concerns.
 - Every in-window milestone has an **Ordering reason** field that explains its placement.
   - Milestones that bundle multiple concerns include explicit justification for the bundling.
@@ -12,8 +13,13 @@ The file already exists in draft state; `Phase:Finalize` completes it.
   its own verification criteria.
 - Every configuration or naming scheme that others depend on is an explicit deliverable.
 - CI setup is not deferred past the first milestone that produces testable output.
+  On a greenfield plan, its placement was settled with the user in `Phase:Discuss` per
+  <../greenfield-plans.md>.
 - Make-it-work → make-it-right → make-it-fast order is respected.
-- M1 is a research milestone if any spec assumptions are unconfirmed.
+- A greenfield plan follows the opening sequence in <../greenfield-plans.md>.
+- Every unconfirmed spec assumption is covered by a research milestone, placed where its findings
+  unblock the most later milestones.
+  On a greenfield plan its placement follows <../greenfield-plans.md>.
 - Each milestone is independently verifiable without depending on a later milestone.
 
 If any item fails: return to `Phase:Discuss` and resolve before continuing.

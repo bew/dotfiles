@@ -29,7 +29,7 @@ finished first: one entry per dependency, joined with ` & `.
 `task:<slug>` — the other task's `$taskfilename` with the `TASK-` prefix and `.md` suffix dropped.
 When the blocker is a whole milestone rather than a specific task, name it in the body's opening
 paragraph instead of inventing a ref kind.
-Work units inside one milestone are parallel-safe — do not chain them.
+Units run one at a time, in the **Tasks** order, so a shared compile surface is not a dependency.
 Omit the key otherwise.
 
 The body:

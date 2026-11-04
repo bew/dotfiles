@@ -13,6 +13,9 @@ Identify:
 - The persistence layer: whether it is designed in the spec, or needs a design step.
 - Any docs/URLs referenced alongside `$specpath` (linked specs, related tickets, prior art) —
   track these for the file's **Sources** section (see <../file-format.md>).
+- Whether this is a **greenfield plan** — the project does not exist yet — or work inside an
+  existing project.
+  This is the detection step; read <../greenfield-plans.md> only if it comes out greenfield.
 
 Before leaving this phase, cross-check every spec section/table row against the draft topic
 list: for each requirement found, confirm it maps to at least one topic (existing or new), or
@@ -23,7 +26,6 @@ If no readable content is found under `$specpath`: stop and tell the user.
 
 Check whether `$milestonesfile` already exists.
 - **No file** — create from scratch. Apply the ordering and grouping rules in `SKILL.md`.
-  M1 is always a research milestone if any spec assumptions are unconfirmed.
 - **File exists** — determine what changed or what the user wants to add/adjust.
   Read existing milestones; map them against the spec.
   Surface only the affected milestones for discussion — do not re-plan the whole file unless asked.

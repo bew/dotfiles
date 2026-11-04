@@ -66,6 +66,12 @@ $hints:          <resolved value, or "(none)">
   A deliverable is done when its Verification criteria can be executed and pass.
 - **Scoped task**: a work unit with its own task file under `$taskdir` — ready to execute.
 - **Rough task**: a work unit listed inline as an idea, not yet scoped into a file.
+- **Greenfield plan**: a plan whose project does not exist yet — there is no source to build on.
+  Inferred in `Phase:Discover` from the spec (it describes a project to be built) or the repo
+  (no source yet); ask the user when the signal is mixed.
+  A new subsystem inside an existing project is not greenfield, however empty its area is.
+  A repo holding source is not greenfield, unless the user settles the label that way.
+  Read <./refs/greenfield-plans.md> only once the plan is detected as greenfield.
 - **Ordering window**: the milestones whose order is settled — the next `$orderwindow` past the
   delivery edge. They carry numbers, dependency edges, and an Ordering reason.
   The delivery edge is the last delivered milestone; on a fresh plan it is the start.
@@ -122,11 +128,18 @@ Examples: "order more milestones", "promote backlog items", "define tasks for M3
 
 ## Milestone ordering rules
 
-- **M1 is always a research milestone** if any spec assumptions are unconfirmed.
+- **A greenfield plan starts with scaffolding, then two very small milestones.**
+  A spike blocking the scaffolding comes first.
+  Read <./refs/greenfield-plans.md> when the plan is greenfield, for the scaffolding contents,
+  the smoke-test shape, and the sizing rules.
+
+- **A research milestone is due when spec assumptions are unconfirmed.**
+  - Place it where its findings unblock the most later milestones — normally early.
+  - On a greenfield plan its placement follows <./refs/greenfield-plans.md>.
   - Output is written findings (e.g. in `findings/`), not production code.
   - It investigates whatever the spec marks uncertain or "to be confirmed empirically".
   - Later milestones may be research spikes too, when a question blocks the next step.
-  - Prefer front-loading research; do not force it when uncertainty surfaces later.
+  - Do not force a spike when the uncertainty surfaces later.
 
 - Each milestone builds on its dependencies.
   A milestone is not started until all its dependencies are verifiable.
@@ -206,6 +219,8 @@ first one established.
 Do not defer CI past the first milestone that produces testable, non-trivial output.
 CI enables continuous regression detection at each increment — deferring it defeats the purpose
 of incremental verification.
+On a greenfield plan the scaffolding smoke test does not count as that output — settle CI placement
+with the user per <./refs/greenfield-plans.md>.
 
 ### Packaging and release tooling
 

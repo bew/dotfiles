@@ -12,6 +12,10 @@ Its bullets are idea notes — scope them into task files before starting the mi
 Read `$milestonesfile`.
 Resolve `$specpath` from its **Sources** section, `$taskdir` from its location, and
 `$orderwindow` from the skill default `5` — do not re-run `Setup`.
+Greenfield is inferred from the plan, not re-detected: a first milestone that scaffolds the
+project means greenfield — read <./greenfield-plans.md>.
+Ask the user when that is ambiguous, or when the first milestone could scaffold a new subsystem
+rather than a new project.
 
 ### Step 2 — Establish delivery state
 
@@ -23,6 +27,8 @@ That sets the delivery edge — the last delivered milestone.
 Count the ordered milestones past the delivery edge, and promote enough backlog topics to bring
 that count up to `$orderwindow`.
 Present the promotion set and confirm it before numbering; the user may ask for another size.
+A greenfield plan keeps its opening sizing until the two small milestones are past —
+see <./greenfield-plans.md>.
 Honour every `Pinned:` line when picking the set: a pin naming an ordered milestone forces its
 topic's promotion, and a pin it contradicts is surfaced to the user.
 

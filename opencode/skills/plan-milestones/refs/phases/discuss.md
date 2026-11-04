@@ -31,6 +31,8 @@ dependencies force a different order.
 - A constraint the user already knows for a far topic becomes a `Pinned:` line on its backlog
   entry.
 - An in-window milestone depending on a backlog topic promotes that topic into the window.
+- On a greenfield plan, settle CI placement with the other ordering decisions —
+  see <../greenfield-plans.md>.
 
 **Parallel tracks**: derive parallel candidates from the dependency graph — any two topics with
 no edge between them and a common ancestor are potentially parallel.

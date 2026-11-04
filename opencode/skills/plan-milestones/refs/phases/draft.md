@@ -4,6 +4,9 @@ Sketch the milestones as a named list — topic names only, no numbers yet.
 Numbers crystallize only after ordering is settled in `Phase:Discuss`.
 Weigh `$hints` when proposing and placing topics — scope, constraints, focus area.
 
+On a greenfield plan, follow the opening sequence in <../greenfield-plans.md> — do not bundle the
+two small topics after the scaffolding.
+
 IMPORTANT: During this phase, always refer to milestones by topic name.
 
 The focused view (see <../discussion-views.md>) supplies each topic's goal so the reader always has
