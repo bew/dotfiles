@@ -1,0 +1,405 @@
+#!/usr/bin/env python3
+# Deterministic mechanical checks for a package README:
+# manifest identity, path references, source census.
+
+import argparse
+import json
+import os
+import re
+import sys
+import tomllib
+from dataclasses import dataclass
+from pathlib import Path
+
+# Directories never descended into during the source census.
+EXCLUDED_DIRS = {".git", "target", "node_modules", "dist", "build", "__pycache__", ".venv"}
+
+# Extensions treated as source code for the census.
+SOURCE_EXTENSIONS = {
+    ".c",
+    ".cc",
+    ".cpp",
+    ".cs",
+    ".dart",
+    ".erl",
+    ".ex",
+    ".exs",
+    ".go",
+    ".h",
+    ".hpp",
+    ".hs",
+    ".java",
+    ".js",
+    ".jsx",
+    ".kt",
+    ".lua",
+    ".ml",
+    ".nix",
+    ".php",
+    ".proto",
+    ".py",
+    ".rb",
+    ".rs",
+    ".scala",
+    ".sh",
+    ".sql",
+    ".svelte",
+    ".swift",
+    ".ts",
+    ".tsx",
+    ".vue",
+}
+
+# Extensions that qualify a README inline-code token as a file reference.
+REFERENCE_EXTENSIONS = SOURCE_EXTENSIONS | {
+    ".adoc",
+    ".cfg",
+    ".ini",
+    ".json",
+    ".md",
+    ".rst",
+    ".toml",
+    ".txt",
+    ".yaml",
+    ".yml",
+}
+
+# Subdirectories (relative to the package dir) tried when resolving a README path token.
+# "" is the package dir itself; "src" covers READMEs that list modules without the prefix.
+RESOLUTION_BASES = ("", "src")
+
+# Characters that mark a token as shell syntax, a glob, or otherwise not a plain path.
+NON_PATH_CHARS = set("*?[]$!|><;&(){}\\\"'`")
+
+# A token containing this marker is a URL, not a package-relative path.
+URL_MARKER = "://"
+
+INLINE_CODE_PATTERN = re.compile(r"`([^`\n]+)`")
+FENCED_CODE_PATTERN = re.compile(r"```.*?```", re.DOTALL)
+
+
+class ScriptError(Exception):
+    """Raised when the script encounters an error."""
+
+
+@dataclass(frozen=True)
+class PackageIdentity:
+    """Detected manifest and the package name it declares."""
+
+    manifest_name: str
+    package_name: str | None
+
+
+@dataclass(frozen=True)
+class MissingReference:
+    """A README inline-code path token that does not exist under the package directory."""
+
+    token: str
+
+
+@dataclass(frozen=True)
+class StyleWarning:
+    """A README path token that redundantly prefixes a file that lives under `src/`."""
+
+    token: str
+
+
+@dataclass(frozen=True)
+class SourceGroup:
+    """Source-file count for a single extension."""
+
+    extension: str
+    file_count: int
+
+
+def print_err(msg: str) -> None:
+    """Print msg to stderr."""
+    print(msg, file=sys.stderr)
+
+
+def usage_and_exit(status: int) -> None:
+    """Print usage to stderr and exit with status."""
+    print_err("Usage: mechanical-checks --dir <package-dir> [--readme <path>]")
+    sys.exit(status)
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    --dir is validated in main (not via argparse) so a missing value exits with
+    the documented status 1 instead of argparse's default 2.
+    """
+    parser = argparse.ArgumentParser(
+        prog="mechanical-checks",
+        description="Run deterministic checks against a package README.",
+    )
+    parser.add_argument(
+        "--dir",
+        dest="package_dir",
+        help="package directory to inspect",
+    )
+    parser.add_argument(
+        "--readme",
+        dest="readme_path",
+        help="path to the README (default: <package-dir>/README.md)",
+    )
+    return parser.parse_args()
+
+
+def _load_toml(path: Path) -> dict[str, object]:
+    """Parse a TOML file, raising ScriptError on unreadable or malformed content."""
+    try:
+        return tomllib.loads(path.read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise ScriptError(f"Could not parse '{path}': {exc}") from exc
+
+
+def _load_json(path: Path) -> dict[str, object]:
+    """Parse a JSON file, raising ScriptError on unreadable or malformed content."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ScriptError(f"Could not parse '{path}': {exc}") from exc
+
+
+def _extract_pyproject_name(data: dict[str, object]) -> str | None:
+    """Return the PEP 621 or Poetry project name from parsed pyproject data."""
+    project_table = data.get("project")
+    if isinstance(project_table, dict):
+        name = project_table.get("name")
+        if isinstance(name, str):
+            return name
+
+    tool_table = data.get("tool")
+    if isinstance(tool_table, dict):
+        poetry_table = tool_table.get("poetry")
+        if isinstance(poetry_table, dict):
+            name = poetry_table.get("name")
+            if isinstance(name, str):
+                return name
+
+    return None
+
+
+def detect_package_identity(package_dir: Path) -> PackageIdentity:
+    """Detect the package manifest under package_dir and read its declared name.
+
+    Precedence is Cargo.toml, then package.json, then pyproject.toml.
+    Returns an empty manifest name when none is present.
+    """
+    cargo_manifest = package_dir / "Cargo.toml"
+    if cargo_manifest.is_file():
+        data = _load_toml(cargo_manifest)
+        package_table = data.get("package")
+        name = package_table.get("name") if isinstance(package_table, dict) else None
+        return PackageIdentity("Cargo.toml", name if isinstance(name, str) else None)
+
+    npm_manifest = package_dir / "package.json"
+    if npm_manifest.is_file():
+        data = _load_json(npm_manifest)
+        name = data.get("name")
+        return PackageIdentity("package.json", name if isinstance(name, str) else None)
+
+    pyproject_manifest = package_dir / "pyproject.toml"
+    if pyproject_manifest.is_file():
+        data = _load_toml(pyproject_manifest)
+        return PackageIdentity("pyproject.toml", _extract_pyproject_name(data))
+
+    return PackageIdentity("", None)
+
+
+def strip_fenced_code_blocks(text: str) -> str:
+    """Remove fenced code blocks so their contents are not parsed as inline references."""
+    return FENCED_CODE_PATTERN.sub("", text)
+
+
+def extract_inline_code_tokens(text: str) -> list[str]:
+    """Return the contents of every single-backtick inline-code span in text."""
+    return INLINE_CODE_PATTERN.findall(strip_fenced_code_blocks(text))
+
+
+def looks_like_path(token: str) -> bool:
+    """Decide whether a README inline-code token is a plausible file reference.
+
+    Uses a conservative heuristic: the token must not contain whitespace, glob
+    characters, shell syntax, or a URL marker, and must either contain a slash or
+    carry a known source/doc extension.
+    """
+    if not token:
+        return False
+    if URL_MARKER in token:
+        return False
+    if any(char in NON_PATH_CHARS for char in token):
+        return False
+    if any(char.isspace() for char in token):
+        return False
+    if token.startswith(("-", "~")):
+        return False
+    if "/" in token:
+        return True
+    return Path(token).suffix.lower() in REFERENCE_EXTENSIONS
+
+
+def _reference_exists(package_dir: Path, token: str) -> bool:
+    """Check whether a README path token exists under any resolution base.
+
+    Relative tokens are tried against the package dir and each entry of
+    RESOLUTION_BASES, so a README that lists source files relative to `src/`
+    does not produce false positives.
+    """
+    normalized = token.removeprefix("./")
+    candidate = Path(normalized)
+    if candidate.is_absolute():
+        return candidate.exists()
+    return any((package_dir / base / normalized).exists() for base in RESOLUTION_BASES)
+
+
+def is_reportable_when_missing(token: str) -> bool:
+    """Decide whether an unresolved token is worth reporting.
+
+    Bare names and slash-joined identifiers (e.g. a crate feature such as
+    `window/wayland`) are skipped to avoid false positives; only tokens that
+    name a file (known reference extension) or a directory (trailing slash)
+    are reported.
+    """
+    if token.endswith("/"):
+        return True
+    return Path(token).suffix.lower() in REFERENCE_EXTENSIONS
+
+
+def find_missing_references(package_dir: Path, readme_text: str) -> list[MissingReference]:
+    """Return README path tokens that do not resolve to an existing path.
+
+    Duplicate tokens are reported once, in first-seen order.
+    """
+    missing: list[MissingReference] = []
+    seen: set[str] = set()
+    for token in extract_inline_code_tokens(readme_text):
+        if token in seen or not looks_like_path(token):
+            continue
+        seen.add(token)
+        if _reference_exists(package_dir, token):
+            continue
+        if not is_reportable_when_missing(token):
+            continue
+        missing.append(MissingReference(token))
+    return missing
+
+
+def find_style_warnings(package_dir: Path, readme_text: str) -> list[StyleWarning]:
+    """Return README path tokens that prefix a file which already lives under `src/`.
+
+    Duplicate tokens are reported once, in first-seen order. Tokens are only
+    reported when the prefixed file exists, matching the rule "do not prefix a
+    file name with `src/` when the file actually lives under `src/`".
+    """
+    warnings: list[StyleWarning] = []
+    seen: set[str] = set()
+    for token in extract_inline_code_tokens(readme_text):
+        if token in seen or not looks_like_path(token):
+            continue
+        seen.add(token)
+        if token.startswith("src/") and (package_dir / token).exists():
+            warnings.append(StyleWarning(token))
+    return warnings
+
+
+def census_sources(package_dir: Path) -> list[SourceGroup]:
+    """Count source files by extension under package_dir, skipping excluded directories.
+
+    Returned groups are sorted by extension, so output is deterministic.
+    """
+    counts: dict[str, int] = {}
+    for root, dirnames, filenames in os.walk(package_dir):
+        # Mutating dirnames in place prunes the walk.
+        dirnames[:] = sorted(name for name in dirnames if name not in EXCLUDED_DIRS)
+        for filename in filenames:
+            extension = Path(filename).suffix.lower()
+            if extension not in SOURCE_EXTENSIONS:
+                continue
+            counts[extension] = counts.get(extension, 0) + 1
+    return [SourceGroup(extension, counts[extension]) for extension in sorted(counts)]
+
+
+def print_report(
+    identity: PackageIdentity,
+    readme_path: Path,
+    readme_text: str | None,
+    missing: list[MissingReference],
+    style_warnings: list[StyleWarning],
+    groups: list[SourceGroup],
+) -> None:
+    """Print the human-readable mechanical-checks report to stdout."""
+    print("Package identity")
+    if identity.manifest_name:
+        print(f"  Manifest: {identity.manifest_name}")
+        print(f"  Name: {identity.package_name or '(not found)'}")
+    else:
+        print("  No known manifest found (Cargo.toml, package.json, pyproject.toml).")
+
+    print("")
+    print("README references")
+    if readme_text is None:
+        print(f"  README not found: {readme_path}")
+    else:
+        print(f"  README: {readme_path}")
+        if missing:
+            print(f"  Missing references: {len(missing)}")
+            for reference in missing:
+                print(f"    - `{reference.token}`")
+        else:
+            print("  Missing references: none")
+
+    print("")
+    print("Style warnings")
+    if style_warnings:
+        for warning in style_warnings:
+            print(f"  - `{warning.token}`: drop the `src/` prefix")
+    else:
+        print("  None.")
+
+    print("")
+    print("Source census")
+    if groups:
+        for group in groups:
+            print(f"  {group.extension}: {group.file_count}")
+    else:
+        print("  No source files found.")
+
+
+def main() -> bool:
+    args = parse_args()
+    if args.package_dir is None:
+        print_err("!! ERROR: --dir is required.")
+        usage_and_exit(1)
+
+    package_dir = Path(args.package_dir)
+    if not package_dir.is_dir():
+        raise ScriptError(f"--dir '{package_dir}' is not a directory.")
+
+    readme_path = Path(args.readme_path) if args.readme_path else package_dir / "README.md"
+    readme_text: str | None = None
+    missing: list[MissingReference] = []
+    style_warnings: list[StyleWarning] = []
+    if readme_path.is_file():
+        readme_text = readme_path.read_text(encoding="utf-8")
+        missing = find_missing_references(package_dir, readme_text)
+        style_warnings = find_style_warnings(package_dir, readme_text)
+
+    identity = detect_package_identity(package_dir)
+    groups = census_sources(package_dir)
+    print_report(identity, readme_path, readme_text, missing, style_warnings, groups)
+    return True
+
+
+def cli_main() -> int:
+    """Console-script entry point; return the process exit status."""
+    try:
+        return 0 if main() else 1
+    except ScriptError as exc:
+        print_err(f"!! ERROR: {exc}")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(cli_main())

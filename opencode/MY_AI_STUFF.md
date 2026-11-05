@@ -138,6 +138,8 @@ flowchart LR
     cmd_task_capture["<b>/ task-capture-handoff</b><br/><i>Trigger</i>"]
     cmd_idea_capture["<b>/ idea-capture-handoff</b><br/><i>Trigger</i>"]
     cmd_bug_capture["<b>/ bug-capture-handoff</b><br/><i>Trigger</i>"]
+    sk_readme_editor["<b>§ package-readme-editor</b><br/><i>HasScript</i>"]
+    sk_verify_claims["<b>§ verify-claims</b>"]
     sk_git_track_skill -->|uses| tool_git_track
     sk_github_issue -->|needs| sk_bew_comm_style
     sk_draft_gh -->|needs| sk_bew_comm_style
@@ -153,6 +155,7 @@ flowchart LR
     cmd_task_capture -->|triggers| sk_work_capture
     cmd_idea_capture -->|triggers| sk_work_capture
     cmd_bug_capture -->|triggers| sk_work_capture
+    sk_readme_editor -->|delegates| sk_verify_claims
   end
 
   subgraph otherskills[Standalone skills]
@@ -163,7 +166,6 @@ flowchart LR
     sk_karpathy["<b>§ karpathy-guidelines</b>"]
     sk_read_man_page["<b>§ read-man-page</b><br/><i>HasScript</i>"]
     sk_text_replace["<b>§ text-replace</b>"]
-    sk_verify_claims["<b>§ verify-claims</b>"]
     sk_work_mode["<b>§ work-mode</b>"]
   end
 
@@ -292,6 +294,12 @@ flowchart LR
 
 - Skill [`bew-communication-style`](./skills/bew-communication-style/) — Style reference for writing prose in bew's voice (PRs, issues, posts, emails, chat).
 - Skill [`bew-inline-callout-style`](./skills/bew-inline-callout-style/) (*NoAutoload*) — Convention for inline callout markers in prose and artefact files; reference-only.
+- Skill [`package-readme-editor`](./skills/package-readme-editor/) (*HasScript*) — Writes, reviews, or updates a package-level `README.md`, keeping it coherent on its own and accurate against the source.
+
+  - Modes: Author (no README yet), Review (audit and report), Update (apply a requested change, then verify).
+  - Delegates claim verification to `verify-claims`, passing the README check-groups on top of its default skeleton.
+  - `scripts/mechanical-checks` runs deterministic checks; `refs/languages/rust.md` adds deeper Rust checks.
+
 - Skill [`draft-github-issue-pr`](./skills/draft-github-issue-pr/) (*MultiPhase*) — Drafts GitHub issues and PRs, conforming to the target repo's templates and guidelines in bew's voice.
 
   - Phases: Classify → ContribGuidelines → PreDraft → Draft → VerifyClaims → (IssueFirst) → Submit.
@@ -322,6 +330,8 @@ flowchart LR
 - Skill [`read-man-page`](./skills/read-man-page/) (*HasScript*) — Token-efficient incremental man page reading via its `manq` script.
 - Skill [`text-replace`](./skills/text-replace/) — Bulk/mechanical search & replace and renames across files using `sd`; supports literal or regex.
 - Skill [`verify-claims`](./skills/verify-claims/) — Verifies an artefact's claims against a ground-truth source; one subagent per check-group, reports verdicts only.
+
+  Used explicitly by `package-readme-editor` at `Step:Verify` to validate README claims against the package source.
 - Skill [`work-mode`](./skills/work-mode/) — Controls agent workflow: One unit at a time with hard stops; either execution units or read-only walkthrough slices.
 - Command [`/whats-going-on`](./commands/whats-going-on.md) (*Meta*) — Status report on current findings and in-flight work, then resume the interrupted work.
 - Command [`/why-you`](./commands/why-you.md) (*Meta*) — Reflect on the root cause of a decision, without acting.
