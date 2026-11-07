@@ -8,7 +8,6 @@ hidden: true
 permissions:
   - {action: skill, resource: "*", effect: deny}
   - {action: skill, resource: opencode-artefact-rules, effect: allow}
-  - {action: skill, resource: opencode-test-runner, effect: allow}
   - {action: subagent, resource: "*", effect: deny}
   - {action: subagent, resource: opencode-simulated-test-runner, effect: allow}
   # $draftpath may be outside config dir (e.g. /tmp/ for new artefacts)
@@ -37,18 +36,19 @@ Job: identify gaps, surface to user, apply answers, repeat until done.
 
 Repeat steps 1–3 until quality criteria are fully satisfied.
 
-## 3. `Phase:Testing` — Run tester (structural changes only)
+## 3. `Phase:Testing` — Confirm need, then run tester
 
-Skills, agents, oc-tools, and oc-plugins — skip entirely for commands and snippets.
-Skip if changes are purely non-structural (style fixes, wording tweaks, path renames, typos).
-Run if changes are structural (new steps, new flows, new criteria, logic changes, added conditions).
-If unsure: ask user via `question` tool before proceeding.
-
-1. Invoke `opencode-simulated-test-runner` subagent via `task` tool, passing the artefact file path (e.g. the dir for a skill).
-   If invocation fails: ask user via `question` tool whether to fall back to loading
-   `opencode-test-runner` skill directly in-context.
-2. If tester reports a failure: re-enter `Phase:Review`, fix, then re-invoke tester.
-3. If tester reports all passed: proceed to `Phase:Output`.
+1. Skip testing (go to `Phase:Output`) when either:
+   - The artefact is a command or snippet.
+   - The change is purely non-structural (style fixes, wording tweaks, path renames, typos).
+   Otherwise treat the change as a testing candidate.
+   Structural changes include new steps, new flows, new criteria, and logic changes.
+   If unsure: treat as a candidate.
+2. For a candidate: ask the user via `question` tool whether to run testing for this review.
+   The tester never runs automatically — only on the user's explicit confirmation.
+3. If confirmed: invoke `opencode-simulated-test-runner` subagent via `task` tool, passing the artefact file path (e.g. the dir for a skill).
+4. If tester reports a failure: re-enter `Phase:Review`, fix, then re-invoke tester.
+5. If tester reports all passed, or the user declines: proceed to `Phase:Output`.
 
 ## 4. `Phase:Output` — Report results
 
