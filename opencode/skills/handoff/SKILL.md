@@ -78,7 +78,8 @@ Do not proceed until the user has switched modes and re-requested.
 Write the handoff doc to `$outputdir/$filename` using the `write` tool,
 without asking for confirmation.
 Read <./refs/template.md> for the required doc structure.
-The file opens with the frontmatter block above the first section: `created-at` set to `$created_at`.
+The file opens with the frontmatter block (`created-at` set to `$created_at`), then the H1,
+then the first section.
 
 If the write fails (e.g. output dir does not exist): tell the user and ask how to proceed.
 
@@ -108,7 +109,8 @@ NEVER output the doc content inline.
 - NEVER write to a path outside the resolved `$outputdir` without explicit user confirmation.
 - Never overwrite an existing `HANDOFF-$slug.md`, and never append a numeric suffix.
   A taken slug goes back to the user for a new one.
-- Every handoff carries the frontmatter block above its first section and never a dated filename.
+- Every handoff carries the frontmatter block, then an H1 title, then its first section;
+  never a dated filename.
 - Run `date` once for `$created_at` — never re-derive the timestamp later.
 - Run commands to get missing information (timestamp, existing HANDOFF list)
   in one tool call, not multiple.

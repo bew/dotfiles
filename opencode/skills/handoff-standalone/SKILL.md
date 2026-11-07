@@ -62,15 +62,23 @@ Otherwise: emit the handoff document inline in a fenced `md` block, and give `$f
 suggested filename for the reader.
 
 Structure the doc per *Handoff doc structure* below.
-The doc opens with the frontmatter block above the first section: `created-at` set to `$created_at`.
+The doc opens with the frontmatter block above the H1: `created-at` set to `$created_at`.
 
 ## Handoff doc structure
 
 The handoff doc must contain the following sections in order.
-Open with the `created-at` block, then the Tool-access notice.
+Open with the `created-at` block, then the H1 title, then the Tool-access notice.
 Omit any section that has no qualifying content — do not keep an empty heading
 or write filler (e.g. "none", "N/A", "nothing to report").
-In the output doc these are top-level `##` headings.
+In the output doc these map to top-level headings — all `##` except the title, which is the H1.
+
+### Title
+
+```md
+# <descriptive title>
+```
+
+H1 heading — one line naming the handoff's subject.
 
 ### Tool-access notice
 
@@ -126,7 +134,7 @@ Include only if applicable.
 
 ## Rules
 
-- Open the doc with the `created-at` block, then the Tool-access notice.
+- Open the doc with the `created-at` block, then the H1 title, then the Tool-access notice.
 - Do not inline file contents — reference by path only.
 - Only reference URLs confirmed in the session.
   Never reference invented or hallucinated URLs.
