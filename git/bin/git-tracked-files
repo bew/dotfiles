@@ -1,0 +1,18 @@
+#!/usr/bin/env nu
+# List every path recorded in the index, one per line (`git ls-files`).
+#
+# Includes intent-to-add entries, so it answers "what does git consider tracked?".
+#
+# Root-relative by default; `--rel` (or `--relative`) prints paths relative to
+# the current directory instead.
+
+source ./_common_helpers.nu
+
+def main [--rel, --relative, ...pathspecs: string] {
+    # `--full-name` makes `ls-files` root-relative, matching the other listers.
+    # `ls-files` is also cwd-scoped, so an empty pathspec becomes the magic
+    # pathspec `:/`; that keeps the listing repo-wide like the diff listers.
+    let effective = if ($pathspecs | is-empty) { [":/"] } else { $pathspecs }
+    let listing = (^git ls-files --full-name -- ...$effective | lines)
+    print_paths $listing ($rel or $relative)
+}

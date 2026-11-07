@@ -65,26 +65,26 @@
     git --no-pager -C \"${repo_path:-.}\" log -n1 --pretty=format:%B ${1:-HEAD}; \
   }; f"
 
-  # Inverts a previous `git add file`
-  # NOTE: changes the index only (the staging area)
-  unstage = restore --staged
+  # Move/rename files without staging the move (kept as an unstaged rename).
+  # Dispatches to the `git-better-rename` script.
+  rename = better-rename
 
-  # NOTE: depends on my custom `git-new-files` script that lists files added via `git add -N`
-  unstage-new-files = "!f() { \
-    echo "New files:"; \
-    git new-files --raw; \
-    echo; echo 'Unstaging...'; \
-    git unstage `git new-files --raw`; \
-  }; f"
+  # Unstage everything, but keep new files as intent-to-add (which is the behavior I expect..).
+  # Dispatches to the `git-unstage-keep-new` script.
+  unstage = unstage-keep-new
+  # What `unstage` used to be, kept for reference:
+  # unstage = restore --staged
 
   # Restore from rev
-  restore-from = restore --source
+  # Dispatches to the `git-restore-from` script.
+  # restore-from = restore --source
 
   # Stage the deletion of a file
   # NOTE: changes the index only (the staging area),
   #   the working tree isn't touched at all
   #   (the file isn't actually deleted)
-  untrack = rm --cached
+  # Dispatches to the `git-untrack` script.
+  # untrack = rm --cached
 
   # repo manipulation
 
@@ -117,11 +117,6 @@
   # ref: https://stackoverflow.com/a/35993495/5655255
   # (note: stashes don't have named reference on them though, only commit hash :/)
   sth-log = !git pretty-log $(git stash list --format="%h")
-
-  # Alias (for nice completion after sth-<TAB>) to help use new git-without-new-files helper script.
-  # This is _VERY_ useful to be able to stash some/all files except the new files which `git stash`
-  # doesn't support, even when added through git (via `git add --intent-to-add ...`).
-  sth-without-new-files = without-new-files stash
 
   reb  = rebase
   rebi = rebase -i

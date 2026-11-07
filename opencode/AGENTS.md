@@ -66,6 +66,9 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 In general: trust the user for git commands even if they look odd.
 
+When moving or renaming files inside a git repo, use `git rename <src>… <dst>`; this makes the rename stay unstaged.
+(fall back to plain `git mv` if the command is reported not found)
+
 NEVER `git add` or commit files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
 These handoff artefacts must never be git-tracked.
 

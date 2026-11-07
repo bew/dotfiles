@@ -1,5 +1,7 @@
 #!/usr/bin/env nu
 
+source ./_common_helpers.nu
+
 # Strip surrounding double-quotes from a path git may have quoted (e.g. paths with spaces)
 def dequote []: string -> string {
     str trim --char '"'
@@ -10,15 +12,20 @@ def dequote []: string -> string {
 #
 # Use when you want to see which "new but not yet committed" paths exist
 # before running stash/commit/diff workflows that are sensitive to -N entries.
+#
+# Paths are repo-root-relative by default; `--rel` makes them cwd-relative.
 def main [
-    --raw   # output only file paths, one per line (no label prefix)
-    --json  # output as JSON array of records with `kind`, `path` (and `old_path` for renames)
+    --raw       # output only file paths, one per line (no label prefix)
+    --json      # output as JSON array of records with `kind`, `path` (and `old_path` for renames)
+    --rel       # print paths relative to the current directory instead of the repo root
+    --relative  # alias of `--rel`
+    ...pathspecs: string  # limit the listing to these paths (default: the whole work tree)
 ] {
     let entries = (
         # Each relevant line is one of:
         #   ` A path`           — intent-to-add        (X=space, Y=A)
         #   ` R old -> new`     — unstaged rename + -N  (X=space, Y=R)
-        ^git status --porcelain=v1
+        ^git status --porcelain=v1 -- ...$pathspecs
         | lines
         | where { ($in | str starts-with " A") or ($in | str starts-with " R") }
         | each {|line|
@@ -32,15 +39,31 @@ def main [
         }
     )
 
+    # `git status` prints paths relative to the repo root; `--rel` re-bases them on the cwd.
+    let paths = if ($rel or $relative) {
+        let prefix = (^git rev-parse --show-prefix | str trim)
+        $entries | each {|entry|
+            if $entry.kind == "rename" {
+                $entry
+                | upsert path (to_cwd_relative $entry.path $prefix)
+                | upsert old_path (to_cwd_relative $entry.old_path $prefix)
+            } else {
+                $entry | upsert path (to_cwd_relative $entry.path $prefix)
+            }
+        }
+    } else {
+        $entries
+    }
+
     if $json {
-        print ($entries | to json)
+        print ($paths | to json)
         return
     }
 
     let lines_to_print = if $raw {
-        $entries | each { $in.path }
+        $paths | each { $in.path }
     } else {
-        $entries | each {|e|
+        $paths | each {|e|
             if $e.kind == "new-file" {
                 $"new file: ($e.path)"
             } else {

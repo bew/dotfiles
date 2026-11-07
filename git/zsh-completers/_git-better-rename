@@ -1,0 +1,19 @@
+#autoload
+#description Move/Rename files, unstaged by default
+
+# Delegates the `git mv` options to `_git-mv`. The script's own `--staged` and
+# `--undo` flags are described separately, because `_arguments` files every
+# option under one tag and would merge them into the `git mv` group.
+
+local -a better_rename_flags
+better_rename_flags=(
+  '--staged:records the move/rename in the index (same as `git mv`)'
+  '--undo:reverse a move/rename'
+)
+
+local ret=1
+if [[ "$PREFIX" = -* ]]; then
+  _describe -t better-rename-flags 'better-rename flags' better_rename_flags && ret=0
+fi
+_git-mv && ret=0
+return ret

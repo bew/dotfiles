@@ -1,0 +1,31 @@
+#!/usr/bin/env nu
+# Unstage the index, but keep new files tracked as intent-to-add (`git add -N`) entries.
+#
+# `git unstage <pathspec>...` unstages everything that is staged, except that a
+# file which was staged as new does not become untracked: it is re-recorded as an
+# intent-to-add entry, so `git status` keeps showing it as a ` A` (or ` R`) entry.
+# Intent-to-add entries that were already present are never touched.
+
+source ./_common_helpers.nu
+
+# Abort an invalid invocation: show the usage line, then the reason.
+def usage_and_exit [reason: string] {
+    print --stderr "usage: git unstage <pathspec>..."
+    fail $reason
+}
+
+def main [...pathspecs: string] {
+    if ($pathspecs | is-empty) {
+        usage_and_exit "git unstage needs 1+ pathspecs"
+    }
+
+    let work_root = (get_work_root)
+    let staged = (^git staged-files ...$pathspecs | lines)
+    let staged_new = (^git staged-new-files ...$pathspecs | lines)
+    # A staged rename shows up as its destination only, so the source must be reset too.
+    let rename_sources = (^git staged-renamed-from-files ...$pathspecs | lines)
+    let entries_to_reset = ($staged | append $rename_sources | uniq)
+
+    reset_index_entries $work_root $entries_to_reset
+    mark_intent_to_add $work_root $staged_new
+}

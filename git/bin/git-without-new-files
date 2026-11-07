@@ -18,7 +18,7 @@ def log [msg: string, --no-prefix] {
 # but you want your normal workflow to remain unchanged afterward.
 def main [...args] {
     log "Collecting new files (added with `git add --intent-to-add` or unstaged renames)"
-    let new_files = (git new-files --json | from json | get path)
+    let new_files = (git tracked-new-files --json | from json | get path)
 
     if ($new_files | is-not-empty) {
         log $"Temporarily removing ($new_files | length) new files from index"

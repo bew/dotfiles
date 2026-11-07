@@ -1,0 +1,121 @@
+#!/usr/bin/env nu
+# Move or rename files like `git mv`, but leave the result unstaged.
+#
+# The move ends up as an unstaged rename (` R old -> new`): the old path is put
+# back into the index and the new path becomes an intent-to-add entry.
+# With `--staged` the move is recorded in the index instead of left unstaged.
+# With `--undo` the given `<src>... <dst>` move is reversed instead of applied.
+# Every argument is passed straight through to `git mv`.
+
+source ./_common_helpers.nu
+
+# Staged additions, with rename detection off so a move is always an `A` entry.
+def list_staged_additions []: nothing -> list<string> {
+    ^git diff --cached --name-only --no-renames --diff-filter=A | lines
+}
+
+# Staged deletions, the other half of a move recorded in the index.
+def list_staged_deletions []: nothing -> list<string> {
+    ^git diff --cached --name-only --no-renames --diff-filter=D | lines
+}
+
+# Stage the given paths into the index, recording both sides of the move.
+# Callers reset the entries first, so a path that exists only in HEAD (a rename
+# source) is back in the index and stages as a deletion like any other.
+def stage_moved_paths [work_root: string, paths: list<string>] {
+    if ($paths | is-empty) { return }
+
+    let staged = (^git -C $work_root add -- ...$paths | complete)
+    if $staged.exit_code != 0 {
+        fail $"could not stage paths: ($staged.stderr | str trim)"
+    }
+}
+
+# True when a path exists on disk and is a directory.
+def is_dir [path: string]: nothing -> bool {
+    if not ($path | path exists) { return false }
+    ($path | path type) == "dir"
+}
+
+# Split move arguments into pass-through flags and positional paths.
+def split_mv_args [mv_args: list<string>]: nothing -> record {
+    {
+        flags: ($mv_args | where {|arg| ($arg | str starts-with '-') })
+        paths: ($mv_args | where {|arg| not ($arg | str starts-with '-') })
+    }
+}
+
+# Pairs reversing a `git mv <src>... <dst>` move.
+# `from` is where a source now sits; `to` is its original name.
+def build_undo_pairs [paths: list<string>]: nothing -> list<record> {
+    if ($paths | length) < 2 {
+        fail "--undo needs <src>... <dst>"
+    }
+    let dst = ($paths | last)
+    let sources = ($paths | take (($paths | length) - 1))
+    let dst_is_dir = (is_dir $dst)
+    if (($sources | length) > 1) and (not $dst_is_dir) {
+        fail $"--undo needs an existing directory as <dst>, got: ($dst)"
+    }
+    $sources | each {|src|
+        let moved_to = if $dst_is_dir { $dst | path join ($src | path basename) } else { $dst }
+        { from: $moved_to, to: $src }
+    }
+}
+
+# Run `git mv` with the given arguments.
+def run_mv [mv_args: list<string>] {
+    ^git mv ...$mv_args
+}
+
+# Reverse the move described by the given arguments, one `git mv` per source.
+# A source already back in place is reported and skipped, so a repeat run is a no-op.
+def run_undo [mv_args: list<string>] {
+    let parts = (split_mv_args $mv_args)
+    let pairs = (build_undo_pairs $parts.paths)
+    let undone = ($pairs | where {|pair| not ($pair.from | path exists) })
+    let pending = ($pairs | where {|pair| $pair.from | path exists })
+
+    for pair in $undone {
+        print --stderr $"already undone: ($pair.to)"
+    }
+    if ($pending | is-empty) { exit 0 }
+
+    for pair in $pending {
+        run_mv ($parts.flags | append [$pair.from $pair.to])
+    }
+}
+
+def --wrapped main [...args: string] {
+    let staged = ($args | any {|arg| $arg == "--staged" })
+    let undo = ($args | any {|arg| $arg == "--undo" })
+    let mv_args = ($args | where {|arg| $arg not-in ["--staged" "--undo"] })
+
+    let work_root = (get_work_root)
+    # Snapshot the staged additions/deletions so only the ones this move creates
+    # are turned back into unstaged entries.
+    let additions_before = (list_staged_additions)
+    let deletions_before = (list_staged_deletions)
+
+    if $undo {
+        run_undo $mv_args
+    } else {
+        run_mv $mv_args
+    }
+
+    let additions_after = (list_staged_additions)
+    let deletions_after = (list_staged_deletions)
+
+    let moved_to = ($additions_after | where {|path| $path not-in $additions_before })
+    let moved_from = ($deletions_after | where {|path| $path not-in $deletions_before })
+    let touched_paths = ($moved_from | append $moved_to | uniq)
+
+    # Reset the entries the move touched, then apply the requested staging:
+    # intent-to-add for the unstaged default, a full stage for `--staged`.
+    reset_index_entries $work_root $touched_paths
+    if $staged {
+        stage_moved_paths $work_root $touched_paths
+    } else {
+        mark_intent_to_add $work_root $moved_to
+    }
+}

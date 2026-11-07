@@ -1,0 +1,13 @@
+#!/usr/bin/env nu
+# List the paths staged in the index, one per line (`git diff --cached --name-only`).
+#
+# Root-relative by default, like `git diff`; `--rel` (or `--relative`) prints
+# them relative to the current directory instead.
+
+source ./_common_helpers.nu
+
+def main [--rel, --relative, ...pathspecs: string] {
+    # `--no-pager`: a short listing should never open a pager.
+    let listing = (^git --no-pager diff --cached --name-only -- ...$pathspecs | lines)
+    print_paths $listing ($rel or $relative)
+}

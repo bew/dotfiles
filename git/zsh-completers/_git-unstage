@@ -1,0 +1,7 @@
+#autoload
+#description Unstage paths, keeping new files as intent-to-add
+
+# Only pathspecs are accepted, so delegating to `_git-restore` would wrongly
+# offer its `--source` / `--worktree` / `-s` flags.
+_arguments -S \
+  '*:pathspec:__git_changed-in-index_files'

@@ -1,0 +1,3 @@
+#autoload
+#description Drop intent-to-add and unstaged-rename entries from the index
+_git-rm

@@ -121,7 +121,7 @@ Detail: [EXPLO-storage-backend.md](./EXPLO-storage-backend.md).
 ## Related Artifacts
 
 - Exploration material lives beside this spec: `EXPLO-BRIEF.md` and `EXPLORATION-*.md` in this directory.
-- Repo tooling convention: bash scripts in `bin/` with `.bats` tests (`git-new-files`, `git-without-new-files`, `opencode-artefacts-status`).
+- Repo tooling convention: scripts in `bin/` (git helpers in `git/bin/`) with `.bats` tests (`git-tracked-new-files`, `git-without-new-files`, `opencode-artefacts-status`).
 - Existing artefact convention this design must coexist with: `_WIP_SPECS/` dirs (some tracked on `main`) and `HANDOFF-*` files (never tracked).
 
 ## Global Open Questions

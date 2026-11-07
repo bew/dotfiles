@@ -1,0 +1,25 @@
+#!/usr/bin/env nu
+# List the source (old) paths of renames staged in the index, one per line.
+#
+# A `--name-only` staged listing only shows a rename's destination; the source is
+# needed to restore a staged rename back into an unstaged one.
+
+source ./_common_helpers.nu
+
+def main [--rel, --relative, ...pathspecs: string] {
+    # `--name-status -z` emits `R<score>\0<old>\0<new>` records, so grouping the
+    # NUL-separated fields in threes and taking the second field yields old paths.
+    let listing = (^git --no-pager diff --cached --name-status -z -M --diff-filter=R -- ...$pathspecs
+        | complete)
+    if $listing.exit_code != 0 {
+        print --stderr ($listing.stderr | str trim)
+        exit $listing.exit_code
+    }
+
+    let old_paths = ($listing.stdout
+        | split row (char nul)
+        | where {|field| $field != "" }
+        | chunks 3
+        | each {|record| $record.1 })
+    print_paths $old_paths ($rel or $relative)
+}

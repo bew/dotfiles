@@ -1,0 +1,36 @@
+#!/usr/bin/env nu
+# Unstage files that were staged as new, keeping them tracked as intent-to-add entries.
+#
+# Usage: `git unstage-new-files <pathspec>...`
+#
+# Plain additions go back to ` A`; staged renames go back to an unstaged ` R old -> new`.
+# The affected files are printed first, then an "Unstaging..." line.
+
+source ./_common_helpers.nu
+
+# Abort an invalid invocation: show the usage line, then the reason.
+def usage_and_exit [reason: string] {
+    print --stderr "usage: git unstage-new-files <pathspec>..."
+    fail $reason
+}
+
+def main [...pathspecs: string] {
+    if ($pathspecs | is-empty) {
+        usage_and_exit "git unstage-new-files needs 1+ pathspecs"
+    }
+
+    let work_root = (get_work_root)
+    let staged_new = (^git staged-new-files ...$pathspecs | lines)
+    # A staged rename shows up as its destination only, so the source must be reset too.
+    let rename_sources = (^git staged-renamed-from-files ...$pathspecs | lines)
+
+    print "New files:"
+    for path in $staged_new {
+        print $path
+    }
+    print ""
+    print "Unstaging..."
+
+    reset_index_entries $work_root ($staged_new | append $rename_sources | uniq)
+    mark_intent_to_add $work_root $staged_new
+}

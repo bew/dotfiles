@@ -1,0 +1,15 @@
+#!/usr/bin/env nu
+# List files staged as new — additions and rename destinations, one per line.
+#
+# Rename detection hides these in a plain `--name-only` listing (a staged rename
+# shows only its destination), so this filters the index diff with `--diff-filter=AR`.
+#
+# Paths are repo-root-relative by default; `--rel` makes them cwd-relative.
+
+source ./_common_helpers.nu
+
+def main [--rel, --relative, ...pathspecs: string] {
+    # `--no-pager`: a short listing should never open a pager.
+    let listing = (^git --no-pager diff --cached --name-only --diff-filter=AR -- ...$pathspecs | lines)
+    print_paths $listing ($rel or $relative)
+}

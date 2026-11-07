@@ -1,0 +1,8 @@
+#autoload
+#description Restore paths from a specific revision
+
+# A revision followed by pathspecs; delegating to `_git-restore` would wrongly
+# offer its own flags and its `HEAD` default.
+_arguments -S \
+  '1:revision:__git_revisions' \
+  '*:pathspec:_files'

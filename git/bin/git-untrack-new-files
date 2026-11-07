@@ -1,0 +1,30 @@
+#!/usr/bin/env nu
+# Drop intent-to-add and unstaged-rename entries from the index.
+#
+# The files stay in the work tree but become untracked (`??`) — the opposite of
+# what `git add --intent-to-add` did to them.
+
+source ./_common_helpers.nu
+
+# Abort an invalid invocation: show the usage line, then the reason.
+def usage_and_exit [reason: string] {
+    print --stderr "usage: git untrack-new-files <pathspec>..."
+    fail $reason
+}
+
+def main [...pathspecs: string] {
+    if ($pathspecs | is-empty) {
+        usage_and_exit "git untrack-new-files needs 1+ pathspecs"
+    }
+
+    let work_root = (get_work_root)
+    # NOTE: no `--` before the pathspecs — a Nushell script's own CLI rejects it.
+    # The lister prints repo-root-relative paths, so the removal runs from the root.
+    let new_paths = (^git tracked-new-files --raw ...$pathspecs | lines)
+    if ($new_paths | is-empty) { return }
+
+    let removed = (^git -C $work_root rm --cached --quiet -- ...$new_paths | complete)
+    if $removed.exit_code != 0 {
+        fail $"could not untrack new files: ($removed.stderr | str trim)"
+    }
+}

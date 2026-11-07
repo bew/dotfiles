@@ -2,7 +2,7 @@
 
 ## Findings
 
-- Repo tooling convention: bash scripts in `bin/` with `.bats` tests (`git-new-files`, `git-without-new-files`, `opencode-artefacts-status`).
+- Repo tooling convention: scripts in `bin/` (git helpers in `git/bin/`) with `.bats` tests (`git-tracked-new-files`, `git-without-new-files`, `opencode-artefacts-status`).
 - Type detection by path convention: `_WIP_SPECS` → spec/exploration; `HANDOFF-*` → handoff.
 - Per-item commit messages match the normal commit workflow (committer-style drafting).
 

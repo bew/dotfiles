@@ -44,6 +44,7 @@ fi
 # Dotfiles bins
 path_maybe_add_entry "$HOME/.dot/bin"
 path_maybe_add_entry "$HOME/.dot/gui/bin"
+path_maybe_add_entry "$HOME/.dot/git/bin"
 
 # User-local bins
 path_maybe_add_entry "$HOME/.local/bin"

@@ -1,0 +1,26 @@
+#!/usr/bin/env nu
+# Drop paths from the index, keeping them in the work tree (`git rm --cached`).
+#
+# Usage: `git untrack <pathspec>...`
+# Flags such as `-r` and `-f` are forwarded to `git rm --cached`.
+# 1+ pathspecs are required, so a bare `git untrack` can never touch the whole index.
+
+source ./_common_helpers.nu
+
+# Abort an invalid invocation: show the usage line, then the reason.
+def usage_and_exit [reason: string] {
+    print --stderr "usage: git untrack <pathspec>..."
+    fail $reason
+}
+
+def --wrapped main [...args: string] {
+    let has_pathspec = ($args | any {|arg| not ($arg | str starts-with "-") })
+    if not $has_pathspec {
+        usage_and_exit "git untrack needs 1+ pathspecs"
+    }
+
+    let removed = (^git rm --cached ...$args | complete)
+    if $removed.exit_code != 0 {
+        fail $"could not untrack: ($removed.stderr | str trim)"
+    }
+}

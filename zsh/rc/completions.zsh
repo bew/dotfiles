@@ -16,6 +16,9 @@ fpath=(
   $fpath
 )
 
+# git subcommand completers that live with the git topic config
+[[ -d ~/.dot/git/zsh-completers ]] && fpath+=(~/.dot/git/zsh-completers)
+
 # Add system completions if available
 # (allows to have 'pacman' completions in nix's zsh for example)
 [[ -d /usr/share/zsh/functions ]] && fpath+=(/usr/share/zsh/functions/*(N))

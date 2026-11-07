@@ -1,0 +1,28 @@
+#!/usr/bin/env nu
+# Restore paths from a specific revision (`git restore --source <rev>`).
+#
+# Usage: `git restore-from <rev> <pathspec>...`
+# Both the revision and 1+ pathspecs are required, so a bare
+# `git restore-from` can never clobber paths over an unintended scope.
+
+source ./_common_helpers.nu
+
+# Abort an invalid invocation: show the usage line, then the reason.
+def usage_and_exit [reason: string] {
+    print --stderr "usage: git restore-from <rev> <pathspec>..."
+    fail $reason
+}
+
+def --wrapped main [...args: string] {
+    if ($args | length) < 2 {
+        usage_and_exit "git restore-from needs a revision and 1+ pathspecs"
+    }
+
+    let revision = ($args | first)
+    let pathspecs = ($args | skip 1)
+
+    let restored = (^git restore --source $revision ...$pathspecs | complete)
+    if $restored.exit_code != 0 {
+        fail $"could not restore from ($revision): ($restored.stderr | str trim)"
+    }
+}

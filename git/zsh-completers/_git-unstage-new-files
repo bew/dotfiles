@@ -1,0 +1,10 @@
+#autoload
+#description Unstage files staged as new, keeping them tracked as intent-to-add
+
+# Only pathspecs are accepted, offering just the staged additions and renames.
+# `__git_diff-index_files` cannot express `--diff-filter`, so this mirrors it.
+local -a new_files
+new_files=(${(0)"$(git diff --cached -z --name-only --no-color --diff-filter=AR 2>/dev/null)"})
+__git_command_successful $pipestatus || return 1
+new_files=(${(0)"$(__git_files_relative $new_files)"})
+_wanted new-files expl 'new file' _multi_parts - / new_files
