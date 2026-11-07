@@ -53,8 +53,9 @@ All extend the rules below.
   (e.g. "milliseconds", "bytes").
 - No trailing whitespace — no trailing spaces or tabs at the end of any line,
   and no lines that contain only whitespace.
-- Never install or declare a package, or silently substitute a stdlib/hand-rolled alternative for a
-  recommended package, without asking the user first.
+- Never install or declare a package you chose yourself (from a skill, or as a recommended choice),
+  or silently substitute a stdlib/hand-rolled alternative for a recommended one, without asking the
+  user first; packages the user named explicitly for this task needs no confirmation.
 - Validate unknown input once, at the boundary that owns it.
   Pass typed values inward instead of re-checking what a schema, constructor, or internal type
   already guarantees.
