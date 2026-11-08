@@ -3,6 +3,19 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@opencode/plugin": "~2.2.0"
-  }
+    "@opencode/plugin": "2.2.5",
+    "@opentui/core": "0.8.1"
+  },
+  "//": [
+    "Keep the versions in sync with the installed OpenCode host, so the types are correct!",
+    "* @opentui/core with the OpenTUI version OpenCode bundles",
+    "* @opencode/plugin with the OpenCode version",
+    "",
+    "note: A mismatched @opentui/core loads as a second instance beside the host's own, and",
+    "the colors it builds cross into the host renderer.",
+    "",
+    "warn: A mismatched @opencode/plugin costs nothing at runtime and merely blinds the types.",
+    "",
+    "SEE: plugin-docs/common.md."
+  ]
 }

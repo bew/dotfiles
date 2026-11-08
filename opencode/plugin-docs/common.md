@@ -17,11 +17,21 @@ This page keeps only what is local to this repo, plus the rules we depend on.
   `@opencode/plugin/tui` at runtime.
   The repo `package.json` exists for editor types only, which is why an out-of-range
   version there costs nothing at runtime but blinds the types.
+  Keep its `@opencode/plugin` version in sync with the host's own version
+  (`opencode2 --version`).
 - The id convention is `<name>.<role>`, e.g. `acme.server`, `acme.cli`, or `acme.tui`.
 - Published plugins declare `exports` with a `./tui` entry and add the OpenTUI peers
   `@opentui/core`, `@opentui/solid`, and `solid-js`.
-  Never install those peers locally: a local copy shadows the host instance, which
-  pins their versions (see `pitfalls.md`).
+  Never install those peers for a published plugin: a local copy shadows the host
+  instance, which pins their versions (see `pitfalls.md`).
+- A local plugin may depend on `@opentui/core` alone — no `@opentui/solid`, no
+  `solid-js`, since the host provides the JSX runtime.
+  That is what lets OpenTUI's color and renderable types resolve in the editor and its
+  modules load under `bun test`.
+  Keep the copy in sync with the OpenTUI version OpenCode bundles: the `@opentui/core`
+  entry in the catalog of OpenCode's root `package.json`.
+  A mismatched copy is a second `@opentui/core` instance next to the host's own, and the
+  colors it builds cross into the host renderer.
 - Register a published plugin in `opencode.json` `plugins`; use `cli.json` `plugins`
   for a CLI-only package that must stay active against remote servers.
 

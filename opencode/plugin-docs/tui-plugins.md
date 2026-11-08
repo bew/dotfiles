@@ -17,6 +17,26 @@ This page is the delta: what upstream does not say, or says in a way that misled
   rendered by a slot, route, or dialog to reach `context`.
 - Local plugins run in the host's Bun runtime, so `node:*` builtins are available (`node:fs`, `node:os`, `node:path`).
 
+### Host-registered elements
+
+The host registers OpenTUI renderables of its own at startup with `extend()` from
+`@opentui/solid` — `extend({ spinner: SpinnerRenderable })`, for example.
+A registered name becomes a JSX intrinsic process-wide, and a plugin's JSX
+compiles to the host's `@opentui/solid` instance, so a host-contributed element
+is usable with no import and no dependency:
+`<spinner frames={frames} color={colorGenerator} interval={40} />`.
+
+The inputs belong to the host element, not to a plugin API: `<spinner>` takes an
+array of frame strings plus a per-cell color function, and the host element owns
+the animation clock and the painting.
+That division is the useful part — a plugin computes the frames and colors, the
+host decides when they advance and how they are drawn.
+
+Registering a name of your own would mean depending on `@opentui/solid` itself,
+which local plugins deliberately do not do.
+As with host command IDs, treat a host element's name and inputs as host
+internals that can move between releases.
+
 ## Slots
 
 Placement keys, per-slot input props, and the published path list are upstream.

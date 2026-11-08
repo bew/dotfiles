@@ -54,7 +54,7 @@ OpenTUI docs (`https://opentui.com/docs/`):
 - `core-concepts/keyboard` — `KeyEvent` fields, propagation, paste.
 - `core-concepts/interaction` — mouse events, focus, the missing synthetic click.
 - `core-concepts/layout` — flexbox layout and absolute positioning.
-- `bindings/solid` — Solid binding, `jsxImportSource`, hooks, version pinning.
+- `bindings/solid` — Solid binding, `jsxImportSource`, hooks, `extend()` component registration, version pinning.
 - `keymap/overview` — layers, priority, pending sequences.
 - `keymap/solid` — `KeymapProvider`, `useKeymap`, `useBindings`.
 - `components/input` — input props, events, focus.
@@ -64,5 +64,5 @@ Types and mirrors:
 
 - `../node_modules/@opencode/plugin/dist/tui/context.d.ts` — the exact TUI contract for the installed host version.
 - `@opencode/theme` on unpkg, `dist/tui/types.d.ts` — `ResolvedTheme` tokens.
-- `@opentui/core`, `@opentui/solid`, `solid-js` — host-resolved, not installed locally.
+- `@opentui/core` — installed locally, kept in sync with the host's version (see `common.md`); `@opentui/solid` and `solid-js` stay host-resolved, not installed locally.
 - `@opencode/plugin` RPC types — the RPC surface.
