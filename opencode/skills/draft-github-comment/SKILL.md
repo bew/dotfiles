@@ -139,7 +139,7 @@ Comment-specific overrides, on top of the style skills:
 - No closing `_italic aside_` besides the signature.
   Any other closing aside must carry new information.
 - Hedge what you don't control (`if possible`), never the facts.
-- One sentence per line.
+- Use wrapped semantic line breaks: each sentence starts on its own line.
 - Proof-read before presenting: no dropped words, no "would be replaces"-style slips.
 - End every draft with a blank line, then `_Comment drafted & iterated on with AI assistance_`.
   The line ships inside the published body.

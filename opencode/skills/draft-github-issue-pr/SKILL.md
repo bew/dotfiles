@@ -129,7 +129,7 @@ When entering `Phase:Submit`: read <./refs/phases/submit.md> for full instructio
   citing the real output.
 - Never alter the user's voice, punctuation, or deliberate quirks.
   Preserve `!`, `🙂`, asides, and wording.
-- One sentence per line in every drafted prose body (semantic line breaks).
+- Use wrapped semantic line breaks in every drafted prose body.
 - Derive a PR's purpose from its diff.
   Keep incidental findings subordinate and mark them explicitly out of scope.
 - Do not state a concrete path, key, or shape unless the code shows it.

@@ -161,6 +161,7 @@ flowchart LR
   subgraph otherskills[Standalone skills]
     sk_agent_blocker["<b>§ agent-blocker</b><br/><i>Meta</i>"]
     sk_agent_stuck["<b>§ agent-stuck</b><br/><i>Meta</i>"]
+    sk_check_semantic_breaks["<b>§ check-semantic-breaks</b><br/><i>HasScript</i>"]
     sk_gh_read_file["<b>§ gh-read-file</b>"]
     sk_incremental_write["<b>§ incremental-write</b>"]
     sk_karpathy["<b>§ karpathy-guidelines</b>"]
@@ -259,6 +260,8 @@ flowchart LR
 - Skill [`check-line-width`](./skills/check-line-width/) (*HasScript*) — Checks line length / column overflow from a file or stdin; the only authority on wrapping.
 
   Used explicitly by `committer` to validate message wrapping, and relied on implicitly by `opencode-crafter` / `opencode-reviewer` when writing or reviewing artefacts (via `coder-generic`'s line-width rule).
+
+- Skill [`check-semantic-breaks`](./skills/check-semantic-breaks/) (*HasScript*) — Flags lines that pack more than one sentence, unless the extra sentence is small and the line fits; the mechanical authority on wrapped semantic line breaks.
 
 - Agent [`explore-diff`](./agents/explore-diff.md) — Generic diff/patch explorer; defaults to a summary of concerns, but can be driven to return any structure the caller asks for.
 

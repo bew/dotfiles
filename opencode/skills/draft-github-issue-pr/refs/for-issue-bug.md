@@ -15,4 +15,4 @@ Repo required items are pinned on top.
 - **Environment** — version, OS, terminal, where relevant.
 
 Load `bew-communication-style` before writing.
-One sentence per line.
+Use wrapped semantic line breaks: each sentence starts on its own line.

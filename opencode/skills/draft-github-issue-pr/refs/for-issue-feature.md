@@ -3,7 +3,7 @@
 Base shape for feature requests, capability asks, and asks for an escape hatch or option.
 Repo required items are pinned on top; advisory hints never override it.
 Load `bew-communication-style`.
-One sentence per line.
+Use wrapped semantic line breaks: each sentence starts on its own line.
 
 - **Greeting** — a short greeting on its own line, e.g. `Hello!`.
 - **Opening** — one short sentence on what you searched or tried, to show it is not a duplicate.

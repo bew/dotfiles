@@ -69,7 +69,7 @@ Read <./refs/design-it-twice.md> before moving on, and say what the pick gives u
 The frames end with a report: `<thing> Architecture Report`, where `<thing>` is what the report
 covers — the repo, a module, or a script.
 Sections, each under its own heading, with every paragraph opening with `**Term**: ` and continuing
-one sentence per line, never restating its lead-in:
+in wrapped semantic line breaks, never restating its lead-in:
 - `Concepts` — what each load-bearing thing means, what it becomes in code, what it is not.
 - `Data` — what makes each thing valid, what identifies it, and what is derived rather than held;
   no frame decides these, so state the choice behind it.

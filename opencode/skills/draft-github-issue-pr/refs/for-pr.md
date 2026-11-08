@@ -3,7 +3,7 @@
 The base shape for a PR body.
 The repo's required items are pinned on top; advisory repo hints never override this.
 Load `bew-communication-style`.
-One sentence per line.
+Use wrapped semantic line breaks: each sentence starts on its own line.
 
 Open with a greeting (`Hello!`).
 Then lead with the motivation, in first person and in your own voice:

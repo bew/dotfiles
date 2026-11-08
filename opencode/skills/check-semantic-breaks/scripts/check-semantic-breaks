@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+# Report lines that pack more than one sentence, in files or piped text.
+# Usage: check-semantic-breaks [- | <file>...]
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+# Tokens that may end with a period without closing a sentence, matched
+# case-insensitively against the token right before the period.
+ABBREVIATIONS = frozenset({
+    "al",
+    "approx",
+    "cf",
+    "e.g",
+    "etc",
+    "fig",
+    "i.e",
+    "no",
+    "resp",
+    "viz",
+    "vs",
+})
+
+# Maximum line width, in columns; a line at or under it needs no wrapping, so
+# a short sentence may keep it company.
+MAX_LINE_WIDTH = 100
+
+# A sentence after a boundary may share the line only while it holds at most
+# this many words; a longer one must start on its own line.
+MAX_SHARED_SENTENCE_WORDS = 5
+
+# Marker printed at each offending sentence boundary on a hit line.
+BOUNDARY_MARK = "┃"
+
+# Words of context kept on each side of a boundary, so a hit line is shown in
+# compacted form; a lone boundary keeps a little more than each of several.
+CONTEXT_WORDS_SINGLE = 3
+CONTEXT_WORDS_MULTI = 2
+
+# Stands in for the text dropped between the windows of a compacted hit line.
+ELISION = "……"
+
+# A candidate boundary: a sentence mark (period, exclamation mark, or question
+# mark) followed by whitespace and then a non-whitespace character.
+# The lookbehind skips the trailing period of an ellipsis.
+BOUNDARY_RE = re.compile(r"(?<!\.)([.!?])([ \t]+)(?=\S)")
+
+# A period that opens an ordered-list item, e.g. the one in "1. Foo".
+LIST_MARKER_RE = re.compile(r"[ \t]*\d+")
+
+# The token ending just before a sentence mark: letters with internal periods, e.g. "e.g".
+TOKEN_RE = re.compile(r"[A-Za-z]+(?:\.[A-Za-z]+)*$")
+
+# stdin is addressed by the '-' argument and needs its own label.
+STDIN_PATH = Path("/dev/stdin")
+
+
+class ScriptError(Exception):
+    """Raised when a source cannot be read."""
+
+
+def print_err(msg: str) -> None:
+    """Print msg to stderr."""
+    print(msg, file=sys.stderr)
+
+
+def usage_and_exit(status: int) -> None:
+    """Print usage to stderr and exit with status."""
+    print_err(
+        "Usage: check-semantic-breaks [- | <file>...]\n"
+        "\n"
+        "Report lines that pack more than one sentence, by source.\n"
+        "Pass '-' to read standard input instead of a file\n"
+        "('-' may appear at most once)\n"
+        "\n"
+        f"A boundary is left alone when the whole line fits within {MAX_LINE_WIDTH}\n"
+        f"columns and the sentence after it holds {MAX_SHARED_SENTENCE_WORDS} words or fewer.\n"
+        "Every other boundary is reported.\n"
+        "\n"
+        "EXIT STATUS:\n"
+        "  0  every source was clean\n"
+        "  1  at least one hit was found\n"
+        "  2  usage error or unreadable file\n"
+        "\n"
+        "EXAMPLES:\n"
+        "  check-semantic-breaks body.txt\n"
+        "  check-semantic-breaks README.md docs/foo.md\n"
+        "  check-semantic-breaks - < body.txt"
+    )
+    sys.exit(status)
+
+
+def display_path(path: Path) -> str:
+    """Return the shortest human-readable form of path.
+
+    Priority: relative to CWD (if nested inside), then ~/... (if under HOME), then absolute.
+    """
+    abs_path = path.resolve()
+    cwd = Path.cwd().resolve()
+    home = Path.home().resolve()
+    try:
+        rel = abs_path.relative_to(cwd)
+        return str(rel)
+    except ValueError:
+        pass
+    try:
+        rel_home = abs_path.relative_to(home)
+        return "~/" + str(rel_home)
+    except ValueError:
+        pass
+    return str(abs_path)
+
+
+def display_source(path: Path) -> str:
+    """Return the label for a source: '<stdin>' for stdin, else display_path()."""
+    if path == STDIN_PATH:
+        return "<stdin>"
+    return display_path(path)
+
+
+def is_abbreviation(before_mark: str) -> bool:
+    """Return True when the token ending just before a sentence mark is a known abbreviation."""
+    match = TOKEN_RE.search(before_mark)
+    return match is not None and match.group(0).lower() in ABBREVIATIONS
+
+
+def may_share_line(sentence: str) -> bool:
+    """Return True when sentence is small enough to share a line with another."""
+    return len(sentence.split()) <= MAX_SHARED_SENTENCE_WORDS
+
+
+def find_boundaries(line: str) -> list[int]:
+    """
+    Return the index where each offending second sentence begins on line.
+
+    A candidate mark is skipped when it opens an ordered-list item ("1. Foo")
+    or ends a known abbreviation ("etc. Foo").
+    A boundary is left alone only when the whole line fits within MAX_LINE_WIDTH
+    and the sentence after it is short enough to share the line; every other one
+    is returned, so a line packing several long sentences reports each of them.
+    """
+    matches = list(BOUNDARY_RE.finditer(line))
+    fits_width = len(line) <= MAX_LINE_WIDTH
+    boundaries: list[int] = []
+    for index, match in enumerate(matches):
+        before_mark = line[: match.start()]
+        if LIST_MARKER_RE.fullmatch(before_mark):
+            continue
+        if is_abbreviation(before_mark):
+            continue
+        # The sentence after this period runs to the next period, or to the end
+        # of the line when this period is the last candidate.
+        next_period = matches[index + 1].start() if index + 1 < len(matches) else len(line)
+        if fits_width and may_share_line(line[match.end() : next_period]):
+            continue
+        boundaries.append(match.end())
+    return boundaries
+
+
+def window_start(line: str, boundary: int, words: int) -> int:
+    """Return the index where the last `words` words before boundary begin."""
+    index = boundary
+    remaining = words
+    while remaining > 0 and index > 0:
+        # Step over the whitespace separating this word from the previous one.
+        while index > 0 and line[index - 1].isspace():
+            index -= 1
+        while index > 0 and not line[index - 1].isspace():
+            index -= 1
+        remaining -= 1
+    return index
+
+
+def window_end(line: str, boundary: int, words: int) -> int:
+    """Return the index just after the first `words` words starting at boundary."""
+    index = boundary
+    remaining = words
+    while remaining > 0 and index < len(line):
+        while index < len(line) and line[index].isspace():
+            index += 1
+        while index < len(line) and not line[index].isspace():
+            index += 1
+        remaining -= 1
+    return index
+
+
+def compact_line(line: str, boundaries: list[int]) -> str:
+    """
+    Return line reduced to a window of words around each boundary.
+
+    Every gap between windows is replaced by ELISION, keeping the whitespace
+    that bounded it — so a line that packs several sentences stays readable
+    instead of being printed in full.
+    """
+    words = CONTEXT_WORDS_SINGLE if len(boundaries) == 1 else CONTEXT_WORDS_MULTI
+    kept = [False] * len(line)
+    for boundary in boundaries:
+        start = window_start(line, boundary, words)
+        end = window_end(line, boundary, words)
+        for index in range(start, end):
+            kept[index] = True
+
+    marks = set(boundaries)
+    parts: list[str] = []
+    index = 0
+    while index < len(line):
+        if kept[index]:
+            parts.append(f"{BOUNDARY_MARK}{line[index]}" if index in marks else line[index])
+            index += 1
+            continue
+        # Report the gap once, in place of the text it hides.
+        gap_start = index
+        while index < len(line) and not kept[index]:
+            index += 1
+        gap = line[gap_start:index]
+        before = " " if gap_start > 0 and gap[0].isspace() else ""
+        after = " " if index < len(line) and gap[-1].isspace() else ""
+        parts.append(f"{before}{ELISION}{after}")
+    return "".join(parts)
+
+
+def format_hit(line: str, lineno: int, boundaries: list[int]) -> str:
+    """Build the display string for one reported line, marking every boundary."""
+    return f"{lineno}: {compact_line(line, boundaries)}"
+
+
+def scan_text(text: str) -> list[str]:
+    """Return formatted hit strings for every over-packed line in text."""
+    hits: list[str] = []
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        boundaries = find_boundaries(line)
+        if boundaries:
+            hits.append(format_hit(line, lineno, boundaries))
+    return hits
+
+
+def parse_sources(args: list[str]) -> list[Path]:
+    """Return the sources named on the command line, or exit with usage."""
+    if not args:
+        usage_and_exit(2)
+    sources = [STDIN_PATH if arg == "-" else Path(arg) for arg in args]
+    if sources.count(STDIN_PATH) > 1:
+        usage_and_exit(2)
+    return sources
+
+
+def read_sources(sources: list[Path]) -> list[str]:
+    """Return the text of every source, refusing as soon as one cannot be read."""
+    texts: list[str] = []
+    for path in sources:
+        try:
+            texts.append(path.read_text(encoding="utf-8", errors="replace"))
+        except OSError as exc:
+            raise ScriptError(f"cannot read {display_source(path)}: {exc}") from exc
+    return texts
+
+
+def main() -> bool:
+    """
+    Check every source and report its multi-sentence lines.
+
+    Returns True when every source was clean, False when at least one hit was
+    found; an unreadable source raises ScriptError before anything is printed.
+    """
+    sources = parse_sources(sys.argv[1:])
+    texts = read_sources(sources)
+
+    is_single = len(sources) == 1
+    hits_found = False
+    for source, text in zip(sources, texts):
+        hits = scan_text(text)
+        if not is_single:
+            print(f"{display_source(source)}:")
+        if hits:
+            print("\n".join(hits))
+            hits_found = True
+        else:
+            print("(OK)")
+        if not is_single:
+            print()
+
+    if hits_found:
+        print(f"('{BOUNDARY_MARK}' marks a sentence boundary)\n")
+
+    return not hits_found
+
+
+def cli_main() -> int:
+    """Console entry point; return the process exit status."""
+    try:
+        return 0 if main() else 1
+    except ScriptError as exc:
+        print_err(f"!! ERROR: {exc}")
+        # A refusal is a usage-class failure, so it exits 2, not 1.
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(cli_main())

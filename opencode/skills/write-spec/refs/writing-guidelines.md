@@ -2,7 +2,7 @@
 
 ## Prose style
 
-- One sentence per line.
+- Use wrapped semantic line breaks: each sentence starts on its own line.
   Long sentences may wrap, but next sentence always starts on a new line.
 - Keep sentences direct and relatively short — prefer clarity over verbosity.
 - Break prose into paragraphs by logical grouping to ease reading by human.

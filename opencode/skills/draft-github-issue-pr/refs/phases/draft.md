@@ -73,7 +73,7 @@ State it in one sentence: the problem, and why this change addresses it.
 
 Load `bew-communication-style` before writing any prose.
 
-- One sentence per line.
+- Use wrapped semantic line breaks: each sentence starts on its own line.
 - Preserve the user's voice, punctuation, and deliberate quirks.
   Do not "fix" their style.
 - Name real APIs, keys, and paths only as the code shows them.

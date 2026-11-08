@@ -17,7 +17,7 @@ Re-check the draft, now that its text and motivation are fixed.
 
 ## Prose
 
-- One sentence per line.
+- Use wrapped semantic line breaks: each sentence starts on its own line.
   Split any line packing multiple sentences.
 - Confirm the user's voice and punctuation are intact.
 - Confirm the draft opens with the point and cuts filler.

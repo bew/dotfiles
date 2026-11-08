@@ -241,7 +241,8 @@ Omit body entirely for single trivial changes (typo fix, rename, comment tweak).
   Sentences stay in the same paragraph; only a blank line splits paragraphs.
   This is a hard rule, and it holds under every refinement — "Terser", "Drop the bullets",
   or any form change removes content, never merges two sentences onto one line.
-  After writing the body, verify no line contains more than one sentence.
+  After writing the body, verify the body uses wrapped semantic line breaks — no line holds
+  more than one sentence.
 - Fit the subject and every body line into 72 chars, use newlines as needed
   (compress text a little, should still be ~prose).
   Never join two sentences on one line to satisfy the limit — see the sentence-break rule above.
