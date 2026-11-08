@@ -29,14 +29,17 @@ Determine the following values from whatever is available in context
   Default: the default skeleton.
 - **Deterministic checks**: a domain entrypoint to run first, if one exists.
   Default: `(none)`.
-- **Domain refs**: the domain check specs to consult before checking (e.g. language census procedures).
+- **Domain refs**: the domain check specs to consult before checking (e.g. language coverage procedures).
   Default: `(none)`.
+- **Coverage oracle** (optional): facts or questions the artefact must address, each with a source locator.
+  When supplied, the report checks presence as well as accuracy.
 
 State resolved values:
 ```text
 Artefact: <resolved value>
 Ground truth: <resolved value>
 Taxonomy: <resolved value>
+Coverage oracle: <resolved value, or "(none)">
 Deterministic checks: <resolved value, or "(none)">
 Domain refs: <resolved value, or "(none)">
 ```
@@ -46,17 +49,20 @@ Stop and ask when an input is missing or ambiguous; do not spawn subagents.
 ## Goal
 
 Verify every claim in an artefact against its ground-truth source, and report per-claim verdicts.
+When a coverage oracle is supplied, verify that each oracle item is addressed as well.
 Produce verdicts only; never apply fixes.
 
 ## Step 1 — Derive Claims
 
 Enumerate every claim in the artefact as an atomic, falsifiable statement.
 Split compound sentences into separate claims.
+When a coverage oracle is supplied, also derive one claim per oracle item, phrased as "the artefact addresses <item>".
 
 ## Step 2 — Group Claims
 
 Assign each claim to a check-group.
 Cover the default skeleton (<§default-check-groups>) plus any caller-supplied taxonomy.
+Place coverage-oracle claims in a **Coverage** group.
 Order groups foundation-first: existence and naming first, mechanism and behaviour last.
 
 ## Step 3 — Deterministic Pre-checks
@@ -68,7 +74,27 @@ Translate each finding in that output into a claim verdict and carry it into the
 
 ## Step 4 — Validate
 
-Spawn one `general` subagent per check-group.
+Run the groups in stages, foundation first.
+A later stage depends on the earlier ones: a missing symbol makes every downstream verdict moot.
+
+- **Stage 1 — Foundation**: existence, referential integrity, naming.
+  One subagent.
+  If a core symbol or path is missing, report and stop; do not spend subagents on the rest.
+- **Stage 2 — Breadth**: factual accuracy, completeness, and any caller group that checks the ground truth for facts or mechanism.
+  Two or three subagents in parallel, after Stage 1 returns.
+- **Stage 3 — Judgement**: internal coherence, conventions and style, and any caller group that judges the artefact against itself.
+  Two or three subagents in parallel, after Stage 2 returns.
+
+Place a caller-supplied group by the question it answers: does the thing exist (Stage 1), does the ground truth agree (Stage 2), or does the artefact hold together (Stage 3).
+Place Coverage in Stage 2: it needs both the oracle and the artefact.
+
+**Small packages**: a package with three or fewer source files is small enough for one subagent to hold the whole ground truth.
+For a small package you may merge Stages 2 and 3 into 1-2 subagents.
+Above that, keep the stages separate.
+
+Scope each subagent's ground truth to the package directory plus explicitly named cross-reference files.
+Do not hand it a repository root; an unbounded search invites wandering.
+
 Each subagent explores the ground truth to validate its claims; the main agent must not self-validate.
 Pass any supplied domain refs to the subagent for the groups they cover.
 
@@ -77,15 +103,20 @@ Instruct each subagent:
 - When the artefact is its own ground truth, check claims against its other parts.
 - Quote a concrete locator (`file:line` or equivalent) as evidence per claim.
 - Return TRUE / FALSE / PARTIAL / UNVERIFIABLE per claim.
+- Return MISSING when a coverage-oracle item has no corresponding claim in the artefact.
 - Use UNVERIFIABLE when the ground truth cannot decide; state what is missing.
 
-One subagent per group keeps verdicts independent and stops context creeping between checks.
+Keep each group's verdicts independent; batching groups into one subagent must not let context creep between checks.
+
+If a subagent is cancelled, retry it once.
+On a second cancellation, stop and ask the user how to proceed.
 
 ## Step 5 — Report
 
 Collect every verdict, including findings from the deterministic pre-checks. Group the report by check-group.
 Per claim, write a paragraph: a `Claim:` line, then `Verdict:` and `Evidence:` each on its own line.
-Add a `Suggested fix:` line for each FALSE/PARTIAL verdict you can fix confidently.
+Add a `Suggested fix:` line for each FALSE/PARTIAL/MISSING verdict you can fix confidently.
+For PARTIAL, `remove the claim` is a valid fix when a coverage oracle does not require it.
 Surface conflicting verdicts to the user; never silently pick one.
 The report is the deliverable; the caller applies any fixes.
 
@@ -104,6 +135,8 @@ Add domain groups when needed, for example:
 - **Mechanism** — control-flow and concurrency claims match the actual types and call sites.
 - **Examples** — samples are semantically correct, not merely symbol-valid.
 
+Coverage is not part of the default skeleton; it requires an oracle.
+
 ## Output format
 
 ```md
@@ -121,6 +154,11 @@ Suggested fix: rename the flag to `--quick`.
 Claim: "the scheduler is initialised by `run()`".
 Verdict: UNVERIFIABLE.
 Evidence: `src/lib.rs:5`; ground truth does not show initialisation.
+
+Claim: "the README states the caller-enforced serial-0 convention".
+Verdict: MISSING.
+Evidence: `wezterm-client/src/client.rs:404`; the artefact does not mention it.
+Suggested fix: add the convention under serial correlation.
 ```
 
 ## Example
