@@ -13,8 +13,8 @@ let
     repo = fetchFromGitHub {
       owner = "bew";
       repo = "diralias";
-      rev = "v0.8.0";
-      hash = "sha256-tmgyijz0ar96p7pJKfYDYwns+OFg4lfe9XE5GqHxEIg=";
+      rev = "v0.9.0";
+      hash = "sha256-tv+QG7BhvzKZCUXfFyxP01qMT+yLFHoRE2a0HX+yy7w=";
     };
   in pkgs.callPackage "${repo}/package.nix" {};
 in {
