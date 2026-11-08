@@ -12,5 +12,13 @@ Verify it as in `Phase:VerifyClaims`.
 
 ## File
 
-- File only after explicit user go-ahead (`gh issue create`).
-- Capture the issue number for `Phase:Submit`.
+The issue draft is `$draftfile` in this phase.
+Before `gh issue create`, read it and check its meta block:
+- `**Status**: READY` — file it.
+- `**Status**: DRAFT`, missing, or any other value — stop and point the user at the draft file.
+  Do not file. Ask whether to mark it READY, and set the marker only on an explicit yes.
+
+Flipping the marker to READY is the user's publish go-ahead for this issue.
+A go-ahead for the PR, or for advancing the phase, is never that go-ahead.
+
+Capture the issue number for `Phase:Submit`.

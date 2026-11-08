@@ -73,6 +73,15 @@ NEVER `git add` or commit files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BU
 These handoff artefacts must never be git-tracked.
 
 
+## Remote writes
+
+Remote write actions that publish content — `gh pr create`, `gh issue create`, `gh pr close`,
+`gh pr comment`, and similar — need explicit approval of the payload in the same turn.
+
+Approving a plan never covers these steps, even when the plan names them.
+The approval is asked again when the payload is ready to send.
+
+
 ## Token efficiency
 
 - When writing identical/near-identical files to multiple paths, write once then `cp` — never repeat the write tool call.

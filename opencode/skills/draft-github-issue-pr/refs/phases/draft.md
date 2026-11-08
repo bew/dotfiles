@@ -7,9 +7,10 @@ Write a review package into a concrete file, then iterate with the user.
 `$draftfile` (default `/tmp/opencode_gh_drafts/<reponame>-<kind>-<slug>.md`) is a review package,
 not the final body.
 It holds:
-- A `## Meta` block: target, the issue-first decision (required? auto-enforced or procedural, and
-  when the issue is created), the template used, the pinned required items, the advisory items
-  applied or skipped, the base branch, and the claim list from `Phase:PreDraft`.
+- A `## Meta` block: the publish status (`**Status**: DRAFT` or `**Status**: READY`), target, the
+  issue-first decision (required? auto-enforced or procedural, and when the issue is created), the
+  template used, the pinned required items, the advisory items applied or skipped, the base branch,
+  and the claim list from `Phase:PreDraft`.
 - Then a `---` separator, and a `##` heading holding the PR title.
 - Then the body, running to the end of the file.
   Write it inline — never wrap the body in a markdown code block.
@@ -19,6 +20,25 @@ The meta block is review scaffolding and is never filed.
 
 Derive `$draftfile`: `<reponame>` from `$repo`, `<kind>` from `$kind`, and `<slug>` as a short
 kebab-case of the draft's topic.
+Re-derive it for every new draft, so `$draftfile` always names the artefact currently in play.
+
+## Publish marker
+
+Every draft opens with `**Status**: DRAFT` in the meta block: complete for review, not cleared to
+publish.
+
+Flip it to `**Status**: READY` only on an explicit publish go-ahead — "publish" or "file it" —
+stated in this loop or given as an explicit yes to the `Phase:Submit` publish gate.
+The user may also edit the marker themselves.
+A bare "looks good" approves the draft text, not publishing: ask which one is meant.
+
+Never set READY on your own judgement.
+A go-ahead for another step — push, branch, drafting, or advancing past a phase gate — is never
+READY.
+
+Any later edit to the draft's title or body after READY, including `Phase:VerifyClaims` fixes,
+returns the marker to DRAFT and requires a fresh go-ahead.
+Writing the marker itself is not such an edit.
 
 ## Structure
 
@@ -100,6 +120,8 @@ This phase is a stop-and-wait loop, not one shot.
   then revise and rewrite it.
 - Re-check context, motivation, and tone each round.
   Repeat until the user confirms.
+- Flip the marker to `**Status**: READY` when the user gives the explicit publish go-ahead.
+  Return it to DRAFT on every later edit to the title or body.
 - Never overwrite a manual edit without reading it first.
 
 ## Findings

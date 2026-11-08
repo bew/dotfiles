@@ -55,7 +55,7 @@ State each var in context once known:
   `(none)` if absent.
 - `$repoguidelines` — the repo's contributing guidelines, with required and advisory items marked.
   `(none)` if absent.
-- `$draftfile` — path of the current local draft.
+- `$draftfile` — path of the current local draft, re-derived for each new draft.
 
 ## 1. `Phase:Classify` — confirm target and subtype
 
@@ -141,7 +141,8 @@ When entering `Phase:Submit`: read <./refs/phases/submit.md> for full instructio
 - Default to the smallest deliverable.
   Do not build scripts or tooling unless asked.
 - Draft only.
-  File via `gh` only after explicit user go-ahead.
+  File via `gh` only after the draft is marked `**Status**: READY` in its meta block.
+  Never set that marker without the user's explicit publish go-ahead.
 
 ## Guidelines
 

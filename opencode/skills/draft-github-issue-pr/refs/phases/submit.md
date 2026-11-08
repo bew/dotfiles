@@ -1,7 +1,20 @@
 # Phase:Submit
 
 File the artefact (the PR, or the issue on an issue-only run).
-Draft-only unless the user gives explicit go-ahead.
+
+## Publish gate
+
+Before any `gh ... create`, read the draft file of the artefact about to be filed — its own
+`$draftfile`, re-derived for that artefact, never an already-filed issue draft — and check its
+meta block:
+- `**Status**: READY` — proceed to File.
+- `**Status**: DRAFT`, missing, or any other value — stop and point the user at that file.
+  Do not file. Ask whether to mark it READY, and set the marker only on an explicit yes.
+
+Only the marker of the artefact being filed authorises a file.
+A READY issue draft never authorises the PR.
+Flipping the marker to READY is the user's publish go-ahead.
+A request to draft, push, branch, review, or advance the phase is never that go-ahead.
 
 ## File
 
@@ -16,8 +29,7 @@ Branch on `$kind`:
   `gh issue create --title <title> --body-file <temp>`.
   Apply any required title convention from `$repotemplate` (e.g. a `[FEATURE]:` prefix).
 
-File only after explicit user go-ahead.
-Never file automatically.
+File only after the publish gate passes.
 
 ## gh auth
 

@@ -29,5 +29,7 @@ Re-check the draft, now that its text and motivation are fixed.
   Advisory items may be omitted.
 - The review package has a `##` title heading after the meta `---`, with the body following, and
   its meta matches reality.
+- Any edit in this phase returns a `**Status**: READY` marker to DRAFT.
+  The marker never outlives a change: the user's publish go-ahead is re-asked at `Phase:Submit`.
 - The draft follows the required repo rules: base branch and required checklists.
 - Checklist boxes match what was actually done.
