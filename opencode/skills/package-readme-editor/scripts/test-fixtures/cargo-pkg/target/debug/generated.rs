@@ -1,2 +1,2 @@
-// Build artefact that the census must exclude.
+// Build artefact that the source count must exclude.
 pub fn generated() {}

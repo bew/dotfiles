@@ -98,6 +98,72 @@ function assert_not_contains() {
 }
 
 # ------------------------------------------------------------------------------
+# Tests: good package
+
+@test "good: reports no defects for a clean package" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/cargo-pkg"
+    assert_contains "$output" "Missing references: none"
+    assert_contains "$output" "Markdown warnings: 0"
+    assert_contains "$output" "2/2 .rs files start with"
+}
+
+# ------------------------------------------------------------------------------
+# Tests: bad package
+
+@test "bad: reports every defect in the bad package" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "Missing references: 1"
+    assert_contains "$output" '`src/lib.rs`'
+    assert_contains "$output" "Markdown warnings: 4"
+}
+
+# ------------------------------------------------------------------------------
+# Tests: markdown
+
+@test "markdown: flags a bold lead-in with the period inside the span" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "bold lead-in ends with '.'"
+}
+
+@test "markdown: accepts a bold lead-in with the colon outside the span" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_not_contains "$output" "bold lead-in ends with ':'"
+}
+
+@test "markdown: flags a blank line between a colon lead-in and a fence" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "line 9: blank line between a ':' lead-in"
+}
+
+@test "markdown: flags a blank line between a colon lead-in and a list" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "line 15: blank line between a ':' lead-in"
+}
+
+@test "markdown: skips bold text inside a fenced code block" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "Markdown warnings: 4"
+}
+
+@test "markdown: flags a thematic break before a heading" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "line 19: thematic break"
+}
+
+# ------------------------------------------------------------------------------
+# Tests: module docs
+
+@test "module docs: counts documented and undocumented Rust files" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
+    assert_contains "$output" "1/2 .rs files start with"
+}
+
+@test "module docs: omits the section when there is no src directory" {
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/npm-pkg"
+    assert_not_contains "$output" "Module docs"
+}
+
+# ------------------------------------------------------------------------------
 # Tests: error
 
 @test "error: exits 1 for a non-existent directory" {
@@ -109,7 +175,7 @@ function assert_not_contains() {
 # Tests: edge
 
 @test "edge: reports a missing README path reference" {
-    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/cargo-pkg"
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
     assert_contains "$output" '`missing.rs`'
 }
 
@@ -120,7 +186,7 @@ function assert_not_contains() {
 }
 
 @test "edge: flags an existing file referenced with a src/ prefix" {
-    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/cargo-pkg"
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
     assert_contains "$output" '`src/lib.rs`'
 }
 
@@ -144,7 +210,7 @@ function assert_not_contains() {
 }
 
 @test "edge: exits 0 even when missing references exist" {
-    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/cargo-pkg"
+    run -0 "$SCRIPT_PATH" --dir "$FIXTURES_DIR/bad-pkg"
     assert_contains "$output" "Missing references: 1"
 }
 

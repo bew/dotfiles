@@ -6,9 +6,11 @@ Run these in addition to `./scripts/mechanical-checks`.
   - Compare `package.name` against every name used in the README;
     abbreviated names are a common defect.
   - Note `publish = false` and whether the README claims workspace prominence.
-- Module-doc census: count `.rs` files under `src/` and those starting with `//!`.
+- Module-doc coverage: count `.rs` files under `src/` and those starting with `//!`.
   - Flag any "each/every/all file is documented" claim unless the counts match.
-- Feature census: diff `[features]` keys in `Cargo.toml` against feature names in the README.
+- Feature coverage: diff `[features]` keys in `Cargo.toml` against feature names in the README.
+- Constant check: flag any constant value quoted in the README.
+  The value rots; the name is the stable handle a consumer imports or compares against.
 - Dependency provenance: flag any negative or absence claim about a dependency
   (what the package does not use or depend on).
 - Cross-platform claims: check `[target.'cfg(...)']` tables and `build.rs`

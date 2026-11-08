@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Deterministic mechanical checks for a package README:
-# manifest identity, path references, source census.
+# manifest identity, path references, source count.
 
 import argparse
 import json
@@ -11,10 +11,10 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
-# Directories never descended into during the source census.
+# Directories never descended into during the source count.
 EXCLUDED_DIRS = {".git", "target", "node_modules", "dist", "build", "__pycache__", ".venv"}
 
-# Extensions treated as source code for the census.
+# Extensions treated as source code for the count.
 SOURCE_EXTENSIONS = {
     ".c",
     ".cc",
@@ -77,6 +77,21 @@ URL_MARKER = "://"
 INLINE_CODE_PATTERN = re.compile(r"`([^`\n]+)`")
 FENCED_CODE_PATTERN = re.compile(r"```.*?```", re.DOTALL)
 
+# A line that opens or closes a fenced code block.
+FENCE_PATTERN = re.compile(r"^\s*(?:```|~~~)")
+
+# A Markdown list item, ordered or unordered.
+LIST_ITEM_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s")
+
+# A bold span at the start of a line, used as a paragraph lead-in.
+BOLD_LEADIN_PATTERN = re.compile(r"^\*\*(?P<label>[^*\n]+)\*\*")
+
+# A thematic break line, which the repo convention reserves for major structural breaks.
+THEMATIC_BREAK_PATTERN = re.compile(r"^\s*---\s*$")
+
+# A Markdown heading line.
+HEADING_PATTERN = re.compile(r"^#{1,6}\s")
+
 
 class ScriptError(Exception):
     """Raised when the script encounters an error."""
@@ -105,11 +120,41 @@ class StyleWarning:
 
 
 @dataclass(frozen=True)
+class MarkdownWarning:
+    """A README line that breaks a Markdown convention."""
+
+    line_number: int
+    detail: str
+
+
+@dataclass(frozen=True)
 class SourceGroup:
     """Source-file count for a single extension."""
 
     extension: str
     file_count: int
+
+
+@dataclass(frozen=True)
+class ModuleDocCoverage:
+    """Count of Rust source files and those carrying a module doc comment."""
+
+    total: int
+    documented: int
+
+
+@dataclass(frozen=True)
+class Report:
+    """Everything the mechanical checks found for one package."""
+
+    identity: PackageIdentity
+    readme_path: Path
+    readme_text: str | None
+    missing: list[MissingReference]
+    style_warnings: list[StyleWarning]
+    markdown_warnings: list[MarkdownWarning]
+    groups: list[SourceGroup]
+    module_docs: ModuleDocCoverage
 
 
 def print_err(msg: str) -> None:
@@ -304,7 +349,101 @@ def find_style_warnings(package_dir: Path, readme_text: str) -> list[StyleWarnin
     return warnings
 
 
-def census_sources(package_dir: Path) -> list[SourceGroup]:
+def annotate_fences(lines: list[str]) -> list[bool]:
+    """Return a per-line flag that is True for fenced code block lines.
+
+    Fence delimiter lines are flagged too, so callers skip them as well.
+    """
+    inside: list[bool] = []
+    in_fence = False
+    for line in lines:
+        if FENCE_PATTERN.match(line):
+            inside.append(True)
+            in_fence = not in_fence
+            continue
+        inside.append(in_fence)
+    return inside
+
+
+def frontmatter_line_count(lines: list[str]) -> int:
+    """Return the number of leading lines occupied by a YAML frontmatter block."""
+    if not lines or lines[0].strip() != "---":
+        return 0
+    for index in range(1, len(lines)):
+        if lines[index].strip() == "---":
+            return index + 1
+    return 0
+
+
+def find_markdown_warnings(readme_text: str) -> list[MarkdownWarning]:
+    """Return README lines that break a Markdown convention.
+
+    Checks bold lead-in punctuation, the blank line between a `:` lead-in and
+    its following list or code block, and a thematic break before a heading.
+    Fenced code blocks are skipped.
+    """
+    lines = readme_text.splitlines()
+    inside_fence = annotate_fences(lines)
+    frontmatter_end = frontmatter_line_count(lines)
+    warnings: list[MarkdownWarning] = []
+
+    # Phase 1: a bold lead-in must close with the colon outside the span.
+    for index, line in enumerate(lines):
+        if inside_fence[index]:
+            continue
+        match = BOLD_LEADIN_PATTERN.match(line)
+        if match is None:
+            continue
+        label = match.group("label")
+        if label.endswith((".", ":")):
+            bare_label = label.rstrip(".:")
+            warnings.append(
+                MarkdownWarning(
+                    index + 1,
+                    f"bold lead-in ends with '{label[-1]}', write `**{bare_label}**:`",
+                )
+            )
+
+    # Phase 2: a `:` lead-in must be followed directly by its list or fence.
+    for index, line in enumerate(lines):
+        if inside_fence[index] or not line.rstrip().endswith(":"):
+            continue
+        blank_index = index + 1
+        if blank_index >= len(lines) or lines[blank_index].strip():
+            continue
+        following_index = blank_index + 1
+        if following_index >= len(lines):
+            continue
+        following = lines[following_index]
+        if FENCE_PATTERN.match(following) or LIST_ITEM_PATTERN.match(following):
+            warnings.append(
+                MarkdownWarning(
+                    index + 1,
+                    "blank line between a ':' lead-in and the following block",
+                )
+            )
+
+    # Phase 3: a `---` line directly before a heading is a default separator.
+    for index, line in enumerate(lines):
+        if inside_fence[index] or index < frontmatter_end:
+            continue
+        if not THEMATIC_BREAK_PATTERN.match(line):
+            continue
+        following_index = index + 1
+        while following_index < len(lines) and not lines[following_index].strip():
+            following_index += 1
+        if following_index < len(lines) and HEADING_PATTERN.match(lines[following_index]):
+            warnings.append(
+                MarkdownWarning(
+                    index + 1,
+                    "thematic break `---` used as a separator before a heading",
+                )
+            )
+
+    return warnings
+
+
+def count_sources(package_dir: Path) -> list[SourceGroup]:
     """Count source files by extension under package_dir, skipping excluded directories.
 
     Returned groups are sorted by extension, so output is deterministic.
@@ -321,50 +460,83 @@ def census_sources(package_dir: Path) -> list[SourceGroup]:
     return [SourceGroup(extension, counts[extension]) for extension in sorted(counts)]
 
 
-def print_report(
-    identity: PackageIdentity,
-    readme_path: Path,
-    readme_text: str | None,
-    missing: list[MissingReference],
-    style_warnings: list[StyleWarning],
-    groups: list[SourceGroup],
-) -> None:
+def read_first_line(path: Path) -> str:
+    """Return the first line of path, stripped, or an empty string when empty."""
+    try:
+        with path.open(encoding="utf-8") as handle:
+            return handle.readline().strip()
+    except OSError as exc:
+        raise ScriptError(f"Could not read '{path}': {exc}") from exc
+
+
+def count_module_docs(package_dir: Path) -> ModuleDocCoverage:
+    """Count `.rs` files under `src/` and those whose first line starts with `//!`."""
+    src_dir = package_dir / "src"
+    if not src_dir.is_dir():
+        return ModuleDocCoverage(0, 0)
+
+    total = 0
+    documented = 0
+    for path in sorted(src_dir.rglob("*.rs")):
+        relative_parts = path.relative_to(package_dir).parts
+        if any(part in EXCLUDED_DIRS for part in relative_parts):
+            continue
+        total += 1
+        if read_first_line(path).startswith("//!"):
+            documented += 1
+    return ModuleDocCoverage(total, documented)
+
+
+def print_report(report: Report) -> None:
     """Print the human-readable mechanical-checks report to stdout."""
     print("Package identity")
-    if identity.manifest_name:
-        print(f"  Manifest: {identity.manifest_name}")
-        print(f"  Name: {identity.package_name or '(not found)'}")
+    if report.identity.manifest_name:
+        print(f"  Manifest: {report.identity.manifest_name}")
+        print(f"  Name: {report.identity.package_name or '(not found)'}")
     else:
         print("  No known manifest found (Cargo.toml, package.json, pyproject.toml).")
 
     print("")
     print("README references")
-    if readme_text is None:
-        print(f"  README not found: {readme_path}")
+    if report.readme_text is None:
+        print(f"  README not found: {report.readme_path}")
     else:
-        print(f"  README: {readme_path}")
-        if missing:
-            print(f"  Missing references: {len(missing)}")
-            for reference in missing:
+        print(f"  README: {report.readme_path}")
+        if report.missing:
+            print(f"  Missing references: {len(report.missing)}")
+            for reference in report.missing:
                 print(f"    - `{reference.token}`")
         else:
             print("  Missing references: none")
 
     print("")
     print("Style warnings")
-    if style_warnings:
-        for warning in style_warnings:
+    if report.style_warnings:
+        for warning in report.style_warnings:
             print(f"  - `{warning.token}`: drop the `src/` prefix")
     else:
         print("  None.")
 
     print("")
-    print("Source census")
-    if groups:
-        for group in groups:
+    print(f"Markdown warnings: {len(report.markdown_warnings)}")
+    for warning in report.markdown_warnings:
+        print(f"  - line {warning.line_number}: {warning.detail}")
+
+    print("")
+    print("Source count")
+    if report.groups:
+        for group in report.groups:
             print(f"  {group.extension}: {group.file_count}")
     else:
         print("  No source files found.")
+
+    if report.module_docs.total:
+        print("")
+        print("Module docs")
+        print(
+            f"  src/: {report.module_docs.documented}/{report.module_docs.total}"
+            " .rs files start with `//!`"
+        )
 
 
 def main() -> bool:
@@ -381,14 +553,24 @@ def main() -> bool:
     readme_text: str | None = None
     missing: list[MissingReference] = []
     style_warnings: list[StyleWarning] = []
+    markdown_warnings: list[MarkdownWarning] = []
     if readme_path.is_file():
         readme_text = readme_path.read_text(encoding="utf-8")
         missing = find_missing_references(package_dir, readme_text)
         style_warnings = find_style_warnings(package_dir, readme_text)
+        markdown_warnings = find_markdown_warnings(readme_text)
 
-    identity = detect_package_identity(package_dir)
-    groups = census_sources(package_dir)
-    print_report(identity, readme_path, readme_text, missing, style_warnings, groups)
+    report = Report(
+        identity=detect_package_identity(package_dir),
+        readme_path=readme_path,
+        readme_text=readme_text,
+        missing=missing,
+        style_warnings=style_warnings,
+        markdown_warnings=markdown_warnings,
+        groups=count_sources(package_dir),
+        module_docs=count_module_docs(package_dir),
+    )
+    print_report(report)
     return True
 
 

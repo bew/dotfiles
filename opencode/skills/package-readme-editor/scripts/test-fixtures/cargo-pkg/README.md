@@ -8,11 +8,6 @@ Demonstration package used by the mechanical-checks test suite.
 - `lib.rs` — library root.
 - `docs/guide.md` — usage guide.
 - `Cargo.toml` — manifest.
-- `src/lib.rs` — intentionally prefixed; the script should warn.
-
-## Missing on purpose
-
-- `missing.rs`
 
 ## Should be skipped
 
@@ -21,6 +16,6 @@ Demonstration package used by the mechanical-checks test suite.
 - Glob: `src/*.rs`
 - Feature: `window/wayland`
 
-```text
+```
 inside-fence.rs
 ```
