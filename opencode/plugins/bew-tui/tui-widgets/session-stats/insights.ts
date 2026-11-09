@@ -7,33 +7,36 @@
 import type { DcpBlock, DcpSummary } from "./dcp-state";
 import type { SessionStats, SessionTiming, StatsGroup } from "./counts";
 
-// A coloured run of a row's value.
+// A base colour a run can take.
+export type InsightToneName =
+  | "value"
+  | "muted"
+  | "agent"
+  | "count"
+  | "cost"
+  | "error"
+  | "time";
+
+// A run's colour: one base tone, or a base tone plus `muted` to make it recede.
+// `muted` on its own is the muted text colour rather than a dimmed base.
+export type InsightTone = InsightToneName | readonly InsightToneName[];
+
+// A coloured run of a row.
 export type InsightSegment = {
   // Text of the run.
   readonly text: string;
   // Which part of the row the run is, so the view can pick its colour.
-  readonly tone:
-    | "value"
-    | "muted"
-    | "agent"
-    | "count"
-    | "countDim"
-    | "cost"
-    | "costDim"
-    | "error"
-    | "time";
+  readonly tone: InsightTone;
   // Draw the run in bold, for a unit that should stand out from its number.
   readonly bold?: boolean;
 };
 
-// One labelled row of a tooltip.
+// One row of a tooltip, labelled or a detail line for the row above.
 export type InsightRow = {
-  // Left-hand label.
-  readonly label: string;
-  // Right-hand value, as one plain run unless `segments` splits it.
-  readonly value: string;
-  // Coloured runs of the value, for rows whose parts read better apart.
-  readonly segments?: readonly InsightSegment[];
+  // Left-hand label; omitted on a detail line.
+  readonly label?: string;
+  // Coloured runs of the row, read left to right.
+  readonly segments: readonly InsightSegment[];
 };
 
 // One titled group of rows.
@@ -174,7 +177,6 @@ export function buildInsights(input: InsightInput): Insights {
             ...tokenRows(input.session, input.contextWindow),
             {
               label: "span",
-              value: span,
               segments: [{ text: span, tone: "time" }],
             },
             ...workingRows(input.stats.timing, spanMs),
@@ -195,7 +197,7 @@ export function buildInsights(input: InsightInput): Insights {
     context: {
       title: CONTEXT_GROUP_TITLE,
       sections: [
-        ...windowSections(input.contextWindow),
+        ...windowSections(input.contextWindow, input.session),
         {
           heading: "activity",
           rows: [
@@ -263,11 +265,16 @@ export function measureInsightWidth(
   return Math.max(headingWidth, rowWidth);
 }
 
+// Plain text of a row, as its coloured runs read left to right.
+function rowText(row: InsightRow): string {
+  return segmentsText(row.segments);
+}
+
 // Cells one rendered row needs, its label cell included.
 function rowWidthOf(row: InsightRow, layout: InsightLayout): number {
   const labelCell =
-    row.label.length === 0 ? layout.detailIndent : layout.labelWidth;
-  return labelCell + layout.labelGap + row.value.length;
+    row.label === undefined ? layout.detailIndent : layout.labelWidth;
+  return labelCell + layout.labelGap + rowText(row).length;
 }
 
 // Counts <1k as-is, then <1M with `k`, then >=1M with `M`, each with at most
@@ -313,15 +320,6 @@ export function formatCost(usd: number): string {
   return `$${rounded.toFixed(2)}`;
 }
 
-// One entry of a packed usage list: its plain text for measuring, and the runs
-// it is drawn as.
-type UsageEntry = {
-  // The whole entry, as the packer measures it.
-  readonly text: string;
-  // Coloured runs the entry renders as.
-  readonly segments: readonly InsightSegment[];
-};
-
 // Tool rows: the total, then the usage entries packed onto lines of `width`
 // cells, under an empty label.
 function toolRows(
@@ -330,18 +328,15 @@ function toolRows(
   width: number,
 ): readonly InsightRow[] {
   if (group.toolCalls === 0) {
-    return [{ label, value: "none" }];
+    return [{ label, segments: [{ text: "none", tone: "value" }] }];
   }
 
-  const entries: readonly UsageEntry[] = sortedUsage(group.toolUsage).map(
-    ([name, count]) => ({
-      text: `${name} ${count}`,
-      segments: [
-        { text: name, tone: "value" },
-        { text: ` ${count}`, tone: "countDim" },
-      ],
-    }),
-  );
+  const entries: readonly (readonly InsightSegment[])[] = sortedUsage(
+    group.toolUsage,
+  ).map(([name, count]) => [
+    { text: name, tone: "value" },
+    { text: ` ${count}`, tone: ["count", "muted"] },
+  ]);
 
   return countThenRows(label, group.toolCalls, entries, width);
 }
@@ -355,12 +350,9 @@ function skillRows(
   width: number,
   compressed: number,
 ): readonly InsightRow[] {
-  const entries: readonly UsageEntry[] = sortedUsage(group.skillUsage).map(
-    ([name]) => ({
-      text: name,
-      segments: [{ text: name, tone: "value" }],
-    }),
-  );
+  const entries: readonly (readonly InsightSegment[])[] = sortedUsage(
+    group.skillUsage,
+  ).map(([name]) => [{ text: name, tone: "value" }]);
   const note =
     compressed > 0
       ? { count: compressed, label: "compressed" }
@@ -375,32 +367,30 @@ function skillRows(
 function countThenRows(
   label: string,
   count: number,
-  entries: readonly UsageEntry[],
+  entries: readonly (readonly InsightSegment[])[],
   width: number,
   note?: { readonly count: number; readonly label: string },
 ): readonly InsightRow[] {
   const total = formatCount(count);
-  const noteCount = note === undefined ? "" : formatCount(note.count);
+  const totalSegments: readonly InsightSegment[] = [
+    { text: total, tone: "count" },
+  ];
+  const firstRow: InsightRow =
+    note === undefined
+      ? { label, segments: totalSegments }
+      : rowWithNote({
+          label,
+          body: totalSegments,
+          note: [
+            { text: formatCount(note.count), tone: "count" },
+            { text: ` ${note.label}`, tone: "muted" },
+          ],
+        });
   return [
-    {
-      label,
-      value:
-        note === undefined ? total : `${total} (${noteCount} ${note.label})`,
-      segments:
-        note === undefined
-          ? [{ text: total, tone: "count" }]
-          : [
-              { text: total, tone: "count" },
-              { text: " (", tone: "muted" },
-              { text: noteCount, tone: "countDim" },
-              { text: ` ${note.label})`, tone: "muted" },
-            ],
-    },
-    ...packEntries(entries, width).map((entry) => ({
-      label: "",
-      value: entry.text,
-      segments: entry.segments,
-    })),
+    firstRow,
+    ...packEntries(entries, width).map(
+      (entry): InsightRow => ({ segments: entry }),
+    ),
   ];
 }
 
@@ -418,20 +408,21 @@ function sortedUsage(
 // An entry longer than the width keeps a line to itself rather than being cut
 // here: the renderer is left to decide what to do with an over-long row.
 function packEntries(
-  entries: readonly UsageEntry[],
+  entries: readonly (readonly InsightSegment[])[],
   width: number,
-): readonly UsageEntry[] {
-  const lines: UsageEntry[][] = [];
-  let line: UsageEntry[] = [];
+): readonly (readonly InsightSegment[])[] {
+  const lines: (readonly (readonly InsightSegment[])[])[] = [];
+  let line: (readonly InsightSegment[])[] = [];
   let lineWidth = 0;
   for (const entry of entries) {
     const addition =
-      (line.length === 0 ? 0 : ENTRY_SEPARATOR.length) + entry.text.length;
+      (line.length === 0 ? 0 : ENTRY_SEPARATOR.length) +
+      segmentsText(entry).length;
     // Start a new line when this entry would overrun the current one.
     if (line.length > 0 && lineWidth + addition > width) {
       lines.push(line);
       line = [entry];
-      lineWidth = entry.text.length;
+      lineWidth = segmentsText(entry).length;
       continue;
     }
     line.push(entry);
@@ -443,18 +434,40 @@ function packEntries(
   return lines.map(joinEntries);
 }
 
-// Join entries onto one row, keeping their own runs and dimming the separators.
-function joinEntries(entries: readonly UsageEntry[]): UsageEntry {
-  const segments = entries.flatMap(
+// Join entries onto one run list, dimming the separators between them.
+function joinEntries(
+  entries: readonly (readonly InsightSegment[])[],
+): readonly InsightSegment[] {
+  return entries.flatMap(
     (entry, index): readonly InsightSegment[] =>
       index === 0
-        ? entry.segments
-        : [{ text: ENTRY_SEPARATOR, tone: "muted" }, ...entry.segments],
+        ? entry
+        : [{ text: ENTRY_SEPARATOR, tone: "muted" }, ...entry],
   );
-  return {
-    text: entries.map((entry) => entry.text).join(ENTRY_SEPARATOR),
-    segments,
-  };
+}
+
+// The plain text of a run list.
+function segmentsText(segments: readonly InsightSegment[]): string {
+  return segments.map((segment) => segment.text).join("");
+}
+
+// A detail row built from entries, keeping their runs and dimming the
+// separators between them.
+function detailRow(entries: readonly (readonly InsightSegment[])[]): InsightRow {
+  return { segments: joinEntries(entries) };
+}
+
+// A row whose body is followed by a parenthesized note; a row without a label
+// is a detail line.
+function rowWithNote(noteRow: {
+  readonly label?: string;
+  readonly body: readonly InsightSegment[];
+  readonly note: readonly InsightSegment[];
+}): InsightRow {
+  const segments = [...noteRow.body, ...parenthesized(noteRow.note)];
+  return noteRow.label === undefined
+    ? { segments }
+    : { label: noteRow.label, segments };
 }
 
 // Sum of a step's token counts, matching the host's context-usage figure.
@@ -476,22 +489,12 @@ function tokenTotal(traffic: TokenTraffic): number {
 function packedTokenRow(
   entries: readonly (readonly [string, number])[],
 ): InsightRow {
-  return {
-    label: "",
-    value: entries
-      .map(([label, count]) => `${label} ${formatCount(count)}`)
-      .join(ENTRY_SEPARATOR),
-    segments: entries.flatMap(([label, count], index) => {
-      const segments: InsightSegment[] = [
-        ...(index === 0
-          ? []
-          : [{ text: ENTRY_SEPARATOR, tone: "muted" as const }]),
-        { text: `${label} `, tone: "value" },
-        ...tokenSegments(count),
-      ];
-      return segments;
-    }),
-  };
+  return detailRow(
+    entries.map(([label, count]) => [
+      { text: `${label} `, tone: "value" },
+      ...tokenSegments(count),
+    ]),
+  );
 }
 
 // Cache-hit detail: the share of the prompt tokens the provider served from its
@@ -506,32 +509,45 @@ function cacheHitRows(traffic: TokenTraffic): readonly InsightRow[] {
     return [];
   }
   const percent = Math.round((traffic.cacheRead / promptTokens) * 100);
-  const cacheRead = formatCount(traffic.cacheRead);
-  const prompt = formatCount(promptTokens);
   return [
-    {
-      label: "",
-      value: `last cache hit ${percent}% (${cacheRead} of ${prompt} prompt)`,
-      segments: [
-        { text: `last cache hit `, tone: "value" },
+    rowWithNote({
+      body: [
+        { text: "last cache hit ", tone: "value" },
         { text: String(percent), tone: "count" },
         { text: "%", tone: "count", bold: true },
-        { text: " (", tone: "muted" },
-        ...tokenSegments(traffic.cacheRead, "countDim"),
-        { text: " of ", tone: "muted" },
-        ...tokenSegments(promptTokens, "countDim"),
-        { text: " prompt)", tone: "muted" },
       ],
-    },
+      note: [
+        ...tokenSegments(traffic.cacheRead),
+        { text: " of ", tone: "muted" },
+        ...tokenSegments(promptTokens),
+        { text: " prompt", tone: "muted" },
+      ],
+    }),
   ];
 }
 
-// Token rows: the size of the model's window now, then the session's prompt,
-// completion, and cache traffic as its detail line, its cache-hit share, and its
-// thinking when it reasoned.
+// Detail rows shared by both groups: the prompt, completion, and cache traffic,
+// its cache-hit share, and the session's thinking.
+function tokenDetailRows(
+  facts: SessionFacts,
+  traffic: TokenTraffic,
+): readonly InsightRow[] {
+  return [
+    packedTokenRow([
+      ["input", traffic.input],
+      ["output", traffic.output],
+      ["cache", traffic.cacheRead + traffic.cacheWrite],
+    ]),
+    ...cacheHitRows(traffic),
+    ...thinkingRows(facts),
+  ];
+}
+
+// Token rows: the size of the model's window now, then the token details both
+// groups share.
 //
 // The window size is left blank while no assistant step carries token data; the
-// traffic stays, since it is read from the session totals rather than a step.
+// details stay, since they are read from the session totals rather than a step.
 function tokenRows(
   facts: SessionFacts,
   usage: ContextWindowUsage | undefined,
@@ -544,24 +560,28 @@ function tokenRows(
     cacheWrite: facts.cacheWriteTokens,
   };
   const usedTokens = usage === undefined ? undefined : tokenTotal(usage.traffic);
-  const usageRow: InsightRow =
-    usedTokens === undefined
-      ? { label: "tokens", value: "" }
-      : {
-          label: "tokens",
-          value: formatCount(usedTokens),
-          segments: tokenSegments(usedTokens),
-        };
-  return [
-    usageRow,
-    packedTokenRow([
-      ["input", traffic.input],
-      ["output", traffic.output],
-      ["cache", traffic.cacheRead + traffic.cacheWrite],
-    ]),
-    ...cacheHitRows(traffic),
-    ...thinkingRows(facts),
-  ];
+  return [tokenRow(usedTokens), ...tokenDetailRows(facts, traffic)];
+}
+
+// Token row: the used size, and the model's limit beside it when known.
+//
+// Blank while no assistant step carries token data.
+function tokenRow(usedTokens: number | undefined, limit?: number): InsightRow {
+  if (usedTokens === undefined) {
+    return { label: "tokens", segments: [] };
+  }
+  const usedSegments = tokenSegments(usedTokens);
+  if (limit === undefined) {
+    return { label: "tokens", segments: usedSegments };
+  }
+  return rowWithNote({
+    label: "tokens",
+    body: usedSegments,
+    note: [
+      { text: "model limit: ", tone: "muted" },
+      ...tokenSegments(limit),
+    ],
+  });
 }
 
 // Thinking detail, reporting the reasoning the session generated and how much of
@@ -572,44 +592,37 @@ function thinkingRows(facts: SessionFacts): readonly InsightRow[] {
   if (facts.reasoningTokens === 0) {
     return [];
   }
-  const total = formatCount(facts.reasoningTokens);
-  const active = formatCount(facts.activeReasoningTokens);
   return [
-    {
-      label: "",
-      value: `thinking ${total} (${active} active)`,
-      segments: [
+    rowWithNote({
+      body: [
         { text: "thinking ", tone: "value" },
         ...tokenSegments(facts.reasoningTokens),
-        { text: " (", tone: "muted" },
-        ...tokenSegments(facts.activeReasoningTokens, "countDim"),
-        { text: " active)", tone: "muted" },
       ],
-    },
+      note: [
+        ...tokenSegments(facts.activeReasoningTokens),
+        { text: " active", tone: "muted" },
+      ],
+    }),
   ];
 }
 
 // Cost row, showing this session and the whole family once they differ.
 function costRow(facts: SessionFacts): InsightRow {
   const sessionCost = formatCost(facts.costUsd);
+  const sessionSegments: readonly InsightSegment[] = [
+    { text: sessionCost, tone: "cost" },
+  ];
   if (facts.familyCostUsd <= facts.costUsd) {
-    return {
-      label: "cost",
-      value: sessionCost,
-      segments: [{ text: sessionCost, tone: "cost" }],
-    };
+    return { label: "cost", segments: sessionSegments };
   }
-  const familyCost = formatCost(facts.familyCostUsd);
-  return {
+  return rowWithNote({
     label: "cost",
-    value: `${sessionCost} (${familyCost} incl. subagents)`,
-    segments: [
-      { text: sessionCost, tone: "cost" },
-      { text: " (", tone: "muted" },
-      { text: familyCost, tone: "costDim" },
-      { text: " incl. subagents)", tone: "muted" },
+    body: sessionSegments,
+    note: [
+      { text: formatCost(facts.familyCostUsd), tone: "cost" },
+      { text: " incl. subagents", tone: "muted" },
     ],
-  };
+  });
 }
 
 // The subagents section: the total, then one line per subagent.
@@ -652,14 +665,16 @@ function subagentSection(
 
 // The count row that opens the subagents section.
 function subagentCountRow(count: number): InsightRow {
-  const text = formatCount(count);
-  return { label: "count", value: text, segments: [{ text, tone: "count" }] };
+  return {
+    label: "count",
+    segments: [{ text: formatCount(count), tone: "count" }],
+  };
 }
 
 // Label row opening one group of a trimmed subagent list, naming the group and
 // how many lines follow it.
 function subagentGroupRow(name: string, count: number): InsightRow {
-  return { label: `${name} ${formatCount(count)}`, value: "" };
+  return { label: `${name} ${formatCount(count)}`, segments: [] };
 }
 
 // Subagent indexes, dearest first, ties left in creation order.
@@ -757,11 +772,7 @@ function subagentRow(
     { text: " ", tone: "value" },
     { text: formatCost(subagent.costUsd).padStart(columns.cost), tone: "cost" },
   ];
-  return {
-    label: "",
-    value: segments.map((segment) => segment.text).join(""),
-    segments,
-  };
+  return { segments };
 }
 
 // Spaces that widen a column's content to its shared width, so the columns to
@@ -804,39 +815,31 @@ function workingRows(
     [formatDuration(timing.toolsMs), "tools"],
     ...(idleMs > 0 ? [[formatDuration(idleMs), "idle"] as const] : []),
   ];
+  const busySegments: readonly InsightSegment[] = [
+    { text: busy, tone: "time" },
+  ];
   return [
-    {
-      label: "busy",
-      value: share === undefined ? busy : `${busy} (${share})`,
-      segments: [
-        { text: busy, tone: "time" },
-        ...(share === undefined
-          ? []
-          : [{ text: ` (${share})`, tone: "muted" as const }]),
-      ],
-    },
-    {
-      label: "",
-      value: details
-        .map(([duration, unit]) => `${duration} ${unit}`)
-        .join(ENTRY_SEPARATOR),
-      segments: details.flatMap(([duration, unit], index) => [
-        ...(index === 0 ? [] : [{ text: ENTRY_SEPARATOR, tone: "muted" as const }]),
-        { text: duration, tone: "time" as const },
-        { text: ` ${unit}`, tone: "value" as const },
+    share === undefined
+      ? { label: "busy", segments: busySegments }
+      : rowWithNote({
+          label: "busy",
+          body: busySegments,
+          note: [{ text: share, tone: "muted" }],
+        }),
+    detailRow(
+      details.map(([duration, unit]) => [
+        { text: duration, tone: "time" },
+        { text: ` ${unit}`, tone: "value" },
       ]),
-    },
+    ),
   ];
 }
 
 // One count as coloured runs: the number as a count, then its unit in bold so a
 // shortened figure still reads as a quantity.
-//
-// Pass `countDim` for a figure that sits in parentheses, so it keeps its own
-// colour while receding behind the value it qualifies.
 function tokenSegments(
   count: number,
-  tone: "count" | "countDim" = "count",
+  tone: InsightTone = "count",
 ): readonly InsightSegment[] {
   return countSegments(formatCount(count), tone);
 }
@@ -845,7 +848,7 @@ function tokenSegments(
 // to the token, so a decimal would read as precision it does not have.
 function roundedTokenSegments(
   count: number,
-  tone: "count" | "countDim" = "count",
+  tone: InsightTone = "count",
 ): readonly InsightSegment[] {
   return countSegments(formatRoundedTokens(count), tone);
 }
@@ -853,7 +856,7 @@ function roundedTokenSegments(
 // Splits a formatted count into its number run and a bold unit run.
 function countSegments(
   text: string,
-  tone: "count" | "countDim",
+  tone: InsightTone,
 ): readonly InsightSegment[] {
   const unit = text.at(-1);
   if (unit === "k" || unit === "M") {
@@ -890,50 +893,27 @@ function truncateText(text: string, width: number): string {
   return `${text.slice(0, width - 1)}…`;
 }
 
-// Window section: the used and total window, the step's token composition, and
-// its cache-hit share.
+// Window section: the used and total window, then the same token detail block
+// as the session totals.
 //
 // No section at all when the model's limit is unknown.
 function windowSections(
   usage: ContextWindowUsage | undefined,
+  facts: SessionFacts,
 ): readonly InsightSection[] {
   const limit = usage?.limit;
   if (usage === undefined || limit === undefined) {
     return [];
   }
-  const traffic = usage.traffic;
-  const composition: readonly (readonly [string, number])[] = [
-    ["input", traffic.input],
-    ["output", traffic.output],
-    ["cache", traffic.cacheRead + traffic.cacheWrite],
-    ...(traffic.reasoning > 0
-      ? [["thinking", traffic.reasoning] as const]
-      : []),
-  ];
   return [
     {
       heading: "window",
       rows: [
-        windowRow(tokenTotal(traffic), limit),
-        packedTokenRow(composition),
-        ...cacheHitRows(traffic),
+        tokenRow(tokenTotal(usage.traffic), limit),
+        ...tokenDetailRows(facts, usage.traffic),
       ],
     },
   ];
-}
-
-// Window usage row, for a window whose limit is known.
-function windowRow(used: number, limit: number): InsightRow {
-  return {
-    label: "window",
-    value: `${formatCount(used)} (model limit: ${formatCount(limit)})`,
-    segments: [
-      ...tokenSegments(used),
-      { text: " (model limit: ", tone: "muted" },
-      ...tokenSegments(limit, "countDim"),
-      { text: ")", tone: "muted" },
-    ],
-  };
 }
 
 // Reads row: total reads with the distinct-file count beside them.
@@ -942,16 +922,14 @@ function readRows(group: StatsGroup): readonly InsightRow[] {
     return [];
   }
   return [
-    {
+    rowWithNote({
       label: "reads",
-      value: `${group.reads} (${group.uniqueReads} unique)`,
-      segments: [
-        { text: formatCount(group.reads), tone: "count" },
-        { text: " (", tone: "muted" },
-        { text: formatCount(group.uniqueReads), tone: "countDim" },
-        { text: " unique)", tone: "muted" },
+      body: [{ text: formatCount(group.reads), tone: "count" }],
+      note: [
+        { text: formatCount(group.uniqueReads), tone: "count" },
+        { text: " unique", tone: "muted" },
       ],
-    },
+    }),
   ];
 }
 
@@ -963,7 +941,6 @@ function failureRows(group: StatsGroup): readonly InsightRow[] {
   return [
     {
       label: "failures",
-      value: formatCount(group.failures),
       segments: [{ text: formatCount(group.failures), tone: "error" }],
     },
   ];
@@ -982,7 +959,7 @@ function compressionSection(
   width: number,
 ): InsightSection {
   if (dcp.blocks.length === 0) {
-    return { heading, rows: [{ label: "none", value: "" }] };
+    return { heading, rows: [{ label: "none", segments: [] }] };
   }
 
   // Context size had nothing been pruned: what the model holds now plus every
@@ -991,17 +968,13 @@ function compressionSection(
     windowUsage === undefined ? undefined : tokenTotal(windowUsage.traffic);
   const unprunedTokens =
     usedTokens === undefined ? undefined : usedTokens + dcp.totalPruneTokens;
-  const rangeText =
-    usedTokens === undefined || unprunedTokens === undefined
-      ? ""
-      : ` (${formatCount(unprunedTokens)} → ${formatCount(usedTokens)})`;
   const rangeSegments =
     usedTokens === undefined || unprunedTokens === undefined
       ? []
-      : parenthetical([
-          ...tokenSegments(unprunedTokens, "countDim"),
+      : parenthesized([
+          ...tokenSegments(unprunedTokens),
           { text: " → ", tone: "muted" },
-          ...tokenSegments(usedTokens, "countDim"),
+          ...tokenSegments(usedTokens),
         ]);
 
   const blockWord = dcp.blocks.length === 1 ? "block" : "blocks";
@@ -1010,7 +983,6 @@ function compressionSection(
     rows: [
       {
         label: "pruned",
-        value: `${formatCount(dcp.totalPruneTokens)}${rangeText}`,
         segments: [
           ...tokenSegments(dcp.totalPruneTokens),
           ...rangeSegments,
@@ -1018,13 +990,12 @@ function compressionSection(
       },
       {
         label: "blocks",
-        value: `${formatCount(dcp.blocks.length)} ${blockWord}`,
         segments: [
           { text: formatCount(dcp.blocks.length), tone: "count" },
           { text: ` ${blockWord}`, tone: "value" },
         ],
       },
-      ...dcp.blocks.map((block) => {
+      ...dcp.blocks.map((block): InsightRow => {
         const id = `#${block.id}`;
         const saving = block.compressedTokens - block.summaryTokens;
         const savingText = saving > 0 ? ` (−${formatRoundedTokens(saving)})` : "";
@@ -1041,8 +1012,6 @@ function compressionSection(
             savingText.length,
         );
         return {
-          label: "",
-          value: `${id} ${topic}${ENTRY_SEPARATOR}${blockSize}${savingText}`,
           segments: [
             { text: `${id} `, tone: "muted" },
             { text: topic, tone: "value" },
@@ -1050,7 +1019,7 @@ function compressionSection(
             ...tokenSegments(block.compressedTokens),
             { text: " → ", tone: "muted" },
             ...tokenSegments(block.summaryTokens),
-            ...(saving > 0 ? parenthetical(savingSegments(saving)) : []),
+            ...(saving > 0 ? parenthesized(savingSegments(saving)) : []),
           ],
         };
       }),
@@ -1058,18 +1027,30 @@ function compressionSection(
   };
 }
 
-// A run of segments wrapped in a plain pair of parentheses.
-function parenthetical(inner: readonly InsightSegment[]): readonly InsightSegment[] {
+// A run of segments wrapped in a plain pair of parentheses, its runs muted so
+// the note recedes behind the body it qualifies.
+function parenthesized(
+  inner: readonly InsightSegment[],
+): readonly InsightSegment[] {
   return [
     { text: " (", tone: "muted" },
-    ...inner,
+    ...inner.map((segment) => ({
+      ...segment,
+      tone: withMutedTone(segment.tone),
+    })),
     { text: ")", tone: "muted" },
   ];
 }
 
+// A tone with `muted` added, unless it is already there.
+function withMutedTone(tone: InsightTone): InsightTone {
+  const tones = typeof tone === "string" ? [tone] : tone;
+  return tones.includes("muted") ? tone : [...tones, "muted"];
+}
+
 // A saving as a dimmed figure with a minus sign: the tokens a compression freed.
 function savingSegments(saving: number): readonly InsightSegment[] {
-  const [head, ...tail] = roundedTokenSegments(saving, "countDim");
+  const [head, ...tail] = roundedTokenSegments(saving);
   if (head === undefined) {
     return [];
   }

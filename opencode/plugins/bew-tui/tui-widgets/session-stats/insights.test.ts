@@ -20,6 +20,9 @@ import type {
 import { NO_DCP_SUMMARY } from "./dcp-state";
 import type { StatsGroup } from "./counts";
 
+// Sentinel for a detail row, which carries no label.
+const NO_LABEL = Symbol("no label");
+
 // A stats group with everything at zero, overridden per case.
 function makeGroup(overrides: Partial<StatsGroup> = {}): StatsGroup {
   return {
@@ -77,12 +80,18 @@ function rowsOf(sections: readonly InsightSection[]) {
   return sections.flatMap((section) => section.rows);
 }
 
+// Plain text of a row, as its coloured runs read.
+function textOf(row: InsightRow): string {
+  return row.segments.map((segment) => segment.text).join("");
+}
+
 // The value of the row with `label`, or undefined when it is absent.
 function valueOf(
   sections: readonly InsightSection[],
   label: string,
 ): string | undefined {
-  return rowsOf(sections).find((row) => row.label === label)?.value;
+  const row = rowsOf(sections).find((candidate) => candidate.label === label);
+  return row === undefined ? undefined : textOf(row);
 }
 
 // The rows of the section with `heading`, or none when the section is absent.
@@ -95,10 +104,15 @@ function sectionRows(
   );
 }
 
-// Rows reduced to label and plain value, so colour runs do not affect a
+// The row's label, or the detail-row sentinel.
+function labelOf(row: InsightRow): string | typeof NO_LABEL {
+  return row.label ?? NO_LABEL;
+}
+
+// Rows reduced to label and plain text, so colour runs do not affect a
 // structural comparison.
 function labelledRows(rows: readonly InsightRow[]) {
-  return rows.map((row) => ({ label: row.label, value: row.value }));
+  return rows.map((row) => ({ label: labelOf(row), value: textOf(row) }));
 }
 
 describe("formatCount", () => {
@@ -186,7 +200,7 @@ describe("tool rows", () => {
 
     expect(labelledRows(sectionRows(insights.session, "activity"))).toEqual([
       { label: "tools", value: "6" },
-      { label: "", value: "read 3 · edit 2 · bash 1" },
+      { label: NO_LABEL, value: "read 3 · edit 2 · bash 1" },
       { label: "skills", value: "0" },
     ]);
   });
@@ -212,8 +226,8 @@ describe("tool rows", () => {
 
     expect(labelledRows(sectionRows(insights.session, "activity")).slice(0, 3)).toEqual([
       { label: "tools", value: "6" },
-      { label: "", value: "read 3 · edit 2" },
-      { label: "", value: "bash 1" },
+      { label: NO_LABEL, value: "read 3 · edit 2" },
+      { label: NO_LABEL, value: "bash 1" },
     ]);
   });
 });
@@ -240,7 +254,7 @@ describe("skill rows", () => {
     expect(labelledRows(sectionRows(insights.session, "activity"))).toEqual([
       { label: "tools", value: "none" },
       { label: "skills", value: "4" },
-      { label: "", value: "coder-ts · opencode · text-replace" },
+      { label: NO_LABEL, value: "coder-ts · opencode · text-replace" },
     ]);
   });
 
@@ -266,8 +280,8 @@ describe("skill rows", () => {
     expect(labelledRows(sectionRows(insights.session, "activity"))).toEqual([
       { label: "tools", value: "none" },
       { label: "skills", value: "4" },
-      { label: "", value: "coder-ts · opencode" },
-      { label: "", value: "text-replace" },
+      { label: NO_LABEL, value: "coder-ts · opencode" },
+      { label: NO_LABEL, value: "text-replace" },
     ]);
   });
 
@@ -348,8 +362,8 @@ describe("buildInsights", () => {
     expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 4)).toEqual([
       { label: "cost", value: "$2.50" },
       { label: "tokens", value: "62.3k" },
-      { label: "", value: "input 1.2M · output 40k · cache 520k" },
-      { label: "", value: "last cache hit 29% (500k of 1.7M prompt)" },
+      { label: NO_LABEL, value: "input 1.2M · output 40k · cache 520k" },
+      { label: NO_LABEL, value: "last cache hit 29% (500k of 1.7M prompt)" },
     ]);
     expect(valueOf(insights.session.sections, "span")).toBe("2h 15m");
   });
@@ -360,7 +374,7 @@ describe("buildInsights", () => {
     expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 3)).toEqual([
       { label: "cost", value: "$0.00" },
       { label: "tokens", value: "" },
-      { label: "", value: "input 0 · output 0 · cache 0" },
+      { label: NO_LABEL, value: "input 0 · output 0 · cache 0" },
     ]);
   });
 
@@ -378,12 +392,12 @@ describe("buildInsights", () => {
     const totals = sectionRows(insights.session, "totals");
 
     expect(labelledRows(totals).slice(2, 4)).toEqual([
-      { label: "", value: "input 0 · output 0 · cache 0" },
-      { label: "", value: "thinking 21.7k (6.5k active)" },
+      { label: NO_LABEL, value: "input 0 · output 0 · cache 0" },
+      { label: NO_LABEL, value: "thinking 21.7k (6.5k active)" },
     ]);
     expect(totals[3]?.segments).toContainEqual({
       text: "6.5",
-      tone: "countDim",
+      tone: ["count", "muted"],
     });
   });
 
@@ -392,7 +406,7 @@ describe("buildInsights", () => {
 
     expect(
       rowsOf(insights.session.sections).some((row) =>
-        row.value.startsWith("thinking "),
+        textOf(row).startsWith("thinking "),
       ),
     ).toBe(false);
   });
@@ -417,7 +431,7 @@ describe("buildInsights", () => {
 
     const rows = sectionRows(insights.session, "subagents");
 
-    expect(rows.map((row) => row.value)).toEqual([
+    expect(rows.map((row) => textOf(row))).toEqual([
       "2",
       `explore 12.4k ${"Verify examples".padEnd(30)} $0.01`,
       `general   800 ${" ".repeat(30)}   ~$0`,
@@ -474,11 +488,11 @@ describe("buildInsights", () => {
 
     const rows = sectionRows(insights.session, "subagents").slice(1);
 
-    expect(rows.map((row) => row.value)).toEqual([
+    expect(rows.map((row) => textOf(row))).toEqual([
       `a${" ".repeat(7)}1.5k ${"one".padEnd(31)} $1.20`,
       `explore 800k ${"two".padEnd(31)}   ~$0`,
     ]);
-    expect(rows.map((row) => row.value.length)).toEqual([50, 50]);
+    expect(rows.map((row) => textOf(row).length)).toEqual([50, 50]);
   });
 
   test("cuts a long agent name to its column", () => {
@@ -503,7 +517,7 @@ describe("buildInsights", () => {
       text: "a-very-long…",
       tone: "agent",
     });
-    expect(row?.value.length).toBe(50);
+    expect(row === undefined ? undefined : textOf(row).length).toBe(50);
   });
 
   test("cuts a long purpose to the description column", () => {
@@ -524,7 +538,11 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(sectionRows(insights.session, "subagents")[1]?.value).toBe(
+    expect(
+      sectionRows(insights.session, "subagents")[1] === undefined
+        ? undefined
+        : textOf(sectionRows(insights.session, "subagents")[1]),
+    ).toBe(
       "explore 12.4k Verify ex… $0.01",
     );
   });
@@ -564,17 +582,17 @@ describe("buildInsights", () => {
 
     const rows = sectionRows(insights.session, "subagents");
 
-    expect(rows.map((row) => row.label)).toEqual([
+    expect(rows.map((row) => labelOf(row))).toEqual([
       "count",
       "top 3",
-      "",
-      "",
-      "",
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
       "latest 4",
-      "",
-      "",
-      "",
-      "",
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
     ]);
     expect(labelledRows(rows).slice(0, 2)).toEqual([
       { label: "count", value: "8" },
@@ -596,21 +614,21 @@ describe("buildInsights", () => {
 
     const rows = sectionRows(insights.session, "subagents");
 
-    expect(rows.map((row) => row.label)).toEqual([
+    expect(rows.map((row) => labelOf(row))).toEqual([
       "count",
       "top 3",
-      "",
-      "",
-      "",
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
       "latest 4",
-      "",
-      "",
-      "",
-      "",
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
     ]);
     expect(
       rows
-        .filter((row) => row.label === "")
+        .filter((row) => labelOf(row) === NO_LABEL)
         .map((row) => row.segments?.[0]?.text),
     ).toEqual(["s7", "s6", "s5", "s1", "s2", "s3", "s4"]);
   });
@@ -627,8 +645,17 @@ describe("buildInsights", () => {
     );
 
     expect(
-      sectionRows(insights.session, "subagents").map((row) => row.label),
-    ).toEqual(["count", "", "", "", "", "", "", ""]);
+      sectionRows(insights.session, "subagents").map((row) => labelOf(row)),
+    ).toEqual([
+      "count",
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+      NO_LABEL,
+    ]);
   });
 
   test("shows the session and family cost together once they differ", () => {
@@ -662,8 +689,9 @@ describe("buildInsights", () => {
     ).toEqual([
       { text: "$1.21", tone: "cost" },
       { text: " (", tone: "muted" },
-      { text: "$1.41", tone: "costDim" },
-      { text: " incl. subagents)", tone: "muted" },
+      { text: "$1.41", tone: ["cost", "muted"] },
+      { text: " incl. subagents", tone: "muted" },
+      { text: ")", tone: "muted" },
     ]);
   });
 
@@ -686,7 +714,7 @@ describe("buildInsights", () => {
     const totals = sectionRows(insights.session, "totals");
     expect(valueOf(insights.session.sections, "busy")).toBe("1h 15m (83%)");
     expect(labelledRows(totals)).toContainEqual({
-      label: "",
+      label: NO_LABEL,
       value: "1h generating · 15m tools · 15m idle",
     });
   });
@@ -696,7 +724,7 @@ describe("buildInsights", () => {
 
     expect(
       rowsOf(insights.session.sections).some((row) =>
-        row.value.includes("generating"),
+        textOf(row).includes("generating"),
       ),
     ).toBe(false);
   });
@@ -722,10 +750,10 @@ describe("buildInsights", () => {
     expect(rows[0]?.segments).toEqual([{ text: "6", tone: "count" }]);
     expect(rows[1]?.segments).toEqual([
       { text: "read", tone: "value" },
-      { text: " 3", tone: "countDim" },
+      { text: " 3", tone: ["count", "muted"] },
       { text: " · ", tone: "muted" },
       { text: "edit", tone: "value" },
-      { text: " 2", tone: "countDim" },
+      { text: " 2", tone: ["count", "muted"] },
     ]);
   });
 
@@ -741,7 +769,7 @@ describe("buildInsights", () => {
     );
 
     const traffic = rowsOf(insights.session.sections).find((row) =>
-      row.value.startsWith("input "),
+      textOf(row).startsWith("input "),
     );
     expect(traffic?.segments).toEqual([
       { text: "input ", tone: "value" },
@@ -813,6 +841,11 @@ describe("buildInsights", () => {
     );
     const withUsage = buildInsights(
       makeInput({
+        session: {
+          ...makeInput().session,
+          reasoningTokens: 2_500,
+          activeReasoningTokens: 1_000,
+        },
         contextWindow: {
           traffic: makeTraffic({
             input: 30_000,
@@ -826,20 +859,21 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(valueOf(without.context.sections, "window")).toBeUndefined();
-    expect(valueOf(withoutLimit.context.sections, "window")).toBeUndefined();
+    expect(valueOf(without.context.sections, "tokens")).toBeUndefined();
+    expect(valueOf(withoutLimit.context.sections, "tokens")).toBeUndefined();
     expect(valueOf(withoutLimit.session.sections, "tokens")).toBe("62.3k");
-    expect(valueOf(withUsage.context.sections, "window")).toBe(
+    expect(valueOf(withUsage.context.sections, "tokens")).toBe(
       "62.3k (model limit: 200k)",
     );
     expect(labelledRows(sectionRows(withUsage.context, "window"))).toEqual([
-      { label: "window", value: "62.3k (model limit: 200k)" },
-      { label: "", value: "input 30k · output 1k · cache 31k · thinking 300" },
-      { label: "", value: "last cache hit 49% (30k of 61k prompt)" },
+      { label: "tokens", value: "62.3k (model limit: 200k)" },
+      { label: NO_LABEL, value: "input 30k · output 1k · cache 31k" },
+      { label: NO_LABEL, value: "last cache hit 49% (30k of 61k prompt)" },
+      { label: NO_LABEL, value: "thinking 2.5k (1k active)" },
     ]);
     expect(
       sectionRows(withUsage.context, "window")[0]?.segments,
-    ).toContainEqual({ text: "k", tone: "countDim", bold: true });
+    ).toContainEqual({ text: "k", tone: ["count", "muted"], bold: true });
     expect(
       withUsage.context.sections.map((section) => section.heading),
     ).toEqual(["window", "activity", "compression"]);
@@ -867,13 +901,15 @@ describe("buildInsights", () => {
 
     expect(valueOf(insights.context.sections, "pruned")).toBe("215.8k");
     const compression = sectionRows(insights.context, "compression");
-    expect(compression.map((row) => row.label)).toEqual([
+    expect(compression.map((row) => labelOf(row))).toEqual([
       "pruned",
       "blocks",
-      "",
+      NO_LABEL,
     ]);
-    expect(compression[1]?.value).toBe("1 block");
-    expect(compression.at(-1)?.value).toBe(
+    const block = compression[1];
+    const last = compression.at(-1);
+    expect(block === undefined ? undefined : textOf(block)).toBe("1 block");
+    expect(last === undefined ? undefined : textOf(last)).toBe(
       "#1 session stats · 12k → 1.5k (−11k)",
     );
   });
@@ -899,7 +935,9 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(sectionRows(insights.context, "compression").at(-1)?.value).toBe(
+    const last = sectionRows(insights.context, "compression").at(-1);
+
+    expect(last === undefined ? undefined : textOf(last)).toBe(
       "#3 a very… · 12k → 1.5k (−11k)",
     );
   });
@@ -939,7 +977,7 @@ describe("buildInsights", () => {
     );
     expect(
       sectionRows(insights.context, "compression")[0]?.segments,
-    ).toContainEqual({ text: "62.3", tone: "countDim" });
+    ).toContainEqual({ text: "62.3", tone: ["count", "muted"] });
   });
 
   test("keeps the compression list out of the session group", () => {
@@ -971,7 +1009,7 @@ describe("buildInsights", () => {
     const last = insights.context.sections.at(-1);
 
     expect(last?.heading).toBe("compression");
-    expect(last?.rows).toEqual([{ label: "none", value: "" }]);
+    expect(last?.rows).toEqual([{ label: "none", segments: [] }]);
   });
 });
 
@@ -1003,7 +1041,7 @@ describe("countInsightLines", () => {
 
   test("counts no separator when a group has a single section", () => {
     const singleSection: readonly InsightSection[] = [
-      { heading: "only", rows: [{ label: "a", value: "1" }] },
+      { heading: "only", rows: [{ label: "a", segments: [{ text: "1", tone: "count" }] }] },
     ];
 
     expect(countInsightLines(singleSection)).toBe(2);
@@ -1017,7 +1055,10 @@ describe("measureInsightWidth", () => {
 
   test("measures a labelled row by its label column, gap, and value", () => {
     const sections: readonly InsightSection[] = [
-      { heading: "ab", rows: [{ label: "cost", value: "$1.24" }] },
+      {
+        heading: "ab",
+        rows: [{ label: "cost", segments: [{ text: "$1.24", tone: "cost" }] }],
+      },
     ];
 
     expect(measureInsightWidth(sections, layout)).toBe(9 + 1 + 5);
@@ -1025,7 +1066,14 @@ describe("measureInsightWidth", () => {
 
   test("measures a detail row by the indent instead of the label column", () => {
     const sections: readonly InsightSection[] = [
-      { heading: "ab", rows: [{ label: "", value: "read 3 · edit 2" }] },
+      {
+        heading: "ab",
+        rows: [
+          {
+            segments: [{ text: "read 3 · edit 2", tone: "value" }],
+          },
+        ],
+      },
     ];
 
     expect(measureInsightWidth(sections, layout)).toBe(1 + 1 + "read 3 · edit 2".length);
@@ -1033,8 +1081,18 @@ describe("measureInsightWidth", () => {
 
   test("takes the widest row across every section", () => {
     const sections: readonly InsightSection[] = [
-      { heading: "one", rows: [{ label: "a", value: "12" }] },
-      { heading: "two", rows: [{ label: "", value: "read 3 · edit 2" }] },
+      {
+        heading: "one",
+        rows: [{ label: "a", segments: [{ text: "12", tone: "count" }] }],
+      },
+      {
+        heading: "two",
+        rows: [
+          {
+            segments: [{ text: "read 3 · edit 2", tone: "value" }],
+          },
+        ],
+      },
     ];
 
     expect(measureInsightWidth(sections, layout)).toBe(1 + 1 + "read 3 · edit 2".length);
@@ -1042,7 +1100,10 @@ describe("measureInsightWidth", () => {
 
   test("measures a heading that outruns its rows", () => {
     const sections: readonly InsightSection[] = [
-      { heading: "compression", rows: [{ label: "a", value: "1" }] },
+      {
+        heading: "compression",
+        rows: [{ label: "a", segments: [{ text: "1", tone: "count" }] }],
+      },
     ];
 
     expect(measureInsightWidth(sections, layout)).toBe(11);

@@ -11,10 +11,11 @@ The line reads `Sess: 󰍩 12 󱜾 30 󰒔 118 · Ctx: 󰍩 3 󱜾 9 󰒔 31`: `
 - The tooltip: clicking a group opens it, clicking the other replaces it, and clicking again or the close glyph dismisses it.
 - What the tooltip reports: the session totals and the subagent sessions behind them, the model's window usage, the activity counts, and the compression blocks.
 - The `tokens` row: the context the model holds now, summed the way the built-in counter does — prompt, completion, reasoning, and both cache directions of the latest assistant step — with the session's input, output and cache traffic as its detail line.
-- The window section: the used and total window, then the step's input, output, cache and thinking split, and its cache-hit share; omitted when the model's limit is unknown.
+- The window section: the `tokens` row with the used and total window, then the step's input, output and cache split, its cache-hit share, and the same `thinking` detail line as the session totals; omitted when the model's limit is unknown.
 - The `last cache hit` detail line: the share of prompt tokens served from the provider's cache, reported for the session totals (based on the last step).
-- The `thinking` detail line: reasoning the session generated, with how much of it remains in the active context in parentheses; omitted when the session reported none.
+- The `thinking` detail line, in both groups: reasoning the session generated, with how much of it remains in the active context in parentheses; omitted when the session reported none.
 - The `busy` row: the share of the span spent generating or running tools, with the remaining time split into generating, tools and idle; a question tool's answer wait counts as idle.
+- The tooltip text: selectable, so the figures can be copied out of the panel.
 - A long subagent list: past a handful of sessions it trims to the dearest few and the most recent few, each group under its own label; a long agent name is cut so the columns stay aligned.
 
 ## Architecture

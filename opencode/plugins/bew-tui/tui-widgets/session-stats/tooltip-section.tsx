@@ -6,7 +6,7 @@ import { usePlugin } from "@opencode/plugin/tui";
 import type { Context } from "@opencode/plugin/tui/context";
 import { TextAttributes } from "@opentui/core";
 import { For, Show } from "solid-js";
-import type { InsightRow, InsightSection, InsightSegment } from "./insights";
+import type { InsightRow, InsightSection, InsightSegment, InsightToneName } from "./insights";
 import { dimColor } from "./colors";
 
 // Column width of a row's label, in cells, so values line up between rows.
@@ -50,7 +50,6 @@ export function InsightSectionView(props: {
         <text
           fg={context.theme.hue.accent[400]}
           attributes={TextAttributes.BOLD}
-          selectable={false}
           wrapMode="none"
         >
           {props.section.heading.toUpperCase()}
@@ -84,43 +83,25 @@ export function InsightRowView(props: {
       <text
         fg={context.theme.text.muted}
         width={labelWidth}
-        selectable={false}
         wrapMode="none"
       >
         {rowPrefix(props.row, props.isLastDetail)}
       </text>
-      <Show
-        when={props.row.segments}
-        fallback={
-          <text
-            fg={context.theme.text.base}
-            selectable={false}
-            wrapMode="none"
-            truncate
-          >
-            {props.row.value}
-          </text>
-        }
-      >
-        {(segments) => (
-          <box flexDirection="row">
-            <For each={segments()}>
-              {(segment) => (
-                <text
-                  fg={segmentColor(context, segment.tone)}
-                  attributes={
-                    segment.bold === true ? TextAttributes.BOLD : undefined
-                  }
-                  selectable={false}
-                  wrapMode="none"
-                >
-                  {segment.text}
-                </text>
-              )}
-            </For>
-          </box>
-        )}
-      </Show>
+      <box flexDirection="row">
+        <For each={props.row.segments}>
+          {(segment) => (
+            <text
+              fg={segmentColor(context, segment.tone)}
+              attributes={
+                segment.bold === true ? TextAttributes.BOLD : undefined
+              }
+              wrapMode="none"
+            >
+              {segment.text}
+            </text>
+          )}
+        </For>
+      </box>
     </box>
   );
 }
@@ -128,37 +109,44 @@ export function InsightRowView(props: {
 // Whether a row is a detail line for the row above it, rather than a labelled
 // row of its own.
 function isDetailRow(row: InsightRow): boolean {
-  return row.label.length === 0;
+  return row.label === undefined;
 }
 
 // Text opening a row: a labelled row shows its label, a detail row shows a bar,
 // and the last detail row of a run closes the bar with a corner.
 function rowPrefix(row: InsightRow, isLastDetail: boolean): string {
-  if (!isDetailRow(row)) {
-    return row.label;
+  const label = row.label;
+  if (label !== undefined) {
+    return label;
   }
   return isLastDetail ? DETAIL_CORNER : DETAIL_BAR;
 }
 
-// Colour a segment's tone reads in: a count in the theme's yellow, a per-tool
-// count in a dimmer yellow, a duration in its orange, a cost or a failure
-// count in its error red, a subagent name in its blue, a description muted,
-// and anything else in the value colour.
-function segmentColor(context: Context, tone: InsightSegment["tone"]): string {
+// Colour a segment's tone reads in, with `muted` dimming whatever base tone it
+// accompanies: a count in the theme's yellow, a duration in its orange, a cost
+// or a failure count in its error red, a subagent name in its blue, a
+// description muted, and anything else in the value colour.
+function segmentColor(
+  context: Context,
+  tone: InsightSegment["tone"],
+): string {
+  const tones = typeof tone === "string" ? [tone] : tone;
+  const base = tones.find((candidate) => candidate !== "muted") ?? "muted";
+  const color = baseToneColor(context, base);
+  const isMuted = tones.includes("muted");
+  if (base === "muted" || !isMuted) {
+    return color;
+  }
+  return dimColor(color, DETAIL_TOKEN_DIM);
+}
+
+// Colour of a base tone, before any `muted` modifier.
+function baseToneColor(context: Context, tone: InsightToneName): string {
   if (tone === "count") {
     return context.theme.hue.yellow?.[400] ?? COUNT_FALLBACK_COLOR;
   }
-  if (tone === "countDim") {
-    return dimColor(
-      context.theme.hue.yellow?.[400] ?? COUNT_FALLBACK_COLOR,
-      DETAIL_TOKEN_DIM,
-    );
-  }
   if (tone === "cost" || tone === "error") {
     return context.theme.text.feedback.error.base;
-  }
-  if (tone === "costDim") {
-    return dimColor(context.theme.text.feedback.error.base, DETAIL_TOKEN_DIM);
   }
   if (tone === "time") {
     return context.theme.hue.orange?.[400] ?? TIME_FALLBACK_COLOR;
