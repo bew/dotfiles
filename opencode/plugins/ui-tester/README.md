@@ -32,9 +32,9 @@ inert unless the panel is shown (or, for the toggle, armed).
 
 - `alt+f` — show/hide the panel (while armed).
 - `alt+i` — release/re-arm the pushed input mode (see below).
+- `alt+q` — disarm: hide the panel and remove the widgets and indicator.
 - `d` — switch between docked and floating.
 - `p` — cycle the placement mode.
-- `shift+d` — disarm: hide the panel and remove the widgets and indicator.
 - `c` — cycle the background colour.
 - `shift+c` — centre the settings box on its surface.
 - `h`/`j`/`k`/`l` — move the settings box one cell; `shift` moves ten.

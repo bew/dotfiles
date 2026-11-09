@@ -298,7 +298,7 @@ function SettingsPanel(props: SettingsPanelProps) {
           <text fg={context.theme.text.muted}>h/j/k/l move · shift moves 10</text>
           <text fg={context.theme.text.muted}>↑/↓ or alt+j/alt+k cursor · enter/click toggle</text>
           <text fg={context.theme.text.muted}>c colour · shift+c centre · d dock</text>
-          <text fg={context.theme.text.muted}>p placement · shift+d disarm</text>
+          <text fg={context.theme.text.muted}>p placement · alt+q disarm</text>
           <text fg={context.theme.text.muted}>alt+i release · esc hide</text>
           <text>{" "}</text>
           <For each={PANEL_ROWS}>
@@ -422,11 +422,10 @@ export default Plugin.define({
       syncSlots();
     }
 
-    // Detach every widget, clear the enabled set, and report it.
+    // Detach every widget and clear the enabled set.
     function disableAll() {
       setEnabledSlots(new Set());
       syncSlots();
-      context.ui.toast.show({ message: "ui-tester: widgets off" });
     }
 
     // Arm the plugin and show the panel on the requested surface.
@@ -492,10 +491,20 @@ export default Plugin.define({
         case "page":
           context.ui.router.navigate({ type: "plugin", name: PAGE_NAME });
           return;
-        case "disarm":
+        case "disarm": {
+          const hadWidgets = enabledSlots().size > 0;
+          const wasVisible = visible();
           disarm();
           disableAll();
+          const changes = [
+            ...(wasVisible ? ["panel hidden"] : []),
+            ...(hadWidgets ? ["widgets off"] : []),
+          ];
+          context.ui.toast.show({
+            message: changes.length > 0 ? `ui-tester: disarmed — ${changes.join(", ")}` : "ui-tester: disarmed",
+          });
           return;
+        }
       }
     }
 
@@ -605,8 +614,8 @@ export default Plugin.define({
       }
 
       // Panel keys live in two layers.
-      // The toggle, the release, and escape stay `global` so they work in every
-      // mode; everything else is scoped to the pushed `ui-tester` mode, so
+      // The toggle, the release, escape, and disarm stay `global` so they work in
+      // every mode; everything else is scoped to the pushed `ui-tester` mode, so
       // releasing the mode hands the keys back to the prompt.
       // Mode keys only fire while the panel is visible; nothing else competes
       // for them because the pushed mode isolates typing from the prompt.
@@ -635,6 +644,12 @@ export default Plugin.define({
             enabled: () => visible(),
             run: () => toggleVisible(),
           },
+          {
+            id: "ui-tester.disarm",
+            bind: "alt+q",
+            enabled: () => visible(),
+            run: () => activate("disarm"),
+          },
         ],
       }));
 
@@ -653,12 +668,6 @@ export default Plugin.define({
             bind: "p",
             enabled: () => visible(),
             run: () => cyclePlacement(),
-          },
-          {
-            id: "ui-tester.disarm",
-            bind: "shift+d",
-            enabled: () => visible(),
-            run: () => activate("disarm"),
           },
           {
             id: "ui-tester.color",
