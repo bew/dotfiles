@@ -42,6 +42,29 @@ describe("countInsights", () => {
     });
   });
 
+  test("keeps the wait for a question answer out of tool time", () => {
+    const messages: CountableMessage[] = [
+      makeMessage({
+        id: "a1",
+        type: "assistant",
+        time: { created: 1_000, streamed: 2_000, completed: 12_000 },
+        content: [
+          {
+            id: "call_1",
+            type: "tool",
+            name: "question",
+            time: { ran: 2_500, completed: 11_000 },
+          },
+        ],
+      }),
+    ];
+
+    expect(countInsights(messages, NO_DCP_SUMMARY.compressed).timing).toEqual({
+      generatingMs: 1_000,
+      toolsMs: 1_500,
+    });
+  });
+
   test("leaves a step that has not finished out of the working time", () => {
     const messages: CountableMessage[] = [
       makeMessage({ id: "a1", type: "assistant", time: { created: 1_000 } }),

@@ -21,6 +21,7 @@ import { countInsights } from "./counts";
 import type { CountableMessage, StatsGroup } from "./counts";
 import { brightenColor } from "./colors";
 import type {
+  ContextWindowUsage,
   InsightGroup,
   InsightLayout,
   InsightSection,
@@ -51,7 +52,7 @@ const ASSISTANT_GLYPH = "󱜾";
 const TOOL_GLYPH = "󰒔";
 
 // Widest the tooltip may draw, in terminal cells, padding included.
-const TOOLTIP_MAX_WIDTH = 61;
+const TOOLTIP_MAX_WIDTH = 64;
 
 // Narrowest the tooltip may draw, so a short readout still reads as a panel.
 const TOOLTIP_MIN_WIDTH = 30;
@@ -109,6 +110,8 @@ const EMPTY_SESSION_FACTS: SessionFacts = {
   subagents: [],
   inputTokens: 0,
   outputTokens: 0,
+  reasoningTokens: 0,
+  activeReasoningTokens: 0,
   cacheReadTokens: 0,
   cacheWriteTokens: 0,
   createdAt: 0,
@@ -601,6 +604,8 @@ function buildTooltipGroup(
             subagents: collectSubagents(context, sessionID),
             inputTokens: info.tokens.input,
             outputTokens: info.tokens.output,
+            reasoningTokens: info.tokens.reasoning,
+            activeReasoningTokens: activeReasoningTokens(messages, dcp),
             cacheReadTokens: info.tokens.cache.read,
             cacheWriteTokens: info.tokens.cache.write,
             createdAt: info.time.created,
@@ -686,7 +691,7 @@ function collectSubagents(
       agent: session.agent ?? "agent",
       title: session.title ?? "",
       // Prompt, completion, and both cache directions, matching the session's
-      // tokens row; reasoning is a detail of the output, not separate traffic.
+      // token traffic line; reasoning is reported separately as thinking.
       tokenTotal:
         session.tokens.input +
         session.tokens.output +
@@ -715,27 +720,17 @@ function childSessions(
 // Tokens in the model's window, from the newest assistant step still in context,
 // and the window of the model the session runs.
 //
-// Returns undefined when the step or the model's limit is unknown, which is the
-// case before the host has synced the model list.
+// The token split matches the host's own context-usage figure: prompt, completion,
+// reasoning, and both cache directions of that step.
+// The usage is returned without a limit when the model's catalogue entry is
+// unknown, so the window figures still reach the tooltip; it is undefined only
+// when no assistant step carries token data.
 function contextWindowOf(
   messages: readonly WindowMessage[],
   dcp: DcpSummary,
   model: { readonly providerID: string; readonly id: string } | undefined,
   models: readonly ModelInfoShape[] | undefined,
-) {
-  if (model === undefined || models === undefined) {
-    return undefined;
-  }
-
-  const limit = models.find(
-    (candidate) =>
-      candidate.providerID === model.providerID &&
-      (candidate.modelID === model.id || candidate.id === model.id),
-  )?.limit.context;
-  if (limit === undefined) {
-    return undefined;
-  }
-
+): ContextWindowUsage | undefined {
   const lastAssistant = lastAssistantInContext(messages, dcp);
   if (lastAssistant?.tokens === undefined) {
     return undefined;
@@ -743,9 +738,50 @@ function contextWindowOf(
 
   const tokens = lastAssistant.tokens;
   return {
-    used: tokens.input + tokens.cache.read + tokens.cache.write,
-    limit,
+    traffic: {
+      input: tokens.input,
+      output: tokens.output,
+      reasoning: tokens.reasoning,
+      cacheRead: tokens.cache.read,
+      cacheWrite: tokens.cache.write,
+    },
+    limit: modelLimitOf(model, models),
   };
+}
+
+// Reasoning tokens the assistant steps still in context carry.
+//
+// A step DCP compresses leaves the model's context, so its thinking no longer
+// counts as active.
+function activeReasoningTokens(
+  messages: readonly WindowMessage[],
+  dcp: DcpSummary,
+): number {
+  return messages.reduce((total, message) => {
+    if (
+      message.type !== "assistant" ||
+      dcp.compressed.messageIds.has(message.id)
+    ) {
+      return total;
+    }
+    return total + (message.tokens?.reasoning ?? 0);
+  }, 0);
+}
+
+// The model's window size, or undefined until the model list is synced or when
+// it has no entry for the model.
+function modelLimitOf(
+  model: { readonly providerID: string; readonly id: string } | undefined,
+  models: readonly ModelInfoShape[] | undefined,
+): number | undefined {
+  if (model === undefined || models === undefined) {
+    return undefined;
+  }
+  return models.find(
+    (candidate) =>
+      candidate.providerID === model.providerID &&
+      (candidate.modelID === model.id || candidate.id === model.id),
+  )?.limit.context;
 }
 
 // The newest assistant step still in context: its tokens are the ones filling
@@ -773,6 +809,8 @@ function lastAssistantInContext(
 type WindowMessage = CountableMessage & {
   readonly tokens?: {
     readonly input: number;
+    readonly output: number;
+    readonly reasoning: number;
     readonly cache: {
       readonly read: number;
       readonly write: number;

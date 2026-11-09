@@ -6,7 +6,7 @@ import {
   countInsightLines,
   formatCost,
   formatDuration,
-  formatTokens,
+  formatCount,
   measureInsightWidth,
 } from "./insights";
 import type {
@@ -15,6 +15,7 @@ import type {
   InsightLayout,
   InsightRow,
   InsightSection,
+  TokenTraffic,
 } from "./insights";
 import { NO_DCP_SUMMARY } from "./dcp-state";
 import type { StatsGroup } from "./counts";
@@ -35,6 +36,18 @@ function makeGroup(overrides: Partial<StatsGroup> = {}): StatsGroup {
   };
 }
 
+// A token breakdown with everything at zero, overridden per case.
+function makeTraffic(overrides: Partial<TokenTraffic> = {}): TokenTraffic {
+  return {
+    input: 0,
+    output: 0,
+    reasoning: 0,
+    cacheRead: 0,
+    cacheWrite: 0,
+    ...overrides,
+  };
+}
+
 // Tooltip input with neutral defaults, overridden per case.
 function makeInput(overrides: Partial<InsightInput> = {}): InsightInput {
   return {
@@ -45,6 +58,8 @@ function makeInput(overrides: Partial<InsightInput> = {}): InsightInput {
       subagents: [],
       inputTokens: 0,
       outputTokens: 0,
+      reasoningTokens: 0,
+      activeReasoningTokens: 0,
       cacheReadTokens: 0,
       cacheWriteTokens: 0,
       createdAt: 0,
@@ -86,24 +101,24 @@ function labelledRows(rows: readonly InsightRow[]) {
   return rows.map((row) => ({ label: row.label, value: row.value }));
 }
 
-describe("formatTokens", () => {
+describe("formatCount", () => {
   test("keeps counts below a thousand as-is", () => {
-    expect(formatTokens(0)).toBe("0");
-    expect(formatTokens(999)).toBe("999");
+    expect(formatCount(0)).toBe("0");
+    expect(formatCount(999)).toBe("999");
   });
 
   test("shortens thousands to one decimal", () => {
-    expect(formatTokens(1234)).toBe("1.2k");
-    expect(formatTokens(12000)).toBe("12k");
+    expect(formatCount(1234)).toBe("1.2k");
+    expect(formatCount(12000)).toBe("12k");
   });
 
-  test("rounds larger thousands to whole numbers", () => {
-    expect(formatTokens(215784)).toBe("216k");
-    expect(formatTokens(999_999)).toBe("1000k");
+  test("keeps one decimal for larger thousands", () => {
+    expect(formatCount(215784)).toBe("215.8k");
+    expect(formatCount(999_999)).toBe("1000k");
   });
 
   test("shortens millions", () => {
-    expect(formatTokens(1_250_000)).toBe("1.25M");
+    expect(formatCount(1_250_000)).toBe("1.3M");
   });
 });
 
@@ -282,13 +297,13 @@ describe("buildInsights", () => {
     expect(insights.context.title).toBe("active context");
   });
 
-  test("groups the session rows into totals, subagents, and activity", () => {
+  test("groups the session rows into totals, activity, and subagents", () => {
     const insights = buildInsights(makeInput());
 
     expect(insights.session.sections.map((section) => section.heading)).toEqual([
       "totals",
-      "subagents",
       "activity",
+      "subagents",
     ]);
   });
 
@@ -301,15 +316,27 @@ describe("buildInsights", () => {
     ]);
   });
 
-  test("reports session totals and span", () => {
+  test("reports the window size, the token traffic, and the span", () => {
     const insights = buildInsights(
       makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+        },
         session: {
           costUsd: 2.5,
           familyCostUsd: 2.5,
           subagents: [],
           inputTokens: 1_200_000,
           outputTokens: 40_000,
+          reasoningTokens: 0,
+          activeReasoningTokens: 0,
           cacheReadTokens: 500_000,
           cacheWriteTokens: 20_000,
           createdAt: 1_000_000,
@@ -318,11 +345,56 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(valueOf(insights.session.sections, "cost")).toBe("$2.50");
-    expect(valueOf(insights.session.sections, "tokens")).toBe(
-      "in 1.2M · out 40k · cache 520k",
-    );
+    expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 4)).toEqual([
+      { label: "cost", value: "$2.50" },
+      { label: "tokens", value: "62.3k" },
+      { label: "", value: "input 1.2M · output 40k · cache 520k" },
+      { label: "", value: "last cache hit 29% (500k of 1.7M prompt)" },
+    ]);
     expect(valueOf(insights.session.sections, "span")).toBe("2h 15m");
+  });
+
+  test("keeps the token traffic when the window usage is unknown", () => {
+    const insights = buildInsights(makeInput());
+
+    expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 3)).toEqual([
+      { label: "cost", value: "$0.00" },
+      { label: "tokens", value: "" },
+      { label: "", value: "input 0 · output 0 · cache 0" },
+    ]);
+  });
+
+  test("reports thinking and the part still in the active context", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          reasoningTokens: 21_662,
+          activeReasoningTokens: 6_463,
+        },
+      }),
+    );
+
+    const totals = sectionRows(insights.session, "totals");
+
+    expect(labelledRows(totals).slice(2, 4)).toEqual([
+      { label: "", value: "input 0 · output 0 · cache 0" },
+      { label: "", value: "thinking 21.7k (6.5k active)" },
+    ]);
+    expect(totals[3]?.segments).toContainEqual({
+      text: "6.5",
+      tone: "countDim",
+    });
+  });
+
+  test("hides the thinking line while the session reported no reasoning", () => {
+    const insights = buildInsights(makeInput());
+
+    expect(
+      rowsOf(insights.session.sections).some((row) =>
+        row.value.startsWith("thinking "),
+      ),
+    ).toBe(false);
   });
 
   test("lists each subagent with its tokens, purpose, and cost", () => {
@@ -407,6 +479,31 @@ describe("buildInsights", () => {
       `explore 800k ${"two".padEnd(31)}   ~$0`,
     ]);
     expect(rows.map((row) => row.value.length)).toEqual([50, 50]);
+  });
+
+  test("cuts a long agent name to its column", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          subagents: [
+            {
+              agent: "a-very-long-agent-name",
+              title: "work",
+              tokenTotal: 1_000,
+              costUsd: 0,
+            },
+          ],
+        },
+      }),
+    );
+
+    const row = sectionRows(insights.session, "subagents")[1];
+    expect(row?.segments?.[0]).toEqual({
+      text: "a-very-long…",
+      tone: "agent",
+    });
+    expect(row?.value.length).toBe(50);
   });
 
   test("cuts a long purpose to the description column", () => {
@@ -570,9 +667,14 @@ describe("buildInsights", () => {
     ]);
   });
 
-  test("shows the working time under the span", () => {
+  test("shows busy time with its share and the idle part of the span", () => {
     const insights = buildInsights(
       makeInput({
+        session: {
+          ...makeInput().session,
+          createdAt: 1_000,
+          updatedAt: 1_000 + 5_400_000,
+        },
         stats: {
           session: makeGroup(),
           context: makeGroup(),
@@ -581,11 +683,12 @@ describe("buildInsights", () => {
       }),
     );
 
-    const working = rowsOf(insights.session.sections).find((row) =>
-      row.value.includes("generating"),
-    );
-    expect(working?.label).toBe("");
-    expect(working?.value).toBe("1h generating · 15m tools");
+    const totals = sectionRows(insights.session, "totals");
+    expect(valueOf(insights.session.sections, "busy")).toBe("1h 15m (83%)");
+    expect(labelledRows(totals)).toContainEqual({
+      label: "",
+      value: "1h generating · 15m tools · 15m idle",
+    });
   });
 
   test("hides the working time while nothing has run", () => {
@@ -626,7 +729,7 @@ describe("buildInsights", () => {
     ]);
   });
 
-  test("draws a shortened token count as a count with a bold unit", () => {
+  test("draws shortened token traffic as counts with bold units", () => {
     const insights = buildInsights(
       makeInput({
         session: {
@@ -637,15 +740,15 @@ describe("buildInsights", () => {
       }),
     );
 
-    const tokens = sectionRows(insights.session, "totals").find(
-      (row) => row.label === "tokens",
+    const traffic = rowsOf(insights.session.sections).find((row) =>
+      row.value.startsWith("input "),
     );
-    expect(tokens?.segments).toEqual([
-      { text: "in ", tone: "value" },
-      { text: "123", tone: "count" },
+    expect(traffic?.segments).toEqual([
+      { text: "input ", tone: "value" },
+      { text: "123.5", tone: "count" },
       { text: "k", tone: "count", bold: true },
       { text: " · ", tone: "muted" },
-      { text: "out ", tone: "value" },
+      { text: "output ", tone: "value" },
       { text: "4", tone: "count" },
       { text: "M", tone: "count", bold: true },
       { text: " · ", tone: "muted" },
@@ -675,18 +778,67 @@ describe("buildInsights", () => {
     expect(valueOf(insights.session.sections, "reads")).toBe("41 (23 unique)");
   });
 
+  test("reports the failure count in the error tone", () => {
+    const insights = buildInsights(
+      makeInput({
+        stats: {
+          session: makeGroup({ failures: 2 }),
+          context: makeGroup(),
+          timing: { generatingMs: 0, toolsMs: 0 },
+        },
+      }),
+    );
+
+    const failures = rowsOf(insights.session.sections).find(
+      (row) => row.label === "failures",
+    );
+
+    expect(failures?.segments).toEqual([{ text: "2", tone: "error" }]);
+  });
+
   test("reports the window only when the model limit is known", () => {
     const without = buildInsights(makeInput());
+    const withoutLimit = buildInsights(
+      makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+        },
+      }),
+    );
     const withUsage = buildInsights(
-      makeInput({ contextWindow: { used: 62_300, limit: 200_000 } }),
+      makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+        },
+      }),
     );
 
     expect(valueOf(without.context.sections, "window")).toBeUndefined();
+    expect(valueOf(withoutLimit.context.sections, "window")).toBeUndefined();
+    expect(valueOf(withoutLimit.session.sections, "tokens")).toBe("62.3k");
     expect(valueOf(withUsage.context.sections, "window")).toBe(
       "62.3k (model limit: 200k)",
     );
+    expect(labelledRows(sectionRows(withUsage.context, "window"))).toEqual([
+      { label: "window", value: "62.3k (model limit: 200k)" },
+      { label: "", value: "input 30k · output 1k · cache 31k · thinking 300" },
+      { label: "", value: "last cache hit 49% (30k of 61k prompt)" },
+    ]);
     expect(
-      rowsOf(withUsage.context.sections, "window")[0]?.segments,
+      sectionRows(withUsage.context, "window")[0]?.segments,
     ).toContainEqual({ text: "k", tone: "countDim", bold: true });
     expect(
       withUsage.context.sections.map((section) => section.heading),
@@ -713,13 +865,14 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(valueOf(insights.context.sections, "pruned")).toBe("1 blocks · 216k");
+    expect(valueOf(insights.context.sections, "pruned")).toBe("215.8k");
     const compression = sectionRows(insights.context, "compression");
     expect(compression.map((row) => row.label)).toEqual([
       "pruned",
       "blocks",
       "",
     ]);
+    expect(compression[1]?.value).toBe("1 block");
     expect(compression.at(-1)?.value).toBe(
       "#1 session stats · 12k → 1.5k (−11k)",
     );
@@ -754,7 +907,16 @@ describe("buildInsights", () => {
   test("puts the context size before and after the pruning beside the total", () => {
     const insights = buildInsights(
       makeInput({
-        contextWindow: { used: 62_300, limit: 200_000 },
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+        },
         dcp: {
           compressed: NO_DCP_SUMMARY.compressed,
           totalPruneTokens: 215_784,
@@ -773,7 +935,7 @@ describe("buildInsights", () => {
     );
 
     expect(valueOf(insights.context.sections, "pruned")).toBe(
-      "1 blocks · 216k (278k → 62.3k)",
+      "215.8k (278.1k → 62.3k)",
     );
     expect(
       sectionRows(insights.context, "compression")[0]?.segments,

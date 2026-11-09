@@ -34,6 +34,12 @@ export type CountablePart = {
     readonly status?: string;
     readonly input?: unknown;
   };
+  // Wall-clock marks of a tool call, used to keep a user wait out of tool time.
+  readonly time?: {
+    readonly created?: number;
+    readonly ran?: number;
+    readonly completed?: number;
+  };
 };
 
 // Counts for one scope: the whole session, or the part still in model context.
@@ -88,6 +94,9 @@ const SHELL_TOOL_NAME = "shell";
 // The tool name whose input paths are counted as unique reads.
 const READ_TOOL_NAME = "read";
 
+// Tool whose running time is the user's answer wait, not tool work.
+const QUESTION_TOOL_NAME = "question";
+
 // Count conversation turns and tool usage for a session and for its active
 // context.
 //
@@ -127,9 +136,29 @@ function countTiming(messages: readonly CountableMessage[]): SessionTiming {
     }
     const streamed = time.streamed ?? time.completed;
     generatingMs += Math.max(0, streamed - time.created);
-    toolsMs += Math.max(0, time.completed - streamed);
+    const toolMs = Math.max(0, time.completed - streamed);
+    toolsMs += Math.max(0, toolMs - questionWaitMs(message));
   }
   return { generatingMs, toolsMs };
+}
+
+// Time a step spent waiting for the user's answer to a question tool.
+//
+// The question tool runs from its `ran` mark until the answer arrives, which is
+// user time rather than tool time. A call without a `ran` mark contributes
+// nothing, so its time stays in the tool phase.
+function questionWaitMs(message: CountableMessage): number {
+  return (message.content ?? []).reduce((total, part) => {
+    if (part.type !== "tool" || part.name !== QUESTION_TOOL_NAME) {
+      return total;
+    }
+    const started = part.time?.ran;
+    const completed = part.time?.completed;
+    if (started === undefined || completed === undefined) {
+      return total;
+    }
+    return total + Math.max(0, completed - started);
+  }, 0);
 }
 
 // Count turns and tool usage in one set of messages.

@@ -141,9 +141,9 @@ function rowPrefix(row: InsightRow, isLastDetail: boolean): string {
 }
 
 // Colour a segment's tone reads in: a count in the theme's yellow, a per-tool
-// count in a dimmer yellow, a duration in its orange, a cost in its error red,
-// a subagent name in its blue, a description muted, and anything else in the
-// value colour.
+// count in a dimmer yellow, a duration in its orange, a cost or a failure
+// count in its error red, a subagent name in its blue, a description muted,
+// and anything else in the value colour.
 function segmentColor(context: Context, tone: InsightSegment["tone"]): string {
   if (tone === "count") {
     return context.theme.hue.yellow?.[400] ?? COUNT_FALLBACK_COLOR;
@@ -154,7 +154,7 @@ function segmentColor(context: Context, tone: InsightSegment["tone"]): string {
       DETAIL_TOKEN_DIM,
     );
   }
-  if (tone === "cost") {
+  if (tone === "cost" || tone === "error") {
     return context.theme.text.feedback.error.base;
   }
   if (tone === "costDim") {
