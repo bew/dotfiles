@@ -360,6 +360,8 @@ flowchart LR
 
   Reads `prompt-stash.jsonl` from the OpenCode state directory and watches its parent directory; no stash API exists in the TUI plugin context, so visibility comes from the host's `prompt.stash.list` command instead of the shared file.
 
+- Tool [`bew-tui`](./plugins/bew-tui/) — My TUI setup for OpenCode: a bundle of self-contained widgets, plus a toolkit for building custom UI elements and interaction models (overlay tooltips, spinners, layout helpers).
+
 ### Important third-party plugins
 
 - `@tarquinen/opencode-dcp` — Dynamic Context Pruning: manages context dynamically to optimize tokens for long sessions (smarter than simple summarization).

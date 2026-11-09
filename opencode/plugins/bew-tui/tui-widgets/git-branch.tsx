@@ -18,7 +18,7 @@ import type { JSX } from "solid-js";
 import { createGitWatcher } from "../lib/git-watcher";
 import { formatBranchParts, parseGitStatus } from "../lib/git-status";
 import type { GitStatus } from "../lib/git-status";
-import { BrailleSpinner } from "./spinner/running-spinner";
+import { BrailleSpinner } from "../tui-toolkit/spinners/components";
 
 // `execFile` bound to a promise for the one-off `git status` calls.
 const execFileAsync = promisify(execFile);

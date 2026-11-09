@@ -31,6 +31,10 @@ Traps hit while building the local plugins, kept so they are not hit again.
   Use that path to identify which surface broke.
 - Theme failures can appear only on an interactive state.
   A token first read on hover is not exercised by loading the plugin, so smoke-test hover and click.
+- `backgroundColor` is a `box` option only: a `text` renderable takes `bg` (`TextBufferRenderable`'s
+  `set bg`), so `backgroundColor` on `<text>` is silently ignored and the row draws on whatever is
+  behind it. On a panel that matches the text colour, the row looks blank rather than wrong.
+  Check `node_modules/@opentui/core/renderables/*.d.ts` for which renderable owns a prop.
 - A host state file can be shared across clients while the host keeps a per-client in-memory view.
   Reading it then reports other clients' changes, and a click that dispatches the host command does
   nothing because that client's list is empty.

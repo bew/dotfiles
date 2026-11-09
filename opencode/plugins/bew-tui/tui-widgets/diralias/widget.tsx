@@ -1,14 +1,14 @@
 /** @jsxImportSource @opentui/solid */
-// Diralias footer component: the running spinner and the directory path.
+// Diralias footer widget: the current directory's label.
 //
-// Draws the running spinner followed by the current directory's label.
 // Outside a repository the label is the directory's diralias alias, so a deep
 // directory reads as `~alias`; inside a repository the repository glyph replaces
 // the folder glyph, the repository root is shown in the accent colour, and the
 // path within the repository follows in the base colour.
 // The shared prompt composer renders the replaced `prompt.footer.status` region
 // both in a session and on the home screen, so one claim covers both footers;
-// the TUI entry composes this component with the branch label in that region.
+// the TUI entry composes this widget with the running indicator and the branch
+// label in that region.
 // Aliases come from `diralias get`, re-run whenever the directory or diralias's
 // alias set changes; the repository root comes from `git rev-parse`.
 
@@ -21,7 +21,6 @@ import { Show, createEffect, createSignal, on, onCleanup } from "solid-js";
 import type { JSX } from "solid-js";
 import { parseRepoLocation } from "../../lib/git-repo";
 import type { RepoLocation } from "../../lib/git-repo";
-import { RunningSpinner } from "../spinner/running-spinner";
 import {
   FOLDER_GLYPH,
   REPO_GLYPH,
@@ -57,10 +56,10 @@ type PathDisplay = {
   readonly suffix: string;
 };
 
-// The diralias component, ready to plug into the footer row.
+// The diralias widget, ready to plug into the footer row.
 export type DiraliasFooter = {
-  // Render the spinner and directory label; `sessionID` is absent on the home
-  // composer, whose own slot carries no session.
+  // Render the directory label; `sessionID` is absent on the home composer,
+  // whose own slot carries no session.
   readonly render: (sessionID: string | undefined) => JSX.Element;
   // Stop watching diralias for alias changes.
   readonly dispose: () => void;
@@ -186,7 +185,7 @@ async function resolvePathDisplay(
   };
 }
 
-// The diralias component: the running spinner, then the directory label.
+// The diralias widget: the directory label.
 function DiraliasFooterStatus(props: {
   readonly sessionID?: string;
   readonly aliasTick: number;
@@ -202,12 +201,6 @@ function DiraliasFooterStatus(props: {
       : context.data.session.get(props.sessionID)?.location;
 
   const directory = () => location()?.directory;
-
-  // The host shows the running spinner only for an active session; the home
-  // composer is always idle.
-  const isRunning = () =>
-    props.sessionID !== undefined &&
-    context.data.session.status(props.sessionID) === "running";
 
   // A repository directory takes the repository glyph in the theme's orange and
   // shows its root in the default foreground with the in-repo path in the muted
@@ -247,46 +240,41 @@ function DiraliasFooterStatus(props: {
   );
 
   return (
-    <box flexDirection="row" gap={1} flexShrink={1} minWidth={0}>
-      <Show when={isRunning()}>
-        <RunningSpinner color={context.theme.hue.accent[400]} />
-      </Show>
-      <Show when={display()}>
-        {(current) => (
-          <box flexDirection="row" flexShrink={1} minWidth={0}>
+    <Show when={display()}>
+      {(current) => (
+        <box flexDirection="row" flexShrink={1} minWidth={0}>
+          <text
+            fg={glyphColor(current())}
+            selectable={false}
+            wrapMode="none"
+            truncate
+            flexShrink={1}
+            minWidth={0}
+          >
+            {`${glyph(current())} `}
+          </text>
+          <text
+            fg={nameColor(current())}
+            wrapMode="none"
+            truncate
+            flexShrink={1}
+            minWidth={0}
+          >
+            {current().baseLabel}
+          </text>
+          <Show when={suffix(current()) !== ""}>
             <text
-              fg={glyphColor(current())}
-              selectable={false}
+              fg={context.theme.text.muted}
               wrapMode="none"
               truncate
               flexShrink={1}
               minWidth={0}
             >
-              {`${glyph(current())} `}
+              {suffix(current())}
             </text>
-            <text
-              fg={nameColor(current())}
-              wrapMode="none"
-              truncate
-              flexShrink={1}
-              minWidth={0}
-            >
-              {current().baseLabel}
-            </text>
-            <Show when={suffix(current()) !== ""}>
-              <text
-                fg={context.theme.text.muted}
-                wrapMode="none"
-                truncate
-                flexShrink={1}
-                minWidth={0}
-              >
-                {suffix(current())}
-              </text>
-            </Show>
-          </box>
-        )}
-      </Show>
-    </box>
+          </Show>
+        </box>
+      )}
+    </Show>
   );
 }
