@@ -24,7 +24,8 @@
     "scrollbar": true, // it's actually nice!
     "thinking": "hide",
     "grouping": "none",
-    "markdown": "rendered"
+    "markdown": "rendered",
+    "image_preview": false // FIXME: need Kitty Unicode support in Wezterm!
   },
   "animations": true,
   "debug": {
@@ -43,7 +44,9 @@
   },
   "mouse": true,
   "prompt": {
-    "editor": true
+    "editor": true,
+    "paste": "full", // no [Pasted ~N lines]
+    "image_preview": false // FIXME: need Kitty Unicode support in Wezterm!
   },
   "leader": {
     "timeout": 3000
@@ -216,5 +219,15 @@
     // Prompt (FIXME: what is this?)
     "prompt.submit": "none", // Submit prompt
     "prompt.editor_context.clear": "none", // Clear editor context
-  }
+  },
+  "experimental": {
+    "client-mcp": false,
+    "new-designs": false
+  },
+
+  "plugins": [
+    // Plugin for #foo snippet expansion in prompt, very flexible!
+    // see: https://github.com/JosXa/opencode-snippets
+    "opencode-snippets@latest"
+  ]
 }
