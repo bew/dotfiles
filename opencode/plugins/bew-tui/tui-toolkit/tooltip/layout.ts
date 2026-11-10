@@ -23,20 +23,20 @@ export type Size = {
   readonly height: number;
 };
 
-// Where the tooltip lands, and which side of its anchor it ended up on.
+// Where the tooltip lands.
 export type TooltipPosition = {
   readonly top: number;
   readonly left: number;
-  readonly placement: "above" | "below";
 };
 
 // Places a tooltip next to `anchor`.
 //
 // The tooltip goes above the anchor when it fits there, otherwise below it.
-// Horizontally it is centred on the anchor, then nudged back inside the terminal
-// so its left edge keeps `TOOLTIP_LEFT_MARGIN` and its right edge keeps
-// `TOOLTIP_RIGHT_MARGIN`. A terminal narrower than the right margin plus the
-// tooltip leaves the tooltip at the left margin.
+// Horizontally it is centred on the anchor, then nudged
+// back inside the terminal so its left edge keeps
+// `TOOLTIP_LEFT_MARGIN` and its right edge keeps `TOOLTIP_RIGHT_MARGIN`.
+// A terminal narrower than the right
+// margin plus the tooltip leaves the tooltip at the left margin.
 //
 // Vertically the panel is kept inside the terminal too: a spot that would push
 // its last row past the bottom edge is lifted until it fits, and one that would
@@ -57,6 +57,5 @@ export function resolveTooltipPosition(
   return {
     top,
     left: Math.max(0, left),
-    placement: fitsAbove ? "above" : "below",
   };
 }

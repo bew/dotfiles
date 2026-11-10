@@ -23,7 +23,6 @@ describe("resolveTooltipPosition", () => {
   test("sits above the anchor when there is room", () => {
     const position = resolveTooltipPosition(makeAnchor(), SIZE, VIEWPORT);
 
-    expect(position.placement).toBe("above");
     expect(position.top).toBe(16);
   });
 
@@ -32,7 +31,6 @@ describe("resolveTooltipPosition", () => {
 
     const position = resolveTooltipPosition(anchor, SIZE, VIEWPORT);
 
-    expect(position.placement).toBe("below");
     expect(position.top).toBe(3);
   });
 
@@ -77,7 +75,6 @@ describe("resolveTooltipPosition", () => {
 
     const position = resolveTooltipPosition(anchor, tallSize, shortViewport);
 
-    expect(position.placement).toBe("below");
     expect(position.top).toBe(shortViewport.height - tallSize.height);
   });
 
