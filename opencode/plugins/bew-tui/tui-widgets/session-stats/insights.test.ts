@@ -18,6 +18,7 @@ import type {
   TokenTraffic,
 } from "./insights";
 import { NO_DCP_SUMMARY } from "./dcp-state";
+import { DETAIL_INDENT, LABEL_GAP, LABEL_WIDTH } from "./tooltip-width";
 import type { StatsGroup } from "./counts";
 
 // Sentinel for a detail row, which carries no label.
@@ -54,7 +55,14 @@ function makeTraffic(overrides: Partial<TokenTraffic> = {}): TokenTraffic {
 // Tooltip input with neutral defaults, overridden per case.
 function makeInput(overrides: Partial<InsightInput> = {}): InsightInput {
   return {
-    stats: { session: makeGroup(), context: makeGroup(), timing: { generatingMs: 0, toolsMs: 0 } },
+    stats: {
+      session: makeGroup(),
+      context: makeGroup(),
+      timing: { generatingMs: 0, toolsMs: 0 },
+      content: [],
+      systemPrompt: undefined,
+      lastTurn: undefined,
+    },
     session: {
       costUsd: 0,
       familyCostUsd: 0,
@@ -194,6 +202,8 @@ describe("tool rows", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -220,6 +230,8 @@ describe("tool rows", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -247,6 +259,8 @@ describe("skill rows", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -273,6 +287,8 @@ describe("skill rows", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -292,6 +308,8 @@ describe("skill rows", () => {
           session: makeGroup({ skills: 5 }),
           context: makeGroup({ skills: 0 }),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -311,17 +329,17 @@ describe("buildInsights", () => {
     expect(insights.context.title).toBe("active context");
   });
 
-  test("groups the session rows into totals, activity, and subagents", () => {
+  test("groups the session rows into general, activity, and subagents", () => {
     const insights = buildInsights(makeInput());
 
     expect(insights.session.sections.map((section) => section.heading)).toEqual([
-      "totals",
+      "general",
       "activity",
       "subagents",
     ]);
   });
 
-  test("groups the context rows into activity and compression", () => {
+  test("keeps the context activity and compression when no content is known", () => {
     const insights = buildInsights(makeInput());
 
     expect(insights.context.sections.map((section) => section.heading)).toEqual([
@@ -330,7 +348,7 @@ describe("buildInsights", () => {
     ]);
   });
 
-  test("reports the window size, the token traffic, and the span", () => {
+  test("reports the window size, the token traffic, and the wall time", () => {
     const insights = buildInsights(
       makeInput({
         contextWindow: {
@@ -359,19 +377,19 @@ describe("buildInsights", () => {
       }),
     );
 
-    expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 4)).toEqual([
+    expect(labelledRows(sectionRows(insights.session, "general")).slice(0, 4)).toEqual([
       { label: "cost", value: "$2.50" },
       { label: "tokens", value: "62.3k" },
       { label: NO_LABEL, value: "input 1.2M · output 40k · cache 520k" },
-      { label: NO_LABEL, value: "last cache hit 29% (500k of 1.7M prompt)" },
+      { label: NO_LABEL, value: "avg cache hit 29% (500k of 1.7M tokens)" },
     ]);
-    expect(valueOf(insights.session.sections, "span")).toBe("2h 15m");
+    expect(valueOf(insights.session.sections, "wall time")).toBe("2h 15m");
   });
 
   test("keeps the token traffic when the window usage is unknown", () => {
     const insights = buildInsights(makeInput());
 
-    expect(labelledRows(sectionRows(insights.session, "totals")).slice(0, 3)).toEqual([
+    expect(labelledRows(sectionRows(insights.session, "general")).slice(0, 3)).toEqual([
       { label: "cost", value: "$0.00" },
       { label: "tokens", value: "" },
       { label: NO_LABEL, value: "input 0 · output 0 · cache 0" },
@@ -389,7 +407,7 @@ describe("buildInsights", () => {
       }),
     );
 
-    const totals = sectionRows(insights.session, "totals");
+    const totals = sectionRows(insights.session, "general");
 
     expect(labelledRows(totals).slice(2, 4)).toEqual([
       { label: NO_LABEL, value: "input 0 · output 0 · cache 0" },
@@ -457,13 +475,13 @@ describe("buildInsights", () => {
 
     expect(sectionRows(insights.session, "subagents")[1]?.segments).toEqual([
       { text: "explore", tone: "agent" },
-      { text: " ", tone: "value" },
+      { text: " " },
       { text: "12.4", tone: "count" },
       { text: "k", tone: "count", bold: true },
-      { text: " ", tone: "value" },
+      { text: " " },
       { text: "Verify examples", tone: "muted" },
-      { text: " ".repeat(15), tone: "value" },
-      { text: " ", tone: "value" },
+      { text: " ".repeat(15) },
+      { text: " " },
       { text: "$0.01", tone: "cost" },
     ]);
   });
@@ -684,7 +702,7 @@ describe("buildInsights", () => {
       "$1.21 ($1.41 incl. subagents)",
     );
     expect(
-      sectionRows(family.session, "totals").find((row) => row.label === "cost")
+      sectionRows(family.session, "general").find((row) => row.label === "cost")
         ?.segments,
     ).toEqual([
       { text: "$1.21", tone: "cost" },
@@ -695,7 +713,7 @@ describe("buildInsights", () => {
     ]);
   });
 
-  test("shows busy time with its share and the idle part of the span", () => {
+  test("shows busy time with its share and the idle part of the wall time", () => {
     const insights = buildInsights(
       makeInput({
         session: {
@@ -707,15 +725,19 @@ describe("buildInsights", () => {
           session: makeGroup(),
           context: makeGroup(),
           timing: { generatingMs: 3_600_000, toolsMs: 900_000 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
 
-    const totals = sectionRows(insights.session, "totals");
-    expect(valueOf(insights.session.sections, "busy")).toBe("1h 15m (83%)");
+    const totals = sectionRows(insights.session, "general");
+    expect(valueOf(insights.session.sections, "timings")).toBe(
+      "1h 15m busy (83%) · 15m idle",
+    );
     expect(labelledRows(totals)).toContainEqual({
       label: NO_LABEL,
-      value: "1h generating · 15m tools · 15m idle",
+      value: "1h generating · 15m tools",
     });
   });
 
@@ -742,6 +764,8 @@ describe("buildInsights", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -749,10 +773,10 @@ describe("buildInsights", () => {
     const rows = sectionRows(insights.session, "activity");
     expect(rows[0]?.segments).toEqual([{ text: "6", tone: "count" }]);
     expect(rows[1]?.segments).toEqual([
-      { text: "read", tone: "value" },
+      { text: "read" },
       { text: " 3", tone: ["count", "muted"] },
       { text: " · ", tone: "muted" },
-      { text: "edit", tone: "value" },
+      { text: "edit" },
       { text: " 2", tone: ["count", "muted"] },
     ]);
   });
@@ -772,15 +796,15 @@ describe("buildInsights", () => {
       textOf(row).startsWith("input "),
     );
     expect(traffic?.segments).toEqual([
-      { text: "input ", tone: "value" },
+      { text: "input " },
       { text: "123.5", tone: "count" },
       { text: "k", tone: "count", bold: true },
       { text: " · ", tone: "muted" },
-      { text: "output ", tone: "value" },
+      { text: "output " },
       { text: "4", tone: "count" },
       { text: "M", tone: "count", bold: true },
       { text: " · ", tone: "muted" },
-      { text: "cache ", tone: "value" },
+      { text: "cache " },
       { text: "0", tone: "count" },
     ]);
   });
@@ -799,6 +823,8 @@ describe("buildInsights", () => {
           session: makeGroup({ reads: 41, uniqueReads: 23 }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -813,6 +839,8 @@ describe("buildInsights", () => {
           session: makeGroup({ failures: 2 }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -855,28 +883,226 @@ describe("buildInsights", () => {
             cacheWrite: 1_000,
           }),
           limit: 200_000,
+          streamingMs: 26_000,
         },
       }),
     );
 
     expect(valueOf(without.context.sections, "tokens")).toBeUndefined();
     expect(valueOf(withoutLimit.context.sections, "tokens")).toBeUndefined();
+    expect(valueOf(withoutLimit.context.sections, "last step")).toBeUndefined();
     expect(valueOf(withoutLimit.session.sections, "tokens")).toBe("62.3k");
     expect(valueOf(withUsage.context.sections, "tokens")).toBe(
       "62.3k (model limit: 200k)",
     );
-    expect(labelledRows(sectionRows(withUsage.context, "window"))).toEqual([
+    expect(labelledRows(sectionRows(withUsage.context, "general"))).toEqual([
       { label: "tokens", value: "62.3k (model limit: 200k)" },
-      { label: NO_LABEL, value: "input 30k · output 1k · cache 31k" },
-      { label: NO_LABEL, value: "last cache hit 49% (30k of 61k prompt)" },
       { label: NO_LABEL, value: "thinking 2.5k (1k active)" },
+      { label: "last step", value: "26s · ~50 tok/s" },
+      { label: NO_LABEL, value: "input 30k · output 1k · cache 31k" },
+      { label: NO_LABEL, value: "cache hit 49% (30k of 61k tokens)" },
     ]);
     expect(
-      sectionRows(withUsage.context, "window")[0]?.segments,
+      sectionRows(withUsage.context, "general")[0]?.segments,
     ).toContainEqual({ text: "k", tone: ["count", "muted"], bold: true });
     expect(
       withUsage.context.sections.map((section) => section.heading),
-    ).toEqual(["window", "activity", "compression"]);
+    ).toEqual(["general", "activity", "compression"]);
+  });
+
+  test("apportions the context across content kinds and reports words", () => {
+    const insights = buildInsights(
+      makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+        },
+        stats: {
+          ...makeInput().stats,
+          content: [
+            { kind: "user", entries: 2, words: 10, characters: 100 },
+            { kind: "assistant", entries: 3, words: 20, characters: 200 },
+            { kind: "tools", entries: 4, words: 5, characters: 100 },
+          ],
+        },
+      }),
+    );
+
+    expect(labelledRows(sectionRows(insights.context, "content"))).toEqual([
+      { label: "user", value: "2 msg · ~15.6k (25% ctx) (10 words)" },
+      { label: "assistant", value: "3 msg · ~31.1k (50% ctx) (20 words)" },
+      { label: "tools", value: "4 calls · ~15.6k (25% ctx) (5 words)" },
+    ]);
+  });
+
+  test("folds bookkeeping and prompt overhead under the system row", () => {
+    const insights = buildInsights(
+      makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+        },
+        session: {
+          ...makeInput().session,
+          systemPrompt: { words: 10, characters: 100 },
+          availableSkills: 12,
+          availableAgents: 5,
+          mcpServers: 2,
+        },
+        stats: {
+          ...makeInput().stats,
+          content: [
+            { kind: "user", entries: 2, words: 10, characters: 100 },
+            { kind: "assistant", entries: 3, words: 20, characters: 200 },
+            { kind: "tools", entries: 4, words: 5, characters: 100 },
+            { kind: "system", entries: 4, words: 6, characters: 100 },
+            { kind: "switches", entries: 3, words: 0, characters: 0 },
+            { kind: "idle", entries: 20, words: 0, characters: 0 },
+          ],
+        },
+      }),
+    );
+
+    expect(labelledRows(sectionRows(insights.context, "content"))).toEqual([
+      { label: "system", value: "~10.4k (17% ctx) (10 words)" },
+      {
+        label: NO_LABEL,
+        value: "available: 12 skills · 5 agents · 2 mcp servers",
+      },
+      { label: "user", value: "2 msg · ~10.4k (17% ctx) (10 words)" },
+      { label: "assistant", value: "3 msg · ~20.8k (33% ctx) (20 words)" },
+      { label: "tools", value: "4 calls · ~10.4k (17% ctx) (5 words)" },
+      { label: "other", value: "27 msg · ~10.4k (17% ctx) (6 words)" },
+      { label: NO_LABEL, value: "4 system · 3 switches · 20 idle" },
+    ]);
+  });
+
+  test("reports the last turn's steps, cost, output, and the last step's pace and cache hit", () => {
+    const insights = buildInsights(
+      makeInput({
+        contextWindow: {
+          traffic: makeTraffic({
+            input: 30_000,
+            output: 1_000,
+            reasoning: 300,
+            cacheRead: 30_000,
+            cacheWrite: 1_000,
+          }),
+          limit: 200_000,
+          streamingMs: 26_000,
+        },
+        session: {
+          ...makeInput().session,
+          subagents: [
+            {
+              agent: "explore",
+              title: "Check the turn",
+              tokenTotal: 2_000,
+              costUsd: 0.08,
+              createdAt: 2_000,
+            },
+          ],
+        },
+        stats: {
+          ...makeInput().stats,
+          lastTurn: {
+            durationMs: 80_000,
+            startedAt: 1_000,
+            steps: 4,
+            costUsd: 0.12,
+            outputTokens: 1_200,
+            reasoningTokens: 300,
+            generatingMs: 30_000,
+          },
+        },
+      }),
+    );
+
+    const rows = labelledRows(sectionRows(insights.context, "general"));
+    expect(rows).toContainEqual({
+      label: "last turn",
+      value: "4 steps (1m)",
+    });
+    expect(rows).toContainEqual({
+      label: NO_LABEL,
+      value: "cost $0.12 ($0.20 incl. subagents)",
+    });
+    expect(rows).toContainEqual({
+      label: NO_LABEL,
+      value: "output 1.2k · thinking 300",
+    });
+    expect(rows).toContainEqual({
+      label: "last step",
+      value: "26s · ~50 tok/s",
+    });
+    expect(rows).toContainEqual({
+      label: NO_LABEL,
+      value: "input 30k · output 1k · cache 31k",
+    });
+    expect(rows).toContainEqual({
+      label: NO_LABEL,
+      value: "cache hit 49% (30k of 61k tokens)",
+    });
+    expect(
+      insights.context.sections.map((section) => section.heading),
+    ).toEqual(["general", "activity", "compression"]);
+  });
+
+  test("keeps the last turn visible before the provider reports tokens", () => {
+    const insights = buildInsights(
+      makeInput({
+        stats: {
+          ...makeInput().stats,
+          lastTurn: {
+            steps: 1,
+            costUsd: 0,
+            outputTokens: 0,
+            reasoningTokens: 0,
+            generatingMs: 0,
+          },
+        },
+      }),
+    );
+
+    expect(labelledRows(sectionRows(insights.context, "general"))).toEqual([
+      { label: "last turn", value: "1 steps" },
+      { label: NO_LABEL, value: "cost $0.00" },
+      { label: NO_LABEL, value: "output 0 · thinking 0" },
+    ]);
+  });
+
+  test("reports a system row when the prompt text is unavailable", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          systemPromptExposed: true,
+        },
+        stats: {
+          ...makeInput().stats,
+          content: [
+            { kind: "user", entries: 2, words: 10, characters: 100 },
+          ],
+        },
+      }),
+    );
+
+    expect(labelledRows(sectionRows(insights.context, "content"))).toEqual([
+      { label: "system", value: "prompt not exposed" },
+      { label: "user", value: "2 msg (10 words)" },
+    ]);
   });
 
   test("lists each compression block with its size in the context group", () => {
@@ -1027,6 +1253,8 @@ describe("countInsightLines", () => {
           }),
           context: makeGroup(),
           timing: { generatingMs: 0, toolsMs: 0 },
+          content: [],
+          lastTurn: undefined,
         },
       }),
     );
@@ -1051,7 +1279,11 @@ describe("countInsightLines", () => {
 describe("measureInsightWidth", () => {
   // Layout the widget renders with: a label column, a detail indent, and the gap
   // between a label cell and its value.
-  const layout: InsightLayout = { labelWidth: 9, detailIndent: 1, labelGap: 1 };
+  const layout: InsightLayout = {
+    labelWidth: LABEL_WIDTH,
+    detailIndent: DETAIL_INDENT,
+    labelGap: LABEL_GAP,
+  };
 
   test("measures a labelled row by its label column, gap, and value", () => {
     const sections: readonly InsightSection[] = [
@@ -1061,7 +1293,9 @@ describe("measureInsightWidth", () => {
       },
     ];
 
-    expect(measureInsightWidth(sections, layout)).toBe(9 + 1 + 5);
+    expect(measureInsightWidth(sections, layout)).toBe(
+      layout.labelWidth + layout.labelGap + 5,
+    );
   });
 
   test("measures a detail row by the indent instead of the label column", () => {
@@ -1070,13 +1304,15 @@ describe("measureInsightWidth", () => {
         heading: "ab",
         rows: [
           {
-            segments: [{ text: "read 3 · edit 2", tone: "value" }],
+            segments: [{ text: "read 3 · edit 2" }],
           },
         ],
       },
     ];
 
-    expect(measureInsightWidth(sections, layout)).toBe(1 + 1 + "read 3 · edit 2".length);
+    expect(measureInsightWidth(sections, layout)).toBe(
+      layout.detailIndent + layout.labelGap + "read 3 · edit 2".length,
+    );
   });
 
   test("takes the widest row across every section", () => {
@@ -1089,13 +1325,15 @@ describe("measureInsightWidth", () => {
         heading: "two",
         rows: [
           {
-            segments: [{ text: "read 3 · edit 2", tone: "value" }],
+            segments: [{ text: "read 3 · edit 2" }],
           },
         ],
       },
     ];
 
-    expect(measureInsightWidth(sections, layout)).toBe(1 + 1 + "read 3 · edit 2".length);
+    expect(measureInsightWidth(sections, layout)).toBe(
+      layout.detailIndent + layout.labelGap + "read 3 · edit 2".length,
+    );
   });
 
   test("measures a heading that outruns its rows", () => {

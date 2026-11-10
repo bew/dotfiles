@@ -5,36 +5,31 @@
 // tool calls the session holds, and how many of them remain in the model's
 // active context after DCP compression.
 // Session counts come from the host's reactive message store; the compressed
-// ids come from DCP's per-session state file, watched so the line follows a
-// compression.
+// ids come from DCP's per-session state file, watched so the line
+// follows a compression.
 
 import { usePlugin } from "@opencode/plugin/tui";
 import type { Context } from "@opencode/plugin/tui/context";
+import type { TextRenderable } from "@opentui/core";
 import { watch } from "node:fs";
 import { For, Show, createEffect, createMemo, createSignal, on } from "solid-js";
 import type { Accessor, JSX } from "solid-js";
-import { BODY_PADDING_X, Tooltip } from "../../tui-toolkit/tooltip/component";
-import { anchorBoxFromEvent, anchorFromEvent } from "../../tui-toolkit/tooltip/anchor";
+import { Tooltip } from "../../tui-toolkit/tooltip/component";
+import type { TooltipBody } from "../../tui-toolkit/tooltip/component";
 import type { AnchorBox } from "../../tui-toolkit/tooltip/anchor";
-import type { Rect } from "../../tui-toolkit/tooltip/layout";
 import { countInsights } from "./counts";
 import type { CountableMessage, StatsGroup } from "./counts";
 import { brightenColor } from "./colors";
 import type {
   ContextWindowUsage,
   InsightGroup,
-  InsightLayout,
   InsightSection,
   SessionFacts,
   SubagentFacts,
 } from "./insights";
-import { buildInsights, countInsightLines, measureInsightWidth } from "./insights";
-import {
-  DETAIL_INDENT,
-  InsightSectionView,
-  LABEL_GAP,
-  LABEL_WIDTH,
-} from "./tooltip-section";
+import { buildInsights, countInsightLines } from "./insights";
+import { InsightSectionView } from "./tooltip-section";
+import { TOOLTIP_MAX_WIDTH, contentWidth, valueWidth } from "./tooltip-width";
 import { getDcpStateDirectory, readDcpSummary } from "./dcp-state";
 import type { DcpSummary } from "./dcp-state";
 
@@ -50,25 +45,6 @@ const ASSISTANT_GLYPH = "󱜾";
 
 // Nerd Font glyph that labels a tool count.
 const TOOL_GLYPH = "󰒔";
-
-// Widest the tooltip may draw, in terminal cells, padding included.
-const TOOLTIP_MAX_WIDTH = 64;
-
-// Narrowest the tooltip may draw, so a short readout still reads as a panel.
-const TOOLTIP_MIN_WIDTH = 30;
-
-// Cells the tooltip's value column offers at its widest: the panel width less
-// its body padding, the label column, and the gap after the label. Long rows
-// wrap to it.
-const TOOLTIP_VALUE_WIDTH =
-  TOOLTIP_MAX_WIDTH - 2 * BODY_PADDING_X - LABEL_WIDTH - LABEL_GAP;
-
-// Row layout the widest line is measured against, so the panel can hug it.
-const TOOLTIP_LAYOUT: InsightLayout = {
-  labelWidth: LABEL_WIDTH,
-  detailIndent: DETAIL_INDENT,
-  labelGap: LABEL_GAP,
-};
 
 // How far an open group's colour is brightened toward white, 0 to 1.
 const OPEN_BRIGHTEN_AMOUNT = 0.35;
@@ -92,14 +68,13 @@ const INCOMPLETE_PAGING_WARNING =
 // Which count group the click landed on.
 type StatsGroupKind = "session" | "context";
 
-// An open count group, with the box it occupies and the session it belongs to,
-// so the tooltip can be placed and filled.
+// An open count group: which popup it is, and the session
+// whose counts it explains.
+// The target is remembered while another route is viewed, so the tooltip comes
+// back with its session; the element it points at is resolved when the tooltip
+// measures itself, since the composer is remounted per session.
 type OpenStatsGroup = {
   readonly kind: StatsGroupKind;
-  readonly anchor: Rect;
-  // The clicked element itself, kept so the anchor can be re-read after a
-  // terminal resize moves it.
-  readonly source?: AnchorBox;
   readonly sessionID: string;
 };
 
@@ -135,17 +110,90 @@ export function createSessionStats(context: Context): SessionStatsLine {
   const [revision, setRevision] = createSignal(0);
   const stopWatching = watchDcpState(() => setRevision((value) => value + 1));
 
-  // The count group whose tooltip is open, or nothing when it is closed.
-  const [open, setOpen] = createSignal<OpenStatsGroup | undefined>(undefined);
+  // Which count group each session has open, so switching sessions keeps
+  // the popup each one had.
+  // A session with no entry has its popup closed.
+  const [openBySession, setOpenBySession] = createSignal<
+    ReadonlyMap<string, StatsGroupKind>
+  >(new Map());
 
-  // Clicking a group opens its tooltip, clicking it again closes it, and
-  // clicking the other group replaces it.
+  // The target a session has open, or nothing when it has none.
+  function openGroupOf(sessionID: string): OpenStatsGroup | undefined {
+    const kind = openBySession().get(sessionID);
+    return kind === undefined ? undefined : { kind, sessionID };
+  }
+
+  // The element currently drawn for each count group.
+  // The composer is replaced whenever the session changes, so keeping the
+  // element inside the target would leave a destroyed one behind; the tooltip
+  // asks for it here at measure time instead, and gets whichever
+  // element is drawn now.
+  const triggerElements = new Map<
+    StatsGroupKind,
+    { readonly sessionID: string; readonly element: TextRenderable }
+  >();
+
+  // Record the element a count group draws into, replacing any element recorded
+  // for that group before.
+  function registerTrigger(
+    kind: StatsGroupKind,
+    sessionID: string,
+    element: TextRenderable,
+  ): void {
+    triggerElements.set(kind, { sessionID, element });
+  }
+
+  // Live box of a target's trigger, or nothing while no element is drawn for it
+  // or the recorded one belongs to another session or is already destroyed.
+  function anchorBoxOf(target: OpenStatsGroup): AnchorBox | undefined {
+    const trigger = triggerElements.get(target.kind);
+    if (
+      trigger === undefined ||
+      trigger.sessionID !== target.sessionID ||
+      trigger.element.isDestroyed
+    ) {
+      return undefined;
+    }
+    return trigger.element;
+  }
+
+  // Clicking a group opens its session's tooltip, clicking it again closes it,
+  // and clicking the other group of that session replaces it.
+  // Other sessions keep whatever they had open.
   function toggleGroup(target: OpenStatsGroup): void {
-    setOpen((current) =>
-      current?.kind === target.kind && current.sessionID === target.sessionID
-        ? undefined
-        : target,
-    );
+    setOpenBySession((current) => {
+      const next = new Map(current);
+      if (next.get(target.sessionID) === target.kind) {
+        next.delete(target.sessionID);
+      } else {
+        next.set(target.sessionID, target.kind);
+      }
+      return next;
+    });
+  }
+
+  // Close the popup of the given session, leaving the others as they were.
+  function closeGroup(sessionID: string): void {
+    setOpenBySession((current) => {
+      if (!current.has(sessionID)) {
+        return current;
+      }
+      const next = new Map(current);
+      next.delete(sessionID);
+      return next;
+    });
+  }
+
+  // The target belonging to the session on screen, or nothing when that session
+  // has no popup open or the route is not a session.
+  // Reading the route in a component makes leaving a session hide its popup
+  // while keeping it, so returning to that session brings it back.
+  function openGroupOnScreen(): OpenStatsGroup | undefined {
+    const route = context.ui.router.current();
+    if (route.type !== "session") {
+      return undefined;
+    }
+    return openGroupOf(route.sessionID);
   }
 
   // The tooltip lives in the app slot, whose box is the whole main area, so an
@@ -153,15 +201,12 @@ export function createSessionStats(context: Context): SessionStatsLine {
   const disposeTooltip = context.ui.slot({
     append: "app",
     render: () => (
-      <Show when={open()}>
-        {(target) => (
-          <StatsTooltip
-            target={target()}
-            revision={revision}
-            onClose={() => setOpen(undefined)}
-          />
-        )}
-      </Show>
+      <StatsTooltip
+        target={openGroupOnScreen}
+        revision={revision}
+        anchorBox={anchorBoxOf}
+        onClose={closeGroup}
+      />
     ),
   });
 
@@ -170,9 +215,9 @@ export function createSessionStats(context: Context): SessionStatsLine {
       <SessionStats
         sessionID={sessionID}
         revision={revision()}
-        open={open}
+        openKind={() => openGroupOf(sessionID)?.kind}
         onToggle={toggleGroup}
-        onClose={() => setOpen(undefined)}
+        onRegister={registerTrigger}
       />
     ),
     dispose: () => {
@@ -183,7 +228,8 @@ export function createSessionStats(context: Context): SessionStatsLine {
 }
 
 // Watch DCP's state directory for compressions, reporting to `onChange` once a
-// burst of writes settles. Returns a disposer that closes the watch.
+// burst of writes settles.
+// Returns a disposer that closes the watch.
 function watchDcpState(onChange: () => void): () => void {
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
   function scheduleChange(): void {
@@ -218,9 +264,9 @@ function watchDcpState(onChange: () => void): () => void {
 // Load a session's whole transcript into the host's message store.
 //
 // The store holds only the newest window by default and pages older messages in
-// on demand, so the counts would otherwise cover just that window. Reading the
-// store here keeps the caller's effect subscribed, so the load repeats whenever
-// the host truncates the window again.
+// on demand, so the counts would otherwise cover just that window.
+// Reading the store here keeps the caller's effect subscribed, so the load
+// repeats whenever the host truncates the window again.
 function loadTranscript(context: Context, sessionID: string): void {
   if (context.data.session.message.list(sessionID).length === 0) {
     void syncTranscript(context, sessionID);
@@ -233,8 +279,9 @@ function loadTranscript(context: Context, sessionID: string): void {
   });
 }
 
-// Load the newest window of a session whose store is empty, then the rest of its
-// transcript. A failure leaves the counts on whatever was loaded.
+// Load the newest window of a session whose store is empty, then the
+// rest of its transcript.
+// A failure leaves the counts on whatever was loaded.
 async function syncTranscript(
   context: Context,
   sessionID: string,
@@ -242,8 +289,8 @@ async function syncTranscript(
   try {
     await context.data.session.message.sync(sessionID);
   } catch {
-    // A session can be deleted while it loads; the counts stay empty until the
-    // store has messages.
+    // A session can be deleted while it loads; the counts stay empty until
+    // the store has messages.
     return;
   }
 
@@ -253,8 +300,8 @@ async function syncTranscript(
 // Page the messages older than the loaded window into the store.
 //
 // The paging methods are undocumented host surface, so a missing, failing, or
-// unfinished load is reported: the counts would otherwise silently cover only
-// the newest window.
+// unfinished load is reported: the counts would otherwise silently cover
+// only the newest window.
 async function extendTranscript(
   context: Context,
   sessionID: string,
@@ -337,9 +384,13 @@ type MessageHistoryStore = {
 function SessionStats(props: {
   readonly sessionID: string;
   readonly revision: number;
-  readonly open: Accessor<OpenStatsGroup | undefined>;
+  readonly openKind: Accessor<StatsGroupKind | undefined>;
   readonly onToggle: (target: OpenStatsGroup) => void;
-  readonly onClose: () => void;
+  readonly onRegister: (
+    kind: StatsGroupKind,
+    sessionID: string,
+    element: TextRenderable,
+  ) => void;
 }) {
   const context = usePlugin();
   const [dcp, setDcp] = createSignal<DcpSummary>(
@@ -362,16 +413,6 @@ function SessionStats(props: {
     ),
   );
 
-  // Close an open tooltip when the viewed session changes, so it never
-  // describes the session that was open before.
-  createEffect(
-    on(
-      () => props.sessionID,
-      () => props.onClose(),
-      { defer: true },
-    ),
-  );
-
   const insights = createMemo(() =>
     countInsights(
       context.data.session.message.list(props.sessionID),
@@ -385,8 +426,8 @@ function SessionStats(props: {
     return session.userMessages + session.assistantMessages > 0;
   };
 
-  // Whether compression has removed anything, so the context counts need their
-  // own group.
+  // Whether compression has removed anything, so the context counts
+  // need their own group.
   const contextDiffers = () => {
     const { session, context: active } = insights();
     return (
@@ -399,12 +440,14 @@ function SessionStats(props: {
   // Muted theme colour, shared by the session group and the separator.
   const mutedColor = context.theme.text.muted;
 
-  // Colour for a group: its base colour, or a brighter shade of the same hue
-  // while its tooltip is open.
+  // Accent colour, shared by the context group and the `ctx info` marker that
+  // stands in for it while the two groups are merged.
+  const contextColor = context.theme.hue.accent[400];
+
+  // Colour for a clickable piece: its base colour, or a brighter shade of the
+  // same hue while its tooltip is open.
   const groupColor = (kind: StatsGroupKind, base: string) =>
-    props.open()?.kind === kind
-      ? brightenColor(base, OPEN_BRIGHTEN_AMOUNT)
-      : base;
+    props.openKind() === kind ? brightenColor(base, OPEN_BRIGHTEN_AMOUNT) : base;
 
   return (
     <Show when={hasTurns()}>
@@ -412,14 +455,27 @@ function SessionStats(props: {
         <Show
           when={contextDiffers()}
           fallback={
-            <CountGroup
-              label="Sess/Ctx"
-              kind="session"
-              sessionID={props.sessionID}
-              group={insights().session}
-              fg={groupColor("session", mutedColor)}
-              onToggle={props.onToggle}
-            />
+            <>
+              <CountGroup
+                label="Sess/Ctx"
+                kind="session"
+                sessionID={props.sessionID}
+                group={insights().session}
+                fg={groupColor("session", mutedColor)}
+                onToggle={props.onToggle}
+                onRegister={props.onRegister}
+              />
+              <LineSeparator fg={mutedColor} />
+              <StatsTarget
+                kind="context"
+                sessionID={props.sessionID}
+                fg={groupColor("context", contextColor)}
+                onToggle={props.onToggle}
+                onRegister={props.onRegister}
+              >
+                ctx info
+              </StatsTarget>
+            </>
           }
         >
           <CountGroup
@@ -429,17 +485,17 @@ function SessionStats(props: {
             group={insights().session}
             fg={groupColor("session", mutedColor)}
             onToggle={props.onToggle}
+            onRegister={props.onRegister}
           />
-          <text fg={mutedColor} selectable={false} wrapMode="none">
-            ·
-          </text>
+          <LineSeparator fg={mutedColor} />
           <CountGroup
             label="Ctx"
             kind="context"
             sessionID={props.sessionID}
             group={insights().context}
-            fg={groupColor("context", context.theme.hue.accent[400])}
+            fg={groupColor("context", contextColor)}
             onToggle={props.onToggle}
+            onRegister={props.onRegister}
           />
         </Show>
       </box>
@@ -447,13 +503,23 @@ function SessionStats(props: {
   );
 }
 
-// One count group: a label followed by the user, assistant, and tool counts, for
-// example `Sess: 󰍩 12 󱜾 30 󰒔 118`.
+// The dot the line draws between two clickable pieces.
+function LineSeparator(props: { readonly fg: string }) {
+  return (
+    <text fg={props.fg} selectable={false} wrapMode="none">
+      ·
+    </text>
+  );
+}
+
+// One count group: a label followed by the user, assistant, and tool counts,
+// for example `Sess: 󰍩 12 󱜾 30 󰒔 118`.
 //
-// `label` names the group, `kind` says which tooltip it explains, `sessionID` is
-// the session it counts, `group` holds the counts it shows, and `fg` is the
-// terminal colour token applied to the whole group. `onToggle` reports a click
-// released over the group.
+// `label` names the group, `kind` says which tooltip it explains, `sessionID`
+// is the session it counts, `group` holds the counts it shows, and `fg` is the
+// terminal colour token applied to the whole group.
+// `onToggle` reports a click released over the group, and `onRegister` reports
+// the element it draws into.
 function CountGroup(props: {
   readonly label: string;
   readonly kind: StatsGroupKind;
@@ -461,13 +527,57 @@ function CountGroup(props: {
   readonly group: StatsGroup;
   readonly fg: string;
   readonly onToggle: (target: OpenStatsGroup) => void;
+  readonly onRegister: (
+    kind: StatsGroupKind,
+    sessionID: string,
+    element: TextRenderable,
+  ) => void;
 }) {
+  return (
+    <StatsTarget
+      kind={props.kind}
+      sessionID={props.sessionID}
+      fg={props.fg}
+      onToggle={props.onToggle}
+      onRegister={props.onRegister}
+    >
+      {`${props.label}: ${USER_GLYPH} ${props.group.userMessages} ${ASSISTANT_GLYPH} ${props.group.assistantMessages} ${TOOL_GLYPH} ${props.group.toolCalls}`}
+    </StatsTarget>
+  );
+}
+
+// One clickable piece of the counts line: it opens one popup, and carries the
+// colour of the kind it opens.
+//
+// `kind` says which tooltip it explains, `sessionID` is the session it belongs
+// to, `fg` is the terminal colour token applied to the piece, `onToggle`
+// reports a click released over it, `onRegister` reports the element it draws
+// into, and `children` is the text it draws.
+function StatsTarget(props: {
+  readonly kind: StatsGroupKind;
+  readonly sessionID: string;
+  readonly fg: string;
+  readonly onToggle: (target: OpenStatsGroup) => void;
+  readonly onRegister: (
+    kind: StatsGroupKind,
+    sessionID: string,
+    element: TextRenderable,
+  ) => void;
+  readonly children: JSX.Element;
+}) {
+  // Record the piece's element, so the tooltip can place itself against
+  // whichever element is drawn for this group while it is on screen.
+  const register = (node: TextRenderable): void => {
+    props.onRegister(props.kind, props.sessionID, node);
+  };
+
   return (
     // Keyed on the colour: the host applies `fg` when the text is created, so a
     // changed colour needs a fresh renderable.
     <Show keyed when={props.fg}>
       {(fg) => (
         <text
+          ref={register}
           fg={fg}
           selectable={false}
           wrapMode="none"
@@ -478,13 +588,11 @@ function CountGroup(props: {
             }
             props.onToggle({
               kind: props.kind,
-              anchor: anchorFromEvent(event),
-              source: anchorBoxFromEvent(event),
               sessionID: props.sessionID,
             });
           }}
         >
-          {`${props.label}: ${USER_GLYPH} ${props.group.userMessages} ${ASSISTANT_GLYPH} ${props.group.assistantMessages} ${TOOL_GLYPH} ${props.group.toolCalls}`}
+          {props.children}
         </text>
       )}
     </Show>
@@ -496,89 +604,121 @@ function CountGroup(props: {
 // Reads the session's counters, totals, and DCP compression summary, so the
 // tooltip follows both the session and the compression state while it is open.
 function StatsTooltip(props: {
-  readonly target: OpenStatsGroup;
+  // The target belonging to the session on screen, or nothing while that
+  // session has no popup open.
+  // The caller keeps per-session state, so the panel hides rather than
+  // unmounting when the answer is nothing.
+  readonly target: Accessor<OpenStatsGroup | undefined>;
   readonly revision: Accessor<number>;
-  readonly onClose: () => void;
+  // Live box of the target's trigger, or nothing while it is not drawn.
+  readonly anchorBox: (target: OpenStatsGroup) => AnchorBox | undefined;
+  // Closes the popup of the session that owns the shown target.
+  readonly onClose: (sessionID: string) => void;
 }) {
   const context = usePlugin();
 
-  // The tooltip's rows and the body-row count they need. Reading the revision
-  // here subscribes the memo to DCP's state-file watcher.
-  const view = createMemo(() => {
+  // Builds what the panel draws for the cells its body may use.
+  // Reading the revision here subscribes the body to DCP's state-file watcher.
+  const buildBody = (contentWidthLimit: number): TooltipBody | undefined => {
     void props.revision();
-    return buildTooltipView(context, props.target);
-  });
+    const target = props.target();
+    // Nothing to describe while no group is open; the panel is hidden then, and
+    // showing a placeholder is left to it.
+    if (target === undefined) {
+      return undefined;
+    }
+    const view = buildTooltipView(context, target, contentWidthLimit);
+    return {
+      width: view.width,
+      title: view.title,
+      bodyRows: view.bodyRows,
+      content: (
+        <For each={view.sections}>
+          {(section, index) => (
+            <>
+              <Show when={index() > 0}>
+                <text selectable={false}>{SECTION_GAP_ROW}</text>
+              </Show>
+              <InsightSectionView section={section} />
+            </>
+          )}
+        </For>
+      ),
+    };
+  };
+
+  // Box of the trigger drawn for the target, once the panel asks where to sit.
+  const shownAnchorBox = (): AnchorBox | undefined => {
+    const target = props.target();
+    return target === undefined ? undefined : props.anchorBox(target);
+  };
+
+  // Closes the popup of whichever session the panel is showing.
+  const close = (): void => {
+    const target = props.target();
+    if (target !== undefined) {
+      props.onClose(target.sessionID);
+    }
+  };
 
   return (
     <Tooltip
-      anchor={props.target.anchor}
-      anchorSource={props.target.source}
-      width={view().width}
-      bodyRows={view().bodyRows}
-      title={view().title}
-      onClose={props.onClose}
-    >
-      <For each={view().sections}>
-        {(section, index) => (
-          <>
-            <Show when={index() > 0}>
-              <text selectable={false}>{SECTION_GAP_ROW}</text>
-            </Show>
-            <InsightSectionView section={section} />
-          </>
-        )}
-      </For>
-    </Tooltip>
+      when={props.target() !== undefined}
+      anchorRef={shownAnchorBox}
+      preferredBodyWidth={TOOLTIP_MAX_WIDTH}
+      body={buildBody}
+      onClose={close}
+    />
   );
 }
 
-// The tooltip's title, rows, and the body rows they need for an open group.
-//
-// Always returns a value. A failure while reading the host's stores becomes a
-// titled `error` section: the panel is a readout, so a visible reason beats a
-// tooltip that would blank out.
-function buildTooltipView(
-  context: Context,
-  target: OpenStatsGroup,
-): {
+// What the tooltip draws for an open group: the body the panel renders, plus
+// the sections that body composes its content from.
+type TooltipView = {
   readonly title: string;
   readonly sections: readonly InsightSection[];
   readonly bodyRows: number;
   readonly width: number;
-} {
+};
+
+// The tooltip's title, rows, and the body rows they need for an open group.
+//
+// Always returns a value: a failure while reading the host's stores becomes a
+// titled `error` section, since the panel is a readout and a visible reason
+// beats a tooltip that would blank out.
+function buildTooltipView(
+  context: Context,
+  target: OpenStatsGroup,
+  widthLimit: number,
+): TooltipView {
   try {
-    const group = buildTooltipGroup(context, target);
+    const group = buildTooltipGroup(context, target, widthLimit);
     return {
       title: group.title,
       sections: group.sections,
       bodyRows: countInsightLines(group.sections),
-      width: panelWidth(group.sections),
+      width: contentWidth(group.sections, widthLimit),
     };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     const sections: readonly InsightSection[] = [
       {
         heading: "error",
-        rows: [{ label: "reason", value: detail.slice(0, 120) }],
+        rows: [
+          {
+            label: "reason",
+            segments: [{ text: detail.slice(0, 120) }],
+          },
+        ],
       },
     ];
     return {
       title: "session stats",
       sections,
       bodyRows: countInsightLines(sections),
-      width: panelWidth(sections),
+      width: contentWidth(sections, widthLimit),
     };
   }
-}
-
-// Cells the panel needs for the sections, kept inside the tooltip's width range:
-// wide enough for the widest rendered line, and no wider.
-function panelWidth(sections: readonly InsightSection[]): number {
-  const content = measureInsightWidth(sections, TOOLTIP_LAYOUT);
-  return Math.min(
-    TOOLTIP_MAX_WIDTH,
-    Math.max(TOOLTIP_MIN_WIDTH, content + 2 * BODY_PADDING_X),
-  );
 }
 
 // The tooltip group for an open kind: the counters, the session's totals, the
@@ -586,12 +726,16 @@ function panelWidth(sections: readonly InsightSection[]): number {
 function buildTooltipGroup(
   context: Context,
   target: OpenStatsGroup,
+  widthLimit: number,
 ): InsightGroup {
   const sessionID = target.sessionID;
   const messages = context.data.session.message.list(sessionID) ?? [];
   const dcp = readDcpSummary(sessionID);
   const info = context.data.session.get(sessionID);
-  const stats = countInsights(messages, dcp.compressed);
+  const systemPrompt =
+    info === undefined ? undefined : agentSystemPrompt(context, info);
+  const stats = countInsights(messages, dcp.compressed, systemPrompt);
+  const location = locationGroup(context);
 
   return buildInsights({
     stats,
@@ -610,6 +754,13 @@ function buildTooltipGroup(
             cacheWriteTokens: info.tokens.cache.write,
             createdAt: info.time.created,
             updatedAt: info.time.updated,
+            systemPrompt: stats.systemPrompt,
+            systemPromptExposed: info !== undefined,
+            availableSkills: location?.skill?.list?.(info.location)?.length,
+            availableAgents: location
+              ?.agent?.list?.(info.location)
+              ?.filter((agent) => agent.hidden !== true).length,
+            mcpServers: location?.mcp?.server?.list?.(info.location)?.length,
           },
     contextWindow: contextWindowOf(
       messages,
@@ -618,28 +769,61 @@ function buildTooltipGroup(
       listModels(context),
     ),
     dcp,
-    valueWidth: TOOLTIP_VALUE_WIDTH,
+    valueWidth: valueWidth(widthLimit),
   })[target.kind];
 }
 
-// The models the host knows, or undefined when the data layer has not synced
-// them yet.
+// The models the host knows, or undefined when the data layer has
+// not synced them yet.
 //
 // Read through a narrow type: the collection hangs off the data layer's
 // location group, well away from anything the tooltip otherwise touches.
 function listModels(context: Context): readonly ModelInfoShape[] | undefined {
-  const location = (
-    context.data as { readonly location?: ModelLocationGroup }
-  ).location;
-  return location?.model?.list?.();
+  return locationGroup(context)?.model?.list?.();
 }
 
-// The data layer's location group, narrowed to the model collection.
-type ModelLocationGroup = {
+// The data layer's location group, narrowed to the
+// collections the tooltip reads.
+function locationGroup(context: Context): LocationGroup | undefined {
+  return (context.data as { readonly location?: LocationGroup }).location;
+}
+
+// The agent fields the system-prompt lookup and the available count read.
+type AgentEntry = {
+  readonly id: string;
+  readonly system?: string;
+  // Hidden agents stay callable by name but are absent from the model's
+  // listings, so the available count leaves them out.
+  readonly hidden?: boolean;
+};
+
+// The data layer's location group, narrowed to the model, agent, skill,
+// and MCP collections.
+type LocationGroup = {
   readonly model?: {
     readonly list?: () => readonly ModelInfoShape[] | undefined;
   };
+  readonly agent?: {
+    readonly list?: (location?: unknown) => readonly AgentEntry[] | undefined;
+  };
+  readonly skill?: {
+    readonly list?: (location?: unknown) => readonly unknown[] | undefined;
+  };
+  readonly mcp?: {
+    readonly server?: {
+      readonly list?: (location?: unknown) => readonly unknown[] | undefined;
+    };
+  };
 };
+
+// The system prompt of the session's selected agent, when the host exposes it.
+function agentSystemPrompt(
+  context: Context,
+  info: { readonly agent?: string; readonly location: unknown },
+): string | undefined {
+  const agents = locationGroup(context)?.agent?.list?.(info.location);
+  return agents?.find((agent) => agent.id === info.agent)?.system;
+}
 
 // The session fields the subagent walk needs.
 type SessionTreeEntry = {
@@ -659,8 +843,8 @@ type SessionTreeEntry = {
   readonly time: { readonly created: number };
 };
 
-// Sessions spawned under `sessionID`, at any depth, in the order they were
-// created.
+// Sessions spawned under
+// `sessionID`, at any depth, in the order they were created.
 //
 // The host's family list is keyed by root, so it cannot answer this for a
 // nested session; walking the parent links stays right at either level.
@@ -698,6 +882,7 @@ function collectSubagents(
         session.tokens.cache.read +
         session.tokens.cache.write,
       costUsd: session.cost,
+      createdAt: session.time.created,
     }));
 }
 
@@ -717,11 +902,11 @@ function childSessions(
   return childIds;
 }
 
-// Tokens in the model's window, from the newest assistant step still in context,
-// and the window of the model the session runs.
+// Tokens in the model's window, from the newest assistant step still in
+// context, and the window of the model the session runs.
 //
-// The token split matches the host's own context-usage figure: prompt, completion,
-// reasoning, and both cache directions of that step.
+// The token split matches the host's own context-usage figure: prompt,
+// completion, reasoning, and both cache directions of that step.
 // The usage is returned without a limit when the model's catalogue entry is
 // unknown, so the window figures still reach the tooltip; it is undefined only
 // when no assistant step carries token data.
@@ -746,13 +931,24 @@ function contextWindowOf(
       cacheWrite: tokens.cache.write,
     },
     limit: modelLimitOf(model, models),
+    streamingMs: streamingTimeOf(lastAssistant),
   };
+}
+
+// Streaming time of a step: from its creation to the moment it stopped
+// streaming, which is its completion when the provider reports no earlier end.
+function streamingTimeOf(message: WindowMessage): number | undefined {
+  const time = message.time;
+  if (time?.completed === undefined) {
+    return undefined;
+  }
+  return Math.max(0, (time.streamed ?? time.completed) - time.created);
 }
 
 // Reasoning tokens the assistant steps still in context carry.
 //
-// A step DCP compresses leaves the model's context, so its thinking no longer
-// counts as active.
+// A step DCP compresses leaves the model's context, so its thinking no
+// longer counts as active.
 function activeReasoningTokens(
   messages: readonly WindowMessage[],
   dcp: DcpSummary,
@@ -784,8 +980,8 @@ function modelLimitOf(
   )?.limit.context;
 }
 
-// The newest assistant step still in context: its tokens are the ones filling
-// the window now.
+// The newest assistant step still in context: its tokens are the ones
+// filling the window now.
 function lastAssistantInContext(
   messages: readonly WindowMessage[],
   dcp: DcpSummary,

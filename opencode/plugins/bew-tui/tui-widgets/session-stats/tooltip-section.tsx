@@ -8,16 +8,7 @@ import { TextAttributes } from "@opentui/core";
 import { For, Show } from "solid-js";
 import type { InsightRow, InsightSection, InsightSegment, InsightToneName } from "./insights";
 import { dimColor } from "./colors";
-
-// Column width of a row's label, in cells, so values line up between rows.
-export const LABEL_WIDTH = 9;
-
-// Cells between a row's label column and its value.
-export const LABEL_GAP = 1;
-
-// Cells a detail row spends on its prefix, in place of the label column: the
-// bar or corner alone, with the row's gap supplying the space after it.
-export const DETAIL_INDENT = 1;
+import { DETAIL_INDENT, LABEL_GAP, LABEL_WIDTH } from "./tooltip-width";
 
 // Prefix of a detail row that has further detail rows under it.
 const DETAIL_BAR = "│";
@@ -51,6 +42,7 @@ export function InsightSectionView(props: {
           fg={context.theme.hue.accent[400]}
           attributes={TextAttributes.BOLD}
           wrapMode="none"
+          truncate
         >
           {props.section.heading.toUpperCase()}
         </text>
@@ -71,7 +63,7 @@ export function InsightSectionView(props: {
 //
 // A row with no label is a detail line for the row above, so a bar opens it in
 // place of the label column; the last detail row of a run closes with a corner.
-export function InsightRowView(props: {
+function InsightRowView(props: {
   readonly row: InsightRow;
   readonly isLastDetail: boolean;
 }) {
@@ -96,6 +88,10 @@ export function InsightRowView(props: {
                 segment.bold === true ? TextAttributes.BOLD : undefined
               }
               wrapMode="none"
+              // Clipped at the panel edge instead of running past it: the
+              // terminal can be narrowed under an open panel, which clamps the
+              // panel below the width its rows were built for.
+              truncate
             >
               {segment.text}
             </text>
@@ -106,8 +102,8 @@ export function InsightRowView(props: {
   );
 }
 
-// Whether a row is a detail line for the row above it, rather than a labelled
-// row of its own.
+// Whether a row is a detail line for the row above it, rather than a
+// labelled row of its own.
 function isDetailRow(row: InsightRow): boolean {
   return row.label === undefined;
 }
@@ -122,13 +118,13 @@ function rowPrefix(row: InsightRow, isLastDetail: boolean): string {
   return isLastDetail ? DETAIL_CORNER : DETAIL_BAR;
 }
 
-// Colour a segment's tone reads in, with `muted` dimming whatever base tone it
-// accompanies: a count in the theme's yellow, a duration in its orange, a cost
-// or a failure count in its error red, a subagent name in its blue, a
-// description muted, and anything else in the value colour.
+// Colour a segment's tone reads in, defaulting to the base text colour, with
+// `muted` dimming whatever base tone it accompanies: a count in the theme's
+// yellow, a duration in its orange, a cost or a failure count in its error red,
+// a subagent name in its blue, and a description muted.
 function segmentColor(
   context: Context,
-  tone: InsightSegment["tone"],
+  tone: InsightSegment["tone"] = "default",
 ): string {
   const tones = typeof tone === "string" ? [tone] : tone;
   const base = tones.find((candidate) => candidate !== "muted") ?? "muted";

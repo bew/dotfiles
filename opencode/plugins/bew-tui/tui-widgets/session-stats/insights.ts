@@ -1,15 +1,28 @@
 // Tooltip content for the session-stats component.
 //
-// Turns the counters, the session totals, and DCP's compression summary into
-// labelled rows. Pure formatting, so the wording and the number shapes are
+// Turns the counters, the session totals, and DCP's compression
+// summary into labelled rows.
+// Pure formatting, so the wording and the number shapes are
 // unit-testable without a terminal.
 
 import type { DcpBlock, DcpSummary } from "./dcp-state";
-import type { SessionStats, SessionTiming, StatsGroup } from "./counts";
+import type {
+  ContentBucket,
+  ContentFacts,
+  ContentKind,
+  LastTurn,
+  PromptFacts,
+  SessionStats,
+  SessionTiming,
+  StatsGroup,
+  TokenTraffic,
+} from "./counts";
+
+export type { TokenTraffic } from "./counts";
 
 // A base colour a run can take.
 export type InsightToneName =
-  | "value"
+  | "default"
   | "muted"
   | "agent"
   | "count"
@@ -21,12 +34,13 @@ export type InsightToneName =
 // `muted` on its own is the muted text colour rather than a dimmed base.
 export type InsightTone = InsightToneName | readonly InsightToneName[];
 
-// A coloured run of a row.
+// A coloured run of a row; plain text needs only its `text`.
 export type InsightSegment = {
   // Text of the run.
   readonly text: string;
-  // Which part of the row the run is, so the view can pick its colour.
-  readonly tone: InsightTone;
+  // Which part of the row the run is, so the view can pick its colour; omitted
+  // for the default tone.
+  readonly tone?: InsightTone;
   // Draw the run in bold, for a unit that should stand out from its number.
   readonly bold?: boolean;
 };
@@ -61,12 +75,15 @@ export type SubagentFacts = {
   readonly agent: string;
   // What the subagent was asked to do.
   readonly title: string;
-  // The subagent session's own token total: prompt, completion, and both cache
-  // directions. Reasoning is left out, matching the session's token detail line,
-  // so the two figures stay comparable.
+  // The subagent session's own token total: prompt, completion, and
+  // both cache directions.
+  // Reasoning is left out, matching the session's token detail line, so the two
+  // figures stay comparable.
   readonly tokenTotal: number;
   // The subagent session's own cost in US dollars.
   readonly costUsd: number;
+  // Creation time in milliseconds since the epoch, when the host reported it.
+  readonly createdAt?: number;
 };
 
 // Session totals the tooltip reports, reduced from the host's session info.
@@ -93,20 +110,16 @@ export type SessionFacts = {
   readonly createdAt: number;
   // Session last-update time in milliseconds since the epoch.
   readonly updatedAt: number;
-};
-
-// Token counts of one assistant step, split the way the provider reports them.
-export type TokenTraffic = {
-  // Prompt tokens the provider had to process.
-  readonly input: number;
-  // Completion tokens the step produced.
-  readonly output: number;
-  // Reasoning tokens the step produced.
-  readonly reasoning: number;
-  // Prompt tokens served from the provider's cache.
-  readonly cacheRead: number;
-  // Prompt tokens written to the provider's cache.
-  readonly cacheWrite: number;
+  // The agent's system prompt, when the host exposes its text.
+  readonly systemPrompt?: PromptFacts;
+  // Whether the host has an agent whose prompt it could expose.
+  readonly systemPromptExposed?: boolean;
+  // Skills the agent can load, when the location lists them.
+  readonly availableSkills?: number;
+  // Agents the session can switch to, when the location lists them.
+  readonly availableAgents?: number;
+  // MCP servers whose tools the agent can call, when the location lists them.
+  readonly mcpServers?: number;
 };
 
 // Tokens in the model's window, and the window's size when it is known.
@@ -115,6 +128,8 @@ export type ContextWindowUsage = {
   readonly traffic: TokenTraffic;
   // The model's window size, missing until the model catalogue is synced.
   readonly limit?: number;
+  // Streaming time of that step, missing until the provider stamps its end.
+  readonly streamingMs?: number;
 };
 
 // Everything the tooltip content is built from.
@@ -155,8 +170,8 @@ const SUBAGENT_TOP_LIMIT = 3;
 // Most recently created subagents kept when the list is trimmed.
 const SUBAGENT_LATEST_LIMIT = 4;
 
-// Spaces between the columns of a subagent line: agent, tokens, description,
-// and cost.
+// Spaces between the columns of a subagent line: agent, tokens,
+// description, and cost.
 const SUBAGENT_COLUMN_GAPS = 3;
 
 // Cells the subagent name column may take before its description is squeezed.
@@ -171,12 +186,12 @@ export function buildInsights(input: InsightInput): Insights {
       title: SESSION_GROUP_TITLE,
       sections: [
         {
-          heading: "totals",
+          heading: "general",
           rows: [
             costRow(input.session),
             ...tokenRows(input.session, input.contextWindow),
             {
-              label: "span",
+              label: "wall time",
               segments: [{ text: span, tone: "time" }],
             },
             ...workingRows(input.stats.timing, spanMs),
@@ -197,7 +212,16 @@ export function buildInsights(input: InsightInput): Insights {
     context: {
       title: CONTEXT_GROUP_TITLE,
       sections: [
-        ...windowSections(input.contextWindow, input.session),
+        ...windowSections(
+          input.contextWindow,
+          input.session,
+          input.stats.lastTurn,
+        ),
+        ...contentSections(
+          input.stats.content,
+          input.contextWindow,
+          input.session,
+        ),
         {
           heading: "activity",
           rows: [
@@ -244,8 +268,8 @@ export type InsightLayout = {
 
 // Cells the widest line of the sections needs, headings included.
 //
-// A panel is sized from this so it hugs its content instead of reserving columns
-// its rows never reach.
+// A panel is sized from this so it hugs its content instead of reserving
+// columns its rows never reach.
 export function measureInsightWidth(
   sections: readonly InsightSection[],
   layout: InsightLayout,
@@ -289,8 +313,8 @@ export function formatCount(count: number): string {
   return `${trimDecimals(count / 1_000_000, 1)}M`;
 }
 
-// Durations in the largest unit that keeps them short: seconds, minutes, hours,
-// or days.
+// Durations in the largest unit that keeps them short: seconds,
+// minutes, hours, or days.
 export function formatDuration(milliseconds: number): string {
   const totalSeconds = Math.max(0, Math.round(milliseconds / 1000));
   if (totalSeconds < 60) {
@@ -310,8 +334,9 @@ export function formatDuration(milliseconds: number): string {
   return rest === 0 ? `${days}d` : `${days}d ${rest}h`;
 }
 
-// Costs in US dollars, at most two decimals. A non-zero amount that rounds to
-// nothing shows as `~$0`, so a sub-cent figure is not read as exact.
+// Costs in US dollars, at most two decimals.
+// A non-zero amount that rounds to nothing shows as
+// `~$0`, so a sub-cent figure is not read as exact.
 export function formatCost(usd: number): string {
   const rounded = Math.round(usd * 100) / 100;
   if (rounded === 0) {
@@ -328,13 +353,13 @@ function toolRows(
   width: number,
 ): readonly InsightRow[] {
   if (group.toolCalls === 0) {
-    return [{ label, segments: [{ text: "none", tone: "value" }] }];
+    return [{ label, segments: [{ text: "none" }] }];
   }
 
   const entries: readonly (readonly InsightSegment[])[] = sortedUsage(
     group.toolUsage,
   ).map(([name, count]) => [
-    { text: name, tone: "value" },
+    { text: name },
     { text: ` ${count}`, tone: ["count", "muted"] },
   ]);
 
@@ -352,7 +377,7 @@ function skillRows(
 ): readonly InsightRow[] {
   const entries: readonly (readonly InsightSegment[])[] = sortedUsage(
     group.skillUsage,
-  ).map(([name]) => [{ text: name, tone: "value" }]);
+  ).map(([name]) => [{ text: name }]);
   const note =
     compressed > 0
       ? { count: compressed, label: "compressed" }
@@ -457,8 +482,8 @@ function detailRow(entries: readonly (readonly InsightSegment[])[]): InsightRow 
   return { segments: joinEntries(entries) };
 }
 
-// A row whose body is followed by a parenthesized note; a row without a label
-// is a detail line.
+// A row whose body is followed by a parenthesized note; a row without a
+// label is a detail line.
 function rowWithNote(noteRow: {
   readonly label?: string;
   readonly body: readonly InsightSegment[];
@@ -484,26 +509,29 @@ function tokenTotal(traffic: TokenTraffic): number {
   );
 }
 
-// One detail row packing token entries as `label count`, joined by the
-// separator.
+// A row of token counts as a detail line:
+// `label count`, joined by the separator.
 function packedTokenRow(
   entries: readonly (readonly [string, number])[],
 ): InsightRow {
   return detailRow(
     entries.map(([label, count]) => [
-      { text: `${label} `, tone: "value" },
+      { text: `${label} ` },
       ...tokenSegments(count),
     ]),
   );
 }
 
-// Cache-hit detail: the share of the prompt tokens the provider served from its
-// cache.
+// Cache-hit detail: the share of the prompt tokens served from the cache.
 //
 // Prompt tokens are the uncached input plus both cache directions, and a cache
-// read counts as a hit. Omitted when the prompt carried no tokens, so an empty
-// or untokenized scope does not report a meaningless rate.
-function cacheHitRows(traffic: TokenTraffic): readonly InsightRow[] {
+// read counts as a hit.
+// Omitted when the prompt carried no tokens, so an empty or untokenized scope
+// does not report a meaningless rate.
+function cacheHitRows(
+  traffic: TokenTraffic,
+  label: "avg cache hit" | "cache hit",
+): readonly InsightRow[] {
   const promptTokens = traffic.input + traffic.cacheRead + traffic.cacheWrite;
   if (promptTokens === 0) {
     return [];
@@ -512,7 +540,7 @@ function cacheHitRows(traffic: TokenTraffic): readonly InsightRow[] {
   return [
     rowWithNote({
       body: [
-        { text: "last cache hit ", tone: "value" },
+        { text: `${label} ` },
         { text: String(percent), tone: "count" },
         { text: "%", tone: "count", bold: true },
       ],
@@ -520,14 +548,16 @@ function cacheHitRows(traffic: TokenTraffic): readonly InsightRow[] {
         ...tokenSegments(traffic.cacheRead),
         { text: " of ", tone: "muted" },
         ...tokenSegments(promptTokens),
-        { text: " prompt", tone: "muted" },
+        { text: " tokens", tone: "muted" },
       ],
     }),
   ];
 }
 
-// Detail rows shared by both groups: the prompt, completion, and cache traffic,
-// its cache-hit share, and the session's thinking.
+// Detail rows for the session totals: the lifetime prompt, completion, and
+// cache traffic, then the session's thinking and its average cache-hit share.
+//
+// The context group reports its own step instead; see `lastStepRows`.
 function tokenDetailRows(
   facts: SessionFacts,
   traffic: TokenTraffic,
@@ -538,13 +568,13 @@ function tokenDetailRows(
       ["output", traffic.output],
       ["cache", traffic.cacheRead + traffic.cacheWrite],
     ]),
-    ...cacheHitRows(traffic),
     ...thinkingRows(facts),
+    ...cacheHitRows(traffic, "avg cache hit"),
   ];
 }
 
-// Token rows: the size of the model's window now, then the token details both
-// groups share.
+// Token rows: the size of the model's window now, then the token
+// details both groups share.
 //
 // The window size is left blank while no assistant step carries token data; the
 // details stay, since they are read from the session totals rather than a step.
@@ -560,7 +590,10 @@ function tokenRows(
     cacheWrite: facts.cacheWriteTokens,
   };
   const usedTokens = usage === undefined ? undefined : tokenTotal(usage.traffic);
-  return [tokenRow(usedTokens), ...tokenDetailRows(facts, traffic)];
+  return [
+    tokenRow(usedTokens),
+    ...tokenDetailRows(facts, traffic),
+  ];
 }
 
 // Token row: the used size, and the model's limit beside it when known.
@@ -584,8 +617,8 @@ function tokenRow(usedTokens: number | undefined, limit?: number): InsightRow {
   });
 }
 
-// Thinking detail, reporting the reasoning the session generated and how much of
-// it is still in the active context.
+// Thinking detail, reporting the reasoning the session generated and how much
+// of it is still in the active context.
 //
 // Omitted for a session that never reported reasoning.
 function thinkingRows(facts: SessionFacts): readonly InsightRow[] {
@@ -595,7 +628,7 @@ function thinkingRows(facts: SessionFacts): readonly InsightRow[] {
   return [
     rowWithNote({
       body: [
-        { text: "thinking ", tone: "value" },
+        { text: "thinking " },
         ...tokenSegments(facts.reasoningTokens),
       ],
       note: [
@@ -627,9 +660,10 @@ function costRow(facts: SessionFacts): InsightRow {
 
 // The subagents section: the total, then one line per subagent.
 //
-// A list longer than the limit is trimmed to its dearest few and its most recent
-// few, each group under a label row of its own, so the total still accounts for
-// what the rows leave out. The subagents arrive in creation order.
+// A list longer than the limit is trimmed to its dearest few and its most
+// recent few, each group under a label row of its own, so the total still
+// accounts for what the rows leave out.
+// The subagents arrive in creation order.
 function subagentSection(
   subagents: readonly SubagentFacts[],
   width: number,
@@ -763,13 +797,13 @@ function subagentRow(
   const segments: readonly InsightSegment[] = [
     { text: agent, tone: "agent" },
     ...paddingSegments(agent.length, columns.agent),
-    { text: " ", tone: "value" },
+    { text: " " },
     ...paddingSegments(token.length, columns.token),
     ...tokenSegments(subagent.tokenTotal),
-    { text: " ", tone: "value" },
+    { text: " " },
     ...descriptionSegments,
     ...paddingSegments(description.length, columns.description),
-    { text: " ", tone: "value" },
+    { text: " " },
     { text: formatCost(subagent.costUsd).padStart(columns.cost), tone: "cost" },
   ];
   return { segments };
@@ -783,7 +817,7 @@ function paddingSegments(
 ): readonly InsightSegment[] {
   return length >= width
     ? []
-    : [{ text: " ".repeat(width - length), tone: "value" }];
+    : [{ text: " ".repeat(width - length) }];
 }
 
 // Longest length in a list of strings, 0 when it is empty.
@@ -794,8 +828,8 @@ function longestOf(values: readonly string[]): number {
 // Working-time rows: the share of the span spent working, then the split
 // between streaming, waiting for tools, and idling.
 //
-// Idle covers everything else in the span, including time waiting for the user's
-// answer to a question tool.
+// Idle covers everything else in the span, including time waiting for the
+// user's answer to a question tool.
 function workingRows(
   timing: SessionTiming,
   spanMs: number,
@@ -806,6 +840,7 @@ function workingRows(
   }
   const idleMs = Math.max(0, spanMs - busyMs);
   const busy = formatDuration(busyMs);
+  const idle = formatDuration(idleMs);
   const share =
     spanMs > 0
       ? `${Math.min(100, Math.round((busyMs / spanMs) * 100))}%`
@@ -813,23 +848,23 @@ function workingRows(
   const details: readonly (readonly [string, string])[] = [
     [formatDuration(timing.generatingMs), "generating"],
     [formatDuration(timing.toolsMs), "tools"],
-    ...(idleMs > 0 ? [[formatDuration(idleMs), "idle"] as const] : []),
   ];
   const busySegments: readonly InsightSegment[] = [
     { text: busy, tone: "time" },
+    { text: " busy" },
+    ...(share === undefined
+      ? []
+      : parenthesized([{ text: share, tone: "muted" }])),
+    { text: ENTRY_SEPARATOR, tone: "muted" },
+    { text: idle, tone: "time" },
+    { text: " idle" },
   ];
   return [
-    share === undefined
-      ? { label: "busy", segments: busySegments }
-      : rowWithNote({
-          label: "busy",
-          body: busySegments,
-          note: [{ text: share, tone: "muted" }],
-        }),
+    { label: "timings", segments: busySegments },
     detailRow(
       details.map(([duration, unit]) => [
         { text: duration, tone: "time" },
-        { text: ` ${unit}`, tone: "value" },
+        { text: ` ${unit}` },
       ]),
     ),
   ];
@@ -893,25 +928,416 @@ function truncateText(text: string, width: number): string {
   return `${text.slice(0, width - 1)}…`;
 }
 
-// Window section: the used and total window, then the same token detail block
-// as the session totals.
+// Content section: what fills the active context, by kind.
 //
-// No section at all when the model's limit is unknown.
+// Token figures are apportioned from each bucket's share of the
+// transcript's characters.
+// The system prompt and tool schemas are not in the transcript, so the split is
+// an approximation; the word count is measured exactly.
+function contentSections(
+  content: ContentFacts,
+  usage: ContextWindowUsage | undefined,
+  session: SessionFacts,
+): readonly InsightSection[] {
+  const rows = contentRows(content, usage, session);
+  if (rows.length === 0) {
+    return [];
+  }
+  return [{ heading: "content", rows }];
+}
+
+// The agent prompt first, then one row per content bucket, then the remaining
+// system records, bookkeeping, and the prompt overhead the location reports.
+function contentRows(
+  content: ContentFacts,
+  usage: ContextWindowUsage | undefined,
+  session: SessionFacts,
+): readonly InsightRow[] {
+  const prompt = session.systemPrompt;
+  const totalCharacters =
+    (prompt?.characters ?? 0) +
+    content.reduce((total, bucket) => total + bucket.characters, 0);
+  const usedTokens = usage === undefined ? undefined : tokenTotal(usage.traffic);
+
+  const rows: InsightRow[] = [];
+  if (prompt !== undefined) {
+    rows.push(systemPromptRow(prompt, totalCharacters, usedTokens));
+  } else if (session.systemPromptExposed === true) {
+    // The built-in agents keep their prompt out of the SDK, so the row can
+    // report that the prompt exists without inventing a size for it.
+    rows.push({
+      label: "system",
+      segments: [{ text: "prompt not exposed", tone: "muted" }],
+    });
+  }
+
+  // Prompt overhead the location reports sits directly below the
+  // prompt it loads alongside.
+  const available = availableSegments(session);
+  if (available.length > 0) {
+    rows.push({ segments: [{ text: "available: " }, ...available] });
+  }
+
+  // Conversation buckets are reported one per row; switches, idle markers, and
+  // persisted system notices are protocol records rather than conversation.
+  for (const bucket of content) {
+    if (
+      bucket.kind === "switches" ||
+      bucket.kind === "idle" ||
+      bucket.kind === "system"
+    ) {
+      continue;
+    }
+    rows.push(contentRow(bucket, totalCharacters, usedTokens));
+  }
+
+  const system = content.find((bucket) => bucket.kind === "system");
+  const switches = contentEntries(content, "switches");
+  const idle = contentEntries(content, "idle");
+  const otherTotal = (system?.entries ?? 0) + switches + idle;
+  if (otherTotal > 0) {
+    rows.push(
+      contentRow(
+        {
+          kind: "system",
+          entries: otherTotal,
+          words: system?.words ?? 0,
+          characters: system?.characters ?? 0,
+        },
+        totalCharacters,
+        usedTokens,
+        "other",
+      ),
+    );
+    const breakdown = otherBreakdownSegments(
+      system?.entries ?? 0,
+      switches,
+      idle,
+    );
+    if (breakdown.length > 0) {
+      rows.push({ segments: breakdown });
+    }
+  }
+
+  return rows;
+}
+
+// The agent's system prompt as the first system row.
+// It is one prompt, so no message count is shown.
+function systemPromptRow(
+  prompt: PromptFacts,
+  totalCharacters: number,
+  usedTokens: number | undefined,
+): InsightRow {
+  const body = contentTokenSegments(
+    prompt.characters,
+    totalCharacters,
+    usedTokens,
+  );
+  const note: readonly InsightSegment[] =
+    prompt.words === 0
+      ? []
+      : [
+          { text: formatCount(prompt.words), tone: "count" },
+          { text: " words", tone: "muted" },
+        ];
+  return rowWithNote({ label: "system", body, note });
+}
+
+// One content bucket as a labelled row, with its estimated token share
+// and exact word count.
+function contentRow(
+  bucket: ContentBucket,
+  totalCharacters: number,
+  usedTokens: number | undefined,
+  label: string = contentLabel(bucket.kind),
+): InsightRow {
+  const unit = bucket.kind === "tools" ? "calls" : "msg";
+  const estimatedTokens = contentTokenSegments(
+    bucket.characters,
+    totalCharacters,
+    usedTokens,
+  );
+  const body: InsightSegment[] = [
+    { text: formatCount(bucket.entries), tone: "count" },
+    { text: ` ${unit}` },
+    ...(estimatedTokens.length === 0
+      ? []
+      : [
+          { text: ENTRY_SEPARATOR, tone: "muted" as const },
+          ...estimatedTokens,
+        ]),
+  ];
+  const note: readonly InsightSegment[] =
+    bucket.words === 0
+      ? []
+      : [
+          { text: formatCount(bucket.words), tone: "count" },
+          { text: " words", tone: "muted" },
+        ];
+  return rowWithNote({ label, body, note });
+}
+
+// Estimated tokens of a piece of content, marked `~`, with its share of the
+// window; empty when the window size is unknown.
+function contentTokenSegments(
+  characters: number,
+  totalCharacters: number,
+  usedTokens: number | undefined,
+): readonly InsightSegment[] {
+  const share =
+    totalCharacters === 0 ? undefined : characters / totalCharacters;
+  if (usedTokens === undefined || share === undefined || share <= 0) {
+    return [];
+  }
+  const tokens = Math.round(usedTokens * share);
+  const percent = Math.round(share * 100);
+  return [
+    { text: "~", tone: "muted" },
+    ...tokenSegments(tokens),
+    { text: " (", tone: "muted" },
+    { text: String(percent), tone: "count" },
+    { text: "% ctx)", tone: "muted" },
+  ];
+}
+
+// Entries recorded for one content kind, or zero when it is absent.
+function contentEntries(content: ContentFacts, kind: ContentKind): number {
+  return content.find((bucket) => bucket.kind === kind)?.entries ?? 0;
+}
+
+// The other entries broken down under their total: persisted system notices,
+// agent switches, and idle markers.
+function otherBreakdownSegments(
+  system: number,
+  switches: number,
+  idle: number,
+): readonly InsightSegment[] {
+  const entries: (readonly InsightSegment[])[] = [];
+  if (system > 0) {
+    entries.push([
+      { text: formatCount(system), tone: "count" },
+      { text: " system" },
+    ]);
+  }
+  if (switches > 0) {
+    entries.push([
+      { text: formatCount(switches), tone: "count" },
+      { text: " switches" },
+    ]);
+  }
+  if (idle > 0) {
+    entries.push([
+      { text: formatCount(idle), tone: "count" },
+      { text: " idle" },
+    ]);
+  }
+  return entries.length === 0 ? [] : joinEntries(entries);
+}
+
+// Prompt overhead the location reports: available skills,
+// agents, and MCP servers.
+function availableSegments(session: SessionFacts): readonly InsightSegment[] {
+  const entries: (readonly InsightSegment[])[] = [];
+  const skills = session.availableSkills ?? 0;
+  if (skills > 0) {
+    entries.push([
+      { text: formatCount(skills), tone: "count" },
+      { text: " skills" },
+    ]);
+  }
+  const agents = session.availableAgents ?? 0;
+  if (agents > 0) {
+    entries.push([
+      { text: formatCount(agents), tone: "count" },
+      { text: " agents" },
+    ]);
+  }
+  const servers = session.mcpServers ?? 0;
+  if (servers > 0) {
+    entries.push([
+      { text: formatCount(servers), tone: "count" },
+      { text: " mcp servers" },
+    ]);
+  }
+  return joinEntries(entries);
+}
+
+// Label of a content bucket.
+function contentLabel(kind: ContentKind): string {
+  switch (kind) {
+    case "user":
+      return "user";
+    case "assistant":
+      return "assistant";
+    case "tools":
+      return "tools";
+    case "system":
+      return "system";
+    case "switches":
+      return "switches";
+    case "idle":
+      return "idle";
+  }
+}
+
+// Last-turn rows, shown under the context group's general section: how long the
+// turn took, what it cost, and what it produced.
+function lastTurnRows(
+  turn: LastTurn | undefined,
+  subagents: readonly SubagentFacts[],
+): readonly InsightRow[] {
+  if (turn === undefined) {
+    return [];
+  }
+  const note: InsightSegment[] =
+    turn.durationMs === undefined
+      ? []
+      : [{ text: formatDuration(turn.durationMs), tone: "time" }];
+  const rows: InsightRow[] = [
+    rowWithNote({
+      label: "last turn",
+      body: [
+        { text: formatCount(turn.steps), tone: "count" },
+        { text: " steps" },
+      ],
+      note,
+    }),
+    lastTurnCostRow(turn.costUsd, lastTurnSubagentCost(turn, subagents)),
+    packedTokenRow([
+      ["output", turn.outputTokens],
+      ["thinking", turn.reasoningTokens],
+    ]),
+  ];
+  return rows;
+}
+
+// The step whose report fills the window, under the last-turn rows: how long it
+// streamed and how fast, then the prompt it sent uncached and cached, the
+// completion it returned, and its cache-hit share.
+//
+// `input` counts only the prompt tokens the provider billed as uncached, so the
+// cache figure carries the bulk of a long prompt; together they are the window
+// total the row above reports.
+//
+// Both figures need the provider's streaming marks, so a step still in flight
+// reports its tokens under the last turn's rows without a `last step` label.
+function lastStepRows(usage: ContextWindowUsage): readonly InsightRow[] {
+  const rows: InsightRow[] = [];
+  const pace = stepPaceSegments(usage);
+  if (pace.length > 0) {
+    rows.push({ label: "last step", segments: pace });
+  }
+  rows.push(
+    packedTokenRow([
+      ["input", usage.traffic.input],
+      ["output", usage.traffic.output],
+      ["cache", usage.traffic.cacheRead + usage.traffic.cacheWrite],
+    ]),
+    ...cacheHitRows(usage.traffic, "cache hit"),
+  );
+  return rows;
+}
+
+// How long the step streamed and how fast it did, as `22s · ~50 tok/s`.
+function stepPaceSegments(usage: ContextWindowUsage): readonly InsightSegment[] {
+  const segments: InsightSegment[] = [];
+  if (usage.streamingMs !== undefined) {
+    segments.push({ text: formatDuration(usage.streamingMs), tone: "time" });
+  }
+  const rate = tokensPerSecond(
+    usage.traffic.output + usage.traffic.reasoning,
+    usage.streamingMs,
+  );
+  if (rate === undefined) {
+    return segments;
+  }
+  if (segments.length > 0) {
+    segments.push({ text: ENTRY_SEPARATOR, tone: "muted" });
+  }
+  segments.push(
+    { text: "~", tone: "muted" },
+    { text: String(rate), tone: "count" },
+    { text: " tok/s" },
+  );
+  return segments;
+}
+
+// Cost of the last turn, with the subagent total when any ran during it.
+function lastTurnCostRow(costUsd: number, subagentCostUsd: number): InsightRow {
+  const body: readonly InsightSegment[] = [
+    { text: "cost " },
+    { text: formatCost(costUsd), tone: "cost" },
+  ];
+  if (subagentCostUsd <= 0) {
+    return { segments: body };
+  }
+  return rowWithNote({
+    body,
+    note: [
+      { text: formatCost(costUsd + subagentCostUsd), tone: "cost" },
+      { text: " incl. subagents", tone: "muted" },
+    ],
+  });
+}
+
+// Cost of the subagents created during the turn, skipping any without a
+// creation time, which cannot be placed in time.
+function lastTurnSubagentCost(
+  turn: LastTurn,
+  subagents: readonly SubagentFacts[],
+): number {
+  const startedAt = turn.startedAt;
+  if (startedAt === undefined) {
+    return 0;
+  }
+  return subagents.reduce(
+    (total, subagent) =>
+      subagent.createdAt !== undefined && subagent.createdAt >= startedAt
+        ? total + subagent.costUsd
+        : total,
+    0,
+  );
+}
+
+// Tokens the model produced per second of streaming time.
+function tokensPerSecond(
+  generatedTokens: number,
+  generatingMs: number | undefined,
+): number | undefined {
+  if (generatingMs === undefined || generatingMs <= 0) {
+    return undefined;
+  }
+  return Math.round((generatedTokens / generatingMs) * 1000);
+}
+
+// Window section: the used and total window with the session's thinking, then
+// the last turn, then the step whose report fills the window.
+//
+// The window rows need the model's limit, which stays unknown until the model
+// catalogue is synced; the last-turn and the last-step rows are
+// reported without it.
 function windowSections(
   usage: ContextWindowUsage | undefined,
   facts: SessionFacts,
+  lastTurn: LastTurn | undefined,
 ): readonly InsightSection[] {
   const limit = usage?.limit;
-  if (usage === undefined || limit === undefined) {
+  const windowRows: readonly InsightRow[] =
+    usage === undefined || limit === undefined
+      ? []
+      : [tokenRow(tokenTotal(usage.traffic), limit), ...thinkingRows(facts)];
+  // The last turn is reported as soon as its first step starts, before the
+  // provider has returned the token counts the window row needs.
+  const turnRows = lastTurnRows(lastTurn, facts.subagents);
+  const stepRows = usage === undefined ? [] : lastStepRows(usage);
+  if (windowRows.length === 0 && turnRows.length === 0) {
     return [];
   }
   return [
     {
-      heading: "window",
-      rows: [
-        tokenRow(tokenTotal(usage.traffic), limit),
-        ...tokenDetailRows(facts, usage.traffic),
-      ],
+      heading: "general",
+      rows: [...windowRows, ...turnRows, ...stepRows],
     },
   ];
 }
@@ -950,8 +1376,7 @@ function failureRows(group: StatsGroup): readonly InsightRow[] {
 // replaced with its summary plus the saving, and the running total at the top,
 // with the context size before and after the pruning when the usage is known.
 //
-// `width` is the value column, so a topic too long for the room left is cut to
-// it.
+// `width` is the value column, so a topic too long for the room left is cut.
 function compressionSection(
   dcp: DcpSummary,
   heading: string,
@@ -992,7 +1417,7 @@ function compressionSection(
         label: "blocks",
         segments: [
           { text: formatCount(dcp.blocks.length), tone: "count" },
-          { text: ` ${blockWord}`, tone: "value" },
+          { text: ` ${blockWord}` },
         ],
       },
       ...dcp.blocks.map((block): InsightRow => {
@@ -1001,7 +1426,8 @@ function compressionSection(
         const savingText = saving > 0 ? ` (−${formatRoundedTokens(saving)})` : "";
         const blockSize = formatBlockSize(block);
         // Cut the topic to the cells the figures after it leave, so an
-        // overflowing description ends in an ellipsis rather than a clipped word.
+        // overflowing description ends in an ellipsis rather
+        // than a clipped word.
         const topic = truncateText(
           formatTopic(block),
           width -
@@ -1014,7 +1440,7 @@ function compressionSection(
         return {
           segments: [
             { text: `${id} `, tone: "muted" },
-            { text: topic, tone: "value" },
+            { text: topic },
             { text: ENTRY_SEPARATOR, tone: "muted" },
             ...tokenSegments(block.compressedTokens),
             { text: " → ", tone: "muted" },
@@ -1032,6 +1458,9 @@ function compressionSection(
 function parenthesized(
   inner: readonly InsightSegment[],
 ): readonly InsightSegment[] {
+  if (inner.length === 0) {
+    return [];
+  }
   return [
     { text: " (", tone: "muted" },
     ...inner.map((segment) => ({
@@ -1042,13 +1471,14 @@ function parenthesized(
   ];
 }
 
-// A tone with `muted` added, unless it is already there.
-function withMutedTone(tone: InsightTone): InsightTone {
+// A tone with `muted` added, unless it is already there; omitted tones start
+// from the default tone.
+function withMutedTone(tone: InsightTone = "default"): InsightTone {
   const tones = typeof tone === "string" ? [tone] : tone;
   return tones.includes("muted") ? tone : [...tones, "muted"];
 }
 
-// A saving as a dimmed figure with a minus sign: the tokens a compression freed.
+// A saving shown as a dimmed negative figure: the tokens a compression freed.
 function savingSegments(saving: number): readonly InsightSegment[] {
   const [head, ...tail] = roundedTokenSegments(saving);
   if (head === undefined) {
@@ -1057,8 +1487,9 @@ function savingSegments(saving: number): readonly InsightSegment[] {
   return [{ ...head, text: `−${head.text}` }, ...tail];
 }
 
-// Label for a compression block: its topic, or its number when DCP recorded no
-// topic. Cutting it to the room left is the section's job.
+// Label for a compression block: its topic, or its number when
+// DCP recorded no topic.
+// Cutting it to the room left is the section's job.
 function formatTopic(block: DcpBlock): string {
   const topic = block.topic.trim();
   return topic.length === 0 ? `block ${block.id}` : topic;

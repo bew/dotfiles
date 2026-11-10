@@ -65,6 +65,127 @@ describe("countInsights", () => {
     });
   });
 
+  test("counts the content still in context by kind, words, and characters", () => {
+    const messages: CountableMessage[] = [
+      makeMessage({ id: "u1", type: "user", text: "hello there" }),
+      makeMessage({
+        id: "a1",
+        type: "assistant",
+        content: [
+          { id: "p1", type: "text", text: "one two" },
+          { id: "p2", type: "reasoning", text: "three" },
+          {
+            id: "call_1",
+            type: "tool",
+            name: "read",
+            state: {
+              input: { path: "a" },
+              content: [{ type: "text", text: "four five" }],
+            },
+          },
+        ],
+      }),
+      makeMessage({ id: "s1", type: "synthetic", text: "sys one" }),
+      makeMessage({ id: "sw1", type: "agent-switched" }),
+      makeMessage({ id: "idle1", type: "idle" }),
+    ];
+
+    const insights = countInsights(messages, NO_DCP_SUMMARY.compressed);
+
+    expect(insights.content).toEqual([
+      { kind: "user", entries: 1, words: 2, characters: 11 },
+      { kind: "assistant", entries: 1, words: 3, characters: 12 },
+      { kind: "tools", entries: 1, words: 3, characters: 22 },
+      { kind: "system", entries: 1, words: 2, characters: 7 },
+      { kind: "switches", entries: 1, words: 0, characters: 0 },
+      { kind: "idle", entries: 1, words: 0, characters: 0 },
+    ]);
+  });
+
+  test("apportions content only from steps that have settled", () => {
+    const messages: CountableMessage[] = [
+      makeMessage({ id: "u1", type: "user", text: "hello there" }),
+      makeMessage({
+        id: "a1",
+        type: "assistant",
+        time: { created: 1_000, streamed: 2_000, completed: 3_000 },
+        content: [{ id: "p1", type: "reasoning", text: "settled" }],
+      }),
+      makeMessage({
+        id: "a2",
+        type: "assistant",
+        time: { created: 4_000 },
+        content: [{ id: "p2", type: "reasoning", text: "still thinking" }],
+      }),
+    ];
+
+    expect(
+      countInsights(messages, NO_DCP_SUMMARY.compressed).content,
+    ).toEqual([
+      { kind: "user", entries: 1, words: 2, characters: 11 },
+      { kind: "assistant", entries: 1, words: 1, characters: 7 },
+    ]);
+  });
+
+  test("reports the agent prompt apart from the stored messages", () => {
+    const messages: CountableMessage[] = [
+      makeMessage({ id: "u1", type: "user", text: "hello" }),
+    ];
+
+    const insights = countInsights(
+      messages,
+      NO_DCP_SUMMARY.compressed,
+      "be brief and exact",
+    );
+
+    expect(insights.systemPrompt).toEqual({ words: 4, characters: 18 });
+    expect(insights.content.some((bucket) => bucket.kind === "system")).toBe(
+      false,
+    );
+  });
+
+  test("reports the last turn from the latest user message onward", () => {
+    const messages: CountableMessage[] = [
+      makeMessage({ id: "u0", type: "user" }),
+      makeMessage({ id: "a0", type: "assistant" }),
+      makeMessage({ id: "u1", type: "user", time: { created: 1_000 } }),
+      makeMessage({
+        id: "a1",
+        type: "assistant",
+        time: { created: 2_000, streamed: 5_000, completed: 8_000 },
+        cost: 0.02,
+        tokens: {
+          input: 30_000,
+          output: 100,
+          reasoning: 20,
+          cache: { read: 1_000, write: 200 },
+        },
+      }),
+      makeMessage({
+        id: "a2",
+        type: "assistant",
+        time: { created: 9_000, streamed: 11_000, completed: 12_000 },
+        cost: 0.03,
+        tokens: {
+          input: 31_000,
+          output: 200,
+          reasoning: 30,
+          cache: { read: 2_000, write: 300 },
+        },
+      }),
+    ];
+
+    expect(countInsights(messages, NO_DCP_SUMMARY.compressed).lastTurn).toEqual({
+      durationMs: 11_000,
+      startedAt: 1_000,
+      steps: 2,
+      costUsd: 0.05,
+      outputTokens: 300,
+      reasoningTokens: 50,
+      generatingMs: 5_000,
+    });
+  });
+
   test("leaves a step that has not finished out of the working time", () => {
     const messages: CountableMessage[] = [
       makeMessage({ id: "a1", type: "assistant", time: { created: 1_000 } }),
