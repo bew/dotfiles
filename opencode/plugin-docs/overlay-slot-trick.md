@@ -41,6 +41,20 @@ onMouseUp={(event) => {
 
 `stopPropagation` matters: without it the event also reaches the surface beneath the overlay.
 
+## Following an anchor
+
+An overlay that belongs beside another element needs more than fixed coordinates.
+
+- The anchor box is only valid from the frame after the element was laid out, so
+  read it from the renderer's `frame` event.
+- Moving the overlay means creating it again with the new coordinates, so a burst of
+  movement is rate limited.
+- Its width is clamped to the terminal, or a narrow terminal wraps its rows.
+- A resize re-places it before the new layout is painted.
+
+`../plugins/bew-tui/tui-toolkit/tooltip/` does all of this; read it instead of
+rebuilding it.
+
 ## Caveats
 
 - This is a coordinate hack, not a slot; any host layout change can shift the element.

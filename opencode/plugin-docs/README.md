@@ -33,6 +33,8 @@ Local examples:
 - `../plugins/ui-tester/` — TUI plugin (slots, keymap, panels, overlay).
 - `../plugins/stash-count/` — TUI plugin (host state file watch, hover and click, host command dispatch).
 - `../plugins/git-track-new-file/` — server plugin with a tool transform.
+- `../plugins/bew-tui/` — TUI plugin bundle (overlay slot, widget and toolkit split,
+  `create*()` factories, host state file watch).
 
 ## Sources
 

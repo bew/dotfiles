@@ -39,3 +39,7 @@ Traps hit while building the local plugins, kept so they are not hit again.
   Reading it then reports other clients' changes, and a click that dispatches the host command does
   nothing because that client's list is empty.
   Gate on the host command's reachability (`context.keymap.commands()`) instead.
+- Writing a position onto a live renderable — `panel.top = …` from an effect — did not move a
+  painted panel: it stayed where it was created.
+  A node keeps the props it was created with, so moving it means creating it again with the new
+  coordinates.

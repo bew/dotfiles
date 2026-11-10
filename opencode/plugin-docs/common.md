@@ -41,3 +41,7 @@ This page keeps only what is local to this repo, plus the rules we depend on.
   Slots, keymap layers, routes, and panels therefore need no manual disposal when they are created inside a component.
 - Re-registering on a state change means disposing the previous registrations
   first; keep each kind in its own set of disposers.
+- Keep width maths, parsing, and state derivation in modules free of host and OpenTUI
+  Solid types.
+  `bun test` covers those modules, while a `.tsx` component has neither a test path nor
+  a local typecheck.

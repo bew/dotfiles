@@ -37,6 +37,20 @@ which local plugins deliberately do not do.
 As with host command IDs, treat a host element's name and inputs as host
 internals that can move between releases.
 
+### Nodes, props, and geometry
+
+- A node's props are applied when the node is created.
+  Changing `fg`, `top`, or `left` on a node that already exists does not repaint it,
+  so a colour or a position that changes needs a fresh node — a keyed `Show` around
+  it, for example.
+- `screenX`, `screenY`, `width` and `height` describe the last frame that was laid
+  out, so a node created or moved in this frame still reports the terminal origin.
+  Read a box from the renderer's `frame` event (`useRenderer().on("frame", …)`), not
+  while rendering.
+- The renderer emits `resize` after resizing its console and before it asks for the
+  next frame, so an effect on `useTerminalDimensions()` sees the new size in time to
+  re-place content before the host paints it.
+
 ## Slots
 
 Placement keys, per-slot input props, and the published path list are upstream.
@@ -46,6 +60,21 @@ Three behaviours are only in the host source:
 - At a path the host no longer publishes, additive claims degrade to the nearest
   surviving ancestor, and replacements are suppressed.
 - `before` and `after` on `app` are no-ops: the root has no siblings.
+
+Claims also have a lifetime, because the host mounts a session under a keyed `Show`
+on its session id and switches routes beside the `app` claim:
+
+- Switching session destroys the session subtree.
+  A claim on a session slot, and every effect inside it, dies on the switch, so
+  anything that must outlive a session belongs to the plugin scope rather than to the
+  slot component.
+- The `app` claim is a sibling of the route switch, so it survives session changes;
+  it is where UI that reacts to the current route belongs.
+  A route is the view the host is showing: the home screen, a session identified by
+  its id, or a plugin page.
+  `context.ui.router.current()` is reactive inside a Solid computation, so such a
+  component tracks the route by reading it.
+  Upstream does not state that.
 
 See `overlay-slot-trick.md` for placing an element anywhere via the `app` slot.
 
