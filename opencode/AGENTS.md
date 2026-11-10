@@ -102,11 +102,16 @@ treat the path as a required constraint — never silently drop it or widen the 
 
 In general: trust the user for git commands even if they look odd.
 
-When moving or renaming files inside a git repo, use `git rename <src>… <dst>`; this makes the rename stay unstaged.
+Unknown or odd git subcommand mentioned by the user (like `git untrack`, `git rename`, …):
+Run it directly.
+If the shell reports it not found, fall back to the documented equivalent (stop if there is none).
+
+When moving or renaming files inside a git repo:
+Use `git rename <src>… <dst>`; this makes the rename stay unstaged.
 (fall back to plain `git mv` if the command is reported not found)
 
-NEVER `git add` or commit files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
-These handoff artefacts must never be git-tracked.
+NEVER auto track (or commit) files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
+These handoff/planning artefacts must not be git-tracked.
 
 
 ## Remote writes
