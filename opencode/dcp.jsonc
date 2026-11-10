@@ -1,3 +1,20 @@
 {
-  "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json"
+  "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json",
+  "experimental": {
+    "allowSubAgents": true,
+    // Enables editable DCP prompt overrides:
+    // - system: core DCP instruction block, injected into the model system prompt every request.
+    // - compress-range: range-mode compress tool instructions and summary constraints.
+    // - compress-message: message-mode compress tool instructions and summary constraints.
+    // - context-limit-nudge: high-priority nudge when context exceeds maxContextLimit.
+    // - turn-nudge: nudge to compress closed ranges at turn boundaries.
+    // - iteration-nudge: nudge after many iterations without user input.
+    // Up to three may exist: <project>/.opencode/dcp-prompts/overrides,
+    // $OPENCODE_CONFIG_DIR/dcp-prompts/overrides, and
+    // ~/.config/opencode/dcp-prompts/overrides.
+    // The first existing override wins; it replaces the whole prompt; it
+    // does not append or merge.
+    // Ref: https://github.com/Opencode-DCP/opencode-dynamic-context-pruning#prompt-overrides
+    "customPrompts": true
+  }
 }
