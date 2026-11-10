@@ -35,8 +35,14 @@ NOTE: Bats test files are written in bash, but can end-to-end test scripts/tools
 - When testing stderr output, use `--separate-stderr` flag on `run`.
   Access stderr via `$stderr`, stdout via `$output`.
 - Custom assertion helpers must be prefixed `assert_`.
+- Custom assertion helpers print expected vs actual, with the offending phrase on fd3.
+- Assert a phrase carrying the values under test — not a bare keyword,
+  not the whole block. See `## Assertions`.
+- Assert absence as well as presence — pair contains helpers with lacks helpers.
 - Test execution wrappers must be prefixed `run_`.
 - Setup helpers (beyond the shared `setup()`) must be prefixed `setup_`.
+- A test that needs clean state creates a new directory under `$BATS_TEST_TMPDIR` —
+  never reset a fixture root with `rm -rf` or `rm -r`. See `## Test isolation`.
 - Never build arg strings dynamically (e.g. `printf '%q ' "$@"`).
   Pass `"$@"` through directly — it is always safe, including when empty.
 - When told to add a check "in each test", place it in each `@test` body.
@@ -111,9 +117,42 @@ function setup() {
 
 @test "error: rejects non-numeric length" {
     run -1 --separate-stderr "$SCRIPT_PATH" abc
-    [[ "$stderr" == *"Error:"* ]]
+    [[ "$stderr" == *"Error: invalid length abc"* ]]
 }
 ```
+
+## Assertions
+
+Assert a *phrase* carrying the values under test — neither a bare keyword nor the whole
+expected block. Roughly 4–5 meaningful tokens (state name, tag, path, count) is the
+heuristic, not a hard count; the failure modes below carry the rule.
+
+- Too weak: `[[ "$stderr" == *"invalid"* ]]` — passes on partial or wrong output.
+- Too brittle: the entire expected block byte for byte — any extra line, spacing change,
+  or unrelated wording breaks the test for no behavioural reason.
+- Right: a phrase carrying the values that matter, e.g.
+  `[[ "$stderr" == *"Error: invalid length abc"* ]]`.
+
+Presence and absence are separate requirements.
+Every output contract has a shadow contract: what must *not* be printed.
+Pair a contains assertion with a lacks assertion,
+and prove a failure path prints no success output.
+A contains-only suite cannot express absence.
+
+Granularity follows the assertion kind:
+- Transcript (stdout/stderr) — pin a phrase carrying values.
+- File content — stay literal (`grep -F`), so punctuation is never read as regex.
+- World state — assert the resulting state (tree shape, git status line, path absence),
+  not the transcript that produced it.
+- Contract-shaped assertions — a named helper asserts the header plus each
+  value-bearing line, without pinning line order or blank-line spacing.
+
+Route contract-shaped assertions through a named `assert_*` helper; inline `[[ ]]` is fine
+for computed values (counts, regex matches).
+When the same kind of assertion is needed more than twice, move it to a helper.
+No generic `assert_equals` — it invites the byte-for-byte extreme.
+Helpers print expected vs actual, with the offending phrase on fd3 — a format change lands
+in one place, and a failure names the broken property instead of dumping a diff.
 
 ## Section separators
 
@@ -140,6 +179,15 @@ function setup() {
     git config user.name "Test"
 }
 ```
+
+## Test isolation
+
+A test that needs clean state creates a new directory under `$BATS_TEST_TMPDIR`
+instead of resetting a fixture root with `rm -rf` or `rm -r` — one mistyped variable
+deletes real files, and the blast radius is invisible in review.
+
+Any deletion a test performs must stay inside `$BATS_TEST_TMPDIR` or `$BATS_FILE_TMPDIR`;
+a delete outside those roots is a bug, not a reset.
 
 ## `run_script` wrapper helpers
 
