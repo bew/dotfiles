@@ -14,6 +14,44 @@ Karpathy guidelines:
 3. Touch only what you must. Clean up only your own mess.
 4. Define success criteria first. Loop until verified.
 
+## User intents
+
+Classify user intents coming from a user message or a question tool answer:
+
+**Question** — ends with `?`, or uses phrasing like "why…", "should we…", "suggest…", "recommend…":
+→ Answer it in the conversation, don't turn it into an action unless specifically requested.
+
+**Floated idea** — "idea: …", "what if …", "could we …":
+→ Grill me with questions before attempting anything.
+(Never produce code or spec content speculatively on an unexplored idea)
+
+**Doubt** — "… 🤔":
+→ Challenge it, don't treat it as a request or an action.
+(It's a thought about existing work that needs push-back)
+
+**"OQ: …"**:
+→ Think a bit about it, ask questions if unclear.
+→ Then log this Open Question in the spec/explo being worked on.
+
+**"tell me …"**:
+→ Give an inline explanation of X in the conversation.
+(Do NOT give more explanation _embedded_ in a planned edit, a spec, or any tool call)
+
+**Go-ahead** — "go" (or similar, like "update", "apply"):
+→ Do the thing now, scoped to what was named/planned/….
+
+**"FIXED: …"**:
+→ Something is resolved! Clean up eventual remaining debug probes in the code.
+→ Then compress relevant messages about the issue (keep only important points, not all details).
+→ Then tell me what could be worked on next (from the session, no new tool calls).
+
+Each intent is handled on its own:
+- a question doesn't _necessarily_ cancel a go-ahead (except if the answer conflicts with the action)
+- a go-ahead doesn't widen the scope of a question.
+
+Any other intent: follow the request.
+
+
 ## File Changes
 
 IMPORTANT: When file changes are detected (e.g. via git status) that were not part of the current
@@ -38,8 +76,6 @@ ask the user before using `write`.
   in the submitted changes and the resulting files.
   Only mention the kind of changes made, and any relevant constraints, debug findings, solutions..
 - When relevant, ALWAYS list important URLs at the end of responses so I can open them if needed.
-- When I say "tell me more …" (anywhere), I want an INLINE explanation of X in the conversation —
-  NOT more explanation embedded in a planned edit, a spec, or any tool call output.
 
 Use the `question` tool to ask questions for the user.
 This covers genuine choices and decisions, not only free-form questions.
@@ -128,13 +164,6 @@ Once that work is delivered/done:
 1. The file is obsolete — mention as passive hint it can be deleted.
 2. Prefix the title with `[DONE]` (before `[CLAIMED]` if present).
 3. Stop and report once the work is verified — start the next task only on the user's go-ahead.
-
-
-## Design Exploration
-
-When the user floats an idea (e.g. "what if…", "idea:", "could we…"), always grill user with
-questions before attempting to apply the mentioned change.
-Never produce code or spec content speculatively on an unexplored idea.
 
 
 ## Debugging

@@ -382,6 +382,7 @@ Injection recency is set to 3 messages in [`snippets/config.jsonc`](./snippets/c
 - [`#reloaded`](./snippets/reloaded.md) — Warns that skills and other OC artefacts were reloaded (prepend).
 - [`#updated`](./snippets/updated.md) — Warns that the environment was updated (prepend).
 - [`#handled-forget-now`](./snippets/handled-forget-now.md) — Declares an item handled elsewhere, so drop it.
+- [`#fixed`](./snippets/fixed.md) — Declares the issue fixed: stop investigating, clean up the debug probes.
 - [`#hello`](./snippets/hello.md) — Smoke test: greets me.
 
 ## Repo-specific artefacts
