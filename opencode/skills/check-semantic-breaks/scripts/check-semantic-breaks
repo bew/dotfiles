@@ -11,17 +11,11 @@ from pathlib import Path
 # Tokens that may end with a period without closing a sentence, matched
 # case-insensitively against the token right before the period.
 ABBREVIATIONS = frozenset({
-    "al",
     "approx",
     "cf",
     "e.g",
-    "etc",
     "fig",
     "i.e",
-    "no",
-    "resp",
-    "viz",
-    "vs",
 })
 
 # Maximum line width, in columns; a line at or under it needs no wrapping, so
@@ -48,8 +42,9 @@ ELISION = "……"
 # The lookbehind skips the trailing period of an ellipsis.
 BOUNDARY_RE = re.compile(r"(?<!\.)([.!?])([ \t]+)(?=\S)")
 
-# A period that opens an ordered-list item, e.g. the one in "1. Foo".
-LIST_MARKER_RE = re.compile(r"[ \t]*\d+")
+# A period that opens an ordered-list item, e.g. the one in "1. Foo" or the
+# bolded "**1. Foo**".
+LIST_MARKER_RE = re.compile(r"[ \t]*(?:\*\*)?\d+")
 
 # The token ending just before a sentence mark: letters with internal periods, e.g. "e.g".
 TOKEN_RE = re.compile(r"[A-Za-z]+(?:\.[A-Za-z]+)*$")
@@ -136,8 +131,8 @@ def find_boundaries(line: str) -> list[int]:
     """
     Return the index where each offending second sentence begins on line.
 
-    A candidate mark is skipped when it opens an ordered-list item ("1. Foo")
-    or ends a known abbreviation ("etc. Foo").
+    A candidate mark is skipped when it opens an ordered-list item ("1. Foo"
+    or "**1. Foo**") or ends a known abbreviation ("etc. Foo").
     A boundary is left alone only when the whole line fits within MAX_LINE_WIDTH
     and the sentence after it is short enough to share the line; every other one
     is returned, so a line packing several long sentences reports each of them.

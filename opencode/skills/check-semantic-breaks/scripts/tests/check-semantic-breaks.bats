@@ -23,12 +23,12 @@ function setup() {
         "Tighten the ship gate." \
         > "$CLEAN_FILE"
 
-    # Lines: 1 single short sentence; 2 over the width limit and packing a long
-    # second sentence (a hit)
+    # Lines: 1 single short sentence; 2 a hit (trailing sentence over the
+    # shared-word limit)
     HIT_FILE="$BATS_TEST_TMPDIR/hit.txt"
     printf '%s\n' \
         "Tighten the ship gate." \
-        "Tighten the ship gate. It now refuses to run unless the working tree is clean, which is the new contract we agreed on." \
+        "Tighten the ship gate. It now refuses to run entirely." \
         > "$HIT_FILE"
 }
 
@@ -54,7 +54,7 @@ function setup() {
 # Tests: stdin
 
 @test "stdin: reads lines from stdin when given '-'" {
-    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate. It now refuses to run unless the working tree is clean, which is the new contract we agreed on.\n'
+    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate. It now refuses to run entirely.\n'
     [[ "$output" == *"1: "* ]]
     [[ "$output" == *"┃"* ]]
 }
@@ -109,8 +109,8 @@ function setup() {
     [[ "$output" != *"hit.txt:"* ]]
 }
 
-@test "defaults: flags an under-width line holding two long sentences" {
-    run -1 "$SCRIPT_PATH" - <<< $'Tighten the gate. Then run the whole suite before tagging the release.\n'
+@test "defaults: flags an under-width line holding two sentences" {
+    run -1 "$SCRIPT_PATH" - <<< $'Tighten the gate. Then run the whole suite now.\n'
     [[ "$output" == *"gate. ┃Then run"* ]]
 }
 
@@ -148,58 +148,74 @@ function setup() {
 }
 
 @test "edge: marks the boundary right before the second sentence" {
-    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate so it refuses to run when the tree is dirty. That keeps every release honest and clear.\n'
+    run -1 "$SCRIPT_PATH" - <<< $'Tighten when the tree is dirty. That keeps it honest and clear.\n'
     [[ "$output" == *"dirty. ┃That keeps"* ]]
 }
 
 @test "edge: reports every offending boundary in compacted form" {
-    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate first. Then run the full test suite before tagging. Finally publish the release notes to the team.\n'
-    [[ "$output" == *"1: …… gate first. ┃Then run …… before tagging. ┃Finally publish ……"* ]]
+    run -1 "$SCRIPT_PATH" - <<< $'Tighten the gate first. Then run the whole suite quickly. Finally publish the notes to the team.\n'
+    [[ "$output" == *"1: …… gate first. ┃Then run …… suite quickly. ┃Finally publish ……"* ]]
 }
 
 @test "edge: a lone boundary keeps three words of context" {
-    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate. It now refuses to run unless the working tree is clean, which is the new contract we agreed on.\n'
+    run -1 "$SCRIPT_PATH" - <<< $'Tighten the ship gate. It now refuses to run entirely.\n'
     [[ "$output" == *"1: …… the ship gate. ┃It now refuses ……"* ]]
 }
 
 @test "edge: ignores an ordered-list marker" {
-    run -0 "$SCRIPT_PATH" - <<< $'1. Tighten the ship gate so it refuses to run whenever the working tree still holds any uncommitted change\n'
+    run -0 "$SCRIPT_PATH" - <<< $'1. Tighten the ship gate so it refuses everything.\n'
     [[ "$output" == *"(OK)"* ]]
+}
+
+@test "edge: ignores a bold ordered-list marker" {
+    run -0 "$SCRIPT_PATH" - <<< $'**1. Tighten the ship gate so it refuses everything.**\n'
+    [[ "$output" == *"(OK)"* ]]
+}
+
+@test "edge: still flags a second sentence inside a bold list item" {
+    run -1 "$SCRIPT_PATH" - <<< $'**1. Tighten the gate. It now refuses to run entirely.**\n'
+    [[ "$output" == *"gate. ┃It now refuses"* ]]
 }
 
 @test "edge: ignores a trailing abbreviation" {
-    run -0 "$SCRIPT_PATH" - <<< $'Add etc. items here so the list stays tidy and every reviewer can skim the whole thing in one pass without scrolling\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Add approx. items here so the list stays tidy.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
+@test "edge: flags a removed abbreviation" {
+    run -1 "$SCRIPT_PATH" - <<< $'Add etc. items here so the list stays tidy.\n'
+    [[ "$output" == *"etc. ┃items here"* ]]
+}
+
 @test "edge: ignores a dotted abbreviation" {
-    run -0 "$SCRIPT_PATH" - <<< $'Use e.g. this form when the document needs a quick example that readers can follow without any extra context\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Use e.g. this form when the document needs it.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
 @test "edge: ignores an ellipsis" {
-    run -0 "$SCRIPT_PATH" - <<< $'Wait ... then go ahead with the plan once every reviewer has signed off on the final wording of the change\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Wait ... then go and finish the whole task.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
 @test "edge: ignores a decimal number" {
-    run -0 "$SCRIPT_PATH" - <<< $'Released in 1.2 today so every user gets the fix quickly without doing any manual work on their own machine\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Released in 1.2 today so everyone should update soon.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
 @test "edge: ignores a filename" {
-    run -0 "$SCRIPT_PATH" - <<< $'Edit SKILL.md now so every section lands where the reader expects to find it while skimming the whole file\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Edit SKILL.md now so the reader finds every section.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
 @test "edge: ignores a dotted hostname" {
-    run -0 "$SCRIPT_PATH" - <<< $'Visit example.com now to read the whole story and see why the change matters for every single real user\n'
+    run -0 "$SCRIPT_PATH" - <<< $'Visit example.com now to read the whole story.\n'
     [[ "$output" == *"(OK)"* ]]
 }
 
 @test "edge: '!' and '?' also end a sentence" {
-    run -1 "$SCRIPT_PATH" - <<< $'Stop! Go? Ship the whole thing once every reviewer has signed off on the change and the gate always passes\n'
-    [[ "$output" == *"Stop! ┃Go? ┃Ship"* ]]
+    run -1 "$SCRIPT_PATH" - <<< $'Stop! Then go and ship it now. Go? Then finish the whole job up\n'
+    [[ "$output" == *"Stop! ┃Then go"* ]]
+    [[ "$output" == *"Go? ┃Then finish"* ]]
 }
 
 @test "edge: empty source prints (OK)" {
@@ -217,7 +233,7 @@ function setup() {
     local nested="$work/sub/input.txt"
     local extra="$work/extra.txt"
     mkdir -p "$work/sub"
-    printf '%s\n' "Tighten the ship gate. It now refuses to run unless the working tree is clean, which is the new contract we agreed on." > "$nested"
+    printf '%s\n' "Tighten the ship gate. It now refuses to run entirely." > "$nested"
     printf '%s\n' "Tighten the ship gate." > "$extra"
     cd "$work"
     run -1 "$SCRIPT_PATH" sub/input.txt extra.txt

@@ -55,8 +55,8 @@ A period, exclamation mark, or question mark ends a sentence only when whitespac
 non-whitespace character comes next.
 Tokens built from dots therefore never end a sentence on their own: `1.2`, `SKILL.md`,
 `example.com`, `e.g`.
-Two more forms are skipped, so a hit stays trustworthy: an ordered-list marker (`1. Foo`) and a
-trailer abbreviation (`etc`, `vs`, `cf`, `al`, `fig`, `no`, `approx`, `resp`, `viz`, `e.g`, `i.e`).
+Two more forms are skipped, so a hit stays trustworthy: an ordered-list marker (`1.`, or its bold
+form `**1.**`) and a trailer abbreviation (`approx`, `cf`, `e.g`, `fig`, `i.e`).
 
 ## Rules
 
