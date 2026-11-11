@@ -84,13 +84,6 @@ let
     let
       sep = if actions.sep == null then ":" else actions.sep;
 
-      # `makeWrapper` expands the separator through the shell's IFS, so it must
-      # be exactly one character long.
-      checkSep = args:
-        if lib.stringLength sep == 1
-        then args
-        else throw "wrapkit: env.${var}.sep must be a non-empty single character, got `${sep}`.";
-
       joinValues = values: lib.concatStringsSep sep values;
 
       scalarArgs =
@@ -99,10 +92,10 @@ let
         ++ lib.optionals (actions.unset == true) [ "--unset" var ];
 
       prefixSuffixArgs =
-        lib.optionals (actions.prepend != null) (checkSep [ "--prefix" var sep (joinValues actions.prepend) ])
-        ++ lib.optionals (actions.append != null) (checkSep [ "--suffix" var sep (joinValues actions.append) ])
-        ++ lib.concatMap (file: checkSep [ "--prefix-contents" var sep (toString file) ]) (asList actions.prependFromFile)
-        ++ lib.concatMap (file: checkSep [ "--suffix-contents" var sep (toString file) ]) (asList actions.appendFromFile);
+        lib.optionals (actions.prepend != null) [ "--prefix" var sep (joinValues actions.prepend) ]
+        ++ lib.optionals (actions.append != null) [ "--suffix" var sep (joinValues actions.append) ]
+        ++ lib.concatMap (file: [ "--prefix-contents" var sep (toString file) ]) (asList actions.prependFromFile)
+        ++ lib.concatMap (file: [ "--suffix-contents" var sep (toString file) ]) (asList actions.appendFromFile);
     in
     scalarArgs ++ prefixSuffixArgs;
 
@@ -119,8 +112,7 @@ let
 in {
   inherit resolveWrappedBin defaultBinName;
 
-  # The schema of one wrapper's whole surface: env actions, invocation flags,
-  # and process control.
+  # The schema of one wrapper's whole surface: env actions, invocation flags, and process control.
   wrapperType = ty.submodule {
     options = {
       env = lib.mkOption {

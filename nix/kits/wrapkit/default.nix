@@ -11,8 +11,19 @@ let
   normalizeWrapper = (import ./wrapper-composer.nix { inherit lib; }).normalizeWrapper;
   mkWrapkitWrapperOption = (import ./wrapper-composer.nix { inherit lib; }).mkWrapkitWrapperOption;
 
-  # Run a mini-eval over the base module plus the caller's wrapper input and
-  # return the wrapped binary.
+  kitsys = import ../../kit-system { inherit lib; };
+
+  # The kit itself: one kitsys evaluation over the base module. Every
+  # `mkWrapkitBin` call runs this kit, layering that wrap's inline records on
+  # top of it.
+  wrapkit = kitsys.newKit ({ self, kitsys }: {
+    meta.name = "Wrapkit system";
+    baseModules = [ ./wrapkit-base.module.nix ];
+    eval = kitsys.defineEval { inherit self; class = "wrapkit"; };
+  });
+
+  # Run the wrapkit kit over the caller's wrapper input and return the evaluated
+  # config together with the wrapped derivation (`config.output`).
   #
   # wrappedBin — the binary to wrap: a path string, or a derivation resolved with `lib.getExe`.
   # binName — the command name; defaults to the resolved binary's command name.
@@ -20,9 +31,10 @@ let
   #   single-file `$out` layout.
   # wrapper — one record written as definitions (inline mode); null loads no record.
   # wrappers — resolved records applied in order (layered mode); null loads no record.
-  # specialArgs — extra values threaded into the mini-eval.
+  # specialArgs — extra values threaded into the kit eval as module args.
   #
-  # The two record inputs are mutually exclusive; passing both is an error.
+  # The two record inputs are mutually exclusive; passing both fails the eval's
+  # assertion.
   mkWrapkitBin = {
     wrappedBin,
     binName ? defaultBinName wrappedBin,
@@ -33,7 +45,7 @@ let
     let
       bothGiven = wrapper != null && wrappers != null;
 
-      # An inline record enters the mini-eval untouched, so merging stays
+      # An inline record enters the kit eval untouched, so merging stays
       # ordinary module priority.
       # Layered values carry no priority, so each is normalised first, then
       # applied as one definition apiece.
@@ -44,13 +56,26 @@ let
         if wrappers == null
         then lib.optional (wrapper != null) wrapper
         else map normalizeWrapper (lib.reverseList wrappers);
+
+      evaluated = wrapkit.eval {
+        inherit pkgs lib;
+        config = { _module.args = { inherit wrappedBin binName; } // specialArgs; };
+        moreModules =
+          map (record: { wrapper = record; }) recordDefinitions
+          ++ [ {
+            assertions = [ {
+              assertion = !bothGiven;
+              message = "wrapkit: `wrapper` and `wrappers` are mutually exclusive.";
+            } ];
+          } ];
+      };
     in
-    if bothGiven
-    then throw "wrapkit: `wrapper` and `wrappers` are mutually exclusive."
-    else (lib.evalModules {
-      modules = [ ./wrapkit-base.module.nix ] ++ map (record: { wrapper = record; }) recordDefinitions;
-      specialArgs = { inherit pkgs wrappedBin binName; } // specialArgs;
-    }).config.output;
+    {
+      config = evaluated;
+      drv = evaluated.output;
+    };
 in {
-  inherit mkWrapkitBin wrapperType mkWrapkitWrapperOption;
+  wraplib = {
+    inherit mkWrapkitBin wrapperType mkWrapkitWrapperOption;
+  };
 }

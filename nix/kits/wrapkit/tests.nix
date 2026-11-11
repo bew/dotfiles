@@ -8,43 +8,47 @@ let
   lib = flake.lib;
   pkgs = flake.legacyPackages.${builtins.currentSystem};
 
-  wrapkit = import ./. { inherit pkgs lib; };
+  module = import ./. { inherit pkgs lib; };
+  wraplib = module.wraplib;
 
   # Fixtures: the hello binary, wrapped through each input shape.
+  # Every `mkWrapkitBin` call returns `{ config; drv; }`.
   helloBin = "${pkgs.hello}/bin/hello";
 
-  binDefaultName = wrapkit.mkWrapkitBin {
+  binDefaultName = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     wrapper.env.FOO.set = "bar";
   };
 
-  binExplicitName = wrapkit.mkWrapkitBin {
+  binExplicitName = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     binName = "greet";
     wrapper.env.FOO.set = "bar";
   };
 
-  binFromDerivation = wrapkit.mkWrapkitBin {
+  binFromDerivation = wraplib.mkWrapkitBin {
     wrappedBin = pkgs.hello;
     wrapper.env.FOO.set = "bar";
   };
 
   # single-file layout: `binName = null` emits the executable file directly as `$out`.
-  binSingleFile = wrapkit.mkWrapkitBin {
+  binSingleFile = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     binName = null;
     wrapper.env.FOO.set = "bar";
   };
 
-  # Resolve the effective wrapper from definitions written directly against the
-  # base module, as inline mode's own evaluation does.
-  inlineEval = modules:
-    lib.evalModules {
-      modules = [ ./wrapkit-base.module.nix ] ++ modules;
-      specialArgs = { inherit pkgs; wrappedBin = helloBin; binName = "hello"; };
-    };
+  # Inline-layering fixtures: a host holds the evaluated config and refines it
+  # with `lib.extendWith`, exactly as the kit's extension helper allows.
+  inlineBase = wraplib.mkWrapkitBin {
+    wrappedBin = helloBin;
+    wrapper.env.FOO.prepend = [ "/commons" ];
+  };
 
-  baseEval = inlineEval [ { wrapper.env.FOO.set = "bar"; } ];
+  inlineScalarBase = wraplib.mkWrapkitBin {
+    wrappedBin = helloBin;
+    wrapper.env.FOO.set = "commons";
+  };
 
   # Argument-assembly fixtures: resolve a partial record through the schema, so
   # every omitted field takes its null default, then assemble its `makeWrapper`
@@ -54,7 +58,7 @@ let
   resolveWrapper = record:
     (lib.evalModules {
       modules = [
-        { options.wrapper = lib.mkOption { type = wrapkit.wrapperType; default = {}; }; }
+        { options.wrapper = lib.mkOption { type = wraplib.wrapperType; default = {}; }; }
         { wrapper = record; }
       ];
     }).config.wrapper;
@@ -65,7 +69,7 @@ let
 
   # Layered builds: a host hands over resolved records, as it would with its
   # commons (`config.wrapper`) and a profile's override.
-  layeredBin = wrapkit.mkWrapkitBin {
+  layeredBin = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     wrappers = [
       (resolveWrapper { env.FOO.prepend = [ "/commons" ]; env.BAR.set = "bar"; })
@@ -73,7 +77,7 @@ let
     ];
   };
 
-  layeredListBin = wrapkit.mkWrapkitBin {
+  layeredListBin = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     wrappers = [
       (resolveWrapper { env.FOO.prepend = [ "/a" ]; })
@@ -83,31 +87,31 @@ let
 
   tests = {
     "test.0default-binName" = {
-      expr = lib.getExe binDefaultName;
-      expected = "${binDefaultName}/bin/hello";
+      expr = lib.getExe binDefaultName.drv;
+      expected = "${binDefaultName.drv}/bin/hello";
     };
     "test.1explicit-binName" = {
-      expr = lib.getExe binExplicitName;
-      expected = "${binExplicitName}/bin/greet";
+      expr = lib.getExe binExplicitName.drv;
+      expected = "${binExplicitName.drv}/bin/greet";
     };
     "test.2derivation-target-name" = {
-      expr = lib.getExe binFromDerivation;
-      expected = "${binFromDerivation}/bin/hello";
+      expr = lib.getExe binFromDerivation.drv;
+      expected = "${binFromDerivation.drv}/bin/hello";
     };
     "test.3output-is-derivation" = {
-      expr = lib.isDerivation binDefaultName;
+      expr = lib.isDerivation binDefaultName.drv;
       expected = true;
     };
     "test.4wrapper-option-path" = {
-      expr = baseEval.config.wrapper.env.FOO.set;
+      expr = binDefaultName.config.wrapper.env.FOO.set;
       expected = "bar";
     };
     "test.5constructor-exported" = {
-      expr = builtins.isFunction wrapkit.mkWrapkitBin;
+      expr = builtins.isFunction wraplib.mkWrapkitBin;
       expected = true;
     };
     "test.6wrapperType-exported" = {
-      expr = builtins.isAttrs wrapkit.wrapperType;
+      expr = builtins.isAttrs wraplib.wrapperType;
       expected = true;
     };
 
@@ -195,52 +199,61 @@ let
       expected = [ "--run" "echo hi" "--run" "echo bye" ];
     };
 
-    # `sep` validation.
+    # `sep` validation: an invalid separator fails the kit eval's assertion.
     "test.26sep-empty-invalid" = {
-      expr = (builtins.tryEval (assembleArgs { env.FOO.sep = ""; env.FOO.prepend = [ "/a" ]; })).success;
+      expr = (builtins.tryEval (wraplib.mkWrapkitBin {
+        wrappedBin = helloBin;
+        wrapper.env.FOO.sep = "";
+        wrapper.env.FOO.prepend = [ "/a" ];
+      }).drv.buildCommand).success;
       expected = false;
     };
     "test.27sep-multichar-invalid" = {
-      expr = (builtins.tryEval (assembleArgs { env.FOO.sep = "::"; env.FOO.prepend = [ "/a" ]; })).success;
+      expr = (builtins.tryEval (wraplib.mkWrapkitBin {
+        wrappedBin = helloBin;
+        wrapper.env.FOO.sep = "::";
+        wrapper.env.FOO.prepend = [ "/a" ];
+      }).drv.buildCommand).success;
       expected = false;
     };
 
-    # mode selection.
+    # mode selection: `wrapper` and `wrappers` are mutually exclusive, enforced
+    # by an assertion in the kit eval.
     "test.28wrapper-and-wrappers-mutually-exclusive" = {
-      expr = (builtins.tryEval (wrapkit.mkWrapkitBin {
+      expr = (builtins.tryEval (wraplib.mkWrapkitBin {
         wrappedBin = helloBin;
         wrapper.env.FOO.set = "inline";
         wrappers = [ (resolveWrapper { env.BAR.set = "layered"; }) ];
-      }).buildCommand).success;
+      }).drv.buildCommand).success;
       expected = false;
     };
 
     # layered mode: each record is normalised, then applied as one definition, so
     # an override that touches one action leaves the other actions for that VAR.
     "test.29layered-override-action" = {
-      expr = lib.hasInfix "--set FOO override" layeredBin.buildCommand;
+      expr = lib.hasInfix "--set FOO override" layeredBin.drv.buildCommand;
       expected = true;
     };
     "test.30layered-commons-action-inherited" = {
-      expr = lib.hasInfix "--prefix FOO : /commons" layeredBin.buildCommand;
+      expr = lib.hasInfix "--prefix FOO : /commons" layeredBin.drv.buildCommand;
       expected = true;
     };
     "test.31layered-commons-var-inherited" = {
-      expr = lib.hasInfix "--set BAR bar" layeredBin.buildCommand;
+      expr = lib.hasInfix "--set BAR bar" layeredBin.drv.buildCommand;
       expected = true;
     };
     "test.32layered-list-order-follows-layer-order" = {
-      expr = lib.hasInfix "--prefix FOO : /a:/b" layeredListBin.buildCommand;
+      expr = lib.hasInfix "--prefix FOO : /a:/b" layeredListBin.drv.buildCommand;
       expected = true;
     };
     "test.33layered-scalar-collision-fails" = {
-      expr = (builtins.tryEval (wrapkit.mkWrapkitBin {
+      expr = (builtins.tryEval (wraplib.mkWrapkitBin {
         wrappedBin = helloBin;
         wrappers = [
           (resolveWrapper { env.FOO.set = "a"; })
           (resolveWrapper { env.FOO.set = "b"; })
         ];
-      }).buildCommand).success;
+      }).drv.buildCommand).success;
       expected = false;
     };
 
@@ -255,52 +268,41 @@ let
       expected = { env = { FOO = { set = "x"; }; }; };
     };
 
-    # inline mode: ordinary module priority within one module application.
+    # inline mode: the evaluated config is refined with `lib.extendWith`, using
+    # ordinary module priority within one kit eval.
     "test.36inline-override-action" = {
-      expr = (inlineEval [
-        { wrapper.env.FOO.prepend = [ "/commons" ]; }
-        { wrapper.env.FOO.set = "override"; }
-      ]).config.wrapper.env.FOO.set;
+      expr = (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set;
       expected = "override";
     };
     "test.37inline-commons-action-inherited" = {
-      expr = (inlineEval [
-        { wrapper.env.FOO.prepend = [ "/commons" ]; }
-        { wrapper.env.FOO.set = "override"; }
-      ]).config.wrapper.env.FOO.prepend;
+      expr = (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.prepend;
       expected = [ "/commons" ];
     };
     "test.38inline-collision-without-mkForce-fails" = {
-      expr = (builtins.tryEval (inlineEval [
-        { wrapper.env.FOO.set = "commons"; }
-        { wrapper.env.FOO.set = "override"; }
-      ]).config.wrapper.env.FOO.set).success;
+      expr = (builtins.tryEval (inlineScalarBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set).success;
       expected = false;
     };
     "test.39inline-mkForce-wins-collision" = {
-      expr = (inlineEval [
-        { wrapper.env.FOO.set = "commons"; }
-        { wrapper.env.FOO.set = lib.mkForce "override"; }
-      ]).config.wrapper.env.FOO.set;
+      expr = (inlineScalarBase.config.lib.extendWith ({ wrapper.env.FOO.set = lib.mkForce "override"; })).wrapper.env.FOO.set;
       expected = "override";
     };
 
     # single-file layout: `binName = null` builds the executable as `$out`, with no `bin/`
     # directory and no `meta.mainProgram` (so `lib.getExe` does not resolve it).
     "test.40single-file-layout" = {
-      expr = lib.hasInfix "$out/bin" binSingleFile.buildCommand;
+      expr = lib.hasInfix "$out/bin" binSingleFile.drv.buildCommand;
       expected = false;
     };
     "test.41single-file-no-mainProgram" = {
-      expr = binSingleFile.meta.mainProgram or null;
+      expr = binSingleFile.drv.meta.mainProgram or null;
       expected = null;
     };
     "test.42bin-dir-layout" = {
-      expr = lib.hasInfix "$out/bin/hello" binDefaultName.buildCommand;
+      expr = lib.hasInfix "$out/bin/hello" binDefaultName.drv.buildCommand;
       expected = true;
     };
     "test.43single-file-derivation-name" = {
-      expr = binSingleFile.name;
+      expr = binSingleFile.drv.name;
       expected = "hello-wrapped-bin";
     };
 
@@ -309,7 +311,7 @@ let
     "test.44wrapper-option-helper" = {
       expr = (lib.evalModules {
         modules = [
-          { options.wrapper = wrapkit.mkWrapkitWrapperOption { }; }
+          { options.wrapper = wraplib.mkWrapkitWrapperOption { }; }
           { wrapper.env.FOO.set = "bar"; }
         ];
       }).config.wrapper.env.FOO.set;
@@ -318,15 +320,48 @@ let
     "test.45wrapper-option-helper-nested-name" = {
       expr = (lib.evalModules {
         modules = [
-          { options.profiles.foo.cfg = wrapkit.mkWrapkitWrapperOption { }; }
+          { options.profiles.foo.cfg = wraplib.mkWrapkitWrapperOption { }; }
           { profiles.foo.cfg.env.FOO.set = "bar"; }
         ];
       }).config.profiles.foo.cfg.env.FOO.set;
       expected = "bar";
     };
     "test.46wrapper-option-helper-exported" = {
-      expr = builtins.isFunction wrapkit.mkWrapkitWrapperOption;
+      expr = builtins.isFunction wraplib.mkWrapkitWrapperOption;
       expected = true;
+    };
+
+    # --- M7: the kit half ---
+    # `mkWrapkitBin` returns the evaluated config and the wrapped derivation.
+    "test.47mkWrapkitBin-shape" = {
+      expr = builtins.attrNames binDefaultName;
+      expected = [ "config" "drv" ];
+    };
+    # the evaluated config comes from a kitsys eval: it carries `lib.extendWith`
+    # and the kit's nesting state.
+    "test.48config-carries-extendWith" = {
+      expr = builtins.isFunction binDefaultName.config.lib.extendWith;
+      expected = true;
+    };
+    "test.49config-nesting-level" = {
+      expr = binDefaultName.config._kitState.nestingLevel;
+      expected = 0;
+    };
+    # `lib.extendWith` re-evaluates the config, so the refined derivation picks
+    # up the layered definition.
+    "test.50extendWith-refines-drv" = {
+      expr = lib.hasInfix "--set FOO refined"
+        (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "refined"; })).output.buildCommand;
+      expected = true;
+    };
+    # the public entry point exposes only the helper library.
+    "test.51entrypoint-exports-wraplib-only" = {
+      expr = builtins.attrNames module;
+      expected = [ "wraplib" ];
+    };
+    "test.52wraplib-helpers" = {
+      expr = builtins.attrNames wraplib;
+      expected = [ "mkWrapkitBin" "mkWrapkitWrapperOption" "wrapperType" ];
     };
   };
 
