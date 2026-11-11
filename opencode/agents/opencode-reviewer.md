@@ -53,9 +53,38 @@ Repeat steps 1–3 until quality criteria are fully satisfied.
 ## 4. `Phase:Output` — Report results
 
 1. Ensure files at `$draftpath` are up-to-date.
-2. Output `$draftpath` only — never include file contents (not as confirmation, not as summary).
-3. Add flags/warnings if any.
+2. Report the review outcome — two flat lists; emit each heading only when its list is non-empty.
+3. Output `$draftpath`.
+   Never include file contents — not as confirmation, not as summary.
+   The review outcome is required; this ban covers artefact text, not the lists.
+4. Add flags/warnings if any.
 
+### Review outcome
+
+`## Changes applied` — every edit, tagged by origin:
+- `[rule]` — from the writing rules, steps/phases/headers rules, or artefact-rules criteria
+- `[reviewer]` — your own judgment, with no user input this iteration
+- `[user]` — from an answer you received in review
+
+`## User decisions` — one line per answer worth recording, in your judgment.
+Format: `- <answer> — <marker>`.
+Do not restate the change — it already appears under `## Changes applied`.
+
+Example markers:
+- `applied` — the answer changed the artefact
+- `no change` — the answer confirmed the draft as-is
+
+Example review outcome:
+```md
+## Changes applied
+- [rule] Split the two sentences chained on one line into separate lines.
+- [reviewer] Trimmed the redundant restatement of the heading rule.
+- [user] Emit the heading only when at least one change was applied.
+
+## User decisions
+- Emit only when changes exist — applied
+- Keep inline code span — no change
+```
 
 ## Rules
 
