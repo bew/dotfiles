@@ -6,6 +6,10 @@
 # With `--staged` the move is recorded in the index instead of left unstaged.
 # With `--undo` the given `<src>... <dst>` move is reversed instead of applied.
 # Every argument is passed straight through to `git mv`.
+#
+# A directory source that contains tracked paths missing from the work tree (an
+# unstaged deletion) is refused: `git mv` cannot move a deletion, so there is no
+# unstaged rename to record. Use `git mv` directly for that case.
 
 source ./_common_helpers.nu
 
@@ -42,6 +46,33 @@ def split_mv_args [mv_args: list<string>]: nothing -> record {
     {
         flags: ($mv_args | where {|arg| ($arg | str starts-with '-') })
         paths: ($mv_args | where {|arg| not ($arg | str starts-with '-') })
+    }
+}
+
+# Paths tracked under `dir` that are missing from the work tree.
+# `git mv <dir> ...` expands the directory from the index and then refuses any
+# such path ("bad source"), so the move cannot be recorded as an unstaged rename.
+def vanished_paths [dir: string]: nothing -> list<string> {
+    ^git ls-files -- $dir
+    | lines
+    | where {|path| not ($path | path exists) }
+}
+
+# Refuse a move whose directory source contains tracked-but-deleted paths.
+# `git mv` cannot move a deletion (there is no file to move) and this wrapper's
+# index bookkeeping only covers paths present on disk, so bail out cleanly.
+def assert_movable [mv_args: list<string>] {
+    let parts = (split_mv_args $mv_args)
+    if ($parts.paths | length) < 2 { return }
+    let sources = ($parts.paths | take (($parts.paths | length) - 1))
+
+    for dir in ($sources | where {|src| is_dir $src }) {
+        let vanished = (vanished_paths $dir)
+        if not ($vanished | is-empty) {
+            let path_lines = ($vanished | each {|path| $"- ($path)" })
+            let detail_lines = ($path_lines | append "resolve or stage the deletion, then retry — or use `git mv` directly")
+            fail $"cannot move directory ($dir): it contains tracked paths missing from the work tree" ...$detail_lines
+        }
     }
 }
 
@@ -100,6 +131,7 @@ def --wrapped main [...args: string] {
     if $undo {
         run_undo $mv_args
     } else {
+        assert_movable $mv_args
         run_mv $mv_args
     }
 

@@ -129,6 +129,23 @@ SCRIPT_PATH="$SCRIPT_DIR/git-better-rename"
     [[ -z "$(git status --porcelain)" ]]
 }
 
+@test "edge: refuses a directory source containing an unstaged deletion" {
+    setup_initial_commit
+    setup_committed_file "dir/a.txt"
+    setup_committed_file "dir/b.txt"
+    setup_committed_file "dir/c.txt"
+    rm "dir/b.txt" "dir/c.txt"
+
+    run --separate-stderr "$SCRIPT_PATH" "dir" "moved"
+    [[ "$status" -ne 0 ]]
+    [[ "$stderr" == *"cannot move directory dir: it contains tracked paths missing from the work tree"* ]]
+    [[ "$stderr" == *"   - dir/b.txt"$'\n'"   - dir/c.txt"* ]]
+    [[ "$stderr" == *"resolve or stage the deletion, then retry"* ]]
+    [[ -e "dir/a.txt" ]]
+    [[ ! -e "moved" ]]
+    [[ -z "$(git diff --cached --name-only)" ]]
+}
+
 # ------------------------------------------------------------------------------
 # Tests: error
 

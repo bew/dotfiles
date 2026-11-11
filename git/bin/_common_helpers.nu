@@ -5,8 +5,10 @@
 # from any cwd.
 
 # Abort with an actionable message on stderr.
-def fail [message: string] {
+# Each extra line is printed on its own line, indented to align under the message.
+def fail [message: string, ...detail_lines: string] {
     print --stderr $"!! ERROR: ($message)"
+    for line in $detail_lines { print --stderr $"   ($line)" }
     exit 1
 }
 
