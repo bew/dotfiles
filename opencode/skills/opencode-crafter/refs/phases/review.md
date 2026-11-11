@@ -10,9 +10,10 @@ Invoke `opencode-simulated-test-runner` directly — skip `opencode-reviewer`.
 Pass the same context (artefact type/name, `$draftpath`, simulated execution environment).
 After subagent returns, proceed normally (reflect on results, ask if ready to ship).
 
-Otherwise — invoke the `opencode-reviewer` subagent immediately.
-Do not pre-apply writing or structural rules yourself first.
-The reviewer handles all conformance checks.
+Otherwise — invoke the `opencode-reviewer` subagent.
+The phase transition is already user-gated; first dispatch needs no confirmation beyond the gate.
+On re-review: ask the user for explicit confirmation first (a fresh dispatch after the draft changed).
+Do not pre-apply writing or structural rules yourself first, reviewer handles all conformance.
 
 Invoke via `task` tool. Pass in prompt:
 - Artefact type and name
