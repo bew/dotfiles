@@ -33,7 +33,7 @@ flowchart LR
   %% Referenced by the craft/spec subgraphs but not members of them.
   sk_cav["<b>§ caveman</b>"]
   sk_bew_callout["<b>§ bew-inline-callout-style</b><br/><i>NoAutoload</i>"]
-  sk_work_capture["<b>§ work-capture-handoff</b>"]
+  sk_work_capture["<b>§ work-capture</b>"]
   legend["<b>Prefix legend</b><br/>@ → Agent<br/>§ → Skill<br/>/ → Command<br/>(tool) → Tool"]
   style legend text-align:left,fill:none
 
@@ -123,7 +123,7 @@ flowchart LR
 
   subgraph misc[Misc]
     sk_handoff["<b>§ handoff</b><br/><i>NoAutoload, HasVariants</i>"]
-    sk_work_capture["<b>§ work-capture-handoff</b>"]
+    sk_work_capture["<b>§ work-capture</b>"]
     sk_git_track_skill["<b>§ git-track-new-file</b>"]
     tool_git_track["<b>(tool) git-track-new-file</b>"]
     sk_github_issue["<b>§ write-github-issue</b><br/><i>NoAutoload</i>"]
@@ -135,9 +135,10 @@ flowchart LR
     sk_reflect_frict["<b>§ opencode-reflect-friction</b><br/><i>NoAutoload, Meta</i>"]
     cmd_handoff["<b>/ handoff</b><br/><i>Trigger</i>"]
     cmd_friction["<b>/ reflect-friction</b><br/><i>Trigger</i>"]
-    cmd_task_capture["<b>/ task-capture-handoff</b><br/><i>Trigger</i>"]
-    cmd_idea_capture["<b>/ idea-capture-handoff</b><br/><i>Trigger</i>"]
-    cmd_bug_capture["<b>/ bug-capture-handoff</b><br/><i>Trigger</i>"]
+    cmd_task_capture["<b>/ task-capture</b><br/><i>Trigger</i>"]
+    cmd_idea_capture["<b>/ idea-capture</b><br/><i>Trigger</i>"]
+    cmd_bug_capture["<b>/ bug-capture</b><br/><i>Trigger</i>"]
+    cmd_task_follow["<b>/ task-follow-from-session</b><br/><i>Trigger</i>"]
     sk_readme_editor["<b>§ package-readme-editor</b><br/><i>HasScript</i>"]
     sk_verify_claims["<b>§ verify-claims</b>"]
     sk_git_track_skill -->|uses| tool_git_track
@@ -155,6 +156,7 @@ flowchart LR
     cmd_task_capture -->|triggers| sk_work_capture
     cmd_idea_capture -->|triggers| sk_work_capture
     cmd_bug_capture -->|triggers| sk_work_capture
+    cmd_task_follow -->|triggers| sk_work_capture
     sk_readme_editor -->|delegates| sk_verify_claims
   end
 
@@ -285,13 +287,15 @@ flowchart LR
 
 - Command [`/reflect-friction`](./commands/reflect-friction.md) — **triggers `opencode-reflect-friction`**.
 
-- Skill [`work-capture-handoff`](./skills/work-capture-handoff/) — Captures one deferred, explicitly-named work item from the session as a small `TASK-*`, `IDEA-*`, or `BUG-*` note for a future user or agent to pick up; mode `capture-task`, `capture-idea`, or `capture-bug` selects the prefix.
+- Skill [`work-capture`](./skills/work-capture/) — Captures one deferred, explicitly-named work item from the session as a small `TASK-*`, `IDEA-*`, or `BUG-*` note for a future user or agent to pick up; mode `capture-task`, `capture-idea`, or `capture-bug` selects the prefix. With follow enabled, keeps the note current as the session evolves.
 
-- Command [`/task-capture-handoff`](./commands/task-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-task`.
+- Command [`/task-capture`](./commands/task-capture.md) — **triggers `work-capture`** in mode `capture-task`.
 
-- Command [`/idea-capture-handoff`](./commands/idea-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-idea`.
+- Command [`/idea-capture`](./commands/idea-capture.md) — **triggers `work-capture`** in mode `capture-idea`.
 
-- Command [`/bug-capture-handoff`](./commands/bug-capture-handoff.md) — **triggers `work-capture-handoff`** in mode `capture-bug`.
+- Command [`/bug-capture`](./commands/bug-capture.md) — **triggers `work-capture`** in mode `capture-bug`.
+
+- Command [`/task-follow-from-session`](./commands/task-follow-from-session.md) — **triggers `work-capture`** in mode `capture-task`: creates the TASK from the work being shaped in the session, then keeps it current as the session evolves.
 
 ## Writing & issues
 

@@ -33,7 +33,7 @@ A gap is a concept or term the spec relies on that no project-global doc defines
 Define the concept or term inline in the spec, so the spec stays self-contained.
 Then ask the user how to resolve the gap:
 - **Own it** — the concept or term is specific to this spec; keep the definition spec-local.
-- **Promote** — the concept or term is cross-cutting; load `work-capture-handoff` skill
+- **Promote** — the concept or term is cross-cutting; load `work-capture` skill
   in mode `capture-task` to capture a task for adding it to the project-global docs.
 
 On promote, emit one capture per gap, immediately when the gap is found.

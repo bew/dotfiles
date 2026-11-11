@@ -7,7 +7,7 @@
 > Until that holds, the format is unvalidated and nothing below counts as settled.
 
 > **PARTIALLY IMPLEMENTED**: every task, idea, bug, and handoff file in this repo already carries the
-> block and an undated name, and both writers emit them: `work-capture-handoff` on each new capture,
+> block and an undated name, and both writers emit them: `work-capture` on each new capture,
 > `handoff` (plus `handoff-standalone`) on each handoff doc.
 > `tmp-frontmatter-migration` now exists, and repairs one file or a whole directory on request.
 > `write-spec init` now emits the block on `SPEC.md` and `manage-spec` preserves it,
@@ -271,7 +271,7 @@ no dated task, idea, bug, handoff, or spec name remains, and every artefact carr
 That note is what eventually deletes the skill, not a calendar reminder nobody reads.
 
 Removal is gated on the artefacts' producers rather than on the corpus.
-`work-capture-handoff` must emit the block in the task, idea, and bug files it creates,
+`work-capture` must emit the block in the task, idea, and bug files it creates,
 `handoff` must emit it in the handoff docs it writes,
 `write-spec init` must emit it on `SPEC.md`, and `manage-spec` must preserve it through
 promotion and renames.
@@ -338,7 +338,7 @@ A reader reports; only a deliberate human or agent edit rewrites a block, and on
 - `opencode/skills/write-spec/refs/lifecycle.md` owns spec states and the file that carries them.
   Its state-prefixed directory names (`SPEC-DRAFT-`, `SPEC-READY-`) must become plain `SPEC-<slug>/`, so the doc itself needs updating.
 - `opencode/skills/write-spec/scripts/manage-spec` already finds the H1 after the frontmatter block, and seeds the block on `SPEC.md` at `init`.
-- `opencode/skills/work-capture-handoff/` creates task, idea, and bug files, so it must emit the
+- `opencode/skills/work-capture/` creates task, idea, and bug files, so it must emit the
   block for the migration skill to be removable.
 - `opencode/skills/handoff/` writes handoff docs, so it carries the same obligation.
 - `./DISCOVERY.md` records the inputs and constraints this spec was drafted from.

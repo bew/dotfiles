@@ -3,7 +3,7 @@ description: Capture one explicitly-named idea from this session as an IDEA-* no
 subtask: false # shared context!
 ---
 
-Load the `work-capture-handoff` skill in mode `capture-idea`, and follow its instructions.
+Load the `work-capture` skill in mode `capture-idea`, and follow its instructions.
 
 ## User context
 

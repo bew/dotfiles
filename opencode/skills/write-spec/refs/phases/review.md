@@ -25,7 +25,7 @@ Check each of the following, flag any issues:
 - Cross-spec references are written by slug — `` `<spec:wk-init>` `` — and match a directory that
   exists, `SPEC-*-<slug>/`; no `SPEC-<STATE>-<slug>/` path stands in for one
   (see <../spec-structure.md§cross-spec-references>)
-- Gaps are inline-defined and recorded; promoted gaps carry a `work-capture-handoff` capture
+- Gaps are inline-defined and recorded; promoted gaps carry a `work-capture` capture
 - Alternatives & Tradeoffs section present and honest (compares against simpler alternative),
   or dropped with its flagged omission comment.
   If missing or thin — no simpler alternative named, or no concrete cost of the proposed design —

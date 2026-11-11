@@ -23,6 +23,14 @@ H1 heading — one line stating the intent.
 May state what in the session triggered it, as provenance.
 Keep it to a short paragraph.>
 
+## Decisions
+
+Follow-mode section: on a follow capture, create it after the description when the first line is
+recorded.
+A capture made without follow folds settled choices into the description instead.
+Bullets, one line each: what was settled or rejected, and why.
+Keep it curated — merge or supersede stale lines; no chronology.
+
 ## Blockers
 
 Optional — include only when the item has blockers or prerequisites.

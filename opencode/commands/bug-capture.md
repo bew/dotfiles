@@ -3,7 +3,7 @@ description: Capture one explicitly-named bug from this session as a BUG-* note,
 subtask: false # shared context!
 ---
 
-Load the `work-capture-handoff` skill in mode `capture-bug`, and follow its instructions.
+Load the `work-capture` skill in mode `capture-bug`, and follow its instructions.
 
 ## User context
 

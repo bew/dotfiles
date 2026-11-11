@@ -34,7 +34,7 @@ Commit subjects in this directory use a scoped-commit prefix:
 - Scope words are lowercase kebab-case, matching the artefact or subdir name.
 - Use `misc` for small changes with no clear area.
 - When adding a new skill, use the bare prefix with `Init`.
-  (e.g. `oc: Init coder-ts skill`, `oc: Init work-capture-handoff skill for deferred work`)
+  (e.g. `oc: Init coder-ts skill`, `oc: Init work-capture skill for deferred work`)
 
 The `committer` skill's `Phase:Style` derives the prefix from recent `git log`,
 so this is the convention it lands on.
@@ -149,7 +149,7 @@ The same vocabulary is mirrored in `MY_AI_STUFF.md`'s `Tag legend`.
   `ag_explore_diff`); the graphs do not share state.
 - A node referenced by a subgraph but not belonging to it is declared outside
   every subgraph, so it does not render inside the wrong group (e.g. the
-  cross-graph `sk_cav`, `sk_bew_callout`, and `sk_task_capture` in the complex
+  cross-graph `sk_cav`, `sk_bew_callout`, and `sk_work_capture` in the complex
   graph, or `ag_explore_diff` in the remaining graph).
 - Do not add `~~~` invisible links — Mermaid does not honour them.
 - Do not add `classDef` styling for trigger commands; nodes use the default style.

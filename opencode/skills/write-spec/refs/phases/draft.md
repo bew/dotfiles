@@ -239,7 +239,7 @@ During iteration, if user introduces a new idea, constraint, or design angle not
   path. See <../spec-structure.md§cross-spec-references>.
 - On a gap (a concept or term no project-global doc defines): inline-define it in the spec
   and record it (Open Question or `FIXME:` callout), then ask the user to own it or promote it.
-  Promote: load `work-capture-handoff` skill in mode `capture-task` and emit one capture per gap,
+  Promote: load `work-capture` skill in mode `capture-task` and emit one capture per gap,
   immediately.
 - `## Global Open Questions` is always included. Default entries included verbatim in skeleton (see Default entries above).
   Do not prune it even if empty — it is a structural fixture.

@@ -1,5 +1,5 @@
 ---
-name: work-capture-handoff
+name: work-capture
 description: |
   Captures one deferred, explicitly-named work item from the current session as a small
   TASK-*, IDEA-*, or BUG-* note — an intent to do later, for a future user or agent to pick up.
@@ -17,6 +17,8 @@ description: |
   Never load in `capture-bug` mode on a bare mention of breakage ("it fails", "that looks wrong")
   — grill those first.
   Never load on a bare idea float ("what if…", "idea:", "could we…") — grill those first.
+  With follow enabled (e.g. `/task-follow-from-session`), the capture stays current as the session
+  evolves: its sections are rewritten to the latest state and a decisions list is kept.
 metadata:
   maintainers: [bew]
 ---
@@ -24,8 +26,10 @@ metadata:
 IMPORTANT: Do not invoke `compress` while producing this capture.
 If a context compression is due, write the doc first, then compress.
 Keep compression blocked even when the PLAN-mode guard halts the write — a halt is not an exit.
-Release it only once the doc has been written, or when the skill exits with no doc
+Release it only once the doc has been written — or when the skill exits with no doc
 (the unrelated-idea "later" answer).
+In follow mode the release stands: once the doc is written, compression may run — the summary
+must preserve the capture path and the follow duty.
 
 ## Setup — resolve inputs
 
@@ -41,8 +45,14 @@ Determine these from whatever is available in context
   `$worktype` follows from the mode: `TASK` for `capture-task`, `IDEA` for `capture-idea`,
   `BUG` for `capture-bug`.
   If absent, stop and ask the user.
+- **Follow** (optional): `yes` or `no`. Default `no`.
+  Set `yes` when the invoking command or the user asks to keep the capture current as the session
+  continues (e.g. `/task-follow-from-session`).
+  Applies to `capture-task` and `capture-idea` only — resolve it to `no` in `capture-bug`.
 - **Subject**: what the capture is about — the task, the idea, or the bug.
   Required — never inferred.
+  When Follow is `yes`, read it against the work being shaped in the session, and take its
+  provenance from there.
   If absent, stop and ask the user.
 - **Bug state** (`capture-bug` only): `open` or `confirmed`. Default `open`.
   Take `confirmed` from the user context or wording, e.g. "confirmed", "reproduced",
@@ -76,6 +86,7 @@ State resolved values:
 
 ```text
 Mode: <capture-task|capture-idea|capture-bug>
+Follow: <yes|no>
 Subject: <value>
 Bug state: <open|confirmed>   # capture-bug only
 Dependencies: <refs|none>
@@ -141,12 +152,17 @@ After writing, tell the user:
 
 > <Task|Idea|Bug> capture written to `<full path>` — open to inspect.
 
+If Follow is `yes`: read <./refs/follow-mode.md> and apply it for the rest of the session.
+The capture stays open for updates; do not treat this skill as finished after the write.
+
 NEVER output the doc content inline.
 
 ## Rules
 
 - ALWAYS write the capture with the `write` tool.
   Never output the doc content inline in the conversation.
+- Follow-mode updates edit an existing capture with the `edit` tool.
+  Never rewrite it with `write`.
 - Do not inline file contents — reference by path only.
 - ONLY include content relevant for the subject.
 - ONLY reference URLs that were confirmed valid in the session.
@@ -158,7 +174,7 @@ NEVER output the doc content inline.
   (e.g. "no other files were referenced", "this section does not apply").
   State content, not commentary about the doc.
 - NEVER reference the skill or template that produced this capture
-  (e.g. the `work-capture-handoff` `SKILL.md`, its `refs/template.md` or `refs/template-bug.md`)
+  (e.g. the `work-capture` `SKILL.md`, its `refs/template.md` or `refs/template-bug.md`)
   merely as tooling.
   If that skill is itself the subject of the work, reference it as content in the relevant section.
 - Use caveman mode when writing the doc to reduce words without losing signal.
