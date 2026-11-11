@@ -66,8 +66,13 @@ Repeat steps 1–3 until quality criteria are fully satisfied.
 - `[reviewer]` — your own judgment, with no user input this iteration
 - `[user]` — from an answer you received in review
 
-`## User decisions` — one line per answer worth recording, in your judgment.
-Format: `- <answer> — <marker>`.
+`## User decisions` — one line per distinct decision, in your judgment.
+Format: `- <topic>: <answer> — <marker>`.
+`<topic>` is a short label (2–4 words) naming the decision — not the full question text.
+Each line must stand on its own — a reader with no knowledge of this session and its tool calls must be able to understand the decision.
+Fold answers that resolve to the same decision into a single line.
+Avoid listing decisions superseded in a later answer; keep only the surviving line.
+Skip answers about minor formatting or cosmetics — not worth recording.
 Do not restate the change — it already appears under `## Changes applied`.
 
 Example markers:
@@ -82,8 +87,8 @@ Example review outcome:
 - [user] Emit the heading only when at least one change was applied.
 
 ## User decisions
-- Emit only when changes exist — applied
-- Keep inline code span — no change
+- Heading emission: omit a section heading when its list is empty — applied
+- Tester invocation: keep the existing explicit-confirmation gate — no change
 ```
 
 ## Rules
