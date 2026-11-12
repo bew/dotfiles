@@ -182,7 +182,7 @@ export default Plugin.define({
         render,
       }),
       context.ui.slot({
-        append: "prompt.footer.status",
+        after: "prompt.footer.status",
         render,
       }),
     ];
