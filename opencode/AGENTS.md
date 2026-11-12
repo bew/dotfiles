@@ -21,6 +21,9 @@ Classify user intents coming from a user message or a question tool answer:
 **Question** — ends with `?`, or uses phrasing like "why…", "should we…", "suggest…", "recommend…":
 → Answer it in the conversation, don't turn it into an action unless specifically requested.
 
+**"pros/cons"** — usually given as an answer to a `question` tool prompt:
+→ Lay out the pros and cons of the subject in the output, before asking again.
+
 **Floated idea** — "idea: …", "what if …", "could we …":
 → Grill me with questions before attempting anything.
 (Never produce code or spec content speculatively on an unexplored idea)
@@ -39,6 +42,9 @@ Classify user intents coming from a user message or a question tool answer:
 
 **Go-ahead** — "go" (or similar, like "update", "apply"):
 → Do the thing now, scoped to what was named/planned/….
+
+**"resume"**:
+→ Simply continue what you were doing before the interruption.
 
 **"FIXED: …"**:
 → Something is resolved! Clean up eventual remaining debug probes in the code.
@@ -72,6 +78,8 @@ ask the user before using `write`.
 - NEVER re-explain what I just said back to me.
 - If I ask for code, give code — NEVER give prose about what you're about to do.
   (except in _thinking_ blocks)
+  This forbids narrating the *what* you're about to do; the short why/direction/finding
+  mentions in `## Narration` are still expected.
 - NEVER repeat code you wrote/changed at the end of your answer — the user can already see it
   in the submitted changes and the resulting files.
   Only mention the kind of changes made, and any relevant constraints, debug findings, solutions..
@@ -84,6 +92,14 @@ understand the context.
 EXCEPTION: do NOT use the `question` tool for simple go/no-go/yes/no confirmation/approval prompts
 (e.g. "proceed with this plan?", "shall I go ahead?").
 Leave a passive hint at the end of the output instead, and let the user decide.
+
+
+## Narration
+
+- Narrate as you work — short one-liners so I can follow along; not full rational descriptions.
+- When you change direction, or do something different than before, say so and why — briefly.
+- When you make an important finding, mention it as you go.
+- This runs alongside the work and does NOT replace the end-of-turn recap.
 
 
 ## Git Guardrail
