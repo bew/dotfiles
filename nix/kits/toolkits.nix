@@ -6,7 +6,7 @@ let
   # - the dynpaths toolkit module
   # - the tool-specific `baseModule`
   newToolkit = { tool, baseModule, meta ? {} }:
-    kitsys.newKit ({ self, kitsys }: {
+    kitsys.newKit {
       inherit meta;
       baseModules = [
         ./kit-modules/toolkit-base.kit-module.nix
@@ -14,14 +14,14 @@ let
         flakeInputs.dynpaths.modules.kitsys.dynpaths
         baseModule
       ];
-      eval = kitsys.defineEval {
-        inherit self;
-        class = "tool.${tool}";
+      class = "tool.${tool}";
 
-        # `lib` option is already defined in the tool base module
-        declareLibOption = false;
-      };
-    });
+      # The toolkit base modules read `pkgs`, so report an omitted one early.
+      requirePkgs = true;
+
+      # `lib` option is already defined in the tool base module
+      declareLibOption = false;
+    };
 in {
   lib = { inherit newToolkit; };
 

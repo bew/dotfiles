@@ -117,6 +117,21 @@
         "type": "github"
       }
     },
+    "kit-system": {
+      "locked": {
+        "lastModified": 1794450338,
+        "narHash": "sha256-oMJw960swR0BICFw0QgNDvjFUUNSxwsCUFRwe029yWE=",
+        "owner": "bew",
+        "repo": "nix-kit-system",
+        "rev": "142e7d921cc68ab24601f7883ba6aad4ff38297c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bew",
+        "repo": "nix-kit-system",
+        "type": "github"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -256,6 +271,7 @@
         "devshell": "devshell",
         "dynpaths": "dynpaths",
         "homeManager": "homeManager",
+        "kit-system": "kit-system",
         "llm-agents": "llm-agents",
         "myTemplates": "myTemplates",
         "nixpkgsBleedingEdge": "nixpkgsBleedingEdge",

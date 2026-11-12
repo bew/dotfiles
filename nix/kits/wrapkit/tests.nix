@@ -39,7 +39,7 @@ let
   };
 
   # Inline-layering fixtures: a host holds the evaluated config and refines it
-  # with `lib.extendWith`, exactly as the kit's extension helper allows.
+  # with `config.extendWith`, exactly as the kit's extension helper allows.
   inlineBase = wraplib.mkWrapkitBin {
     wrappedBin = helloBin;
     wrapper.env.FOO.prepend = [ "/commons" ];
@@ -268,22 +268,22 @@ let
       expected = { env = { FOO = { set = "x"; }; }; };
     };
 
-    # inline mode: the evaluated config is refined with `lib.extendWith`, using
+    # inline mode: the evaluated config is refined with `config.extendWith`, using
     # ordinary module priority within one kit eval.
     "test.36inline-override-action" = {
-      expr = (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set;
+      expr = (inlineBase.config.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set;
       expected = "override";
     };
     "test.37inline-commons-action-inherited" = {
-      expr = (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.prepend;
+      expr = (inlineBase.config.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.prepend;
       expected = [ "/commons" ];
     };
     "test.38inline-collision-without-mkForce-fails" = {
-      expr = (builtins.tryEval (inlineScalarBase.config.lib.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set).success;
+      expr = (builtins.tryEval (inlineScalarBase.config.extendWith ({ wrapper.env.FOO.set = "override"; })).wrapper.env.FOO.set).success;
       expected = false;
     };
     "test.39inline-mkForce-wins-collision" = {
-      expr = (inlineScalarBase.config.lib.extendWith ({ wrapper.env.FOO.set = lib.mkForce "override"; })).wrapper.env.FOO.set;
+      expr = (inlineScalarBase.config.extendWith ({ wrapper.env.FOO.set = lib.mkForce "override"; })).wrapper.env.FOO.set;
       expected = "override";
     };
 
@@ -337,21 +337,21 @@ let
       expr = builtins.attrNames binDefaultName;
       expected = [ "config" "drv" ];
     };
-    # the evaluated config comes from a kitsys eval: it carries `lib.extendWith`
+    # the evaluated config comes from a kitsys eval: it carries `config.extendWith`
     # and the kit's nesting state.
     "test.48config-carries-extendWith" = {
-      expr = builtins.isFunction binDefaultName.config.lib.extendWith;
+      expr = builtins.isFunction binDefaultName.config.extendWith;
       expected = true;
     };
     "test.49config-nesting-level" = {
       expr = binDefaultName.config._kitState.nestingLevel;
       expected = 0;
     };
-    # `lib.extendWith` re-evaluates the config, so the refined derivation picks
+    # `config.extendWith` re-evaluates the config, so the refined derivation picks
     # up the layered definition.
     "test.50extendWith-refines-drv" = {
       expr = lib.hasInfix "--set FOO refined"
-        (inlineBase.config.lib.extendWith ({ wrapper.env.FOO.set = "refined"; })).output.buildCommand;
+        (inlineBase.config.extendWith ({ wrapper.env.FOO.set = "refined"; })).output.buildCommand;
       expected = true;
     };
     # the public entry point exposes only the helper library.

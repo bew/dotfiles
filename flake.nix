@@ -42,6 +42,8 @@
     dynpaths.inputs.nixpkgs.follows = "nixpkgsStable";
     dynpaths.inputs.systems.follows = "systems";
 
+    kit-system.url = "github:bew/nix-kit-system";
+
     systems.url = "github:nix-systems/default";
     devshell.url = "github:numtide/devshell";
 
@@ -68,13 +70,13 @@
       lib = stable.lib;
       mypkglib = stable.callPackage ./nix/mypkglib.nix {};
 
-      toolkits = (import ./nix/kits { inherit lib flakeInputs; }).toolkits;
+      toolkits = (import ./nix/kits { inherit flakeInputs; }).toolkits;
 
       toolConfigs.zsh-bew = toolkits.zshkit.eval {
         pkgs = stable;
-        config = ./zsh/bew-config.zshkit-module.nix;
+        configModule = ./zsh/bew-config.zshkit-module.nix;
       };
-      toolConfigs.zsh-bew-bins-from-PATH = toolConfigs.zsh-bew.lib.extendWith {
+      toolConfigs.zsh-bew-bins-from-PATH = toolConfigs.zsh-bew.extendWith {
         deps.bins = {
           fzf.pkg = lib.mkForce "from-PATH";
           eza.pkg = lib.mkForce "from-PATH";
@@ -83,27 +85,28 @@
 
       toolConfigs.nvim-minimal = toolkits.nvimkit.eval {
         pkgs = stable;
-        config = ./nvim/minimal-config.nvimkit-module.nix;
+        configModule = ./nvim/minimal-config.nvimkit-module.nix;
       };
-      toolConfigs.nvim-bew = toolkits.nvimkit.eval {
-        pkgs = stable;
-        config = ./nvim/bew-config.nvimkit-module.nix;
-        configOverride = {
-          # Override to use latest Ruff (always better!)
-          deps.bins.ruff.pkg = lib.mkForce bleedingedge.ruff;
-          # Override to use latest Pyrefly (always better!)
-          deps.bins.pyrefly.pkg = lib.mkForce bleedingedge.pyrefly;
-          # Override to use latest lua LS (always better!)
-          deps.bins.lua-language-server.pkg = lib.mkForce bleedingedge.lua-language-server;
-          # Always use latest to ensure editing my projects using Rust from unstable work well
-          # (e.g. when proc-macro-server is more recent in a project, generating errors)
-          deps.bins.rust-analyzer.pkg = lib.mkForce bleedingedge.rust-analyzer;
+      toolConfigs.nvim-bew = let
+        nvimkitCfg = toolkits.nvimkit.eval {
+          pkgs = stable;
+          configModule = ./nvim/bew-config.nvimkit-module.nix;
         };
+      in nvimkitCfg.extendWith {
+        # Override to use latest Ruff (always better!)
+        deps.bins.ruff.pkg = lib.mkForce bleedingedge.ruff;
+        # Override to use latest Pyrefly (always better!)
+        deps.bins.pyrefly.pkg = lib.mkForce bleedingedge.pyrefly;
+        # Override to use latest lua LS (always better!)
+        deps.bins.lua-language-server.pkg = lib.mkForce bleedingedge.lua-language-server;
+        # Always use latest to ensure editing my projects using Rust from unstable work well
+        # (e.g. when proc-macro-server is more recent in a project, generating errors)
+        deps.bins.rust-analyzer.pkg = lib.mkForce bleedingedge.rust-analyzer;
       };
 
       toolConfigs.tmux-bew = toolkits.tmuxkit.eval {
         pkgs = stable;
-        config = ./tmux/bew-config.tmuxkit-module.nix;
+        configModule = ./tmux/bew-config.tmuxkit-module.nix;
       };
 
       # Returns dynamic kit configs with symlinks pointing to `dotfilesRealPath`.
@@ -115,7 +118,7 @@
             realPath = dotfilesRealPath;
           };
         };
-        makeDynamic = config: config.lib.extendWith {
+        makeDynamic = config: config.extendWith {
           imports = [dynpathsOverride];
           # Make the config dynamic if it's supported
           dynamicConfig.tryEnable = true;
@@ -206,7 +209,7 @@
       zsh-bew = useStandalonePkg toolConfigs.zsh-bew;
       zsh-bew-bin = mypkglib.linkSingleBin mypkgs.zsh-bew;
       # note: this variant is useful for testing zsh zwidgets with my custom fzf config (:
-      zsh-bew-with-fzf-bew = useStandalonePkg (toolConfigs.zsh-bew.lib.extendWith {
+      zsh-bew-with-fzf-bew = useStandalonePkg (toolConfigs.zsh-bew.extendWith {
         deps.bins.fzf.pkg = lib.mkForce mypkgs.fzf-bew;
       });
 

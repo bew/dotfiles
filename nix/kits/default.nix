@@ -1,11 +1,11 @@
-{ lib, flakeInputs }:
+{ flakeInputs }:
 
 let
-  kitsys = import ../kit-system { inherit lib; };
+  kitsys = flakeInputs.kit-system.lib.kitsys;
   toolkits = import ./toolkits.nix { inherit kitsys flakeInputs; };
 in {
   lib = {
-    kitsys = kitsys;
+    inherit kitsys;
     inherit (toolkits.lib) newToolkit;
   };
   inherit (toolkits) toolkits;

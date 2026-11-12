@@ -1,7 +1,7 @@
 # Kits & tool kits
 
 A **tool kit** is a [kit](../DESIGN_config_system.md) specialized for a CLI tool.
-It is built with `newToolkit` in [./toolkits.nix](./toolkits.nix) — the registry of this repo's tool kits — on top of the tool-agnostic `kitsys` in [../kit-system](../kit-system).
+It is built with `newToolkit` in [./toolkits.nix](./toolkits.nix) — the registry of this repo's tool kits — on top of the tool-agnostic `kitsys` in the [`kit-system` flake input](https://github.com/bew/nix-kit-system).
 
 Each toolkit bundles:
 - the shared tool [base module](./kit-modules/toolkit-base.kit-module.nix)
@@ -11,8 +11,9 @@ Each toolkit bundles:
 A **tool config** is the evaluation of a toolkit with a config module:
 ```nix
 toolconfigs.zsh-bew = toolkits.zshkit.eval {
+  # system-specific packages belong to the evaluation
   pkgs = bleedingedgePkgs;
-  config = ./zsh/bew-config.zshkit-module.nix;
+  configModule = ./zsh/bew-config.zshkit-module.nix;
 };
 ```
 
