@@ -665,6 +665,7 @@ function StatsTooltip(props: {
     <Tooltip
       when={props.target() !== undefined}
       anchorRef={shownAnchorBox}
+      side="onTop"
       preferredBodyWidth={TOOLTIP_MAX_WIDTH}
       body={buildBody}
       onClose={close}

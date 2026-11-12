@@ -7,7 +7,7 @@
 
 import { usePlugin } from "@opencode/plugin/tui";
 import { useRenderer, useTerminalDimensions } from "@opentui/solid";
-import type { MouseEvent } from "@opentui/core";
+import type { BoxRenderable, MouseEvent } from "@opentui/core";
 import {
   For,
   children,
@@ -22,8 +22,11 @@ import type { JSX } from "solid-js";
 import {
   TOOLTIP_LEFT_MARGIN,
   TOOLTIP_RIGHT_MARGIN,
+  availableRows,
+  defaultSide,
   resolveTooltipPosition,
 } from "./layout";
+import type { ContainerExtent, TooltipSide } from "./layout";
 import { rectOf } from "./anchor";
 import type { AnchorRef } from "./anchor";
 import { PLACEHOLDER_ROWS, placeholderWidth } from "./placeholder";
@@ -38,6 +41,11 @@ const CAP_ROWS = 2;
 
 // Rows the header band takes when the tooltip has a title or a close control.
 const HEADER_ROWS = 1;
+
+// Rows the body shows even when the panel's side of the anchor leaves less room
+// than that: below this the panel stops being readable, so it overlaps its
+// anchor rather than shrinking further.
+const MIN_BODY_ROWS = 2;
 
 // Glyph of the close control, drawn at the right end of the header band.
 const CLOSE_GLYPH = "✕";
@@ -89,6 +97,11 @@ export type TooltipProps = {
   // element when the layout moves it, and a ref yielding no box
   // leaves the panel undrawn.
   readonly anchorRef: AnchorRef;
+  // Side of the anchor to draw the panel on.
+  // Left out, the panel takes the side the anchor leaves the room for:
+  // `onTop` when the anchor sits in the lower half of the area, `onBottom`
+  // otherwise.
+  readonly side?: TooltipSide;
   // Widest body the caller wants, in cells, padding excluded: the panel adds
   // its own padding and shrinks the body to the width the terminal
   // leaves, never widening it.
@@ -113,13 +126,18 @@ type PanelPlacement = {
   readonly left: number;
   readonly width: number;
   readonly height: number;
+  // Rows of that height the body shows at once; the rest stay reachable by
+  // scrolling.
+  readonly bodyRows: number;
 };
 
 // The tooltip panel: half-block caps around a filled body, placed near the
 // element its ref points at.
 //
-// The panel goes above the anchor when it fits, below it otherwise, and is
-// centred on the anchor while staying inside the terminal margins.
+// The panel is drawn on the side of the anchor the caller asks for, and on the
+// side the anchor leaves the room for when the caller states none.
+// It stays on that side rather than swapping when its content does not fit, and
+// is centred on the anchor while staying inside the terminal margins.
 //
 // The anchor is sampled from the renderer's frame events, since a renderable
 // that was just mounted or moved still reports the terminal origin until the
@@ -135,10 +153,14 @@ type PanelPlacement = {
 // The panel sizes itself: the body builder states the cells its content needs
 // and how many rows it takes.
 // The frame adds its own padding, cap and title rows, all held inside the cells
-// the caller and the terminal leave.
+// the caller and the area leave.
 //
-// A panel taller than the terminal is cut to the terminal height,
-// and its body scrolls.
+// The rows are cut to those the panel's side of the anchor leaves, so a panel
+// with more content than room to draw it keeps its place and scrolls, instead
+// of moving down over its anchor.
+//
+// The area is the host's main area, which the panel measures: it is not the
+// whole terminal, so bottom bars the host draws take rows off it.
 export function Tooltip(props: TooltipProps) {
   const context = usePlugin();
   const renderer = useRenderer();
@@ -181,19 +203,44 @@ export function Tooltip(props: TooltipProps) {
   const hasHeader = () =>
     bodyView().title !== undefined || props.onClose !== undefined;
 
-  // The panel's own size, recomputed when its body or the terminal changes, so
-  // a tooltip that replaces another does not keep the earlier height.
+  // Rows the panel spends on its own frame: the two cap rows, plus a header
+  // band when it has one.
+  const frameRowCount = (): number =>
+    CAP_ROWS + (hasHeader() ? HEADER_ROWS : 0);
+
+  // Where the overlay area starts and how many rows it has, read from the
+  // probe box below; undefined until that box has been laid out once.
   //
-  // A panel taller than the terminal is cut to the terminal height, and its
-  // body scrolls, so its rows never run off the screen.
-  const layout = createMemo(() => {
-    const frameRows = CAP_ROWS + (hasHeader() ? HEADER_ROWS : 0);
-    const maxRows = Math.max(frameRows + 2, viewport().height);
-    const fullHeight = frameRows + bodyView().bodyRows;
-    const height = Math.min(fullHeight, maxRows);
-    // Rows the body shows at once; the rest stay reachable by scrolling.
-    return { height, bodyRows: height - frameRows };
-  });
+  // The slot publishes no geometry, and the terminal dimensions report the
+  // whole terminal, while the host's own bottom bars take rows off the area an
+  // overlay may occupy: the panel measures the area instead of assuming it.
+  // Bookkeeping the panel never renders from, so it is not a signal.
+  let areaExtent: ContainerExtent | undefined;
+
+  // The box the probe is drawn as, kept from the renderer so the frame handler
+  // can read the area it stretches across.
+  let probeBox: BoxRenderable | undefined;
+
+  // Records the probe box.
+  const registerProbe = (node: BoxRenderable): void => {
+    probeBox = node;
+  };
+
+  // Reads the area's extent from the probe box, which reports the screen origin
+  // until the frame that lays it out, and is gone once replaced.
+  const measureArea = (): void => {
+    const box = probeBox;
+    if (box === undefined || box.isDestroyed || box.height <= 0) {
+      return;
+    }
+    areaExtent = { top: box.screenY, height: box.height };
+  };
+
+  // The area the panel may occupy: where it has been measured, and the whole
+  // terminal otherwise, which is what the panel fits in until the host's bottom
+  // bars are known to take rows off it.
+  const areaOf = (): ContainerExtent =>
+    areaExtent ?? { top: 0, height: viewport().height };
 
   // Fill colour of the tooltip body.
   const panelColor = context.theme.hue.gray[600];
@@ -215,13 +262,38 @@ export function Tooltip(props: TooltipProps) {
     if (box === undefined) {
       return undefined;
     }
-    const size = { width: panelWidth(), height: layout().height };
-    const at = resolveTooltipPosition(rectOf(box), size, viewport());
+
+    // Where the panel points, which side of the anchor it takes, and the room
+    // there.
+    const anchor = rectOf(box);
+    const area = areaOf();
+    const side = props.side ?? defaultSide(anchor, area);
+
+    // The panel is cut to the rows its side leaves rather than moved: what does
+    // not fit scrolls.
+    // Its frame rows are kept even when the room is smaller than they are, so
+    // the panel stays readable over its anchor.
+    const frameRows = frameRowCount();
+    const room = availableRows(anchor, side, area);
+    const height = Math.min(
+      frameRows + bodyView().bodyRows,
+      Math.max(frameRows + MIN_BODY_ROWS, room),
+    );
+
+    const width = panelWidth();
+    const at = resolveTooltipPosition({
+      anchor,
+      side,
+      size: { width, height },
+      area,
+      viewportWidth: viewport().width,
+    });
     return {
       top: at.top,
       left: at.left,
-      width: size.width,
-      height: size.height,
+      width,
+      height,
+      bodyRows: height - frameRows,
     };
   };
 
@@ -239,11 +311,14 @@ export function Tooltip(props: TooltipProps) {
     const previous = placement();
     // The size counts too: a narrower terminal gives the panel a narrower box,
     // and the cap rows are drawn once, when the panel is created.
+    // The body's row count counts as well, so a header band appearing under an
+    // open panel resizes its scrollbox rather than only shifting it.
     if (
       previous?.top === at?.top &&
       previous?.left === at?.left &&
       previous?.width === at?.width &&
-      previous?.height === at?.height
+      previous?.height === at?.height &&
+      previous?.bodyRows === at?.bodyRows
     ) {
       return;
     }
@@ -260,6 +335,9 @@ export function Tooltip(props: TooltipProps) {
 
   // Follows the anchor across frames, rate limiting the rebuilds that follow.
   const onFrame = (): void => {
+    // The area is read first, so a placement decided now is measured against
+    // the geometry the frame this event reports has just laid out.
+    measureArea();
     const at = measurePlacement();
     // The first placement and the removal of the panel skip the interval: there
     // is no panel on screen for a rebuild to disturb.
@@ -308,16 +386,20 @@ export function Tooltip(props: TooltipProps) {
   // that lays the new size out: a panel still placed against the old, larger
   // screen is painted past the edge, and its rows wrap onto the next line.
   //
-  // The placement is clamped into the new viewport, so it is already on screen
-  // even though the anchor's box still describes the layout being replaced; the
-  // next frame corrects it.
+  // The probe box still describes the screen being replaced, so the measured
+  // area is dropped here: the placement is made against the live terminal
+  // dimensions until the frame that stretches the probe across the new area has
+  // been laid out.
   //
   // Deferred because the first run would only place a panel the frame
   // handler has not placed yet.
   createEffect(
     on(
       () => [viewport().width, viewport().height] as const,
-      () => applyPlacement(measurePlacement()),
+      () => {
+        areaExtent = undefined;
+        applyPlacement(measurePlacement());
+      },
       { defer: true },
     ),
   );
@@ -348,93 +430,108 @@ export function Tooltip(props: TooltipProps) {
   // `top`/`left` alone would leave it where it first landed.
   // A fresh panel per placement is what makes a move take effect, and the only
   // way its size follows the terminal, at the cost of rebuilding its content.
+  //
+  // The probe is drawn whether or not the panel is: it reports the area a
+  // placement is measured against, so it has to be laid out before the panel
+  // needs that measurement, and it spans no cells, so it costs nothing on
+  // screen and takes no click meant for the host.
   return (
-    <Show keyed when={placement()}>
-      {(at) => (
-        <box
-          position="absolute"
-          top={at.top}
-          left={at.left}
-          width={at.width}
-          height={at.height}
-          zIndex={6000}
-          flexDirection="column"
-          onMouseDown={swallowClick}
-          onMouseUp={swallowClick}
-        >
-          <text
-            fg={panelColor}
-            selectable={false}
-            wrapMode="none"
+    <>
+      <box
+        ref={registerProbe}
+        position="absolute"
+        top={0}
+        left={0}
+        bottom={0}
+        width={0}
+      />
+      <Show keyed when={placement()}>
+        {(at) => (
+          <box
+            position="absolute"
+            top={at.top}
+            left={at.left}
+            width={at.width}
+            height={at.height}
+            zIndex={6000}
+            flexDirection="column"
+            onMouseDown={swallowClick}
+            onMouseUp={swallowClick}
           >
-            {TOP_CAP.repeat(at.width)}
-          </text>
-          <Show when={hasHeader()}>
-            <box
-              backgroundColor={panelColor}
-              flexDirection="row"
-              paddingX={BODY_PADDING_X}
-              flexShrink={0}
+            <text
+              fg={panelColor}
+              selectable={false}
+              wrapMode="none"
             >
-              {/* Balances the close glyph so the title still centres. */}
-              <box width={1} flexShrink={0} />
-              <box flexDirection="row" justifyContent="center" flexGrow={1}>
-                <Show when={bodyView().title}>
-                  {(title) => (
-                    <text
-                      fg={panelColor}
-                      bg={context.theme.text.base}
-                      selectable={false}
-                      wrapMode="none"
-                      truncate
-                    >
-                      {`${TITLE_PADDING}${title()}${TITLE_PADDING}`}
-                    </text>
-                  )}
+              {TOP_CAP.repeat(at.width)}
+            </text>
+            <Show when={hasHeader()}>
+              <box
+                backgroundColor={panelColor}
+                flexDirection="row"
+                paddingX={BODY_PADDING_X}
+                flexShrink={0}
+              >
+                {/* Balances the close glyph so the title still centres. */}
+                <box width={1} flexShrink={0} />
+                <box flexDirection="row" justifyContent="center" flexGrow={1}>
+                  <Show when={bodyView().title}>
+                    {(title) => (
+                      <text
+                        fg={panelColor}
+                        bg={context.theme.text.base}
+                        selectable={false}
+                        wrapMode="none"
+                        truncate
+                      >
+                        {`${TITLE_PADDING}${title()}${TITLE_PADDING}`}
+                      </text>
+                    )}
+                  </Show>
+                </box>
+                <Show
+                  when={props.onClose !== undefined}
+                  fallback={<box width={1} flexShrink={0} />}
+                >
+                  <text
+                    fg={context.theme.text.muted}
+                    selectable={false}
+                    wrapMode="none"
+                    onMouseUp={handleClose}
+                  >
+                    {CLOSE_GLYPH}
+                  </text>
                 </Show>
               </box>
-              <Show
-                when={props.onClose !== undefined}
-                fallback={<box width={1} flexShrink={0} />}
-              >
-                <text
-                  fg={context.theme.text.muted}
-                  selectable={false}
-                  wrapMode="none"
-                  onMouseUp={handleClose}
-                >
-                  {CLOSE_GLYPH}
-                </text>
-              </Show>
-            </box>
-          </Show>
-          <box
-            backgroundColor={panelColor}
-            flexDirection="column"
-            flexGrow={1}
-          >
-            <scrollbox
-              height={layout().bodyRows}
-              width="100%"
-              scrollX={false}
-              scrollY
-              verticalScrollbarOptions={{ showArrows: false }}
+            </Show>
+            <box
+              backgroundColor={panelColor}
+              flexDirection="column"
+              flexGrow={1}
             >
-              <box flexDirection="column" paddingX={BODY_PADDING_X}>
-                {body()}
-              </box>
-            </scrollbox>
+              <scrollbox
+                height={at.bodyRows}
+                width="100%"
+                scrollX={false}
+                scrollY
+                verticalScrollbarOptions={{ showArrows: false }}
+              >
+                <box flexDirection="column" paddingX={BODY_PADDING_X}>
+                  {body()}
+                </box>
+              </scrollbox>
+            </box>
+            <text
+              fg={panelColor}
+              selectable={false}
+              wrapMode="none"
+            >
+              {BOTTOM_CAP.repeat(at.width)}
+            </text>
           </box>
-          <text
-            fg={panelColor}
-            selectable={false}
-            wrapMode="none"
-          >
-            {BOTTOM_CAP.repeat(at.width)}
-          </text>
-        </box>
-      )}
-    </Show>
+        )}
+      </Show>
+    </>
   );
 }
 
