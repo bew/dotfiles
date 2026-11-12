@@ -139,7 +139,7 @@ matches:
 
   - triggers: # ellipsis
       - "!..!"
-      - "...!" # easier to type (_should_ not pose issues with how I write 🤔)
+      - "..!" # easier to type (_should_ not pose issues with how I write 🤔)
     replace: '…'
 
   - trigger: "!-!" # semantic-rich separator
