@@ -12,8 +12,8 @@
   input by other projects, with a surface small enough to read in one sitting.
 - **Inspirations**: `numtide/devshell` (its artifact model, entrypoint flags, direnv handling);
   `devenv` (rejected as scope reference, kept as feasibility reference); `flake-parts` and
-  `drv-parts` (the "parts" in the name: module-based composition); `nix/SPEC-DRAFT-wrapkit-system`
-  (the per-VAR environment action model); nixpkgs' module system and `nixosOptionsDoc`.
+  `drv-parts` (the "parts" in the name: module-based composition); `declarawrap`'s
+  `nix/SPEC-READY-wrapkit/` (the per-VAR environment action model); nixpkgs' module system and `nixosOptionsDoc`.
 
 ## Sources
 

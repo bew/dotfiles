@@ -50,7 +50,7 @@ Inspirations, and what each contributes:
   reference.
 - `flake-parts` and `drv-parts` — the composition stance behind the name: parts combined by the
   module system rather than by a bespoke merge.
-- `nix/SPEC-DRAFT-wrapkit-system` — the per-variable environment action vocabulary (`set`,
+- the wrapkit spec's `nix/SPEC-READY-wrapkit/` — the per-variable environment action vocabulary (`set`,
   `set-default`, `unset`, `prefix`, `suffix`), reduced here to the actions a shell actually needs.
 - nixpkgs' module system — the evaluator, the option types, and the error messages.
 
@@ -625,7 +625,7 @@ Rejected as a reference for scope, kept as evidence that the declarative shell i
   evaluating the shell hook, which is why the hooks are reachable under direnv at all.
 - `EXPLO-shell-shape.md` and `EXPLO-consumer-contract.md` in this directory — the settled decisions
   with the rejected candidates and their reasons, in more detail than this spec keeps.
-- `nix/SPEC-DRAFT-wrapkit-system/SPEC.md` — the per-variable environment action model, reduced here
+- `declarawrap`'s `nix/SPEC-READY-wrapkit/SPEC.md` — the per-variable environment action model, reduced here
   to the actions a shell needs.
 - nixpkgs' module system and `nixosOptionsDoc` — the evaluator, the option types, and the error
   messages this design relies on instead of reimplementing.

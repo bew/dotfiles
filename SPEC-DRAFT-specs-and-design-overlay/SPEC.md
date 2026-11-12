@@ -6,7 +6,7 @@
 ## Introduction
 
 This repo accumulates design artefacts — specs, explorations, handoff docs, TODO/FIXME notes — scattered across the tree.
-Some are committed to `main` (e.g. `_WIP_SPECS/do-it-later-task-manager/`, `nix/_WIP_SPECS/wrapkit-system/`), and some sit as untracked `??` noise (e.g. `desktop/os-darwin/hammerspoon/_WIP_SPECS/`, `nvim/TODO_*`, `opencode/skills/coder-nix/HANDOFF-*.md`).
+Some are committed to `main` (e.g. `_WIP_SPECS/do-it-later-task-manager/`), and some sit as untracked `??` noise (e.g. `desktop/os-darwin/hammerspoon/_WIP_SPECS/`, `nvim/TODO_*`, `opencode/skills/coder-nix/HANDOFF-*.md`).
 There is no way to version these without polluting the working branch, and no way to surface a chosen subset into the current worktree without committing it there.
 `HANDOFF-*` must never be committed to a working branch (repo `AGENTS.md` rule).
 
