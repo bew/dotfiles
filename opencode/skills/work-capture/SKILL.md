@@ -49,6 +49,7 @@ Determine these from whatever is available in context
   Set `yes` when the invoking command or the user asks to keep the capture current as the session
   continues (e.g. `/task-follow-from-session`).
   Applies to `capture-task` and `capture-idea` only — resolve it to `no` in `capture-bug`.
+  Per-capture: a later capture does not inherit follow — resolve it again.
 - **Subject**: what the capture is about — the task, the idea, or the bug.
   Required — never inferred.
   When Follow is `yes`, read it against the work being shaped in the session, and take its
@@ -152,7 +153,8 @@ After writing, tell the user:
 
 > <Task|Idea|Bug> capture written to `<full path>` — open to inspect.
 
-If Follow is `yes`: read <./refs/follow-mode.md> and apply it for the rest of the session.
+If Follow is `yes`: read <./refs/follow-mode.md> and apply it to this capture for the rest of the
+session.
 The capture stays open for updates; do not treat this skill as finished after the write.
 
 NEVER output the doc content inline.

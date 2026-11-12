@@ -3,6 +3,9 @@
 Keep the capture current for the rest of the session.
 Applies to `capture-task` and `capture-idea` captures made with follow enabled.
 
+Follow binds to a single capture — the capture follow was enabled for.
+A capture filed later in the session is not in follow mode unless follow is enabled for it.
+
 ## Invariant
 
 At the end of every turn in which context about the subject changed, the capture reflects the
