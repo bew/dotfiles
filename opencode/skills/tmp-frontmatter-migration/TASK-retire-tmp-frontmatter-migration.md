@@ -11,7 +11,7 @@ The temporary skill `tmp-frontmatter-migration` exists to clear the legacy backl
 
 The spec asks every task, idea, bug, handoff, and spec carrier to carry a `created-at` block and an
 undated name.
-Its writers (`work-capture-handoff`, `handoff`, `handoff-standalone`) emit both.
+Its writers (`work-capture`, `handoff`, `handoff-standalone`) emit both.
 Its adoption trigger in `AGENTS.md`, and its spec-carrier handling in `manage-spec`, do not exist
 yet.
 Until they do, this skill performs the migration pass by hand.
