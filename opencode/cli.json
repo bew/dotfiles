@@ -141,7 +141,7 @@
     // V2 swap kept: Enter=newline, Alt+Enter=submit (so `prompt.queue` is freed below)
     "input.newline": "alt+o,return,shift+return", // (note: newline inserted at cursor, not at eol)
     "input.submit": "alt+return", // 🤔 (!!) ctrl+j / ctrl+return not recognized 👀
-    "prompt.queue": "none",
+    "prompt.queue": "<leader>alt+return",
 
     "input.move.left": "left,alt+h",
     "input.move.down": "down,alt+j",
