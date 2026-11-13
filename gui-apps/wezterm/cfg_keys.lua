@@ -89,6 +89,9 @@ end
 --   (based on the keyboard-layout)
 ---@type KeybindSpecsNested[]
 cfg.keys = {
+  -- Disable CS-F10, used for voice input tool! (with e.g. Handy)
+  keybind(mods.CS, "F10", act.Nop),
+
   -- Remap C-Backspace to C-w everywhere
   keybind(mods.C, "Backspace", act.SendKey{mods=mods.C, key="w"}),
 
