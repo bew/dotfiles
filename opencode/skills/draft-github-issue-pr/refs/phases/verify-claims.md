@@ -6,14 +6,17 @@ Re-check the draft, now that its text and motivation are fixed.
 
 - Re-check every claim against the final text.
   Remove or hedge anything still `unverified`.
+  A `reported` claim must still read as the user's observation.
 - Run any command you intend to cite (tests, build) now, and paste the real result.
   Never write a result you did not produce.
 - The user may also mark a claim `verified` from their own knowledge; that counts.
 
 ## Paths and shapes
 
-- Re-check every concrete path, key, method, or config value against the code or docs.
-- Remove any detail the code does not support.
+- Re-check every concrete path, key, method, or config value against whatever produced it:
+  the user's report, the investigation, or the diff.
+- Remove any detail nothing backs.
+  For an issue with no investigation, drop the detail rather than reading the code now.
 
 ## Prose
 

@@ -76,7 +76,7 @@ Load `bew-communication-style` before writing any prose.
 - Use wrapped semantic line breaks: each sentence starts on its own line.
 - Preserve the user's voice, punctuation, and deliberate quirks.
   Do not "fix" their style.
-- Name real APIs, keys, and paths only as the code shows them.
+- Name real APIs, keys, and paths only as the code or the user's report shows them.
 - Cut filler, restated tasks, and summary paragraphs.
 
 ## Alert blocks
@@ -84,7 +84,7 @@ Load `bew-communication-style` before writing any prose.
 Use GitHub alert blocks for asides, caveats, and "why not X" notes, instead of leaving them flat
 in the body:
 - `> [!NOTE]` — neutral context, or a "why not X" aside.
-- `> [!IMPORTANT]` — something the reader must not miss, that's particularly special for the context.
+- `> [!IMPORTANT]` — something the reader must not miss; particularly relevant to the context.
 - `> [!WARNING]` — a sharp caveat.
 - `> [!CAUTION]` — a risk or destructive outcome.
 

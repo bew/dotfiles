@@ -7,6 +7,7 @@ Use wrapped semantic line breaks: each sentence starts on its own line.
 
 - **Greeting** — a short greeting on its own line, e.g. `Hello!`.
 - **Opening** — one short sentence on what you searched or tried, to show it is not a duplicate.
+  The duplicate search supplies this; do not read code for it.
 - **Problem** — the concrete situation you are in, grounded in real behavior or a real limitation.
 - **The ask** — state plainly what you want.
   A question ("is there a way?") or a request ("it would help to have…").

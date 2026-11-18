@@ -27,6 +27,7 @@ Determine the following values from whatever is available in context
   Default: current git repo.
 - **Source**: the diff, branch, spec, code, or repro the draft is based on.
   Required for a PR; optional for an issue.
+  Default for an issue: the user's report — what they observed, the exact steps, and any output.
 - **Hints**: any remaining free-form text.
   Default: `(none)`.
 
@@ -42,7 +43,7 @@ Hints: <value, or "(none)">
 
 1. `Phase:Classify` — confirm target artefact and subtype; stop before drafting.
 2. `Phase:ContribGuidelines` — read the repo's conventions; decide if an issue is required.
-3. `Phase:PreDraft` — gather facts; build the claim list; label verified or unverified.
+3. `Phase:PreDraft` — gather facts; build the claim list; label reported, verified, or unverified.
 4. `Phase:Draft` — write and iterate on the draft in a concrete file.
 5. `Phase:VerifyClaims` — run cited commands; re-check claims, paths, prose, conventions.
 6. `Phase:IssueFirst` _(if required)_ — draft and file the issue before the PR.
@@ -82,6 +83,12 @@ Ready to move to `Phase:PreDraft`? (say 'next' or similar to proceed)
 ## 3. `Phase:PreDraft` — gather facts and build the claim list
 
 When entering `Phase:PreDraft`: read <./refs/phases/pre-draft.md> for full instructions.
+
+For an issue, the draft is built from what the user supplied.
+No source code is read unless they accept the offer or ask for it later.
+Offer the investigation once, before gathering facts:
+- say 'dig in' — read the code for a root cause, or to check a feature already exists;
+- anything else — draft from the report alone.
 
 Ready to move to `Phase:Draft`? (say 'next' or similar to proceed)
 
@@ -124,7 +131,12 @@ When entering `Phase:Submit`: read <./refs/phases/submit.md> for full instructio
   Do not guess.
 - Never assert a claim — bug status, test result, API shape, or path — that code, a repro, or
   a command run does not back.
-  Label unverified claims as such.
+  Label unverified claims as such, and state what the user reported only as their own observation.
+  The user's own report backs what they observed, never a fault location or mechanism.
+- For an issue, do not read the repo's source code unless the user opted in: either at the
+  `Phase:PreDraft` offer, or by a later explicit ask.
+  Prefer omitting a detail over researching it.
+  Reading conventions files and searching issues/PRs are not source reading, and stay required.
 - Never write "verified", "tests pass", or similar without running the command yourself and
   citing the real output.
 - Never alter the user's voice, punctuation, or deliberate quirks.
@@ -132,7 +144,7 @@ When entering `Phase:Submit`: read <./refs/phases/submit.md> for full instructio
 - Use wrapped semantic line breaks in every drafted prose body.
 - Derive a PR's purpose from its diff.
   Keep incidental findings subordinate and mark them explicitly out of scope.
-- Do not state a concrete path, key, or shape unless the code shows it.
+- Do not state a concrete path, key, or shape unless the code or the user's report shows it.
 - Write every draft to a concrete file.
   Do not leave the body only in chat.
 - For an issue, check existing issues and PRs (open and closed) for duplicates via a subagent
