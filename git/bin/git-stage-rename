@@ -1,0 +1,127 @@
+#!/usr/bin/env nu
+# Stage the path change of a rename only, leaving the destination's edits unstaged.
+#
+# Recovers the state an unstaged rename leaves behind once the new path has been edited:
+# the old path is still recorded in the index, the new path is an intent-to-add entry.
+#
+# The index entry is moved to the new path untouched, so `git diff --cached` reports
+# a 100% rename while `git diff` still shows the edits.
+
+source ./_common_helpers.nu
+
+# Print the usage line, then exit with the given status.
+def usage_and_exit [status: int]: nothing -> nothing {
+    print --stderr "usage: git stage-rename <old-path> <new-path>"
+    exit $status
+}
+
+# Collapse `.` and `..` segments of a slash-separated path, without touching the disk.
+# A `..` that would climb above the start is refused, since it leaves the work tree.
+def collapse_dot_segments [path: string]: nothing -> string {
+    $path
+    | split row "/"
+    | reduce --fold [] {|segment, kept|
+        match $segment {
+            "." | "" => $kept
+            ".." => (do {
+                if ($kept | is-empty) { fail $"path is outside the work tree: ($path)" }
+                $kept | take (($kept | length) - 1)
+            })
+            _ => ($kept | append $segment)
+        }
+    }
+    | str join "/"
+}
+
+# Turn a cwd-relative path into a repo-root-relative one, as index entries are recorded.
+def to_root_relative [path: string]: nothing -> string {
+    # Absolute paths are refused: the work-tree root git reports is symlink-resolved,
+    # while the shell keeps the logical cwd, so the two cannot be matched reliably.
+    if ($path | str starts-with "/") {
+        fail $"absolute path is not supported: ($path)" "pass a path relative to the current directory"
+    }
+
+    let prefix = (^git rev-parse --show-prefix | str trim)
+    let joined = if $prefix == "" { $path } else { $"($prefix)($path)" }
+    collapse_dot_segments $joined
+}
+
+# Index entries recorded for a path, as records of `mode`, `blob`, and `stage`.
+def list_index_entries [work_root: string, path: string]: nothing -> list<record> {
+    # Each entry is `<mode> SP <blob> SP <stage> TAB <path>`, NUL-terminated;
+    # only the fields before the tab are kept, so paths with spaces are fine.
+    ^git -C $work_root ls-files --stage -z -- $path
+    | split row (char nul)
+    | where {|entry| $entry != "" }
+    | each {|entry|
+        let fields = ($entry | split row "\t" | first | split row " ")
+        {
+            mode: ($fields | get 0)
+            blob: ($fields | get 1)
+            stage: ($fields | get 2 | into int)
+        }
+    }
+}
+
+# Return the source's single index entry, refusing when it cannot be moved as-is.
+def get_source_entry [work_root: string, source_path: string]: nothing -> record {
+    let entries = (list_index_entries $work_root $source_path)
+    if ($entries | is-empty) {
+        fail $"($source_path) has no index entry" "track it first with `git add`, then retry"
+    }
+    if ($entries | length) > 1 {
+        fail $"($source_path) matches ($entries | length) index entries" "pass a single file, not a directory or a conflicted path"
+    }
+
+    let source_entry = ($entries | first)
+    if $source_entry.stage != 0 {
+        fail $"($source_path) is in a conflicted state" "resolve the conflict first, then retry"
+    }
+    $source_entry
+}
+
+# Refuse a destination that holds staged content which the move would overwrite.
+# An intent-to-add entry, or an entry already holding the source content, is fine.
+def assert_destination_free [
+    work_root: string
+    destination_path: string
+    source_blob: string
+] {
+    let entries = (list_index_entries $work_root $destination_path)
+    if ($entries | is-empty) { return }
+    if ($entries | length) > 1 {
+        fail $"($destination_path) matches ($entries | length) index entries" "pass a single file, not a directory or a conflicted path"
+    }
+
+    let empty_blob = (^git -C $work_root hash-object -t blob /dev/null | str trim)
+    let destination_blob = ($entries | first).blob
+    if $destination_blob in [$source_blob $empty_blob] { return }
+    fail $"($destination_path) already has staged content" "unstage it with `git unstage` first, then retry"
+}
+
+# Move the source's index entry to the destination path, leaving both paths on disk alone.
+def move_index_entry [work_root: string, source_entry: record, source_path: string, destination_path: string] {
+    let removed = (^git -C $work_root update-index --force-remove -- $source_path | complete)
+    if $removed.exit_code != 0 {
+        fail $"could not drop the ($source_path) index entry: ($removed.stderr | str trim)"
+    }
+
+    # The mode comes from the entry itself, so executables and symlinks keep theirs.
+    let cacheinfo = $"($source_entry.mode),($source_entry.blob),($destination_path)"
+    let added = (^git -C $work_root update-index --add --cacheinfo $cacheinfo | complete)
+    if $added.exit_code != 0 {
+        fail $"could not record ($destination_path) in the index: ($added.stderr | str trim)"
+    }
+}
+
+def main [...paths: string] {
+    if ($paths | length) != 2 { usage_and_exit 1 }
+
+    let work_root = (get_work_root)
+    let source_path = (to_root_relative ($paths | get 0))
+    let destination_path = (to_root_relative ($paths | get 1))
+
+    let source_entry = (get_source_entry $work_root $source_path)
+    assert_destination_free $work_root $destination_path $source_entry.blob
+    move_index_entry $work_root $source_entry $source_path $destination_path
+}

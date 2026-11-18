@@ -69,6 +69,11 @@
   # Dispatches to the `git-better-rename` script.
   rename = better-rename
 
+  # Stage only the path change of an already-unstaged rename, leaving the new path's
+  # edits unstaged (unlike `git add`, which would stage them too).
+  # Dispatches to the `git-stage-rename` script.
+  ar = stage-rename
+
   # Unstage everything, but keep new files as intent-to-add (which is the behavior I expect..).
   # Dispatches to the `git-unstage-keep-new` script.
   unstage = unstage-keep-new

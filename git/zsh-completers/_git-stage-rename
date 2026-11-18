@@ -1,0 +1,8 @@
+#autoload
+#description Stage a rename's path change only, leaving its edits unstaged
+
+# The old path is recorded in the index but gone from the work tree, so it is
+# offered from the index; the new path only exists on disk.
+_arguments -S \
+  '1:old path:__git_changed-in-index_files' \
+  '2:new path:_files'

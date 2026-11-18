@@ -113,21 +113,29 @@ Every `git commit` is preceded by the `committer` skill's draft/iterate phase �
 never author the commit message inline, even when the commit itself was already approved
 (e.g. as part of a publish/ship flow).
 
+NEVER auto track (or commit) files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
+These handoff/planning artefacts must not be git-tracked.
+
 When the user specifies a git command with a path argument (e.g. `git diff .`, `git log src/`),
 treat the path as a required constraint — never silently drop it or widen the scope.
 
 In general: trust the user for git commands even if they look odd.
 
+### Unknown & additional git commands
+
 Unknown or odd git subcommand mentioned by the user (like `git untrack`, `git rename`, …):
 Run it directly.
 If the shell reports it not found, fall back to the documented equivalent (stop if there is none).
 
-When moving or renaming files inside a git repo:
-Use `git rename <src>… <dst>`; this makes the rename stay unstaged.
-(fall back to plain `git mv` if the command is reported not found)
+Additional git commands you may use:
 
-NEVER auto track (or commit) files matching `HANDOFF-*`, `TASK-*`, `IDEA-*`, or `BUG-*`.
-These handoff/planning artefacts must not be git-tracked.
+- When moving or renaming files inside a git repo:
+  Use `git rename <src>… <dst>`; this makes the rename stay unstaged.
+  (fallback: `git mv …`)
+
+- When wanting to only stage a file rename, without its edits:
+  Use `git stage-rename <old> <new>`.
+  (fallback: `git add …`)
 
 
 ## Remote writes

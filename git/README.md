@@ -35,6 +35,8 @@ Actions:
 - `git untrack-new-files` — drop intent-to-add and unstaged-rename entries from the index.
 - `git better-rename` (alias: `git rename`) — move/rename files, unstaged by
   default; `--staged` records the move in the index, `--undo` reverses a move.
+- `git stage-rename` (alias: `git ar`) — stage only the path change of an
+  already-unstaged rename, leaving the new path's edits unstaged.
 - `git untrack` — drop paths from the index, keeping them in the work tree (`rm --cached`).
 - `git restore-from <rev>` — restore paths from a specific revision.
 
