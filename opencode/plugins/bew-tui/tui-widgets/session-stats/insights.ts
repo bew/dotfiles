@@ -639,23 +639,41 @@ function thinkingRows(facts: SessionFacts): readonly InsightRow[] {
   ];
 }
 
-// Cost row, showing this session and the whole family once they differ.
+// Cost row, with the family total and subagent count noted once any subagent
+// ran: `($bar incl. N subagents)` when the totals differ, `(incl. N subagents)`
+// otherwise.
 function costRow(facts: SessionFacts): InsightRow {
-  const sessionCost = formatCost(facts.costUsd);
-  const sessionSegments: readonly InsightSegment[] = [
-    { text: sessionCost, tone: "cost" },
+  const body: readonly InsightSegment[] = [
+    { text: formatCost(facts.costUsd), tone: "cost" },
   ];
-  if (facts.familyCostUsd <= facts.costUsd) {
-    return { label: "cost", segments: sessionSegments };
+  const note = subagentCostNote(
+    facts.costUsd,
+    facts.familyCostUsd,
+    facts.subagents.length,
+  );
+  return note.length === 0
+    ? { label: "cost", segments: body }
+    : rowWithNote({ label: "cost", body, note });
+}
+
+// The parenthesized note a cost row carries while subagents ran. The muted
+// hue comes from the wrapper, so only the figures and counts take a tone.
+function subagentCostNote(
+  ownCostUsd: number,
+  withSubagentsCostUsd: number,
+  count: number,
+): readonly InsightSegment[] {
+  if (count === 0) {
+    return [];
   }
-  return rowWithNote({
-    label: "cost",
-    body: sessionSegments,
-    note: [
-      { text: formatCost(facts.familyCostUsd), tone: "cost" },
-      { text: " incl. subagents", tone: "muted" },
-    ],
-  });
+  const subagentWord = `${formatCount(count)} ${count === 1 ? "subagent" : "subagents"}`;
+  if (withSubagentsCostUsd > ownCostUsd) {
+    return [
+      { text: formatCost(withSubagentsCostUsd), tone: "cost" },
+      { text: ` incl. ${subagentWord}` },
+    ];
+  }
+  return [{ text: `incl. ${subagentWord}` }];
 }
 
 // The subagents section: the total, then one line per subagent.
@@ -1203,7 +1221,7 @@ function lastTurnRows(
       ],
       note,
     }),
-    lastTurnCostRow(turn.costUsd, lastTurnSubagentCost(turn, subagents)),
+    lastTurnCostRow(turn.costUsd, lastTurnSubagents(turn, subagents)),
     packedTokenRow([
       ["output", turn.outputTokens],
       ["thinking", turn.reasoningTokens],
@@ -1263,41 +1281,44 @@ function stepPaceSegments(usage: ContextWindowUsage): readonly InsightSegment[] 
   return segments;
 }
 
-// Cost of the last turn, with the subagent total when any ran during it.
-function lastTurnCostRow(costUsd: number, subagentCostUsd: number): InsightRow {
+// Cost of the last turn, with the subagent total noted when any ran during it.
+function lastTurnCostRow(
+  costUsd: number,
+  subagents: readonly SubagentFacts[],
+): InsightRow {
   const body: readonly InsightSegment[] = [
     { text: "cost " },
     { text: formatCost(costUsd), tone: "cost" },
   ];
-  if (subagentCostUsd <= 0) {
-    return { segments: body };
-  }
-  return rowWithNote({
-    body,
-    note: [
-      { text: formatCost(costUsd + subagentCostUsd), tone: "cost" },
-      { text: " incl. subagents", tone: "muted" },
-    ],
-  });
+  const note = subagentCostNote(
+    costUsd,
+    costUsd + subagentCost(subagents),
+    subagents.length,
+  );
+  return note.length === 0
+    ? { segments: body }
+    : rowWithNote({ body, note });
 }
 
-// Cost of the subagents created during the turn, skipping any without a
-// creation time, which cannot be placed in time.
-function lastTurnSubagentCost(
+// Subagents created during the turn, skipping any without a creation time,
+// which cannot be placed in time.
+function lastTurnSubagents(
   turn: LastTurn,
   subagents: readonly SubagentFacts[],
-): number {
+): readonly SubagentFacts[] {
   const startedAt = turn.startedAt;
   if (startedAt === undefined) {
-    return 0;
+    return [];
   }
-  return subagents.reduce(
-    (total, subagent) =>
-      subagent.createdAt !== undefined && subagent.createdAt >= startedAt
-        ? total + subagent.costUsd
-        : total,
-    0,
+  return subagents.filter(
+    (subagent) =>
+      subagent.createdAt !== undefined && subagent.createdAt >= startedAt,
   );
+}
+
+// Cost the subagents together incurred.
+function subagentCost(subagents: readonly SubagentFacts[]): number {
+  return subagents.reduce((total, subagent) => total + subagent.costUsd, 0);
 }
 
 // Tokens the model produced per second of streaming time.

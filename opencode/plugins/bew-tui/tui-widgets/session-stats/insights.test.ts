@@ -699,7 +699,7 @@ describe("buildInsights", () => {
 
     expect(valueOf(alone.session.sections, "cost")).toBe("$0.00");
     expect(valueOf(family.session.sections, "cost")).toBe(
-      "$1.21 ($1.41 incl. subagents)",
+      "$1.21 ($1.41 incl. 1 subagent)",
     );
     expect(
       sectionRows(family.session, "general").find((row) => row.label === "cost")
@@ -708,9 +708,49 @@ describe("buildInsights", () => {
       { text: "$1.21", tone: "cost" },
       { text: " (", tone: "muted" },
       { text: "$1.41", tone: ["cost", "muted"] },
-      { text: " incl. subagents", tone: "muted" },
+      { text: " incl. 1 subagent", tone: ["default", "muted"] },
       { text: ")", tone: "muted" },
     ]);
+  });
+
+  test("notes the subagent count when the family cost does not differ", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          costUsd: 2.5,
+          familyCostUsd: 2.5,
+          subagents: [
+            { agent: "a", title: "", tokenTotal: 0, costUsd: 0 },
+            { agent: "b", title: "", tokenTotal: 0, costUsd: 0 },
+          ],
+        },
+      }),
+    );
+
+    expect(valueOf(insights.session.sections, "cost")).toBe(
+      "$2.50 (incl. 2 subagents)",
+    );
+  });
+
+  test("uses the singular subagent word for a single subagent", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          costUsd: 1.21,
+          familyCostUsd: 1.41,
+          subagents: [
+            { agent: "a", title: "", tokenTotal: 0, costUsd: 0.2 },
+            { agent: "b", title: "", tokenTotal: 0, costUsd: 0.2 },
+          ],
+        },
+      }),
+    );
+
+    expect(valueOf(insights.session.sections, "cost")).toBe(
+      "$1.21 ($1.41 incl. 2 subagents)",
+    );
   });
 
   test("shows busy time with its share and the idle part of the wall time", () => {
@@ -1037,7 +1077,7 @@ describe("buildInsights", () => {
     });
     expect(rows).toContainEqual({
       label: NO_LABEL,
-      value: "cost $0.12 ($0.20 incl. subagents)",
+      value: "cost $0.12 ($0.20 incl. 1 subagent)",
     });
     expect(rows).toContainEqual({
       label: NO_LABEL,
@@ -1081,6 +1121,51 @@ describe("buildInsights", () => {
       { label: NO_LABEL, value: "cost $0.00" },
       { label: NO_LABEL, value: "output 0 · thinking 0" },
     ]);
+  });
+
+  test("notes the subagent count when the last turn's subagents were free", () => {
+    const insights = buildInsights(
+      makeInput({
+        session: {
+          ...makeInput().session,
+          subagents: [
+            {
+              agent: "explore",
+              title: "Check the turn",
+              tokenTotal: 0,
+              costUsd: 0,
+              createdAt: 2_000,
+            },
+            {
+              agent: "general",
+              title: "Also in the turn",
+              tokenTotal: 0,
+              costUsd: 0,
+              createdAt: 3_000,
+            },
+          ],
+        },
+        stats: {
+          ...makeInput().stats,
+          lastTurn: {
+            durationMs: 80_000,
+            startedAt: 1_000,
+            steps: 4,
+            costUsd: 0.12,
+            outputTokens: 1_200,
+            reasoningTokens: 300,
+            generatingMs: 30_000,
+          },
+        },
+      }),
+    );
+
+    expect(
+      labelledRows(sectionRows(insights.context, "general")),
+    ).toContainEqual({
+      label: NO_LABEL,
+      value: "cost $0.12 (incl. 2 subagents)",
+    });
   });
 
   test("reports a system row when the prompt text is unavailable", () => {
