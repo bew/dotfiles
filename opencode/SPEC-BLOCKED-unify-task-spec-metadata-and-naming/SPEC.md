@@ -49,7 +49,7 @@ It carries no status, type, title, or ownership, because each of those already h
 Scope is tasks, ideas, bugs, handoffs, and specs.
 Exploration files stay out until the format has proven itself on those families.
 
-The design is inspired by the `wkf` work in the `devtree-harness` repo, which addresses work items as `[kind]:[slug]` and records a single frontmatter format as a deferred direction.
+The design is inspired by the `wkf` work in the `spacetree-harness` repo, which addresses work items as `[kind]:[slug]` and records a single frontmatter format as a deferred direction.
 
 ## Naming & IDs
 
@@ -330,7 +330,7 @@ A reader reports; only a deliberate human or agent edit rewrites a block, and on
 
 ## Related artifacts
 
-- `SPEC-DRAFT-wk-files/` in the `devtree-harness` repo is the source of the addressing scheme.
+- `SPEC-DRAFT-wk-files/` in the `spacetree-harness` repo is the source of the addressing scheme.
   Its item taxonomy defines `[kind]:[slug]` and records a single metadata format as a deferred direction.
   This spec is that direction, narrowed to two fields and five families.
 - `opencode/AGENTS.md` owns task, idea, bug, and handoff naming, the task and bug tag vocabularies,

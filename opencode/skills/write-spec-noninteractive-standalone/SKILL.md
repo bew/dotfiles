@@ -259,7 +259,7 @@ Wrap the reference in backticks: an unquoted `<spec:…>` reads as markup to MDX
 and the reference can vanish.
 
 Carry the relationship in ordinary prose, not in the placeholder:
-"depends on `` `<spec:wk-init>` ``", "owned by `` `<spec:devtree-daemons>` ``".
+"depends on `` `<spec:wk-init>` ``", "owned by `` `<spec:spacetree-daemons>` ``".
 There is no `<spec:slug:depends>` form.
 
 A reference is a promise that the target exists.

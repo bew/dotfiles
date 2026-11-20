@@ -7,7 +7,7 @@
 **Problem** — task, idea, bug, and spec artefacts carry no machine-readable metadata block.
 Type lives in the filename, status in the H1 tag, and the creation timestamp is one of the filename tokens, so anything that needs "when was this created" or "what does this depend on" parses names and headings, or cannot answer at all.
 Dependency edges in particular have no representation today: a task that waits on a spec, or a spec that waits on another spec, expresses that only in prose.
-**Inspirations** — the `wkf` work in `~/self/my-projects/devtree-harness` (`SPEC-DRAFT-wk-files/`), whose `EXPLO-item-taxonomy.md` records "single metadata format (front-matter)" as a deferred direction and whose id vocabulary is `[kind]:[name]`.
+**Inspirations** — the `wkf` work in `~/self/my-projects/spacetree-harness` (`SPEC-DRAFT-wk-files/`), whose `EXPLO-item-taxonomy.md` records "single metadata format (front-matter)" as a deferred direction and whose id vocabulary is `[kind]:[name]`.
 Also the filename timestamp convention (`TASK-20261022T0855-<slug>.md`) and the `HANDOFF-` date convention this repo already uses.
 
 ## Constraints stated by the user
@@ -34,7 +34,7 @@ Also the filename timestamp convention (`TASK-20261022T0855-<slug>.md`) and the 
   State lives in the H1 tag alone, so nothing is renamed when work advances.
 - **Validity is gated on `wkf`**: the spec is not valid until the `wkf` tool is available, working, and supports this block format.
   Recorded at the top of the spec as a blocker.
-- **Target repo**: `dotfiles/opencode` — the current working directory, not `devtree-harness`.
+- **Target repo**: `dotfiles/opencode` — the current working directory, not `spacetree-harness`.
 
 ## Project-global docs
 
