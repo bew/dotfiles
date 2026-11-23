@@ -224,10 +224,4 @@
     "client-mcp": false,
     "new-designs": false
   },
-
-  "plugins": [
-    // Plugin for #foo snippet expansion in prompt, very flexible!
-    // see: https://github.com/JosXa/opencode-snippets
-    "opencode-snippets@latest"
-  ]
 }
