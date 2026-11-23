@@ -18,9 +18,13 @@
     // NOTE: matching is lexical, so `*/opencode/*` covers the `~/.config/opencode`,
     // `~/.dot/opencode` and the real `dotfiles/opencode` spellings alike.
     { "action": "external_directory", "resource": "*/opencode/*", "effect": "allow" },
-    // ...but editing those files stays gated — `edit` is allow-all by default,
+    // ... but writing/editing those files stays gated — `edit` is allow-all by default,
     // and `external_directory` no longer asks for them.
-    { "action": "edit", "resource": "*/opencode/*", "effect": "ask" }
+    { "action": "write", "resource": "*/opencode/*", "effect": "ask" },
+    { "action": "edit", "resource": "*/opencode/*", "effect": "ask" },
+    // ... writing/editing in tmp opencode dirs is _always_ allowed.
+    { "action": "write", "resource": "/tmp/opencode/*", "effect": "allow" },
+    { "action": "edit", "resource": "/tmp/opencode/*", "effect": "allow" },
   ],
 
   "experimental": {
